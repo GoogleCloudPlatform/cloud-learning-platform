@@ -9,3 +9,10 @@ requires:
 
 - path: ./microservices/sample_service
   configs: [sample-service]
+
+profiles:
+- name: custom
+- name: prod
+- name: dev
+  activation:
+    - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1

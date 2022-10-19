@@ -11,8 +11,8 @@ for variable in ${EnvVars[@]}; do
   fi
 done
 
-CLUSTER_NAME=main-cluster
-EXPECTED_CONTEXT=gke_${PROJECT_ID}_${REGION}_main-cluster
+CLUSTER_NAME=core-learning-services-dev-us-central1
+EXPECTED_CONTEXT=gke_${PROJECT_ID}_${REGION}_${CLUSTER_NAME}
 
 BLUE=$(tput setaf 4)
 RED=$(tput setaf 1)
@@ -38,7 +38,7 @@ init() {
   gcloud config set project $PROJECT_ID
 
   printf "\n${BLUE}Set up gcloud and kubectl context ...${NORMAL}\n"
-  gcloud container clusters get-credentials main-cluster --zone ${REGION} --project ${PROJECT_ID}
+  gcloud container clusters get-credentials core-learning-services-dev-us-central1 --zone ${REGION} --project ${PROJECT_ID}
 }
 
 setup_namespace() {

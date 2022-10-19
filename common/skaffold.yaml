@@ -37,7 +37,7 @@ profiles:
           - '**/*.json'
 - name: dev
   activation:
-  - kubeContext: gke_core-learning-services-dev_us-central1_main-cluster
+  - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
     googleCloudBuild: {}
     artifacts:

@@ -151,7 +151,7 @@ minikube start
 skaffold dev
 ```
 
-* Minikube run with ENV variables
+* Minikube run with ENV variables that are captured in Kustomize, for example [here](./microservices/sample_service/kustomize/base/env.properties)
 
 ```
 # if PROJECT_ID variable is used in your containers
@@ -197,11 +197,20 @@ After cloning the repo, please set up for local development.
   ```
   ./setup/setup_local.sh
   ```
+* Run the following to setup the Kubernetes Service Account (ksa) in your namespace:
+  ```
+  export NAMESPACE=$SKAFFOLD_NAMESPACE
+  export GCP_PROJECT=$PROJECT_ID
+  ./setup/setup_ksa.sh
+  ```
 
 ###  4.2. <a name='BuildandrunallmicroservicesinthedefaultGKEclusterwithlivereload'></a>Build and run all microservices in the default GKE cluster with live reload
 
-> **_NOTE:_**  By default, skaffold builds with CloudBuild and runs in GKE cluster, using the namespace set above.
+> **_NOTE:_**  By default, skaffold builds with CloudBuild and runs in kubernetes cluster set in your local `kubeconfig`, using the namespace set above in `SKAFFOLD_NAMESPACE`. If it is set to your GKE cluster, it will deploy to the the cluster. If it's set to `minikube`, it will deploy there.
 ```
+# check your current kubeconfig
+kubectx
+
 skaffold dev
 ```
 - Please note that any change in the code locally will rerun the build process.

@@ -64,7 +64,7 @@ profiles:
         alias: BASE_IMG
 - name: dev
   activation:
-  - kubeContext: gke_core-learning-services-dev_us-central1_default-cluster
+  - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
     googleCloudBuild: {}
     artifacts:
