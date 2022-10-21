@@ -32,6 +32,7 @@ Please contact dhodun@google.com for any questions.
 
 | Tool  | Current Version  |
 |---|---|
+| Python  | v3.9  |
 | Skaffold  | v1.39.2  |
 | GKE  | v1.22  |
 | Kustomize  | v4.3.1  |
