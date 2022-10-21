@@ -22,10 +22,15 @@
 	* 6.3. [Build and run microservices with a different Skaffold profile](#BuildandrunmicroserviceswithadifferentSkaffoldprofile)
 	* 6.4. [Skaffold profiles](#Skaffoldprofiles)
 	* 6.5. [Switching from local (minikube) to GKE development](#SwitchingfromlocalminikubetoGKEdevelopment)
-* 7. [Development with CloudRun (serverless)](#DevelopmentwithCloudRunserverless)
-* 8. [Unit tests - microservices](#Unittests-microservices)
-		* 8.1. [Run linter locally:](#Runlinterlocally:)
-		* 8.2. [Unit test file format:](#Unittestfileformat:)
+* 7. [Debugging](#Debugging)
+	* 7.1. [Local Debugging - Common](#LocalDebugging-Common)
+	* 7.2. [Local Debugging - Microservice](#LocalDebugging-Microservice)
+	* 7.3. [Minikube Microservice Debugging w/ Skaffold + Cloud Code (VS Code)](#MinikubeMicroserviceDebuggingwSkaffoldCloudCodeVSCode)
+	* 7.4. [GKE Microservice Debugging w/ Skaffold + Cloud Code (VS Code)](#GKEMicroserviceDebuggingwSkaffoldCloudCodeVSCode)
+* 8. [Development with CloudRun (serverless)](#DevelopmentwithCloudRunserverless)
+* 9. [Unit tests - microservices](#Unittests-microservices)
+		* 9.1. [Run linter locally:](#Runlinterlocally:)
+		* 9.2. [Unit test file format:](#Unittestfileformat:)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -439,22 +444,22 @@ skaffold dev
 
 
 
-## Debugging
+##  7. <a name='Debugging'></a>Debugging
 
-### Local Debugging - Common
+###  7.1. <a name='LocalDebugging-Common'></a>Local Debugging - Common
 
 By default VS Code will use the Python interpreter you've selected with the Python extentions (CMD + SHIFT + P -> __Select Interpreter__) so clicking __Debug__ and running without a configuration should work, so long as you have shifted the interpreter over and activated the "Common" VENV.
 
 Mileage will vary - you may need to create a "Debug Current File" Debug configuration in VS Code, particularly if you are in a multi-folder Workspace.
 
-### Local Debugging - Microservice
+###  7.2. <a name='LocalDebugging-Microservice'></a>Local Debugging - Microservice
 
 This should also just work, so long as you have selected the right interpreter, are in the microservice folder, and have entered your VENV.
 
 Mileage will vary - you may need to create a "Debug Current File" Debug configuration in VS Code, particularly if you are in a multi-folder Workspace.
 
 
-### Minikube Microservice Debugging w/ Skaffold + Cloud Code (VS Code)
+###  7.3. <a name='MinikubeMicroserviceDebuggingwSkaffoldCloudCodeVSCode'></a>Minikube Microservice Debugging w/ Skaffold + Cloud Code (VS Code)
 
 You don't need a VENV for this option.
 
@@ -471,7 +476,9 @@ minikube start
 * Select a profile (Default for minikube)
 * Select context (minikube)
 
-### GKE Microservice Debugging w/ Skaffold + Cloud Code (VS Code)
+If minikube isn't starting, you may need to disable "Enable Minikube Gcp Auth Plugin" in the Cloud Code Settings.
+
+###  7.4. <a name='GKEMicroserviceDebuggingwSkaffoldCloudCodeVSCode'></a>GKE Microservice Debugging w/ Skaffold + Cloud Code (VS Code)
 
 You don't need a VENV for this option.
 
@@ -488,11 +495,11 @@ When you're done, make sure to fully disconnect the debugger so it removes the r
 
 
 
-##  7. <a name='DevelopmentwithCloudRunserverless'></a>Development with CloudRun (serverless)
+##  8. <a name='DevelopmentwithCloudRunserverless'></a>Development with CloudRun (serverless)
 
 TBD
 
-##  8. <a name='Unittests-microservices'></a>Unit tests - microservices
+##  9. <a name='Unittests-microservices'></a>Unit tests - microservices
 
 Install Firebase CLI:
 ```
@@ -515,12 +522,12 @@ Run unit tests locally:
 PYTEST_ADDOPTS="--cache-clear --cov . " PYTHONPATH=$BASE_DIR/common/src python -m pytest
 ```
 
-####  8.1. <a name='Runlinterlocally:'></a>Run linter locally:
+####  9.1. <a name='Runlinterlocally:'></a>Run linter locally:
 ```
 python -m pylint $(git ls-files '*.py') --rcfile=$BASE_DIR/.pylintrc
 ```
 
-####  8.2. <a name='Unittestfileformat:'></a>Unit test file format:
+####  9.2. <a name='Unittestfileformat:'></a>Unit test file format:
 
 All unit test files follow the filename format:
 
