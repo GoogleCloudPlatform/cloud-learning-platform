@@ -39,7 +39,7 @@
 <!-- /vscode-markdown-toc -->
 
 
-This doc explains the development workflow so you can get started contributing code to Core Learning Services
+This doc explains the development workflow so you can get started contributing code to Cloud Learning Platform
 
 ##  1. <a name='ProjectRequirements'></a>Project Requirements
 

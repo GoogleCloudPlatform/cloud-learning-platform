@@ -1,4 +1,4 @@
-# Core Learning Services
+# Cloud Learning Platform
 <!-- vscode-markdown-toc -->
 * 1. [Project Requirements](#ProjectRequirements)
 * 2. [Getting Started](#GettingStarted)
