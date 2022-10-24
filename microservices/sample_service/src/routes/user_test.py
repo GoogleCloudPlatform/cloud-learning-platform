@@ -12,6 +12,7 @@ from common.testing.firestore_emulator import client_with_emulator, firestore_em
 from common.models import User
 import mock
 
+
 # assigning url
 API_URL = "http://localhost/sample_service"
 TEST_USER = {
