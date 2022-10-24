@@ -508,8 +508,10 @@ curl -sL https://firebase.tools | bash
 
 Install Virtualenv and pip requirements
 ```
-# Go to a specific microservie folder:
+# Start in the root folder
 export BASE_DIR=$(pwd)
+
+# Go to a specific microservice folder:
 cd microservices/sample_service
 virtualenv .venv
 source .venv/bin/activate
