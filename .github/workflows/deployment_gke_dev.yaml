@@ -15,7 +15,7 @@ env:
   SKAFFOLD_DEFAULT_REPO: gcr.io/core-learning-services-dev
   SKAFFOLD_PROFILE: dev
   SKAFFOLD_NAMESPACE: default
-  GKE_CLUSTER: main-cluster
+  GKE_CLUSTER: core-learning-services-dev-us-central1
   GKE_ZONE: us-central1
   KUSTOMIZE_VERSION: 4.1.3
   SKAFFOLD_VERSION: 1.29.0
