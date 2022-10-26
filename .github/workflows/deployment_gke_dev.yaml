@@ -68,9 +68,7 @@ jobs:
           skaffold run \
           --profile dev \
           -l commit=$GITHUB_SHA \
-          --tag latest \
-          --add-skaffold-labels=false
-
+          --tag latest 
       - name: Upload Skaffold cache
         run: |
           gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
