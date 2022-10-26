@@ -134,7 +134,7 @@ terraform apply -auto-approve
 
 Connect to the `default-cluster`:
 ```
-gcloud container clusters get-credentials main-cluster --region $REGION --project $PROJECT_ID
+gcloud container clusters get-credentials core-learning-services-dev-us-central1 --region $REGION --project $PROJECT_ID
 ```
 
 Build all microservices (including web app) and deploy to the cluster:

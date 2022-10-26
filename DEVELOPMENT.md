@@ -347,7 +347,6 @@ After cloning the repo, please set up for local development.
 * Run the following to setup the Kubernetes Service Account (ksa) in your namespace:
   ```
   export NAMESPACE=$SKAFFOLD_NAMESPACE
-  export GCP_PROJECT=$PROJECT_ID
   ./setup/setup_ksa.sh
   ```
 
@@ -508,8 +507,10 @@ curl -sL https://firebase.tools | bash
 
 Install Virtualenv and pip requirements
 ```
-# Go to a specific microservie folder:
+# Start in the root folder
 export BASE_DIR=$(pwd)
+
+# Go to a specific microservice folder:
 cd microservices/sample_service
 virtualenv .venv
 source .venv/bin/activate

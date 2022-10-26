@@ -7,7 +7,7 @@ on:
     branches:
       - main
     paths:
-      - 'common/src/**.py'
+      - 'common/**'
   workflow_dispatch:
 
 env:
@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7]
+        python-version: [3.9]
         target-folder: [
           common,
         ]
@@ -31,7 +31,7 @@ jobs:
       uses: google-github-actions/setup-gcloud@v0
       with:
         project_id: ${{ env.PROJECT_ID }}
-        service_account_key: ${{ secrets.DEPLOYMENT_DEV_SA_KEY }}
+        service_account_key: ${{ secrets.FIREBASE_EMULATOR_SA_KEY }}
         export_default_credentials: true
 
     - name: Install Firebase CLI
@@ -68,7 +68,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7]
+        python-version: [3.9]
         target-folder: [
           common,
         ]

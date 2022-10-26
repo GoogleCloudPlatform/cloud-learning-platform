@@ -2,6 +2,7 @@
 Config module to setup common environment
 """
 
+
 import os
 
 PROJECT_ID = os.environ.get("PROJECT_ID", "")
