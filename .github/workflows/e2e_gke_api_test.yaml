@@ -11,6 +11,7 @@ on:
       - 'common/**'
       - 'e2e/**'
       - 'utils/**'
+      - '.github/workflows/e2e_gke_api_test.yaml'
   workflow_dispatch:
 env:
   PROJECT_ID: core-learning-services-dev
