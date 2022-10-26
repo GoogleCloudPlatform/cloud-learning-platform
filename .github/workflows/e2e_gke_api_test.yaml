@@ -9,7 +9,7 @@ on:
     paths:
       - 'microservices/**'
       - 'common/**'
-      - 'e2e/gke_api_tests/**'
+      - 'e2e/**'
       - 'utils/**'
   workflow_dispatch:
 env:
