@@ -1,7 +1,6 @@
 firebase_admin
 fireo==1.4.1
 google-cloud-logging
-google-cloud-pubsub==2.8.0
 google-cloud-secret-manager==2.5.0
 mock
 pylint
