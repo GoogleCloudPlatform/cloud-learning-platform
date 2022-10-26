@@ -4,7 +4,6 @@ google-cloud-logging
 google-cloud-pubsub==2.8.0
 google-cloud-secret-manager==2.5.0
 mock
-pandas==1.2.4
 pylint
 pytest
 pytest - cov
