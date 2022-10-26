@@ -18,7 +18,7 @@ env:
   GKE_CLUSTER: core-learning-services-dev-us-central1
   GKE_ZONE: us-central1
   KUSTOMIZE_VERSION: 4.1.3
-  SKAFFOLD_VERSION: 1.29.0
+  SKAFFOLD_VERSION: 1.39.2
   SKAFFOLD_CACHE_GCS: gs://core-learning-services-dev.appspot.com/skaffold/cache
 
 # cookiecutter:raw 
