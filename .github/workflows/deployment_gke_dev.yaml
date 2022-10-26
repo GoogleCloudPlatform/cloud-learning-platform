@@ -8,6 +8,7 @@ on:
       - 'common/**'
       - 'e2e/**'
       - 'utils/**'
+      - '.github/workflows/deployment_gke_dev.yaml'
   workflow_dispatch:
 
 env:

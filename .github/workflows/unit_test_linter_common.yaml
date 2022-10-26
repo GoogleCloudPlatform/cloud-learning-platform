@@ -8,6 +8,7 @@ on:
       - main
     paths:
       - 'common/**'
+      - '.github/workflows/unit_test_linter_common.yaml'
   workflow_dispatch:
 
 env:
