@@ -1,7 +1,7 @@
 apiVersion: skaffold/v2beta12
 kind: Config
 metadata:
-  name: sample-service
+  name: lms
 requires:
   - path: ../../common
     configs: [common]
@@ -11,7 +11,7 @@ build:
   local:
     concurrency: 0
   artifacts:
-  - image: sample-service
+  - image: lms
     requires:
       - image: common
         alias: BASE_IMG
@@ -21,7 +21,7 @@ build:
         - '**/*.json'
 portForward:
 - resourceType: service
-  resourceName: sample-service
+  resourceName: lms
   port: 80
   localPort: 8888
 deploy:
@@ -33,7 +33,7 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: sample-service
+    - image: lms
       requires:
       - image: common
         alias: BASE_IMG
@@ -54,11 +54,11 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: sample-service
+    - image: lms
       docker:
         cacheFrom:
-          - sample-service
-          - sample-service:latest
+          - lms
+          - lms:latest
       requires:
       - image: common
         alias: BASE_IMG
@@ -68,11 +68,11 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: gcr.io/core-learning-services-dev/sample-service
+    - image: gcr.io/core-learning-services-dev/lms
       docker:
         cacheFrom:
-          - gcr.io/core-learning-services-dev/sample-service
-          - gcr.io/core-learning-services-dev/sample-service:latest
+          - gcr.io/core-learning-services-dev/lms
+          - gcr.io/core-learning-services-dev/lms:latest
       requires:
         - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG

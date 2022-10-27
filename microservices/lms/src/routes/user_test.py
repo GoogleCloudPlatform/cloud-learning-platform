@@ -12,9 +12,8 @@ from common.testing.firestore_emulator import client_with_emulator, firestore_em
 from common.models import User
 import mock
 
-
 # assigning url
-API_URL = "http://localhost/sample_service"
+API_URL = "http://localhost/lms/api/v1"
 TEST_USER = {
     "user_id": "user-12345",
     "first_name": "John",
@@ -34,7 +33,7 @@ def test_get_user(client_with_emulator):
   user = User.from_dict(user_dict)
   user.save()
 
-  url = API_URL + f"/user/{user.user_id}"
+  url = API_URL + f"/users/{user.user_id}"
   data = TEST_USER
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
@@ -45,7 +44,7 @@ def test_get_user(client_with_emulator):
 
 def test_get_nonexist_user(client_with_emulator):
   user_id = "non_exist_user_id"
-  url = API_URL + f"/user/{user_id}"
+  url = API_URL + f"/users/{user_id}"
   data = {"detail": "user not found"}
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
@@ -55,14 +54,14 @@ def test_get_nonexist_user(client_with_emulator):
 
 def test_post_user_new(client_with_emulator):
   input_user = TEST_USER
-  url = API_URL + "/user"
+  url = API_URL + "/users"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.post(url, json=input_user)
 
   assert resp.status_code == 200, "Status 200"
 
   # now see if GET endpoint returns same data
-  url = API_URL + f"/user/{input_user['user_id']}"
+  url = API_URL + f"/users/{input_user['user_id']}"
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
   assert json_response == input_user
@@ -96,14 +95,14 @@ def test_post_user_new(client_with_emulator):
 def test_put_user(client_with_emulator):
   # create new user with POST to get timestamps
   input_user = TEST_USER
-  url = API_URL + "/user"
+  url = API_URL + "/users"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.post(url, json=input_user)
 
   # modify user
   input_user["first_name"] = "Emmy"
 
-  url = API_URL + "/user"
+  url = API_URL + "/users"
   resp_data = SUCCESS_RESPONSE
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.put(url, json=input_user)
@@ -113,7 +112,7 @@ def test_put_user(client_with_emulator):
   assert json_response == resp_data, "Response received"
 
   # now make sure user is updated and updated_timestamp is changed
-  url = API_URL + f"/user/{input_user['user_id']}"
+  url = API_URL + f"/users/{input_user['user_id']}"
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
 
@@ -139,7 +138,7 @@ def test_put_user_negative(client_with_emulator):
   input_user = TEST_USER
   input_user["user_id"] = "U2DDBkl3Ayg0PWudzhI"
 
-  url = API_URL + "/user"
+  url = API_URL + "/users"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.put(url, json=input_user)
 
@@ -152,19 +151,19 @@ def test_delete_user(client_with_emulator):
   user.save()
 
   # confirm in backend with API
-  url = API_URL + f"/user/{user.user_id}"
+  url = API_URL + f"/users/{user.user_id}"
   resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
 
   # now delete user with API
-  url = API_URL + f"/user/{user.user_id}"
+  url = API_URL + f"/users/{user.user_id}"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.delete(url)
 
   assert resp.status_code == 200, "Status 200"
 
   # now confirm user gone with API
-  url = API_URL + f"/user/{user.user_id}"
+  url = API_URL + f"/users/{user.user_id}"
   resp = client_with_emulator.get(url)
   assert resp.status_code == 404, "Status 404"
 
@@ -174,7 +173,7 @@ def test_delete_user_negative(client_with_emulator):
   user = User.from_dict(user_dict)
   user.save()
 
-  url = API_URL + "/user/U2DDBkl3Ayg0PWudzhIi"
+  url = API_URL + "/users/U2DDBkl3Ayg0PWudzhIi"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.delete(url)
 

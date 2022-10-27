@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lms
+spec:
+  replicas: 3
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: lms
+        image: lms
+        imagePullPolicy: Always

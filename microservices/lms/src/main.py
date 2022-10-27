@@ -1,5 +1,5 @@
 """
-  Sample Service Microservice
+  LMS Service Microservice
 """
 import uvicorn
 import asyncio
@@ -10,7 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 from fastapi import FastAPI, Request
 from routes import user
 
-app = FastAPI(title="Sample Service API")
+app = FastAPI()
 
 
 @app.on_event("startup")
@@ -42,16 +42,21 @@ def hello():
   return "Hello World."
 
 
-api = FastAPI(title="Sample Service API", version="latest")
+api = FastAPI(
+    title="LMS Service APIs",
+    version="latest",
+)
 
 api.include_router(user.router)
 
-app.mount("/sample_service", api)
+# TODO: add these back in
+# add_exception_handlers(app)
+# add_exception_handlers(api)
+app.mount("/lms/api/v1", api)
 
 if __name__ == "__main__":
-  uvicorn.run(
-      "main:app",
-      host="0.0.0.0",
-      port=int(config.PORT),
-      log_level="info",
-      reload=True)
+  uvicorn.run("main:app",
+              host="0.0.0.0",
+              port=int(config.PORT),
+              log_level="debug",
+              reload=True)

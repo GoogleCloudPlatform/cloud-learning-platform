@@ -10,7 +10,7 @@ on:
       # TODO: Add all microservice folders below.
       - 'microservices/**'
       - 'common/**'
-      - '.github/workflows/unit_test_linter_sample_service.yaml'
+      - '.github/workflows/unit_test_linter_lms.yaml'
   workflow_dispatch:
 
 env:
@@ -26,7 +26,7 @@ jobs:
         python-version: [3.9]
         target-folder: [
           # TODO: Add all microservice folders below.
-          microservices/sample_service,
+          microservices/lms,
         ]
     steps:
     - uses: actions/checkout@v3
