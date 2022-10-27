@@ -10,7 +10,7 @@ from google.api_core.exceptions import PermissionDenied
 # disabling for linting to pass
 # pylint: disable = broad-except
 
-router = APIRouter(prefix="/user", tags=["User"])
+router = APIRouter(prefix="/users", tags=["Users"])
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
