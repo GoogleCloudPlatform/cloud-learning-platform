@@ -146,7 +146,7 @@ skaffold run -p prod --default-repo=gcr.io/$PROJECT_ID
 Test with API endpoint:
 ```
 export API_DOMAIN=$(kubectl describe ingress | grep Address | awk '{print $2}')
-echo "http://${API_DOMAIN}/sample_service/docs"
+echo "http://${API_DOMAIN}/lms/docs"
 ```
 
 ###  2.5. <a name='DeployingMicroservicestoCloudRun'></a>Deploying Microservices to CloudRun
@@ -163,7 +163,7 @@ _IMAGE="common"
 
 Set up endpoint permission:
 ```
-export SERVICE_NAME=sample-service
+export SERVICE_NAME=lms
 gcloud run services add-iam-policy-binding $SERVICE_NAME \
 --region="$REGION" \
 --member="allUsers" \

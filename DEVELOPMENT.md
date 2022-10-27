@@ -170,7 +170,7 @@ You may need to reload VS Code for these to take effect:
 
 ###  3.1. <a name='Commoncontainersetup'></a>"Common" container setup
 
-The `common` container houses any common libraries, modules, data objects (ORM) etc that might be needed by other microservices. It can serve as the base container for builds in other microservices as shown in [this Dockerfile](./microservices/sample_service/Dockerfile#L1-L2)
+The `common` container houses any common libraries, modules, data objects (ORM) etc that might be needed by other microservices. It can serve as the base container for builds in other microservices as shown in [this Dockerfile](./microservices/lms/Dockerfile#L1-L2)
 
 Additional setup is required in a Python development environment so libraries added here are included in your IDE's code completion, etc.
 
@@ -222,7 +222,7 @@ deactivate
 ```
 
 ```
-cd microservices/sample_service
+cd microservices/lms
 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -238,7 +238,7 @@ pip install -r requirements.txt
 * Open Command Palette (CMD + SHIFT + P)
 * Type "Python: Select Interpreter"
 * Choose your new interpreter
-  * will look something like `./microservices/sample_service/.venv/bin/python3`
+  * will look something like `./microservices/lms/.venv/bin/python3`
 
 If you added the following to your VS Code `settings.json` file like mentiond before, the modules should load when you run from command line, and you should see code completion hints.
 
@@ -256,7 +256,7 @@ If you added the following to your VS Code `settings.json` file like mentiond be
 You should now be able to load modules and test them locally:
 
 ```
-cd microservices/sample_service/src
+cd microservices/lms/src
 
 # run web server
 python main.py
@@ -297,7 +297,7 @@ minikube start
 skaffold dev
 ```
 
-* Minikube run with ENV variables that are captured in Kustomize, for example [here](./microservices/sample_service/kustomize/base/env.properties)
+* Minikube run with ENV variables that are captured in Kustomize, for example [here](./microservices/lms/kustomize/base/env.properties)
 
 ```
 # if PROJECT_ID variable is used in your containers
@@ -511,7 +511,7 @@ Install Virtualenv and pip requirements
 export BASE_DIR=$(pwd)
 
 # Go to a specific microservice folder:
-cd microservices/sample_service
+cd microservices/lms
 virtualenv .venv
 source .venv/bin/activate
 pip install -r requirements.txt

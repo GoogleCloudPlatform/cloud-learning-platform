@@ -1,12 +1,12 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: cpu-pod-scaling-sample-service
+  name: cpu-pod-scaling-lms
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: sample-service
+    name: lms
   minReplicas: 3
   maxReplicas: 110
   metrics:

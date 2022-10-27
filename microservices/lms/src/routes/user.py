@@ -4,6 +4,8 @@ from fastapi import APIRouter, HTTPException
 from schemas.user import UserModel
 from common.models import User
 from common.utils.logging_handler import Logger
+from fastapi.encoders import jsonable_encoder
+from google.api_core.exceptions import PermissionDenied
 
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -15,7 +17,7 @@ FAILED_RESPONSE = {"status": "Failed"}
 
 
 @router.get("/{user_id}", response_model=UserModel)
-async def get_user(user_id: str):
+def get_user(user_id: str):
   """Get a user
 
   Args:
@@ -36,7 +38,7 @@ async def get_user(user_id: str):
 
 
 @router.post("")
-async def create_user(input_user: UserModel):
+def create_user(input_user: UserModel):
   """Register a user
 
   Args:
@@ -62,16 +64,22 @@ async def create_user(input_user: UserModel):
       new_user.save()
     else:
       new_user.last_updated_timestamp = timestamp
-      new_user.update.update(existing_user.id)
+      new_user.update(existing_user.id)
 
     return new_user.user_id
 
+  except PermissionDenied as e:
+    # Firestore auth misconfigured usually
+    Logger.error(e)
+    raise HTTPException(status_code=500) from e
+
   except Exception as e:
-    raise HTTPException(status_code=500, detail=e) from e
+    Logger.error(e)
+    raise HTTPException(status_code=500) from e
 
 
 @router.put("")
-async def update_user(input_user: UserModel):
+def update_user(input_user: UserModel):
   """Update a user
 
   Args:
@@ -105,7 +113,7 @@ async def update_user(input_user: UserModel):
 
 
 @router.delete("/{user_id}")
-async def delete_user(user_id: str):
+def delete_user(user_id: str):
   """Delete a user
 
   Args:

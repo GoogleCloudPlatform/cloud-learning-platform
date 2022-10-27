@@ -14,7 +14,7 @@ import mock
 
 
 # assigning url
-API_URL = "http://localhost/sample_service"
+API_URL = "http://localhost/lms"
 TEST_USER = {
     "user_id": "user-12345",
     "first_name": "John",
