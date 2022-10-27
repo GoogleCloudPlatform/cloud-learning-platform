@@ -54,7 +54,7 @@ def test_get_nonexist_user(client_with_emulator):
 
 def test_post_user_new(client_with_emulator):
   input_user = TEST_USER
-  url = API_URL + "/user"
+  url = API_URL + "/users"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.post(url, json=input_user)
 
@@ -95,14 +95,14 @@ def test_post_user_new(client_with_emulator):
 def test_put_user(client_with_emulator):
   # create new user with POST to get timestamps
   input_user = TEST_USER
-  url = API_URL + "/user"
+  url = API_URL + "/users"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.post(url, json=input_user)
 
   # modify user
   input_user["first_name"] = "Emmy"
 
-  url = API_URL + "/user"
+  url = API_URL + "/users"
   resp_data = SUCCESS_RESPONSE
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.put(url, json=input_user)
@@ -138,7 +138,7 @@ def test_put_user_negative(client_with_emulator):
   input_user = TEST_USER
   input_user["user_id"] = "U2DDBkl3Ayg0PWudzhI"
 
-  url = API_URL + "/user"
+  url = API_URL + "/users"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.put(url, json=input_user)
 
