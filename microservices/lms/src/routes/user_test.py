@@ -77,10 +77,8 @@ def test_post_user_new(client_with_emulator):
   # remove the timestamps since they aren't returned in the API
   # response doesn't include
   acceptable_sec_diff = 15
-  created_timestamp = datetime.datetime.strptime(
-      loaded_user_dict.pop("created_timestamp"), "%Y-%m-%d %H:%M:%S.%f")
-  last_updated_timestamp = datetime.datetime.strptime(
-      loaded_user_dict.pop("last_updated_timestamp"), "%Y-%m-%d %H:%M:%S.%f")
+  created_timestamp = loaded_user_dict.pop("created_timestamp")
+  last_updated_timestamp = loaded_user_dict.pop("last_updated_timestamp")
 
   assert (timestamp - created_timestamp).total_seconds() < acceptable_sec_diff
   assert (timestamp -
@@ -120,10 +118,8 @@ def test_put_user(client_with_emulator):
   # loading from DB since not surfaced in API
   loaded_user = User.find_by_user_id(input_user["user_id"])
 
-  created_timestamp = datetime.datetime.strptime(loaded_user.created_timestamp,
-                                                 "%Y-%m-%d %H:%M:%S.%f")
-  last_updated_timestamp = datetime.datetime.strptime(
-      loaded_user.last_updated_timestamp, "%Y-%m-%d %H:%M:%S.%f")
+  created_timestamp = loaded_user.created_timestamp
+  last_updated_timestamp = loaded_user.last_updated_timestamp
 
   assert created_timestamp < last_updated_timestamp
 
