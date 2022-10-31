@@ -16,8 +16,8 @@ SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
 
 
-@router.get("/{user_id}", response_model=UserModel)
-def get_user(user_id: str):
+@router.get("/{email}", response_model=UserModel)
+def get_user(email: str):
   """Get a user
 
   Args:
@@ -30,7 +30,7 @@ def get_user(user_id: str):
   Returns:
     [user]: user object for the provided user id
   """
-  user = User.find_by_user_id(user_id)
+  user = User.find_by_user_email(email)
 
   if user is None:
     raise HTTPException(status_code=404, detail="user not found")
@@ -55,7 +55,7 @@ def create_user(input_user: UserModel):
     new_user = User()
     input_user_dict = {**input_user.dict()}
     new_user = new_user.from_dict(input_user_dict)
-    existing_user = User.find_by_user_id(input_user_dict["user_id"])
+    existing_user = User.find_by_user_email(input_user_dict["user_email"])
     timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
 
     if existing_user is None:
@@ -95,7 +95,7 @@ def update_user(input_user: UserModel):
   user = User()
   input_user_dict = {**input_user.dict()}
   user = user.from_dict(input_user_dict)
-  existing_user = User.find_by_user_id(input_user_dict["user_id"])
+  existing_user = User.find_by_user_email(input_user_dict["user_email"])
 
   timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
 
@@ -112,8 +112,8 @@ def update_user(input_user: UserModel):
   return SUCCESS_RESPONSE
 
 
-@router.delete("/{user_id}")
-def delete_user(user_id: str):
+@router.delete("/{email}")
+def delete_user(user_email: str):
   """Delete a user
 
   Args:
@@ -127,7 +127,7 @@ def delete_user(user_id: str):
     {'status': 'Failed'} if the user deletion raises an exception
   """
 
-  user = User.find_by_user_id(user_id)
+  user = User.find_by_user_email(user_email)
   if user is None:
     raise HTTPException(status_code=404, detail="user not found")
 

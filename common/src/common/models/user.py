@@ -47,12 +47,12 @@ class User(BaseModel):
     collection_name = DATABASE_PREFIX + "user"
 
   @classmethod
-  def find_by_user_id(cls, uuid):
-    """Find a user using user_id (UUID)
+  def find_by_user_email(cls, email):
+    """Find a user using user_email (email)
     Args:
-        uuid (string): User ID
+        email (string): User Email Id
     Returns:
         User: User Object
     """
-    return User.collection.filter("user_id", "==", uuid).get()
+    return User.collection.filter("user_email", "==", email).get()
 
