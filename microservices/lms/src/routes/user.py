@@ -4,11 +4,7 @@ from fastapi import APIRouter, HTTPException
 from schemas.user import UserModel
 from common.models import User
 from common.utils.logging_handler import Logger
-from fastapi.encoders import jsonable_encoder
 from google.api_core.exceptions import PermissionDenied
-
-# disabling for linting to pass
-# pylint: disable = broad-except
 
 router = APIRouter(prefix="/users", tags=["Users"])
 

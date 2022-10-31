@@ -1,0 +1,84 @@
+<!--
+Copyright 2022 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<html>
+
+<head>
+  <title>Sample Classroom Page</title>
+  <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // console.log(googleUser);
+    });
+
+    function checkEnrollment(email) {
+      window.location.href =
+        "https://classroom.google.com/c/INSER_COURSE_ID";
+    }
+  </script>
+  <script>
+    function signOut() {
+      var auth2 = gapi.auth2.getAuthInstance();
+      auth2.signOut().then(function () {
+        console.log("User signed out.");
+      });
+    }
+  </script>
+  <script src="https://www.google.com/recaptcha/api.js"></script>
+  <script>
+    function onSubmit(token) {
+      document.getElementById("demo-form").submit();
+    }
+  </script>
+  <meta name="google-signin-client_id" content="INSERT_CLIENT_ID.apps.googleusercontent.com" />
+</head>
+
+<body>
+  <!-- <div class="m-10 rounded border bg-gray-50 h-full/2 w-1/2 p-10 ml-40 mt-40">
+      <div class="text-2xl text-gray-800">Welcome to studyhall</div>
+      <div class="text-base text-gray-400">
+        Your email is used to enroll you in class!
+      </div>
+
+      <div
+        class="p-2 inline-block mt-4 cursor-pointer rounded hover:bg-blue-600 bg-blue-500"
+        onclick="checkEnrollment()"
+      >
+        Enter
+      </div>
+      <div
+        id="statusbox"
+        class="border mt-4 rounded text-red-400 hidden border-red-400 p-2"
+      ></div>
+    </div>  -->
+
+  <div class="flex min-h-screen">
+    <div class="relative h-full">
+      <img class="" src="/static/bg.png" height="10"></img>
+      <button
+        class="g-recaptcha absolute border bottom-0 hover:bg-gray-800  right-0 mr-40 mb-40 text-white btn bg-gray-900 rounded p-3"
+        data-sitekey="INSERT_SITE_KEY" data-callback='onSubmit' data-action='submit'
+        onclick="checkEnrollment()">
+        Enroll in Class
+      </button>
+    </div>
+  </div>
+
+  <!-- <a href="#" onclick="signOut();">Sign out</a> -->
+</body>
+
+</html>
