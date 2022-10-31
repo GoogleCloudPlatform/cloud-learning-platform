@@ -20,8 +20,8 @@ class Cohort(BaseModel):
   cohort_end_date = DateTime(required=True)
   cohort_max_student = NumberField()
   course_reference=ReferenceField(CourseTemplate,required=True)
-  created_timestamp = DateTime()
-  last_updated_timestamp = DateTime()
+  created_timestamp = TextField()
+  last_updated_timestamp = TextField()
 
   class Meta:
     ignore_none_field = False
