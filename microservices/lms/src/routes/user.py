@@ -56,7 +56,7 @@ def create_user(input_user: UserModel):
     input_user_dict = {**input_user.dict()}
     new_user = new_user.from_dict(input_user_dict)
     existing_user = User.find_by_user_id(input_user_dict["user_id"])
-    timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
+    timestamp = datetime.datetime.utcnow()
 
     if existing_user is None:
       new_user.created_timestamp = timestamp
@@ -97,7 +97,7 @@ def update_user(input_user: UserModel):
   user = user.from_dict(input_user_dict)
   existing_user = User.find_by_user_id(input_user_dict["user_id"])
 
-  timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
+  timestamp = datetime.datetime.utcnow()
 
   if existing_user:
     try:

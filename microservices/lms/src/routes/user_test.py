@@ -17,8 +17,8 @@ API_URL = "http://localhost/lms/api/v1"
 TEST_USER = {
     "user_id":"user-12345",
     "user_auth_id": "user-auth-12345",
-    "user_role": "Admin",
-    "user_email": "john.338@gmail.com"
+    "user_email": "john.338@gmail.com",
+    "user_role": "Admin"
 }
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
@@ -98,7 +98,7 @@ def test_put_user(client_with_emulator):
     resp = client_with_emulator.post(url, json=input_user)
 
   # modify user
-  input_user["user_role"] = "User_admin"
+  input_user["user_role"] = "User Admin"
 
   url = API_URL + "/users"
   resp_data = SUCCESS_RESPONSE
