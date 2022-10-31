@@ -1,3 +1,6 @@
+"""
+Module to add cohort in Fireo
+"""
 import os
 
 

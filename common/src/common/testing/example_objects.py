@@ -1,5 +1,6 @@
+"""Example Data for testing"""
 TEST_USER= {
-        "user_authId" : "fake-user-id",
+        "user_auth_id" : "fake-user-id",
         "user_email" : "user@gmail.com",
         "user_role" : "Admin"
       }
@@ -11,8 +12,7 @@ TEST_COURSE={
             "course_admin" : "admin",
             "course_instructional_designer": "IDesiner",
             "course_classroom_id":"clID",
-            "course_classroom_code":"clcode",
-            
+            "course_classroom_code":"clcode"
         }
 TEST_COHORT={
             "cohort_name": "name",
