@@ -10,4 +10,4 @@ def test_new_user():
   # a placeholder unit test so github actions runs until we add more
   user = User.from_dict(TEST_USER)
 
-  assert user.user_authId == TEST_USER["user_authId"]
+  assert user.user_auth_id == TEST_USER["user_auth_id"]

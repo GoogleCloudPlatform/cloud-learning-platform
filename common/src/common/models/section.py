@@ -1,3 +1,6 @@
+"""
+Module to add section in Fireo
+"""
 import os
 
 from common.models import BaseModel,CourseTemplate,Cohort

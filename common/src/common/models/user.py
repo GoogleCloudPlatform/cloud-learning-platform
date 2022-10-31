@@ -33,7 +33,10 @@ PROJECT_ID = os.environ.get("PROJECT_ID", "")
 
 
 class User(BaseModel):
-  user_authId=TextField(required=True)
+  """
+  User ORM class
+  """
+  user_auth_id=TextField(required=True)
   user_email=TextField(required=True)
   user_role=TextField()
   created_timestamp = DateTime()
