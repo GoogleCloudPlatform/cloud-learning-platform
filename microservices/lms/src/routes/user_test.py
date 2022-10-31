@@ -98,7 +98,7 @@ def test_put_user(client_with_emulator):
     resp = client_with_emulator.post(url, json=input_user)
 
   # modify user
-  input_user["first_name"] = "Emmy"
+  input_user["user_role"] = "User_admin"
 
   url = API_URL + "/users"
   resp_data = SUCCESS_RESPONSE
