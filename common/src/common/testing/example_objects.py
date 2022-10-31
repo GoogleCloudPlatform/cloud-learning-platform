@@ -1,6 +1,7 @@
 """Example Data for testing"""
 TEST_USER= {
-        "user_auth_id" : "fake-user-id",
+        "user_id":"fake-user-id",
+        "user_auth_id" : "fake-user-auth-id",
         "user_email" : "user@gmail.com",
         "user_role" : "Admin"
       }

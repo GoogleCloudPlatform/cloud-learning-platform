@@ -15,7 +15,8 @@ import mock
 # assigning url
 API_URL = "http://localhost/lms/api/v1"
 TEST_USER = {
-    "user_auth_id": "user-12345",
+    "user_id":"user-12345",
+    "user_auth_id": "user-auth-12345",
     "user_role": "Admin",
     "user_email": "john.338@gmail.com"
 }
@@ -30,7 +31,7 @@ def test_get_user(client_with_emulator):
   user = User.from_dict(user_dict)
   user.save()
 
-  url = API_URL + f"/users/{user.user_email}"
+  url = API_URL + f"/users/{user.user_id}"
   data = TEST_USER
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
@@ -40,8 +41,8 @@ def test_get_user(client_with_emulator):
 
 
 def test_get_nonexist_user(client_with_emulator):
-  user_email = "non_exist_user_email@xyz.com"
-  url = API_URL + f"/users/{user_email}"
+  user_id = "non_exist_user_id"
+  url = API_URL + f"/users/{user_id}"
   data = {"detail": "user not found"}
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
@@ -58,13 +59,13 @@ def test_post_user_new(client_with_emulator):
   assert resp.status_code == 200, "Status 200"
 
   # now see if GET endpoint returns same data
-  url = API_URL + f"/users/{input_user['user_email']}"
+  url = API_URL + f"/users/{input_user['user_id']}"
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
   assert json_response == input_user
 
   # now check and confirm it is properly in the databse
-  loaded_user = User.find_by_user_email(input_user["user_email"])
+  loaded_user = User.find_by_user_id(input_user["user_id"])
   loaded_user_dict = loaded_user.to_dict()
 
   # popping id and key for equivalency test
@@ -97,7 +98,7 @@ def test_put_user(client_with_emulator):
     resp = client_with_emulator.post(url, json=input_user)
 
   # modify user
-  input_user["user_role"] = "User Admin"
+  input_user["first_name"] = "Emmy"
 
   url = API_URL + "/users"
   resp_data = SUCCESS_RESPONSE
@@ -109,7 +110,7 @@ def test_put_user(client_with_emulator):
   assert json_response == resp_data, "Response received"
 
   # now make sure user is updated and updated_timestamp is changed
-  url = API_URL + f"/users/{input_user['user_email']}"
+  url = API_URL + f"/users/{input_user['user_id']}"
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
 
@@ -117,7 +118,7 @@ def test_put_user(client_with_emulator):
 
   # assert timestamp has been updated
   # loading from DB since not surfaced in API
-  loaded_user = User.find_by_user_email(input_user["user_email"])
+  loaded_user = User.find_by_user_id(input_user["user_id"])
 
   created_timestamp = datetime.datetime.strptime(loaded_user.created_timestamp,
                                                  "%Y-%m-%d %H:%M:%S.%f")
@@ -133,7 +134,7 @@ def test_put_user_negative(client_with_emulator):
   user.save()
 
   input_user = TEST_USER
-  input_user["user_email"] = "U2DDBkl3Ayg0PWudzhI"
+  input_user["user_id"] = "U2DDBkl3Ayg0PWudzhI"
 
   url = API_URL + "/users"
   with mock.patch("routes.user.Logger"):
@@ -148,19 +149,19 @@ def test_delete_user(client_with_emulator):
   user.save()
 
   # confirm in backend with API
-  url = API_URL + f"/users/{user.user_email}"
+  url = API_URL + f"/users/{user.user_id}"
   resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
 
   # now delete user with API
-  url = API_URL + f"/users/{user.user_email}"
+  url = API_URL + f"/users/{user.user_id}"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.delete(url)
 
   assert resp.status_code == 200, "Status 200"
 
   # now confirm user gone with API
-  url = API_URL + f"/users/{user.user_email}"
+  url = API_URL + f"/users/{user.user_id}"
   resp = client_with_emulator.get(url)
   assert resp.status_code == 404, "Status 404"
 
@@ -170,7 +171,7 @@ def test_delete_user_negative(client_with_emulator):
   user = User.from_dict(user_dict)
   user.save()
 
-  url = API_URL + "/users/john.338@gmail.com"
+  url = API_URL + "/users/U2DDBkl3Ayg0PWudzhIi"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.delete(url)
 

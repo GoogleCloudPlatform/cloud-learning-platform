@@ -36,6 +36,7 @@ class User(BaseModel):
   """
   User ORM class
   """
+  user_id=TextField()
   user_auth_id=TextField(required=True)
   user_email=TextField(required=True)
   user_role=TextField()
@@ -56,3 +57,12 @@ class User(BaseModel):
     """
     return User.collection.filter("user_email", "==", email).get()
 
+  @classmethod
+  def find_by_user_id(cls, uuid):
+    """Find a user using user_id (UUID)
+    Args:
+        uuid (string): User ID
+    Returns:
+        User: User Object
+    """
+    return User.collection.filter("user_id", "==", uuid).get()

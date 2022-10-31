@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 class UserModel(BaseModel):
   """User Pydantic Model"""
+  user_id:str
   user_auth_id: str
   user_role: Optional[str]=None
   user_email: str
@@ -15,6 +16,7 @@ class UserModel(BaseModel):
     orm_mode = True
     schema_extra = {
         "example": {
+        "user_id":"fake-user-id",
         "user_auth_id" : "fake-user-id",
         "user_email" : "user@gmail.com",
         "user_role" : "Admin"
