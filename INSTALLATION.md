@@ -1,7 +1,7 @@
 # Installation
 
 - Google workspace - allow all users
-![](docs/static/images/c
+![](docs/static/images/classroom_personal_accounts.png)
 
 ## Scopes needed for Service Account
 - https://www.googleapis.com/auth/classroom.announcements
