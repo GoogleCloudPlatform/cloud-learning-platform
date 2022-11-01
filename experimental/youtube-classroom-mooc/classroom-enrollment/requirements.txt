@@ -1,0 +1,4 @@
+Flask==2.1.2
+google_api_python_client==2.49.0
+google_auth_oauthlib==0.4.6
+protobuf==4.21.1
