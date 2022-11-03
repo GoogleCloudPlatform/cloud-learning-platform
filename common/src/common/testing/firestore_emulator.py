@@ -12,16 +12,22 @@ import pytest
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from fastapi.testclient import TestClient
 from main import app
-
+import platform
 # recreate the emulator each module - could consider changing to session
 # pylint: disable = consider-using-with, subprocess-popen-preexec-fn
 @pytest.fixture
 def firestore_emulator():
 
-  emulator = subprocess.Popen(
+  Windows = True if platform.system() == "Windows" else False
+  if Windows:
+    emulator = subprocess.Popen(
       "firebase emulators:start --only firestore --project fake-project",
-      shell=True,
-      preexec_fn=os.setsid)
+      shell=True)
+  else:
+    emulator = subprocess.Popen(
+        "firebase emulators:start --only firestore --project fake-project",
+        shell=True,
+        preexec_fn=os.setsid)
   time.sleep(15)
 
   os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
@@ -30,8 +36,10 @@ def firestore_emulator():
 
   # yield so emulator isn't recreated each test
   yield emulator
-
-  os.killpg(os.getpgid(emulator.pid), signal.SIGTERM)
+  if Windows:
+    os.kill(emulator.pid, signal.CTRL_BREAK_EVENT)
+  else:
+    os.killpg(os.getpgid(emulator.pid), signal.SIGTERM)
   # delete debug files
   # some get deleted, not all
 
