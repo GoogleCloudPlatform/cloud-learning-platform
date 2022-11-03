@@ -22,6 +22,9 @@ def firestore_emulator():
       "firebase emulators:start --only firestore --project fake-project",
       shell=True,
       preexec_fn=os.setsid)
+  # emulator = subprocess.Popen(
+  #     "firebase emulators:start --only firestore --project fake-project",
+  #     shell=True)
   time.sleep(15)
 
   os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"

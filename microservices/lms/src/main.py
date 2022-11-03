@@ -9,6 +9,7 @@ from common.utils.logging_handler import Logger
 from concurrent.futures import ThreadPoolExecutor
 from fastapi import FastAPI, Request
 from routes import user
+from routes import copy_course
 
 app = FastAPI()
 
@@ -48,7 +49,7 @@ api = FastAPI(
 )
 
 api.include_router(user.router)
-
+api.include_router(copy_course.router)
 # TODO: add these back in
 # add_exception_handlers(app)
 # add_exception_handlers(api)

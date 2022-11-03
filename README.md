@@ -1,18 +1,20 @@
 # Cloud Learning Platform
+
 <!-- vscode-markdown-toc -->
-* 1. [Project Requirements](#ProjectRequirements)
-* 2. [Getting Started](#GettingStarted)
-	* 2.1. [Prerequisites](#Prerequisites)
-	* 2.2. [GCP Organizational policies](#GCPOrganizationalpolicies)
-	* 2.3. [GCP Foundation Setup - Terraform](#GCPFoundationSetup-Terraform)
-	* 2.4. [Deploying Kubernetes Microservices to GKE](#DeployingKubernetesMicroservicestoGKE)
-	* 2.5. [Deploying Microservices to CloudRun](#DeployingMicroservicestoCloudRun)
-* 3. [Development](#Development)
-* 4. [End-to-End API tests](#End-to-EndAPItests)
-* 5. [CI/CD and Test Automation](#CICDandTestAutomation)
-	* 5.1. [Github Actions](#GithubActions)
-	* 5.2. [Test Github Action workflows locally](#TestGithubActionworkflowslocally)
-* 6. [CloudBuild](#CloudBuild)
+
+- 1. [Project Requirements](#ProjectRequirements)
+- 2. [Getting Started](#GettingStarted)
+  - 2.1. [Prerequisites](#Prerequisites)
+  - 2.2. [GCP Organizational policies](#GCPOrganizationalpolicies)
+  - 2.3. [GCP Foundation Setup - Terraform](#GCPFoundationSetup-Terraform)
+  - 2.4. [Deploying Kubernetes Microservices to GKE](#DeployingKubernetesMicroservicestoGKE)
+  - 2.5. [Deploying Microservices to CloudRun](#DeployingMicroservicestoCloudRun)
+- 3. [Development](#Development)
+- 4. [End-to-End API tests](#End-to-EndAPItests)
+- 5. [CI/CD and Test Automation](#CICDandTestAutomation)
+  - 5.1. [Github Actions](#GithubActions)
+  - 5.2. [Test Github Action workflows locally](#TestGithubActionworkflowslocally)
+- 6. [CloudBuild](#CloudBuild)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -26,27 +28,26 @@ Please contact dhodun@google.com for any questions.
 
 > **_New Developers:_** Consult the [development guide](./DEVELOPMENT.md) for setup and contribution instructions
 
+## 1. <a name='ProjectRequirements'></a>Project Requirements
 
+| Tool      | Current Version |
+| --------- | --------------- |
+| Python    | v3.9            |
+| Skaffold  | v1.39.2         |
+| GKE       | v1.22           |
+| Kustomize | v4.3.1          |
 
-##  1. <a name='ProjectRequirements'></a>Project Requirements
-
-| Tool  | Current Version  |
-|---|---|
-| Python  | v3.9  |
-| Skaffold  | v1.39.2  |
-| GKE  | v1.22  |
-| Kustomize  | v4.3.1  |
-
-##  2. <a name='GettingStarted'></a>Getting Started
+## 2. <a name='GettingStarted'></a>Getting Started
 
 This guide will detail how to set up your new solutions template project. See the [development guide](./DEVELOPMENT.md) for how to contribute to the project.
 
-###  2.1. <a name='Prerequisites'></a>Prerequisites
+### 2.1. <a name='Prerequisites'></a>Prerequisites
 
 ```
 # Set up environmental variables
 export PROJECT_ID=core-learning-services-dev
 export ADMIN_EMAIL=dhodun@google.com
+export CLASSROOM_ADMIN_EMAIL=lms_service@dhodun.altostrat.com
 export REGION=us-central1
 export API_DOMAIN=cloudpssolutions.com
 export BASE_DIR=$(pwd)
@@ -62,11 +63,13 @@ For development with Kubernetes on GKE:
 Install required packages:
 
 - For MacOS:
+
   ```
   brew install --cask skaffold kustomize google-cloud-sdk
   ```
 
 - For Windows:
+
   ```
   choco install -y skaffold kustomize gcloudsdk
   ```
@@ -77,13 +80,14 @@ Install required packages:
   sudo install skaffold /usr/local/bin/
   ```
 
-* Make sure to use __skaffold 1.24.1__ or later for development.
+* Make sure to use **skaffold 1.24.1** or later for development.
 
-###  2.2. <a name='GCPOrganizationalpolicies'></a>GCP Organizational policies
+### 2.2. <a name='GCPOrganizationalpolicies'></a>GCP Organizational policies
 
 Optionally, you may need to update Organization policies for CI/CD test automation.
 
 Run the following commands to update Organization policies:
+
 ```
 export ORGANIZATION_ID=$(gcloud organizations list --format="value(name)")
 gcloud resource-manager org-policies disable-enforce constraints/compute.requireOsLogin --organization=$ORGANIZATION_ID
@@ -92,10 +96,11 @@ gcloud resource-manager org-policies delete constraints/iam.allowedPolicyMemberD
 ```
 
 Or, change the following Organization policy constraints in [GCP Console](https://console.cloud.google.com/iam-admin/orgpolicies)
+
 - constraints/compute.requireOsLogin - Enforced Off
 - constraints/compute.vmExternalIpAccess - Allow All
 
-###  2.3. <a name='GCPFoundationSetup-Terraform'></a>GCP Foundation Setup - Terraform
+### 2.3. <a name='GCPFoundationSetup-Terraform'></a>GCP Foundation Setup - Terraform
 
 Set up Terraform environment variables and GCS bucket for state file.
 If the new project is just created recently, you may need to wait for 1-2 minutes
@@ -130,28 +135,32 @@ terraform apply -target=module.project_services -target=module.service_accounts 
 terraform apply -auto-approve
 ```
 
-###  2.4. <a name='DeployingKubernetesMicroservicestoGKE'></a>Deploying Kubernetes Microservices to GKE
+### 2.4. <a name='DeployingKubernetesMicroservicestoGKE'></a>Deploying Kubernetes Microservices to GKE
 
 Connect to the `default-cluster`:
+
 ```
 gcloud container clusters get-credentials core-learning-services-dev-us-central1 --region $REGION --project $PROJECT_ID
 ```
 
 Build all microservices (including web app) and deploy to the cluster:
+
 ```
 cd $BASE_DIR
 skaffold run -p prod --default-repo=gcr.io/$PROJECT_ID
 ```
 
 Test with API endpoint:
+
 ```
 export API_DOMAIN=$(kubectl describe ingress | grep Address | awk '{print $2}')
 echo "http://${API_DOMAIN}/lms/docs"
 ```
 
-###  2.5. <a name='DeployingMicroservicestoCloudRun'></a>Deploying Microservices to CloudRun
+### 2.5. <a name='DeployingMicroservicestoCloudRun'></a>Deploying Microservices to CloudRun
 
 Build common image
+
 ```
 cd common
 gcloud builds submit --config=cloudbuild.yaml --substitutions=\
@@ -162,6 +171,7 @@ _IMAGE="common"
 ```
 
 Set up endpoint permission:
+
 ```
 export SERVICE_NAME=lms
 gcloud run services add-iam-policy-binding $SERVICE_NAME \
@@ -171,6 +181,7 @@ gcloud run services add-iam-policy-binding $SERVICE_NAME \
 ```
 
 Build service image
+
 ```
 gcloud builds submit --config=cloudbuild.yaml --substitutions=\
 _CLOUD_RUN_SERVICE_NAME=$SERVICE_NAME,\
@@ -183,6 +194,7 @@ _ALLOW_UNAUTHENTICATED_FLAG="--allow-unauthenticated"
 ```
 
 Manually deploy a microservice to CloudRun with public endpoint:
+
 ```
 gcloud run services add-iam-policy-binding $SERVICE_NAME \
 --region="$REGION" \
@@ -190,21 +202,21 @@ gcloud run services add-iam-policy-binding $SERVICE_NAME \
 --role="roles/run.invoker"
 ```
 
-##  3. <a name='Development'></a>Development
+## 3. <a name='Development'></a>Development
 
-
-##  4. <a name='End-to-EndAPItests'></a>End-to-End API tests
+## 4. <a name='End-to-EndAPItests'></a>End-to-End API tests
 
 TBD
 
-##  5. <a name='CICDandTestAutomation'></a>CI/CD and Test Automation
+## 5. <a name='CICDandTestAutomation'></a>CI/CD and Test Automation
 
-###  5.1. <a name='GithubActions'></a>Github Actions
+### 5.1. <a name='GithubActions'></a>Github Actions
 
-###  5.2. <a name='TestGithubActionworkflowslocally'></a>Test Github Action workflows locally
+### 5.2. <a name='TestGithubActionworkflowslocally'></a>Test Github Action workflows locally
 
 - Install Docker desktop: https://www.docker.com/products/docker-desktop/
 - Install [Act](https://github.com/nektos/act)
+
   ```
   # Mac
   brew install act
@@ -218,7 +230,7 @@ TBD
   act --workflows .github/workflows/e2e_gke_api_test.yaml
   ```
 
-##  6. <a name='CloudBuild'></a>CloudBuild
+## 6. <a name='CloudBuild'></a>CloudBuild
 
 TBD
 
