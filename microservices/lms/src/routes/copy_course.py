@@ -12,7 +12,6 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
-from schemas.user import Topic
 from schemas.course_details import CourseDetails
 from services import classroom_crud
 import traceback
@@ -43,21 +42,7 @@ def get_courses():
     List of courses in classroom ,
     {'status': 'Failed'} if the user creation raises an exception
   """
-  try:
-
-    # SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly',
-    # 'https://www.googleapis.com/auth/classroom.rosters']
-
-    # a_creds = service_account.Credentials.from_service_account_file(
-    # 'utils/service.json', scopes=SCOPES)
-    # creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-    # service = build('classroom', 'v1', credentials=creds)
-
-    #     # Call the Classroom API
-    # results = service.courses().list().execute()
-    # courses = results.get('courses', [])
-    # print("------This is result-----------")
-    # course_details = list(courses)    
+  try: 
     course_list = classroom_crud.get_course_list()
     return list(course_list)
 
@@ -90,7 +75,6 @@ def copy_courses(course_details: CourseDetails):
       return "No course found "
     # Create a new course
     new_course = classroom_crud.create_course(current_course["name"],current_course["section"],current_course["ownerId"]) 
-    print("New course is created",new_course)
     print("---------------------------------------------------------2")
     # Get topics of current course
     topics = classroom_crud.get_topics(course_id)
