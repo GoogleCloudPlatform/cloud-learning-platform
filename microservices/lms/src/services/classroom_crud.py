@@ -13,7 +13,6 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
-from schemas.user import Topic
 import traceback
 from google.protobuf.json_format import MessageToDict
 from config import CLASSROOM_ADMIN_EMAIL
