@@ -5,64 +5,50 @@ User object in the ORM
 import os
 
 from common.models import BaseModel
-from fireo.fields import TextField
+from common.utils.errors import ResourceNotFoundException
+from fireo.fields import TextField,DateTime
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PROJECT_ID = os.environ.get("PROJECT_ID", "")
-
-
-# # sample class
-# class User(BaseModel):
-#   """User ORM class
-#   """
-#   user_id = TextField()
-#   first_name = TextField()
-#   middle_name = TextField()
-#   last_name = TextField()
-#   date_of_birth = TextField()
-#   email_address = TextField()
-#   created_timestamp = TextField()
-#   last_updated_timestamp = TextField()
-
-#   class Meta:
-#     ignore_none_field = False
-#     collection_name = DATABASE_PREFIX + "users"
-
-#   # pylint: enable= line-too-long
-
 
 
 class User(BaseModel):
   """
   User ORM class
   """
-  user_id=TextField()
-  user_auth_id=TextField(required=True)
-  user_email=TextField(required=True)
-  user_role=TextField()
-  created_timestamp = TextField()
-  last_updated_timestamp = TextField()
+  uuid=TextField()
+  auth_id=TextField(required=True)
+  email=TextField(required=True)
+  role=TextField()
+  created_timestamp = DateTime()
+  last_updated_timestamp = DateTime()
 
   class Meta:
     ignore_none_field = False
     collection_name = DATABASE_PREFIX + "user"
 
   @classmethod
-  def find_by_user_email(cls, email):
-    """Find a user using user_email (email)
+  def find_by_email(cls, email):
+    """Find a user using email (string)
     Args:
-        email (string): User Email Id
+        email (string): User Email
     Returns:
         User: User Object
     """
-    return User.collection.filter("user_email", "==", email).get()
+    user= User.collection.filter("email", "==", email).get()
+    if user is None:
+      raise ResourceNotFoundException(f"User with email {email} is not found")
+    return user
 
   @classmethod
-  def find_by_user_id(cls, uuid):
-    """Find a user using user_id (UUID)
+  def find_by_uuid(cls, uuid):
+    """Find a user using uuid (UUID)
     Args:
         uuid (string): User ID
     Returns:
         User: User Object
     """
-    return User.collection.filter("user_id", "==", uuid).get()
+    user=User.collection.filter("uuid", "==", uuid).get()
+    if user is None:
+      raise ResourceNotFoundException(f"User with uuid {uuid} is not found")
+    return user

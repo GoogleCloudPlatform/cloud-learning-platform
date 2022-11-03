@@ -8,5 +8,5 @@ def test_new_section():
   '''test for creating and loading a new section'''
   section=Section.from_dict(TEST_SECTION)
 
-  assert section.section_name == TEST_SECTION["section_name"]
-  assert section.section_sec == TEST_SECTION["section_sec"]
+  assert section.name == TEST_SECTION["name"]
+  assert section.section == TEST_SECTION["section"]

@@ -8,17 +8,16 @@ import datetime
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from common.testing.firestore_emulator import client_with_emulator, firestore_emulator, clean_firestore
-
 from common.models import User
 import mock
 
 # assigning url
 API_URL = "http://localhost/lms/api/v1"
 TEST_USER = {
-    "user_id":"user-12345",
-    "user_auth_id": "user-auth-12345",
-    "user_email": "john.338@gmail.com",
-    "user_role": "Admin"
+    "uuid":"user-12345",
+    "auth_id": "user-auth-12345",
+    "email": "john.338@gmail.com",
+    "role": "Admin"
 }
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
@@ -31,7 +30,7 @@ def test_get_user(client_with_emulator):
   user = User.from_dict(user_dict)
   user.save()
 
-  url = API_URL + f"/users/{user.user_id}"
+  url = API_URL + f"/users/{user.uuid}"
   data = TEST_USER
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
@@ -41,9 +40,13 @@ def test_get_user(client_with_emulator):
 
 
 def test_get_nonexist_user(client_with_emulator):
-  user_id = "non_exist_user_id"
-  url = API_URL + f"/users/{user_id}"
-  data = {"detail": "user not found"}
+  uuid = "non_exist_uuid"
+  url = API_URL + f"/users/{uuid}"
+  data = {
+    "success": False,
+    "message": f"User with uuid {uuid} is not found",
+    "data": None
+  }
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
   assert resp.status_code == 404, "Status 404"
@@ -59,13 +62,14 @@ def test_post_user_new(client_with_emulator):
   assert resp.status_code == 200, "Status 200"
 
   # now see if GET endpoint returns same data
-  url = API_URL + f"/users/{input_user['user_id']}"
+  input_user["uuid"]=resp.json()
+  url = API_URL + f"/users/{input_user['uuid']}"
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
   assert json_response == input_user
 
   # now check and confirm it is properly in the databse
-  loaded_user = User.find_by_user_id(input_user["user_id"])
+  loaded_user = User.find_by_uuid(input_user["uuid"])
   loaded_user_dict = loaded_user.to_dict()
 
   # popping id and key for equivalency test
@@ -77,14 +81,12 @@ def test_post_user_new(client_with_emulator):
   # remove the timestamps since they aren't returned in the API
   # response doesn't include
   acceptable_sec_diff = 15
-  created_timestamp = datetime.datetime.strptime(
-      loaded_user_dict.pop("created_timestamp"), "%Y-%m-%d %H:%M:%S.%f")
-  last_updated_timestamp = datetime.datetime.strptime(
-      loaded_user_dict.pop("last_updated_timestamp"), "%Y-%m-%d %H:%M:%S.%f")
+  created_timestamp = loaded_user_dict.pop("created_timestamp")
+  last_updated_timestamp = loaded_user_dict.pop("last_updated_timestamp")
 
-  assert (timestamp - created_timestamp).total_seconds() < acceptable_sec_diff
-  assert (timestamp - last_updated_timestamp).total_seconds() < acceptable_sec_diff
-
+  assert (timestamp.second - created_timestamp.second) < acceptable_sec_diff
+  assert (timestamp.second - 
+                last_updated_timestamp.second) < acceptable_sec_diff
   # assert that rest of the fields are equivalent
   assert loaded_user_dict == input_user
 
@@ -97,7 +99,8 @@ def test_put_user(client_with_emulator):
     resp = client_with_emulator.post(url, json=input_user)
 
   # modify user
-  input_user["user_role"] = "User Admin"
+  input_user["role"] = "User Admin"
+  input_user["uuid"]=resp.json()
 
   url = API_URL + "/users"
   resp_data = SUCCESS_RESPONSE
@@ -109,7 +112,7 @@ def test_put_user(client_with_emulator):
   assert json_response == resp_data, "Response received"
 
   # now make sure user is updated and updated_timestamp is changed
-  url = API_URL + f"/users/{input_user['user_id']}"
+  url = API_URL + f"/users/{input_user['uuid']}"
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
 
@@ -117,12 +120,9 @@ def test_put_user(client_with_emulator):
 
   # assert timestamp has been updated
   # loading from DB since not surfaced in API
-  loaded_user = User.find_by_user_id(input_user["user_id"])
-
-  created_timestamp = datetime.datetime.strptime(loaded_user.created_timestamp,
-                                                 "%Y-%m-%d %H:%M:%S.%f")
-  last_updated_timestamp = datetime.datetime.strptime(
-      loaded_user.last_updated_timestamp, "%Y-%m-%d %H:%M:%S.%f")
+  loaded_user = User.find_by_uuid(input_user["uuid"])
+  created_timestamp = loaded_user.created_timestamp
+  last_updated_timestamp = loaded_user.last_updated_timestamp
   assert created_timestamp < last_updated_timestamp
 
 
@@ -132,7 +132,7 @@ def test_put_user_negative(client_with_emulator):
   user.save()
 
   input_user = TEST_USER
-  input_user["user_id"] = "U2DDBkl3Ayg0PWudzhI"
+  input_user["uuid"] = "U2DDBkl3Ayg0PWudzhI"
 
   url = API_URL + "/users"
   with mock.patch("routes.user.Logger"):
@@ -147,19 +147,19 @@ def test_delete_user(client_with_emulator):
   user.save()
 
   # confirm in backend with API
-  url = API_URL + f"/users/{user.user_id}"
+  url = API_URL + f"/users/{user.uuid}"
   resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
 
   # now delete user with API
-  url = API_URL + f"/users/{user.user_id}"
+  url = API_URL + f"/users/{user.uuid}"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.delete(url)
 
   assert resp.status_code == 200, "Status 200"
 
   # now confirm user gone with API
-  url = API_URL + f"/users/{user.user_id}"
+  url = API_URL + f"/users/{user.uuid}"
   resp = client_with_emulator.get(url)
   assert resp.status_code == 404, "Status 404"
 
@@ -173,7 +173,11 @@ def test_delete_user_negative(client_with_emulator):
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.delete(url)
 
-  data = {"detail": "user not found"}
+  data = {
+    "success": False,
+    "message": "User with uuid U2DDBkl3Ayg0PWudzhIi is not found",
+    "data": None
+  }
   resp = client_with_emulator.delete(url)
   json_response = json.loads(resp.text)
   assert resp.status_code == 404, "Status 404"

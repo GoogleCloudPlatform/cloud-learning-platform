@@ -1,16 +1,32 @@
 """ User endpoints """
 import datetime
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from schemas.user import UserModel
 from common.models import User
 from common.utils.logging_handler import Logger
-from fastapi.encoders import jsonable_encoder
+from common.utils.errors import ResourceNotFoundException
+from common.utils.http_exceptions import ResourceNotFound,InternalServerError,Conflict
+from schemas.error_schema import (InternalServerErrorResponseModel,NotFoundErrorResponseModel,
+                                  ConflictResponseModel,ValidationErrorResponseModel)
 from google.api_core.exceptions import PermissionDenied
 
 # disabling for linting to pass
 # pylint: disable = broad-except
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(prefix="/users", tags=["Users"],responses={
+  500:{
+            "model": InternalServerErrorResponseModel
+        },
+  404:{
+    "model":NotFoundErrorResponseModel
+  },
+  409:{
+    "model":ConflictResponseModel
+  },
+  422: {
+            "model": ValidationErrorResponseModel
+        }
+})
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
@@ -24,17 +40,19 @@ def get_user(user_id: str):
     user_id (str): unique id of the user
 
   Raises:
-    HTTPException: 404 Not Found if user doesn't exist for the given user id
+    ResourceNotFoundException: If the user does not exist
     HTTPException: 500 Internal Server Error if something fails
 
   Returns:
     [user]: user object for the provided user id
   """
-  user = User.find_by_user_id(user_id)
-
-  if user is None:
-    raise HTTPException(status_code=404, detail="user not found")
-  return user
+  try:
+    user = User.find_by_uuid(user_id)
+    return user
+  except ResourceNotFoundException as re:
+    raise ResourceNotFound(str(re)) from re
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
 
 
 @router.post("")
@@ -49,33 +67,35 @@ def create_user(input_user: UserModel):
 
   Returns:
     [JSON]: user ID of the user if the user is successfully created,
-    {'status': 'Failed'} if the user creation raises an exception
+    InternalServerErrorResponseModel if the user creation raises an exception
   """
+  existing_user=None
   try:
     new_user = User()
     input_user_dict = {**input_user.dict()}
     new_user = new_user.from_dict(input_user_dict)
-    existing_user = User.find_by_user_id(input_user_dict["user_id"])
-    timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
-
-    if existing_user is None:
-      new_user.created_timestamp = timestamp
-      new_user.last_updated_timestamp = timestamp
-      new_user.save()
-    else:
-      new_user.last_updated_timestamp = timestamp
-      new_user.update(existing_user.id)
-
-    return new_user.user_id
-
+    existing_user = User.find_by_email(input_user_dict["email"])
+  except ResourceNotFoundException:
+    pass
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+  if existing_user is not None:
+    raise Conflict()
+  try:
+    timestamp = datetime.datetime.utcnow()
+    new_user.created_timestamp = timestamp
+    new_user.last_updated_timestamp = timestamp
+    new_user.save()
+    new_user.uuid=new_user.id
+    new_user.update()
+    return new_user.uuid
   except PermissionDenied as e:
     # Firestore auth misconfigured usually
     Logger.error(e)
-    raise HTTPException(status_code=500) from e
-
+    raise InternalServerError(str(e)) from e
   except Exception as e:
     Logger.error(e)
-    raise HTTPException(status_code=500) from e
+    raise InternalServerError(str(e)) from e
 
 
 @router.put("")
@@ -86,30 +106,29 @@ def update_user(input_user: UserModel):
     input_user (UserModel): Required body of the user
 
   Raises:
+    ResourceNotFoundException: If the User does not exist
     HTTPException: 500 Internal Server Error if something fails
 
   Returns:
     [JSON]: {'status': 'Succeed'} if the user is updated,
-    {'status': 'Failed'} if the user updation raises an exception
+    NotFoundErrorResponseModel if the user not found,
+    InternalServerErrorResponseModel if the user updation raises an exception
   """
-  user = User()
-  input_user_dict = {**input_user.dict()}
-  user = user.from_dict(input_user_dict)
-  existing_user = User.find_by_user_id(input_user_dict["user_id"])
+  try:
+    user = User()
+    input_user_dict = {**input_user.dict()}
+    user = user.from_dict(input_user_dict)
+    existing_user = User.find_by_uuid(input_user_dict["uuid"])
 
-  timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
-
-  if existing_user:
-    try:
-      user.last_updated_timestamp = timestamp
-      user.update(existing_user.id)
-
-    except Exception as e:
-      raise HTTPException(status_code=500, detail=FAILED_RESPONSE) from e
-  else:
-    raise HTTPException(status_code=404, detail="user not found")
-
-  return SUCCESS_RESPONSE
+    timestamp = datetime.datetime.utcnow()
+    user.last_updated_timestamp = timestamp
+    user.created_timestamp=existing_user.created_timestamp
+    user.update(existing_user.id)
+    return SUCCESS_RESPONSE
+  except ResourceNotFoundException as re:
+    raise ResourceNotFound(str(re)) from re
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
 
 
 @router.delete("/{user_id}")
@@ -120,17 +139,19 @@ def delete_user(user_id: str):
     user_id (str): unique id of the user
 
   Raises:
+    ResourceNotFoundException: If the User does not exist
     HTTPException: 500 Internal Server Error if something fails
 
   Returns:
     [JSON]: {'status': 'Succeed'} if the user is deleted,
-    {'status': 'Failed'} if the user deletion raises an exception
+    NotFoundErrorResponseModel if the user not found,
+    InternalServerErrorResponseModel if the user deletion raises an exception
   """
-
-  user = User.find_by_user_id(user_id)
-  if user is None:
-    raise HTTPException(status_code=404, detail="user not found")
-
-  User.collection.delete(user.key)
-
-  return SUCCESS_RESPONSE
+  try:
+    user = User.find_by_uuid(user_id)
+    User.collection.delete(user.key)
+    return SUCCESS_RESPONSE
+  except ResourceNotFoundException as re:
+    raise ResourceNotFound(str(re)) from re
+  except Exception as e:
+    raise InternalServerError(str(e)) from e

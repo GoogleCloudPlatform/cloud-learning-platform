@@ -6,6 +6,7 @@ import asyncio
 import time
 import config
 from common.utils.logging_handler import Logger
+from common.utils.http_exceptions import add_exception_handlers
 from concurrent.futures import ThreadPoolExecutor
 from fastapi import FastAPI, Request
 from routes import user
@@ -49,9 +50,9 @@ api = FastAPI(
 
 api.include_router(user.router)
 
-# TODO: add these back in
-# add_exception_handlers(app)
-# add_exception_handlers(api)
+
+add_exception_handlers(app)
+add_exception_handlers(api)
 app.mount("/lms/api/v1", api)
 
 if __name__ == "__main__":

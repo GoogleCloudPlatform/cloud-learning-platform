@@ -8,6 +8,6 @@ def test_new_cohort():
   """Test for creating and loading of a new cohort"""
   cohort=Cohort.from_dict(TEST_COHORT)
 
-  assert cohort.cohort_name == TEST_COHORT["cohort_name"]
-  assert cohort.cohort_max_student == TEST_COHORT["cohort_max_student"]
+  assert cohort.name == TEST_COHORT["name"]
+  assert cohort.max_student == TEST_COHORT["max_student"]
   

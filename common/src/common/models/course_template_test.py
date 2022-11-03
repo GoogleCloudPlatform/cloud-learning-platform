@@ -8,4 +8,4 @@ def test_new_course():
   """Test for creating and loading a new course"""
   course = CourseTemplate.from_dict(TEST_COURSE)
   # course.save()
-  assert course.course_name==TEST_COURSE["course_name"]
+  assert course.name==TEST_COURSE["name"]
