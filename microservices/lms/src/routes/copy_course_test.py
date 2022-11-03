@@ -23,11 +23,8 @@ SUCCESS_RESPONSE = {"status": "Success"}
 
 def test_get_user(client_with_emulator):
   url = API_URL + "/course/get_courses/"
-  print(url)
   with mock.patch("routes.copy_course.classroom_crud.get_course_list"):
     resp = client_with_emulator.get(url)
-#   json_response = json.loads(resp)
-  print(resp.json())
   assert resp.status_code == 200
 
 
@@ -55,5 +52,4 @@ def test_copy_course_not_found(client_with_emulator):
                 with mock.patch("routes.copy_course.classroom_crud.get_coursework"):
                     with mock.patch("routes.copy_course.classroom_crud.create_coursework"):
                         resp = client_with_emulator.post(url,json=course_details)
-  print(resp.json())
   assert resp.status_code == 200   

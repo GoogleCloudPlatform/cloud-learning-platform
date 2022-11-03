@@ -33,7 +33,6 @@ def create_course(name,section,owner_id):
     "utils/service.json", scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
-    print("******In create course function")
     new_course = {}
     new_course["name"]=name
     new_course["section"]=section
@@ -45,7 +44,6 @@ def create_course(name,section,owner_id):
     course = service.courses().create(body=new_course).execute()
     course_name = course.get("name")
     course_id = course.get("id")
-    print(f"Course created: {course_name} ,{course_id}")
     return course
     
 def get_course_by_id(course_id):
@@ -75,7 +73,6 @@ def get_course_list():
     return courses
 
 def get_topics(course_id):
-    print(" GET TOPICS of old course")
     SCOPES = ['https://www.googleapis.com/auth/classroom.topics',
   'https://www.googleapis.com/auth/classroom.topics.readonly']
     a_creds = service_account.Credentials.from_service_account_file(
@@ -88,7 +85,6 @@ def get_topics(course_id):
         response = service.courses().topics().list(
         pageToken=page_token,
         courseId=course_id).execute()
-        print("response topics",response)
         topics = topics.extend(response.get('topic', []))
         page_token = response.get('nextPageToken', None)
         if not page_token:
@@ -106,7 +102,6 @@ def create_topics(course_id , topics):
     "utils/service.json", scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
-    print("Inside create topic function")
     for topic in topics:
         topic_name = topic["name"]
         topic = {
@@ -114,19 +109,16 @@ def create_topics(course_id , topics):
         response = service.courses().topics().create(
         courseId=course_id,
         body=topic).execute()
-    print('Topic created: ', response['name'])
     return "success"
 
 def get_coursework(course_id):
     SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students',
     'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
-    print("Inside get courseWork Api")
     a_creds = service_account.Credentials.from_service_account_file(
     "utils/service.json", scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
     coursework_list = service.courses().courseWork().list(courseId=course_id).execute()
-    print(coursework_list)
     if coursework_list:
         coursework_list = coursework_list['courseWork']
     return coursework_list
@@ -134,19 +126,14 @@ def get_coursework(course_id):
 def create_coursework(course_id, coursework_list):
     SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students',
     'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
-    print("Inside create coursework func")
     a_creds = service_account.Credentials.from_service_account_file(
     "utils/service.json", scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
     for coursework_item  in coursework_list:
-        print("--------------------------------------------")
-        print("In for loop 1",coursework_item)
-        print(type(coursework_item))
         # coursework_item['courseId'] = new_course_id
         # coursework_item.pop("id")
         coursework = service.courses().courseWork().create(courseId=course_id, body=coursework_item).execute()
-    print("In for loop 2")
     
 def delete_course_by_id(course_id):
     SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
@@ -157,6 +144,5 @@ def delete_course_by_id(course_id):
     service = build("classroom", "v1", credentials=creds)
     course = service.courses().delete(id=course_id).execute()
     course_name = course.get("name")
-    print(f"Course Found: {course_name}")
     return course
 

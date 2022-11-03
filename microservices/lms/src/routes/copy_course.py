@@ -48,7 +48,6 @@ def get_courses():
 
   except Exception as e:
     Logger.error(e)
-    print(e)
     raise HTTPException(status_code=500) from e
 
 
@@ -75,18 +74,14 @@ def copy_courses(course_details: CourseDetails):
       return "No course found "
     # Create a new course
     new_course = classroom_crud.create_course(current_course["name"],current_course["section"],current_course["ownerId"]) 
-    print("---------------------------------------------------------2")
     # Get topics of current course
     topics = classroom_crud.get_topics(course_id)
-    print("------------------Topics----------",topics)
     if topics is not None:
       classroom_crud.create_topics(new_course["id"],topics)
-    print("-------------topic create---------------------------3")
     # Get coursework of current course and create a new course
     coursework_list  = classroom_crud.get_coursework(course_id)
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"],coursework_list)
-    print("-----------coursework created-----------------------------4")
 
     SUCCESS_RESPONSE["new_course"] = new_course
     return SUCCESS_RESPONSE
