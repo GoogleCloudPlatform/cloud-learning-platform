@@ -1,4 +1,4 @@
-fireo==1.4.1
+fireo==1.5.1
 google-cloud-logging
 google-cloud-secret-manager==2.12.6
 jsonschema==4.16.0

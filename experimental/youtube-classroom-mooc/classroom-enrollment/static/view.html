@@ -1,0 +1,152 @@
+<!--
+Copyright 2022 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<html>
+  <head>
+    <title>Sample Classroom Page</title>
+    <link
+      href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // console.log(googleUser);
+      });
+
+      function getRecapcha() {
+        const response = grecaptcha.getResponse();
+        console.log(response);
+      }
+
+      function checkEnrollment(email) {
+        const element = document.getElementById("statusbox");
+        element.classList.remove("hidden");
+        var data = new FormData();
+        data.append(
+          "json",
+          JSON.stringify({
+            email: email,
+          })
+        );
+
+        let fetchJsonRequest = {
+          cache: "no-cache",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: email }),
+        };
+
+        fetch(`${window.origin}/enroll`, fetchJsonRequest)
+          .then(function (response) {
+            element.classList.remove("hidden");
+            if (response.status != 200) {
+              console.log(response.statusText);
+            }
+            response.json().then(function (data) {
+              console.log("response ...", data);
+              window.location.href =
+                "https://classroom.google.com/c/NTMyNDE4ODgwMjA5";
+              // window.location.href = "/studyhall";
+            });
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }
+      function onSignIn(googleUser) {
+        console.log("trying");
+        var profile = googleUser.getBasicProfile();
+        console.log("ID: " + profile.getId()); // Do not send to your backend! Use an ID token instead.
+        console.log("Name: " + profile.getName());
+        console.log("Image URL: " + profile.getImageUrl());
+        console.log("Email: " + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+        // window.location.href =
+        //   "https://classroom.google.com/u/1/c/NTIwNzA5NDEyODcw";
+        checkEnrollment(profile.getEmail());
+      }
+    </script>
+    <script>
+      function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+          console.log("User signed out.");
+        });
+      }
+    </script>
+
+    <meta
+      name="google-signin-client_id"
+      content="532482101496-tmijs31sk91ohop17lmaq9br96oi758m.apps.googleusercontent.com"
+    />
+  </head>
+
+  <body class="relative">
+    <div class="absolute">
+      <!-- <img src="static/images/1.png" /> -->
+
+      <div class="relative">
+        <div
+          style="right: 60px; top: 65px"
+          class="absolute rounded bg-[#f9f1d1]"
+        >
+          <div class="text-xl font-bold text-gray-800">
+            Sign in to Get Started
+          </div>
+          <!-- <div class="text-base text-gray-400">
+            Your email is used to enroll you in class!
+          </div> -->
+          <div
+            id="statusbox"
+            class="border mt-2 rounded text-red-400 hidden border-red-400 p-2"
+          >
+            <span class="inline-block mr-2 text-red-400 animate-spin">
+              <svg
+                class="text-red-400"
+                fill="currentColor"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12.979 3.055c4.508.489 8.021 4.306 8.021 8.945.001 2.698-1.194 5.113-3.075 6.763l-1.633-1.245c1.645-1.282 2.709-3.276 2.708-5.518 0-3.527-2.624-6.445-6.021-6.923v2.923l-5.25-4 5.25-4v3.055zm-1.979 15.865c-3.387-.486-6-3.401-6.001-6.92 0-2.237 1.061-4.228 2.697-5.509l-1.631-1.245c-1.876 1.65-3.066 4.061-3.065 6.754-.001 4.632 3.502 8.444 8 8.942v3.058l5.25-4-5.25-4v2.92z"
+                />
+              </svg>
+            </span>
+            Checking enrollment status
+          </div>
+
+          <div class="g-signin2 pt-4" data-onsuccess="onSignIn"></div>
+          <div
+            class="pt-4 g-recaptcha"
+            data-sitekey="6LdMBjUgAAAAAJpVHTrgqTR7egwaRxLYVlSWziqQ"
+          ></div>
+        </div>
+        <img src="static/images/1.png" />
+      </div>
+
+      <img src="static/images/2.png" />
+      <img src="static/images/4.png" />
+      <img src="static/images/5.png" />
+    </div>
+
+    <!-- <a href="#" onclick="signOut();">Sign out</a> -->
+  </body>
+</html>

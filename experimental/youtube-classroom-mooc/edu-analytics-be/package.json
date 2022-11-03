@@ -1,0 +1,27 @@
+{
+  "name": "edu-analytics-be",
+  "version": "1.0.0",
+  "description": "Edu Analytics APIs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "googleapis": "^100.0.0",
+    "mysql": "^2.18.1",
+    "query-string": "^7.1.1",
+    "swagger-jsdoc": "^6.2.1",
+    "swagger-ui-express": "^4.3.0",
+    "url-parse": "^1.5.10"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0"
+  }
+}
