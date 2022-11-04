@@ -23,9 +23,9 @@ class CustomHTTPException(Exception):
 
 
 # Exception handlers
-def add_exception_handlers(_app: FastAPI):
+def add_exception_handlers(app: FastAPI):
 
-  @_app.exception_handler(CustomHTTPException)
+  @app.exception_handler(CustomHTTPException)
   async def generic_exception_handler(req: Request, exc: CustomHTTPException):
     return JSONResponse(
         status_code=exc.status_code,
@@ -35,7 +35,7 @@ def add_exception_handlers(_app: FastAPI):
             "data": exc.data
         })
 
-  @_app.exception_handler(RequestValidationError)
+  @app.exception_handler(RequestValidationError)
   async def pydantic_exception_handler(req: Request,
                                        exc: RequestValidationError):
     return JSONResponse(

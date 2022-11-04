@@ -1,0 +1,67 @@
+/**
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+@layer components {
+  #__next {
+    @apply h-full;
+  }
+
+  /* Calender picker on type="date" inputs */
+  ::-webkit-calendar-picker-indicator {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" viewBox="0 0 24 24"><path fill="%23bbbbbb" d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>');
+  }
+
+  a {
+    @apply text-primary cursor-pointer;
+  }
+
+  .btn {
+    @apply rounded-md normal-case;
+  }
+
+  .input {
+    @apply border-base-300 rounded-md bg-base-200 focus:bg-base-100;
+  }
+
+  .select {
+    @apply border-base-300 rounded-md bg-base-200 focus:bg-base-100;
+  }
+
+  .form-control {
+    @apply mb-4;
+  }
+  .form-control > label {
+    @apply mb-1 tracking-wide font-semibold;
+  }
+
+  .invalid-feedback {
+    @apply block text-error text-sm mt-1;
+  }
+
+  .text-faint {
+    @apply opacity-60;
+  }
+  .text-normal {
+    @apply opacity-100;
+  }
+}
