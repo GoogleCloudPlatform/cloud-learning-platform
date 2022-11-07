@@ -25,8 +25,8 @@ class Cohort(BaseModel):
   max_student = NumberField()
   enrolled_student_count=NumberField()
   course_template=ReferenceField(CourseTemplate,required=True)
-  created_timestamp = TextField()
-  last_updated_timestamp = TextField()
+  created_timestamp = DateTime()
+  last_updated_timestamp = DateTime()
 
   class Meta:
     ignore_none_field = False
