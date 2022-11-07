@@ -18,7 +18,6 @@ class CourseTemplate(BaseModel):
   uuid=TextField()
   name = TextField(required=True)
   description = TextField(required=True)
-  topic = TextField(required=True)
   admin = TextField(required=True)
   instructional_designer=TextField(required=True)
   classroom_id=TextField()

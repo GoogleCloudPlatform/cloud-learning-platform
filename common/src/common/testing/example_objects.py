@@ -10,7 +10,6 @@ TEST_COURSE={
             "uuid":"fake-course-id",
             "name" : "name",
             "description" : "description",
-            "topic" :"topic",
             "admin" : "admin",
             "instructional_designer": "IDesiner",
             "classroom_id":"clID",
@@ -22,7 +21,10 @@ TEST_COHORT={
             "description": "description",
             "start_date": "2022-05-05",
             "end_date": "2022-04-04",
+            "registration_date": "2022-05-05",
+            "registration_end_date": "2022-04-04",
             "max_student": 0,
+            "enrolled_student_count":0,
             "course_template":TEST_COURSE
         }
 TEST_SECTION={
