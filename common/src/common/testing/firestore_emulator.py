@@ -32,7 +32,7 @@ import platform
 @pytest.fixture
 def firestore_emulator():
 
-  winows = True if platform.system() == "Windows" else False
+  winows = bool(platform.system() == "Windows")
   if winows:
     emulator = subprocess.Popen(
         "firebase emulators:start --only firestore --project fake-project",
@@ -55,7 +55,7 @@ def firestore_emulator():
     os.kill(emulator.pid, signal.CTRL_BREAK_EVENT)
   else:
     os.killpg(os.getpgid(emulator.pid), signal.SIGTERM)
-    
+
   # delete debug files
   # some get deleted, not all
 
