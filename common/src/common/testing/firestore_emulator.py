@@ -32,8 +32,8 @@ import platform
 @pytest.fixture
 def firestore_emulator():
 
-  is_winows = bool(platform.system() == "Windows")
-  if is_winows:
+  is_windows = bool(platform.system() == "Windows")
+  if is_windows:
     emulator = subprocess.Popen(
         "firebase emulators:start --only firestore --project fake-project",
         shell=True)
@@ -51,7 +51,7 @@ def firestore_emulator():
   # yield so emulator isn't recreated each test
   yield emulator
 
-  if is_winows:
+  if is_windows:
     os.kill(emulator.pid, signal.CTRL_BREAK_EVENT)
   else:
     os.killpg(os.getpgid(emulator.pid), signal.SIGTERM)
