@@ -12,11 +12,18 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
+from google.oauth2.credentials import Credentials
 from schemas.course_details import CourseDetails
 from services import classroom_crud
 import traceback
 import os
-from config import CLASSROOM_ADMIN_EMAIL
+from config import CLASSROOM_KEY
+import argparse
+import requests
+import os.path
+import os
+import google.auth
+from config import CLASSROOM_ADMIN_EMAIL,TEST,PROJECT_ID
 # disabling for linting to pass
 # pylint: disable = broad-except
 
@@ -24,8 +31,6 @@ router = APIRouter(prefix="/course", tags=["Course"])
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
-
-
 
 
 @router.get("/get_courses/")
@@ -44,11 +49,39 @@ def get_courses():
   """
   try: 
     course_list = classroom_crud.get_course_list()
-    return list(course_list)
-
+    SUCCESS_RESPONSE["result"]= list(course_list)
+    return SUCCESS_RESPONSE
   except Exception as e:
     Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    print(err)
     raise HTTPException(status_code=500) from e
+
+@router.post("/create_course/")
+def get_courses():
+  """Get courses list
+
+  Args:
+    course_id (Course): Course_id of a course that needs to copied
+
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+
+  Returns:
+    List of courses in classroom ,
+    {'status': 'Failed'} if the user creation raises an exception
+  """
+  try: 
+    result = classroom_crud.create_course("Maths_test1","a","me")
+    SUCCESS_RESPONSE["result"]= result
+    return SUCCESS_RESPONSE
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    print(err)
+    raise HTTPException(status_code=500) from e
+
+
 
 
 @router.post("/copy_course/")
@@ -88,5 +121,64 @@ def copy_courses(course_details: CourseDetails):
   except Exception as e:
     Logger.error(e)
     print(e)
+    raise HTTPException(status_code=500,data =e) from e
+
+
+
+@router.post("/get_data_metadata_server_d/")
+def get_data_metadata_server():
+  try:
+    SCOPES = [
+      'https://www.googleapis.com/auth/classroom.courses.readonly',
+      'https://www.googleapis.com/auth/classroom.rosters',
+      'https://www.googleapis.com/auth/classroom.courses'
+  ]
+
+    creds = google.auth.default(scopes=SCOPES)
+    service = build("classroom", "v1", credentials=creds)
+    results = service.courses().list().execute()
+    courses = results.get('courses', [])
+    print(courses)
+    return "success"
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    print(err)
+    raise HTTPException(status_code=500,data =e) from e
+
+
+@router.post("/get_data_metadata_server_s/")
+def get_data_metadata_server():
+  try:
+
+    METADATA_URL = 'http://metadata.google.internal/computeMetadata/v1/'
+    METADATA_HEADERS = {'Metadata-Flavor': 'Google'}
+    SERVICE_ACCOUNT = 'default'
+    url = '{}instance/service-accounts/{}/token'.format(
+        METADATA_URL, SERVICE_ACCOUNT)
+    # Request an access token from the metadata server.
+    r = requests.get(url, headers=METADATA_HEADERS)
+    r.raise_for_status() 
+    # Extract the access token from the response.
+    access_token = r.json()['access_token']
+    print(access_token)
+    class_url = "https://classroom.googleapis.com/v1/courses"
+
+    headers = {
+        'Authorization': 'Bearer {}'.format(access_token)
+    }
+    SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly',
+    'https://www.googleapis.com/auth/classroom.rosters',
+    'https://www.googleapis.com/auth/classroom.rosters']
+    creds = Credentials(access_token,scopes =SCOPES)
+
+    service = build("classroom", "v1", credentials=creds)
+    results = service.courses().list().execute()
+    courses = results.get('courses', [])
+    return courses
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    print(err)
     raise HTTPException(status_code=500,data =e) from e
 
