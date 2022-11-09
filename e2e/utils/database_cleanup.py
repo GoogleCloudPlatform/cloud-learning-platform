@@ -72,7 +72,6 @@ def delete_classroom_courses():
     if course["id"]=="561705256154":
       course = service.courses().delete(id="561705256154").execute()
       print("Deleted course success 561705256154 fully",course)
-      final_list.remove(course)
   return final_list
 
 if __name__ == "__main__":
