@@ -18,7 +18,10 @@
 """
 import os
 import firebase_admin
+import json
 from firebase_admin import credentials, firestore
+from google.oauth2 import service_account
+
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
@@ -45,9 +48,25 @@ def delete_collection(coll_ref, batch_size):
     return delete_collection(coll_ref, batch_size)
 
 
+def delete_classroom_courses():
+  GKE_POD_SA_KEY=json.loads(os.environ.get("GKE_POD_SA_KEY"))
+  CLASSROOM_ADMIN_EMAIL=os.environ.get(CLASSROOM_ADMIN_EMAIL)
+  SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
+    "https://www.googleapis.com/auth/classroom.courses.readonly"]
+  a_creds = service_account.Credentials.from_service_account_info(GKE_POD_SA_KEY,scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build('classroom', 'v1', credentials=creds)
+  courses = []
+    # pylint: disable=maybe-no-member
+  response = service.courses().list().execute()
+  courses.extend(response.get('courses', []))
+  return courses
+
 if __name__ == "__main__":
   if DATABASE_PREFIX is None:
     raise Exception("DATABASE_PREFIX is not defined. Database cleanup skipped.")
 
   print("Deleting Firebase collection")
   delete_firestore_collection(f"{DATABASE_PREFIX}document")
+  print("Deleting Courses from classroom")
+  print(delete_classroom_courses())

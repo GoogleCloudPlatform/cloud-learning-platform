@@ -29,5 +29,5 @@ def test_create_course():
   res = requests.post(base_url + "/lms/api/v1/course/create_course/")
   result = res.json()
   print(res.json)
-
+  
   assert res.status_code == 200
