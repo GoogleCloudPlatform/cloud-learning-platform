@@ -15,7 +15,9 @@
 """
 Unit Tests for user ORM object
 """
+# disabling these rules, as they cause issues with pytest fixtures
 # pylint: disable=unused-import
+# pylint: disable=unused-argument,redefined-outer-name
 from common.models import User
 from common.testing.example_objects import TEST_USER
 from common.testing.firestore_emulator import client_with_emulator, firestore_emulator, clean_firestore
