@@ -235,3 +235,4 @@ jobs:
         kubectl delete namespace $NAMESPACE
 
 # cookiecutter:endraw 
+
