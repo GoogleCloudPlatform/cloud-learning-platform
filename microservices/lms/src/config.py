@@ -24,8 +24,7 @@ DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 # CLASSROOM_SA_KEY_PATH = "./keys/{}-classroom-sa-key.json".format(PROJECT_ID)
 CLASSROOM_SA_KEY_PATH = "utils/service.json"
 # CLASSROOM_KEY = os.getenv("CLASSROOM_SA_KEYS","")
-TEST = os.environ.get("TEST")
-GKE_POD_SA_KEY = os.environ.get("GKE_POD_SA_KEY")
+# GKE_POD_SA_KEY = 
 
 SCOPES = [
     "https://www.googleapis.com/auth/cloud-platform",

@@ -23,7 +23,7 @@ import requests
 import os.path
 import os
 import google.auth
-from config import CLASSROOM_ADMIN_EMAIL,TEST,PROJECT_ID
+from config import CLASSROOM_ADMIN_EMAIL,PROJECT_ID
 # disabling for linting to pass
 # pylint: disable = broad-except
 

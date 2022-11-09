@@ -16,7 +16,7 @@ from google.oauth2 import service_account
 import traceback
 import json
 from google.protobuf.json_format import MessageToDict
-from config import CLASSROOM_ADMIN_EMAIL,GKE_POD_SA_KEY,PROJECT_ID
+from config import CLASSROOM_ADMIN_EMAIL,PROJECT_ID
 from google_auth_oauthlib.flow import Flow
 import google_crc32c
 
@@ -36,7 +36,7 @@ def create_course(name,section,owner_id):
 
     # a_creds = service_account.Credentials.from_service_account_file(
     # "utils/service.json", scopes=SCOPES)
-    GKE_POD_SA_KEY=json.loads(GKE_POD_SA_KEY)
+    # GKE_POD_SA_KEY=json.loads(GKE_POD_SA_KEY)
     a_creds = service_account.Credentials.from_service_account_info(GKE_POD_SA_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
