@@ -19,7 +19,7 @@
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 
 import pytest
-from firestore_emulator import clean_firestore
+from .firestore_emulator import clean_firestore
 from fastapi.testclient import TestClient
 from main import app
 
