@@ -59,7 +59,11 @@ def get_user(user_id: str):
   """
   try:
     user = User.find_by_uuid(user_id)
-    return user
+    if user is None:
+      raise ResourceNotFoundException(
+          f'User with uuid {user_id} is not found')
+    else:
+      return user
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
@@ -86,8 +90,6 @@ def create_user(input_user: UserModel):
     input_user_dict = {**input_user.dict()}
     new_user = new_user.from_dict(input_user_dict)
     existing_user = User.find_by_email(input_user_dict["email"])
-  except ResourceNotFoundException:
-    pass
   except Exception as e:
     raise InternalServerError(str(e)) from e
   if existing_user is not None:
@@ -130,7 +132,8 @@ def update_user(input_user: UserModel):
     input_user_dict = {**input_user.dict()}
     user = user.from_dict(input_user_dict)
     existing_user = User.find_by_uuid(input_user_dict["uuid"])
-
+    if existing_user is None:
+      raise ResourceNotFoundException(f'User with uuid {input_user_dict["uuid"]} is not found')
     timestamp = datetime.datetime.utcnow()
     user.last_updated_timestamp = timestamp
     user.created_timestamp=existing_user.created_timestamp
@@ -159,9 +162,11 @@ def delete_user(user_id: str):
     InternalServerErrorResponseModel if the user deletion raises an exception
   """
   try:
-    user = User.find_by_uuid(user_id)
-    User.collection.delete(user.key)
-    return SUCCESS_RESPONSE
+    if User.archive_by_uuid(user_id):
+      return SUCCESS_RESPONSE
+    else:
+      raise ResourceNotFoundException(
+          f'User with uuid {user_id} is not found')
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:

@@ -5,8 +5,7 @@ import os
 
 
 from common.models import BaseModel,CourseTemplate
-from common.utils.errors import ResourceNotFoundException
-from fireo.fields import TextField,DateTime,NumberField,ReferenceField
+from fireo.fields import TextField,DateTime,NumberField,ReferenceField,BooleanField
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PROJECT_ID = os.environ.get("PROJECT_ID", "")
@@ -25,12 +24,14 @@ class Cohort(BaseModel):
   max_student = NumberField()
   enrolled_student_count=NumberField()
   course_template=ReferenceField(CourseTemplate,required=True)
+  is_deleted = BooleanField(default=False)
   created_timestamp = DateTime()
   last_updated_timestamp = DateTime()
+  deleted_at_timestamp = DateTime()
 
   class Meta:
     ignore_none_field = False
-    collection_name = DATABASE_PREFIX + "cohort"
+    collection_name = DATABASE_PREFIX + "cohorts"
 
   @classmethod
   def find_by_uuid(cls, uuid):
@@ -40,7 +41,21 @@ class Cohort(BaseModel):
     Returns:
         Cohort: Cohort Object
     """
-    cohort= Cohort.collection.filter("uuid", "==", uuid).get()
-    if cohort is None:
-      raise ResourceNotFoundException(f"Cohort with uuid {uuid} is not found")
+    cohort = Cohort.collection.filter(
+        "uuid", "==", uuid).filter("is_deleted", "==", False).get()
     return cohort
+
+  @classmethod
+  def archive_by_uuid(cls, uuid):
+    '''Soft Delete a Cohort by using uuid
+    Args:
+        uuid (String): Cohort ID
+    '''
+    cohort = Cohort.collection.filter("uuid", "==", uuid).filter(
+        "is_deleted", "==", False).get()
+    if cohort is None:
+      return False
+    else:
+      cohort.is_deleted = True
+      cohort.update()
+      return True

@@ -72,7 +72,7 @@ def test_post_user_new(client_with_emulator):
   url = API_URL + "/users"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.post(url, json=input_user)
-
+  print(resp.json())
   assert resp.status_code == 200, "Status 200"
 
   # now see if GET endpoint returns same data
@@ -89,6 +89,8 @@ def test_post_user_new(client_with_emulator):
   # popping id and key for equivalency test
   loaded_user_dict.pop("id")
   loaded_user_dict.pop("key")
+  loaded_user_dict.pop("is_deleted")
+  loaded_user_dict.pop("deleted_at_timestamp")
 
   timestamp = datetime.datetime.utcnow()
 

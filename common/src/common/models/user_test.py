@@ -18,13 +18,36 @@ Unit Tests for user ORM object
 
 from common.models import User
 from common.testing.example_objects import TEST_USER
+from common.testing.firestore_emulator import client_with_emulator, firestore_emulator, clean_firestore
 
 
-def test_new_user():
+def test_new_user(client_with_emulator):
   # a placeholder unit test so github actions runs until we add more
-  user = User.from_dict(TEST_USER)
-
+  new_user = User.from_dict(TEST_USER)
+  new_user.save()
+  new_user.uuid=new_user.id
+  new_user.update()
+  user=User.find_by_uuid(new_user.uuid)
   assert user.auth_id == TEST_USER["auth_id"]
+  assert user.email==TEST_USER["email"] 
 
-def test_find_by_uuid():
-  pass
+def test_find_by_email(client_with_emulator):
+  '''test for finding user by email method'''
+  new_user = User.from_dict(TEST_USER)
+  new_user.save()
+  new_user.uuid = new_user.id
+  TEST_USER["uuid"]=new_user.uuid
+  new_user.update()
+  user = User.find_by_uuid(new_user.email)
+  assert user.auth_id == TEST_USER["auth_id"]
+  assert user.uuid == TEST_USER["uuid"]
+
+def test_delete_user(client_with_emulator):
+  '''test for soft delete method'''
+  new_user = User.from_dict(TEST_USER)
+  new_user.save()
+  new_user.uuid = new_user.id
+  new_user.update()
+  assert User.archive_by_uuid('fakeuuid')==False,"User not found"
+  assert User.archive_by_uuid(new_user.uuid)==True,"User successfully deleted"
+  
