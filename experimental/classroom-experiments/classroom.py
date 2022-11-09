@@ -14,6 +14,7 @@ limitations under the License.
 from __future__ import print_function
 
 import os.path
+import os
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -25,20 +26,25 @@ from google.oauth2 import service_account
 # If modifying these scopes, delete the file token.json.
 SCOPES = [
     'https://www.googleapis.com/auth/classroom.courses.readonly',
-    'https://www.googleapis.com/auth/classroom.rosters'
+    # 'https://www.googleapis.com/auth/classroom.rosters',
+    # 'https://www.googleapis.com/auth/classroom.courses'
 ]
 """Shows basic usage of the Classroom API.
 Prints the names of the first 10 courses the user has access to.
 """
-a_creds = service_account.Credentials.from_service_account_file('service.json',
-                                                                scopes=SCOPES)
+creds = service_account.Credentials.from_service_account_file(
+    os.environ["SA_KEY"], scopes=SCOPES)
 
-ADMIN_EMAIL = "<INSERT_ADMIN_EMAIL>"
-STUDENT_EMAIL = "<INSERT_STUDENT_EMAIL>"
+# creds.with_quota_project("classroom-invite-test")
+
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "")
+STUDENT_EMAIL = os.environ.get("STUDENT_EMAIL", "")
 COURSE_ID = "<INSERT_COURSE_ID>"
 ENROLLMENT_CODE = "<INSERT_ENROLLMENT_CODE"
 
-creds = a_creds.with_subject(ADMIN_EMAIL)
+creds = creds.with_subject(ADMIN_EMAIL)
+
+service = build('classroom', 'v1', credentials=creds)
 
 # creds = None
 # The file token.json stores the user's access and refresh tokens, and is
@@ -78,6 +84,48 @@ def get_courses():
     print('An error occurred: %s' % error)
 
 
+def create_course(course_name, creds):
+  service = build('classroom', 'v1', credentials=creds)
+
+  course = {'name': course_name, 'ownerId': 'me'}
+
+  try:
+    course = service.courses().create(body=course).execute()
+    print(f"Course created:  {(course.get('name'), course.get('id'))}")
+    return course
+  except HttpError as error:
+    print(f"An error occurred: {error}")
+    return error
+
+
+def delete_course(course, creds):
+  service = build('classroom', 'v1', credentials=creds)
+
+  try:
+    service.courses().delete(id=course.get("id"))
+    print(f"Course deleted:  {(course.get('name'), course.get('id'))}")
+  except HttpError as error:
+    print(f"An error occurred: {error}")
+    return error
+
+
+def invite_student(student_email, course, creds):
+  service = build('classroom', 'v1', credentials=creds)
+
+  invitation = {
+      'courseId': course.get("id"),
+      'userId': student_email,
+      "role": "STUDENT"
+  }
+
+  try:
+    invitation = service.invitations().create(body=invitation).execute()
+    return invitation
+  except HttpError as error:
+    print('An error occurred: %s' % error)
+    return error
+
+
 def enroll_student(student_email, course_id, enrollment_code, creds):
   service = build('classroom', 'v1', credentials=creds)
   status = False
@@ -112,13 +160,21 @@ def main():
     # Prints the names of the first 10 courses.
     print('Courses:')
     for course in courses:
+      pass
       print(course["name"], course["id"], course["alternateLink"])
 
-    enroll_status = enroll_student(STUDENT_EMAIL,
-                                   COURSE_ID,
-                                   ENROLLMENT_CODE,
-                                   creds=creds)
-    print("Enrollment status", enroll_status)
+    # course = create_course("dhodun-test-course-1", creds)
+
+    # course = service.courses().get(id="COURSE_ID").execute()
+    # delete_course(course, creds)
+    # invitation = invite_student(STUDENT_EMAIL, course, creds)
+    # print(f"Invitation id: {invitation.get('id')}")
+
+    # enroll_status = enroll_student(STUDENT_EMAIL,
+    #                                COURSE_ID,
+    #                                ENROLLMENT_CODE,
+    #                                creds=creds)
+    # print("Enrollment status", enroll_status)
 
     # enroll student
 
