@@ -72,5 +72,5 @@ def firestore_emulator():
 @pytest.fixture
 def clean_firestore(firestore_emulator):
   requests.delete(
-      "http://localhost:8080/emulator/v1/projects/fake-project/databases/(default)/documents"
-  )
+      "http://localhost:8080/emulator/v1/projects/fake-project/databases/(default)/documents",
+      timeout=10)
