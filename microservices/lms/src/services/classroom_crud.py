@@ -37,7 +37,10 @@ def create_course(name,section,owner_id):
     # a_creds = service_account.Credentials.from_service_account_file(
     # "utils/service.json", scopes=SCOPES)
     # GKE_POD_SA_KEY=json.loads(GKE_POD_SA_KEY)
-    a_creds = service_account.Credentials.from_service_account_info(GKE_POD_SA_KEY,scopes=SCOPES)
+    response = get_secret_from_secret_manager()
+    CLASSROOM_KEY = json.loads(response)
+    print("*********CLASSROOM KEY*****************",CLASSROOM_KEY)
+    a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
     new_course = {}
@@ -107,7 +110,8 @@ def get_course_list():
    
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
 
-    print("cred  -------",creds)
+    creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+    print("cred  -------",CLASSROOM_ADMIN_EMAIL,creds)
     service = build("classroom", "v1", credentials=creds)
     results = service.courses().list().execute()
     courses = results.get('courses', [])

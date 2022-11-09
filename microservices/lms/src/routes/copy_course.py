@@ -58,7 +58,7 @@ def get_courses():
     raise HTTPException(status_code=500) from e
 
 @router.post("/create_course/")
-def get_courses():
+def createe_courses():
   """Get courses list
 
   Args:
