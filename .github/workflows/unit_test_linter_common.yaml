@@ -104,6 +104,6 @@ jobs:
       run: |
         BASE_DIR=$(pwd)
         cd ${{ matrix.target-folder }}/src
-        python -m pylint $(git ls-files '*.py') --rcfile=$BASE_DIR/.pylintrc
+        python -m pylint $(git ls-files '*.py') --rcfile=$BASE_DIR/.pylintrc --recursive=y
 
 # cookiecutter:endraw 
