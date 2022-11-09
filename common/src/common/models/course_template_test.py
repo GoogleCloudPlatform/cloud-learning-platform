@@ -32,7 +32,6 @@ def test_new_course(client_with_emulator):
   course_template=CourseTemplate.find_by_uuid(new_course_template.uuid)
   assert course_template.name==TEST_COURSE_TEMPLATE["name"]
   assert course_template.description == TEST_COURSE_TEMPLATE["description"]
-  
 
 def test_delete_course_template(client_with_emulator):
   '''test for soft delete method'''

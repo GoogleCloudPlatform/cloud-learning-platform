@@ -38,7 +38,6 @@ def test_new_section(client_with_emulator):
   section=Section.find_by_uuid(new_section.uuid)
   assert section.name == TEST_SECTION["name"]
   assert section.section == TEST_SECTION["section"]
-  
 
 def test_delete_section(client_with_emulator):
   '''test for soft delete method'''
