@@ -67,13 +67,13 @@ def delete_classroom_courses():
   for course in courses:
     if course["name"]=="Maths_test1":
       final_list.append(course)
-  course = service.courses().delete(id="559098498048").execute()
-  print("Deleted course** success 559098498048 fully",course)
+  # course = service.courses().delete(id="559098498048").execute()
+  # print("Deleted course** success 559098498048 fully",course)
   
-  for course in final_list:
-    if course["id"]=="":
-      course = service.courses().delete(id="559098498048").execute()
-      print("Deleted course success 559098498048 fully",course)
+  # for course in final_list:
+    # if course["id"]=="":
+      # course = service.courses().delete(id="559098498048").execute()
+      # print("Deleted course success 559098498048 fully",course)
   return final_list
 
 if __name__ == "__main__":
