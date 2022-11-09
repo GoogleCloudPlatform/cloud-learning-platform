@@ -10,3 +10,7 @@ pytest - custom_exit_code
 pytest - mock
 pyyaml
 requests
+google-auth
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib

@@ -50,7 +50,7 @@ def delete_collection(coll_ref, batch_size):
 
 def delete_classroom_courses():
   GKE_POD_SA_KEY=json.loads(os.environ.get("GKE_POD_SA_KEY"))
-  CLASSROOM_ADMIN_EMAIL=os.environ.get(CLASSROOM_ADMIN_EMAIL)
+  CLASSROOM_ADMIN_EMAIL=os.environ.get("CLASSROOM_ADMIN_EMAIL")
   SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
   a_creds = service_account.Credentials.from_service_account_info(GKE_POD_SA_KEY,scopes=SCOPES)
