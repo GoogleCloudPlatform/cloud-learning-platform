@@ -50,6 +50,7 @@ def test_delete_user(client_with_emulator):
   new_user.save()
   new_user.uuid = new_user.id
   new_user.update()
-  assert User.archive_by_uuid('fakeuuid') is False, "User not found"
-  assert User.archive_by_uuid(new_user.uuid) is True, "User successfully deleted"
+  assert User.archive_by_uuid("fakeuuid") is False, "User not found"
+  assert User.archive_by_uuid(
+    new_user.uuid) is True, "User successfully deleted"
   
