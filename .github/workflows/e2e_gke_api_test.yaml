@@ -81,7 +81,7 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         NAMESPACE=e2e-pr-$PR_NUMBER
         kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
-        NAMESPACE=${NAMESPACE} bash setup/setup_ksa.sh
+        NAMESPACE=${NAMESPACE} ./setup/setup_ksa.sh
 
     - name: Build and deploy to cluster
       run: |
