@@ -14,6 +14,8 @@
 
 set -e
 
+TERM=dumb
+
 declare -a EnvVars=(
   "NAMESPACE"
   "PROJECT_ID"
