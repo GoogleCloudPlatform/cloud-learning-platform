@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
   Tests for User endpoints
 """
@@ -21,7 +20,8 @@ import datetime
 
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
-from common.testing.firestore_emulator import client_with_emulator, firestore_emulator, clean_firestore
+from common.testing.firestore_emulator import firestore_emulator, clean_firestore
+from common.testing.client_with_emulator import client_with_emulator
 
 from common.models import User
 import mock
