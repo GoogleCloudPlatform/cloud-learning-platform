@@ -1,6 +1,7 @@
 """
 Unit test for section.py
 """
+# pylint: disable=unused-import
 from common.models import Section,CourseTemplate,Cohort
 from common.testing.example_objects import TEST_SECTION,TEST_COURSE_TEMPLATE,TEST_COHORT
 from common.testing.firestore_emulator import clean_firestore,client_with_emulator,firestore_emulator
@@ -36,6 +37,6 @@ def test_delete_section(client_with_emulator):
   new_section.save()
   new_section.uuid = new_section.id
   new_section.update()
-  assert Section.archive_by_uuid("fakeuuid") == False, "Section not found"
+  assert Section.archive_by_uuid("fakeuuid") is False, "Section not found"
   assert Section.archive_by_uuid(
-      new_section.uuid) == True, "Section successfully deleted"
+      new_section.uuid) is True, "Section successfully deleted"

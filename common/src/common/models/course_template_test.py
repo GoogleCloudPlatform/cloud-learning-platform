@@ -1,6 +1,7 @@
 """
 Unit test for course_template.py
 """
+# pylint: disable=unused-import
 from common.models import CourseTemplate
 from common.testing.example_objects import TEST_COURSE_TEMPLATE
 from common.testing.firestore_emulator import client_with_emulator, firestore_emulator, clean_firestore
@@ -24,6 +25,6 @@ def test_delete_course_template(client_with_emulator):
   new_course_template.uuid = new_course_template.id
   new_course_template.update()
   assert CourseTemplate.archive_by_uuid(
-      "fakeuuid") == False, "Course Template not found"
+      "fakeuuid") is False, "Course Template not found"
   assert CourseTemplate.archive_by_uuid(
-      new_course_template.uuid) == True, "Course Template successfully deleted"
+      new_course_template.uuid) is True, "Course Template successfully deleted"
