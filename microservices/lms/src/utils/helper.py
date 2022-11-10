@@ -4,7 +4,7 @@ from google.cloud import secretmanager
 import google_crc32c
 import json
 
-def get_secret_from_secret_manager():
+def get_gke_pd_sa_key_from_secret_manager():
     """Copy course  API
 
   Args:

@@ -13,13 +13,11 @@
 # limitations under the License.
 
 """
-  Deletes datasets from firestore and bigquery when the github actions
+  Deletes courses from google classroom  when the github actions
   complete running tests
 """
 import os
-# import firebase_admin
 import json
-# from firebase_admin import credentials, firestore
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -43,11 +41,11 @@ def delete_classroom_courses():
     # pylint: disable=maybe-no-member
   response = service.courses().list().execute()
   courses.extend(response.get('courses', []))
-  test_course = DATABASE_PREFIX
+  test_course = DATABASE_PREFIX + "test_course"
   print("Course Names to be deleted",DATABASE_PREFIX,len(DATABASE_PREFIX))
   for course in courses:
     print("Course_name "+course["name"]+" ID ",course["id"])
-    if DATABASE_PREFIX in course["name"]:
+    if DATABASE_PREFIX + "test_course" in course["name"]:
       print("Inside IF for delete ")
       final_list.append(course["name"])
       course = service.courses().delete(id=course["id"]).execute()

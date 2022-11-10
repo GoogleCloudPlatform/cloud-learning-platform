@@ -26,11 +26,6 @@ spec:
       labels:
         app: lms
     spec:
-      # serviceAccountName: ksa
-      # volumes:
-      #   - name: classroom-sa-key
-      #     secret:
-      #       secretName:classroom-sa-key
       containers:
       - name: lms
         image: lms

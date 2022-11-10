@@ -27,7 +27,7 @@ def test_copy_course():
   creds = a_creds.with_subject(os.environ.get("CLASSROOM_ADMIN_EMAIL"))
   service = build("classroom", "v1", credentials=creds)
   new_course = {}
-  new_course["name"]=DATABASE_PREFIX
+  new_course["name"]=DATABASE_PREFIX + "test_course"
   new_course["section"]="test_section"
   new_course["description"]="This is description"
   # new_course["room"]=course["room"]

@@ -38,7 +38,7 @@ def create_course(name,description,section,owner_id):
     """""
     SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
-    CLASSROOM_KEY = helper.get_secret_from_secret_manager()
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
@@ -63,7 +63,7 @@ def get_course_by_id(course_id):
     """""
     SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
-    CLASSROOM_KEY = helper.get_secret_from_secret_manager()
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     try:
@@ -87,7 +87,7 @@ def get_course_list():
 
     SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly',
     'https://www.googleapis.com/auth/classroom.rosters']
-    CLASSROOM_KEY = helper.get_secret_from_secret_manager()
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
@@ -105,7 +105,7 @@ def get_topics(course_id):
     SCOPES = ['https://www.googleapis.com/auth/classroom.topics',
   'https://www.googleapis.com/auth/classroom.topics.readonly']
     
-    CLASSROOM_KEY = helper.get_secret_from_secret_manager()
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
@@ -137,7 +137,7 @@ def create_topics(course_id , topics):
     SCOPES = ['https://www.googleapis.com/auth/classroom.topics',
   'https://www.googleapis.com/auth/classroom.topics.readonly']
 
-    CLASSROOM_KEY = helper.get_secret_from_secret_manager()
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
@@ -159,7 +159,7 @@ def get_coursework(course_id):
     """""
     SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students',
     'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
-    CLASSROOM_KEY = helper.get_secret_from_secret_manager()
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
@@ -179,7 +179,7 @@ def create_coursework(course_id, coursework_list):
     """""
     SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students',
     'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
-    CLASSROOM_KEY = helper.get_secret_from_secret_manager()
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
@@ -195,7 +195,7 @@ def delete_course_by_id(course_id):
     """""
     SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
-    CLASSROOM_KEY = helper.get_secret_from_secret_manager()
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
