@@ -21,10 +21,6 @@ PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
 PROJECT_ID = os.environ.get("PROJECT_ID") or \
     os.environ.get("GOOGLE_CLOUD_PROJECT")
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
-# CLASSROOM_SA_KEY_PATH = "./keys/{}-classroom-sa-key.json".format(PROJECT_ID)
-CLASSROOM_SA_KEY_PATH = "utils/service.json"
-# CLASSROOM_KEY = os.getenv("CLASSROOM_SA_KEYS","")
-# GKE_POD_SA_KEY = 
 
 SCOPES = [
     "https://www.googleapis.com/auth/cloud-platform",
