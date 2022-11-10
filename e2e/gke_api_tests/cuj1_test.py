@@ -9,11 +9,7 @@ def test_get_course_list():
   base_url = get_baseurl("lms")
   if not base_url:
     raise NotFoundErr("Unable to locate the service URL for lms")
-  print("*****************************************",base_url+"/lms/api/v1/course/get_courses/")
-#   print(base_url)
-#   with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
   res = requests.get(base_url + "/lms/api/v1/course/get_courses/")
-  print(res.json())
   result = res.json()
   assert res.status_code == 200
 
@@ -26,7 +22,12 @@ def test_create_course():
 #   print(base_url)
 #   with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
   res = requests.post(base_url + "/lms/api/v1/course/create_course/")
+  
   result = res.json()
   print(res.json)
   
   assert res.status_code == 200
+
+def test_copy_course():
+  test_name =os.environ.get("DATABASE_PREFIX")
+  assert test_name =="e2e_pr50"

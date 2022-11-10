@@ -72,7 +72,7 @@ def createe_courses():
     {'status': 'Failed'} if the user creation raises an exception
   """
   try: 
-    result = classroom_crud.create_course("Maths_test1","a","me")
+    result = classroom_crud.create_course("Maths_test1a","a","me")
     SUCCESS_RESPONSE["result"]= result
     return SUCCESS_RESPONSE
   except Exception as e:
@@ -106,7 +106,7 @@ def copy_courses(course_details: CourseDetails):
     if current_course is None:
       return "No course found "
     # Create a new course
-    new_course = classroom_crud.create_course(current_course["name"],current_course["section"],current_course["ownerId"]) 
+    new_course = classroom_crud.create_course(current_course["name"],current_course["description"],current_course["section"],current_course["ownerId"]) 
     # Get topics of current course
     topics = classroom_crud.get_topics(course_id)
     if topics is not None:
@@ -122,63 +122,3 @@ def copy_courses(course_details: CourseDetails):
     Logger.error(e)
     print(e)
     raise HTTPException(status_code=500,data =e) from e
-
-
-
-@router.post("/get_data_metadata_server_d/")
-def get_data_metadata_server():
-  try:
-    SCOPES = [
-      'https://www.googleapis.com/auth/classroom.courses.readonly',
-      'https://www.googleapis.com/auth/classroom.rosters',
-      'https://www.googleapis.com/auth/classroom.courses'
-  ]
-
-    creds = google.auth.default(scopes=SCOPES)
-    service = build("classroom", "v1", credentials=creds)
-    results = service.courses().list().execute()
-    courses = results.get('courses', [])
-    print(courses)
-    return "success"
-  except Exception as e:
-    Logger.error(e)
-    err = traceback.format_exc().replace("\n", " ")
-    print(err)
-    raise HTTPException(status_code=500,data =e) from e
-
-
-@router.post("/get_data_metadata_server_s/")
-def get_data_metadata_server():
-  try:
-
-    METADATA_URL = 'http://metadata.google.internal/computeMetadata/v1/'
-    METADATA_HEADERS = {'Metadata-Flavor': 'Google'}
-    SERVICE_ACCOUNT = 'default'
-    url = '{}instance/service-accounts/{}/token'.format(
-        METADATA_URL, SERVICE_ACCOUNT)
-    # Request an access token from the metadata server.
-    r = requests.get(url, headers=METADATA_HEADERS)
-    r.raise_for_status() 
-    # Extract the access token from the response.
-    access_token = r.json()['access_token']
-    print(access_token)
-    class_url = "https://classroom.googleapis.com/v1/courses"
-
-    headers = {
-        'Authorization': 'Bearer {}'.format(access_token)
-    }
-    SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly',
-    'https://www.googleapis.com/auth/classroom.rosters',
-    'https://www.googleapis.com/auth/classroom.rosters']
-    creds = Credentials(access_token,scopes =SCOPES)
-
-    service = build("classroom", "v1", credentials=creds)
-    results = service.courses().list().execute()
-    courses = results.get('courses', [])
-    return courses
-  except Exception as e:
-    Logger.error(e)
-    err = traceback.format_exc().replace("\n", " ")
-    print(err)
-    raise HTTPException(status_code=500,data =e) from e
-
