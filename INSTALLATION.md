@@ -1,7 +1,7 @@
 # Installation
 
 - Google workspace - allow all users
-![](docs/static/images/classroom_personal_accounts.png)
+  ![](docs/static/images/classroom_personal_accounts.png)
 
 ## Enable Classroom API
 
@@ -10,6 +10,7 @@ The Classroom API Needs to be enabled in the project where the backend Service A
 https://console.cloud.google.com/apis/api/classroom.googleapis.com
 
 ## Scopes needed for Service Account
+
 - https://www.googleapis.com/auth/classroom.announcements
 - https://www.googleapis.com/auth/classroom.announcements.readonly
 - https://www.googleapis.com/auth/classroom.courses

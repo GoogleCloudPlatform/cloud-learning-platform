@@ -18,7 +18,13 @@
 """
 import os
 import firebase_admin
+import json
 from firebase_admin import credentials, firestore
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from google.oauth2 import service_account
+from google.oauth2.credentials import Credentials
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
@@ -51,3 +57,4 @@ if __name__ == "__main__":
 
   print("Deleting Firebase collection")
   delete_firestore_collection(f"{DATABASE_PREFIX}document")
+ 

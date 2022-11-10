@@ -37,7 +37,8 @@ env:
   KUSTOMIZE_VERSION: 4.1.3
   SKAFFOLD_VERSION: 1.39.2
   SKAFFOLD_CACHE_GCS: gs://core-learning-services-dev.appspot.com/skaffold/cache
-
+  CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
+  GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
 # cookiecutter:raw 
 jobs:
   deploy:
@@ -143,6 +144,12 @@ jobs:
         cd e2e/utils
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_cleanup.py
 
+    - name: Cleaning up classroom
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        cd e2e/utils
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python classroom_cleanup.py
+
     - name: Wait for 5s for database cleaning up
       run: sleep 5s
       shell: bash
@@ -193,6 +200,13 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_cleanup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python classroom_cleanup.py
+
+    - name: Cleaning up classroom
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        cd e2e/utils
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python classroom_cleanup.py
 
   deployment-cleanup:
     name: Clean up deployment in PR namespace
