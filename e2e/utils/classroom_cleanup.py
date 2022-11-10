@@ -49,9 +49,10 @@ def delete_classroom_courses():
   response = service.courses().list().execute()
   courses.extend(response.get('courses', []))
   for course in courses:
+    print("Course_name"+course["name"]+" ID ",course["id"])
     if "e2e_pr50_" in course["name"]:
       final_list.append(course)
-      course = service.courses().delete(id=course[id]).execute()
+      course = service.courses().delete(id=course["id"]).execute()
   return final_list
 
 if __name__ == "__main__":
