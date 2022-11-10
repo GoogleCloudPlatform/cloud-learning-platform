@@ -143,6 +143,11 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_cleanup.py
+
+    - name: Cleaning up classroom
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        cd e2e/utils
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python classroom_cleanup.py
 
     - name: Wait for 5s for database cleaning up
@@ -195,6 +200,12 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_cleanup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python classroom_cleanup.py
+
+    - name: Cleaning up classroom
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        cd e2e/utils
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python classroom_cleanup.py
 
   deployment-cleanup:
