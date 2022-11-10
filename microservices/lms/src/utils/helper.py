@@ -1,9 +1,17 @@
+""" Helper Functions"""
+
 from google.cloud import secretmanager
 import google_crc32c
 import json
 
 def get_secret_from_secret_manager():
-    print("Called Function")
+    """Copy course  API
+
+  Args:
+  Returns:
+    return the POD service account keys in JSON format
+    """""
+    
     client = secretmanager.SecretManagerServiceClient()
     secret_id="gke-pod-sa-key"
     version_id="1"
@@ -15,6 +23,5 @@ def get_secret_from_secret_manager():
         print("Data corruption detected.")
         return response
     payload = response.payload.data.decode("UTF-8")
-    print("Plaintext: {}".format(payload))
     response = json.loads(payload)
     return response

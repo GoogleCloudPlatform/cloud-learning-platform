@@ -1,14 +1,11 @@
 """ User endpoints """
-import datetime
 from re import I
 from fastapi import APIRouter, HTTPException
 from common.utils.logging_handler import Logger
 from fastapi.encoders import jsonable_encoder
 from google.api_core.exceptions import PermissionDenied
-import os.path
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-# from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
@@ -16,14 +13,8 @@ from google.oauth2.credentials import Credentials
 from schemas.course_details import CourseDetails
 from services import classroom_crud
 import traceback
-import os
-# from config import CLASSROOM_KEY
-import argparse
-import requests
 import os.path
 import os
-import google.auth
-from config import CLASSROOM_ADMIN_EMAIL,PROJECT_ID
 # disabling for linting to pass
 # pylint: disable = broad-except
 

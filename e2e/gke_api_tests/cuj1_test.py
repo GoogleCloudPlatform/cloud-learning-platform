@@ -19,7 +19,7 @@ def test_get_course_list():
 
 def test_copy_course():
   DATABASE_PREFIX =os.environ.get("DATABASE_PREFIX")
-  # Creating a course 
+  # Creating a course  with DATABASE_PREFIX NAME 
   SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
   CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
@@ -36,11 +36,15 @@ def test_copy_course():
   course = service.courses().create(body=new_course).execute()
   course_name = course.get("name")
   course_id = course.get("id")
+  # Get the course_id of course and hit the copy API to copy the given course
   course_details={
     "course_id":course_id
   }
   base_url = get_baseurl("lms")
   res = requests.post(base_url + "/lms/api/v1/course/copy_course/",json=course_details)
   print(res.json())
-  
+  result = res.json()["result"]
+  assert result["name"] == DATABASE_PREFIX
+  assert result["section"] == new_course["section"]
+  assert result["description"] == new_course["description"]
   assert res.status_code == 200

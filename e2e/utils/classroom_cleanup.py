@@ -29,11 +29,6 @@ from google.oauth2.credentials import Credentials
 PROJECT_ID = os.getenv("PROJECT_ID")
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
 
-# Initializing Firebase client.
-# firebase_admin.initialize_app(credentials.ApplicationDefault(), {
-#     "projectId": PROJECT_ID,
-# })
-
 
 def delete_classroom_courses():
   GKE_POD_SA_KEY=json.loads(os.environ.get("GKE_POD_SA_KEY"))
@@ -52,7 +47,7 @@ def delete_classroom_courses():
   print("Course Names to be deleted",DATABASE_PREFIX,len(DATABASE_PREFIX))
   for course in courses:
     print("Course_name "+course["name"]+" ID ",course["id"])
-    if DATABASE_PREFIX == course["name"]:
+    if DATABASE_PREFIX in course["name"]:
       print("Inside IF for delete ")
       final_list.append(course["name"])
       course = service.courses().delete(id=course["id"]).execute()
@@ -63,4 +58,5 @@ if __name__ == "__main__":
   if DATABASE_PREFIX is None:
     raise Exception("DATABASE_PREFIX is not defined. Database cleanup skipped.")
   print("Deleting Courses from classroom")
-  print(delete_classroom_courses())
+  result = delete_classroom_courses()
+  print(result)

@@ -30,6 +30,12 @@ FAILED_RESPONSE = {"status": "Failed"}
 
 
 def create_course(name,description,section,owner_id):
+    """Create course Function in classroom
+
+  Args: course_name ,description of course, section,owner_id of course
+  Returns:
+    new created course details
+    """""
     SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
     CLASSROOM_KEY = helper.get_secret_from_secret_manager()
@@ -49,6 +55,12 @@ def create_course(name,description,section,owner_id):
     return course
 
 def get_course_by_id(course_id):
+    """Get course by Id function from classroom
+
+    Args: course_id
+  Returns:
+        course details
+    """""
     SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
     CLASSROOM_KEY = helper.get_secret_from_secret_manager()
@@ -64,6 +76,15 @@ def get_course_by_id(course_id):
         return None
 
 def get_course_list():    
+
+    """Get courses list from classroom
+
+  Args: 
+  Returns:
+    list of courses in classroom
+    """""
+
+
     SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly',
     'https://www.googleapis.com/auth/classroom.rosters']
     CLASSROOM_KEY = helper.get_secret_from_secret_manager()
@@ -75,6 +96,12 @@ def get_course_list():
     return courses
 
 def get_topics(course_id):
+    """Get  list of topics from classroom
+
+  Args: course_id
+  Returns:
+    returns list of topics of given course in classroom
+    """""
     SCOPES = ['https://www.googleapis.com/auth/classroom.topics',
   'https://www.googleapis.com/auth/classroom.topics.readonly']
     
@@ -99,7 +126,14 @@ def get_topics(course_id):
 
 
 def create_topics(course_id , topics):
- 
+    """create topic in course
+
+  Args: 
+  course_id: where topics need to be created
+  topics : list of dictionary of topics to be created
+  Returns:
+    returns success
+    """""
     SCOPES = ['https://www.googleapis.com/auth/classroom.topics',
   'https://www.googleapis.com/auth/classroom.topics.readonly']
 
@@ -117,6 +151,12 @@ def create_topics(course_id , topics):
     return "success"
 
 def get_coursework(course_id):
+    """Get  list of coursework from classroom
+
+  Args: course_id
+  Returns:
+    returns list of coursework of given course in classroom
+    """""
     SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students',
     'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
     CLASSROOM_KEY = helper.get_secret_from_secret_manager()
@@ -129,7 +169,14 @@ def get_coursework(course_id):
     return coursework_list
 
 def create_coursework(course_id, coursework_list):
+    """create coursework in a classroom course
 
+  Args: 
+  course_id: where coursework need to be created
+  coursework : list of dictionary of coursework to be created
+  Returns:
+    returns success
+    """""
     SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students',
     'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
     CLASSROOM_KEY = helper.get_secret_from_secret_manager()
@@ -140,6 +187,12 @@ def create_coursework(course_id, coursework_list):
         coursework = service.courses().courseWork().create(courseId=course_id, body=coursework_item).execute()
     
 def delete_course_by_id(course_id):
+    """Delete a course from classroom
+
+  Args: course_id
+  Returns:
+    []
+    """""
     SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
     CLASSROOM_KEY = helper.get_secret_from_secret_manager()
