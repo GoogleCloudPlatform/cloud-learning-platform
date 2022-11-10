@@ -48,11 +48,15 @@ def delete_classroom_courses():
     # pylint: disable=maybe-no-member
   response = service.courses().list().execute()
   courses.extend(response.get('courses', []))
+  test_course = DATABASE_PREFIX
+  print("Course Names to be deleted",DATABASE_PREFIX)
   for course in courses:
     print("Course_name"+course["name"]+" ID ",course["id"])
-    if "e2e_pr50_" in course["name"]:
+    if DATABASE_PREFIX in course["name"]:
+      print("Inside IF for delete ")
       final_list.append(course)
       course = service.courses().delete(id=course["id"]).execute()
+      print("AFter delete")
   return final_list
 
 if __name__ == "__main__":
