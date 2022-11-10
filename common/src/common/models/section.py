@@ -13,27 +13,30 @@
 # limitations under the License.
 
 """
-User object in the ORM
+Module to add section in Fireo
 """
-
 import datetime
 import os
 
-from common.models import BaseModel
-from fireo.fields import TextField,DateTime,BooleanField
+from common.models import BaseModel,CourseTemplate,Cohort
+from fireo.fields import TextField,DateTime,ReferenceField,ListField,BooleanField
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PROJECT_ID = os.environ.get("PROJECT_ID", "")
 
 
-class User(BaseModel):
-  """
-  User ORM class
+class Section(BaseModel):
+  """Section ORM class
   """
   uuid=TextField()
-  auth_id=TextField(required=True)
-  email=TextField(required=True)
-  role=TextField()
+  name = TextField(required=True)
+  section = TextField(required=True)
+  description=TextField()
+  classroom_id = TextField(required=True)
+  classroom_code = TextField(required=True)
+  course_template=ReferenceField(CourseTemplate,required=True)
+  cohort=ReferenceField(Cohort,required=True)
+  teachers_list=ListField(required=True)
   is_deleted = BooleanField(default=False)
   created_timestamp = DateTime()
   last_updated_timestamp = DateTime()
@@ -41,44 +44,32 @@ class User(BaseModel):
 
   class Meta:
     ignore_none_field = False
-    collection_name = DATABASE_PREFIX + "users"
-
-  @classmethod
-  def find_by_email(cls, email):
-    """Find a user using email (string)
-    Args:
-        email (string): User Email
-    Returns:
-        User: User Object
-    """
-    user = User.collection.filter("email", "==", email).filter(
-        "is_deleted", "==", False).get()
-    return user
+    collection_name = DATABASE_PREFIX + "sections"
 
   @classmethod
   def find_by_uuid(cls, uuid):
-    """Find a user using uuid (UUID)
+    """Find a Section using uuid (UUID)
     Args:
-        uuid (string): User ID
+        uuid (string): Section ID
     Returns:
-        User: User Object
+        Section: Section Object
     """
-    user = User.collection.filter("uuid", "==", uuid).filter(
-        "is_deleted", "==", False).get()
-    return user
+    section = Section.collection.filter(
+        "uuid", "==", uuid).filter("is_deleted", "==", False).get()
+    return section
 
   @classmethod
   def archive_by_uuid(cls, uuid):
-    '''Soft Delete a User by using uuid
+    '''Soft Delete a Section by using uuid
       Args:
-          uuid (String): User ID
+          uuid (String): Section ID
       '''
-    user = User.collection.filter("uuid", "==", uuid).filter(
+    section = Section.collection.filter("uuid", "==", uuid).filter(
         "is_deleted", "==", False).get()
-    if user is None:
+    if section is None:
       return False
     else:
-      user.is_deleted = True
-      user.deleted_at_timestamp = datetime.datetime.utcnow()
-      user.update()
+      section.is_deleted = True
+      section.deleted_at_timestamp = datetime.datetime.utcnow()
+      section.update()
       return True

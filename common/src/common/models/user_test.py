@@ -15,13 +15,42 @@
 """
 Unit Tests for user ORM object
 """
-
+# disabling these rules, as they cause issues with pytest fixtures
+# pylint: disable=unused-import
+# pylint: disable=unused-argument,redefined-outer-name
 from common.models import User
+from common.testing.example_objects import TEST_USER
+from common.testing.firestore_emulator import  firestore_emulator, clean_firestore
 
 
-def test_new_user():
+def test_new_user(clean_firestore):
   # a placeholder unit test so github actions runs until we add more
-  user_id = "test_id123"
-  user = User(user_id=user_id)
+  new_user = User.from_dict(TEST_USER)
+  new_user.save()
+  new_user.uuid=new_user.id
+  new_user.update()
+  user=User.find_by_uuid(new_user.uuid)
+  assert user.auth_id == TEST_USER["auth_id"]
+  assert user.email==TEST_USER["email"]
 
-  assert user.user_id == user_id
+def test_find_by_email(clean_firestore):
+  '''test for finding user by email method'''
+  new_user = User.from_dict(TEST_USER)
+  new_user.save()
+  new_user.uuid = new_user.id
+  TEST_USER["uuid"]=new_user.uuid
+  new_user.update()
+  user = User.find_by_email(new_user.email)
+  assert user.auth_id == TEST_USER["auth_id"]
+  assert user.uuid == TEST_USER["uuid"]
+
+def test_delete_user(clean_firestore):
+  '''test for soft delete method'''
+  new_user = User.from_dict(TEST_USER)
+  new_user.save()
+  new_user.uuid = new_user.id
+  new_user.update()
+  assert User.archive_by_uuid("fakeuuid") is False, "User not found"
+  assert User.archive_by_uuid(
+    new_user.uuid) is True, "User successfully deleted"
+  

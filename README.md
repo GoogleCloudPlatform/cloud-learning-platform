@@ -20,6 +20,7 @@
 	numbering=true
 	autoSave=true
 	/vscode-markdown-toc-config -->
+	
 <!-- /vscode-markdown-toc -->
 
 > This solution skeleton is created from https://github.com/GoogleCloudPlatform/solutions-template
