@@ -20,9 +20,9 @@ Unit test for section.py
 # pylint: disable=unused-argument,redefined-outer-name
 from common.models import Section,CourseTemplate,Cohort
 from common.testing.example_objects import TEST_SECTION,TEST_COURSE_TEMPLATE,TEST_COHORT
-from common.testing.firestore_emulator import clean_firestore,client_with_emulator,firestore_emulator
+from common.testing.firestore_emulator import clean_firestore,firestore_emulator
 
-def test_new_section(client_with_emulator):
+def test_new_section(clean_firestore):
   '''test for creating and loading a new section'''
   new_section = Section.from_dict(TEST_SECTION)
   course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
@@ -39,7 +39,7 @@ def test_new_section(client_with_emulator):
   assert section.name == TEST_SECTION["name"]
   assert section.section == TEST_SECTION["section"]
 
-def test_delete_section(client_with_emulator):
+def test_delete_section(clean_firestore):
   '''test for soft delete method'''
   new_section = Section.from_dict(TEST_SECTION)
   course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)

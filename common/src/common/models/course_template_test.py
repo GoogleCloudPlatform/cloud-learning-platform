@@ -20,10 +20,10 @@ Unit test for course_template.py
 # pylint: disable=unused-argument,redefined-outer-name
 from common.models import CourseTemplate
 from common.testing.example_objects import TEST_COURSE_TEMPLATE
-from common.testing.firestore_emulator import client_with_emulator, firestore_emulator, clean_firestore
+from common.testing.firestore_emulator import  firestore_emulator, clean_firestore
 
 
-def test_new_course(client_with_emulator):
+def test_new_course(clean_firestore):
   """Test for creating and loading a new course"""
   new_course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
   new_course_template.save()
@@ -33,7 +33,7 @@ def test_new_course(client_with_emulator):
   assert course_template.name==TEST_COURSE_TEMPLATE["name"]
   assert course_template.description == TEST_COURSE_TEMPLATE["description"]
 
-def test_delete_course_template(client_with_emulator):
+def test_delete_course_template(clean_firestore):
   '''test for soft delete method'''
   new_course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
   new_course_template.save()

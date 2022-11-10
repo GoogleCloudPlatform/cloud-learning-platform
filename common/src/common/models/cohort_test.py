@@ -20,9 +20,10 @@ Unit test for cohort.py
 # pylint: disable=unused-argument,redefined-outer-name
 from common.models import Cohort,CourseTemplate
 from common.testing.example_objects import TEST_COHORT,TEST_COURSE_TEMPLATE
-from common.testing.firestore_emulator import client_with_emulator, firestore_emulator, clean_firestore
+from common.testing.firestore_emulator import  firestore_emulator, clean_firestore
 
-def test_new_cohort(client_with_emulator):
+
+def test_new_cohort(clean_firestore):
   """Test for creating and loading of a new cohort"""
   new_cohort = Cohort.from_dict(TEST_COHORT)
   course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
@@ -35,7 +36,8 @@ def test_new_cohort(client_with_emulator):
   assert cohort.name == TEST_COHORT["name"]
   assert cohort.max_student == TEST_COHORT["max_student"]
 
-def test_delete_cohort(client_with_emulator):
+
+def test_delete_cohort(clean_firestore):
   '''test for soft delete method'''
   new_cohort = Cohort.from_dict(TEST_COHORT)
   course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)

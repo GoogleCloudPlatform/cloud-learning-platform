@@ -20,10 +20,10 @@ Unit Tests for user ORM object
 # pylint: disable=unused-argument,redefined-outer-name
 from common.models import User
 from common.testing.example_objects import TEST_USER
-from common.testing.firestore_emulator import client_with_emulator, firestore_emulator, clean_firestore
+from common.testing.firestore_emulator import  firestore_emulator, clean_firestore
 
 
-def test_new_user(client_with_emulator):
+def test_new_user(clean_firestore):
   # a placeholder unit test so github actions runs until we add more
   new_user = User.from_dict(TEST_USER)
   new_user.save()
@@ -33,18 +33,18 @@ def test_new_user(client_with_emulator):
   assert user.auth_id == TEST_USER["auth_id"]
   assert user.email==TEST_USER["email"]
 
-def test_find_by_email(client_with_emulator):
+def test_find_by_email(clean_firestore):
   '''test for finding user by email method'''
   new_user = User.from_dict(TEST_USER)
   new_user.save()
   new_user.uuid = new_user.id
   TEST_USER["uuid"]=new_user.uuid
   new_user.update()
-  user = User.find_by_uuid(new_user.email)
+  user = User.find_by_email(new_user.email)
   assert user.auth_id == TEST_USER["auth_id"]
   assert user.uuid == TEST_USER["uuid"]
 
-def test_delete_user(client_with_emulator):
+def test_delete_user(clean_firestore):
   '''test for soft delete method'''
   new_user = User.from_dict(TEST_USER)
   new_user.save()
