@@ -13,27 +13,31 @@
 # limitations under the License.
 
 """
-User object in the ORM
+Module to add cohort in Fireo
 """
-
-import datetime
 import os
 
-from common.models import BaseModel
-from fireo.fields import TextField,DateTime,BooleanField
+
+from common.models import BaseModel,CourseTemplate
+from fireo.fields import TextField,DateTime,NumberField,ReferenceField,BooleanField
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PROJECT_ID = os.environ.get("PROJECT_ID", "")
 
 
-class User(BaseModel):
-  """
-  User ORM class
+class Cohort(BaseModel):
+  """Cohort ORM class
   """
   uuid=TextField()
-  auth_id=TextField(required=True)
-  email=TextField(required=True)
-  role=TextField()
+  name = TextField(required=True)
+  description = TextField(required=True)
+  start_date = DateTime(required=True)
+  end_date = DateTime(required=True)
+  registration_start_date = DateTime(required=True)
+  registration_end_date = DateTime(required=True)
+  max_student = NumberField()
+  enrolled_student_count=NumberField()
+  course_template=ReferenceField(CourseTemplate,required=True)
   is_deleted = BooleanField(default=False)
   created_timestamp = DateTime()
   last_updated_timestamp = DateTime()
@@ -41,44 +45,31 @@ class User(BaseModel):
 
   class Meta:
     ignore_none_field = False
-    collection_name = DATABASE_PREFIX + "users"
-
-  @classmethod
-  def find_by_email(cls, email):
-    """Find a user using email (string)
-    Args:
-        email (string): User Email
-    Returns:
-        User: User Object
-    """
-    user = User.collection.filter("email", "==", email).filter(
-        "is_deleted", "==", False).get()
-    return user
+    collection_name = DATABASE_PREFIX + "cohorts"
 
   @classmethod
   def find_by_uuid(cls, uuid):
-    """Find a user using uuid (UUID)
+    """Find a Cohort using uuid (UUID)
     Args:
-        uuid (string): User ID
+        uuid (string): Cohort ID
     Returns:
-        User: User Object
+        Cohort: Cohort Object
     """
-    user = User.collection.filter("uuid", "==", uuid).filter(
-        "is_deleted", "==", False).get()
-    return user
+    cohort = Cohort.collection.filter(
+        "uuid", "==", uuid).filter("is_deleted", "==", False).get()
+    return cohort
 
   @classmethod
   def archive_by_uuid(cls, uuid):
-    '''Soft Delete a User by using uuid
-      Args:
-          uuid (String): User ID
-      '''
-    user = User.collection.filter("uuid", "==", uuid).filter(
+    '''Soft Delete a Cohort by using uuid
+    Args:
+        uuid (String): Cohort ID
+    '''
+    cohort = Cohort.collection.filter("uuid", "==", uuid).filter(
         "is_deleted", "==", False).get()
-    if user is None:
+    if cohort is None:
       return False
     else:
-      user.is_deleted = True
-      user.deleted_at_timestamp = datetime.datetime.utcnow()
-      user.update()
+      cohort.is_deleted = True
+      cohort.update()
       return True
