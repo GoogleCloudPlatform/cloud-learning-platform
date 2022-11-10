@@ -16,5 +16,5 @@ def get_secret_from_secret_manager():
         return response
     payload = response.payload.data.decode("UTF-8")
     print("Plaintext: {}".format(payload))
-    response = json.loads()
+    response = json.loads(payload)
     return response

@@ -30,4 +30,4 @@ def test_create_course():
 
 def test_copy_course():
   test_name =os.environ.get("DATABASE_PREFIX")
-  assert test_name =="e2e_pr50"
+  assert test_name =="e2e_pr50_"

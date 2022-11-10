@@ -69,7 +69,6 @@ def get_course_list():
     CLASSROOM_KEY = helper.get_secret_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-    creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
     results = service.courses().list().execute()
     courses = results.get('courses', [])
