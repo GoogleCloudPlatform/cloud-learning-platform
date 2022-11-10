@@ -42,4 +42,5 @@ def test_copy_course():
   }
   base_url = get_baseurl("lms")
   res = requests.post(base_url + "/lms/api/v1/course/copy_course/",json=course_details)
+  print(res.json())
   assert res.status_code == 200
