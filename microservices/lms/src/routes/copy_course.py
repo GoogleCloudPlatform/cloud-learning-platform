@@ -72,7 +72,7 @@ def createe_courses():
     {'status': 'Failed'} if the user creation raises an exception
   """
   try: 
-    result = classroom_crud.create_course("e2e_PR50_","Test description""a","me")
+    result = classroom_crud.create_course("e2e_PR50_","Test description","a","me")
     SUCCESS_RESPONSE["result"]= result
     return SUCCESS_RESPONSE
   except Exception as e:
