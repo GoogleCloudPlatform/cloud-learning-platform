@@ -49,10 +49,10 @@ def delete_classroom_courses():
   response = service.courses().list().execute()
   courses.extend(response.get('courses', []))
   test_course = DATABASE_PREFIX
-  print("Course Names to be deleted",DATABASE_PREFIX)
+  print("Course Names to be deleted",DATABASE_PREFIX,len(DATABASE_PREFIX))
   for course in courses:
     print("Course_name "+course["name"]+" ID ",course["id"])
-    if DATABASE_PREFIX in course["name"]:
+    if DATABASE_PREFIX == course["name"]:
       print("Inside IF for delete ")
       final_list.append(course["name"])
       course = service.courses().delete(id=course["id"]).execute()

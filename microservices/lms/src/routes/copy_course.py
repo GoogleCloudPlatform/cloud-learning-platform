@@ -57,31 +57,6 @@ def get_courses():
     print(err)
     raise HTTPException(status_code=500) from e
 
-@router.post("/create_course/")
-def createe_courses():
-  """Get courses list
-
-  Args:
-    course_id (Course): Course_id of a course that needs to copied
-
-  Raises:
-    HTTPException: 500 Internal Server Error if something fails
-
-  Returns:
-    List of courses in classroom ,
-    {'status': 'Failed'} if the user creation raises an exception
-  """
-  try: 
-    result = classroom_crud.create_course("e2e_PR50_","Test description","a","me")
-    SUCCESS_RESPONSE["result"]= result
-    return SUCCESS_RESPONSE
-  except Exception as e:
-    Logger.error(e)
-    err = traceback.format_exc().replace("\n", " ")
-    print(err)
-    raise HTTPException(status_code=500) from e
-
-
 
 
 @router.post("/copy_course/")

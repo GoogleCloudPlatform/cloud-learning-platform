@@ -51,36 +51,10 @@ def delete_collection(coll_ref, batch_size):
     return delete_collection(coll_ref, batch_size)
 
 
-# def delete_classroom_courses():
-#   GKE_POD_SA_KEY=json.loads(os.environ.get("GKE_POD_SA_KEY"))
-#   CLASSROOM_ADMIN_EMAIL=os.environ.get("CLASSROOM_ADMIN_EMAIL")
-#   SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
-#     "https://www.googleapis.com/auth/classroom.courses.readonly",""]
-#   a_creds = service_account.Credentials.from_service_account_info(GKE_POD_SA_KEY,scopes=SCOPES)
-#   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-#   service = build('classroom', 'v1', credentials=creds)
-#   courses = []
-#   final_list=[]
-#     # pylint: disable=maybe-no-member
-#   response = service.courses().list().execute()
-#   courses.extend(response.get('courses', []))
-#   for course in courses:
-#     if course["name"]=="Maths_test1":
-#       final_list.append(course)
-  # course = service.courses().delete(id="559098498048").execute()
-  # print("Deleted course** success 559098498048 fully",course)
-  
-  # for course in final_list:
-    # if course["id"]=="":
-      # course = service.courses().delete(id="559098498048").execute()
-      # print("Deleted course success 559098498048 fully",course)
-  # return final_list
-
 if __name__ == "__main__":
   if DATABASE_PREFIX is None:
     raise Exception("DATABASE_PREFIX is not defined. Database cleanup skipped.")
 
   print("Deleting Firebase collection")
   delete_firestore_collection(f"{DATABASE_PREFIX}document")
-  # print("Deleting Courses from classroom")
-  # print(delete_classroom_courses())
+ 
