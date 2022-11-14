@@ -3,6 +3,7 @@ from xml.dom import NotFoundErr
 import os
 import pytest
 import requests
+import uuid
 from endpoint_proxy import get_baseurl
 from common.models import CourseTemplate
 from common.testing.example_objects import TEST_COURSE_TEMPLATE
@@ -25,7 +26,7 @@ def get_create_course_templates_input_data():
     """Fixture to get input data for create course template"""
     emails=get_required_emails_from_secret_manager()
     input_data= {
-            "name": DATABASE_PREFIX+"e2e_test_cases",
+        "name": DATABASE_PREFIX+"test_course"+str(uuid.uuid4),
             "description": "Study Hall Test Course for Development purpose",
             "topic": "e2e test",
             "admin": emails["admin"],
