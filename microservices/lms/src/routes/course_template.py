@@ -61,7 +61,7 @@ def get_course_template(course_template_id: str):
     """Get a Course Template endpoint
 
     Args:
-        course_id (str): unique id of the course template
+        course_template_id (str): unique id of the course template
 
     Raises:
         ResourceNotFoundException: If the Course Template does not exist.
