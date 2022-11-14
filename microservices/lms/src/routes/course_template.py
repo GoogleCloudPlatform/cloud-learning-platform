@@ -37,7 +37,7 @@ def get_course_template_list():
     Returns:
         CourseTemplateListModel: object which contains list of course template object.
         NotFoundErrorResponseModel: if the Course Template not found.
-        InternalServerErrorResponseModel: if the Course Template deletion raises an exception.
+        InternalServerErrorResponseModel: if the get Course Template list raises an exception.
     """
     try:
         course_template_list = CourseTemplate.collection.filter(
