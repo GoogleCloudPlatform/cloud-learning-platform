@@ -38,12 +38,12 @@ def get_course_template_list():
         InternalServerErrorResponseModel: if the get Course Template list raises an exception.
     """
     try:
-        course_template_list = CourseTemplate.collection.filter(
+        fetched_course_template_list = CourseTemplate.collection.filter(
             "is_deleted", "==", False).fetch()
-        if course_template_list is None:
+        if fetched_course_template_list is None:
             return {"message": "Successfully get the course template list, but the list is empty.", "course_template_list": []}
-        courses_list_template = [i for i in course_template_list]
-        return {"course_template_list": courses_list_template}
+        course_template_list = [i for i in fetched_course_template_list]
+        return {"course_template_list": course_template_list}
     except ResourceNotFoundException as re:
         raise ResourceNotFound(str(re)) from re
     except Exception as e:
