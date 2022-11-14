@@ -95,9 +95,9 @@ def test_get_course_template(client_with_emulator):
     data["uuid"] = course_template.uuid
     with mock.patch("routes.course_template.Logger"):
         response = client_with_emulator.get(url)
-    response_user = response.json()
+    response_course_template = response.json()
     assert response.status_code == 200, "Status 200"
-    assert response_user == data, "Return data doesn't match."
+    assert response_course_template == data, "Return data doesn't match."
 
 
 def test_create_course_template(client_with_emulator):
@@ -140,9 +140,9 @@ def test_delete_course_template(client_with_emulator):
     }
     with mock.patch("routes.course_template.Logger"):
         response = client_with_emulator.delete(url)
-    response_user = response.json()
+    response_course_template = response.json()
     assert response.status_code == 200, "Status 200"
-    assert response_user == data, "Return data doesn't match."
+    assert response_course_template == data, "Return data doesn't match."
 
 
 def test_delete_nonexist_course_template(client_with_emulator):
