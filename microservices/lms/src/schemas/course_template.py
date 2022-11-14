@@ -41,7 +41,7 @@ class CourseTemplateModel(BaseModel):
 class CourseTemplateListModel(BaseModel):
     success: Optional[bool] = True
     message: Optional[str] = "Successfully get the course template list"
-    course_template_list: Optional[list[CourseTemplateModel]]
+    course_template_list: Optional[list[CourseTemplateModel]]=[]
 
     class Config():
         orm_mode = True
