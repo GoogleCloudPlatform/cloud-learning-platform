@@ -1,7 +1,5 @@
 '''Course Template Endpoint'''
 import datetime
-import json
-import logging
 from fastapi import APIRouter
 from schemas.course_template import CourseTemplateModel, CourseTemplateListModel, CreateCourseTemplateResponseModel, InputCourseTemplateModel, DeleteCourseTemplateModel
 from common.models import CourseTemplate
@@ -105,12 +103,19 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
         course_template_dict = {**input_course_template.dict()}
         course_template = CourseTemplate()
         course_template = course_template.from_dict(course_template_dict)
+        # creating course om classroom
         classroom = classroom_crud.create_course(
             name=course_template_dict["name"], section="master", description=course_template_dict["description"], owner_id=course_template_dict["admin"])
+        # Adding instructional designer in the course on classroom
         classroom_crud.add_teacher(classroom.get(
             "id"), course_template_dict["instructional_designer"])
+        # Storing classroom details
         course_template.classroom_id = classroom.get("id")
         course_template.classroom_code = classroom.get("enrollmentCode")
+        # adding timestamp
+        timestamp=datetime.datetime.utcnow()
+        course_template.created_timestamp=timestamp
+        course_template.last_updated_timestamp=timestamp
         course_template.save()
         course_template.uuid = course_template.id
         course_template.update()
