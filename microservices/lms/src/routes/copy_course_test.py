@@ -54,4 +54,17 @@ def test_copy_course_not_found(client_with_emulator):
                 with mock.patch("routes.copy_course.classroom_crud.get_coursework"):
                     with mock.patch("routes.copy_course.classroom_crud.create_coursework"):
                         resp = client_with_emulator.post(url,json=course_details)
+  assert resp.status_code == 200
+
+def test_create_section(client_with_emulator):
+  url = API_URL + "/course/copy_course/"
+  course_details = {"course_id":"TEST123"}
+  with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
+      with mock.patch("routes.copy_course.classroom_crud.create_course"):
+          with mock.patch("routes.copy_course.classroom_crud.get_topics"):
+              with mock.patch("routes.copy_course.classroom_crud.create_topics"):
+                with mock.patch("routes.copy_course.classroom_crud.get_coursework"):
+                    with mock.patch("routes.copy_course.classroom_crud.create_coursework"):
+                        resp = client_with_emulator.post(url,json=course_details)
+  json_response = json.loads(resp.text)
   assert resp.status_code == 200   

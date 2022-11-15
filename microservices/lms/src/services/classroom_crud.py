@@ -64,16 +64,48 @@ def get_course_by_id(course_id):
     SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
+
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
+    print("Classroom Admin Email",CLASSROOM_ADMIN_EMAIL)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     try:
+        print(course_id,len(course_id),type(course_id))
         service = build("classroom", "v1", credentials=creds)
         course = service.courses().get(id=course_id).execute()
+        print("Course get method worked ...")
+        print(course)
         return course
 
     except HttpError as error:
         logger.error(error)
         return None
+
+def update_course(course_id,section_name,description,course_state,course_name=None):
+    """Update course Function in classroom
+
+  Args: section_name ,description of course, section,owner_id of course
+  Returns:
+    new created course details
+    """""
+    SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
+    "https://www.googleapis.com/auth/classroom.courses.readonly"]
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
+    a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+    service = build("classroom", "v1", credentials=creds)
+    new_course = {}
+    if course_name is not None:
+      new_course["name"]=course_name
+    new_course["section"]=section_name
+    new_course["description"]=description
+    new_course["course_state"]=course_state
+    course = service.courses().update(id=course_id,body=new_course).execute()
+    course_name = course.get("name")
+    course_id = course.get("id")
+    return course
+
+
 
 def get_course_list():    
 
@@ -107,22 +139,27 @@ def get_topics(course_id):
     
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
-    topics = []
-    page_token = None
-    while True:
-        response = service.courses().topics().list(
-        pageToken=page_token,
-        courseId=course_id).execute()
-        topics = topics.extend(response.get('topic', []))
-        page_token = response.get('nextPageToken', None)
-        if not page_token:
-            break
-    if response:
-        topics = response["topic"] 
-        return topics
-
+    try:
+      topics = []
+      page_token = None
+      while True:
+          response = service.courses().topics().list(
+          pageToken=page_token,
+          courseId=course_id).execute()
+          topics = topics.extend(response.get('topic', []))
+          page_token = response.get('nextPageToken', None)
+          if not page_token:
+              break
+      if response:
+          topics = response["topic"] 
+          print("Topic method worked ")
+          return topics
+    except HttpError as error:
+        logger.error(error)
+        return None
 
 
 def create_topics(course_id , topics):
@@ -139,6 +176,7 @@ def create_topics(course_id , topics):
 
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
     for topic in topics:
@@ -148,6 +186,7 @@ def create_topics(course_id , topics):
         response = service.courses().topics().create(
         courseId=course_id,
         body=topic).execute()
+    print("This is create topic method worked")
     return "success"
 
 def get_coursework(course_id):
@@ -160,13 +199,20 @@ def get_coursework(course_id):
     SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students',
     'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
+    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+    print("In coursework list method........")
     service = build("classroom", "v1", credentials=creds)
-    coursework_list = service.courses().courseWork().list(courseId=course_id).execute()
-    if coursework_list:
-        coursework_list = coursework_list['courseWork']
-    return coursework_list
+    try:
+      coursework_list = service.courses().courseWork().list(courseId=course_id).execute()
+      if coursework_list:
+          coursework_list = coursework_list['courseWork']
+          print("Coursework Method worked")
+      return coursework_list
+    except HttpError as error:
+        logger.error(error)
+        return None
 
 def create_coursework(course_id, coursework_list):
     """create coursework in a classroom course
@@ -181,11 +227,14 @@ def create_coursework(course_id, coursework_list):
     'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
     for coursework_item  in coursework_list:
         coursework = service.courses().courseWork().create(courseId=course_id, body=coursework_item).execute()
-    
+    print("Create coursework method worked")
+    return "success"
+
 def delete_course_by_id(course_id):
     """Delete a course from classroom
 
