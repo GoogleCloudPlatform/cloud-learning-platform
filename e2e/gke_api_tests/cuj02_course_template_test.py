@@ -1,5 +1,4 @@
 """Course template list and Course template CRUD API e2e tests"""
-from xml.dom import NotFoundErr
 import os
 import pytest
 import requests
@@ -7,6 +6,7 @@ import uuid
 from endpoint_proxy import get_baseurl
 from common.models import CourseTemplate
 from common.testing.example_objects import TEST_COURSE_TEMPLATE
+from common.utils.errors import ResourceNotFoundException
 from secrets_helper import get_required_emails_from_secret_manager
 DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 
@@ -43,7 +43,7 @@ def test_create_course_template(get_create_course_templates_input_data):
     """
     base_url = get_baseurl("lms")
     if not base_url:
-        raise NotFoundErr("Unable to locate the service URL for lms")
+        raise ResourceNotFoundException("Unable to locate the service URL for lms")
     else:
         url = base_url + f"/lms/api/v1/course_templates"
         resp = requests.post(
@@ -63,7 +63,7 @@ def test_create_course_template_validation():
     """
     base_url = get_baseurl("lms")
     if not base_url:
-        raise NotFoundErr("Unable to locate the service URL for lms")
+        raise ResourceNotFoundException("Unable to locate the service URL for lms")
     else:
         url = base_url + f"/lms/api/v1/course_templates"
         resp = requests.post(
@@ -82,7 +82,8 @@ def test_get_course_template(setup_course_templates):
     """
     base_url = get_baseurl("lms")
     if not base_url:
-        raise NotFoundErr("Unable to locate the service URL for lms")
+        raise ResourceNotFoundException(
+            "Unable to locate the service URL for lms")
     else:
         url = base_url + \
             f"/lms/api/v1/course_templates/{setup_course_templates.id}"
@@ -102,7 +103,8 @@ def test_get_course_template_negative():
     """
     base_url = get_baseurl("lms")
     if not base_url:
-        raise NotFoundErr("Unable to locate the service URL for lms")
+        raise ResourceNotFoundException(
+            "Unable to locate the service URL for lms")
     else:
         url = base_url + \
             f"/lms/api/v1/course_templates/fake-uuid"
@@ -120,7 +122,8 @@ def test_delete_course_template(setup_course_templates):
     """
     base_url = get_baseurl("lms")
     if not base_url:
-        raise NotFoundErr("Unable to locate the service URL for lms")
+        raise ResourceNotFoundException(
+            "Unable to locate the service URL for lms")
     else:
         url = base_url + \
             f"/lms/api/v1/course_templates/{setup_course_templates.id}"
@@ -138,7 +141,8 @@ def test_delete_course_template_negative():
     """
     base_url = get_baseurl("lms")
     if not base_url:
-        raise NotFoundErr("Unable to locate the service URL for lms")
+        raise ResourceNotFoundException(
+            "Unable to locate the service URL for lms")
     else:
         url = base_url + \
             f"/lms/api/v1/course_templates/fake-uuid"
@@ -155,9 +159,10 @@ def test_get_list_course_template():
     """
     base_url = get_baseurl("lms")
     if not base_url:
-        raise NotFoundErr("Unable to locate the service URL for lms")
+        raise ResourceNotFoundException(
+            "Unable to locate the service URL for lms")
     else:
-        url = base_url + "/lms/api/v1/course_templates/list"
+        url = base_url + "/lms/api/v1/course_templates"
         resp = requests.get(url=url)
         resp_json = resp.json()
         assert resp.status_code == 200, "Status 200"

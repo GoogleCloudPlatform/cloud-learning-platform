@@ -69,14 +69,13 @@ def test_get_course_template_list(client_with_emulator):
         course_template.save()
         course_template.uuid = course_template.id
         course_template.update()
-    url = API_URL+'/list'
     data = {
         "success": True,
         "message": "Successfully get the course template list"
     }
     # mock logger
     with mock.patch("routes.course_template.Logger"):
-        response = client_with_emulator.get(url)
+        response = client_with_emulator.get(API_URL)
     response_json = response.json()
     assert response.status_code == 200, "Status 200"
     assert len(response_json["course_template_list"]) == len(

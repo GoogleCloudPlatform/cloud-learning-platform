@@ -26,7 +26,7 @@ router = APIRouter(prefix="/course_templates", tags=["CourseTemplate"], response
 })
 
 
-@router.get("/list", response_model=CourseTemplateListModel)
+@router.get("", response_model=CourseTemplateListModel)
 def get_course_template_list():
     """Get a list of Course Template endpoint
     
@@ -44,8 +44,6 @@ def get_course_template_list():
             return {"message": "Successfully get the course template list, but the list is empty.", "course_template_list": []}
         course_template_list = [i for i in fetched_course_template_list]
         return {"course_template_list": course_template_list}
-    except ResourceNotFoundException as re:
-        raise ResourceNotFound(str(re)) from re
     except Exception as e:
         print(e.message)
         Logger.error(e)

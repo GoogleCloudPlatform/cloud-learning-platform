@@ -8,7 +8,7 @@ def get_required_emails_from_secret_manager():
 
   Args:
   Returns:
-    return the emails in Json format
+    return the emails in dict format
     """""
 
     client = secretmanager.SecretManagerServiceClient()
