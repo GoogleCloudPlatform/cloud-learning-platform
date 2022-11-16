@@ -94,7 +94,6 @@ def copy_courses(course_details: CourseDetails):
 @router.post("")
 def create_section(sections_details: SectionDetails,response:Response):
   """Create section API
-
   Args:
     name (section): Section name
     description (str):Description
@@ -115,15 +114,11 @@ def create_section(sections_details: SectionDetails,response:Response):
     teachers_list = input_sections_details_dict['teachers_list']
     course_template_id = input_sections_details_dict['course_template']
     cohort_id = input_sections_details_dict['cohort']
-    print(course_template_id)
     course_template_details = CourseTemplate.find_by_uuid(course_template_id)
     if course_template_details == None:
       raise ResourceNotFound(
                 f'Course Template with uuid {course_template_id} is not found')
-    print("course_template------before cohort---------",course_template_details.to_dict())
-    print("Cohort ID...........",cohort_id)
     cohort_details = Cohort.find_by_uuid(cohort_id)
-    print("2-----------**------")
 
     if cohort_details == None:
       print(3)
@@ -132,27 +127,22 @@ def create_section(sections_details: SectionDetails,response:Response):
     
     name = course_template_details.name
     # Get course by course id for copying from master course
-    print("This is classroom Id ",course_template_details.classroom_id)
     current_course =  classroom_crud.get_course_by_id(course_template_details.classroom_id)
-    print("*1")
     if current_course is None:
       raise ResourceNotFound(
                 f'classroom  with uuid {course_template_details.classroom_id} is not found')
     # Create a new course
-    print("*2")
+
     new_course = classroom_crud.create_course(name,description,section_name,"me") 
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
-    print("*3")
     if topics is not None:
       classroom_crud.create_topics(new_course["id"],topics)
     # Get coursework of current course and create a new course
     coursework_list  = classroom_crud.get_coursework(course_template_details.classroom_id)
-    print("Coursework_list",coursework_list)
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"],coursework_list)
     # Add teachers to the created course 
-    print("After cpursework list")
     for teacher_email in teachers_list:
       classroom_crud.add_teacher(new_course["id"],teacher_email) 
     # Save the new record of seecion in firestore
@@ -168,7 +158,6 @@ def create_section(sections_details: SectionDetails,response:Response):
     section.teachers_list=teachers_list
     section.created_timestamp=datetime.datetime.now()
     section.uuid = section.save().id
-    print(section.id)
     section.save()
     SUCCESS_RESPONSE["new_course"] = new_course
     return SUCCESS_RESPONSE
@@ -182,20 +171,16 @@ def create_section(sections_details: SectionDetails,response:Response):
 
 @router.get("/{cohort_id}")
 def list_section(cohort_id:str):
-  """Create section API
+  """ Get a list of sections of one cohort from db
 
   Args:
-    name (section): Section name
-    description (str):Description
-    classroom_template_id(str)
-    cohort_id
-    teachers_list
+    cohort_id(str):cohort uuid from firestore db
   Raises:
     HTTPException: 500 Internal Server Error if something fails
-
+    ResourceNotFound: 404 Resource not found exception
   Returns:
-    {"status":"Success","new_course":{}}: Returns new course details,
-    {'status': 'Failed'} if the user creation raises an exception
+    {"status":"Success","data":{}}: Returns list of sections
+    {'status': 'Failed',"data":null} 
   """
   try:
 
@@ -209,7 +194,6 @@ def list_section(cohort_id:str):
     # Using the cohort object reference key query sections model to get a list 
     # of section of a perticular cohort
     result = Section.collection.filter("cohort","==",cohort.key).fetch()
-    print("Result of sections filter",result)
     sections_list = list(map(lambda x: x.to_dict(),result))
     
     SUCCESS_RESPONSE["data"] = sections_list
@@ -226,7 +210,7 @@ def list_section(cohort_id:str):
 
 @router.get("/get_section/{section_id}")
 def get_section(section_id:str):
-  """Create section API
+  """Get a section details from db
 
   Args:
       section_id (str): section_id in firestore
@@ -235,7 +219,7 @@ def get_section(section_id:str):
       HTTPException: 500 Internal Server Error if something fails
       HTTPException: 404 Section with section id is not found
   Returns:
-    {"status":"Success","new_course":{}}: Returns new course details from firestore db,
+    {"status":"Success","new_course":{}}: Returns section details from  db,
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
@@ -258,7 +242,7 @@ def get_section(section_id:str):
 
 @router.post("/update_section")
 def update_section(sections_details: UpdateSection):
-  """Create section API
+  """Update section API
 
   Args:
     uuid(str): uuid of the section in firestore
@@ -272,7 +256,7 @@ def update_section(sections_details: UpdateSection):
     HTTPException: 500 Internal Server Error if something fails
     ResourceNotFound : 404 if course_id or section_id is not found
   Returns:
-    {"status":"Success","data":{}}: Returns new course details,
+    {"status":"Success","data":{}}: Returns Updated course details,
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:

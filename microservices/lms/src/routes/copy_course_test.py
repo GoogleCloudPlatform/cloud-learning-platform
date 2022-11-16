@@ -219,7 +219,6 @@ def test_create_section_cohort_not_found(client_with_emulator):
 def test_list_section(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  # url = API_URL + "/sections/list_section/?cohort_id=fake-cohort-id"
   url = API_URL + "/sections/fake-cohort-id"
   print("API URL ",url)
   resp = client_with_emulator.get(url)
@@ -229,7 +228,6 @@ def test_list_section(client_with_emulator):
 def test_list_section_cohort_not_found(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  # url = API_URL + "/sections/list_section/?cohort_id=fake-cohort-id22"
   url = API_URL + "/sections/fake-cohort-id22"
 
   print("API URL ",url)
@@ -242,7 +240,6 @@ def test_get_section(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
   print(fake_data_result)
-  # url = API_URL + f"/sections/get_section/?section_id={fake_data_result[2].uuid}"
   url = API_URL + f"/sections/get_section/{fake_data_result[2].uuid}"
   print(fake_data_result)
   print("API URL ",url)
@@ -253,7 +250,6 @@ def test_get_section(client_with_emulator):
 def test_get_section_not_found(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  # url = API_URL + "/sections/get_section/?section_id=Dzz6RRLdojYjZiBDlcI7"
   url = API_URL + f"/sections/get_section/tesr_case_id_does_not_exists"
   print("API URL ",url)
   resp = client_with_emulator.get(url)
