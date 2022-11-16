@@ -112,7 +112,7 @@ def test_create_section(client_with_emulator):
   "course_template":"fake-classroom-id",
   "cohort": "fake-cohort-id",
   "teachers_list": [
-    "string"
+    os.environ.get("CLASSROOM_ADMIN_EMAIL")
   ]
 }
   mock_return_course = {
@@ -126,6 +126,7 @@ def test_create_section(client_with_emulator):
               with mock.patch("routes.copy_course.classroom_crud.create_topics"):
                 with mock.patch("routes.copy_course.classroom_crud.get_coursework"):
                     with mock.patch("routes.copy_course.classroom_crud.create_coursework"):
+                      with mock.patch("routes.copy_course.classroom_crud.add_teacher"):
                         resp = client_with_emulator.post(url,json=section_details)
   json_response = json.loads(resp.text)
   assert resp.status_code == 200   
