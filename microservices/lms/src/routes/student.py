@@ -17,7 +17,7 @@ from schemas.course_details import CourseDetails
 from services import classroom_crud
 import traceback
 import os
-from config import CLASSROOM_KEY
+# from config import CLASSROOM_KEY
 import argparse
 import requests
 from config import CLASSROOM_ADMIN_EMAIL
