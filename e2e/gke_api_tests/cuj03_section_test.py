@@ -96,9 +96,11 @@ def create_course(name,description,section,owner_id):
 
 def test_create_section():
   """ 
-  CUJ01 create a Course template by providing a valid json object
-  as a input using that json object calling create course template api.
-  Which creates a course template and master course in classroom.
+  create a Course template and cohort is created  by  user  
+  then user clicks on create section button and makes a section 
+  by providing section name ,description,course_template_id,cohort_id
+  and list of teachers .A record is created in database and a course
+  with details of course template is created in classroom
   """
   # Create fake classroom in google classroom
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
@@ -109,7 +111,7 @@ def test_create_section():
   base_url = get_baseurl("lms")
   if not base_url:
       raise NotFoundErr("Unable to locate the service URL for lms")
-  url = base_url + f"/lms/api/v1/course/create_section"
+  url = base_url + f"/lms/api/v1/sections"
 
   print(base_url)
   data = {
@@ -126,9 +128,11 @@ def test_create_section():
 
 def test_create_section_course_template_not_found():
   """ 
-  CUJ01 create a Course template by providing a valid json object
-  as a input using that json object calling create course template api.
-  Which creates a course template and master course in classroom.
+  create a Course template and cohort is created  by  user  
+  then user clicks on create section button and makes a section 
+  by providing section name ,description,course_template_id,cohort_id
+  and list of teachers .Given course template id is wrong and course template 
+  id not found error is thrown
   """
   # Create fake classroom in google classroom
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
@@ -139,7 +143,7 @@ def test_create_section_course_template_not_found():
   base_url = get_baseurl("lms")
   if not base_url:
       raise NotFoundErr("Unable to locate the service URL for lms")
-  url = base_url + f"/lms/api/v1/course/create_section"
+  url = base_url + f"/lms/api/v1/sections"
 
   print(base_url)
   data = {
@@ -154,48 +158,15 @@ def test_create_section_course_template_not_found():
   print(resp_json)
   assert resp.status_code == 404
 
-
-def test_create_section():
-  """ 
-  CUJ01 create a Course template by providing a valid json object
-  as a input using that json object calling create course template api.
-  Which creates a course template and master course in classroom.
-  """
-  # Create fake classroom in google classroom
-  course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
-  # Create fake Mastr course in Firestore
-  print("THIS IS FAKE MASTER COURSEE ",course)
-  classroom_id = course["id"]
-  create_fake_data(classroom_id)
-  base_url = get_baseurl("lms")
-  if not base_url:
-      raise NotFoundErr("Unable to locate the service URL for lms")
-  url = base_url + f"/lms/api/v1/course/create_section"
-
-  print(base_url)
-  data = {
-  "name": "string",
-  "description": "string",
-  "course_template": "fake_template_id",
-  "cohort": "fake_cohort_id",
-  "teachers_list": [TEACHER_EMAIL]}
-
-  resp = requests.post(url=url, json=data)
-  resp_json = resp.json()
-  print(resp_json)
-  assert resp.status_code == 200, "Status 200"
-
-
 def test_get_list_sections():
   """ 
-    get a Sections list by calling get course template list api.
-  Which will return a CourseTemplateList object.
+  Get a sections list for a perticular cohort by giving cohort_id as query paramter 
   """
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   classroom_id = course["id"]
   create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
-  url = base_url + "/lms/api/v1/course/list_section/?cohort_id=fake_cohort_id"
+  url = base_url + "/lms/api/v1/sections/fake_cohort_id"
   print(base_url)
   resp = requests.get(url=url)
   resp_json = resp.json()
@@ -203,14 +174,13 @@ def test_get_list_sections():
 
 def test_get_section():
   """
-    get a Section by calling  get section api to get the details of a perticular section
-  Which will return a CourseTemplateList object.
+    Get a sections details for a  section by giving section_id as query paramter 
   """
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   classroom_id = course["id"]
   create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
-  url = base_url + "/lms/api/v1/course/get_section/?section_id=fake_section_id"
+  url = base_url + "/lms/api/v1/sections/get_section/fake_section_id"
   print(base_url)
   resp = requests.get(url=url)
   resp_json = resp.json()
@@ -218,9 +188,9 @@ def test_get_section():
 
 def test_update_section():
   """ 
-  CUJ01 create a Course template by providing a valid json object
-  as a input using that json object calling create course template api.
-  Which creates a course template and master course in classroom.
+  User click on edit button for a section 
+  User Updates the section name ,description,course_state by providing expected 
+  values and details get updated in firestore and classroom course
   """
   # Create fake classroom in google classroom
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
@@ -231,7 +201,7 @@ def test_update_section():
   base_url = get_baseurl("lms")
   if not base_url:
       raise NotFoundErr("Unable to locate the service URL for lms")
-  url = base_url + f"/lms/api/v1/course/update_section/"
+  url = base_url + f"/lms/api/v1/sections/update_section"
 
   print(base_url)
   data={
@@ -248,9 +218,9 @@ def test_update_section():
 
 def test_update_section_course_not_found_in_classroom():
   """ 
-  CUJ01 create a Course template by providing a valid json object
-  as a input using that json object calling create course template api.
-  Which creates a course template and master course in classroom.
+  User click on edit button for a section 
+  User Updates the section name ,description,course_state by providing expected 
+  values but given course_id of classroom is incorrect so it gives course not found error
   """
   # Create fake classroom in google classroom
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
@@ -261,7 +231,7 @@ def test_update_section_course_not_found_in_classroom():
   base_url = get_baseurl("lms")
   if not base_url:
       raise NotFoundErr("Unable to locate the service URL for lms")
-  url = base_url + f"/lms/api/v1/course/update_section/"
+  url = base_url + f"/lms/api/v1/sections/update_section"
 
   print(base_url)
   data={
@@ -271,6 +241,4 @@ def test_update_section_course_not_found_in_classroom():
 "description": "test_description_updated",
 "course_state": "ACTIVE"}
   resp = requests.post(url=url, json=data)
-  # resp_json = resp.json()
-  # print(resp_json)
   assert resp.status_code == 500

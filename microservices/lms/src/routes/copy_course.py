@@ -26,7 +26,7 @@ from common.utils.http_exceptions import ResourceNotFound, InternalServerError
 # disabling for linting to pass
 # pylint: disable = broad-except
 
-router = APIRouter(prefix="/course", tags=["Course"])
+router = APIRouter(prefix="/sections", tags=["Sections"])
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
@@ -35,10 +35,6 @@ FAILED_RESPONSE = {"status": "Failed"}
 @router.get("/get_courses/")
 def get_courses():
   """Get courses list
-
-  Args:
-    course_id (Course): Course_id of a course that needs to copied
-
   Raises:
     HTTPException: 500 Internal Server Error if something fails
 
@@ -95,16 +91,16 @@ def copy_courses(course_details: CourseDetails):
     Logger.error(e)
     raise HTTPException(status_code=500,data =e) from e
 
-@router.post("/create_section/")
+@router.post("")
 def create_section(sections_details: SectionDetails,response:Response):
   """Create section API
 
   Args:
     name (section): Section name
     description (str):Description
-    classroom_template_id(str)
-    cohort_id
-    teachers_list
+    classroom_template_id(str):course_template_id uuid from firestore
+    cohort_id(str):cohort uuid from firestore
+    teachers_list(list):List of teachers to be added
   Raises:
     HTTPException: 500 Internal Server Error if something fails
 
@@ -184,7 +180,7 @@ def create_section(sections_details: SectionDetails,response:Response):
     print(e)
     raise InternalServerError(str(e)) from e
 
-@router.get("/list_section/")
+@router.get("/{cohort_id}")
 def list_section(cohort_id:str):
   """Create section API
 
@@ -228,18 +224,18 @@ def list_section(cohort_id:str):
     raise HTTPException(status_code=500,data =e) from e
 
 
-@router.get("/get_section/")
+@router.get("/get_section/{section_id}")
 def get_section(section_id:str):
   """Create section API
 
   Args:
-    section_id (str): section_id in firestore
+      section_id (str): section_id in firestore
    
   Raises:
-    HTTPException: 500 Internal Server Error if something fails
-
+      HTTPException: 500 Internal Server Error if something fails
+      HTTPException: 404 Section with section id is not found
   Returns:
-    {"status":"Success","new_course":{}}: Returns new course details,
+    {"status":"Success","new_course":{}}: Returns new course details from firestore db,
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
@@ -249,7 +245,6 @@ def get_section(section_id:str):
       raise ResourceNotFound(
                 f'Section with uuid {section_id} is not found')
     # Get course by course id
-    # print ("RESULT OF COHORT DETAILS ......",cohort_details)
     SUCCESS_RESPONSE["section_details"] = section_details
     return SUCCESS_RESPONSE
   except ResourceNotFound as err :
@@ -261,7 +256,7 @@ def get_section(section_id:str):
     print(e)
     raise HTTPException(status_code=500,data =e) from e
 
-@router.post("/update_section/")
+@router.post("/update_section")
 def update_section(sections_details: UpdateSection):
   """Create section API
 

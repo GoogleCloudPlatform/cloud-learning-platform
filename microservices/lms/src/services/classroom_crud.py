@@ -40,7 +40,6 @@ def create_course(name,description,section,owner_id):
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
-    CLASSROOM_ADMIN_EMAIL=="lms_service@dhodun.altostrat.com"
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
 
     service = build("classroom", "v1", credentials=creds)
@@ -68,7 +67,6 @@ def get_course_by_id(course_id):
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
 
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
-    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     print("Classroom Admin Email",CLASSROOM_ADMIN_EMAIL)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     try:
@@ -95,7 +93,6 @@ def update_course(course_id,section_name,description,course_state,course_name=No
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
-    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
     try:
@@ -112,11 +109,7 @@ def update_course(course_id,section_name,description,course_state,course_name=No
       return course
     except HttpError as error:
         logger.error(error)
-        print("________HTTP---------",HttpError.status_code)
-        if HttpError.status_code == 404:
-          return None
-        else:
-          raise HttpError
+        raise HttpError
 
 
 def get_course_list():    
@@ -151,7 +144,6 @@ def get_topics(course_id):
     
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
-    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
     try:
@@ -188,7 +180,6 @@ def create_topics(course_id , topics):
 
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
-    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
     print("This is before create topic")
@@ -212,7 +203,6 @@ def get_coursework(course_id):
     SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students',
     'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
-    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     print("In coursework list method........")
@@ -240,7 +230,6 @@ def create_coursework(course_id, coursework_list):
     'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
-    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
     for coursework_item  in coursework_list:
@@ -269,7 +258,6 @@ def add_teacher(course_id,teacher_email):
   CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
-  CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
   teacher = {"userId": teacher_email}
