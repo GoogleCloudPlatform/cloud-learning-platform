@@ -202,3 +202,35 @@ def delete_course_by_id(course_id):
     course = service.courses().delete(id=course_id).execute()
     return course
 
+def get_course_work_list(course_id):
+    SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students',
+    'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
+    a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+    service = build("classroom", "v1", credentials=creds)
+
+    coursework_list = service.courses().courseWork().list(courseId=course_id).execute()
+    if coursework_list:
+        coursework_list = coursework_list['courseWork']
+    return coursework_list
+
+
+def get_submitted_course_work_list(course_id,student_email):
+    SCOPES=["https://www.googleapis.com/auth/classroom.coursework.students.readonly",
+    "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
+    "https://www.googleapis.com/auth/classroom.coursework.students",
+    "https://www.googleapis.com/auth/classroom.coursework.me"]
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
+    a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+    service = build("classroom", "v1", credentials=creds)
+    
+    submitted_course_work_list = service.courses().courseWork().studentSubmissions().list(
+            courseId=course_id,
+            courseWorkId="-",
+            userId=student_email).execute()
+    if submitted_course_work_list:
+        submitted_course_work_list = submitted_course_work_list['studentSubmissions']
+    return submitted_course_work_list
+

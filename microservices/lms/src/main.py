@@ -24,6 +24,8 @@ from concurrent.futures import ThreadPoolExecutor
 from fastapi import FastAPI, Request
 from routes import user
 from routes import copy_course
+# from routes import copy_course
+from routes import student
 
 app = FastAPI()
 
@@ -56,6 +58,10 @@ def health_check():
 def hello():
   return "Hello World."
 
+@app.get("/new-app")
+def hello():
+  return "Hello World222."
+
 
 api = FastAPI(
     title="LMS Service APIs",
@@ -64,6 +70,9 @@ api = FastAPI(
 
 api.include_router(user.router)
 api.include_router(copy_course.router)
+api.include_router(student.router)
+# api.include_router(copy_course.router)
+
 # TODO: add these back in
 
 add_exception_handlers(app)
