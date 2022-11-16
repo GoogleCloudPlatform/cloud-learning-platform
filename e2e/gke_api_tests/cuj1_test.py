@@ -1,4 +1,3 @@
-from xml.dom import NotFoundErr
 import requests
 from endpoint_proxy import get_baseurl
 import mock
@@ -7,12 +6,13 @@ import json
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
+from common.utils.errors import ResourceNotFoundException
 # from microservices.lms.src import routes
 
 def test_get_course_list():
   base_url = get_baseurl("lms")
   if not base_url:
-    raise NotFoundErr("Unable to locate the service URL for lms")
+    raise ResourceNotFoundException("Unable to locate the service URL for lms")
   res = requests.get(base_url + "/lms/api/v1/course/get_courses/")
   result = res.json()
   assert res.status_code == 200

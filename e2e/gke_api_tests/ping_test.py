@@ -12,15 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from xml.dom import NotFoundErr
 import requests
 from endpoint_proxy import get_baseurl
-
+from common.utils.errors import ResourceNotFoundException
 
 def test_api_ping():
   base_url = get_baseurl("lms")
   if not base_url:
-    raise NotFoundErr("Unable to locate the service URL for lms")
+    raise ResourceNotFoundException("Unable to locate the service URL for lms")
   res = requests.get(base_url + "/ping")
   assert res.status_code == 200
 
@@ -28,6 +27,6 @@ def test_api_ping():
 def test_hello_world():
   base_url = get_baseurl("lms")
   if not base_url:
-    raise NotFoundErr("Unable to locate the service URL for lms")
+    raise ResourceNotFoundException("Unable to locate the service URL for lms")
   res = requests.get(base_url + "/")
   assert res.text == "\"Hello World.\""

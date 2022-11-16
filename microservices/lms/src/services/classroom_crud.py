@@ -210,7 +210,6 @@ def add_teacher(course_id,teacher_email):
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
   teacher = {"userId": teacher_email}
-  print(course_id)
   course = service.courses().teachers().create(
       courseId=course_id, body=teacher).execute()
   return course
