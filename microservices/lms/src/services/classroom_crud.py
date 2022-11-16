@@ -263,3 +263,16 @@ def delete_course_by_id(course_id):
     course = service.courses().delete(id=course_id).execute()
     return course
 
+def add_teacher(course_id,teacher_email):
+  SCOPES = ['https://www.googleapis.com/auth/classroom.rosters']
+  CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
+  a_creds = service_account.Credentials.from_service_account_info(
+      CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("classroom", "v1", credentials=creds)
+  teacher = {"userId": teacher_email}
+  print(course_id)
+  course = service.courses().teachers().create(
+      courseId=course_id, body=teacher).execute()
+  return course
+
