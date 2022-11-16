@@ -53,7 +53,6 @@ def get_courses():
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
-    print(err)
     raise HTTPException(status_code=500) from e
 
 
@@ -94,7 +93,6 @@ def copy_courses(course_details: CourseDetails):
     return SUCCESS_RESPONSE
   except Exception as e:
     Logger.error(e)
-    print(e)
     raise HTTPException(status_code=500,data =e) from e
 
 @router.post("/create_section/")
@@ -121,15 +119,16 @@ def create_section(sections_details: SectionDetails,response:Response):
     teachers_list = input_sections_details_dict['teachers_list']
     course_template_id = input_sections_details_dict['course_template']
     cohort_id = input_sections_details_dict['cohort']
-    print(1)
     print(course_template_id)
     course_template_details = CourseTemplate.find_by_uuid(course_template_id)
     if course_template_details == None:
       raise ResourceNotFound(
                 f'Course Template with uuid {course_template_id} is not found')
-    print("course_template",course_template_details)
+    print("course_template------before cohort---------",course_template_details.to_dict())
+    print("Cohort ID...........",cohort_id)
     cohort_details = Cohort.find_by_uuid(cohort_id)
-    print(2)
+    print("2-----------**------")
+
     if cohort_details == None:
       print(3)
       raise ResourceNotFound(
@@ -153,9 +152,13 @@ def create_section(sections_details: SectionDetails,response:Response):
       classroom_crud.create_topics(new_course["id"],topics)
     # Get coursework of current course and create a new course
     coursework_list  = classroom_crud.get_coursework(course_template_details.classroom_id)
+    print("Coursework_list",coursework_list)
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"],coursework_list)
-     
+    # Add teachers to the created course 
+    print("After cpursework list")
+    for teacher_email in teachers_list:
+      classroom_crud.add_teacher(new_course["id"],teacher_email) 
     # Save the new record of seecion in firestore
     section = Section()
     section.name = name

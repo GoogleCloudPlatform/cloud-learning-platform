@@ -1,0 +1,276 @@
+"""Course template list and Course template CRUD API e2e tests"""
+import os
+import pytest
+import requests
+import uuid
+from xml.dom import NotFoundErr
+import requests
+import mock
+import os
+import json
+from endpoint_proxy import get_baseurl
+from common.models import CourseTemplate
+from common.testing.example_objects import TEST_COURSE_TEMPLATE
+from common.utils.errors import ResourceNotFoundException
+from secrets_helper import get_required_emails_from_secret_manager
+import datetime
+from common.models.cohort import Cohort
+from common.models.section import Section
+from common.models.course_template import CourseTemplate
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from google.oauth2 import service_account
+
+DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
+EMAILS  =  get_required_emails_from_secret_manager()
+TEACHER_EMAIL = EMAILS["instructional_designer"]
+
+def create_fake_data(classroom_id):
+  """Fixture to create temprory data"""
+
+  TEST_COURSE_TEMPLATE = {
+      "name": "test-name",
+      "uuid":"fake_template_id",
+      "description": "test-description",
+      "admin": "test-admin@gmail.com",
+      "instructional_designer": "IDesiner@gmail.com",
+      "classroom_id": classroom_id,
+      "classroom_code": "fake-classroom_code"}
+  course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
+  course_template.save()
+  
+  TEST_COHORT = {
+    "uuid":"fake_cohort_id",
+    "name": "name",
+    "description": "description",
+    "course_template":course_template,
+    "start_date": datetime.datetime(year=2022,month=10, day=14),
+    "end_date": datetime.datetime(year=2022,month=12, day=25),
+    "registration_start_date": datetime.datetime(year=2022,month=10, day=20),
+    "registration_end_date": datetime.datetime(year=2022,month=11, day=14),
+    "max_student": 0,
+    "enrolled_student_count":0
+  }
+  cohort = Cohort.from_dict(TEST_COHORT)
+  cohort.save()
+  TEST_SECTION = {
+    "uuid":"fake_section_id",
+    "name" : "section_name",
+    "section" : "section c",
+    "description": "description",
+    "classroom_id" :"cl_id",
+    "classroom_code" :"cl_code",
+    "course_template":course_template,
+    "cohort":cohort,    
+    "teachers_list":[TEACHER_EMAIL]
+  }
+  section = Section.from_dict(TEST_SECTION)
+  section.save()
+  return course_template , cohort,section
+  
+def create_course(name,description,section,owner_id):
+  """Create course Function in classroom
+
+  Args: course_name ,description of course, section,owner_id of course
+  Returns:
+    new created course details
+    """""
+  SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
+  "https://www.googleapis.com/auth/classroom.courses.readonly"]
+  CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
+  CLASSROOM_ADMIN_EMAIL=os.environ.get("CLASSROOM_ADMIN_EMAIL")
+  a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("classroom", "v1", credentials=creds)
+  new_course = {}
+  new_course["name"]=name
+  new_course["section"]=section
+  new_course["description"]=description
+  # new_course["room"]=course["room"]
+  new_course["ownerId"]=owner_id
+  # new_course["descriptionHeading"]=course["description_heading"]
+  course = service.courses().create(body=new_course).execute()
+  course_name = course.get("name")
+  course_id = course.get("id")
+  return course
+
+def test_create_section():
+  """ 
+  CUJ01 create a Course template by providing a valid json object
+  as a input using that json object calling create course template api.
+  Which creates a course template and master course in classroom.
+  """
+  # Create fake classroom in google classroom
+  course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
+  # Create fake Mastr course in Firestore
+  print("THIS IS FAKE MASTER COURSEE ",course)
+  classroom_id = course["id"]
+  create_fake_data(classroom_id)
+  base_url = get_baseurl("lms")
+  if not base_url:
+      raise NotFoundErr("Unable to locate the service URL for lms")
+  url = base_url + f"/lms/api/v1/course/create_section"
+
+  print(base_url)
+  data = {
+  "name": "string",
+  "description": "string",
+  "course_template": "fake_template_id",
+  "cohort": "fake_cohort_id",
+  "teachers_list": [TEACHER_EMAIL]}
+
+  resp = requests.post(url=url, json=data)
+  resp_json = resp.json()
+  print(resp_json)
+  assert resp.status_code == 200, "Status 200"
+
+def test_create_section_course_template_not_found():
+  """ 
+  CUJ01 create a Course template by providing a valid json object
+  as a input using that json object calling create course template api.
+  Which creates a course template and master course in classroom.
+  """
+  # Create fake classroom in google classroom
+  course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
+  # Create fake Mastr course in Firestore
+  print("THIS IS FAKE MASTER COURSEE ",course)
+  classroom_id = course["id"]
+  create_fake_data(classroom_id)
+  base_url = get_baseurl("lms")
+  if not base_url:
+      raise NotFoundErr("Unable to locate the service URL for lms")
+  url = base_url + f"/lms/api/v1/course/create_section"
+
+  print(base_url)
+  data = {
+  "name": "string",
+  "description": "string",
+  "course_template": "fake_template_id_new",
+  "cohort": "fake_cohort_id",
+  "teachers_list": [TEACHER_EMAIL]}
+
+  resp = requests.post(url=url, json=data)
+  resp_json = resp.json()
+  print(resp_json)
+  assert resp.status_code == 404
+
+
+def test_create_section():
+  """ 
+  CUJ01 create a Course template by providing a valid json object
+  as a input using that json object calling create course template api.
+  Which creates a course template and master course in classroom.
+  """
+  # Create fake classroom in google classroom
+  course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
+  # Create fake Mastr course in Firestore
+  print("THIS IS FAKE MASTER COURSEE ",course)
+  classroom_id = course["id"]
+  create_fake_data(classroom_id)
+  base_url = get_baseurl("lms")
+  if not base_url:
+      raise NotFoundErr("Unable to locate the service URL for lms")
+  url = base_url + f"/lms/api/v1/course/create_section"
+
+  print(base_url)
+  data = {
+  "name": "string",
+  "description": "string",
+  "course_template": "fake_template_id",
+  "cohort": "fake_cohort_id",
+  "teachers_list": [TEACHER_EMAIL]}
+
+  resp = requests.post(url=url, json=data)
+  resp_json = resp.json()
+  print(resp_json)
+  assert resp.status_code == 200, "Status 200"
+
+
+def test_get_list_sections():
+  """ 
+    get a Sections list by calling get course template list api.
+  Which will return a CourseTemplateList object.
+  """
+  course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
+  classroom_id = course["id"]
+  create_fake_data(classroom_id)
+  base_url = get_baseurl("lms")
+  url = base_url + "/lms/api/v1/course/list_section/?cohort_id=fake_cohort_id"
+  print(base_url)
+  resp = requests.get(url=url)
+  resp_json = resp.json()
+  assert resp.status_code == 200, "Status 200"
+
+def test_get_section():
+  """
+    get a Section by calling  get section api to get the details of a perticular section
+  Which will return a CourseTemplateList object.
+  """
+  course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
+  classroom_id = course["id"]
+  create_fake_data(classroom_id)
+  base_url = get_baseurl("lms")
+  url = base_url + "/lms/api/v1/course/get_section/?section_id=fake_section_id"
+  print(base_url)
+  resp = requests.get(url=url)
+  resp_json = resp.json()
+  assert resp.status_code == 200, "Status 200"    
+
+def test_update_section():
+  """ 
+  CUJ01 create a Course template by providing a valid json object
+  as a input using that json object calling create course template api.
+  Which creates a course template and master course in classroom.
+  """
+  # Create fake classroom in google classroom
+  course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
+  # Create fake Mastr course in Firestore
+  print("THIS IS FAKE MASTER COURSEE ",course)
+  classroom_id = course["id"]
+  create_fake_data(classroom_id)
+  base_url = get_baseurl("lms")
+  if not base_url:
+      raise NotFoundErr("Unable to locate the service URL for lms")
+  url = base_url + f"/lms/api/v1/course/update_section/"
+
+  print(base_url)
+  data={
+"uuid": "fake_section_id",
+"course_id": classroom_id,
+"section_name": "section_updated",
+"description": "test_description_updated",
+"course_state": "ACTIVE"
+  }
+  resp = requests.post(url=url, json=data)
+  resp_json = resp.json()
+  print(resp_json)
+  assert resp.status_code == 200, "Status 200"
+
+def test_update_section_course_not_found_in_classroom():
+  """ 
+  CUJ01 create a Course template by providing a valid json object
+  as a input using that json object calling create course template api.
+  Which creates a course template and master course in classroom.
+  """
+  # Create fake classroom in google classroom
+  course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
+  # Create fake Mastr course in Firestore
+  print("THIS IS FAKE MASTER COURSEE ",course)
+  classroom_id = course["id"]
+  create_fake_data(classroom_id)
+  base_url = get_baseurl("lms")
+  if not base_url:
+      raise NotFoundErr("Unable to locate the service URL for lms")
+  url = base_url + f"/lms/api/v1/course/update_section/"
+
+  print(base_url)
+  data={
+"uuid": "fake_section_id",
+"course_id":"test1222",
+"section_name": "section_updated",
+"description": "test_description_updated",
+"course_state": "ACTIVE"}
+  resp = requests.post(url=url, json=data)
+  # resp_json = resp.json()
+  # print(resp_json)
+  assert resp.status_code == 500

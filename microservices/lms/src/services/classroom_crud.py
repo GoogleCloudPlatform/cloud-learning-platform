@@ -40,7 +40,9 @@ def create_course(name,description,section,owner_id):
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    CLASSROOM_ADMIN_EMAIL=="lms_service@dhodun.altostrat.com"
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+
     service = build("classroom", "v1", credentials=creds)
     new_course = {}
     new_course["name"]=name
@@ -98,7 +100,6 @@ def update_course(course_id,section_name,description,course_state,course_name=No
     service = build("classroom", "v1", credentials=creds)
     try:
       new_course = {}
-      
       course = service.courses().get(id=course_id).execute()
       if course_name is not None:
         new_course["name"]=course_name
@@ -111,12 +112,11 @@ def update_course(course_id,section_name,description,course_state,course_name=No
       return course
     except HttpError as error:
         logger.error(error)
+        print("________HTTP---------",HttpError.status_code)
         if HttpError.status_code == 404:
           return None
         else:
           raise HttpError
-
-
 
 
 def get_course_list():    
@@ -191,6 +191,7 @@ def create_topics(course_id , topics):
     CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
+    print("This is before create topic")
     for topic in topics:
         topic_name = topic["name"]
         topic = {
@@ -268,10 +269,11 @@ def add_teacher(course_id,teacher_email):
   CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
+  CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
   teacher = {"userId": teacher_email}
-  print(course_id)
+  print("In ADD teacher",course_id)
   course = service.courses().teachers().create(
       courseId=course_id, body=teacher).execute()
   return course
