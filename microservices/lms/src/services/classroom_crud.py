@@ -88,22 +88,34 @@ def update_course(course_id,section_name,description,course_state,course_name=No
   Returns:
     new created course details
     """""
+
     SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    CLASSROOM_ADMIN_EMAIL="lms_service@dhodun.altostrat.com"
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
-    new_course = {}
-    if course_name is not None:
-      new_course["name"]=course_name
-    new_course["section"]=section_name
-    new_course["description"]=description
-    new_course["course_state"]=course_state
-    course = service.courses().update(id=course_id,body=new_course).execute()
-    course_name = course.get("name")
-    course_id = course.get("id")
-    return course
+    try:
+      new_course = {}
+      
+      course = service.courses().get(id=course_id).execute()
+      if course_name is not None:
+        new_course["name"]=course_name
+      course["section"]=section_name
+      course["description"]=description
+      course["course_state"]=course_state
+      course = service.courses().update(id=course_id,body=course).execute()
+      course_name = course.get("name")
+      course_id = course.get("id")
+      return course
+    except HttpError as error:
+        logger.error(error)
+        if HttpError.status_code == 404:
+          return None
+        else:
+          raise HttpError
+
 
 
 
