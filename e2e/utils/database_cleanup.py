@@ -55,6 +55,9 @@ if __name__ == "__main__":
   if DATABASE_PREFIX is None:
     raise Exception("DATABASE_PREFIX is not defined. Database cleanup skipped.")
 
-  print("Deleting Firebase collection")
-  delete_firestore_collection(f"{DATABASE_PREFIX}document")
+  collections_list = [collection.id for collection in list(db.collections())]
+  for collection_id in collections_list:
+    if DATABASE_PREFIX in collection_id:
+      print("Deleting Firebase collection: " + collection_id)
+      delete_firestore_collection(collection_id)
  

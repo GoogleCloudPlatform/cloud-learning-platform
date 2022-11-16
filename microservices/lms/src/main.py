@@ -26,6 +26,7 @@ from routes import user
 from routes import copy_course
 # from routes import copy_course
 from routes import student
+from routes import course_template
 
 app = FastAPI()
 
@@ -73,7 +74,6 @@ api.include_router(copy_course.router)
 api.include_router(student.router)
 # api.include_router(copy_course.router)
 
-# TODO: add these back in
 
 add_exception_handlers(app)
 add_exception_handlers(api)
