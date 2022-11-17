@@ -3,7 +3,6 @@ import os
 import pytest
 import requests
 import uuid
-from xml.dom import NotFoundErr
 import requests
 import mock
 import os
@@ -20,50 +19,58 @@ from common.models.course_template import CourseTemplate
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
-
+from common.testing.example_objects import TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2
 DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 EMAILS  =  get_required_emails_from_secret_manager()
 TEACHER_EMAIL = EMAILS["instructional_designer"]
 
 def create_fake_data(classroom_id):
-  """Fixture to create temprory data"""
+  """Function to create temprory data"""
 
-  TEST_COURSE_TEMPLATE = {
-      "name": "test-name",
-      "uuid":"fake_template_id",
-      "description": "test-description",
-      "admin": "test-admin@gmail.com",
-      "instructional_designer": "IDesiner@gmail.com",
-      "classroom_id": classroom_id,
-      "classroom_code": "fake-classroom_code"}
+  # TEST_COURSE_TEMPLATE = {
+  #     "name": "test-name",
+  #     "uuid":"fake_template_id",
+  #     "description": "test-description",
+  #     "admin": "test-admin@gmail.com",
+  #     "instructional_designer": "IDesiner@gmail.com",
+  #     "classroom_id": "fake_classroom_id",
+  #     "classroom_code": "fake-classroom_code"}
+  TEST_COURSE_TEMPLATE["classroom_id"]=classroom_id
   course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
   course_template.save()
   
-  TEST_COHORT = {
-    "uuid":"fake_cohort_id",
-    "name": "name",
-    "description": "description",
-    "course_template":course_template,
-    "start_date": datetime.datetime(year=2022,month=10, day=14),
-    "end_date": datetime.datetime(year=2022,month=12, day=25),
-    "registration_start_date": datetime.datetime(year=2022,month=10, day=20),
-    "registration_end_date": datetime.datetime(year=2022,month=11, day=14),
-    "max_student": 0,
-    "enrolled_student_count":0
-  }
+  # TEST_COHORT = {
+  #   "uuid":"fake_cohort_id",
+  #   "name": "name",
+  #   "description": "description",
+  #   "course_template":course_template,
+  #   "start_date": datetime.datetime(year=2022,month=10, day=14),
+  #   "end_date": datetime.datetime(year=2022,month=12, day=25),
+  #   "registration_start_date": datetime.datetime(year=2022,month=10, day=20),
+  #   "registration_end_date": datetime.datetime(year=2022,month=11, day=14),
+  #   "max_student": 0,
+  #   "enrolled_student_count":0
+  # }
+  TEST_COHORT =TEST_COHORT2
+  TEST_COHORT["course_template"]=course_template
+  
   cohort = Cohort.from_dict(TEST_COHORT)
   cohort.save()
-  TEST_SECTION = {
-    "uuid":"fake_section_id",
-    "name" : "section_name",
-    "section" : "section c",
-    "description": "description",
-    "classroom_id" :"cl_id",
-    "classroom_code" :"cl_code",
-    "course_template":course_template,
-    "cohort":cohort,    
-    "teachers_list":[TEACHER_EMAIL]
-  }
+
+  # TEST_SECTION = {
+  #   "uuid":"fake_section_id",
+  #   "name" : "section_name",
+  #   "section" : "section c",
+  #   "description": "description",
+  #   "classroom_id" :"cl_id",
+  #   "classroom_code" :"cl_code",
+  #   "course_template":course_template,
+  #   "cohort":cohort,    
+  #   "teachers_list":[TEACHER_EMAIL]
+  # }
+  TEST_SECTION = TEST_SECTION2
+  TEST_SECTION["cohort"]=cohort
+  TEST_SECTION["course_template"] = course_template
   section = Section.from_dict(TEST_SECTION)
   section.save()
   return course_template , cohort,section
@@ -110,7 +117,7 @@ def test_create_section():
   create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
   if not base_url:
-      raise NotFoundErr("Unable to locate the service URL for lms")
+      raise ResourceNotFoundException("Unable to locate the service URL for lms")
   url = base_url + f"/lms/api/v1/sections"
 
   print(base_url)
@@ -142,7 +149,7 @@ def test_create_section_course_template_not_found():
   create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
   if not base_url:
-      raise NotFoundErr("Unable to locate the service URL for lms")
+      raise ResourceNotFoundException("Unable to locate the service URL for lms")
   url = base_url + f"/lms/api/v1/sections"
 
   print(base_url)
@@ -200,7 +207,7 @@ def test_update_section():
   create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
   if not base_url:
-      raise NotFoundErr("Unable to locate the service URL for lms")
+      raise ResourceNotFoundException("Unable to locate the service URL for lms")
   url = base_url + f"/lms/api/v1/sections/update_section"
 
   print(base_url)
@@ -230,7 +237,7 @@ def test_update_section_course_not_found_in_classroom():
   create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
   if not base_url:
-      raise NotFoundErr("Unable to locate the service URL for lms")
+      raise ResourceNotFoundException("Unable to locate the service URL for lms")
   url = base_url + f"/lms/api/v1/sections/update_section"
 
   print(base_url)
