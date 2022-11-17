@@ -167,7 +167,7 @@ def create_section(sections_details: SectionDetails,response:Response):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-@router.get("/{cohort_id}")
+@router.get("/cohort/{cohort_id}/sections")
 def list_section(cohort_id:str):
   """ Get a list of sections of one cohort from db
 
@@ -204,7 +204,7 @@ def list_section(cohort_id:str):
     raise HTTPException(status_code=500,data =e) from e
 
 
-@router.get("/get_section/{section_id}")
+@router.get("/{section_id}")
 def get_section(section_id:str):
   """Get a section details from db
 
@@ -234,7 +234,7 @@ def get_section(section_id:str):
     Logger.error(e)
     raise HTTPException(status_code=500,data =e) from e
 
-@router.put("")
+@router.patch("")
 def update_section(sections_details: UpdateSection):
   """Update section API
 

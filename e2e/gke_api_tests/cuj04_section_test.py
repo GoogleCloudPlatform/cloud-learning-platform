@@ -2,14 +2,10 @@
 import os
 import pytest
 import requests
-import uuid
 import requests
-import mock
-import os
 import json
 from endpoint_proxy import get_baseurl
 from common.models import CourseTemplate
-from common.testing.example_objects import TEST_COURSE_TEMPLATE
 from common.utils.errors import ResourceNotFoundException
 from secrets_helper import get_required_emails_from_secret_manager
 import datetime
@@ -17,7 +13,6 @@ from common.models.cohort import Cohort
 from common.models.section import Section
 from common.models.course_template import CourseTemplate
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
 from common.testing.example_objects import TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2
 DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
@@ -27,20 +22,17 @@ TEACHER_EMAIL = EMAILS["instructional_designer"]
 def create_fake_data(classroom_id):
   """Function to create temprory data"""
 
-  TEST_COURSE_TEMPLATE=TEST_COURSE_TEMPLATE2
-  TEST_COURSE_TEMPLATE["classroom_id"]=classroom_id
-  course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
+  TEST_COURSE_TEMPLATE2["classroom_id"]=classroom_id
+  course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE2)
   course_template.save()
 
-  TEST_COHORT =TEST_COHORT2
-  TEST_COHORT["course_template"]=course_template
+  TEST_COHORT2["course_template"]=course_template
   
-  cohort = Cohort.from_dict(TEST_COHORT)
+  cohort = Cohort.from_dict(TEST_COHORT2)
   cohort.save()
-  TEST_SECTION = TEST_SECTION2
-  TEST_SECTION["cohort"]=cohort
-  TEST_SECTION["course_template"] = course_template
-  section = Section.from_dict(TEST_SECTION)
+  TEST_SECTION2["cohort"]=cohort
+  TEST_SECTION2["course_template"] = course_template
+  section = Section.from_dict(TEST_SECTION2)
   section.save()
   return course_template , cohort,section
   
@@ -141,7 +133,7 @@ def test_get_list_sections():
   classroom_id = course["id"]
   create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
-  url = base_url + "/lms/api/v1/sections/fake_cohort_id"
+  url = base_url + "/lms/api/v1/sections/cohort/fake_cohort_id/sections"
   print(base_url)
   resp = requests.get(url=url)
   resp_json = resp.json()
@@ -186,7 +178,7 @@ def test_update_section():
 "description": "test_description_updated",
 "course_state": "ACTIVE"
   }
-  resp = requests.put(url=url, json=data)
+  resp = requests.patch(url=url, json=data)
   resp_json = resp.json()
   print(resp_json)
   assert resp.status_code == 200, "Status 200"
@@ -215,5 +207,5 @@ def test_update_section_course_not_found_in_classroom():
 "section_name": "section_updated",
 "description": "test_description_updated",
 "course_state": "ACTIVE"}
-  resp = requests.put(url=url, json=data)
+  resp = requests.patch(url=url, json=data)
   assert resp.status_code == 500

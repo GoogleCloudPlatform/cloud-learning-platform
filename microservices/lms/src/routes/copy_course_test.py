@@ -219,7 +219,7 @@ def test_create_section_cohort_not_found(client_with_emulator):
 def test_list_section(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + "/sections/fake-cohort-id"
+  url = API_URL + "sections/cohort/fake-cohort-id/sections"
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   assert resp.status_code == 200 
@@ -227,7 +227,7 @@ def test_list_section(client_with_emulator):
 def test_list_section_cohort_not_found(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + "/sections/fake-cohort-id22"
+  url = API_URL + "sections/cohort/fake-cohort-id22/sections"
 
   resp = client_with_emulator.get(url)
   json_response = resp.json()
@@ -237,7 +237,7 @@ def test_list_section_cohort_not_found(client_with_emulator):
 def test_get_section(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + f"/sections/get_section/{fake_data_result[2].uuid}"
+  url = API_URL + f"/sections/{fake_data_result[2].uuid}"
 
   resp = client_with_emulator.get(url)
   json_response = resp.json()
@@ -246,7 +246,7 @@ def test_get_section(client_with_emulator):
 def test_get_section_not_found(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + f"/sections/get_section/tesr_case_id_does_not_exists"
+  url = API_URL + f"/sections/test_case_id_does_not_exists"
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   
@@ -264,7 +264,7 @@ def test_update_section(client_with_emulator):
 }
   url = API_URL + f"/sections" 
   with mock.patch("routes.copy_course.classroom_crud.update_course"):
-    resp = client_with_emulator.put(url,json=data)
+    resp = client_with_emulator.patch(url,json=data)
   json_response = resp.json()
   assert resp.status_code == 200 
 
@@ -282,7 +282,7 @@ def test_update_section_section_id_not_found(client_with_emulator):
   url = API_URL + f"/sections"
 
   with mock.patch("routes.copy_course.classroom_crud.update_course"):
-    resp = client_with_emulator.put(url,json=data)
+    resp = client_with_emulator.patch(url,json=data)
   json_response = resp.json()
   assert resp.status_code == 404
 
@@ -298,6 +298,6 @@ def test_update_section_course_id_not_found(client_with_emulator):
 }
   url = API_URL + f"/sections"
   with mock.patch("routes.copy_course.classroom_crud.update_course",return_value=None):
-    resp = client_with_emulator.put(url,json=data)
+    resp = client_with_emulator.patch(url,json=data)
   json_response = resp.json()
   assert resp.status_code == 404 
