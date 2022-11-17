@@ -153,6 +153,21 @@ def test_get_section():
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"    
 
+def test_list_sections():
+  """
+    List all the sections
+  """
+  course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
+  classroom_id = course["id"]
+  create_fake_data(classroom_id)
+  base_url = get_baseurl("lms")
+  url = base_url + "/lms/api/v1/sections"
+  print(base_url)
+  resp = requests.get(url=url)
+  resp_json = resp.json()
+  assert resp.status_code == 200, "Status 200"    
+
+
 def test_update_section():
   """ 
   User click on edit button for a section 

@@ -216,10 +216,18 @@ def test_create_section_cohort_not_found(client_with_emulator):
   json_response = json.loads(resp.text)
   assert resp.status_code == 404  
 
+def test_list_section_for_one_cohort(client_with_emulator):
+
+  fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
+  url = API_URL + "/sections/cohort/fake-cohort-id/sections"
+  resp = client_with_emulator.get(url)
+  json_response = resp.json()
+  assert resp.status_code == 200 
+
 def test_list_section(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + "sections/cohort/fake-cohort-id/sections"
+  url = API_URL + "/sections"
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   assert resp.status_code == 200 
@@ -227,7 +235,7 @@ def test_list_section(client_with_emulator):
 def test_list_section_cohort_not_found(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + "sections/cohort/fake-cohort-id22/sections"
+  url = API_URL + "/sections/cohort/fake-cohort-id22/sections"
 
   resp = client_with_emulator.get(url)
   json_response = resp.json()

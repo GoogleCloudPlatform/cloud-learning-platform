@@ -238,6 +238,33 @@ def get_section(section_id:str):
     raise HTTPException(status_code=500,data =e) from e
 
 
+@router.get("")
+def section_list():
+  """Get a all section details from db
+
+  Args:
+   
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      HTTPException: 500 If refereced course_template and cohort object does not exists in db
+  Returns:
+    {"status":"Success","new_course":{}}: Returns section details from  db,
+    {'status': 'Failed'} if the user creation raises an exception
+  """
+  try:
+    print("1")
+    sections = Section.collection.filter("is_deleted", "==", False).fetch()
+    result = list(
+          map(lambda x: x.to_dict(),sections))
+    SUCCESS_RESPONSE["sections"] = result
+    return SUCCESS_RESPONSE
+
+  except Exception as e:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise HTTPException(status_code=500,data =e) from e
+
+
 @router.patch("")
 def update_section(sections_details: UpdateSection):
   """Update section API
