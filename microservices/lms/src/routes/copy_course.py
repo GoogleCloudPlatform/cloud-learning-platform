@@ -1,15 +1,7 @@
 """ User endpoints """
 from re import I
-from fastapi import APIRouter, HTTPException,status, Response
+from fastapi import APIRouter, HTTPException, Response
 from common.utils.logging_handler import Logger
-from fastapi.encoders import jsonable_encoder
-from google.api_core.exceptions import PermissionDenied
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from google.oauth2 import service_account
-from google.oauth2.credentials import Credentials
 from schemas.course_details import CourseDetails
 from schemas.section import SectionDetails
 from schemas.update_section import UpdateSection
@@ -18,7 +10,6 @@ from common.models.section import Section
 from common.models.course_template import CourseTemplate
 from common.models.cohort import Cohort
 import traceback
-import os.path
 import os
 import datetime
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError
@@ -109,9 +100,6 @@ def create_section(sections_details: SectionDetails,response:Response):
   """
   try:
     sections_details_dict = {**sections_details.dict()}
-    # section_name = sections_details_dict['name']
-    # description = sections_details_dict['description']
-    # teachers_list = sections_details_dict['teachers_list']
     course_template_id = sections_details_dict['course_template']
     cohort_id = sections_details_dict['cohort']
     course_template_details = CourseTemplate.find_by_uuid(sections_details_dict['course_template'])
@@ -184,7 +172,6 @@ def list_section(cohort_id:str):
 
     # Get cohort Id and create a reference of cohort object
 
-    # cohort=Cohort.collection.filter("uuid","==",cohort_id).get()
     cohort=Cohort.find_by_uuid(cohort_id)
     if cohort == None:
       raise ResourceNotFound(
@@ -201,9 +188,7 @@ def list_section(cohort_id:str):
     raise  ResourceNotFound(str(err)) from err
   except Exception as e:
     Logger.error(e)
-    print(e)
     err = traceback.format_exc().replace("\n", " ")
-    print(err)
     raise HTTPException(status_code=500,data =e) from e
 
 
@@ -252,7 +237,6 @@ def section_list():
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    print("1")
     sections = Section.collection.filter("is_deleted", "==", False).fetch()
     result = list(
           map(lambda x: x.to_dict(),sections))
@@ -287,11 +271,8 @@ def update_section(sections_details: UpdateSection):
   try:
 
     sections_details_dict = {**sections_details.dict()}
-    # section_name = sections_details_dict["section_name"]
     uuid = sections_details_dict["uuid"]
-    # description = sections_details_dict["description"]
     course_id = sections_details_dict["course_id"]
-    # course_state= sections_details_dict["course_state"]
     section = Section.find_by_uuid(uuid)
     if section == None:
       raise ResourceNotFound(
