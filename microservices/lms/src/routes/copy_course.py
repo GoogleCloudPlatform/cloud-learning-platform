@@ -240,7 +240,7 @@ def get_section(section_id:str):
     print(e)
     raise HTTPException(status_code=500,data =e) from e
 
-@router.post("/update_section")
+@router.put("")
 def update_section(sections_details: UpdateSection):
   """Update section API
 

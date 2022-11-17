@@ -208,7 +208,7 @@ def test_update_section():
   base_url = get_baseurl("lms")
   if not base_url:
       raise ResourceNotFoundException("Unable to locate the service URL for lms")
-  url = base_url + f"/lms/api/v1/sections/update_section"
+  url = base_url + f"/lms/api/v1/sections"
 
   print(base_url)
   data={
@@ -218,7 +218,7 @@ def test_update_section():
 "description": "test_description_updated",
 "course_state": "ACTIVE"
   }
-  resp = requests.post(url=url, json=data)
+  resp = requests.put(url=url, json=data)
   resp_json = resp.json()
   print(resp_json)
   assert resp.status_code == 200, "Status 200"
@@ -238,7 +238,7 @@ def test_update_section_course_not_found_in_classroom():
   base_url = get_baseurl("lms")
   if not base_url:
       raise ResourceNotFoundException("Unable to locate the service URL for lms")
-  url = base_url + f"/lms/api/v1/sections/update_section"
+  url = base_url + f"/lms/api/v1/sections"
 
   print(base_url)
   data={
@@ -247,5 +247,5 @@ def test_update_section_course_not_found_in_classroom():
 "section_name": "section_updated",
 "description": "test_description_updated",
 "course_state": "ACTIVE"}
-  resp = requests.post(url=url, json=data)
+  resp = requests.put(url=url, json=data)
   assert resp.status_code == 500

@@ -268,11 +268,11 @@ def test_update_section(client_with_emulator):
   "description": "tdescription",
   "course_state": "ACTIVEu"
 }
-  url = API_URL + f"/sections/update_section"
+  url = API_URL + f"/sections"
   print(fake_data_result)
   print("API URL ",url)
   with mock.patch("routes.copy_course.classroom_crud.update_course"):
-    resp = client_with_emulator.post(url,json=data)
+    resp = client_with_emulator.put(url,json=data)
   json_response = resp.json()
   assert resp.status_code == 200 
 
@@ -287,11 +287,11 @@ def test_update_section_section_id_not_found(client_with_emulator):
   "description": "tdescription",
   "course_state": "ACTIVEu"
 }
-  url = API_URL + f"/sections/update_section"
+  url = API_URL + f"/sections"
   print(fake_data_result)
   print("API URL ",url)
   with mock.patch("routes.copy_course.classroom_crud.update_course"):
-    resp = client_with_emulator.post(url,json=data)
+    resp = client_with_emulator.put(url,json=data)
   json_response = resp.json()
   assert resp.status_code == 404
 
@@ -306,10 +306,10 @@ def test_update_section_course_id_not_found(client_with_emulator):
   "description": "tdescription",
   "course_state": "ACTIVEu"
 }
-  url = API_URL + f"/sections/update_section"
+  url = API_URL + f"/sections"
   print(fake_data_result)
   print("API URL ",url)
   with mock.patch("routes.copy_course.classroom_crud.update_course",return_value=None):
-    resp = client_with_emulator.post(url,json=data)
+    resp = client_with_emulator.put(url,json=data)
   json_response = resp.json()
   assert resp.status_code == 404 

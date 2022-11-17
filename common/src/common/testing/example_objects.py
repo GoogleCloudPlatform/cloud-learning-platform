@@ -52,7 +52,7 @@ TEST_COURSE_TEMPLATE2 = {
       "instructional_designer": "IDesiner@gmail.com",
       "classroom_id": "fake_classroom_id",
       "classroom_code": "fake-classroom_code"
-      } 
+    }  
 
 TEST_COHORT2 = {
     "uuid":"fake_cohort_id",
@@ -65,7 +65,7 @@ TEST_COHORT2 = {
     "registration_end_date": datetime.datetime(year=2022,month=11, day=14),
     "max_student": 0,
     "enrolled_student_count":0
-  } 
+  }  
 
 TEST_SECTION2 = {
     "uuid":"fake_section_id",
@@ -77,4 +77,4 @@ TEST_SECTION2 = {
     "course_template":"fake_template_id",
     "cohort":"fake_cohort_id",    
     "teachers_list":["fake_email_id@gmail.com"]
-  }
+  }  
