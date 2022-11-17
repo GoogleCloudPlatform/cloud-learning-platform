@@ -75,7 +75,6 @@ TEST_SECTION2 = {
     "classroom_id" :"cl_id",
     "classroom_code" :"cl_code",
     "course_template":"fake_template_id",
-    "cohort":"fake_cohort_id",    
+    "cohort":"fake_cohort_id",
     "teachers_list":["fake_email_id@gmail.com"]
   }
-  
