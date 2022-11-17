@@ -35,6 +35,7 @@ def create_fake_data(classroom_id):
   #     "instructional_designer": "IDesiner@gmail.com",
   #     "classroom_id": "fake_classroom_id",
   #     "classroom_code": "fake-classroom_code"}
+  TEST_COURSE_TEMPLATE=TEST_COURSE_TEMPLATE2
   TEST_COURSE_TEMPLATE["classroom_id"]=classroom_id
   course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
   course_template.save()
@@ -127,7 +128,6 @@ def test_create_section():
   "course_template": "fake_template_id",
   "cohort": "fake_cohort_id",
   "teachers_list": [TEACHER_EMAIL]}
-
   resp = requests.post(url=url, json=data)
   resp_json = resp.json()
   print(resp_json)
