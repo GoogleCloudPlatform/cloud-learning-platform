@@ -1,7 +1,6 @@
 """Example Data for testing"""
 import datetime
 
-
 TEST_USER= {
         "uuid":"fake-user-id",
         "auth_id" : "fake-user-auth-id",
@@ -18,6 +17,7 @@ TEST_COURSE_TEMPLATE={
             "classroom_id":"clID",
             "classroom_code":"clcode"
         }
+
 TEST_COHORT={
             "uuid":"fake-cohort-id",
             "name": "name",
@@ -33,6 +33,7 @@ TEST_COHORT={
             "max_student": 0,
             "enrolled_student_count":0
         }
+
 TEST_SECTION={
             "uuid":"fake-section-id",
             "name" : "section_name",
@@ -50,7 +51,8 @@ TEST_COURSE_TEMPLATE2 = {
       "admin": "test-admin@gmail.com",
       "instructional_designer": "IDesiner@gmail.com",
       "classroom_id": "fake_classroom_id",
-      "classroom_code": "fake-classroom_code"}
+      "classroom_code": "fake-classroom_code"
+      } 
 
 TEST_COHORT2 = {
     "uuid":"fake_cohort_id",
@@ -63,7 +65,7 @@ TEST_COHORT2 = {
     "registration_end_date": datetime.datetime(year=2022,month=11, day=14),
     "max_student": 0,
     "enrolled_student_count":0
-  }
+  } 
 
 TEST_SECTION2 = {
     "uuid":"fake_section_id",
