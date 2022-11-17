@@ -201,6 +201,9 @@ def list_section(cohort_id:str):
     raise  ResourceNotFound(str(err)) from err
   except Exception as e:
     Logger.error(e)
+    print(e)
+    err = traceback.format_exc().replace("\n", " ")
+    print(err)
     raise HTTPException(status_code=500,data =e) from e
 
 
@@ -233,6 +236,7 @@ def get_section(section_id:str):
   except Exception as e:
     Logger.error(e)
     raise HTTPException(status_code=500,data =e) from e
+
 
 @router.patch("")
 def update_section(sections_details: UpdateSection):

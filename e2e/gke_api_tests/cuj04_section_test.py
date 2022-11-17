@@ -147,7 +147,7 @@ def test_get_section():
   classroom_id = course["id"]
   create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
-  url = base_url + "/lms/api/v1/sections/get_section/fake_section_id"
+  url = base_url + "/lms/api/v1/sections/fake_section_id"
   print(base_url)
   resp = requests.get(url=url)
   resp_json = resp.json()
