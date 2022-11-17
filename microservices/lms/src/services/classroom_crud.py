@@ -67,14 +67,11 @@ def get_course_by_id(course_id):
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
 
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
-    print("Classroom Admin Email",CLASSROOM_ADMIN_EMAIL)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     try:
-        print(course_id,len(course_id),type(course_id))
         service = build("classroom", "v1", credentials=creds)
         course = service.courses().get(id=course_id).execute()
-        print("Course get method worked ...")
-        print(course)
+    
         return course
 
     except HttpError as error:
@@ -159,7 +156,6 @@ def get_topics(course_id):
               break
       if response:
           topics = response["topic"] 
-          print("Topic method worked ")
           return topics
     except HttpError as error:
         logger.error(error)
@@ -182,7 +178,6 @@ def create_topics(course_id , topics):
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
-    print("This is before create topic")
     for topic in topics:
         topic_name = topic["name"]
         topic = {
@@ -190,7 +185,7 @@ def create_topics(course_id , topics):
         response = service.courses().topics().create(
         courseId=course_id,
         body=topic).execute()
-    print("This is create topic method worked")
+    Logger.info(f"Topics created for course_id{course_id}")
     return "success"
 
 def get_coursework(course_id):
@@ -205,13 +200,11 @@ def get_coursework(course_id):
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-    print("In coursework list method........")
     service = build("classroom", "v1", credentials=creds)
     try:
       coursework_list = service.courses().courseWork().list(courseId=course_id).execute()
       if coursework_list:
           coursework_list = coursework_list['courseWork']
-          print("Coursework Method worked")
       return coursework_list
     except HttpError as error:
         logger.error(error)
@@ -234,7 +227,7 @@ def create_coursework(course_id, coursework_list):
     service = build("classroom", "v1", credentials=creds)
     for coursework_item  in coursework_list:
         coursework = service.courses().courseWork().create(courseId=course_id, body=coursework_item).execute()
-    print("Create coursework method worked")
+    Logger.info("Create coursework method worked")
     return "success"
 
 def delete_course_by_id(course_id):
@@ -261,7 +254,6 @@ def add_teacher(course_id,teacher_email):
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
   teacher = {"userId": teacher_email}
-  print("In ADD teacher",course_id)
   course = service.courses().teachers().create(
       courseId=course_id, body=teacher).execute()
   return course

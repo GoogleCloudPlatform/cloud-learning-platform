@@ -220,7 +220,6 @@ def test_list_section(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
   url = API_URL + "/sections/fake-cohort-id"
-  print("API URL ",url)
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   assert resp.status_code == 200 
@@ -230,7 +229,6 @@ def test_list_section_cohort_not_found(client_with_emulator):
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
   url = API_URL + "/sections/fake-cohort-id22"
 
-  print("API URL ",url)
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   
@@ -239,10 +237,8 @@ def test_list_section_cohort_not_found(client_with_emulator):
 def test_get_section(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  print(fake_data_result)
   url = API_URL + f"/sections/get_section/{fake_data_result[2].uuid}"
-  print(fake_data_result)
-  print("API URL ",url)
+
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   assert resp.status_code == 200 
@@ -251,7 +247,6 @@ def test_get_section_not_found(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
   url = API_URL + f"/sections/get_section/tesr_case_id_does_not_exists"
-  print("API URL ",url)
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   
@@ -260,7 +255,6 @@ def test_get_section_not_found(client_with_emulator):
 def test_update_section(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  print(fake_data_result)
   data = {
   "uuid": "fake-section-id",
   "course_id": "561822649300",
@@ -268,9 +262,7 @@ def test_update_section(client_with_emulator):
   "description": "tdescription",
   "course_state": "ACTIVEu"
 }
-  url = API_URL + f"/sections"
-  print(fake_data_result)
-  print("API URL ",url)
+  url = API_URL + f"/sections" 
   with mock.patch("routes.copy_course.classroom_crud.update_course"):
     resp = client_with_emulator.put(url,json=data)
   json_response = resp.json()
@@ -279,7 +271,7 @@ def test_update_section(client_with_emulator):
 def test_update_section_section_id_not_found(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  print(fake_data_result)
+  
   data = {
   "uuid": "fake-section-id_new",
   "course_id": "561822649300",
@@ -288,8 +280,7 @@ def test_update_section_section_id_not_found(client_with_emulator):
   "course_state": "ACTIVEu"
 }
   url = API_URL + f"/sections"
-  print(fake_data_result)
-  print("API URL ",url)
+
   with mock.patch("routes.copy_course.classroom_crud.update_course"):
     resp = client_with_emulator.put(url,json=data)
   json_response = resp.json()
@@ -298,7 +289,6 @@ def test_update_section_section_id_not_found(client_with_emulator):
 def test_update_section_course_id_not_found(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  print(fake_data_result)
   data = {
   "uuid": "fake-section-id_new",
   "course_id": "561822649300",
@@ -307,8 +297,6 @@ def test_update_section_course_id_not_found(client_with_emulator):
   "course_state": "ACTIVEu"
 }
   url = API_URL + f"/sections"
-  print(fake_data_result)
-  print("API URL ",url)
   with mock.patch("routes.copy_course.classroom_crud.update_course",return_value=None):
     resp = client_with_emulator.put(url,json=data)
   json_response = resp.json()
