@@ -56,8 +56,7 @@ class Cohort(BaseModel):
         Cohort: Cohort Object
     """
     cohort = Cohort.collection.filter(
-        "uuid", "==", uuid).filter("is_deleted", "==", False).get()
-        
+        "uuid", "==", uuid).filter("is_deleted", "==", False).get() 
     return cohort
 
   @classmethod
