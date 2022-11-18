@@ -1,8 +1,6 @@
 """Course template list and Course template CRUD API e2e tests"""
 import datetime
-from secrets_helper import get_required_emails_from_secret_manager
 from xml.dom import NotFoundErr
-import os
 import pytest
 import requests
 import uuid
@@ -10,29 +8,21 @@ from endpoint_proxy import get_baseurl
 from common.models import Cohort, CourseTemplate
 from common.testing.example_objects import TEST_COHORT
 from common.utils.errors import ResourceNotFoundException
-DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
-
+from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
+from testing_objects.cohort import COHORT_INPUT_DATA
 
 
 course_template_uuid=None
 @pytest.fixture(scope="session",autouse=True)
 def create_course_template():
     "create a course template for reference"
-    emails = get_required_emails_from_secret_manager()
-    input_data = {
-        "name": DATABASE_PREFIX+"test_course"+str(uuid.uuid4),
-        "description": "Study Hall Test Course for Development purpose",
-        "topic": "e2e test",
-        "admin": emails["admin"],
-        "instructional_designer": emails["instructional_designer"]
-    }
     base_url = get_baseurl("lms")
     if not base_url:
         raise NotFoundErr("Unable to locate the service URL for lms")
     else:
         url = base_url + f"/lms/api/v1/course_templates"
         resp = requests.post(
-            url=url, json=input_data)
+            url=url, json=COURSE_TEMPLATE_INPUT_DATA)
         global course_template_uuid
         course_template_uuid = resp.json()["course_template"]["uuid"]
 
@@ -64,22 +54,13 @@ def test_create_cohort():
             "Unable to locate the service URL for lms")
     else:
         url = base_url + f"/lms/api/v1/cohorts"
-        input_data = {
-            "name": DATABASE_PREFIX+"test_cohort"+str(uuid.uuid4),
-            "description": "Study Hall Test Cohort for Development purpose",
-            "start_date": "2022-10-14T00:00:00",
-            "end_date": "2022-12-25T00:00:00",
-            "registration_start_date": "2022-10-20T00:00:00",
-            "registration_end_date": "2022-11-14T00:00:00",
-            "max_student": 5000,
-            "course_template_uuid": course_template_uuid
-        }
+        COHORT_INPUT_DATA["course_template_uuid"]=course_template_uuid
         resp = requests.post(
-            url=url, json=input_data)
+            url=url, json=COHORT_INPUT_DATA)
         resp_json = resp.json()
         assert resp.status_code == 200, "Status 200"
         assert resp_json["success"] is True, "Check success"
-        assert resp_json["cohort"]["start_date"].split("+")[0] == input_data["start_date"], "Check start_date of chort"
+        assert resp_json["cohort"]["start_date"].split("+")[0] == COHORT_INPUT_DATA["start_date"], "Check start_date of chort"
         assert resp_json["cohort"]["uuid"] not in [
             "", None], "Cohort Firebase check"
 
@@ -96,18 +77,9 @@ def test_create_cohort_negative_course_template():
             "Unable to locate the service URL for lms")
     else:
         url = base_url + f"/lms/api/v1/cohorts"
-        input_data = {
-            "name": DATABASE_PREFIX+"test_cohort"+str(uuid.uuid4),
-            "description": "Study Hall Test Cohort for Development purpose",
-            "start_date": "2022-10-14T00:00:00",
-            "end_date": "2022-12-25T00:00:00",
-            "registration_start_date": "2022-10-20T00:00:00",
-            "registration_end_date": "2022-11-14T00:00:00",
-            "max_student": 5000,
-            "course_template_uuid": "fake-uuid"
-        }
+        COHORT_INPUT_DATA["course_template_uuid"] = "fake-uuid"
         resp = requests.post(
-            url=url, json=input_data)
+            url=url, json=COHORT_INPUT_DATA)
         resp_json = resp.json()
         assert resp.status_code == 404, "Status 404"
         assert resp_json["success"] is False, "Check success"
@@ -125,8 +97,8 @@ def test_create_cohort_validation():
     else:
         url = base_url + f"/lms/api/v1/cohorts"
         resp = requests.post(
-            url=url, json={"name": DATABASE_PREFIX+"e2e_test_cases",
-                           "description": "Study Hall Test Course for Development purpose"})
+            url=url, json={"name": "e2e_test_cases",
+                           "description": "description"})
         assert resp.status_code == 422, "Status 422"
         assert resp.json()["success"] is False
 
@@ -158,8 +130,6 @@ def test_get_cohort(setup_cohort):
         response_cohort.pop("registration_start_date").split("+")[0], '%Y-%m-%dT%H:%M:%S')
         response_cohort["registration_end_date"] = datetime.datetime.strptime(
         response_cohort.pop("registration_end_date").split("+")[0], '%Y-%m-%dT%H:%M:%S')
-        print(data)
-        print(response_cohort)
         assert resp.status_code == 200, "Status 200"
         assert response_cohort == data, "Data doesn't Match"
 

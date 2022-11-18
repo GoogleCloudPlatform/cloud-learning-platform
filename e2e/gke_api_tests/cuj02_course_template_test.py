@@ -2,13 +2,11 @@
 import os
 import pytest
 import requests
-import uuid
 from endpoint_proxy import get_baseurl
 from common.models import CourseTemplate
 from common.testing.example_objects import TEST_COURSE_TEMPLATE
 from common.utils.errors import ResourceNotFoundException
-from secrets_helper import get_required_emails_from_secret_manager
-DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
+from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 
 
 @pytest.fixture
@@ -21,21 +19,7 @@ def setup_course_templates():
     return course_template
 
 
-@pytest.fixture
-def get_create_course_templates_input_data():
-    """Fixture to get input data for create course template"""
-    emails=get_required_emails_from_secret_manager()
-    input_data= {
-        "name": DATABASE_PREFIX+"test_course"+str(uuid.uuid4),
-            "description": "Study Hall Test Course for Development purpose",
-            "topic": "e2e test",
-            "admin": emails["admin"],
-            "instructional_designer": emails["instructional_designer"]
-            }
-    return input_data
-
-
-def test_create_course_template(get_create_course_templates_input_data):
+def test_create_course_template():
     """ 
     CUJ01 create a Course template by providing a valid json object
     as a input using that json object calling create course template api.
@@ -47,7 +31,7 @@ def test_create_course_template(get_create_course_templates_input_data):
     else:
         url = base_url + f"/lms/api/v1/course_templates"
         resp = requests.post(
-            url=url, json=get_create_course_templates_input_data)
+            url=url, json=COURSE_TEMPLATE_INPUT_DATA)
         resp_json = resp.json()
         assert resp.status_code == 200, "Status 200"
         assert resp_json["success"] is True, "Check success"
@@ -67,12 +51,11 @@ def test_create_course_template_validation():
     else:
         url = base_url + f"/lms/api/v1/course_templates"
         resp = requests.post(
-            url=url, json={"name": DATABASE_PREFIX+"e2e_test_cases",
-                           "description": "Study Hall Test Course for Development purpose"})
+            url=url, json={"name": "e2e_test_cases",
+                                    "description": "description"})
         assert resp.status_code == 422, "Status 422"
         assert resp.json()["success"] is False
-    
-    
+
 
 def test_get_course_template(setup_course_templates):
     """ 

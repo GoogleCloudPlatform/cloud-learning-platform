@@ -4,7 +4,7 @@ Pydantic Model for cohort API's
 import datetime
 from typing import Optional
 from pydantic import BaseModel
-from schemas.course_template import CourseTemplateModel,COURSE_TEMPLATE_EXAMPLE
+from schemas.course_template import COURSE_TEMPLATE_EXAMPLE
 
 COHORT_EXAMPLE = {
     "uuid": "fake-cohort-id",
