@@ -82,19 +82,19 @@ TEST_SECTION2 = {
     "teachers_list":["fake_email_id@gmail.com"]
   }
 
-def create_fake_data(TEST_COURSE_TEMPLATE,TEST_COHORT,TEST_SECTION,classroom_id):
+def create_fake_data(test_course_template,test_cohort,test_section,
+  classroom_id):
   """Function to create temprory data"""
 
-  TEST_COURSE_TEMPLATE["classroom_id"]=classroom_id
-  course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
+  test_course_template["classroom_id"]=classroom_id
+  course_template = CourseTemplate.from_dict(test_course_template)
   course_template.save()
-
-  TEST_COHORT["course_template"]=course_template
-  
-  cohort = Cohort.from_dict(TEST_COHORT)
+  test_cohort["course_template"]=course_template
+  cohort = Cohort.from_dict(test_cohort)
   cohort.save()
-  TEST_SECTION["cohort"]=cohort
-  TEST_SECTION["course_template"] = course_template
-  section = Section.from_dict(TEST_SECTION2)
+  test_section["cohort"]=cohort
+  test_section["course_template"] = course_template
+  section = Section.from_dict(test_section)
   section.save()
   return course_template , cohort,section
+  
