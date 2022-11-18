@@ -99,18 +99,20 @@ def create_section(sections_details: SectionDetails,response:Response):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    sections_details_dict = {**sections_details.dict()}
-    course_template_id = sections_details_dict['course_template']
-    cohort_id = sections_details_dict['cohort']
-    course_template_details = CourseTemplate.find_by_uuid(sections_details_dict['course_template'])
+    print("section_details",type(sections_details))
+    print("SECTION DETAILS NAME",sections_details.name)
+    # sections_details_dict = {**sections_details.dict()}
+    # course_template_id = sections_details_dict['course_template']
+    # cohort_id = sections_details_dict['cohort']
+    course_template_details = CourseTemplate.find_by_uuid(sections_details.course_template)
     if course_template_details == None:
       raise ResourceNotFound(
-                f'Course Template with uuid {course_template_id} is not found')
-    cohort_details = Cohort.find_by_uuid(cohort_id)
+                f'Course Template with uuid {sections_details.course_template} is not found')
+    cohort_details = Cohort.find_by_uuid(sections_details.cohort_id)
 
     if cohort_details == None:
       raise ResourceNotFound(
-                f'cohort with uuid {cohort_id} is not found')
+                f'cohort with uuid {sections_details.cohort_id} is not found')
     
     name = course_template_details.name
     # Get course by course id for copying from master course
@@ -120,7 +122,7 @@ def create_section(sections_details: SectionDetails,response:Response):
                 f'classroom  with uuid {course_template_details.classroom_id} is not found')
     # Create a new course
 
-    new_course = classroom_crud.create_course(name,sections_details_dict['description'],sections_details_dict['name'],"me") 
+    new_course = classroom_crud.create_course(name,sections_details.description,sections_details.name,"me") 
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
     if topics is not None:
@@ -130,19 +132,19 @@ def create_section(sections_details: SectionDetails,response:Response):
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"],coursework_list)
     # Add teachers to the created course 
-    for teacher_email in sections_details_dict['teachers_list']:
+    for teacher_email in sections_details.teachers_list:
       classroom_crud.add_teacher(new_course["id"],teacher_email) 
     # Save the new record of seecion in firestore
     section = Section()
     section.name = name
-    section.section = sections_details_dict['name']
-    section.description=sections_details_dict['description']
+    section.section = sections_details.name
+    section.description=sections_details.description
     # Reference document can be get using get() method   
     section.course_template = course_template_details
     section.cohort=cohort_details
     section.classroom_id=new_course["id"]
     section.classroom_code=new_course["enrollmentCode"]
-    section.teachers_list=sections_details_dict['teachers_list']
+    section.teachers_list=sections_details.teachers_list
     section.created_timestamp=datetime.datetime.now()
     section.uuid = section.save().id
     section.save()
@@ -270,21 +272,21 @@ def update_section(sections_details: UpdateSection):
   """
   try:
 
-    sections_details_dict = {**sections_details.dict()}
-    uuid = sections_details_dict["uuid"]
-    course_id = sections_details_dict["course_id"]
-    section = Section.find_by_uuid(uuid)
+    # sections_details_dict = {**sections_details.dict()}
+    # uuid = sections_details_dict["uuid"]
+    # course_id = sections_details_dict["course_id"]
+    section = Section.find_by_uuid(sections_details.uuid)
     if section == None:
       raise ResourceNotFound(
-                f'Section with uuid {uuid} is not found')
+                f'Section with uuid {sections_details.uuid} is not found')
     
-    new_course = classroom_crud.update_course(course_id,sections_details_dict["section_name"],sections_details_dict["description"],sections_details_dict["course_state"]) 
+    new_course = classroom_crud.update_course(sections_details.course_id,sections_details.section_name,sections_details.description,sections_details.course_state) 
     if new_course == None:
       raise ResourceNotFound(
-                f'Course with Course_id {course_id} is not found in classroom')
-    section.section = sections_details_dict["section_name"]
-    section.description=sections_details_dict["description"]
-    section.last_updated_timestamp=datetime.datetime.now()
+                f'Course with Course_id {sections_details.course_id} is not found in classroom')
+    section.section = sections_details.section_name
+    section.description=sections_details.description
+    section.last_updated_timestamp=datetime.datetime.utcnow()
     section.save()
     SUCCESS_RESPONSE["data"] = new_course
     return SUCCESS_RESPONSE
