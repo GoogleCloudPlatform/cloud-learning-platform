@@ -108,11 +108,11 @@ def create_section(sections_details: SectionDetails,response:Response):
     if course_template_details == None:
       raise ResourceNotFound(
                 f'Course Template with uuid {sections_details.course_template} is not found')
-    cohort_details = Cohort.find_by_uuid(sections_details.cohort_id)
+    cohort_details = Cohort.find_by_uuid(sections_details.cohort)
 
     if cohort_details == None:
       raise ResourceNotFound(
-                f'cohort with uuid {sections_details.cohort_id} is not found')
+                f'cohort with uuid {sections_details.cohort} is not found')
     
     name = course_template_details.name
     # Get course by course id for copying from master course
