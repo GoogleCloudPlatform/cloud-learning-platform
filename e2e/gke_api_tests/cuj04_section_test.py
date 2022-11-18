@@ -14,27 +14,11 @@ from common.models.section import Section
 from common.models.course_template import CourseTemplate
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
-from common.testing.example_objects import TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2
+from common.testing.example_objects import create_fake_data,TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2
 DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 EMAILS  =  get_required_emails_from_secret_manager()
 TEACHER_EMAIL = EMAILS["instructional_designer"]
 
-def create_fake_data(classroom_id):
-  """Function to create temprory data"""
-
-  TEST_COURSE_TEMPLATE2["classroom_id"]=classroom_id
-  course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE2)
-  course_template.save()
-
-  TEST_COHORT2["course_template"]=course_template
-  
-  cohort = Cohort.from_dict(TEST_COHORT2)
-  cohort.save()
-  TEST_SECTION2["cohort"]=cohort
-  TEST_SECTION2["course_template"] = course_template
-  section = Section.from_dict(TEST_SECTION2)
-  section.save()
-  return course_template , cohort,section
   
 def create_course(name,description,section,owner_id):
   """Create course Function in classroom
@@ -75,7 +59,7 @@ def test_create_section():
   # Create fake Mastr course in Firestore
   print("THIS IS FAKE MASTER COURSEE ",course)
   classroom_id = course["id"]
-  create_fake_data(classroom_id)
+  create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
   base_url = get_baseurl("lms")
   if not base_url:
       raise ResourceNotFoundException("Unable to locate the service URL for lms")
@@ -106,7 +90,8 @@ def test_create_section_course_template_not_found():
   # Create fake Mastr course in Firestore
   print("THIS IS FAKE MASTER COURSEE ",course)
   classroom_id = course["id"]
-  create_fake_data(classroom_id)
+  create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
+  # create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
   if not base_url:
       raise ResourceNotFoundException("Unable to locate the service URL for lms")
@@ -131,7 +116,8 @@ def test_get_list_sections():
   """
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   classroom_id = course["id"]
-  create_fake_data(classroom_id)
+  # create_fake_data(classroom_id)
+  create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
   base_url = get_baseurl("lms")
   url = base_url + "/lms/api/v1/sections/cohort/fake_cohort_id/sections"
   print(base_url)
@@ -145,7 +131,8 @@ def test_get_section():
   """
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   classroom_id = course["id"]
-  create_fake_data(classroom_id)
+  # create_fake_data(classroom_id)
+  create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
   base_url = get_baseurl("lms")
   url = base_url + "/lms/api/v1/sections/fake_section_id"
   print(base_url)
@@ -159,7 +146,8 @@ def test_list_sections():
   """
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   classroom_id = course["id"]
-  create_fake_data(classroom_id)
+  # create_fake_data(classroom_id)
+  create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
   base_url = get_baseurl("lms")
   url = base_url + "/lms/api/v1/sections"
   print(base_url)
@@ -179,7 +167,8 @@ def test_update_section():
   # Create fake Mastr course in Firestore
   print("THIS IS FAKE MASTER COURSEE ",course)
   classroom_id = course["id"]
-  create_fake_data(classroom_id)
+  create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
+  # create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
   if not base_url:
       raise ResourceNotFoundException("Unable to locate the service URL for lms")
@@ -209,7 +198,8 @@ def test_update_section_course_not_found_in_classroom():
   # Create fake Mastr course in Firestore
   print("THIS IS FAKE MASTER COURSEE ",course)
   classroom_id = course["id"]
-  create_fake_data(classroom_id)
+  create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
+  # create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
   if not base_url:
       raise ResourceNotFoundException("Unable to locate the service URL for lms")

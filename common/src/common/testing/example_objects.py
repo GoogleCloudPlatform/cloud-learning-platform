@@ -1,5 +1,8 @@
 """Example Data for testing"""
 import datetime
+from common.models.cohort import Cohort
+from common.models.section import Section
+from common.models.course_template import CourseTemplate
 
 TEST_USER= {
         "uuid":"fake-user-id",
@@ -78,3 +81,20 @@ TEST_SECTION2 = {
     "cohort":"fake_cohort_id",
     "teachers_list":["fake_email_id@gmail.com"]
   }
+
+def create_fake_data(TEST_COURSE_TEMPLATE,TEST_COHORT,TEST_SECTION,classroom_id):
+  """Function to create temprory data"""
+
+  TEST_COURSE_TEMPLATE["classroom_id"]=classroom_id
+  course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
+  course_template.save()
+
+  TEST_COHORT["course_template"]=course_template
+  
+  cohort = Cohort.from_dict(TEST_COHORT)
+  cohort.save()
+  TEST_SECTION["cohort"]=cohort
+  TEST_SECTION["course_template"] = course_template
+  section = Section.from_dict(TEST_SECTION2)
+  section.save()
+  return course_template , cohort,section
