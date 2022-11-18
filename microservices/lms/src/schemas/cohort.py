@@ -4,39 +4,7 @@ Pydantic Model for cohort API's
 import datetime
 from typing import Optional
 from pydantic import BaseModel
-from schemas.course_template import COURSE_TEMPLATE_EXAMPLE
-
-COHORT_EXAMPLE = {
-    "uuid": "fake-cohort-id",
-    "name": "name",
-    "description": "description",
-    "start_date": datetime.datetime(year=2022,
-                                    month=10, day=14),
-    "end_date": datetime.datetime(year=2022,
-                                  month=12, day=25),
-    "registration_start_date": datetime.datetime(year=2022,
-                                                 month=10, day=20),
-    "registration_end_date": datetime.datetime(year=2022,
-                                               month=11, day=14),
-    "max_student": 0,
-    "enrolled_student_count": 0,
-    "course_template": COURSE_TEMPLATE_EXAMPLE["uuid"]
-}
-INSERT_COHORT_EXAMPLE = {
-    "name": "name",
-    "description": "description",
-    "start_date": datetime.datetime(year=2022,
-                                    month=10, day=14),
-    "end_date": datetime.datetime(year=2022,
-                                  month=12, day=25),
-    "registration_start_date": datetime.datetime(year=2022,
-                                                 month=10, day=20),
-    "registration_end_date": datetime.datetime(year=2022,
-                                               month=11, day=14),
-    "max_student": 0,
-    "course_template":"fake-uuid"
-}
-
+from schemas.schema_examples import COHORT_EXAMPLE,INSERT_COHORT_EXAMPLE
 
 class CohortModel(BaseModel):
     uuid: str

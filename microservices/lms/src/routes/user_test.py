@@ -23,16 +23,11 @@ import datetime
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from common.testing.client_with_emulator import client_with_emulator
 from common.models import User
+from schemas.schema_examples import USER_EXAMPLE
+from testing.test_config import BASE_URL
 import mock
 
 # assigning url
-API_URL = "http://localhost/lms/api/v1"
-TEST_USER = {
-    "uuid":"user-12345",
-    "auth_id": "user-auth-12345",
-    "email": "john.338@gmail.com",
-    "role": "Admin"
-}
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
@@ -40,12 +35,12 @@ SUCCESS_RESPONSE = {"status": "Success"}
 
 
 def test_get_user(client_with_emulator):
-  user_dict = TEST_USER
+  user_dict = USER_EXAMPLE
   user = User.from_dict(user_dict)
   user.save()
 
-  url = API_URL + f"/users/{user.uuid}"
-  data = TEST_USER
+  url = BASE_URL + f"/users/{user.uuid}"
+  data = USER_EXAMPLE
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
 
@@ -55,7 +50,7 @@ def test_get_user(client_with_emulator):
 
 def test_get_nonexist_user(client_with_emulator):
   uuid = "non_exist_uuid"
-  url = API_URL + f"/users/{uuid}"
+  url = BASE_URL + f"/users/{uuid}"
   data = {
     "success": False,
     "message": f"User with uuid {uuid} is not found",
@@ -68,8 +63,8 @@ def test_get_nonexist_user(client_with_emulator):
 
 
 def test_post_user_new(client_with_emulator):
-  input_user = TEST_USER
-  url = API_URL + "/users"
+  input_user = USER_EXAMPLE
+  url = BASE_URL + "/users"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.post(url, json=input_user)
   print(resp.json())
@@ -77,7 +72,7 @@ def test_post_user_new(client_with_emulator):
 
   # now see if GET endpoint returns same data
   input_user["uuid"]=resp.json()
-  url = API_URL + f"/users/{input_user['uuid']}"
+  url = BASE_URL + f"/users/{input_user['uuid']}"
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
   assert json_response == input_user
@@ -109,8 +104,8 @@ def test_post_user_new(client_with_emulator):
 
 def test_put_user(client_with_emulator):
   # create new user with POST to get timestamps
-  input_user = TEST_USER
-  url = API_URL + "/users"
+  input_user = USER_EXAMPLE
+  url = BASE_URL + "/users"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.post(url, json=input_user)
 
@@ -118,7 +113,7 @@ def test_put_user(client_with_emulator):
   input_user["role"] = "User Admin"
   input_user["uuid"]=resp.json()
 
-  url = API_URL + "/users"
+  url = BASE_URL + "/users"
   resp_data = SUCCESS_RESPONSE
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.put(url, json=input_user)
@@ -128,7 +123,7 @@ def test_put_user(client_with_emulator):
   assert json_response == resp_data, "Response received"
 
   # now make sure user is updated and updated_timestamp is changed
-  url = API_URL + f"/users/{input_user['uuid']}"
+  url = BASE_URL + f"/users/{input_user['uuid']}"
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
 
@@ -143,14 +138,14 @@ def test_put_user(client_with_emulator):
 
 
 def test_put_user_negative(client_with_emulator):
-  user_dict = TEST_USER
+  user_dict = USER_EXAMPLE
   user = User.from_dict(user_dict)
   user.save()
 
-  input_user = TEST_USER
+  input_user = USER_EXAMPLE
   input_user["uuid"] = "U2DDBkl3Ayg0PWudzhI"
 
-  url = API_URL + "/users"
+  url = BASE_URL + "/users"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.put(url, json=input_user)
 
@@ -158,34 +153,34 @@ def test_put_user_negative(client_with_emulator):
 
 
 def test_delete_user(client_with_emulator):
-  user_dict = TEST_USER
+  user_dict = USER_EXAMPLE
   user = User.from_dict(user_dict)
   user.save()
 
   # confirm in backend with API
-  url = API_URL + f"/users/{user.uuid}"
+  url = BASE_URL + f"/users/{user.uuid}"
   resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
 
   # now delete user with API
-  url = API_URL + f"/users/{user.uuid}"
+  url = BASE_URL + f"/users/{user.uuid}"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.delete(url)
 
   assert resp.status_code == 200, "Status 200"
 
   # now confirm user gone with API
-  url = API_URL + f"/users/{user.uuid}"
+  url = BASE_URL + f"/users/{user.uuid}"
   resp = client_with_emulator.get(url)
   assert resp.status_code == 404, "Status 404"
 
 
 def test_delete_user_negative(client_with_emulator):
-  user_dict = TEST_USER
+  user_dict = USER_EXAMPLE
   user = User.from_dict(user_dict)
   user.save()
 
-  url = API_URL + "/users/U2DDBkl3Ayg0PWudzhIi"
+  url = BASE_URL + "/users/U2DDBkl3Ayg0PWudzhIi"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.delete(url)
 

@@ -17,6 +17,7 @@ Pydantic Model for User API's
 """
 from typing import Optional
 from pydantic import BaseModel
+from schemas.schema_examples import USER_EXAMPLE
 
 class UserModel(BaseModel):
   """User Pydantic Model"""
@@ -29,12 +30,7 @@ class UserModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-        "example": {
-        "uuid":"fake-user-id",
-        "auth_id" : "fake-user-id",
-        "email" : "user@gmail.com",
-        "role" : "Admin"
-      }
+        "example": USER_EXAMPLE
     }
 
 
