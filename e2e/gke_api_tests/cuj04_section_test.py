@@ -5,13 +5,8 @@ import requests
 import requests
 import json
 from endpoint_proxy import get_baseurl
-from common.models import CourseTemplate
 from common.utils.errors import ResourceNotFoundException
 from secrets_helper import get_required_emails_from_secret_manager
-import datetime
-from common.models.cohort import Cohort
-from common.models.section import Section
-from common.models.course_template import CourseTemplate
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from common.testing.example_objects import create_fake_data,TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2
@@ -57,7 +52,6 @@ def test_create_section():
   # Create fake classroom in google classroom
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   # Create fake Mastr course in Firestore
-  print("THIS IS FAKE MASTER COURSEE ",course)
   classroom_id = course["id"]
   create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
   base_url = get_baseurl("lms")
@@ -65,7 +59,6 @@ def test_create_section():
       raise ResourceNotFoundException("Unable to locate the service URL for lms")
   url = base_url + f"/lms/api/v1/sections"
 
-  print(base_url)
   data = {
   "name": "string",
   "description": "string",
@@ -74,7 +67,6 @@ def test_create_section():
   "teachers_list": [TEACHER_EMAIL]}
   resp = requests.post(url=url, json=data)
   resp_json = resp.json()
-  print(resp_json)
   assert resp.status_code == 200, "Status 200"
 
 def test_create_section_course_template_not_found():
@@ -88,16 +80,13 @@ def test_create_section_course_template_not_found():
   # Create fake classroom in google classroom
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   # Create fake Mastr course in Firestore
-  print("THIS IS FAKE MASTER COURSEE ",course)
   classroom_id = course["id"]
   create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
-  # create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
   if not base_url:
       raise ResourceNotFoundException("Unable to locate the service URL for lms")
   url = base_url + f"/lms/api/v1/sections"
 
-  print(base_url)
   data = {
   "name": "string",
   "description": "string",
@@ -107,7 +96,6 @@ def test_create_section_course_template_not_found():
 
   resp = requests.post(url=url, json=data)
   resp_json = resp.json()
-  print(resp_json)
   assert resp.status_code == 404
 
 def test_get_list_sections():
@@ -116,11 +104,9 @@ def test_get_list_sections():
   """
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   classroom_id = course["id"]
-  # create_fake_data(classroom_id)
   create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
   base_url = get_baseurl("lms")
   url = base_url + "/lms/api/v1/sections/cohort/fake_cohort_id/sections"
-  print(base_url)
   resp = requests.get(url=url)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
@@ -131,11 +117,9 @@ def test_get_section():
   """
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   classroom_id = course["id"]
-  # create_fake_data(classroom_id)
   create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
   base_url = get_baseurl("lms")
   url = base_url + "/lms/api/v1/sections/fake_section_id"
-  print(base_url)
   resp = requests.get(url=url)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"    
@@ -146,11 +130,9 @@ def test_list_sections():
   """
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   classroom_id = course["id"]
-  # create_fake_data(classroom_id)
   create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
   base_url = get_baseurl("lms")
   url = base_url + "/lms/api/v1/sections"
-  print(base_url)
   resp = requests.get(url=url)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"    
@@ -165,16 +147,13 @@ def test_update_section():
   # Create fake classroom in google classroom
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   # Create fake Mastr course in Firestore
-  print("THIS IS FAKE MASTER COURSEE ",course)
   classroom_id = course["id"]
   create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
-  # create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
   if not base_url:
       raise ResourceNotFoundException("Unable to locate the service URL for lms")
   url = base_url + f"/lms/api/v1/sections"
 
-  print(base_url)
   data={
 "uuid": "fake_section_id",
 "course_id": classroom_id,
@@ -184,7 +163,6 @@ def test_update_section():
   }
   resp = requests.patch(url=url, json=data)
   resp_json = resp.json()
-  print(resp_json)
   assert resp.status_code == 200, "Status 200"
 
 def test_update_section_course_not_found_in_classroom():
@@ -196,16 +174,13 @@ def test_update_section_course_not_found_in_classroom():
   # Create fake classroom in google classroom
   course=create_course(DATABASE_PREFIX+"test_course","This is test","test","me")
   # Create fake Mastr course in Firestore
-  print("THIS IS FAKE MASTER COURSEE ",course)
   classroom_id = course["id"]
   create_fake_data(TEST_COURSE_TEMPLATE2,TEST_COHORT2,TEST_SECTION2,classroom_id)
-  # create_fake_data(classroom_id)
   base_url = get_baseurl("lms")
   if not base_url:
       raise ResourceNotFoundException("Unable to locate the service URL for lms")
   url = base_url + f"/lms/api/v1/sections"
 
-  print(base_url)
   data={
 "uuid": "fake_section_id",
 "course_id":"test1222",

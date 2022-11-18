@@ -4,13 +4,13 @@ from fastapi import APIRouter, HTTPException, Response
 from common.utils.logging_handler import Logger
 from schemas.course_details import CourseDetails
 from schemas.section import SectionDetails
+from schemas.cohort import CohortModel
 from schemas.update_section import UpdateSection
 from services import classroom_crud
 from common.models.section import Section
 from common.models.course_template import CourseTemplate
 from common.models.cohort import Cohort
 import traceback
-import os
 import datetime
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError
 
@@ -98,12 +98,7 @@ def create_section(sections_details: SectionDetails,response:Response):
     {"status":"Success","new_course":{}}: Returns new course details,
     {'status': 'Failed'} if the user creation raises an exception
   """
-  try:
-    print("section_details",type(sections_details))
-    print("SECTION DETAILS NAME",sections_details.name)
-    # sections_details_dict = {**sections_details.dict()}
-    # course_template_id = sections_details_dict['course_template']
-    # cohort_id = sections_details_dict['cohort']
+  try: 
     course_template_details = CourseTemplate.find_by_uuid(sections_details.course_template)
     if course_template_details == None:
       raise ResourceNotFound(
@@ -272,9 +267,6 @@ def update_section(sections_details: UpdateSection):
   """
   try:
 
-    # sections_details_dict = {**sections_details.dict()}
-    # uuid = sections_details_dict["uuid"]
-    # course_id = sections_details_dict["course_id"]
     section = Section.find_by_uuid(sections_details.uuid)
     if section == None:
       raise ResourceNotFound(
@@ -292,10 +284,8 @@ def update_section(sections_details: UpdateSection):
     return SUCCESS_RESPONSE
   except ResourceNotFound as err :
     Logger.error(err)
-
     raise  ResourceNotFound(str(err)) from err
   except Exception as e:
     Logger.error(e)
   
     raise HTTPException(status_code=500,data =e) from e
-
