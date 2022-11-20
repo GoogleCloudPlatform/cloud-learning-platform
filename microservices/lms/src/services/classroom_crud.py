@@ -203,6 +203,13 @@ def delete_course_by_id(course_id):
     return course
 
 def get_course_work_list(course_id):
+    """Returns an array of objects containing all the coursework details of a course
+
+    Args: 
+    course_id: unique id of the course for which the coursework needs to be fetched
+    Returns:
+      returns success
+      """""
     SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students',
     'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
@@ -217,6 +224,15 @@ def get_course_work_list(course_id):
 
 
 def get_submitted_course_work_list(course_id,student_email):
+    """Returns an array of objects containing all the coursework of a course assigned to the student with the 
+    status if else the coursework has been submitted by the student or not
+
+    Args: 
+    course_id: unique id of the course for which the coursework needs to be fetched
+    student_email : email id of the student for which the coursework needs to be fetched
+    Returns:
+      returns success
+      """""
     SCOPES=["https://www.googleapis.com/auth/classroom.coursework.students.readonly",
     "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
     "https://www.googleapis.com/auth/classroom.coursework.students",

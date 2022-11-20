@@ -24,7 +24,6 @@ from concurrent.futures import ThreadPoolExecutor
 from fastapi import FastAPI, Request
 from routes import user
 from routes import copy_course
-# from routes import copy_course
 from routes import student
 from routes import course_template
 
@@ -58,10 +57,6 @@ def health_check():
 @app.get("/")
 def hello():
   return "Hello World."
-
-@app.get("/new-app")
-def hello():
-  return "Hello World222."
 
 
 api = FastAPI(
