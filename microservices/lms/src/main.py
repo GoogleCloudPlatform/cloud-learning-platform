@@ -24,6 +24,7 @@ from concurrent.futures import ThreadPoolExecutor
 from fastapi import FastAPI, Request
 from routes import user
 from routes import copy_course
+from routes import student
 from routes import course_template
 
 app = FastAPI()
@@ -65,6 +66,9 @@ api = FastAPI(
 
 api.include_router(user.router)
 api.include_router(copy_course.router)
+api.include_router(student.router)
+
+# TODO: add these back in
 api.include_router(course_template.router)
 
 add_exception_handlers(app)
