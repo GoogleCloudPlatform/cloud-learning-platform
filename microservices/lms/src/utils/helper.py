@@ -25,3 +25,16 @@ def get_gke_pd_sa_key_from_secret_manager():
     payload = response.payload.data.decode("UTF-8")
     response = json.loads(payload)
     return response
+
+def convert_cohort_to_cohort_model(cohort):
+    """Convert Cohort Object to Cohort Model Object
+
+    Args:
+        cohort (Cohort): Cohort Object.  
+    Returns:
+        return a dict in the cohort model format.
+    """""
+    loaded_cohort = cohort.to_dict()
+    course_template = loaded_cohort.pop("course_template").to_dict()
+    loaded_cohort["course_template"] = course_template["key"]
+    return loaded_cohort

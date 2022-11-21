@@ -119,4 +119,3 @@ class DeleteCohort(BaseModel):
             "data": None
         }
     }
-  1  

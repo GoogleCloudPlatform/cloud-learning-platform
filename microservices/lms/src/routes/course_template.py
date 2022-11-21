@@ -45,7 +45,6 @@ def get_course_template_list():
         course_template_list = [i for i in fetched_course_template_list]
         return {"course_template_list": course_template_list}
     except Exception as e:
-        print(e.message)
         Logger.error(e)
         raise InternalServerError(str(e)) from e
 
