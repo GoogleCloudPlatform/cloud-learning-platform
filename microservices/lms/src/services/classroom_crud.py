@@ -26,6 +26,7 @@ def get_credentials():
   creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,
                                                                 scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  return creds
 
 
 def create_course(name, description, section, owner_id):
