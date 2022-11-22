@@ -18,7 +18,7 @@ from testing.test_config import BASE_URL,COHORT_LIST_TEST_DATA,INPUT_COHORT_TEST
 import mock
 
 # assigning url
-API_URL = "http://localhost/lms/api/v1/cohorts"
+API_URL = f"{BASE_URL}/cohorts"
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
