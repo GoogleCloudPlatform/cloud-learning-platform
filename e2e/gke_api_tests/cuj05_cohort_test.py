@@ -153,11 +153,76 @@ def test_get_cohort_negative():
         assert resp_json["success"] is False, "Data doesn't Match"
 
 
+def test_update_chort(setup_cohort):
+    """ 
+    CUJ06 update a cohort by providing a valid uuid
+    as a path variable and calling Update cohort api.
+    Which will return a UpdateCohortResponseModel object as a response.
+    """
+    base_url = get_baseurl("lms")
+    if not base_url:
+        raise ResourceNotFoundException(
+            "Unable to locate the service URL for lms")
+    else:
+        url = base_url + \
+            f"/lms/api/v1/cohorts/{setup_cohort.id}"
+        json_body = {
+            "max_students": 2000
+        }
+        resp = requests.patch(url=url, json=json_body)
+        resp_json = resp.json()
+        resp_cohort = resp_json["cohort"]
+        assert resp.status_code == 200, "Status 200"
+        assert resp_json["success"] is True, "Check success"
+        assert resp_cohort["max_students"] == 2000, "Check Updated Data"
+
+
+def test_update_chort_nonexits_course(setup_cohort):
+    """ 
+    CUJ07 update a cohort by providing a valid as a path variable uuid 
+    and invalid course template uuid as json object and calling Update cohort api.
+    Which will return a not found error response.
+    """
+    base_url = get_baseurl("lms")
+    if not base_url:
+        raise ResourceNotFoundException(
+            "Unable to locate the service URL for lms")
+    else:
+        url = base_url + \
+            f"/lms/api/v1/cohorts/{setup_cohort.id}"
+        json_body = {
+            "max_students": 2000,
+            "course_template": "non_exits"
+        }
+        resp = requests.patch(url=url, json=json_body)
+        resp_json = resp.json()
+        assert resp.status_code == 404, "Status 200"
+        assert resp_json["success"] is False, "Check success"
+
+
+def test_update_cohort_negative():
+    """ 
+    CUJ09 update a cohort by providing a invalid uuid
+    as a path variable and calling update cohort api.
+    Which will return a not found error response.
+    """
+    base_url = get_baseurl("lms")
+    if not base_url:
+        raise ResourceNotFoundException(
+            "Unable to locate the service URL for lms")
+    else:
+        url = base_url + \
+            f"/lms/api/v1/cohorts/fake-uuid"
+        resp = requests.patch(url=url, json={"max_student": 2000})
+        resp_json = resp.json()
+        assert resp.status_code == 404, "Status 404"
+        assert resp_json["success"] is False, "Data doesn't Match"
+
 def test_delete_chort(setup_cohort):
     """ 
-    CUJ05 delete a cohort by providing a valid uuid
+    CUJ09 delete a cohort by providing a valid uuid
     as a path variable and calling delete cohort api.
-    Which will return a DeleteCohortModel object as a response.
+    Which will return a DeleteCohortResponseModel object as a response.
     """
     base_url = get_baseurl("lms")
     if not base_url:
@@ -174,7 +239,7 @@ def test_delete_chort(setup_cohort):
 
 def test_delete_cohort_negative():
     """ 
-    CUJ06 delete a cohort by providing a invalid uuid
+    CUJ010 delete a cohort by providing a invalid uuid
     as a path variable and calling delete cohort api.
     Which will return a not found error response.
     """
@@ -193,8 +258,8 @@ def test_delete_cohort_negative():
 
 def test_get_list_cohort():
     """ 
-    CUJ07 get a cohort list by calling get cohort list api.
-    Which will return a CohortList object.
+    CUJ11 get a cohort list by calling get cohort list api.
+    Which will return a CohortListResponseModel object.
     """
     base_url = get_baseurl("lms")
     if not base_url:

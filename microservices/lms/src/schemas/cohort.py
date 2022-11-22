@@ -25,7 +25,24 @@ class CohortModel(BaseModel):
         }
 
 
-class CohortListModel(BaseModel):
+class UpdateCohortModel(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    start_date: Optional[datetime.datetime] = None
+    end_date: Optional[datetime.datetime] = None
+    registration_start_date: Optional[datetime.datetime] = None
+    registration_end_date: Optional[datetime.datetime] = None
+    max_students: Optional[int] = None
+    enrolled_students_count: Optional[int] = None
+    course_template: Optional[str] = None
+
+    class Config():
+        orm_mode = True
+        schema_extra = {
+            "example": COHORT_EXAMPLE
+        }
+
+class CohortListResponseModel(BaseModel):
     success: Optional[bool] = True
     message: Optional[str] = "Successfully get the Cohort list"
     cohort_list: Optional[list[CohortModel]]
@@ -56,7 +73,7 @@ class CreateCohortResponseModel(BaseModel):
             }}
 
 
-class InputCohort(BaseModel):
+class InputCohortModel(BaseModel):
     name: str
     description: str
     start_date: datetime.datetime
@@ -72,7 +89,23 @@ class InputCohort(BaseModel):
         }
 
 
-class DeleteCohort(BaseModel):
+class UpdateCohortResponseModel(BaseModel):
+  """Update cohort Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully Updated the cohort"
+  cohort: Optional[CohortModel]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully Updated the cohort",
+            "cohort": COHORT_EXAMPLE
+        }
+    }
+
+class DeleteCohortResponseModel(BaseModel):
   """Delete cohort Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully deleted the cohort"
