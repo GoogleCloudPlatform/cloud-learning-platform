@@ -44,8 +44,8 @@ COHORT_LIST_TEST_DATA = [
                                                      month=10, day=20),
         "registration_end_date": datetime.datetime(year=2022,
                                                    month=11, day=14),
-        "max_student": 0,
-        "enrolled_student_count": 0
+        "max_students": 0,
+        "enrolled_students_count": 0
     },
     {
         "name": "name-2",
@@ -58,8 +58,8 @@ COHORT_LIST_TEST_DATA = [
                                                      month=10, day=20),
         "registration_end_date": datetime.datetime(year=2022,
                                                    month=11, day=14),
-        "max_student": 0,
-        "enrolled_student_count": 0
+        "max_students": 0,
+        "enrolled_students_count": 0
     },
     {
         "uuid": "fake-cohort-id-3",
@@ -73,8 +73,8 @@ COHORT_LIST_TEST_DATA = [
                                                      month=10, day=20),
         "registration_end_date": datetime.datetime(year=2022,
                                                    month=11, day=14),
-        "max_student": 0,
-        "enrolled_student_count": 0
+        "max_students": 0,
+        "enrolled_students_count": 0
     }
 ]
 
@@ -85,5 +85,5 @@ INPUT_COHORT_TEST_DATA = {
     "end_date": "2022-12-25T00:00:00",
     "registration_start_date": "2022-10-20T00:00:00",
     "registration_end_date": "2022-11-14T00:00:00",
-    "max_student": 0
+    "max_students": 0
 }
