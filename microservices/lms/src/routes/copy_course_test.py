@@ -10,16 +10,12 @@ from routes import copy_course
 # from common.testing.firestore_emulator import client_with_emulator, firestore_emulator, clean_firestore
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from common.testing.client_with_emulator import client_with_emulator
-
 from common.models.section import Section
 from common.models.course_template import CourseTemplate
 from common.models.cohort import Cohort
 import mock
-from common.testing.example_objects import TEST_COHORT,TEST_COURSE_TEMPLATE
-
-
-# assigning url
-API_URL = "http://localhost/lms/api/v1"
+from testing.test_config import BASE_URL
+from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,COHORT_EXAMPLE
 
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
@@ -27,32 +23,15 @@ os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 SUCCESS_RESPONSE = {"status": "Success"}
 
 def create_fake_data(course_template_id , cohort_id,section_id):
-  TEST_COURSE_TEMPLATE = {
-      "name": "test-name",
-      "uuid":course_template_id,
-      "description": "test-description",
-      "admin": "test-admin@gmail.com",
-      "instructional_designer": "IDesiner@gmail.com",
-      "classroom_id": "fake-classroom-id",
-      "classroom_code": "fake-classroom_code"
-  }
-  course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
+  COURSE_TEMPLATE_EXAMPLE["uuid"]=course_template_id
+  course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
   
-  TEST_COHORT = {
-    "uuid":cohort_id,
-    "name": "name",
-    "description": "description",
-    "course_template":course_template,
-    "start_date": datetime.datetime(year=2022,month=10, day=14),
-    "end_date": datetime.datetime(year=2022,month=12, day=25),
-    "registration_start_date": datetime.datetime(year=2022,month=10, day=20),
-    "registration_end_date": datetime.datetime(year=2022,month=11, day=14),
-    "max_student": 0,
-    "enrolled_student_count":0
-  }
-  cohort = Cohort.from_dict(TEST_COHORT)
+  COHORT_EXAMPLE["uuid"]=cohort_id
+  COHORT_EXAMPLE["course_template"]=course_template
+  cohort = Cohort.from_dict(COHORT_EXAMPLE)
   cohort.save()
+  
   TEST_SECTION = {
     "uuid":"fake-section-id",
     "name" : "section_name",
@@ -64,20 +43,21 @@ def create_fake_data(course_template_id , cohort_id,section_id):
     "cohort":cohort,    
     "teachers_list":["teachera@gmail.com","teacherb@gmail.com"]
   }
+  
   section = Section.from_dict(TEST_SECTION)
   section.save()
   return course_template , cohort,section
   
 
 def test_get_user(client_with_emulator):
-  url = API_URL + "/sections/get_courses/"
+  url = BASE_URL + "/sections/get_courses/"
   with mock.patch("routes.copy_course.classroom_crud.get_course_list"):
     resp = client_with_emulator.get(url)
   assert resp.status_code == 200
 
 
 def test_copy_course(client_with_emulator):
-  url = API_URL + "/sections/copy_course/"
+  url = BASE_URL + "/sections/copy_course/"
   course_details = {"course_id":"TEST123"}
   with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
       with mock.patch("routes.copy_course.classroom_crud.create_course"):
@@ -91,7 +71,7 @@ def test_copy_course(client_with_emulator):
 
 
 def test_copy_course_not_found(client_with_emulator):
-  url = API_URL + "/sections/copy_course/"
+  url = BASE_URL + "/sections/copy_course/"
   course_details = {"course_id":"TEST123"}
   with mock.patch("routes.copy_course.classroom_crud.get_course_by_id",return_value =None):
       with mock.patch("routes.copy_course.classroom_crud.create_course"):
@@ -105,7 +85,7 @@ def test_copy_course_not_found(client_with_emulator):
 def test_create_section(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + "/sections"
+  url = BASE_URL + "/sections"
   section_details = {
   "name": "section_20",
   "description": "This is description",
@@ -134,7 +114,7 @@ def test_create_section(client_with_emulator):
 def test_create_section_course_template_not_found(client_with_emulator):
 
   # create_fake_data()
-  url = API_URL + "/section"
+  url = BASE_URL + "/section"
   section_details = {
   "name": "section_20",
   "description": "This is description",
@@ -162,7 +142,7 @@ def test_create_section_course_template_not_found(client_with_emulator):
 
 
   # create_fake_data()
-  url = API_URL + "/sections"
+  url = BASE_URL + "/sections"
   section_details = {
   "name": "section_20",
   "description": "This is description",
@@ -191,7 +171,7 @@ def test_create_section_course_template_not_found(client_with_emulator):
 def test_create_section_cohort_not_found(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + "/sections"
+  url = BASE_URL + "/sections"
   section_details = {
   "name": "section_20",
   "description": "This is description",
@@ -219,7 +199,7 @@ def test_create_section_cohort_not_found(client_with_emulator):
 def test_list_section_for_one_cohort(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + "/sections/cohort/fake-cohort-id/sections"
+  url = BASE_URL + "/sections/cohort/fake-cohort-id/sections"
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   assert resp.status_code == 200 
@@ -227,7 +207,7 @@ def test_list_section_for_one_cohort(client_with_emulator):
 def test_list_section(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + "/sections"
+  url = BASE_URL + "/sections"
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   assert resp.status_code == 200 
@@ -235,7 +215,7 @@ def test_list_section(client_with_emulator):
 def test_list_section_cohort_not_found(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + "/sections/cohort/fake-cohort-id22/sections"
+  url = BASE_URL + "/sections/cohort/fake-cohort-id22/sections"
 
   resp = client_with_emulator.get(url)
   json_response = resp.json()
@@ -245,7 +225,7 @@ def test_list_section_cohort_not_found(client_with_emulator):
 def test_get_section(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + f"/sections/{fake_data_result[2].uuid}"
+  url = BASE_URL + f"/sections/{fake_data_result[2].uuid}"
 
   resp = client_with_emulator.get(url)
   json_response = resp.json()
@@ -254,7 +234,7 @@ def test_get_section(client_with_emulator):
 def test_get_section_not_found(client_with_emulator):
 
   fake_data_result =create_fake_data("fake-classroom-id","fake-cohort-id","fake-section-id")
-  url = API_URL + f"/sections/test_case_id_does_not_exists"
+  url = BASE_URL + f"/sections/test_case_id_does_not_exists"
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   
@@ -270,7 +250,7 @@ def test_update_section(client_with_emulator):
   "description": "tdescription",
   "course_state": "ACTIVEu"
 }
-  url = API_URL + f"/sections" 
+  url = BASE_URL + f"/sections" 
   with mock.patch("routes.copy_course.classroom_crud.update_course"):
     resp = client_with_emulator.patch(url,json=data)
   json_response = resp.json()
@@ -287,7 +267,7 @@ def test_update_section_section_id_not_found(client_with_emulator):
   "description": "tdescription",
   "course_state": "ACTIVEu"
 }
-  url = API_URL + f"/sections"
+  url = BASE_URL + f"/sections"
 
   with mock.patch("routes.copy_course.classroom_crud.update_course"):
     resp = client_with_emulator.patch(url,json=data)
@@ -304,7 +284,7 @@ def test_update_section_course_id_not_found(client_with_emulator):
   "description": "tdescription",
   "course_state": "ACTIVEu"
 }
-  url = API_URL + f"/sections"
+  url = BASE_URL + f"/sections"
   with mock.patch("routes.copy_course.classroom_crud.update_course",return_value=None):
     resp = client_with_emulator.patch(url,json=data)
   json_response = resp.json()

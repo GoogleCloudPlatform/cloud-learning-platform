@@ -8,5 +8,5 @@ COHORT_INPUT_DATA = {
     "end_date": "2022-12-25T00:00:00",
     "registration_start_date": "2022-10-20T00:00:00",
     "registration_end_date": "2022-11-14T00:00:00",
-    "max_student": 5000
+    "max_students": 5000
 }

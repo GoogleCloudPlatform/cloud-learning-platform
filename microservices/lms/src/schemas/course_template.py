@@ -4,25 +4,11 @@ Pydantic Model for Course template API's
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
-
-COURSE_TEMPLATE_EXAMPLE = {
-    "uuid": "id",
-    "name": "name",
-    "description": "description",
-    "admin": "admin",
-    "instructional_designer": "IDesiner",
-    "classroom_id": "clID",
-    "classroom_code": "clcode"
-}
-INSERT_COURSE_TEMPLATE_EXAMPLE = {
-    "name": "name",
-    "description": "description",
-    "admin": "admin",
-    "instructional_designer": "IDesiner"
-}
+from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, INSERT_COURSE_TEMPLATE_EXAMPLE
 
 
 class CourseTemplateModel(BaseModel):
+    """Course Template Pydantic Model"""
     uuid: str
     name: str
     description: str
@@ -55,6 +41,7 @@ class CourseTemplateListModel(BaseModel):
 
 
 class CreateCourseTemplateResponseModel(BaseModel):
+    """Create Course Template Response Model"""
     success: Optional[bool] = True
     message: Optional[str] = "Successfully created the course template"
     course_template: Optional[CourseTemplateModel]
@@ -70,6 +57,7 @@ class CreateCourseTemplateResponseModel(BaseModel):
 
 
 class InputCourseTemplateModel(BaseModel):
+    """Insert Course Template Model"""
     name: str
     description: str
     admin: str

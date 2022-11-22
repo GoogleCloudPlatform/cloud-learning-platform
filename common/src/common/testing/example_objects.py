@@ -33,8 +33,8 @@ TEST_COHORT={
                                                          month=10, day=20),
             "registration_end_date": datetime.datetime(year=2022,
                                                        month=11, day=14),
-            "max_student": 0,
-            "enrolled_student_count":0
+            "max_students": 0,
+            "enrolled_students_count":0
         }
 
 TEST_SECTION={
@@ -66,8 +66,8 @@ TEST_COHORT2 = {
     "end_date": datetime.datetime(year=2022,month=12, day=25),
     "registration_start_date": datetime.datetime(year=2022,month=10, day=20),
     "registration_end_date": datetime.datetime(year=2022,month=11, day=14),
-    "max_student": 0,
-    "enrolled_student_count":0
+    "max_students": 0,
+    "enrolled_students_count":0
   }
 
 TEST_SECTION2 = {

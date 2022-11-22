@@ -34,7 +34,7 @@ def test_new_cohort(clean_firestore):
   new_cohort.update()
   cohort=Cohort.find_by_uuid(new_cohort.uuid)
   assert cohort.name == TEST_COHORT["name"]
-  assert cohort.max_student == TEST_COHORT["max_student"]
+  assert cohort.max_students == TEST_COHORT["max_students"]
 
 
 def test_delete_cohort(clean_firestore):
