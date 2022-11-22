@@ -41,6 +41,7 @@ def create_course(name,description,section,owner_id):
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+
     service = build("classroom", "v1", credentials=creds)
     new_course = {}
     new_course["name"]=name
@@ -64,16 +65,49 @@ def get_course_by_id(course_id):
     SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly"]
     CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
+
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     try:
         service = build("classroom", "v1", credentials=creds)
         course = service.courses().get(id=course_id).execute()
+    
         return course
 
     except HttpError as error:
         logger.error(error)
         return None
+
+def update_course(course_id,section_name,description,course_state,course_name=None):
+    """Update course Function in classroom
+
+  Args: section_name ,description of course, section,owner_id of course
+  Returns:
+    new created course details
+    """""
+
+    SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
+    "https://www.googleapis.com/auth/classroom.courses.readonly"]
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
+    a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+    service = build("classroom", "v1", credentials=creds)
+    try:
+      new_course = {}
+      course = service.courses().get(id=course_id).execute()
+      if course_name is not None:
+        new_course["name"]=course_name
+      course["section"]=section_name
+      course["description"]=description
+      course["course_state"]=course_state
+      course = service.courses().update(id=course_id,body=course).execute()
+      course_name = course.get("name")
+      course_id = course.get("id")
+      return course
+    except HttpError as error:
+        logger.error(error)
+        raise HttpError
+
 
 def get_course_list():    
 
@@ -109,20 +143,23 @@ def get_topics(course_id):
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
-    topics = []
-    page_token = None
-    while True:
-        response = service.courses().topics().list(
-        pageToken=page_token,
-        courseId=course_id).execute()
-        topics = topics.extend(response.get('topic', []))
-        page_token = response.get('nextPageToken', None)
-        if not page_token:
-            break
-    if response:
-        topics = response["topic"] 
-        return topics
-
+    try:
+      topics = []
+      page_token = None
+      while True:
+          response = service.courses().topics().list(
+          pageToken=page_token,
+          courseId=course_id).execute()
+          topics = topics.extend(response.get('topic', []))
+          page_token = response.get('nextPageToken', None)
+          if not page_token:
+              break
+      if response:
+          topics = response["topic"] 
+          return topics
+    except HttpError as error:
+        logger.error(error)
+        return None
 
 
 def create_topics(course_id , topics):
@@ -148,6 +185,7 @@ def create_topics(course_id , topics):
         response = service.courses().topics().create(
         courseId=course_id,
         body=topic).execute()
+    Logger.info(f"Topics created for course_id{course_id}")
     return "success"
 
 def get_coursework(course_id):
@@ -163,10 +201,14 @@ def get_coursework(course_id):
     a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
     creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
     service = build("classroom", "v1", credentials=creds)
-    coursework_list = service.courses().courseWork().list(courseId=course_id).execute()
-    if coursework_list:
-        coursework_list = coursework_list['courseWork']
-    return coursework_list
+    try:
+      coursework_list = service.courses().courseWork().list(courseId=course_id).execute()
+      if coursework_list:
+          coursework_list = coursework_list['courseWork']
+      return coursework_list
+    except HttpError as error:
+        logger.error(error)
+        return None
 
 def create_coursework(course_id, coursework_list):
     """create coursework in a classroom course
@@ -185,7 +227,9 @@ def create_coursework(course_id, coursework_list):
     service = build("classroom", "v1", credentials=creds)
     for coursework_item  in coursework_list:
         coursework = service.courses().courseWork().create(courseId=course_id, body=coursework_item).execute()
-    
+    Logger.info("Create coursework method worked")
+    return "success"
+
 def delete_course_by_id(course_id):
     """Delete a course from classroom
 
@@ -202,6 +246,54 @@ def delete_course_by_id(course_id):
     course = service.courses().delete(id=course_id).execute()
     return course
 
+def get_course_work_list(course_id):
+    """Returns an array of objects containing all the coursework details of a course
+
+    Args: 
+    course_id: unique id of the course for which the coursework needs to be fetched
+    Returns:
+      returns success
+      """""
+    SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students',
+    'https://www.googleapis.com/auth/classroom.coursework.students.readonly']
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
+    a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+    service = build("classroom", "v1", credentials=creds)
+
+    coursework_list = service.courses().courseWork().list(courseId=course_id).execute()
+    if coursework_list:
+        coursework_list = coursework_list['courseWork']
+    return coursework_list
+
+
+def get_submitted_course_work_list(course_id,student_email):
+    """Returns an array of objects containing all the coursework of a course assigned to the student with the 
+    status if else the coursework has been submitted by the student or not
+
+    Args: 
+    course_id: unique id of the course for which the coursework needs to be fetched
+    student_email : email id of the student for which the coursework needs to be fetched
+    Returns:
+      returns success
+      """""
+    SCOPES=["https://www.googleapis.com/auth/classroom.coursework.students.readonly",
+    "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
+    "https://www.googleapis.com/auth/classroom.coursework.students",
+    "https://www.googleapis.com/auth/classroom.coursework.me"]
+    CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
+    a_creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,scopes=SCOPES)
+    creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+    service = build("classroom", "v1", credentials=creds)
+    
+    submitted_course_work_list = service.courses().courseWork().studentSubmissions().list(
+            courseId=course_id,
+            courseWorkId="-",
+            userId=student_email).execute()
+    if submitted_course_work_list:
+        submitted_course_work_list = submitted_course_work_list['studentSubmissions']
+    return submitted_course_work_list
+    
 def add_teacher(course_id,teacher_email):
   SCOPES = ['https://www.googleapis.com/auth/classroom.rosters']
   CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
