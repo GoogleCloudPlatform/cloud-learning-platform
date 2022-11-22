@@ -12,7 +12,6 @@ from utils import helper
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
 
-CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.rosters",
@@ -23,6 +22,7 @@ SCOPES = [
 
 
 def get_credentials():
+  CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
   creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,
                                                                 scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
