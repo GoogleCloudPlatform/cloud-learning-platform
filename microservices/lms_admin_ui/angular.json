@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "admin-ui": {
+    "lms_admin_ui": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -20,7 +20,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/admin-ui",
+            "outputPath": "dist/lms_admin_ui",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -72,10 +72,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "admin-ui:build:production"
+              "browserTarget": "lms_admin_ui:build:production"
             },
             "development": {
-              "browserTarget": "admin-ui:build:development"
+              "browserTarget": "lms_admin_ui:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -83,7 +83,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "admin-ui:build"
+            "browserTarget": "lms_admin_ui:build"
           }
         },
         "test": {
@@ -107,5 +107,5 @@
       }
     }
   },
-  "defaultProject": "admin-ui"
+  "defaultProject": "lms_admin_ui"
 }
