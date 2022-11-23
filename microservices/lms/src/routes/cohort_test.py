@@ -103,6 +103,76 @@ def test_get_nonexist_cohort(client_with_emulator):
     assert response.status_code == 404, "Status 404"
     assert response.json() == data, "Return data doesn't match."
 
+
+def test_update_cohort(client_with_emulator, create_course_template):
+    cohort = Cohort.from_dict(COHORT_EXAMPLE)
+    cohort.course_template = create_course_template
+    cohort.save()
+    cohort.uuid = cohort.id
+    cohort.update()
+
+    uuid = cohort.uuid
+    url = API_URL+f'/{uuid}'
+    data = {
+        "success": True,
+        "message": f"Successfully Updated the Cohort with uuid {uuid}"
+    }
+    json_body = {
+        "max_students": 5000,
+        "end_date": "2023-01-25T00:00:00"
+    }
+    with mock.patch("routes.cohort.Logger"):
+        response = client_with_emulator.patch(url, json=json_body)
+    response_cohort = response.json()
+    loaded_cohort = response_cohort.pop("cohort")
+    assert response.status_code == 200, "Status 200"
+    assert response_cohort == data, "Return data doesn't match."
+    assert loaded_cohort["max_students"] == 5000, "Updated max student data doesn't match"
+    assert loaded_cohort["end_date"].split("+")[0] == "2023-01-25T00:00:00"
+
+
+def test_update_cohort_nonexits_course_template(client_with_emulator, create_course_template):
+    cohort = Cohort.from_dict(COHORT_EXAMPLE)
+    cohort.course_template = create_course_template
+    cohort.save()
+    cohort.uuid = cohort.id
+    cohort.update()
+
+    uuid = cohort.uuid
+    url = API_URL+f'/{uuid}'
+    data = {
+        "success": False,
+        "message": f"Course template with uuid non_exits_uuid is not found",
+        "data": None
+    }
+    json_body = {
+        "max_students": 5000,
+        "course_template": "non_exits_uuid"
+    }
+    with mock.patch("routes.cohort.Logger"):
+        response = client_with_emulator.patch(url, json=json_body)
+    assert response.status_code == 404, "Status 404"
+    assert response.json() == data, "Return data doesn't match."
+
+
+def test_update_nonexists_cohort(client_with_emulator):
+    uuid = "non_exists_uuid"
+    url = API_URL+f'/{uuid}'
+    data = {
+        "success": False,
+        "message": f"Cohort with uuid {uuid} is not found",
+        "data": None
+    }
+    json_body = {
+        "max_students": 5000,
+        "end_date": "2023-01-25T00:00:00"
+    }
+    with mock.patch("routes.cohort.Logger"):
+        response = client_with_emulator.patch(url, json=json_body)
+    assert response.status_code == 404, "Status 404"
+    assert response.json() == data, "Return data doesn't match."
+
+
 def test_delete_cohort(client_with_emulator,create_course_template):
     cohort = Cohort.from_dict(COHORT_EXAMPLE)
     cohort.course_template = create_course_template

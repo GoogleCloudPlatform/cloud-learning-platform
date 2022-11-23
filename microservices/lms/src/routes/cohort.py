@@ -1,13 +1,12 @@
 '''Cohort Endpoint'''
 import datetime
-import json
-import logging
 from fastapi import APIRouter
-from schemas.cohort import CohortListModel,CohortModel,CreateCohortResponseModel,InputCohort,DeleteCohort
 from common.models import Cohort,CourseTemplate
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError
+from schemas.cohort import (CohortListResponseModel, CohortModel, CreateCohortResponseModel,
+                            InputCohortModel, DeleteCohortResponseModel, UpdateCohortResponseModel, UpdateCohortModel)
 from schemas.error_schema import (InternalServerErrorResponseModel, NotFoundErrorResponseModel,
                                   ConflictResponseModel, ValidationErrorResponseModel)
 from utils.helper import convert_cohort_to_cohort_model
@@ -28,7 +27,7 @@ router = APIRouter(prefix="/cohorts", tags=["Cohort"], responses={
 })
 
 
-@router.get("", response_model=CohortListModel)
+@router.get("", response_model=CohortListResponseModel)
 def get_cohort_list():
     """Get a list of Cohort endpoint
     Raises:
@@ -84,7 +83,7 @@ def get_cohort(cohort_id: str):
 
 
 @router.post("", response_model=CreateCohortResponseModel)
-def create_cohort(input_cohort: InputCohort):
+def create_cohort(input_cohort: InputCohortModel):
     """Create a Cohort endpoint
 
     Args:
@@ -122,8 +121,49 @@ def create_cohort(input_cohort: InputCohort):
         Logger.error(e)
         raise InternalServerError(str(e)) from e
 
+@router.patch("/{cohort_uuid}", response_model=UpdateCohortResponseModel)
+def update_cohort(cohort_uuid: str, update_cohort: UpdateCohortModel):
+    """Update section API
 
-@router.delete("/{cohort_id}", response_model=DeleteCohort)
+    Args:
+        update_cohort (UpdateCohortModel): pydantic model object which contains update details 
+    Raises:
+        HTTPException: 500 Internal Server Error if something fails
+        ResourceNotFound : 404 if cohort or course template id not found
+    Returns:
+        UpdateCohort: Returns Updated Cohort object,
+        InternalServerErrorResponseModel: if the Cohort updation raises an exception
+    """
+    try:
+        cohort_details = Cohort.find_by_uuid(cohort_uuid)
+        if cohort_details is None:
+            raise ResourceNotFound(
+                f'Cohort with uuid {cohort_uuid} is not found')
+        update_cohort_dict = {**update_cohort.dict()}
+        for key in update_cohort_dict:
+            if update_cohort_dict[key] is not None:
+                if key == "course_template":
+                    course_template = CourseTemplate.find_by_uuid(
+                        update_cohort_dict[key])
+                    if course_template is None:
+                        raise ResourceNotFound(
+                            f'Course template with uuid {update_cohort_dict[key]} is not found')
+                    setattr(cohort_details, key, course_template)
+                else:
+                    setattr(cohort_details, key, update_cohort_dict[key])
+        cohort_details.last_updated_timestamp = datetime.datetime.utcnow()
+        cohort_details.update()
+        return {"message": f"Successfully Updated the Cohort with uuid {cohort_uuid}",
+                "cohort": convert_cohort_to_cohort_model(cohort_details)}
+    except ResourceNotFound as err:
+        Logger.error(err)
+        raise ResourceNotFound(str(err))
+    except Exception as e:
+        Logger.error(e)
+        raise InternalServerError(str(e)) from e
+
+
+@router.delete("/{cohort_id}", response_model=DeleteCohortResponseModel)
 def delete_cohort(cohort_id: str):
     """Delete a Cohort endpoint
     Args:
