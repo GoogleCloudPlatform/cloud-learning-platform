@@ -63,7 +63,7 @@ jobs:
         # adding run_id so we can fold in the repo without collision
         path: ${{ format('ailearning-backend_{0}', github.run_id) }}
         token: ${{ secrets.GH_PAT }}
-        ref: ${{ github.event.client_payload.pr_sha }}
+        ref: master
     
     - name: Connect to cluster
       run: |
