@@ -455,7 +455,8 @@ cd ailearning-backend
 
 Run a skaffold dev command to build / deploy the microservice:
 
-```GCP_PROJECT=<YOUR_PROJECT>
+```
+GCP_PROJECT=<YOUR_PROJECT>
 
 GCP_PROJECT=$GCP_PROJECT skaffold dev -m authentication,redis -p custom --default-repo=gcr.io/$GCP_PROJECT
 ```
