@@ -57,7 +57,6 @@ jobs:
 
     # needed to checkout external module
     - name: initialize_pat_token
-      if: inputs.remote_repo_modules
       run: |
         git config --local --remove-section http."https://github.com/"
         git config --global url."https://foo:${GH_PAT}@github.com/${GH_ORGANIZATION}".insteadOf "https://github.com/${GH_ORGANIZATION}"
