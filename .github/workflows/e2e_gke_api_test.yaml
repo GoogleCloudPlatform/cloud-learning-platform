@@ -112,8 +112,8 @@ jobs:
         export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
         export GCP_PROJECT=$PROJECT_ID
         skaffold run \
+        -p custom \
         --module authentication,redis \
-        --profile custom \
         --namespace $NAMESPACE \
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }}
