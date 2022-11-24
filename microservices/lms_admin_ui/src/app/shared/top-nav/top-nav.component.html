@@ -1,0 +1,24 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light top-nav fixed-top">
+    <div class="parent-container">
+        <a><img class="" src="assets/img/ASU-logo.png" alt="vdh" style="width: 75px;margin-right:2%;" /></a>
+
+        <!-- <button mat-button [matMenuTriggerFor]="menu">Menu</button> -->
+        <button mat-icon-button aria-label="Example icon button with a hamburger icon" [matMenuTriggerFor]="menu">
+            <span class="material-symbols-rounded">
+                menu
+            </span> Menu
+        </button>
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item>Item 1</button>
+            <button mat-menu-item>Item 2</button>
+        </mat-menu>
+
+        <div class="user-profile" style="cursor:pointer;">
+            <span class="material-symbols-rounded">
+                account_circle
+            </span>
+            <span class="profile-name">{{userShowName}}</span>
+
+        </div>
+    </div>
+</nav>

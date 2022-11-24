@@ -1,0 +1,45 @@
+<div class="custom-outer-container">
+    <mat-tab-group>
+        <mat-tab label="Cohort List">
+
+            <div class="search-bar">
+                <div style="width: 75%;">
+                    <div class="full-width">
+
+                        <mat-form-field appearance="outline" style="width: 100%;">
+                            <mat-label>Enter Cohort name, keyword</mat-label>
+                            <input matInput>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div style="margin-left:2%;display: flex;" matTooltip="enter at least 3 characters"
+                    matTooltipPosition="above">
+
+                    <button mat-flat-button color="primary"><span class="material-symbols-rounded">
+                            search
+                        </span> Search</button>
+                    <div><span class="clear_search">clear search/filter</span></div>
+                </div>
+            </div>
+
+            <app-cohort></app-cohort>
+
+        </mat-tab>
+    </mat-tab-group>
+
+
+    <button mat-fab color="primary" aria-label="Example icon button with a delete icon" class="sticky-button"
+        [matMenuTriggerFor]="aboveMenu">
+        <span class="material-symbols-rounded">
+            add
+        </span>
+    </button>
+
+    <mat-menu #aboveMenu="matMenu" yPosition="above">
+        <button mat-menu-item (click)="openDialog()">Create Cohort</button>
+        <button mat-menu-item (click)="openCourseTemplateDialog()">Create Course Template</button>
+    </mat-menu>
+
+
+
+</div>
