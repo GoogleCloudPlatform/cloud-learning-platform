@@ -56,15 +56,15 @@ jobs:
         export_default_credentials: true
 
     # needed to checkout external module
-    - name: initialize_pat_token
-      run: |
-        git config --local --remove-section http."https://github.com/"
-        git config --global url."https://foo:${GH_PAT}@github.com/${GH_ORGANIZATION}".insteadOf "https://github.com/${GH_ORGANIZATION}"
-      env:
-        GH_PAT: ${{ secrets.GH_PAT }}
-        GH_ORGANIZATION: ${{ inputs.GH_ORGANIZATION}}
+    # - name: initialize_pat_token
+    #   run: |
+    #     git config --local --remove-section http."https://github.com/"
+    #     git config --global url."https://foo:${GH_PAT}@github.com/${GH_ORGANIZATION}".insteadOf "https://github.com/${GH_ORGANIZATION}"
+    #   env:
+    #     GH_PAT: ${{ secrets.GH_PAT }}
+    #     GH_ORGANIZATION: ${{ inputs.GH_ORGANIZATION}}
     
-    - name: Checkout external modules
+    - name: Checkout external repo
       id: checkout_external_repo
       uses: actions/checkout@v3
       with:
