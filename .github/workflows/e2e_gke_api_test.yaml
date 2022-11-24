@@ -89,9 +89,7 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         NAMESPACE=e2e-pr-$PR_NUMBER
         export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
-        export GCP_PROJECT=$PROJECT_ID
         skaffold run \
-        --module authentication,redis \
         --profile dev \
         --namespace $NAMESPACE \
         -l commit=$GITHUB_SHA \
@@ -112,7 +110,9 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         NAMESPACE=e2e-pr-$PR_NUMBER
         export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+        export GCP_PROJECT=$PROJECT_ID
         skaffold run \
+        --module authentication,redis \
         --profile custom \
         --namespace $NAMESPACE \
         -l commit=$GITHUB_SHA \
