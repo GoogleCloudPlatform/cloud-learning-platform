@@ -118,7 +118,8 @@ jobs:
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }}
 
-    - name: Upload Skaffold cache
+    - name: Upload Skaffold 
+      if: always()
       run: |
         gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
 
