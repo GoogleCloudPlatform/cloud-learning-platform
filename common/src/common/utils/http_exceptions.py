@@ -24,7 +24,14 @@ class CustomHTTPException(Exception):
 
 # Exception handlers
 def add_exception_handlers(app: FastAPI):
+  """To add Custom exception in FastAPI app
 
+  Args:
+      app (FastAPI): _description_
+
+  Returns:
+      _type_: _description_
+  """
   @app.exception_handler(CustomHTTPException)
   async def generic_exception_handler(req: Request, exc: CustomHTTPException):
     return JSONResponse(

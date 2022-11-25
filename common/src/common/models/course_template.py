@@ -18,9 +18,8 @@ Module to add course in Fireo
 
 import datetime
 import os
-
+from fireo.fields import TextField, DateTime, BooleanField
 from common.models import BaseModel
-from fireo.fields import TextField,DateTime,BooleanField
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PROJECT_ID = os.environ.get("PROJECT_ID", "")

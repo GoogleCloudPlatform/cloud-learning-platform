@@ -18,9 +18,8 @@ User object in the ORM
 
 import datetime
 import os
-
-from common.models import BaseModel
 from fireo.fields import TextField,DateTime,BooleanField
+from common.models import BaseModel
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PROJECT_ID = os.environ.get("PROJECT_ID", "")
