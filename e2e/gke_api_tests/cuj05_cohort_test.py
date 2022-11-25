@@ -1,6 +1,5 @@
 """Course template list and Course template CRUD API e2e tests"""
 import datetime
-from xml.dom import NotFoundErr
 import pytest
 import requests
 import uuid
@@ -18,7 +17,8 @@ def create_course_template():
     "create a course template for reference"
     base_url = get_baseurl("lms")
     if not base_url:
-        raise NotFoundErr("Unable to locate the service URL for lms")
+        raise ResourceNotFoundException(
+            "Unable to locate the service URL for lms")
     else:
         url = base_url + f"/lms/api/v1/course_templates"
         resp = requests.post(

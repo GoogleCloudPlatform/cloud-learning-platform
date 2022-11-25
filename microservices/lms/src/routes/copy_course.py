@@ -3,21 +3,38 @@ from re import I
 from fastapi import APIRouter, HTTPException, Response
 from common.utils.logging_handler import Logger
 from schemas.course_details import CourseDetails
-from schemas.section import SectionDetails
+from schemas.section import SectionDetails,AddStudentToSectionModel,AddStudentResponseModel
 from schemas.cohort import CohortModel
 from schemas.update_section import UpdateSection
 from services import classroom_crud
 from common.models.section import Section
 from common.models.course_template import CourseTemplate
 from common.models.cohort import Cohort
+from common.utils.errors import ResourceNotFoundException, InvalidTokenError
+from common.utils.http_exceptions import ResourceNotFound, InternalServerError, InvalidToken, Conflict
+from googleapiclient.errors import HttpError
+from schemas.error_schema import (InternalServerErrorResponseModel, NotFoundErrorResponseModel,
+                                  ConflictResponseModel, ValidationErrorResponseModel)
 import traceback
 import datetime
-from common.utils.http_exceptions import ResourceNotFound, InternalServerError
 
 # disabling for linting to pass
 # pylint: disable = broad-except
 
-router = APIRouter(prefix="/sections", tags=["Sections"])
+router = APIRouter(prefix="/sections", tags=["Sections"], responses={
+    500: {
+        "model": InternalServerErrorResponseModel
+    },
+    404: {
+        "model": NotFoundErrorResponseModel
+    },
+    409: {
+        "model": ConflictResponseModel
+    },
+    422: {
+        "model": ValidationErrorResponseModel
+    }
+})
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
@@ -40,7 +57,7 @@ def get_courses():
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
-    raise HTTPException(status_code=500) from e
+    raise InternalServerError(str(e)) from e
 
 
 
@@ -80,7 +97,7 @@ def copy_courses(course_details: CourseDetails):
     return SUCCESS_RESPONSE
   except Exception as e:
     Logger.error(e)
-    raise HTTPException(status_code=500,data =e) from e
+    raise InternalServerError(str(e)) from e
 
 @router.post("")
 def create_section(sections_details: SectionDetails,response:Response):
@@ -186,7 +203,7 @@ def list_section(cohort_id:str):
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
-    raise HTTPException(status_code=500,data =e) from e
+    raise InternalServerError(str(e)) from e
 
 
 @router.get("/{section_id}")
@@ -217,7 +234,7 @@ def get_section(section_id:str):
     raise  ResourceNotFound(str(err)) from err
   except Exception as e:
     Logger.error(e)
-    raise HTTPException(status_code=500,data =e) from e
+    raise InternalServerError(str(e)) from e
 
 
 @router.get("")
@@ -243,7 +260,7 @@ def section_list():
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
-    raise HTTPException(status_code=500,data =e) from e
+    raise InternalServerError(str(e)) from e
 
 
 @router.patch("")
@@ -289,3 +306,43 @@ def update_section(sections_details: UpdateSection):
     Logger.error(e)
   
     raise HTTPException(status_code=500,data =e) from e
+
+
+@router.post("/{sections_id}/students", response_model=AddStudentResponseModel)
+def enroll_student_section(sections_id:str,input_data:AddStudentToSectionModel):
+  """
+  Args:
+    input_data(AddStudentToSectionModel): An AddStudentToSectionModel object which contains email and credentials
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    AddStudentResponseModel: if the student successfully added,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception  
+  """
+  try:
+    section=Section.find_by_uuid(sections_id)
+    if section == None:
+        raise ResourceNotFoundException(
+            f'Section with uuid {sections_id} is not found')
+    classroom_crud.enroll_student(
+        token={**input_data.credentials.dict()}, student_email=input_data.email, course_id=section.classroom_id, course_code=section.classroom_code)
+    return {"message": f"Successfully Added the Student with email {input_data.email}"}
+  except InvalidTokenError as ive:
+    raise InvalidToken(str(ive)) from ive
+  except ResourceNotFoundException as err:
+        Logger.error(err)
+        raise ResourceNotFound(str(err))
+  except HttpError as ae:
+    if ae.resp.status == 409:
+      raise Conflict(str(ae)) from ae
+    if ae.resp.status == 404:
+      raise ResourceNotFound(str(ae)) from ae
+    raise InternalServerError(str(e)) from ae
+  except Exception as e:
+    print(e)
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e

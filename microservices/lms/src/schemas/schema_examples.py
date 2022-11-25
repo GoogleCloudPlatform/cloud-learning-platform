@@ -55,3 +55,13 @@ INSERT_COHORT_EXAMPLE = {
     "max_students": 0,
     "course_template": "fake-uuid"
 }
+
+CREDENTIAL_JSON = {
+    "token": "fake-token", 
+    "refresh_token": "refresh-token",
+    "token_uri": "fake_token_uri",
+    "client_id": "client_fake_id", 
+    "client_secret": "client_fake_secrets",
+    "scopes": ["Scopes"], 
+    "expiry": "2022-11-23T12:01:17Z"
+    }

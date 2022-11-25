@@ -2,7 +2,6 @@ import behave
 import requests
 from testing_objects.test_config import API_URL
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
-from common.testing.example_objects import TEST_COURSE_TEMPLATE
 
 # -------------------------------CREATE Course Template-------------------------------------
 # ----Positive Scenario-----
@@ -49,8 +48,10 @@ def step_impl_6(context):
 # ----Positive Scenario-----
 @behave.given("A user has access privileges and needs to retrieve a Course Template Record")
 def setp_impl_7(context):
-    TEST_COURSE_TEMPLATE["uuid"] = context.course_template.uuid
-    context.test_data=TEST_COURSE_TEMPLATE
+    COURSE_TEMPLATE_INPUT_DATA["uuid"] = context.course_template.uuid
+    COURSE_TEMPLATE_INPUT_DATA["classroom_id"] = context.course_template.classroom_id
+    COURSE_TEMPLATE_INPUT_DATA["classroom_code"] = context.course_template.classroom_code
+    context.test_data=COURSE_TEMPLATE_INPUT_DATA
     context.url = f'{API_URL}/course_templates/{context.course_template.uuid}'
 @behave.when("API request is sent to retrieve Course Template Record by providing correct uuid")
 def step_impl_8(context):

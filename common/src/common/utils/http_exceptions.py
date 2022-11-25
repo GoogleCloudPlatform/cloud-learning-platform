@@ -46,6 +46,17 @@ def add_exception_handlers(app: FastAPI):
             "data": exc.errors()
         })
 
+class InvalidToken(CustomHTTPException):
+  """Exception raised when permission is denied.
+  Request is not authenticated due to missing,
+  invalid or expired OAuth token.
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "Unauthenticated"):
+    super().__init__(status_code=498, message=message, success=False, data=None)
+
 class ResourceNotFound(CustomHTTPException):
   """Exception raised if a Resource is not found.
   A specific resource is not found.
