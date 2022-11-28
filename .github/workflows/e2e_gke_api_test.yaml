@@ -38,6 +38,7 @@ env:
   SKAFFOLD_CACHE_GCS: gs://core-learning-services-dev.appspot.com/skaffold/cache
   CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
+  FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
 # cookiecutter:raw 
 jobs:
   deploy:
@@ -118,7 +119,6 @@ jobs:
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }} 
         popd
-
 
     - name: Upload Skaffold 
       if: always()
