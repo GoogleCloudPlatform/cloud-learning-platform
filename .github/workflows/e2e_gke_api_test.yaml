@@ -106,8 +106,7 @@ jobs:
         --module authentication,redis \
         --namespace $NAMESPACE \
         -l commit=$GITHUB_SHA \
-        --tag PR${{ github.event.pull_request.number }} \
-        -v debug
+        --tag PR${{ github.event.pull_request.number }} 
 
     - name: Build and deploy to cluster
       run: |
