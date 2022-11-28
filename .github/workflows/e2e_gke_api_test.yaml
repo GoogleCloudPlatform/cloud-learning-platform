@@ -83,6 +83,18 @@ jobs:
         kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
         NAMESPACE=${NAMESPACE} bash setup/setup_ksa.sh
 
+
+    - name: Build and deploy to cluster
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        NAMESPACE=e2e-pr-$PR_NUMBER
+        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+        skaffold run \
+        --profile dev \
+        --namespace $NAMESPACE \
+        -l commit=$GITHUB_SHA \
+        --tag PR${{ github.event.pull_request.number }}
+
     - name: Checkout external repo
       id: checkout_external_repo
       uses: actions/checkout@v3
@@ -94,7 +106,7 @@ jobs:
 
     - name: Build and deploy external services to cluster
       run: |
-        cd ${{ format('ailearning-backend_{0}', github.run_id) }}
+        pushd ${{ format('ailearning-backend_{0}', github.run_id) }}
         pwd
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         NAMESPACE=e2e-pr-$PR_NUMBER
@@ -107,17 +119,7 @@ jobs:
         --namespace $NAMESPACE \
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }} 
-
-    - name: Build and deploy to cluster
-      run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE=e2e-pr-$PR_NUMBER
-        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
-        skaffold run \
-        --profile dev \
-        --namespace $NAMESPACE \
-        -l commit=$GITHUB_SHA \
-        --tag PR${{ github.event.pull_request.number }}
+        popd
 
 
     - name: Upload Skaffold 
