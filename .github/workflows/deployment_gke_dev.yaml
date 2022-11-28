@@ -37,6 +37,7 @@ env:
   SKAFFOLD_CACHE_GCS: gs://core-learning-services-dev.appspot.com/skaffold/cache
   CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
+  FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
 # cookiecutter:raw 
 jobs:
   deploy_backends:
@@ -85,7 +86,29 @@ jobs:
           --profile dev \
           -l commit=$GITHUB_SHA \
           --tag latest 
+
+      - name: Checkout external repo
+        id: checkout_external_repo
+        uses: actions/checkout@v3
+        with:
+          repository: GPS-Solutions/ailearning-backend
+          # adding run_id so we can fold in the repo without collision
+          path: ${{ format('ailearning-backend_{0}', github.run_id) }}
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Build and deploy external services to cluster
+        run: |
+          pushd ${{ format('ailearning-backend_{0}', github.run_id) }}
+          export GCP_PROJECT=$PROJECT_ID
+          skaffold run \
+          -p custom \
+          --module authentication,redis \
+          -l commit=$GITHUB_SHA \
+          --tag PR${{ github.event.pull_request.number }} 
+          popd
+
       - name: Upload Skaffold cache
+        if: always()
         run: |
           gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
 
