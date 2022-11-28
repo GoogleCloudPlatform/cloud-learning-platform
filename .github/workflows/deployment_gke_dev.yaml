@@ -104,10 +104,11 @@ jobs:
           -p custom \
           --module authentication,redis \
           -l commit=$GITHUB_SHA \
-          --tag latest 
+          --tag PR${{ github.event.pull_request.number }} 
           popd
 
       - name: Upload Skaffold cache
+        if: always()
         run: |
           gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
 
