@@ -96,6 +96,7 @@ jobs:
     - name: Build and deploy external services to cluster
       run: |
         cd ${{ format('ailearning-backend_{0}', github.run_id) }}
+        pwd
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         NAMESPACE=e2e-pr-$PR_NUMBER
         export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
