@@ -101,6 +101,7 @@ jobs:
         NAMESPACE=e2e-pr-$PR_NUMBER
         export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
         export GCP_PROJECT=$PROJECT_ID
+        cat /home/runner/.skaffold/config
         skaffold run \
         -p custom \
         --module authentication,redis \
