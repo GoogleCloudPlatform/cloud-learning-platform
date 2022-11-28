@@ -84,17 +84,6 @@ jobs:
         kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
         NAMESPACE=${NAMESPACE} bash setup/setup_ksa.sh
 
-    - name: Build and deploy to cluster
-      run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE=e2e-pr-$PR_NUMBER
-        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
-        skaffold run \
-        --profile dev \
-        --namespace $NAMESPACE \
-        -l commit=$GITHUB_SHA \
-        --tag PR${{ github.event.pull_request.number }}
-
     - name: Checkout external repo
       id: checkout_external_repo
       uses: actions/checkout@v3
@@ -116,7 +105,20 @@ jobs:
         --module authentication,redis \
         --namespace $NAMESPACE \
         -l commit=$GITHUB_SHA \
+        --tag PR${{ github.event.pull_request.number }} \
+        -v debug
+
+    - name: Build and deploy to cluster
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        NAMESPACE=e2e-pr-$PR_NUMBER
+        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+        skaffold run \
+        --profile dev \
+        --namespace $NAMESPACE \
+        -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }}
+
 
     - name: Upload Skaffold 
       if: always()
