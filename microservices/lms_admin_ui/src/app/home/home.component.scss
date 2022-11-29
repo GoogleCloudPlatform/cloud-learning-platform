@@ -1,0 +1,24 @@
+.search-bar {
+    width: 100%;
+    margin-bottom: 2%;
+    display: flex;
+    align-items: center;
+}
+
+.clear_search {
+    width: 15%;
+    text-decoration: underline;
+    letter-spacing: 1px;
+    cursor: pointer
+}
+
+.full-width {
+    width: 100%;
+}
+
+.sticky-button {
+    position: sticky;
+    bottom: 10px;
+    z-index: 99999;
+    float: right;
+}

@@ -1,0 +1,35 @@
+<h1 mat-dialog-title>Create Course Template</h1>
+<div mat-dialog-content>
+    <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Course Name</mat-label>
+        <input matInput>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Course Description</mat-label>
+        <input matInput>
+    </mat-form-field>
+
+
+    <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Instructional Designer</mat-label>
+        <mat-select>
+            <mat-option value="one">First option</mat-option>
+            <mat-option value="two">Second option</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Course Admin</mat-label>
+        <mat-select>
+            <mat-option value="one">First option</mat-option>
+            <mat-option value="two">Second option</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">Create</button>
+    <button mat-button (click)="onNoClick()">Cancel</button>
+</div>
