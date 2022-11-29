@@ -2,7 +2,9 @@
 
 from google.cloud import secretmanager
 import json
+import os
 
+PROJECT_ID = os.getenv("PROJECT_ID","")
 def get_required_emails_from_secret_manager():
     """Get Project user emails for e2e
 
@@ -12,18 +14,12 @@ def get_required_emails_from_secret_manager():
     """""
 
     client = secretmanager.SecretManagerServiceClient()
-    test_user_secrets = {
-        "id":1,
-        "name":"test-user-1-username"
-        }
-    lms_user_secrets = {
-        "id":1,
-        "name":"lms-service-user"
-        }
-    test_user_secret_name = f"projects/core-learning-services-dev/secrets/{test_user_secrets['name']}/versions/{test_user_secrets['id']}"
+    test_user_secret_id="test-user-1-username"
+    lms_user_secret_id="lms-service-user"
+    test_user_secret_name = f"projects/{PROJECT_ID}/secrets/{test_user_secret_id}/versions/latest"
     test_user_response = client.access_secret_version(
         request={"name": test_user_secret_name})
-    lms_user_secret_name = f"projects/core-learning-services-dev/secrets/{lms_user_secrets['name']}/versions/{lms_user_secrets['id']}"
+    lms_user_secret_name = f"projects/{PROJECT_ID}/secrets/{lms_user_secret_id}/versions/latest"
     lms_user_response = client.access_secret_version(
         request={"name": lms_user_secret_name})
     data={
@@ -33,20 +29,16 @@ def get_required_emails_from_secret_manager():
     return data
 
 def get_student_email_and_token():
-    """
-    
+    """Get student email and token
+
+    Returns:
+        dict: returns a dict which contains student email and token
     """
     client = secretmanager.SecretManagerServiceClient()
-    student_email={
-        "id": 1,
-        "name": "personal-test-user-1-username"
-    }
-    student_token={
-        "id": 1,
-        "name": "add_student_token"
-    }
-    student_email_name = f"projects/core-learning-services-dev/secrets/{student_email['name']}/versions/{student_email['id']}"
-    student_token_name = f"projects/core-learning-services-dev/secrets/{student_token['name']}/versions/{student_token['id']}"
+    student_email_secret_id = "personal-test-user-1-username"
+    student_token_secret_id="add_student_token"
+    student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
+    student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
     student_email_response = client.access_secret_version(
         request={"name": student_email_name})
     student_token_response = client.access_secret_version(
