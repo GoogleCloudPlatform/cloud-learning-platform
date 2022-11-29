@@ -2,9 +2,11 @@
 from asyncio.log import logger
 
 from google.oauth2 import service_account
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
+from common.utils.errors import InvalidTokenError
 from common.utils.logging_handler import Logger
 from config import CLASSROOM_ADMIN_EMAIL
 from utils import helper
@@ -254,8 +256,46 @@ def get_submitted_course_work_list(course_id, student_email):
 
 
 def add_teacher(course_id, teacher_email):
+  """Add teacher in a classroom
+  Args:
+    course_id(str): Unique classroom id
+    teacher_email(str): teacher email which needs to be added
+  Return: 
+    course(dict): returns a dict which contains classroom details
+  """
+  
   service = build("classroom", "v1", credentials=get_credentials())
   teacher = {"userId": teacher_email}
   course = service.courses().teachers().create(courseId=course_id,
                                                body=teacher).execute()
   return course
+
+
+def enroll_student(token, course_id, student_email, course_code):
+  """Add student to the classroom using student google auth token
+  Args:
+    token(dict): dict object which contains student credentials
+    course_id(str): unique classroom id which is required to get the classroom
+    student_email(str): student email id
+    course_code(str): unique classroom enrollment code
+  Raise:
+    InvalidTokenError: Raised if the token is expired or not valid
+  Return:
+    dict: returns a dict which contains student and classroom details
+  """
+  
+  SCOPES = [
+      'https://www.googleapis.com/auth/classroom.rosters'
+  ]
+  creds = Credentials.from_authorized_user_info(token, SCOPES)
+  if not creds or not creds.valid:
+    if creds and creds.expired and creds.refresh_token:
+      creds.refresh(Request())
+    else:
+      raise InvalidTokenError("Invalid token please provide a valid token")
+  service = build('classroom', 'v1', credentials=creds)
+  student = {"userId": student_email}
+  return service.courses().students().create(
+      courseId=course_id,
+      body=student,
+      enrollmentCode=course_code).execute()

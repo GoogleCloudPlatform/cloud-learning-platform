@@ -18,19 +18,23 @@ import os
 import signal
 import subprocess
 import time
+import platform
 import requests
 import pytest
 
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
-import platform
 
 
 # recreate the emulator each module - could consider changing to session
 # pylint: disable = consider-using-with, subprocess-popen-preexec-fn
 @pytest.fixture
 def firestore_emulator():
+  """Fixture to start firestore emulator
 
+  Yields:
+      emulator: _description_
+  """
   is_windows = bool(platform.system() == "Windows")
   if is_windows:
     emulator = subprocess.Popen(
@@ -71,6 +75,11 @@ def firestore_emulator():
 # pylint: disable = line-too-long
 @pytest.fixture
 def clean_firestore(firestore_emulator):
+  """Fixture to clean data
+
+  Args:
+      firestore_emulator (func): Fixture
+  """
   requests.delete(
       "http://localhost:8080/emulator/v1/projects/fake-project/databases/(default)/documents",
       timeout=10)

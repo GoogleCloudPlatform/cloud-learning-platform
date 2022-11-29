@@ -24,7 +24,14 @@ class CustomHTTPException(Exception):
 
 # Exception handlers
 def add_exception_handlers(app: FastAPI):
+  """To add Custom exception in FastAPI app
 
+  Args:
+      app (FastAPI): _description_
+
+  Returns:
+      _type_: _description_
+  """
   @app.exception_handler(CustomHTTPException)
   async def generic_exception_handler(req: Request, exc: CustomHTTPException):
     return JSONResponse(
@@ -45,6 +52,17 @@ def add_exception_handlers(app: FastAPI):
             "message": "Validation Failed",
             "data": exc.errors()
         })
+
+class InvalidToken(CustomHTTPException):
+  """Exception raised when permission is denied.
+  Request is not authenticated due to missing,
+  invalid or expired OAuth token.
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "Unauthenticated"):
+    super().__init__(status_code=498, message=message, success=False, data=None)
 
 class ResourceNotFound(CustomHTTPException):
   """Exception raised if a Resource is not found.

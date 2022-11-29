@@ -17,9 +17,8 @@ Module to add section in Fireo
 """
 import datetime
 import os
-
-from common.models import BaseModel,CourseTemplate,Cohort
 from fireo.fields import TextField,DateTime,ReferenceField,ListField,BooleanField
+from common.models import BaseModel,CourseTemplate,Cohort
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PROJECT_ID = os.environ.get("PROJECT_ID", "")

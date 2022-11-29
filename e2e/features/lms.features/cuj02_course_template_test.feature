@@ -10,7 +10,7 @@ Feature: Create, Read, Retive all and delete APIs for Course Template
             When API request is sent to create Course Template Record with incorrect request payload
                 Then Course Template Record Record will not be created and Course Template API will throw a validation error
 
-    @fixture.create.course_tepmlate
+    @fixture.create.course_template
     Scenario: Retrieve Course Template Record by giving valid uuid
         Given A user has access privileges and needs to retrieve a Course Template Record
             When API request is sent to retrieve Course Template Record by providing correct uuid
@@ -21,7 +21,7 @@ Feature: Create, Read, Retive all and delete APIs for Course Template
             When API request is sent to retrieve Course Template Record by providing invalid uuid
                 Then Course Template Record will not be returned and API will throw a resource not found error
 
-    @fixture.create.course_tepmlate
+    @fixture.create.course_template
     Scenario: Delete Course Template Record by giving valid uuid
         Given A user has access privileges and needs to delete a Course Template Record
             When API request is sent to delete Course Template Record by providing correct uuid

@@ -15,7 +15,7 @@ from common.models.course_template import CourseTemplate
 from common.models.cohort import Cohort
 import mock
 from testing.test_config import BASE_URL
-from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,COHORT_EXAMPLE
+from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,COHORT_EXAMPLE,CREDENTIAL_JSON
 
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
@@ -289,3 +289,36 @@ def test_update_section_course_id_not_found(client_with_emulator):
     resp = client_with_emulator.patch(url,json=data)
   json_response = resp.json()
   assert resp.status_code == 404 
+
+
+def test_enroll_student(client_with_emulator):
+  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
+  url=BASE_URL+f"/sections/fake-section-id/students"
+  input_data={
+    "email":"student@gmail.com",
+    "credentials":CREDENTIAL_JSON
+  }
+  data = {
+      "success": True,
+      "message": "Successfully Added the Student with email student@gmail.com",
+      "data": None
+  }
+  with mock.patch("routes.copy_course.classroom_crud.enroll_student"):
+    with mock.patch("routes.copy_course.Logger"):
+      resp=client_with_emulator.post(url,json=input_data)
+  assert resp.status_code==200,"Status 200"
+  assert resp.json() == data,"Data doesn't Match"
+
+
+def test_enroll_student_negative(client_with_emulator):
+  url = BASE_URL+f"/sections/fake_uuid_section/students"
+  input_data = {
+      "email": "student@gmail.com",
+      "credentials": CREDENTIAL_JSON
+  }
+  with mock.patch("routes.copy_course.classroom_crud.enroll_student"):
+    with mock.patch("routes.copy_course.Logger"):
+      resp = client_with_emulator.post(url, json=input_data)
+
+  assert resp.status_code == 404,"Status 404"
+  assert resp.json()["success"] is False,"Check success"
