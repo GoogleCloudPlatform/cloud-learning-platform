@@ -1,0 +1,43 @@
+<h1 mat-dialog-title>Create Cohort</h1>
+<div mat-dialog-content>
+    <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Cohort Name</mat-label>
+        <input matInput>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Cohort Description</mat-label>
+        <input matInput>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Max Students</mat-label>
+        <input matInput>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Select Course Template</mat-label>
+        <mat-select>
+            <mat-option value="one">First option</mat-option>
+            <mat-option value="two">Second option</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="picker1">
+        <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="picker2">
+        <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">Create</button>
+    <button mat-button (click)="onNoClick()">Cancel</button>
+</div>
