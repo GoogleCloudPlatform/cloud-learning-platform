@@ -12,17 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Master Skaffold
-apiVersion: skaffold/v2beta12
-kind: Config
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: backends
-requires:
-- path: ./common
-  configs: [common]
-
-- path: ./microservices/lms
-  configs: [lms]
-
-- path: ./microservices/lms_admin_ui
-  configs: [lms-admin-ui]
+  name: lms_admin_ui
+spec:
+  replicas: 3
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: lms_admin_ui
+        image: lms_admin_ui
+        imagePullPolicy: Always
