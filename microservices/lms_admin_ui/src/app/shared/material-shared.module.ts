@@ -11,6 +11,9 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+
 // import { MatMomentDateModule } from "@angular/material-moment-adapter";
 
 @NgModule({
@@ -30,7 +33,9 @@ import { MatNativeDateModule } from '@angular/material/core';
         MatDialogModule,
         MatDatepickerModule,
         MatSelectModule,
-        MatNativeDateModule
+        MatNativeDateModule,
+        MatProgressSpinnerModule,
+        MatSnackBarModule
     ]
 })
 export class MaterialSharedModule { }

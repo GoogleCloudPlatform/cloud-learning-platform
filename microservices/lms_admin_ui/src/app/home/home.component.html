@@ -1,7 +1,7 @@
 <div class="custom-outer-container">
     <app-breadcrum></app-breadcrum>
 
-    <mat-tab-group>
+    <mat-tab-group style="margin-top: 1%;">
         <mat-tab label="Cohort List">
 
             <div class="search-bar">
@@ -14,20 +14,51 @@
                         </mat-form-field>
                     </div>
                 </div>
-                <div style="margin-left:2%;display: flex;" matTooltip="enter at least 3 characters"
-                    matTooltipPosition="above">
+                <div class="search-button">
 
-                    <button mat-flat-button color="primary"><span class="material-symbols-rounded">
+                    <button mat-flat-button style="padding: 5px 20px;margin-right: 5%;" color="primary"><span
+                            class="material-symbols-rounded">
                             search
                         </span> Search</button>
                     <div><span class="clear_search">clear search/filter</span></div>
                 </div>
             </div>
 
-            <app-cohort></app-cohort>
+            <ngx-skeleton-loader *ngIf="cohortLoader" count="4"
+                [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
+            </ngx-skeleton-loader>
+
+            <app-cohort [cohortList]="cohortList"></app-cohort>
 
         </mat-tab>
         <mat-tab label="Course Template List">
+
+            <div class="search-bar">
+                <div style="width: 75%;">
+                    <div class="full-width">
+
+                        <mat-form-field appearance="outline" style="width: 100%;">
+                            <mat-label>Enter Course template name, keyword</mat-label>
+                            <input matInput>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="search-button">
+
+                    <button mat-flat-button style="padding: 5px 20px;margin-right: 5%;" color="primary"><span
+                            class="material-symbols-rounded">
+                            search
+                        </span> Search</button>
+                    <div><span class="clear_search">clear search/filter</span></div>
+                </div>
+            </div>
+
+            <ngx-skeleton-loader *ngIf="courseTemplateLoader" count="5"
+                [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
+            </ngx-skeleton-loader>
+
+            <app-course-template [courseTemplateList]="courseTemplateList">
+            </app-course-template>
         </mat-tab>
 
 
