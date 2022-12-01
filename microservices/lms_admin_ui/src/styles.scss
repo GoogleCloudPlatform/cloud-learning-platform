@@ -7,7 +7,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0;
-  margin-top: 4.7rem;
+  margin-top: 2rem;
   padding-bottom: 2%;
 }
 
@@ -25,4 +25,26 @@ body {
   height: 100%;
   background-color: #fffdf5;
   font-family: 'Lato', sans-serif !important;
+}
+
+.green-snackbar {
+  background: rgb(0, 0, 0);
+  color: white;
+}
+
+.green-snackbar button {
+  background-color: rgb(0, 0, 0);
+  color: rgb(3, 192, 3);
+  border: none;
+}
+
+.red-snackbar {
+  background: #000000;
+  color: white;
+}
+
+.red-snackbar button {
+  background-color: #000000;
+  color: rgb(222, 0, 0) !important;
+  border: none;
 }

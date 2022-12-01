@@ -1,43 +1,65 @@
 <h1 mat-dialog-title>Create Cohort</h1>
 <div mat-dialog-content>
-    <mat-form-field appearance="fill" style="width: 100%;">
-        <mat-label>Cohort Name</mat-label>
-        <input matInput>
-    </mat-form-field>
+    <form [formGroup]="createCohortForm" class="create-cohort-form">
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Cohort Name</mat-label>
+            <input matInput formControlName="name">
+        </mat-form-field>
 
-    <mat-form-field appearance="fill" style="width: 100%;">
-        <mat-label>Cohort Description</mat-label>
-        <input matInput>
-    </mat-form-field>
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Cohort Description</mat-label>
+            <input matInput formControlName="description">
+        </mat-form-field>
 
-    <mat-form-field appearance="fill" style="width: 100%;">
-        <mat-label>Max Students</mat-label>
-        <input matInput>
-    </mat-form-field>
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Max Students</mat-label>
+            <input matInput formControlName="max_students" type="number">
+        </mat-form-field>
 
-    <mat-form-field appearance="fill" style="width: 100%;">
-        <mat-label>Select Course Template</mat-label>
-        <mat-select>
-            <mat-option value="one">First option</mat-option>
-            <mat-option value="two">Second option</mat-option>
-        </mat-select>
-    </mat-form-field>
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Select Course Template</mat-label>
+            <mat-select formControlName="course_template_uuid">
+                <mat-option *ngFor="let courseTemplate of courseTemplateData" [value]="courseTemplate.uuid">
+                    {{courseTemplate.name}}</mat-option>
+            </mat-select>
+        </mat-form-field>
 
-    <mat-form-field appearance="fill" style="width: 100%;">
-        <mat-label>Start Date</mat-label>
-        <input matInput [matDatepicker]="picker1">
-        <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
-        <mat-datepicker #picker1></mat-datepicker>
-    </mat-form-field>
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Start Date</mat-label>
+            <input matInput [matDatepicker]="picker1" formControlName="start_date">
+            <mat-datepicker-toggle matIconSuffix [for]="picker1" matSuffix></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
 
-    <mat-form-field appearance="fill" style="width: 100%;">
-        <mat-label>End Date</mat-label>
-        <input matInput [matDatepicker]="picker2">
-        <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
-        <mat-datepicker #picker2></mat-datepicker>
-    </mat-form-field>
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>End Date</mat-label>
+            <input matInput [matDatepicker]="picker2" formControlName="end_date">
+            <mat-datepicker-toggle matIconSuffix [for]="picker2" matSuffix></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Registration Start Date</mat-label>
+            <input matInput [matDatepicker]="picker3" formControlName="registration_start_date">
+            <mat-datepicker-toggle matIconSuffix [for]="picker3" matSuffix></mat-datepicker-toggle>
+            <mat-datepicker #picker3></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Registration End Date</mat-label>
+            <input matInput [matDatepicker]="picker4" formControlName="registration_end_date">
+            <mat-datepicker-toggle matIconSuffix [for]="picker4" matSuffix></mat-datepicker-toggle>
+            <mat-datepicker #picker4></mat-datepicker>
+        </mat-form-field>
+
+
+    </form>
 </div>
 <div mat-dialog-actions>
-    <button mat-button (click)="onNoClick()">Create</button>
-    <button mat-button (click)="onNoClick()">Cancel</button>
+    <button mat-flat-button (click)="onNoClick()">Cancel</button>
+    <button mat-flat-button color="primary" (click)="createCohort()" [disabled]="!createCohortForm.valid">
+        <mat-icon *ngIf="showProgressSpinner" style="margin-right:5px;">
+            <mat-spinner diameter="20"></mat-spinner>
+        </mat-icon>Create
+    </button>
 </div>

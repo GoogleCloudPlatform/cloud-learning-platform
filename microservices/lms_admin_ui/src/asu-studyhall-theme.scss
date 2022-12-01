@@ -1,6 +1,7 @@
 @use '@angular/material' as mat;
 
 @include mat.core();
+$custom-typography: mat.define-typography-config($font-family: '"Lato", sans-serif');
 
 $asu-studyhall-palette: (
     50: #fee5e8,
@@ -28,7 +29,7 @@ $asu-studyhall-palette: (
 
 
 $asu-studyhall-primary: mat.define-palette($asu-studyhall-palette, 900);
-$asu-studyhall-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$asu-studyhall-accent: mat.define-palette($asu-studyhall-palette, 200);
 
 $asu-studyhall-warn: mat.define-palette(mat.$red-palette);
 
@@ -36,5 +37,5 @@ $asu-studyhall-theme: mat.define-light-theme((color: (primary: $asu-studyhall-pr
                 accent: $asu-studyhall-accent,
                 warn: $asu-studyhall-warn,
             )));
-
+@include mat.core($custom-typography);
 @include mat.all-component-themes($asu-studyhall-theme);

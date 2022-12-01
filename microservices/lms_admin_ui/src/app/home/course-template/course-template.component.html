@@ -1,8 +1,8 @@
-<ng-container *ngIf="cohortList.length > 0; else noResult">
-    <div *ngFor="let cohort of cohortList" class="data-obj-card">
+<ng-container *ngIf="courseTemplateList.length > 0; else noResult">
+    <div *ngFor="let courseTemplate of courseTemplateList" class="data-obj-card">
         <div class="block-header">
             <div class="title">
-                <a class="text">{{cohort.name}}</a>
+                <a class="text">{{courseTemplate.name}}</a>
             </div>
             <div class="more-options" pTooltip="more options" tooltipPosition="top">
                 <span class="material-symbols-rounded" style="cursor:pointer;">
@@ -14,7 +14,7 @@
         <div class="block-body">
             <div class="description">
                 <div class="text" style="padding: 1.5%;">
-                    <app-show-more [descText]="cohort.description" [letters]="225"></app-show-more>
+                    <app-show-more [descText]="courseTemplate.description" [letters]="225"></app-show-more>
                 </div>
             </div>
 

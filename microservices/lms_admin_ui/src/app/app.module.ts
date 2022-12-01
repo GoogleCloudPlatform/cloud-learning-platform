@@ -21,7 +21,7 @@ import { RouterModule } from '@angular/router';
     RouterModule,
     SharedModule,
     MaterialSharedModule,
-    HttpClientModule
+    HttpClientModule,
   ],
   // providers: [
   //   { provide: MatDialogRef, useValue: {} },

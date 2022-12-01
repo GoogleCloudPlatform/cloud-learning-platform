@@ -1,0 +1,8 @@
+{
+    "/lms/api/v1/*": {
+        "target": "http://localhost",
+        "secure": false,
+        "logLevel": "debug",
+        "changeOrigin": true
+    }
+}
