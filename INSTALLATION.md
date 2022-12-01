@@ -9,6 +9,10 @@ The Classroom API Needs to be enabled in the project where the backend Service A
 
 https://console.cloud.google.com/apis/api/classroom.googleapis.com
 
+## DNS for Front-End
+
+Add an entry for front-end in addition to backend API
+
 ## Scopes needed for Service Account
 
 - https://www.googleapis.com/auth/classroom.announcements
