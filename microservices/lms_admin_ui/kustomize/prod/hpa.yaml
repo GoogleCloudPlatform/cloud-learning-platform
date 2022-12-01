@@ -25,9 +25,9 @@ spec:
   maxReplicas: 110
   metrics:
   - type: Resource
-    #resource:
-    #  name: memory
-    #  targetAverageValue: 500Mi
+    resource:
+     name: memory
+     targetAverageValue: 500Mi
     resource:
       name: cpu
       targetAverageUtilization: 60
