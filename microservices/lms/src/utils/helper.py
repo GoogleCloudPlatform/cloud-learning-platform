@@ -14,8 +14,8 @@ def get_gke_pd_sa_key_from_secret_manager():
 
   client = secretmanager.SecretManagerServiceClient()
   secret_id = "gke-pod-sa-key"
-  secret_name = f"projects/core-learning-services-dev\
-  /secrets/{secret_id}/versions/latest"
+  secret_name = ("projects/core-learning-services-dev/" +
+                 f"secrets/{secret_id}/versions/latest")
 
   response = client.access_secret_version(request={"name": secret_name})
   crc32c = google_crc32c.Checksum()
