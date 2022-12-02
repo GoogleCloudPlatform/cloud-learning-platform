@@ -33,12 +33,5 @@ spec:
         envFrom:
         - configMapRef:
             name: env-vars
-        resources:
-          requests:
-            cpu: "250m"
-            memory: "100Mi"
-          limits:
-            memory: "5000Mi"
-            cpu: "2000m"
         ports:
         - containerPort: 80
