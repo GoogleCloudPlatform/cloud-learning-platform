@@ -5,11 +5,11 @@ import os
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 import mock
-from common.models import CourseTemplate
+from common.models import CourseTemplate, Cohort
 from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, INSERT_COURSE_TEMPLATE_EXAMPLE
-from testing.test_config import BASE_URL, COURSE_TEMPLATE_LIST_TEST_DATA
+from testing.test_config import BASE_URL, COURSE_TEMPLATE_LIST_TEST_DATA, COHORT_LIST_TEST_DATA
 # assigning url
 API_URL = f"{BASE_URL}/course_templates"
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
@@ -51,6 +51,50 @@ def test_get_course_template(client_with_emulator):
   response_course_template = response.json()
   assert response.status_code == 200, "Status 200"
   assert response_course_template == data, "Return data doesn't match."
+
+
+def test_get_cohort_list_by_course_template(client_with_emulator):
+  course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
+  course_template.save()
+  course_template.uuid = course_template.id
+  course_template.update()
+  for i in COHORT_LIST_TEST_DATA:
+    cohort = Cohort.from_dict(i)
+    cohort.course_template = course_template
+    cohort.save()
+    cohort.uuid = cohort.id
+    cohort.update()
+
+  url = API_URL + f"/{course_template.uuid}/cohorts"
+  data = {
+      "success":
+      True,
+      "message":
+      "Successfully get the Cohort list by" +
+      f" Course template uuid {course_template.uuid}"
+  }
+  with mock.patch("routes.course_template.Logger"):
+    response = client_with_emulator.get(url)
+  response_json = response.json()
+  assert response.status_code == 200, "Status 200"
+  assert len(response_json["cohort_list"]) == len(
+      COHORT_LIST_TEST_DATA), "Return data list len doesn't match."
+  response_json.pop("cohort_list")
+  assert response_json == data, "Return data doesn't match."
+
+
+def test_get_cohort_list_by_nonexist_course_template(client_with_emulator):
+  url = API_URL + "/fake_uuid/cohorts"
+  data = {
+      "success": False,
+      "message": "Course Template with uuid fake_uuid is not found",
+      "data": None
+  }
+  with mock.patch("routes.course_template.Logger"):
+    response = client_with_emulator.get(url)
+  response_json = response.json()
+  assert response.status_code == 404, "Status 404"
+  assert response_json == data, "Return data doesn't match."
 
 
 def test_create_course_template(client_with_emulator):

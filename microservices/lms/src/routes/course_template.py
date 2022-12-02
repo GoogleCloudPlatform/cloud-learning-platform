@@ -1,11 +1,13 @@
 '''Course Template Endpoint'''
 import datetime
 from fastapi import APIRouter
-from common.models import CourseTemplate
+from common.models import CourseTemplate, Cohort
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError
 from services import classroom_crud
+from utils.helper import convert_cohort_to_cohort_model
+from schemas.cohort import CohortListResponseModel
 from schemas.course_template import CourseTemplateModel, CourseTemplateListModel, CreateCourseTemplateResponseModel, InputCourseTemplateModel, DeleteCourseTemplateModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
@@ -80,6 +82,53 @@ def get_course_template(course_template_id: str):
       raise ResourceNotFoundException(
           f"Course Template with uuid {course_template_id} is not found")
     return course_template
+  except ResourceNotFoundException as re:
+    raise ResourceNotFound(str(re)) from re
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.get("/{course_template_id}/cohorts",
+            response_model=CohortListResponseModel)
+def get_cohort_list_by_course_template_id(course_template_id: str):
+  """Get list of cohorts inside a course template endpoint
+
+    Args:
+        course_template_id (str): unique id of the course template
+
+    Raises:
+        ResourceNotFoundException: If the Course Template does not exist.
+        HTTPException: 500 Internal Server Error if something fails.
+
+    Returns:
+        CohortListResponseModel:
+          object which contains list of cohort inside cousre template
+        NotFoundErrorResponseModel: if the Course Template not found,
+        InternalServerErrorResponseModel:
+          if the get cohort list raises an exception
+    """
+  try:
+    course_template = CourseTemplate.find_by_uuid(course_template_id)
+    if course_template is None:
+      raise ResourceNotFoundException(
+          f"Course Template with uuid {course_template_id} is not found")
+    fetched_cohort_list = Cohort.collection.filter(
+        "course_template", "==", course_template.key).fetch()
+    if fetched_cohort_list is None:
+      return {
+          "message":
+          "Successfully get the cohorts list, but the list is empty.",
+          "cohort_list": []
+      }
+    cohort_list = [
+        convert_cohort_to_cohort_model(i) for i in fetched_cohort_list
+    ]
+    return {
+        "message": "Successfully get the Cohort list" +
+        f" by Course template uuid {course_template_id}",
+        "cohort_list": cohort_list
+    }
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
