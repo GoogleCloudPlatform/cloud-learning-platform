@@ -41,7 +41,8 @@ def get_cohort_list():
 
     Returns:
         CohortListModel: object which contains list of Cohort object.
-        InternalServerErrorResponseModel: if the get cohort list raises an exception.
+        InternalServerErrorResponseModel:
+            if the get cohort list raises an exception.
     """
   try:
     fetched_cohort_list = Cohort.collection.filter("is_deleted", "==",
@@ -84,7 +85,7 @@ def get_cohort(cohort_id: str):
     cohort = Cohort.find_by_uuid(cohort_id)
     if cohort is None:
       raise ResourceNotFoundException(
-          f'Cohort with uuid {cohort_id} is not found')
+          f"Cohort with uuid {cohort_id} is not found")
     loaded_cohort = convert_cohort_to_cohort_model(cohort)
     return loaded_cohort
   except ResourceNotFoundException as re:
@@ -108,16 +109,16 @@ def create_cohort(input_cohort: InputCohortModel):
     Returns:
         CreateCohortResponseModel: Cohort Object,
         NotFoundErrorResponseModel: if the Course template not found,
-        InternalServerErrorResponseModel: if the Cohort creation raises an exception
+        InternalServerErrorResponseModel:
+            if the Cohort creation raises an exception
   """
   try:
     cohort_dict = {**input_cohort.dict()}
     course_template = CourseTemplate.find_by_uuid(
         cohort_dict["course_template_uuid"])
     if course_template is None:
-      raise ResourceNotFoundException(
-          f'Course Template with uuid {cohort_dict["course_template_uuid"]} is not found'
-      )
+      raise ResourceNotFoundException(f'Course Template with uuid\
+              {cohort_dict["course_template_uuid"]} is not found')
     cohort_dict.pop("course_template_uuid")
     cohort = Cohort.from_dict(cohort_dict)
     cohort.course_template = course_template
@@ -136,32 +137,33 @@ def create_cohort(input_cohort: InputCohortModel):
 
 
 @router.patch("/{cohort_uuid}", response_model=UpdateCohortResponseModel)
-def update_cohort(cohort_uuid: str, update_cohort: UpdateCohortModel):
+def update_cohort(cohort_uuid: str, update_cohort_model: UpdateCohortModel):
   """Update section API
 
     Args:
-        update_cohort (UpdateCohortModel): pydantic model object which contains update details 
+        update_cohort_model (UpdateCohortModel):
+            pydantic model object which contains update details
     Raises:
         HTTPException: 500 Internal Server Error if something fails
         ResourceNotFound : 404 if cohort or course template id not found
     Returns:
         UpdateCohort: Returns Updated Cohort object,
-        InternalServerErrorResponseModel: if the Cohort updation raises an exception
+        InternalServerErrorResponseModel:
+            if the Cohort updation raises an exception
     """
   try:
     cohort_details = Cohort.find_by_uuid(cohort_uuid)
     if cohort_details is None:
-      raise ResourceNotFound(f'Cohort with uuid {cohort_uuid} is not found')
-    update_cohort_dict = {**update_cohort.dict()}
+      raise ResourceNotFound(f"Cohort with uuid {cohort_uuid} is not found")
+    update_cohort_dict = {**update_cohort_model.dict()}
     for key in update_cohort_dict:
       if update_cohort_dict[key] is not None:
         if key == "course_template":
           course_template = CourseTemplate.find_by_uuid(
               update_cohort_dict[key])
           if course_template is None:
-            raise ResourceNotFound(
-                f'Course template with uuid {update_cohort_dict[key]} is not found'
-            )
+            raise ResourceNotFound(f"Course template with uuid\
+                    {update_cohort_dict[key]} is not found")
           setattr(cohort_details, key, course_template)
         else:
           setattr(cohort_details, key, update_cohort_dict[key])
@@ -173,7 +175,7 @@ def update_cohort(cohort_uuid: str, update_cohort: UpdateCohortModel):
     }
   except ResourceNotFound as err:
     Logger.error(err)
-    raise ResourceNotFound(str(err))
+    raise ResourceNotFound(str(err)) from err
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -192,7 +194,8 @@ def delete_cohort(cohort_id: str):
     Returns:
         DeleteCohortModel: if the Cohort is deleted,
         NotFoundErrorResponseModel: if the Cohort not found,
-        InternalServerErrorResponseModel: if the Cohort deletion raises an exception
+        InternalServerErrorResponseModel:
+            if the Cohort deletion raises an exception
     """
   try:
     if Cohort.archive_by_uuid(cohort_id):
@@ -201,7 +204,7 @@ def delete_cohort(cohort_id: str):
       }
     else:
       raise ResourceNotFoundException(
-          f'Cohort with uuid {cohort_id} is not found')
+          f"Cohort with uuid {cohort_id} is not found")
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:

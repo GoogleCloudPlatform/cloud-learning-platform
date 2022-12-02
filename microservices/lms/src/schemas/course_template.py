@@ -1,7 +1,6 @@
 """
 Pydantic Model for Course template API's
 """
-from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, INSERT_COURSE_TEMPLATE_EXAMPLE
@@ -23,6 +22,7 @@ class CourseTemplateModel(BaseModel):
 
 
 class CourseTemplateListModel(BaseModel):
+  """Pydantic Course Template Response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully get the course template list"
   course_template_list: Optional[list[CourseTemplateModel]] = []

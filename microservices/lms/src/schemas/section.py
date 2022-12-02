@@ -1,7 +1,6 @@
 """
 Pydantic Model for copy course API's
 """
-import datetime
 from typing import Optional
 from pydantic import BaseModel
 from schemas.schema_examples import CREDENTIAL_JSON
@@ -9,6 +8,7 @@ from schemas.schema_examples import CREDENTIAL_JSON
 
 class SectionDetails(BaseModel):
   """Course Detail model"""
+  uuid: Optional[str]
   name: str
   description: str
   course_template: str

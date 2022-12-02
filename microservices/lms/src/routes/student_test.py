@@ -13,8 +13,9 @@ SUCCESS_RESPONSE = {"status": "Success"}
 
 
 def test_get_student_course_progress_percent(client_with_emulator):
-  url = BASE_URL + """/student/get_progress_percentage/
-  ?course_id=504551481098&student_email=test_user_1@dhodun.altostrat.com"""
+  url = BASE_URL + "/student/get_progress_percentage/\
+    ?course_id=504551481098&student_email=test_user_1@dhodun.altostrat.com"
+
   with mock.patch("routes.student.classroom_crud.get_course_work_list",
                   return_value=[{}, {}]):
     with mock.patch(

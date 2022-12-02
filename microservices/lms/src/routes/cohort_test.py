@@ -59,7 +59,7 @@ def test_get_cohort(client_with_emulator, create_course_template):
   cohort.uuid = cohort.id
   cohort.update()
 
-  url = API_URL + f'/{cohort.uuid}'
+  url = API_URL + f"/{cohort.uuid}"
   data = COHORT_EXAMPLE
   data["uuid"] = cohort.uuid
   data["course_template"] = create_course_template.key
@@ -67,15 +67,15 @@ def test_get_cohort(client_with_emulator, create_course_template):
     response = client_with_emulator.get(url)
   response_cohort = json.loads(response.text)
   response_cohort["start_date"] = datetime.datetime.strptime(
-      response_cohort.pop("start_date").split("+")[0], '%Y-%m-%dT%H:%M:%S')
+      response_cohort.pop("start_date").split("+")[0], "%Y-%m-%dT%H:%M:%S")
   response_cohort["end_date"] = datetime.datetime.strptime(
-      response_cohort.pop("end_date").split("+")[0], '%Y-%m-%dT%H:%M:%S')
+      response_cohort.pop("end_date").split("+")[0], "%Y-%m-%dT%H:%M:%S")
   response_cohort["registration_start_date"] = datetime.datetime.strptime(
       response_cohort.pop("registration_start_date").split("+")[0],
-      '%Y-%m-%dT%H:%M:%S')
+      "%Y-%m-%dT%H:%M:%S")
   response_cohort["registration_end_date"] = datetime.datetime.strptime(
       response_cohort.pop("registration_end_date").split("+")[0],
-      '%Y-%m-%dT%H:%M:%S')
+      "%Y-%m-%dT%H:%M:%S")
   assert response.status_code == 200, "Status 200"
   assert response_cohort == data, "Return data doesn't match."
 
@@ -86,11 +86,12 @@ def test_create_course_template(client_with_emulator, create_course_template):
     response = client_with_emulator.post(API_URL, json=INPUT_COHORT_TEST_DATA)
   response_json = json.loads(response.text)
   assert response.status_code == 200, "Status 200"
-  assert response_json["success"] == True, "Response Success"
+  assert response_json["success"] is True, "Response Success"
   assert response_json["cohort"]["name"] == INPUT_COHORT_TEST_DATA[
       "name"], "Check the response cohort name"
   assert response_json["cohort"][
-      "course_template"] == create_course_template.key, "Check the response cohort name"
+      "course_template"] == create_course_template.key, "Check the\
+        response cohort name"
 
 
 def test_get_nonexist_cohort(client_with_emulator):
@@ -115,7 +116,7 @@ def test_update_cohort(client_with_emulator, create_course_template):
   cohort.update()
 
   uuid = cohort.uuid
-  url = API_URL + f'/{uuid}'
+  url = API_URL + f"/{uuid}"
   data = {
       "success": True,
       "message": f"Successfully Updated the Cohort with uuid {uuid}"
@@ -141,10 +142,10 @@ def test_update_cohort_nonexits_course_template(client_with_emulator,
   cohort.update()
 
   uuid = cohort.uuid
-  url = API_URL + f'/{uuid}'
+  url = API_URL + f"/{uuid}"
   data = {
       "success": False,
-      "message": f"Course template with uuid non_exits_uuid is not found",
+      "message": "Course template with uuid non_exits_uuid is not found",
       "data": None
   }
   json_body = {"max_students": 5000, "course_template": "non_exits_uuid"}
@@ -156,7 +157,7 @@ def test_update_cohort_nonexits_course_template(client_with_emulator,
 
 def test_update_nonexists_cohort(client_with_emulator):
   uuid = "non_exists_uuid"
-  url = API_URL + f'/{uuid}'
+  url = API_URL + f"/{uuid}"
   data = {
       "success": False,
       "message": f"Cohort with uuid {uuid} is not found",
@@ -177,7 +178,7 @@ def test_delete_cohort(client_with_emulator, create_course_template):
   cohort.update()
 
   uuid = cohort.uuid
-  url = API_URL + f'/{uuid}'
+  url = API_URL + f"/{uuid}"
   data = {
       "success": True,
       "message": f"Successfully deleted the Cohort with uuid {uuid}",

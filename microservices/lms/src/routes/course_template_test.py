@@ -44,7 +44,7 @@ def test_get_course_template(client_with_emulator):
   course_template.uuid = course_template.id
   course_template.update()
 
-  url = API_URL + f'/{course_template.uuid}'
+  url = API_URL + f"/{course_template.uuid}"
   data = COURSE_TEMPLATE_EXAMPLE
   data["uuid"] = course_template.uuid
   with mock.patch("routes.course_template.Logger"):
@@ -93,7 +93,7 @@ def test_delete_course_template(client_with_emulator):
   course_template.update()
 
   uuid = course_template.uuid
-  url = API_URL + f'/{uuid}'
+  url = API_URL + f"/{uuid}"
   data = {
       "success": True,
       "message": f"Successfully deleted the course template with uuid {uuid}",

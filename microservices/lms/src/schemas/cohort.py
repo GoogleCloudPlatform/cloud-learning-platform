@@ -8,6 +8,11 @@ from schemas.schema_examples import COHORT_EXAMPLE, INSERT_COHORT_EXAMPLE
 
 
 class CohortModel(BaseModel):
+  """Cohort Pydantic Model
+
+  Args:
+      BaseModel (_type_): _description_
+  """
   uuid: str
   name: str
   description: str
@@ -20,11 +25,17 @@ class CohortModel(BaseModel):
   course_template: str
 
   class Config():
+    "Pydantic Config Class"
     orm_mode = True
     schema_extra = {"example": COHORT_EXAMPLE}
 
 
 class UpdateCohortModel(BaseModel):
+  """Update Cohort Pydantic Model
+
+  Args:
+      BaseModel (_type_): _description_
+  """
   name: Optional[str] = None
   description: Optional[str] = None
   start_date: Optional[datetime.datetime] = None
@@ -41,6 +52,7 @@ class UpdateCohortModel(BaseModel):
 
 
 class CohortListResponseModel(BaseModel):
+  """Cohort List Response model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully get the Cohort list"
   cohort_list: Optional[list[CohortModel]]
@@ -57,6 +69,7 @@ class CohortListResponseModel(BaseModel):
 
 
 class CreateCohortResponseModel(BaseModel):
+  """Create Cohort Response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully created the cohort"
   cohort: Optional[CohortModel]
@@ -73,6 +86,11 @@ class CreateCohortResponseModel(BaseModel):
 
 
 class InputCohortModel(BaseModel):
+  """Pydantic Input Cohort Model
+
+  Args:
+      BaseModel (_type_): _description_
+  """
   name: str
   description: str
   start_date: datetime.datetime
@@ -88,7 +106,7 @@ class InputCohortModel(BaseModel):
 
 
 class UpdateCohortResponseModel(BaseModel):
-  """Update cohort Model"""
+  """Update cohort response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully Updated the cohort"
   cohort: Optional[CohortModel]

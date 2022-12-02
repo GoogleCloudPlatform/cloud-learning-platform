@@ -33,14 +33,13 @@ router = APIRouter(prefix="/course_templates",
 @router.get("", response_model=CourseTemplateListModel)
 def get_course_template_list():
   """Get a list of Course Template endpoint
-    
     Raises:
         HTTPException: 500 Internal Server Error if something fails.
 
     Returns:
-        CourseTemplateListModel: 
+        CourseTemplateListModel:
             object which contains list of course template object.
-        InternalServerErrorResponseModel: 
+        InternalServerErrorResponseModel:
             if the get Course Template list raises an exception.
     """
   try:
@@ -73,13 +72,14 @@ def get_course_template(course_template_id: str):
     Returns:
         CourseTemplateModel: course template object for the provided id
         NotFoundErrorResponseModel: if the Course Template not found,
-        InternalServerErrorResponseModel: if the get Course Template raises an exception
+        InternalServerErrorResponseModel:
+            if the get Course Template raises an exception
     """
   try:
     course_template = CourseTemplate.find_by_uuid(course_template_id)
     if course_template is None:
       raise ResourceNotFoundException(
-          f'Course Template with uuid {course_template_id} is not found')
+          f"Course Template with uuid {course_template_id} is not found")
     return course_template
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
@@ -93,14 +93,16 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
   """Create a Course Template endpoint
 
     Args:
-        input_course_template (InputCourseTemplateModel): input course template to be inserted
+        input_course_template (InputCourseTemplateModel):
+            input course template to be inserted
 
     Raises:
         Exception: 500 Internal Server Error if something went wrong
 
     Returns:
         CreateCourseTemplateResponseModel: Course Template Object
-        InternalServerErrorResponseModel: if the Course Template creation raises an exception
+        InternalServerErrorResponseModel:
+            if the Course Template creation raises an exception
   """
   try:
     course_template_dict = {**input_course_template.dict()}
@@ -145,17 +147,19 @@ def delete_course_template(course_template_id: str):
     Returns:
         DeleteCourseTemplateModel: if the Course Template is deleted,
         NotFoundErrorResponseModel: if the Course Template not found,
-        InternalServerErrorResponseModel: if the Course Template deletion raises an exception
+        InternalServerErrorResponseModel:
+            if the Course Template deletion raises an exception
     """
   try:
     if CourseTemplate.archive_by_uuid(course_template_id):
       return {
           "message":
-          f"Successfully deleted the course template with uuid {course_template_id}"
+          f"Successfully deleted the course\
+              template with uuid {course_template_id}"
       }
     else:
       raise ResourceNotFoundException(
-          f'Course Template with uuid {course_template_id} is not found')
+          f"Course Template with uuid {course_template_id} is not found")
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
