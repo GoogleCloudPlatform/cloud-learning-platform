@@ -23,10 +23,6 @@ build:
     concurrency: 0
   artifacts:
   - image: lms-admin-ui
-    sync:
-      infer:
-        - '**/*.py'
-        - '**/*.json'
 portForward:
 - resourceType: service
   resourceName: lms-admin-ui
@@ -66,10 +62,6 @@ profiles:
         cacheFrom:
           - gcr.io/core-learning-services-dev/lms-admin-ui
           - gcr.io/core-learning-services-dev/lms-admin-ui:latest
-      sync:
-        infer:
-          - '**/*.py'
-          - '**/*.json'
   deploy:
     kustomize:
       paths:
