@@ -78,7 +78,8 @@
               "browserTarget": "lms_admin_ui:build:production"
             },
             "development": {
-              "browserTarget": "lms_admin_ui:build:development"
+              "browserTarget": "lms_admin_ui:build:development",
+              "proxyConfig": "proxy.config.json"
             }
           },
           "defaultConfiguration": "development"
