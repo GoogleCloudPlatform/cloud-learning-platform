@@ -23,6 +23,11 @@ build:
     concurrency: 0
   artifacts:
   - image: lms-admin-ui
+    sync:
+      infer:
+        - '**/*.js'
+        - '**/*.json'
+        - '**/*.css'
 portForward:
 - resourceType: service
   resourceName: lms-admin-ui
@@ -47,6 +52,11 @@ profiles:
     googleCloudBuild: {}
     artifacts:
     - image: lms-admin-ui
+      sync:
+        infer:
+          - '**/*.js'
+          - '**/*.json'
+          - '**/*.css'
       docker:
         cacheFrom:
           - lms-admin-ui
@@ -58,6 +68,11 @@ profiles:
     googleCloudBuild: {}
     artifacts:
     - image: gcr.io/core-learning-services-dev/lms-admin-ui
+      sync:
+        infer:
+          - '**/*.js'
+          - '**/*.json'
+          - '**/*.css'
       docker:
         cacheFrom:
           - gcr.io/core-learning-services-dev/lms-admin-ui
