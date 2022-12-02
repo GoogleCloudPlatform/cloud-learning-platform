@@ -24,8 +24,8 @@ SCOPES = [
 
 
 def get_credentials():
-  CLASSROOM_KEY = helper.get_gke_pd_sa_key_from_secret_manager()
-  creds = service_account.Credentials.from_service_account_info(CLASSROOM_KEY,
+  classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
+  creds = service_account.Credentials.from_service_account_info(classroom_key,
                                                                 scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   return creds
@@ -260,10 +260,10 @@ def add_teacher(course_id, teacher_email):
   Args:
     course_id(str): Unique classroom id
     teacher_email(str): teacher email which needs to be added
-  Return: 
+  Return:
     course(dict): returns a dict which contains classroom details
   """
-  
+
   service = build("classroom", "v1", credentials=get_credentials())
   teacher = {"userId": teacher_email}
   course = service.courses().teachers().create(courseId=course_id,
@@ -283,19 +283,15 @@ def enroll_student(token, course_id, student_email, course_code):
   Return:
     dict: returns a dict which contains student and classroom details
   """
-  
-  SCOPES = [
-      'https://www.googleapis.com/auth/classroom.rosters'
-  ]
-  creds = Credentials.from_authorized_user_info(token, SCOPES)
+
+  scopes = ["https://www.googleapis.com/auth/classroom.rosters"]
+  creds = Credentials.from_authorized_user_info(token, scopes)
   if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
       creds.refresh(Request())
     else:
       raise InvalidTokenError("Invalid token please provide a valid token")
-  service = build('classroom', 'v1', credentials=creds)
+  service = build("classroom", "v1", credentials=creds)
   student = {"userId": student_email}
   return service.courses().students().create(
-      courseId=course_id,
-      body=student,
-      enrollmentCode=course_code).execute()
+      courseId=course_id, body=student, enrollmentCode=course_code).execute()

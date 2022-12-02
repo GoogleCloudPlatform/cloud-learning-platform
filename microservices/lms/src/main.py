@@ -14,14 +14,14 @@
 """
   LMS Service Microservice
 """
-import uvicorn
 import asyncio
 import time
-import config
+from concurrent.futures import ThreadPoolExecutor
+import uvicorn
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import add_exception_handlers
-from concurrent.futures import ThreadPoolExecutor
 from fastapi import FastAPI, Request
+import config
 from routes import user
 from routes import copy_course
 from routes import student
@@ -39,6 +39,15 @@ def set_default_executor():
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
+  """Middleware
+
+  Args:
+      request (Request): _description_
+      call_next (_type_): _description_
+
+  Returns:
+      _type_: _description_
+  """
   method = request.method
   path = request.scope.get("path")
   start_time = time.time()
