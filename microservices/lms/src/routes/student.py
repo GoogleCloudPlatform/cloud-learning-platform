@@ -27,8 +27,9 @@ router = APIRouter(prefix="/student", tags=["Student"])
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
 
+
 @router.get("/get_progress_percentage/")
-def get_progress_percentage(course_id:int,student_email:str):
+def get_progress_percentage(course_id: int, student_email: str):
   """Get progress percentage
 
   Args:
@@ -43,14 +44,18 @@ def get_progress_percentage(course_id:int,student_email:str):
     {'status': 'Failed'} if any exception is raised
   """
   try:
-    submitted_course_work_list=0 
+    submitted_course_work_list = 0
     course_work_list = len(classroom_crud.get_course_work_list(course_id))
-    submitted_course_work = classroom_crud.get_submitted_course_work_list(course_id,student_email)
+    submitted_course_work = classroom_crud.get_submitted_course_work_list(
+        course_id, student_email)
     for x in submitted_course_work:
-      if x['state']=="TURNED_IN":
-        submitted_course_work_list = submitted_course_work_list+1
+      if x['state'] == "TURNED_IN":
+        submitted_course_work_list = submitted_course_work_list + 1
 
-    SUCCESS_RESPONSE["result"]= {"progress_percentage":round((submitted_course_work_list/course_work_list)*100,2)}
+    SUCCESS_RESPONSE["result"] = {
+        "progress_percentage":
+        round((submitted_course_work_list / course_work_list) * 100, 2)
+    }
     return SUCCESS_RESPONSE
 
   except Exception as e:

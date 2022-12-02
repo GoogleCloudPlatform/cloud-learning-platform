@@ -17,15 +17,14 @@
 import os
 import json
 import datetime
-
+import mock
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
+from testing.test_config import BASE_URL
+from schemas.schema_examples import USER_EXAMPLE
+from common.models import User
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from common.testing.client_with_emulator import client_with_emulator
-from common.models import User
-from schemas.schema_examples import USER_EXAMPLE
-from testing.test_config import BASE_URL
-import mock
 
 # assigning url
 
@@ -52,9 +51,9 @@ def test_get_nonexist_user(client_with_emulator):
   uuid = "non_exist_uuid"
   url = BASE_URL + f"/users/{uuid}"
   data = {
-    "success": False,
-    "message": f"User with uuid {uuid} is not found",
-    "data": None
+      "success": False,
+      "message": f"User with uuid {uuid} is not found",
+      "data": None
   }
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
@@ -71,7 +70,7 @@ def test_post_user_new(client_with_emulator):
   assert resp.status_code == 200, "Status 200"
 
   # now see if GET endpoint returns same data
-  input_user["uuid"]=resp.json()
+  input_user["uuid"] = resp.json()
   url = BASE_URL + f"/users/{input_user['uuid']}"
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
@@ -96,8 +95,8 @@ def test_post_user_new(client_with_emulator):
   last_updated_timestamp = loaded_user_dict.pop("last_updated_timestamp")
 
   assert (timestamp.second - created_timestamp.second) < acceptable_sec_diff
-  assert (timestamp.second - 
-                last_updated_timestamp.second) < acceptable_sec_diff
+  assert (timestamp.second -
+          last_updated_timestamp.second) < acceptable_sec_diff
   # assert that rest of the fields are equivalent
   assert loaded_user_dict == input_user
 
@@ -111,7 +110,7 @@ def test_put_user(client_with_emulator):
 
   # modify user
   input_user["role"] = "User Admin"
-  input_user["uuid"]=resp.json()
+  input_user["uuid"] = resp.json()
 
   url = BASE_URL + "/users"
   resp_data = SUCCESS_RESPONSE
@@ -185,9 +184,9 @@ def test_delete_user_negative(client_with_emulator):
     resp = client_with_emulator.delete(url)
 
   data = {
-    "success": False,
-    "message": "User with uuid U2DDBkl3Ayg0PWudzhIi is not found",
-    "data": None
+      "success": False,
+      "message": "User with uuid U2DDBkl3Ayg0PWudzhIi is not found",
+      "data": None
   }
   resp = client_with_emulator.delete(url)
   json_response = json.loads(resp.text)

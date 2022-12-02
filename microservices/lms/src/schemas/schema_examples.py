@@ -29,14 +29,10 @@ COHORT_EXAMPLE = {
     "uuid": "fake-cohort-id",
     "name": "name",
     "description": "description",
-    "start_date": datetime.datetime(year=2022,
-                                    month=10, day=14),
-    "end_date": datetime.datetime(year=2022,
-                                  month=12, day=25),
-    "registration_start_date": datetime.datetime(year=2022,
-                                                 month=10, day=20),
-    "registration_end_date": datetime.datetime(year=2022,
-                                               month=11, day=14),
+    "start_date": datetime.datetime(year=2022, month=10, day=14),
+    "end_date": datetime.datetime(year=2022, month=12, day=25),
+    "registration_start_date": datetime.datetime(year=2022, month=10, day=20),
+    "registration_end_date": datetime.datetime(year=2022, month=11, day=14),
     "max_students": 0,
     "enrolled_students_count": 0,
     "course_template": "course_template/fake-uuid"
@@ -44,24 +40,20 @@ COHORT_EXAMPLE = {
 INSERT_COHORT_EXAMPLE = {
     "name": "name",
     "description": "description",
-    "start_date": datetime.datetime(year=2022,
-                                    month=10, day=14),
-    "end_date": datetime.datetime(year=2022,
-                                  month=12, day=25),
-    "registration_start_date": datetime.datetime(year=2022,
-                                                 month=10, day=20),
-    "registration_end_date": datetime.datetime(year=2022,
-                                               month=11, day=14),
+    "start_date": datetime.datetime(year=2022, month=10, day=14),
+    "end_date": datetime.datetime(year=2022, month=12, day=25),
+    "registration_start_date": datetime.datetime(year=2022, month=10, day=20),
+    "registration_end_date": datetime.datetime(year=2022, month=11, day=14),
     "max_students": 0,
     "course_template": "fake-uuid"
 }
 
 CREDENTIAL_JSON = {
-    "token": "fake-token", 
+    "token": "fake-token",
     "refresh_token": "refresh-token",
     "token_uri": "fake_token_uri",
-    "client_id": "client_fake_id", 
+    "client_id": "client_fake_id",
     "client_secret": "client_fake_secrets",
-    "scopes": ["Scopes"], 
+    "scopes": ["Scopes"],
     "expiry": "2022-11-23T12:01:17Z"
-    }
+}
