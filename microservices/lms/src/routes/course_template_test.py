@@ -5,12 +5,11 @@ import os
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 import mock
-from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, INSERT_COURSE_TEMPLATE_EXAMPLE
-from testing.test_config import BASE_URL, COURSE_TEMPLATE_LIST_TEST_DATA
-from common.models import CourseTemplate, Cohort
+from common.models import CourseTemplate
 from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
-
+from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, INSERT_COURSE_TEMPLATE_EXAMPLE
+from testing.test_config import BASE_URL, COURSE_TEMPLATE_LIST_TEST_DATA
 # assigning url
 API_URL = f"{BASE_URL}/course_templates"
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"

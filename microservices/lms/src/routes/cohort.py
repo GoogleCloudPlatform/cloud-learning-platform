@@ -1,6 +1,10 @@
 '''Cohort Endpoint'''
 import datetime
 from fastapi import APIRouter
+from common.models import Cohort, CourseTemplate
+from common.utils.logging_handler import Logger
+from common.utils.errors import ResourceNotFoundException
+from common.utils.http_exceptions import ResourceNotFound, InternalServerError
 from schemas.cohort import (CohortListResponseModel, CohortModel,
                             CreateCohortResponseModel, InputCohortModel,
                             DeleteCohortResponseModel,
@@ -10,10 +14,6 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 from utils.helper import convert_cohort_to_cohort_model
-from common.models import Cohort, CourseTemplate
-from common.utils.logging_handler import Logger
-from common.utils.errors import ResourceNotFoundException
-from common.utils.http_exceptions import ResourceNotFound, InternalServerError
 
 router = APIRouter(prefix="/cohorts",
                    tags=["Cohort"],
@@ -162,8 +162,8 @@ def update_cohort(cohort_uuid: str, update_cohort_model: UpdateCohortModel):
           course_template = CourseTemplate.find_by_uuid(
               update_cohort_dict[key])
           if course_template is None:
-            raise ResourceNotFound(f"Course template with uuid\
-                    {update_cohort_dict[key]} is not found")
+            raise ResourceNotFound("Course template with uuid" +
+                                   f" {update_cohort_dict[key]} is not found")
           setattr(cohort_details, key, course_template)
         else:
           setattr(cohort_details, key, update_cohort_dict[key])

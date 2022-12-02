@@ -20,11 +20,11 @@ import datetime
 import mock
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
-from testing.test_config import BASE_URL
-from schemas.schema_examples import USER_EXAMPLE
 from common.models import User
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from common.testing.client_with_emulator import client_with_emulator
+from testing.test_config import BASE_URL
+from schemas.schema_examples import USER_EXAMPLE
 
 # assigning url
 

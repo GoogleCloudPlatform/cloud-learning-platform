@@ -10,11 +10,11 @@ import mock
 
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
+from common.models import CourseTemplate, Cohort
+from common.testing.client_with_emulator import client_with_emulator
+from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, COHORT_EXAMPLE
 from testing.test_config import BASE_URL, COHORT_LIST_TEST_DATA, INPUT_COHORT_TEST_DATA
-from common.models import CourseTemplate, Cohort
-from common.testing.firestore_emulator import firestore_emulator, clean_firestore
-from common.testing.client_with_emulator import client_with_emulator
 
 # assigning url
 API_URL = f"{BASE_URL}/cohorts"
@@ -90,8 +90,8 @@ def test_create_course_template(client_with_emulator, create_course_template):
   assert response_json["cohort"]["name"] == INPUT_COHORT_TEST_DATA[
       "name"], "Check the response cohort name"
   assert response_json["cohort"][
-      "course_template"] == create_course_template.key, "Check the\
-        response cohort name"
+      "course_template"] == create_course_template.key, \
+  "Check the response cohort name"
 
 
 def test_get_nonexist_cohort(client_with_emulator):

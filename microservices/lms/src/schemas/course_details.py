@@ -1,7 +1,6 @@
 """
 Pydantic Model for copy course API's
 """
-from typing import Optional
 from pydantic import BaseModel
 
 

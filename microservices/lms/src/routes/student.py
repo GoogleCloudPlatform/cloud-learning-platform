@@ -1,8 +1,8 @@
 """ User endpoints """
 import traceback
 from fastapi import APIRouter, HTTPException
-from services import classroom_crud
 from common.utils.logging_handler import Logger
+from services import classroom_crud
 # disabling for linting to pass
 # pylint: disable = broad-except
 

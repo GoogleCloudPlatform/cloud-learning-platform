@@ -1,16 +1,16 @@
 '''Course Template Endpoint'''
 import datetime
 from fastapi import APIRouter
+from common.models import CourseTemplate
+from common.utils.logging_handler import Logger
+from common.utils.errors import ResourceNotFoundException
+from common.utils.http_exceptions import ResourceNotFound, InternalServerError
 from services import classroom_crud
 from schemas.course_template import CourseTemplateModel, CourseTemplateListModel, CreateCourseTemplateResponseModel, InputCourseTemplateModel, DeleteCourseTemplateModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
-from common.models import CourseTemplate
-from common.utils.logging_handler import Logger
-from common.utils.errors import ResourceNotFoundException
-from common.utils.http_exceptions import ResourceNotFound, InternalServerError
 
 router = APIRouter(prefix="/course_templates",
                    tags=["CourseTemplate"],
@@ -43,16 +43,15 @@ def get_course_template_list():
             if the get Course Template list raises an exception.
     """
   try:
-    fetched_course_template_list = CourseTemplate.collection.filter(
+    course_template_list = CourseTemplate.collection.filter(
         "is_deleted", "==", False).fetch()
-    if fetched_course_template_list is None:
+    if course_template_list is None:
       return {
           "message":
           "Successfully get the course template list, but the list is empty.",
           "course_template_list": []
       }
-    course_template_list = [i for i in fetched_course_template_list]
-    return {"course_template_list": course_template_list}
+    return {"course_template_list": list(course_template_list)}
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -154,8 +153,8 @@ def delete_course_template(course_template_id: str):
     if CourseTemplate.archive_by_uuid(course_template_id):
       return {
           "message":
-          f"Successfully deleted the course\
-              template with uuid {course_template_id}"
+          "Successfully deleted the course template with" +
+          f" uuid {course_template_id}"
       }
     else:
       raise ResourceNotFoundException(

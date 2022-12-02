@@ -14,16 +14,16 @@
 """ User endpoints """
 import datetime
 from fastapi import APIRouter
-from schemas.user import UserModel
+from google.api_core.exceptions import PermissionDenied
 from common.models import User
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, Conflict
+from schemas.user import UserModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
-from google.api_core.exceptions import PermissionDenied
 
 router = APIRouter(prefix="/users",
                    tags=["Users"],
@@ -63,7 +63,7 @@ def get_user(user_id: str):
   try:
     user = User.find_by_uuid(user_id)
     if user is None:
-      raise ResourceNotFoundException(f'User with uuid {user_id} is not found')
+      raise ResourceNotFoundException(f"User with uuid {user_id} is not found")
     else:
       return user
   except ResourceNotFoundException as re:
@@ -168,7 +168,7 @@ def delete_user(user_id: str):
     if User.archive_by_uuid(user_id):
       return SUCCESS_RESPONSE
     else:
-      raise ResourceNotFoundException(f'User with uuid {user_id} is not found')
+      raise ResourceNotFoundException(f"User with uuid {user_id} is not found")
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:

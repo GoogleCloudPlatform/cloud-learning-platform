@@ -1,7 +1,13 @@
 """ User endpoints """
 import traceback
 import datetime
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter
+from common.utils.logging_handler import Logger
+from common.models.section import Section
+from common.models.course_template import CourseTemplate
+from common.models.cohort import Cohort
+from common.utils.errors import ResourceNotFoundException, InvalidTokenError
+from common.utils.http_exceptions import ResourceNotFound, InternalServerError, InvalidToken, Conflict
 from googleapiclient.errors import HttpError
 from schemas.course_details import CourseDetails
 from schemas.section import SectionDetails, AddStudentToSectionModel, AddStudentResponseModel
@@ -11,13 +17,6 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.update_section import UpdateSection
 from services import classroom_crud
-from common.utils.logging_handler import Logger
-from common.models.section import Section
-from common.models.course_template import CourseTemplate
-from common.models.cohort import Cohort
-from common.utils.errors import ResourceNotFoundException, InvalidTokenError
-from common.utils.http_exceptions import ResourceNotFound, InternalServerError, InvalidToken, Conflict
-
 # disabling for linting to pass
 # pylint: disable = broad-except
 
@@ -124,8 +123,9 @@ def create_section(sections_details: SectionDetails):
     course_template_details = CourseTemplate.find_by_uuid(
         sections_details.course_template)
     if course_template_details is None:
-      raise ResourceNotFound(f"Course Template with uuid\
-            {sections_details.course_template} is not found")
+      raise ResourceNotFound(
+          "Course Template with uuid" +
+          " {sections_details.course_template} is not found")
     cohort_details = Cohort.find_by_uuid(sections_details.cohort)
 
     if cohort_details is None:
@@ -137,8 +137,9 @@ def create_section(sections_details: SectionDetails):
     current_course = classroom_crud.get_course_by_id(
         course_template_details.classroom_id)
     if current_course is None:
-      raise ResourceNotFound(f"classroom  with uuid\
-            {course_template_details.classroom_id} is not found")
+      raise ResourceNotFound(
+          "classroom  with uuid" +
+          f" {course_template_details.classroom_id} is not found")
     # Create a new course
 
     new_course = classroom_crud.create_course(name,
@@ -302,8 +303,9 @@ def update_section(sections_details: UpdateSection):
                                               sections_details.description,
                                               sections_details.course_state)
     if new_course is None:
-      raise ResourceNotFound(f"Course with Course_id\
-            {sections_details.course_id} is not found in classroom")
+      raise ResourceNotFound(
+          "Course with Course_id"
+          f" {sections_details.course_id} is not found in classroom")
     section.section = sections_details.section_name
     section.description = sections_details.description
     section.last_updated_timestamp = datetime.datetime.utcnow()
