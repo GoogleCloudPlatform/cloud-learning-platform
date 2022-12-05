@@ -7,7 +7,7 @@ from common.models.section import Section
 from common.models.course_template import CourseTemplate
 from common.models.cohort import Cohort
 from common.utils.errors import ResourceNotFoundException, InvalidTokenError
-from common.utils.http_exceptions import ResourceNotFound, InternalServerError, InvalidToken, Conflict
+from common.utils.http_exceptions import ResourceNotFound, InternalServerError, InvalidToken, CustomHTTPException
 from googleapiclient.errors import HttpError
 from schemas.course_details import CourseDetails
 from schemas.section import SectionDetails, AddStudentToSectionModel, AddStudentResponseModel
@@ -356,11 +356,10 @@ def enroll_student_section(sections_id: str,
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except HttpError as ae:
-    if ae.resp.status == 409:
-      raise Conflict(str(ae)) from ae
-    if ae.resp.status == 404:
-      raise ResourceNotFound(str(ae)) from ae
-    raise InternalServerError(str(ae)) from ae
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
   except Exception as e:
     print(e)
     Logger.error(e)
