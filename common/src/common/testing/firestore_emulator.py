@@ -28,7 +28,7 @@ import pytest
 
 # recreate the emulator each module - could consider changing to session
 # pylint: disable = consider-using-with, subprocess-popen-preexec-fn
-@pytest.fixture
+@pytest.fixture(scope="session", autouse=True)
 def firestore_emulator():
   """Fixture to start firestore emulator
 
@@ -55,7 +55,7 @@ def firestore_emulator():
   yield emulator
 
   if is_windows:
-    os.kill(emulator.pid, signal.CTRL_BREAK_EVENT)
+    os.kill(emulator.pid, signal.SIGTERM)
   else:
     os.killpg(os.getpgid(emulator.pid), signal.SIGTERM)
 
@@ -74,7 +74,7 @@ def firestore_emulator():
 
 # pylint: disable = line-too-long
 @pytest.fixture
-def clean_firestore(firestore_emulator):
+def clean_firestore():
   """Fixture to clean data
 
   Args:
