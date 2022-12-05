@@ -287,10 +287,7 @@ def enroll_student(token, course_id, student_email, course_code):
   scopes = ["https://www.googleapis.com/auth/classroom.rosters"]
   creds = Credentials.from_authorized_user_info(token, scopes)
   if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-      creds.refresh(Request())
-    else:
-      raise InvalidTokenError("Invalid token please provide a valid token")
+    raise InvalidTokenError("Invalid token please provide a valid token")
   service = build("classroom", "v1", credentials=creds)
   student = {"userId": student_email}
   return service.courses().students().create(
