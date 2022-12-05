@@ -28,7 +28,7 @@ import pytest
 
 # recreate the emulator each module - could consider changing to session
 # pylint: disable = consider-using-with, subprocess-popen-preexec-fn
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def firestore_emulator():
   """Fixture to start firestore emulator
 
