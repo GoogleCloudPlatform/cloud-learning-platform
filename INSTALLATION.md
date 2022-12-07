@@ -29,3 +29,4 @@ Add an entry for front-end in addition to backend API
 - https://www.googleapis.com/auth/classroom.rosters.readonly
 - https://www.googleapis.com/auth/classroom.topics
 - https://www.googleapis.com/auth/classroom.topics.readonly
+- https://www.googleapis.com/auth/drive
