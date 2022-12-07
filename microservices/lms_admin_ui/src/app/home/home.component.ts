@@ -15,6 +15,8 @@ export class HomeComponent implements OnInit {
   courseTemplateList: any[]
   courseTemplateLoader: boolean = true
   cohortLoader: boolean = true
+  searchCohortTerm: string
+  searchCourseTemplate: string
   constructor(public dialog: MatDialog, public _HomeService: HomeService) { }
 
   ngOnInit(): void {
@@ -23,6 +25,7 @@ export class HomeComponent implements OnInit {
   }
   getCourseTemplateList() {
     this.courseTemplateLoader = true
+    this.courseTemplateList = []
     this._HomeService.getCourseTemplateList().subscribe((res: any) => {
       if (res.success == true) {
         this.courseTemplateList = res.course_template_list
@@ -32,6 +35,7 @@ export class HomeComponent implements OnInit {
   }
   getCohortList() {
     this.cohortLoader = true
+    this.cohortList = []
     this._HomeService.getCohortList().subscribe((res: any) => {
       if (res.success == true) {
         this.cohortList = res.cohort_list

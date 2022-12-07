@@ -1,0 +1,71 @@
+<h1 mat-dialog-title>Create Section</h1>
+<div mat-dialog-content>
+
+
+    <form [formGroup]="addSectionForm" class="course-teplate-form">
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Section Name</mat-label>
+            <input matInput formControlName="section_name">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Section Description</mat-label>
+            <input matInput formControlName="section_description">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Cohort</mat-label>
+            <input matInput formControlName="cohort">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Course Template</mat-label>
+            <input matInput formControlName="course_template">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Instructional Designe</mat-label>
+            <input matInput formControlName="instructional_designer">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Course Admin</mat-label>
+            <input matInput formControlName="admin">
+        </mat-form-field>
+
+
+
+
+        <mat-form-field class="example-chip-list" appearance="fill" style="width: 100%;">
+            <mat-label>Add Teaching Staff</mat-label>
+            <mat-chip-list #chipGrid aria-label="Enter email">
+                <mat-chip *ngFor="let staff of teachingStaff" (removed)="remove(staff)">
+                    {{staff}}
+                    <button matChipRemove [attr.aria-label]="'remove ' + staff">
+                        <mat-icon>cancel</mat-icon>
+                    </button>
+                </mat-chip>
+                <input placeholder="New staff..." [matChipInputFor]="chipGrid"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                    (matChipInputTokenEnd)="add($event)" formControlName="teaching_staff" />
+
+            </mat-chip-list>
+            <mat-hint>Do not add admin or instructional designer emails</mat-hint>
+        </mat-form-field>
+
+
+
+    </form>
+
+
+</div>
+<div mat-dialog-actions>
+    <button mat-flat-button (click)="onNoClick()">Cancel</button>
+    <button mat-flat-button color="primary" (click)="createSection()" [disabled]="!addSectionForm.valid">
+        <mat-icon *ngIf="showProgressSpinner" style="margin-right:5px;">
+            <mat-spinner diameter="20"></mat-spinner>
+        </mat-icon>Create
+    </button>
+</div>
+<!-- <button mat-button (click)="createCourseTemplate()">Create</button> -->

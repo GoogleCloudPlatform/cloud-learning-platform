@@ -5,22 +5,25 @@
         <mat-tab label="Cohort List">
 
             <div class="search-bar">
-                <div style="width: 75%;">
+                <div style="width: 87%;">
                     <div class="full-width">
 
                         <mat-form-field appearance="outline" style="width: 100%;">
                             <mat-label>Enter Cohort name, keyword</mat-label>
-                            <input matInput>
+                            <input matInput type="text" [(ngModel)]="searchCohortTerm">
+                            <button *ngIf="searchCohortTerm" matSuffix mat-icon-button aria-label="Clear"
+                                (click)="searchCohortTerm=''">
+                                <mat-icon>close</mat-icon>
+                            </button>
                         </mat-form-field>
                     </div>
                 </div>
                 <div class="search-button">
 
-                    <button mat-flat-button style="padding: 5px 20px;margin-right: 5%;" color="primary"><span
+                    <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"><span
                             class="material-symbols-rounded">
                             search
                         </span> Search</button>
-                    <div><span class="clear_search">clear search/filter</span></div>
                 </div>
             </div>
 
@@ -34,22 +37,25 @@
         <mat-tab label="Course Template List">
 
             <div class="search-bar">
-                <div style="width: 75%;">
+                <div style="width: 87%;">
                     <div class="full-width">
 
                         <mat-form-field appearance="outline" style="width: 100%;">
                             <mat-label>Enter Course template name, keyword</mat-label>
-                            <input matInput>
+                            <input matInput [(ngModel)]="searchCourseTemplate">
+                            <button *ngIf="searchCourseTemplate" matSuffix mat-icon-button aria-label="Clear"
+                                (click)="searchCourseTemplate=''">
+                                <mat-icon>close</mat-icon>
+                            </button>
                         </mat-form-field>
                     </div>
                 </div>
                 <div class="search-button">
 
-                    <button mat-flat-button style="padding: 5px 20px;margin-right: 5%;" color="primary"><span
+                    <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"><span
                             class="material-symbols-rounded">
                             search
                         </span> Search</button>
-                    <div><span class="clear_search">clear search/filter</span></div>
                 </div>
             </div>
 

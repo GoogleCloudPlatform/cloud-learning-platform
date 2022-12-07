@@ -22,4 +22,16 @@ export class HomeService {
   createCohort(data: any) {
     return this.http.post(`${environment.apiurl}cohorts`, data)
   }
+  getCohort(data: any) {
+    return this.http.get(`${environment.apiurl}cohorts/${data}`)
+  }
+  getCourseTemplate(data: any) {
+    return this.http.get(`${environment.apiurl}course_templates/${data}`)
+  }
+  getSectionList(data: any) {
+    return this.http.get(`${environment.apiurl}sections/cohort/${data}/sections`)
+  }
+  createSection(data: any) {
+    return this.http.post(`${environment.apiurl}sections`, data)
+  }
 }

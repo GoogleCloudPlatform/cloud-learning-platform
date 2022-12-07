@@ -2,7 +2,7 @@
     <div *ngFor="let cohort of cohortList" class="data-obj-card">
         <div class="block-header">
             <div class="title">
-                <a class="text">{{cohort.name}}</a>
+                <a class="text" (click)="reRout(cohort.uuid)">{{cohort.name}}</a>
             </div>
             <div class="more-options" pTooltip="more options" tooltipPosition="top">
                 <span class="material-symbols-rounded" style="cursor:pointer;">
