@@ -26,6 +26,15 @@
                         </span> Search</button>
                 </div>
             </div>
+            <mat-divider></mat-divider>
+            <div class="add-button">
+                <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"
+                    (click)="openDialog()">
+                    <span class="material-symbols-rounded">
+                        add
+                    </span>
+                    Add Cohort</button>
+            </div>
 
             <ngx-skeleton-loader *ngIf="cohortLoader" count="4"
                 [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
@@ -58,6 +67,16 @@
                         </span> Search</button>
                 </div>
             </div>
+            <mat-divider></mat-divider>
+            <div class="add-button">
+                <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"
+                    (click)="openCourseTemplateDialog()">
+                    <span class="material-symbols-rounded">
+                        add
+                    </span>
+                    Add Course Template</button>
+            </div>
+
 
             <ngx-skeleton-loader *ngIf="courseTemplateLoader" count="5"
                 [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
@@ -70,7 +89,7 @@
 
     </mat-tab-group>
 
-
+    <!-- 
     <button mat-fab color="primary" aria-label="Example icon button with a delete icon" class="sticky-button"
         [matMenuTriggerFor]="aboveMenu">
         <span class="material-symbols-rounded">
@@ -81,7 +100,7 @@
     <mat-menu #aboveMenu="matMenu" yPosition="above">
         <button mat-menu-item (click)="openDialog()">Create Cohort</button>
         <button mat-menu-item (click)="openCourseTemplateDialog()">Create Course Template</button>
-    </mat-menu>
+    </mat-menu> -->
 
 
 

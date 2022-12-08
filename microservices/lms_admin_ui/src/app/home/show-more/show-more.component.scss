@@ -1,5 +1,9 @@
+@use '@angular/material' as mat;
+$my-palette: mat.define-palette(mat.$grey-palette);
+
 .edited-desc-text {
     margin-bottom: 0.5rem;
+    color: mat.get-color-from-palette($my-palette, 800)
 }
 
 .show-button {

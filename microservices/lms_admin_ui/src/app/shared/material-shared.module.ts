@@ -16,7 +16,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTableModule } from '@angular/material/table';
-// import { MatMomentDateModule } from "@angular/material-moment-adapter";
+import { MatDividerModule } from '@angular/material/divider';
 
 @NgModule({
     declarations: [
@@ -40,7 +40,8 @@ import { MatTableModule } from '@angular/material/table';
         MatSnackBarModule,
         MatCardModule,
         MatChipsModule,
-        MatTableModule
+        MatTableModule,
+        MatDividerModule
     ]
 })
 export class MaterialSharedModule { }

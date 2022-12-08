@@ -130,4 +130,26 @@ export class SectionComponent implements OnInit {
     });
   }
 
+  openEditSelectionDialog(): void {
+    let tempObj: LooseObject = {}
+    tempObj['cohort_name'] = this.cohortDetails.name
+    tempObj['course_template_name'] = this.courseTemplateDetails.name
+    tempObj['cohort_uuid'] = this.cohortDetails.uuid
+    tempObj['course_template_uuid'] = this.courseTemplateDetails.uuid
+    tempObj['instructional_desiner'] = this.courseTemplateDetails.instructional_designer
+    tempObj['admin'] = this.courseTemplateDetails.admin
+    tempObj['section_uuid'] = this.selectedSection.uuid
+    tempObj['course_state'] = 'ACTIVE'
+    const dialogRef = this.dialog.open(CreateSectionComponent, {
+      width: '500px',
+      data: tempObj
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.data == 'success') {
+        this.getSectionList(this.cohortDetails.uuid)
+      }
+    });
+  }
+
 }

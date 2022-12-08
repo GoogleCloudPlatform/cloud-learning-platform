@@ -16,6 +16,7 @@ import { CreateSectionComponent } from './create-section/create-section.componen
 // import { BrowserModule } from '@angular/platform-browser';
 // import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatChipsModule } from '@angular/material/chips';
+import { EditSectionComponent } from './edit-section/edit-section.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { MatChipsModule } from '@angular/material/chips';
     CourseTemplateComponent,
     SectionComponent,
     CreateSectionComponent,
+    EditSectionComponent,
 
   ],
   // entryComponents: [CreateCohortModalComponent],
