@@ -16,8 +16,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lms-admin-ui
-  annotations:
-    cloud.google.com/neg: '{"ingress": true}' # Creates a NEG after an Ingress is created
 spec:
   replicas: 1
   selector:

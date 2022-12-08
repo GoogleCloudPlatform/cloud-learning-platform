@@ -18,6 +18,8 @@ metadata:
   name: lms-admin-ui
   labels:
     app: lms-admin-ui
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}' # Creates a NEG after an Ingress is created
 spec:
   type: NodePort
   ports:
