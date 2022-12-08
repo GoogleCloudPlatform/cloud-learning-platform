@@ -159,7 +159,7 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
     # creating course om classroom
     classroom = classroom_crud.create_course(
         name=course_template_dict["name"],
-        section="master",
+        section="template",
         description=course_template_dict["description"],
         owner_id=course_template_dict["admin"])
     # Adding instructional designer in the course on classroom
