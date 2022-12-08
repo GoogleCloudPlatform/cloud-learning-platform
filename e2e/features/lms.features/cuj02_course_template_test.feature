@@ -22,6 +22,17 @@ Feature: Create, Read, Retive all and delete APIs for Course Template
     Then Course Template Record will not be returned and API will throw a resource not found error
 
   @fixture.create.course_template
+  Scenario: Update Course Template Record by giving valid uuid and request payload
+    Given A user has access privileges and needs to update a Course Template Record
+    When API request is sent to update Course Template Record by providing correct uuid and request payload
+    Then Course Template Record will be updated successfully
+
+  Scenario: Unable to Update Course Template Record when invalid uuid and valid request payload given
+    Given A user has access to admin portal and wants to update a Course Template Record
+    When API request is sent to delete Course Template Record by providing invalid uuid and valid payload
+    Then Course Template Record will not be update and API will throw a resource not found error
+
+  @fixture.create.course_template
   Scenario: Delete Course Template Record by giving valid uuid
     Given A user has access privileges and needs to delete a Course Template Record
     When API request is sent to delete Course Template Record by providing correct uuid

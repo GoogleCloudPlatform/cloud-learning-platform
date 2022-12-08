@@ -64,6 +64,22 @@ class InvalidToken(CustomHTTPException):
   def __init__(self, message: str = "Unauthenticated"):
     super().__init__(status_code=498, message=message, success=False, data=None)
 
+
+class BadRequest(CustomHTTPException):
+  """Exception raised for errors in the input request.
+  This can contain following scenarios:
+  Invalid Argument: The argument is not as expected by the server.
+  Precondition Failed: The request cannot be completed in
+    the current system state.
+  Out of range: For fetching records where range is required
+    and is invalid.
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "Bad Request", data=None):
+    super().__init__(status_code=422, message=message, success=False, data=data)
+
 class ResourceNotFound(CustomHTTPException):
   """Exception raised if a Resource is not found.
   A specific resource is not found.

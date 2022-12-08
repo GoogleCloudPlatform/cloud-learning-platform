@@ -161,3 +161,42 @@ def test_delete_nonexist_course_template(client_with_emulator):
     response = client_with_emulator.delete(url)
   assert response.status_code == 404, "Status 404"
   assert response.json() == data, "Return data doesn't match."
+
+def test_update_course_template(client_with_emulator):
+  course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
+  course_template.save()
+  course_template.uuid = course_template.id
+  course_template.update()
+
+  uuid = course_template.uuid
+  url = API_URL + f"/{uuid}"
+  data = {
+      "success": True,
+      "message": f"Successfully Updated the Course Template with uuid {uuid}"
+  }
+  json_body = {"name":"update_name","description": "updated_description"}
+  with mock.patch("routes.course_template.Logger"):
+    response = client_with_emulator.patch(url, json=json_body)
+  response_course_template = response.json()
+  loaded_course_template = response_course_template.pop("course_template")
+  assert response.status_code == 200, "Status 200"
+  assert response_course_template == data, "Return data doesn't match."
+  assert loaded_course_template[
+      "name"] == json_body["name"], "Updated data doesn't match"
+  assert loaded_course_template[
+    "description"] == json_body["description"], "Updated data doesn't match"
+
+
+def test_update_nonexists_course_template(client_with_emulator):
+  uuid = "non_exists_uuid"
+  url = API_URL + f"/{uuid}"
+  data = {
+      "success": False,
+      "message": f"Course Template with uuid {uuid} is not found",
+      "data": None
+  }
+  json_body = {"name": "update_name", "description": "updated_description"}
+  with mock.patch("routes.course_template.Logger"):
+    response = client_with_emulator.patch(url, json=json_body)
+  assert response.status_code == 404, "Status 404"
+  assert response.json() == data, "Return data doesn't match."
