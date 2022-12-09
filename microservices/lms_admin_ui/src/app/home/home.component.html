@@ -5,23 +5,35 @@
         <mat-tab label="Cohort List">
 
             <div class="search-bar">
-                <div style="width: 75%;">
+                <div style="width: 87%;">
                     <div class="full-width">
 
                         <mat-form-field appearance="outline" style="width: 100%;">
                             <mat-label>Enter Cohort name, keyword</mat-label>
-                            <input matInput>
+                            <input matInput type="text" [(ngModel)]="searchCohortTerm">
+                            <button *ngIf="searchCohortTerm" matSuffix mat-icon-button aria-label="Clear"
+                                (click)="searchCohortTerm=''">
+                                <mat-icon>close</mat-icon>
+                            </button>
                         </mat-form-field>
                     </div>
                 </div>
                 <div class="search-button">
 
-                    <button mat-flat-button style="padding: 5px 20px;margin-right: 5%;" color="primary"><span
+                    <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"><span
                             class="material-symbols-rounded">
                             search
                         </span> Search</button>
-                    <div><span class="clear_search">clear search/filter</span></div>
                 </div>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="add-button">
+                <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"
+                    (click)="openDialog()">
+                    <span class="material-symbols-rounded">
+                        add
+                    </span>
+                    Add Cohort</button>
             </div>
 
             <ngx-skeleton-loader *ngIf="cohortLoader" count="4"
@@ -34,24 +46,37 @@
         <mat-tab label="Course Template List">
 
             <div class="search-bar">
-                <div style="width: 75%;">
+                <div style="width: 87%;">
                     <div class="full-width">
 
                         <mat-form-field appearance="outline" style="width: 100%;">
                             <mat-label>Enter Course template name, keyword</mat-label>
-                            <input matInput>
+                            <input matInput [(ngModel)]="searchCourseTemplate">
+                            <button *ngIf="searchCourseTemplate" matSuffix mat-icon-button aria-label="Clear"
+                                (click)="searchCourseTemplate=''">
+                                <mat-icon>close</mat-icon>
+                            </button>
                         </mat-form-field>
                     </div>
                 </div>
                 <div class="search-button">
 
-                    <button mat-flat-button style="padding: 5px 20px;margin-right: 5%;" color="primary"><span
+                    <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"><span
                             class="material-symbols-rounded">
                             search
                         </span> Search</button>
-                    <div><span class="clear_search">clear search/filter</span></div>
                 </div>
             </div>
+            <mat-divider></mat-divider>
+            <div class="add-button">
+                <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"
+                    (click)="openCourseTemplateDialog()">
+                    <span class="material-symbols-rounded">
+                        add
+                    </span>
+                    Add Course Template</button>
+            </div>
+
 
             <ngx-skeleton-loader *ngIf="courseTemplateLoader" count="5"
                 [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
@@ -64,7 +89,7 @@
 
     </mat-tab-group>
 
-
+    <!-- 
     <button mat-fab color="primary" aria-label="Example icon button with a delete icon" class="sticky-button"
         [matMenuTriggerFor]="aboveMenu">
         <span class="material-symbols-rounded">
@@ -75,7 +100,7 @@
     <mat-menu #aboveMenu="matMenu" yPosition="above">
         <button mat-menu-item (click)="openDialog()">Create Cohort</button>
         <button mat-menu-item (click)="openCourseTemplateDialog()">Create Course Template</button>
-    </mat-menu>
+    </mat-menu> -->
 
 
 

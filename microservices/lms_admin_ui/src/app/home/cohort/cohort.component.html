@@ -1,24 +1,67 @@
 <ng-container *ngIf="cohortList.length > 0; else noResult">
     <div *ngFor="let cohort of cohortList" class="data-obj-card">
-        <div class="block-header">
-            <div class="title">
-                <a class="text">{{cohort.name}}</a>
-            </div>
-            <div class="more-options" pTooltip="more options" tooltipPosition="top">
-                <span class="material-symbols-rounded" style="cursor:pointer;">
-                    more_vert
-                </span>
-            </div>
-        </div>
+        <div class="content-body-section">
+            <div class="block-header">
+                <div class="title">
+                    <a class="text" color="primary" (click)="reRout(cohort.uuid)">{{cohort.name}}</a>
 
-        <div class="block-body">
-            <div class="description">
-                <div class="text" style="padding: 1.5%;">
-                    <app-show-more [descText]="cohort.description" [letters]="225"></app-show-more>
+                    <span class="material-symbols-rounded" style="font-size: 0.9rem;">
+                        open_in_new
+                    </span>
+
+                    <div class="status-chip">
+                        <mat-chip-list>
+                            <mat-chip class="active-chip">Active</mat-chip>
+                            <!-- <mat-chip class="deactive-chip">Deactive</mat-chip> -->
+                        </mat-chip-list>
+                    </div>
+
+                </div>
+
+
+
+                <!-- <div>
+                <mat-chip-list>
+                    <mat-chip class="deactive-chip">Deactive</mat-chip>
+                </mat-chip-list>
+            </div> -->
+
+
+                <div class="more-options" pTooltip="more options" tooltipPosition="top">
+                    <span class="material-symbols-rounded" style="cursor:pointer;" [matMenuTriggerFor]="subMenu">
+                        more_vert
+                    </span>
+                </div>
+            </div>
+
+            <div class="block-body">
+                <div class="description">
+                    <div class="text" style="padding: 1.5%;">
+                        <app-show-more [descText]="cohort.description" [letters]="225"></app-show-more>
+                    </div>
+                </div>
+
+            </div>
+            <div class="block-metadata">
+                <div class="metadata">
+                    <div class="date-block"><span class="material-symbols-rounded">
+                            date_range
+                        </span> <span class="date-body"><span>{{cohort.start_date | date: 'EEEE, MMM d, y'}}</span> -
+                            {{cohort.end_date | date: 'EEEE, MMM d, y'}}</span></div>
                 </div>
             </div>
 
         </div>
+
+        <div class="enrolled-section">
+
+            <div class="enrolled-section-content">
+                <div class="number">2,334</div>
+                <div class="text">enrolled</div>
+            </div>
+
+        </div>
+
 
     </div>
 </ng-container>
@@ -26,3 +69,11 @@
 <ng-template #noResult>
     <div class="no-data-inner-comp">No Data Found</div>
 </ng-template>
+
+<mat-menu #subMenu="matMenu" yPosition="below">
+    <div class="edit-menu">
+        <button mat-menu-item class="button"><span class="material-symbols-rounded" style="padding-right: 10px;">
+                edit
+            </span>Edit cohort details</button>
+    </div>
+</mat-menu>

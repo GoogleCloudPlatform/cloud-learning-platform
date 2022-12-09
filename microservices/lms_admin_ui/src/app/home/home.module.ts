@@ -10,7 +10,13 @@ import { CreateCohortModalComponent } from './create-cohort-modal/create-cohort-
 import { CreateCourseTemplateModalComponent } from './create-course-template-modal/create-course-template-modal.component';
 import { CourseTemplateComponent } from './course-template/course-template.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader'
+import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
+import { SectionComponent } from './section/section.component';
+import { CreateSectionComponent } from './create-section/create-section.component';
+// import { BrowserModule } from '@angular/platform-browser';
+// import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatChipsModule } from '@angular/material/chips';
+import { EditSectionComponent } from './edit-section/edit-section.component';
 
 @NgModule({
   declarations: [
@@ -20,15 +26,22 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader'
     CreateCohortModalComponent,
     CreateCourseTemplateModalComponent,
     CourseTemplateComponent,
+    SectionComponent,
+    CreateSectionComponent,
+    EditSectionComponent,
 
   ],
   // entryComponents: [CreateCohortModalComponent],
   imports: [
     CommonModule,
+    // BrowserModule,
+    // BrowserAnimationsModule,
     HomeRoutingModule,
     ReactiveFormsModule,
+    FormsModule,
     SharedModule,
     MaterialSharedModule,
+    MatChipsModule,
     NgxSkeletonLoaderModule.forRoot({ animation: 'progress' })
 
   ],
