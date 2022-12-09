@@ -4,7 +4,7 @@ Pydantic Model for cohort API's
 import datetime
 from typing import Optional
 from pydantic import BaseModel
-from schemas.schema_examples import COHORT_EXAMPLE, INSERT_COHORT_EXAMPLE
+from schemas.schema_examples import COHORT_EXAMPLE, INSERT_COHORT_EXAMPLE,UPDATE_COHORT_EXAMPLE
 
 
 class CohortModel(BaseModel):
@@ -48,7 +48,7 @@ class UpdateCohortModel(BaseModel):
 
   class Config():
     orm_mode = True
-    schema_extra = {"example": COHORT_EXAMPLE}
+    schema_extra = {"example": UPDATE_COHORT_EXAMPLE}
 
 
 class CohortListResponseModel(BaseModel):

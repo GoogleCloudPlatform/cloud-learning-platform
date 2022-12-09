@@ -3,8 +3,8 @@ import datetime
 from fastapi import APIRouter
 from common.models import Cohort, CourseTemplate
 from common.utils.logging_handler import Logger
-from common.utils.errors import ResourceNotFoundException
-from common.utils.http_exceptions import ResourceNotFound, InternalServerError
+from common.utils.errors import ResourceNotFoundException, ValidationError
+from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest
 from schemas.cohort import (CohortListResponseModel, CohortModel,
                             CreateCohortResponseModel, InputCohortModel,
                             DeleteCohortResponseModel,
@@ -138,14 +138,15 @@ def create_cohort(input_cohort: InputCohortModel):
 
 @router.patch("/{cohort_uuid}", response_model=UpdateCohortResponseModel)
 def update_cohort(cohort_uuid: str, update_cohort_model: UpdateCohortModel):
-  """Update section API
+  """Update Cohort API
 
     Args:
         update_cohort_model (UpdateCohortModel):
             pydantic model object which contains update details
     Raises:
-        HTTPException: 500 Internal Server Error if something fails
-        ResourceNotFound : 404 if cohort or course template id not found
+        InternalServerError: 500 Internal Server Error if something fails
+        ResourceNotFoundException :
+          404 if cohort or course template id not found
     Returns:
         UpdateCohort: Returns Updated Cohort object,
         InternalServerErrorResponseModel:
@@ -154,15 +155,22 @@ def update_cohort(cohort_uuid: str, update_cohort_model: UpdateCohortModel):
   try:
     cohort_details = Cohort.find_by_uuid(cohort_uuid)
     if cohort_details is None:
-      raise ResourceNotFound(f"Cohort with uuid {cohort_uuid} is not found")
+      raise ResourceNotFoundException("Cohort with uuid "+
+                                      f"{cohort_uuid} is not found")
     update_cohort_dict = {**update_cohort_model.dict()}
+    if not any(update_cohort_dict.values()):
+      raise ValidationError("Invalid request please provide some data " +
+                            f"to update the Cohort with uuid {cohort_uuid}")
+      # return {"message": "Please provide some data to update the" +
+      #         f" Cohort with uuid {cohort_uuid}",
+      #         "cohort": cohort_details}
     for key in update_cohort_dict:
       if update_cohort_dict[key] is not None:
         if key == "course_template":
           course_template = CourseTemplate.find_by_uuid(
               update_cohort_dict[key])
           if course_template is None:
-            raise ResourceNotFound("Course template with uuid" +
+            raise ResourceNotFoundException("Course template with uuid" +
                                    f" {update_cohort_dict[key]} is not found")
           setattr(cohort_details, key, course_template)
         else:
@@ -173,7 +181,9 @@ def update_cohort(cohort_uuid: str, update_cohort_model: UpdateCohortModel):
         "message": f"Successfully Updated the Cohort with uuid {cohort_uuid}",
         "cohort": convert_cohort_to_cohort_model(cohort_details)
     }
-  except ResourceNotFound as err:
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
+  except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Exception as e:
