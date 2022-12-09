@@ -1,4 +1,3 @@
-import { classNames } from './../../../../../../experimental/youtube-classroom-mooc/edu-analytics-ui/src/utils/dom';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatSort, Sort } from '@angular/material/sort';
