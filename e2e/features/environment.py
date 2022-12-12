@@ -1,5 +1,6 @@
 import os
 import json
+import traceback
 from behave import fixture, use_fixture
 from common.models import CourseTemplate, Cohort,Section
 from common.testing.example_objects import TEST_SECTION,TEST_COHORT
@@ -8,6 +9,7 @@ from googleapiclient.discovery import build
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.cohort import COHORT_INPUT_DATA
 import logging
+from setup import user_login
 
 def create_course(name,section,description,ownerId):
   """Create course Function in classroom
@@ -95,3 +97,10 @@ def before_tag(context, tag):
         except Exception as e:
             print(e)
             logging.error(str(e))
+
+def before_all(context):
+  try:
+    user_login()
+  except Exception as e:
+    print("Failed in before_all hook with error:", str(e))
+    print(traceback.print_exc())

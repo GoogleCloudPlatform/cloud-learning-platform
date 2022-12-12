@@ -60,3 +60,17 @@ def get_student_email_and_token():
       "credentials": json.loads(credentials_dict)
   }
   return data
+
+
+def get_user_email_and_password_for_e2e():
+  client = secretmanager.SecretManagerServiceClient()
+  user_email_secret_id = "personal-test-user-2-username"
+  user_password_secret_id = "personal-test-user-2-password"
+  user_email_secret_name = f"projects/{PROJECT_ID}/secrets/{user_email_secret_id}/versions/latest"
+  user_password_secret_name = f"projects/{PROJECT_ID}/secrets/{user_password_secret_id}/versions/latest"
+  user_email_response = client.access_secret_version(
+      request={"name": user_email_secret_name})
+  user_password_response = client.access_secret_version(
+      request={"name": user_password_secret_name})
+  return user_email_response.payload.data.decode(
+      "UTF-8").lower(), user_password_response.payload.data.decode("UTF-8")

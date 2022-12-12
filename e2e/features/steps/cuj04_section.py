@@ -1,7 +1,7 @@
 import behave
-import requests
 from testing_objects.test_config import API_URL
 from e2e.gke_api_tests.secrets_helper import get_student_email_and_token
+from setup import post_method
 
 # -------------------------------Enroll student to Section-------------------------------------
 # ----Positive Scenario-----
@@ -15,7 +15,7 @@ def step_impl_1(context):
 
 @behave.when("API request is sent to enroll student to a section with correct request payload and valid section uuid")
 def step_impl_2(context):
-    resp = requests.post(context.url, json=context.payload)
+    resp = post_method(context.url, request_body=context.payload)
     context.status = resp.status_code
     context.response = resp.json()
 
@@ -36,7 +36,7 @@ def setp_impl_4(context):
 
 @behave.when("API request is sent to enroll student to a section with correct request payload and invalid section uuid")
 def step_impl_5(context):
-    resp = requests.post(context.url, json=context.payload)
+    resp = post_method(context.url, request_body=context.payload)
     context.status = resp.status_code
     context.response = resp.json()
 
@@ -55,7 +55,7 @@ def step_impl_7(context):
 
 @behave.when("API request is sent to enroll student to a section with incorrect request payload and valid section uuid")
 def step_impl_8(context):
-    resp = requests.post(context.url, json=context.payload)
+    resp = post_method(context.url, request_body=context.payload)
     context.status = resp.status_code
     context.response = resp.json()
 
