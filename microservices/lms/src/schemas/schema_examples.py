@@ -15,7 +15,8 @@ COURSE_TEMPLATE_EXAMPLE = {
     "admin": "admin",
     "instructional_designer": "IDesiner",
     "classroom_id": "clID",
-    "classroom_code": "clcode"
+    "classroom_code": "clcode",
+    "classroom_url": "https://classroom.google.com"
 }
 UPDATE_COURSE_TEMPLATE_EXAMPLE = {
     "name": "name",
@@ -23,7 +24,8 @@ UPDATE_COURSE_TEMPLATE_EXAMPLE = {
     "admin": "admin",
     "instructional_designer": "IDesiner",
     "classroom_id": "clID",
-    "classroom_code": "clcode"
+    "classroom_code": "clcode",
+    "classroom_url": "https://classroom.google.com"
 }
 
 INSERT_COURSE_TEMPLATE_EXAMPLE = {
