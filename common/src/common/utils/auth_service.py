@@ -26,7 +26,6 @@ def validate_token(token: auth_scheme = Depends()):
     if token is None:
       raise InvalidTokenError("Unauthorized")
     token_dict = dict(token)
-    # print(token)
     if token_dict["credentials"]:
       api_endpoint = "http://authentication/authentication/api/v1/validate"
       res = requests.get(
