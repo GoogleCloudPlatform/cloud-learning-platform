@@ -263,8 +263,6 @@ def delete_section(section_id: str):
   try:
     section_details = Section.find_by_uuid(section_id)
     classroom_crud.delete_course_by_id(section_details.classroom_id)
-    # Logger.info(f"classroom with course id {section_details.classroom_id} 
-    # deleted {result}")
     section_details = Section.archive_by_uuid(section_id)
     if section_details:
       return {
