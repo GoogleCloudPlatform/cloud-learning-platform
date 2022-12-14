@@ -249,7 +249,7 @@ def get_section(section_id: str):
 
 @router.delete("/{section_id}", response_model=DeleteSectionResponseModel)
 def delete_section(section_id: str):
-  """Get a section details from db and delete record from section collection and 
+  """Get a section details from db and delete record from section collection and
   google classroom course
 
   Args:
@@ -263,11 +263,11 @@ def delete_section(section_id: str):
   try:
     section_details = Section.find_by_uuid(section_id)
     result = classroom_crud.delete_course_by_id(section_details.classroom_id)
-    Logger.log(f"classroom with course id {section_details.classroom_id} deleted {result}")
-    section_details = Section.archive_by_uuid(section_id)
+    Logger.info(f"classroom with course id {section_details.classroom_id} deleted {result}")
+    scection_details = Section.archive_by_uuid(section_id)
     if section_details:
       return {
-          "message": f"Successfully deleted the Section with uuid {section_id}"
+        "message": f"Successfully deleted the Section with uuid {section_id}"
       }
     else:
       raise ResourceNotFoundException(
@@ -349,6 +349,7 @@ def update_section(sections_details: UpdateSection):
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+  
 
 
 @router.post("/{sections_id}/students", response_model=AddStudentResponseModel)
