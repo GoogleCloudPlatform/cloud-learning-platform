@@ -347,6 +347,6 @@ def test_delete_section(client_with_emulator):
   }
   url = BASE_URL + "/sections"
   with mock.patch("routes.copy_course.classroom_crud.delete_course_by_id"):
-      with mock.patch("routes.copy_course.Logger"):
-        resp = client_with_emulator.patch(url, json=data)
+    resp = client_with_emulator.patch(url, json=data)
+  print(resp.json())
   assert resp.status_code == 200

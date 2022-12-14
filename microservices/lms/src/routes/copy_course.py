@@ -263,8 +263,9 @@ def delete_section(section_id: str):
   try:
     section_details = Section.find_by_uuid(section_id)
     result = classroom_crud.delete_course_by_id(section_details.classroom_id)
-    Logger.info(f"classroom with course id {section_details.classroom_id} deleted {result}")
-    scection_details = Section.archive_by_uuid(section_id)
+    # Logger.info(f"classroom with course id {section_details.classroom_id} 
+    # deleted {result}")
+    section_details = Section.archive_by_uuid(section_id)
     if section_details:
       return {
         "message": f"Successfully deleted the Section with uuid {section_id}"
@@ -349,8 +350,6 @@ def update_section(sections_details: UpdateSection):
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
-  
-
 
 @router.post("/{sections_id}/students", response_model=AddStudentResponseModel)
 def enroll_student_section(sections_id: str,
