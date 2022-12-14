@@ -10,7 +10,7 @@ from common.utils.errors import ResourceNotFoundException, InvalidTokenError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, InvalidToken, CustomHTTPException
 from googleapiclient.errors import HttpError
 from schemas.course_details import CourseDetails
-from schemas.section import SectionDetails, AddStudentToSectionModel, AddStudentResponseModel
+from schemas.section import SectionDetails, AddStudentToSectionModel, AddStudentResponseModel,DeleteSectionResponseModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
@@ -247,6 +247,38 @@ def get_section(section_id: str):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+@router.delete("/{section_id}", response_model=DeleteSectionResponseModel)
+def delete_section(section_id: str):
+  """Get a section details from db and delete record from section collection and 
+  google classroom course
+
+  Args:
+      section_id (str): section_id in firestore
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      HTTPException: 404 Section with section id is not found
+  Returns:
+    {"message": "Successfully deleted section"}
+  """
+  try:
+    section_details = Section.find_by_uuid(section_id)
+    result = classroom_crud.delete_course_by_id(section_details.classroom_id)
+    Logger.log(f"classroom with course id {section_details.classroom_id} deleted {result}")
+    section_details = Section.archive_by_uuid(section_id)
+    if section_details:
+      return {
+          "message": f"Successfully deleted the Section with uuid {section_id}"
+      }
+    else:
+      raise ResourceNotFoundException(
+          f"Section with uuid {section_id} is not found")
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
 
 @router.get("")
 def section_list():
@@ -271,7 +303,6 @@ def section_list():
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
-
 
 @router.patch("")
 def update_section(sections_details: UpdateSection):
