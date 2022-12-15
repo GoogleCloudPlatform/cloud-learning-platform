@@ -40,3 +40,4 @@ def convert_cohort_to_cohort_model(cohort):
   course_template = loaded_cohort.pop("course_template").to_dict()
   loaded_cohort["course_template"] = course_template["key"]
   return loaded_cohort
+
