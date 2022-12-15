@@ -77,6 +77,10 @@ jobs:
       run: |
         gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
 
+    - name: Install GKE Auth Plugin
+      run: | 
+        gcloud components install gke-gcloud-auth-plugin
+
     - name: Set up Kubernetes namespace and Service Account
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
