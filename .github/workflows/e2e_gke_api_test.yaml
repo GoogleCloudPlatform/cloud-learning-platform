@@ -190,6 +190,9 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_setup.py
+    - name: ping lms server
+      run: |
+       curl http://localhost:8888/ping
 
     - name: Run pytest
       run: |
