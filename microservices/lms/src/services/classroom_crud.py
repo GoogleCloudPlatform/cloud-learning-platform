@@ -302,14 +302,13 @@ def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns 
       return a dictionary of view link as keys and edit link as values
   """
-  service = build('drive', 'v3', credentials=get_credentials())
-  files = []
+  service = build("drive", "v3", credentials=get_credentials())
   page_token = None
   while True:
     response = service.files().list(q="mimeType='application/vnd.google-apps.form'",
-                                      spaces='drive',
-                                      fields='nextPageToken, '
-                                        'files(id, name,webViewLink,thumbnailLink)',
+                                      spaces="drive",
+                                      fields="nextPageToken, "
+                                        "files(id, name,webViewLink,thumbnailLink)",
                                       pageToken=page_token).execute()
     view_link_and_edit_link_matching ={}
     for file in response.get('files', []):    
@@ -322,6 +321,6 @@ def get_edit_url_and_view_url_mapping_of_form():
 def get_view_link_from_id (form_id):
   "Query google forms api  using form id and get view url of  google form"
 
-  service = build('forms', 'v1', credentials=get_credentials())
+  service = build("forms", "v1", credentials=get_credentials())
   result = service.forms().get(formId=form_id).execute()
   return result

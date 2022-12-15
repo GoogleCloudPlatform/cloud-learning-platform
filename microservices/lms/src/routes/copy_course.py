@@ -9,8 +9,9 @@ from common.models.cohort import Cohort
 from common.utils.errors import ResourceNotFoundException, InvalidTokenError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, InvalidToken, CustomHTTPException
 from googleapiclient.errors import HttpError
-from services.classroom_crud import (get_credentials,
-                            get_edit_url_and_view_url_mapping_of_form,get_view_link_from_id)
+from google.auth.transport.requests import Request
+from services.classroom_crud import (
+                            get_edit_url_and_view_url_mapping_of_form)
 from schemas.course_details import CourseDetails
 from schemas.section import SectionDetails, AddStudentToSectionModel, AddStudentResponseModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
@@ -19,15 +20,6 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.update_section import UpdateSection
 from services import classroom_crud
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-# from httplib2 import Http
-# from apiclient import discovery
-# from oauth2client import client, file, tools
-
 
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -144,7 +136,7 @@ def create_section(sections_details: SectionDetails):
               "url":edit_url_and_view_url_mapping[material["form"]["formUrl"]]
             }
             # remove form from  material dict
-            removed_form= material.pop("form")
+            material.pop("form")
             # material["form"]["formUrl"]=edit_url_and_view_url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
     if coursework_list is  not None:
@@ -174,6 +166,8 @@ def create_section(sections_details: SectionDetails):
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Exception as e:
+    error =traceback.format_exc().replace("\n", " ")
+    Logger.error(error)
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
@@ -415,7 +409,7 @@ def copy_courses(course_details: CourseDetails):
               "url":edit_url_and_view_url_mapping[material["form"]["formUrl"]]
             }
             # remove form from  material dict
-            removed_form= material.pop("form")
+            material.pop("form")
             # material["form"]["formUrl"]=edit_url_and_view_url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
     if coursework_list is  not None:
@@ -425,5 +419,5 @@ def copy_courses(course_details: CourseDetails):
     return SUCCESS_RESPONSE
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
-    Logger.error(e)
+    Logger.error(err)
     raise InternalServerError(str(e)) from e
