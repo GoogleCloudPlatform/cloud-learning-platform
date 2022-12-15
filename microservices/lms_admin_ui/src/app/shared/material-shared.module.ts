@@ -13,8 +13,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-
-// import { MatMomentDateModule } from "@angular/material-moment-adapter";
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatTableModule } from '@angular/material/table';
+import { MatDividerModule } from '@angular/material/divider';
 
 @NgModule({
     declarations: [
@@ -35,7 +37,11 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
         MatSelectModule,
         MatNativeDateModule,
         MatProgressSpinnerModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        MatCardModule,
+        MatChipsModule,
+        MatTableModule,
+        MatDividerModule
     ]
 })
 export class MaterialSharedModule { }

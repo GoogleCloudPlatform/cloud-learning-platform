@@ -1,0 +1,61 @@
+.object-details {
+    background-color: white;
+    padding: 0% 1%;
+    padding-top: 1%;
+
+    .heading {
+        font-size: 1.2rem;
+        margin-bottom: 2%;
+    }
+
+    .element {
+        margin-bottom: 1.5%;
+
+        .element-heading {
+            font-weight: 600;
+        }
+
+        .element-content {
+            font-size: 0.9rem;
+            margin-left: 0.5%;
+        }
+    }
+}
+
+.section-select {
+    .heading {
+        font-weight: 600;
+        margin-bottom: 2%;
+        font-size: 1rem;
+    }
+
+    .body {
+        display: flex;
+        align-items: center;
+    }
+}
+
+.section-management {
+    display: flex;
+    justify-content: space-between;
+    margin: 1.5% 0%;
+    background-color: #ebebeb;
+    padding: 1%;
+    align-items: center;
+
+    .heading {
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+}
+
+.no-section {
+    text-align: center;
+    margin-top: 5%;
+    font-size: 1.3rem;
+}
+
+:host ::ng-deep .mat-chip.mat-standard-chip {
+    background-color: #a2ea8c;
+    color: rgb(7 96 26 / 87%);
+}

@@ -123,27 +123,80 @@ def step_impl_12(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
 
+# -------------------------------Update Course Template-------------------------------------
+# ----Positive Scenario-----
+
+
+@behave.given("A user has access privileges and needs to update a Course Template Record")
+def setp_impl_13(context):
+  context.url = f'{API_URL}/course_templates/{context.course_template.uuid}'
+  context.payload={"name":"updated_name","description":"updated_description"}
+  
+
+
+@behave.when(
+    "API request is sent to update Course Template Record by providing correct uuid and request payload"
+)
+def step_impl_14(context):
+  resp = requests.patch(context.url,json=context.payload)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then("Course Template Record will be updated successfully")
+def step_impl_15(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "Check success"
+  assert context.response["course_template"]["name"]==context.payload["name"], "Check updated data"
+  assert context.response["course_template"]["description"]==context.payload["description"], "Check updated data"
+
+# ----Negative Scenario-----
+
+@behave.given(
+    "A user has access to admin portal and wants to update a Course Template Record"
+)
+def setp_impl_16(context):
+  context.url = f'{API_URL}/course_templates/fake_non_exist_uuid'
+  context.payload = {"name": "updated_name",
+                     "description": "updated_description"}
+
+
+@behave.when(
+    "API request is sent to delete Course Template Record by providing invalid uuid and valid payload"
+)
+def step_impl_17(context):
+  resp = requests.patch(context.url, json=context.payload)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Course Template Record will not be update and API will throw a resource not found error"
+)
+def step_impl_18(context):
+  assert context.status == 404, "Status 404"
+  assert context.response["success"] is False, "Check success"
 
 # -------------------------------Delete Course Template-------------------------------------
 # ----Positive Scenario-----
 @behave.given(
     "A user has access privileges and needs to delete a Course Template Record"
 )
-def setp_impl_13(context):
+def setp_impl_19(context):
   context.url = f'{API_URL}/course_templates/{context.course_template.uuid}'
 
 
 @behave.when(
     "API request is sent to delete Course Template Record by providing correct uuid"
 )
-def step_impl_14(context):
+def step_impl_20(context):
   resp = requests.delete(context.url)
   context.status = resp.status_code
   context.response = resp.json()
 
 
 @behave.then("Course Template Record will be deleted successfully")
-def step_impl_12(context):
+def step_impl_21(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 
@@ -154,14 +207,14 @@ def step_impl_12(context):
 @behave.given(
     "A user has access to admin portal and wants to delete a Course Template Record"
 )
-def setp_impl_10(context):
+def setp_impl_22(context):
   context.url = f'{API_URL}/course_templates/fake_non_exist_uuid'
 
 
 @behave.when(
     "API request is sent to delete Course Template Record by providing invalid uuid"
 )
-def step_impl_11(context):
+def step_impl_23(context):
   resp = requests.delete(context.url)
   context.status = resp.status_code
   context.response = resp.json()
@@ -170,7 +223,7 @@ def step_impl_11(context):
 @behave.then(
     "Course Template Record will not be deleted and API will throw a resource not found error"
 )
-def step_impl_12(context):
+def step_impl_24(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
 
@@ -181,12 +234,12 @@ def step_impl_12(context):
 @behave.given(
     "A user has access privileges and needs to fetch all Course Template Records"
 )
-def step_impl_13(context):
+def step_impl_25(context):
   context.url = f'{API_URL}/course_templates'
 
 
 @behave.when("API request is sent to fetch all Course Template Records")
-def step_impl_14(context):
+def step_impl_26(context):
   resp = requests.get(context.url)
   context.status = resp.status_code
   context.response = resp.json()
@@ -195,7 +248,7 @@ def step_impl_14(context):
 @behave.then(
     "Course Template API will return all existing Course Template Records successfully"
 )
-def step_impl_15(context):
+def step_impl_27(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 
@@ -207,14 +260,14 @@ def step_impl_15(context):
 @behave.given(
     "A user has access privileges and needs to fetch all Cohort Records using course template"
 )
-def step_impl_16(context):
+def step_impl_28(context):
   context.url = f'{API_URL}/course_templates/{context.cohort.course_template.uuid}/cohorts'
 
 
 @behave.when(
     "API request is sent to fetch all Cohorts Records by providing Course template valid uuid"
 )
-def step_impl_17(context):
+def step_impl_29(context):
   resp = requests.get(context.url)
   context.status = resp.status_code
   context.response = resp.json()
@@ -223,7 +276,7 @@ def step_impl_17(context):
 @behave.then(
     "Course Template list Cohort API will return all existing Cohort Records successfully"
 )
-def step_impl_18(context):
+def step_impl_30(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 
@@ -233,14 +286,14 @@ def step_impl_18(context):
 @behave.given(
     "A user has access to admin portal and wants to retrieve list of Cohort Records using course template"
 )
-def setp_impl_19(context):
+def setp_impl_31(context):
   context.url = f'{API_URL}/course_templates/fake_non_exist_uuid'
 
 
 @behave.when(
     "API request is sent to fetch all Cohorts Records by providing Course template invalid uuid"
 )
-def step_impl_20(context):
+def step_impl_32(context):
   resp = requests.delete(context.url)
   context.status = resp.status_code
   context.response = resp.json()
@@ -248,6 +301,6 @@ def step_impl_20(context):
 
 @behave.then(
     "Course Template list Cohort API will throw a resource not found error")
-def step_impl_21(context):
+def step_impl_33(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"

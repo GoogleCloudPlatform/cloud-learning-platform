@@ -1,6 +1,6 @@
 .search-bar {
     width: 100%;
-    margin-bottom: 1%;
+    margin-bottom: 0.7%;
     margin-top: 2%;
     display: flex;
     align-items: center;
@@ -12,7 +12,6 @@
     position: absolute;
     right: 0px;
     top: 11px;
-    width: 24%;
     align-items: center;
 }
 
@@ -33,4 +32,8 @@
     bottom: 10px;
     z-index: 99999;
     float: right;
+}
+
+.add-button {
+    margin: 5% 0% 2.5%;
 }

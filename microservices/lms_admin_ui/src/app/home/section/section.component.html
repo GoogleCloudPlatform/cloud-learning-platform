@@ -1,0 +1,124 @@
+<div class="custom-outer-container">
+    <app-breadcrum></app-breadcrum>
+
+    <ngx-skeleton-loader *ngIf="loadCard" count="1"
+        [theme]="{'height': '100px','margin-top':'30px','background-color': '#EAEAEA'}">
+    </ngx-skeleton-loader>
+
+
+
+    <mat-card *ngIf="!loadCard" style="margin-top:2%;margin-bottom: 3%;">
+        <mat-card-content>
+
+            <div class="object-details">
+                <div class="element"><span class="element-heading">Cohort Name : </span> <span
+                        class="element-content">{{cohortDetails.name}}</span></div>
+                <div class="element"><span class="element-heading">Cohort Description : </span> <span
+                        class="element-content">{{cohortDetails.description}}</span></div>
+                <div class="element"><span class="element-heading">Instructional Designer : </span> <span
+                        class="element-content">{{courseTemplateDetails.instructional_designer}}</span></div>
+                <div class="element"><span class="element-heading">Course Admin : </span> <span
+                        class="element-content">{{courseTemplateDetails.admin}}</span></div>
+            </div>
+
+        </mat-card-content>
+    </mat-card>
+
+
+
+    <ngx-skeleton-loader *ngIf="loadSection" count="1"
+        [theme]="{'height': '200px', 'margin-top':'30px','background-color': '#EAEAEA'}">
+    </ngx-skeleton-loader>
+
+    <ng-container *ngIf="!loadSection">
+        <ng-container *ngIf="sectionDetails.length > 0; else noSection">
+            <div class="section-select">
+                <div class="heading">
+                    Select Section
+                </div>
+                <div class="body">
+                    <mat-form-field appearance="fill" style="margin-right: 2%;">
+                        <mat-label>Select Section</mat-label>
+                        <mat-select [(value)]="selectedSection" (selectionChange)="createTableData()">
+                            <!-- <mat-option value="Section A">Section A</mat-option>
+                    <mat-option value="Section B">Section B</mat-option> -->
+                            <mat-option *ngFor="let section of sectionDetails" [value]="section">
+                                {{section.section}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <div>
+                        <mat-chip-list>
+                            <mat-chip>Active</mat-chip>
+                        </mat-chip-list>
+                    </div>
+
+                    <button mat-button (click)="openCreateSectionDialog()"><span class="material-symbols-rounded">
+                            add_circle
+                        </span> Add Section</button>
+
+                    <button mat-button><span class="material-symbols-rounded">
+                            insights
+                        </span> View Reports</button>
+
+                    <button mat-button><span class="material-symbols-rounded">
+                            edit
+                        </span> View / Edit info</button>
+                </div>
+
+
+            </div>
+
+            <div class="section-management">
+                <span class="heading">{{selectedSection.section}} management</span>
+
+                <button mat-flat-button color="primary"><span class="material-symbols-rounded">
+                        add
+                    </span> Add Staff</button>
+            </div>
+
+            <ng-container>
+                <table mat-table [dataSource]="tableData" matSort class="mat-elevation-z8" style="width: 100%;">
+
+                    <!-- Name Column -->
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by name">
+                            Name
+                        </th>
+                        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                    </ng-container>
+
+                    <!-- Email Column -->
+                    <ng-container matColumnDef="email">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by email">
+                            Email
+                        </th>
+                        <td mat-cell *matCellDef="let element"> {{element.email}} </td>
+                    </ng-container>
+
+                    <!-- Role Column -->
+                    <ng-container matColumnDef="role">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by role">
+                            Role
+                        </th>
+                        <td mat-cell *matCellDef="let element"> {{element.role}} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </ng-container>
+
+        </ng-container>
+
+        <ng-template #noSection>
+            <div class="no-section"><span>No sections found</span> <button mat-flat-button color="primary"
+                    style="margin-left: 1%;" (click)="openCreateSectionDialog()"><span class="material-symbols-rounded"
+                        style="margin-right: 1%;">
+                        add_circle
+                    </span> Add Section</button></div>
+        </ng-template>
+    </ng-container>
+
+</div>

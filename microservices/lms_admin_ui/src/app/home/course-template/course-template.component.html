@@ -2,10 +2,10 @@
     <div *ngFor="let courseTemplate of courseTemplateList" class="data-obj-card">
         <div class="block-header">
             <div class="title">
-                <a class="text">{{courseTemplate.name}}</a>
+                <a class="text" color="primary">{{courseTemplate.name}}</a>
             </div>
             <div class="more-options" pTooltip="more options" tooltipPosition="top">
-                <span class="material-symbols-rounded" style="cursor:pointer;">
+                <span class="material-symbols-rounded" style="cursor:pointer;" [matMenuTriggerFor]="subMenu">
                     more_vert
                 </span>
             </div>
@@ -20,9 +20,41 @@
 
         </div>
 
+        <div class="block-metadata">
+            <div class="metadata">
+
+                <div class="id-block">
+                    <span class="material-symbols-rounded">
+                        history_edu
+                    </span>
+                    <span class="heading">ID : </span>
+                    <span class="body">{{courseTemplate.instructional_designer}}</span>
+                </div>
+
+                <div class="admin-block">
+                    <span class="material-symbols-rounded">
+                        admin_panel_settings
+                    </span>
+                    <span class="heading">Admin : </span>
+                    <span class="body">{{courseTemplate.admin}}</span>
+                </div>
+
+
+            </div>
+        </div>
+
+
     </div>
 </ng-container>
 
 <ng-template #noResult>
     <div class="no-data-inner-comp">No Data Found</div>
 </ng-template>
+
+<mat-menu #subMenu="matMenu" yPosition="below">
+    <div class="edit-menu">
+        <button mat-menu-item class="button"><span class="material-symbols-rounded" style="padding-right: 10px;">
+                edit
+            </span>Edit course template details</button>
+    </div>
+</mat-menu>
