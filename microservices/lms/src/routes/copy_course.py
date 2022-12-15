@@ -9,7 +9,7 @@ from common.models.cohort import Cohort
 from common.utils.errors import ResourceNotFoundException, InvalidTokenError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, InvalidToken, CustomHTTPException
 from googleapiclient.errors import HttpError
-from google.auth.transport.requests import Request
+from services import classroom_crud
 from services.classroom_crud import (
                             get_edit_url_and_view_url_mapping_of_form)
 from schemas.course_details import CourseDetails
@@ -19,7 +19,6 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.update_section import UpdateSection
-from services import classroom_crud
 
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -116,7 +115,8 @@ def create_section(sections_details: SectionDetails):
     if topics is not None:
       topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
     # Get coursework of current course and create a new course
-    coursework_list = classroom_crud.get_coursework(course_template_details.classroom_id)
+    coursework_list = classroom_crud.get_coursework(
+      course_template_details.classroom_id)
     for coursework in coursework_list:
       #Check if a coursework is linked to a topic if yes then 
       # replace the old topic id to new topic id using topic_id_map
@@ -124,20 +124,24 @@ def create_section(sections_details: SectionDetails):
         coursework["topicId"]=topic_id_map[coursework["topicId"]]
       #Check if a material is present in coursework 
       if "materials" in coursework.keys():
-        # Calling function to get edit_url and view url of google form which returns 
-        # a dictionary of view_links as keys and edit likns as values of google form
-        edit_url_and_view_url_mapping = get_edit_url_and_view_url_mapping_of_form()
-        # Loop to check if a material in courssework has a google form attached to it
+        # Calling function to get edit_url and view url of 
+        # google form which returns 
+        # a dictionary of view_links as keys and edit
+        #  likns as values of google form
+        url_mapping=get_edit_url_and_view_url_mapping_of_form()
+        # Loop to check if a material in courssework has a google 
+        # form attached to it
         # update the  view link to edit link and attach it as a form
         for material in coursework["materials"]:
           if "form" in material.keys():
             material["link"]={
               "title":material["form"]["title"],
-              "url":edit_url_and_view_url_mapping[material["form"]["formUrl"]]
+              "url":url_mapping[material["form"]["formUrl"]]
             }
             # remove form from  material dict
             material.pop("form")
-            # material["form"]["formUrl"]=edit_url_and_view_url_mapping[material["form"]["formUrl"]]
+            # material["form"]["formUrl"]=
+            # url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
     if coursework_list is  not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
@@ -391,26 +395,32 @@ def copy_courses(course_details: CourseDetails):
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(course_id)
     for coursework in coursework_list:
-      #Check if a coursework is linked to a topic if yes then 
-      # replace the old topic id to new topic id using topic_id_map
+      #Check if a coursework is linked to
+      #  a topic if yes then 
+      # replace the old topic id to new 
+      # topic id using topic_id_map
       if "topicId" in coursework.keys():
         coursework["topicId"]=topic_id_map[coursework["topicId"]]
       #Check if a material is present in coursework 
       if "materials" in coursework.keys():
-        # Calling function to get edit_url and view url of google form which returns 
-        # a dictionary of view_links as keys and edit likns as values of google form
-        edit_url_and_view_url_mapping = get_edit_url_and_view_url_mapping_of_form()
-        # Loop to check if a material in courssework has a google form attached to it
+        # Calling function to get edit_url and view url of google
+        #  form which returns 
+        # a dictionary of view_links as keys and edit likns as 
+        # values of google form
+        url_mapping = get_edit_url_and_view_url_mapping_of_form()
+        # Loop to check if a material in courssework has
+        #  a google form attached to it
         # update the  view link to edit link and attach it as a form
         for material in coursework["materials"]:
           if "form" in material.keys():
             material["link"]={
               "title":material["form"]["title"],
-              "url":edit_url_and_view_url_mapping[material["form"]["formUrl"]]
+              "url":url_mapping[material["form"]["formUrl"]]
             }
             # remove form from  material dict
             material.pop("form")
-            # material["form"]["formUrl"]=edit_url_and_view_url_mapping[material["form"]["formUrl"]]
+            # material["form"]["formUrl"]=
+            # url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
     if coursework_list is  not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)

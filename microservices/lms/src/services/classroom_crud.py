@@ -1,6 +1,5 @@
 """ Hepler functions for classroom crud API """
 from asyncio.log import logger
-
 from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -9,6 +8,9 @@ from common.utils.errors import InvalidTokenError
 from common.utils.logging_handler import Logger
 from config import CLASSROOM_ADMIN_EMAIL
 from utils import helper
+# Disabling pylint which conflict with drive and forms api code
+# pylint: disable=inconsistent-quotes
+
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
@@ -19,7 +21,6 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.topics",
     "https://www.googleapis.com/auth/classroom.coursework.students",
     "https://www.googleapis.com/auth/classroom.coursework.me",
-    # "https://www.googleapis.com/auth/drive.metadata.readonly"
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/forms.body.readonly"
 ]
@@ -315,7 +316,7 @@ def get_edit_url_and_view_url_mapping_of_form():
       result = get_view_link_from_id(file.get("id"))
       view_link_and_edit_link_matching[result["responderUri"]] = file.get("webViewLink")
     if page_token is None:
-            break
+      break
   return view_link_and_edit_link_matching
 
 def get_view_link_from_id (form_id):
