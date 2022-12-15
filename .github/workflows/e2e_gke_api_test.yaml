@@ -163,10 +163,6 @@ jobs:
       run: |
         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
-    - name: ping lms server before pf
-      run: |
-       curl http://localhost:8888/ping
-
     - name: Set up port forwarding
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
@@ -196,7 +192,9 @@ jobs:
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_setup.py
     - name: ping lms server
       run: |
+       curl http://lms/ping
        curl http://localhost:8888/ping
+       
 
     - name: Run pytest
       run: |
