@@ -300,7 +300,7 @@ def enroll_student(token, course_id, student_email, course_code):
       courseId=course_id, body=student, enrollmentCode=course_code).execute()
 
 def get_edit_url_and_view_url_mapping_of_form():
-  """  Query google drive api and get all the forms a user owns 
+  """  Query google drive api and get all the forms a user owns
       return a dictionary of view link as keys and edit link as values
   """
   service = build("drive", "v3", credentials=get_credentials())

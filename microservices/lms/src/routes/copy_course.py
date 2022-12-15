@@ -19,7 +19,6 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.update_section import UpdateSection
-
 # disabling for linting to pass
 # pylint: disable = broad-except
 
@@ -118,18 +117,18 @@ def create_section(sections_details: SectionDetails):
     coursework_list = classroom_crud.get_coursework(
       course_template_details.classroom_id)
     for coursework in coursework_list:
-      #Check if a coursework is linked to a topic if yes then 
+      #Check if a coursework is linked to a topic if yes then
       # replace the old topic id to new topic id using topic_id_map
       if "topicId" in coursework.keys():
         coursework["topicId"]=topic_id_map[coursework["topicId"]]
-      #Check if a material is present in coursework 
+      #Check if a material is present in coursework
       if "materials" in coursework.keys():
-        # Calling function to get edit_url and view url of 
-        # google form which returns 
+        # Calling function to get edit_url and view url of
+        # google form which returns
         # a dictionary of view_links as keys and edit
         #  likns as values of google form
         url_mapping=get_edit_url_and_view_url_mapping_of_form()
-        # Loop to check if a material in courssework has a google 
+        # Loop to check if a material in courssework has a google
         # form attached to it
         # update the  view link to edit link and attach it as a form
         for material in coursework["materials"]:
@@ -162,7 +161,6 @@ def create_section(sections_details: SectionDetails):
     section.created_timestamp = datetime.datetime.now()
     section.uuid = section.save().id
     section.save()
-    
 
     SUCCESS_RESPONSE["new_course"] = new_course
     return SUCCESS_RESPONSE
@@ -379,7 +377,7 @@ def copy_courses(course_details: CourseDetails):
     # Get course by course id
     current_course = classroom_crud.get_course_by_id(course_id)
     if current_course is None:
-      return "No course found "    
+      return "No course found "
     # Create a new course
     new_course = classroom_crud.create_course(current_course["name"],
                                               current_course["description"],
@@ -397,14 +395,14 @@ def copy_courses(course_details: CourseDetails):
     for coursework in coursework_list:
       #Check if a coursework is linked to
       #  a topic if yes then 
-      # replace the old topic id to new 
+      # replace the old topic id to new
       # topic id using topic_id_map
       if "topicId" in coursework.keys():
         coursework["topicId"]=topic_id_map[coursework["topicId"]]
       #Check if a material is present in coursework 
       if "materials" in coursework.keys():
         # Calling function to get edit_url and view url of google
-        #  form which returns 
+        #  form which returns
         # a dictionary of view_links as keys and edit likns as 
         # values of google form
         url_mapping = get_edit_url_and_view_url_mapping_of_form()
