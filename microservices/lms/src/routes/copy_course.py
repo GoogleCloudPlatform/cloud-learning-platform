@@ -312,7 +312,6 @@ def update_section(sections_details: UpdateSection):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-
 @router.post("/{sections_id}/students", response_model=AddStudentResponseModel)
 def enroll_student_section(sections_id: str,
                            input_data: AddStudentToSectionModel):
@@ -394,16 +393,16 @@ def copy_courses(course_details: CourseDetails):
     coursework_list = classroom_crud.get_coursework(course_id)
     for coursework in coursework_list:
       #Check if a coursework is linked to
-      #  a topic if yes then 
+      #  a topic if yes then
       # replace the old topic id to new
       # topic id using topic_id_map
       if "topicId" in coursework.keys():
         coursework["topicId"]=topic_id_map[coursework["topicId"]]
-      #Check if a material is present in coursework 
+      #Check if a material is present in coursework
       if "materials" in coursework.keys():
         # Calling function to get edit_url and view url of google
         #  form which returns
-        # a dictionary of view_links as keys and edit likns as 
+        # a dictionary of view_links as keys and edit likns as
         # values of google form
         url_mapping = get_edit_url_and_view_url_mapping_of_form()
         # Loop to check if a material in courssework has
