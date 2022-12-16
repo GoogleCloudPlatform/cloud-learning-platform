@@ -38,6 +38,7 @@ env:
   CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+  USE_GKE_GCLOUD_AUTH_PLUGIN: True
 # cookiecutter:raw 
 jobs:
   deploy_backends:
@@ -71,6 +72,10 @@ jobs:
         run: |
           curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v$SKAFFOLD_VERSION/skaffold-linux-amd64
           sudo install skaffold /usr/local/bin/skaffold
+
+      - name: Install GKE Auth Plugin
+        run: |
+         gcloud components install gke-gcloud-auth-plugin
 
       - name: Set default repo for Skaffold
         run: |
