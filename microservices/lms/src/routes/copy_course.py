@@ -211,6 +211,7 @@ def list_section(cohort_id: str):
     raise InternalServerError(str(e)) from e
 
 
+
 @router.get("/{section_id}")
 def get_section(section_id: str):
   """Get a section details from db
