@@ -58,6 +58,10 @@ jobs:
       - name: Connect to cluster
         run: |
           gcloud container clusters get-credentials "$GKE_CLUSTER" --region $GKE_REGION --project $PROJECT_ID
+      
+      - name: Install GKE Auth Plugin
+        run: |
+         gcloud components install gke-gcloud-auth-plugin
 
       - name: Set up Service Account
         run: |
@@ -72,10 +76,6 @@ jobs:
         run: |
           curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v$SKAFFOLD_VERSION/skaffold-linux-amd64
           sudo install skaffold /usr/local/bin/skaffold
-
-      - name: Install GKE Auth Plugin
-        run: |
-         gcloud components install gke-gcloud-auth-plugin
 
       - name: Set default repo for Skaffold
         run: |
