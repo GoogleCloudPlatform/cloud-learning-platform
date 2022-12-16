@@ -39,6 +39,7 @@ env:
   CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+  USE_GKE_GCLOUD_AUTH_PLUGIN: True
 # cookiecutter:raw 
 jobs:
   deploy:
@@ -76,6 +77,10 @@ jobs:
     - name: Download Skaffold cache if exists
       run: |
         gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
+
+    - name: Install GKE Auth Plugin
+      run: | 
+        gcloud components install gke-gcloud-auth-plugin
 
     - name: Set up Kubernetes namespace and Service Account
       run: |
@@ -157,6 +162,10 @@ jobs:
     - name: Connect to cluster
       run: |
         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+
+    - name: Install GKE Auth Plugin
+      run: |
+         gcloud components install gke-gcloud-auth-plugin
 
     - name: Set up port forwarding
       run: |
@@ -267,6 +276,10 @@ jobs:
       run: |
         curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v$SKAFFOLD_VERSION/skaffold-linux-amd64
         sudo install skaffold /usr/local/bin/skaffold
+
+    - name: Install GKE Auth Plugin
+      run: |
+         gcloud components install gke-gcloud-auth-plugin
 
     - name: Set default repo for Skaffold
       run: |
