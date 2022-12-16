@@ -277,6 +277,10 @@ jobs:
         curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v$SKAFFOLD_VERSION/skaffold-linux-amd64
         sudo install skaffold /usr/local/bin/skaffold
 
+    - name: Install GKE Auth Plugin
+      run: |
+         gcloud components install gke-gcloud-auth-plugin
+
     - name: Set default repo for Skaffold
       run: |
         skaffold config set default-repo "$SKAFFOLD_DEFAULT_REPO"
