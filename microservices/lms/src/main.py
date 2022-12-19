@@ -80,7 +80,7 @@ api.include_router(user.router)
 api.include_router(copy_course.router)
 api.include_router(student.router)
 
-# TODO: add these back in
+
 api.include_router(course_template.router)
 api.include_router(cohort.router)
 
