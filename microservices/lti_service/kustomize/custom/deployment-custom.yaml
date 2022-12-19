@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lti-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: lti-service
+        image: lti-service
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ISSUER
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: ISSUER
+        - name: LTI_SERVICE_PUBLIC_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: LTI_SERVICE_PUBLIC_KEY
+        - name: LTI_SERVICE_PRIVATE_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: LTI_SERVICE_PRIVATE_KEY
+        resources:
+          requests:
+            memory: "500Mi"

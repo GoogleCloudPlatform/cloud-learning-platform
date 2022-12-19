@@ -1,0 +1,12 @@
+fastapi==0.85.0
+uvicorn==0.18.3
+firebase-admin==4.5.2
+redis==3.4.1
+google-cloud-logging==3.1.2
+protobuf==3.19.4
+fireo==1.4.1
+python-jose[cryptography]
+python-multipart
+pycryptodome
+jinja2==3.1.2
+google-cloud-secret-manager==2.11.1

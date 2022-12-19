@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lti-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lti-service
+  template:
+    metadata:
+      labels:
+        app: lti-service
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: lti-service
+        image: lti-service
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1000Mi"
+          limits:
+            memory: "5000Mi"
+            cpu: "2000m"
+        env:
+        # Define the environment variable
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: API_BASE_URL
+          # Required format: api/version
+          value: api/v1
+        - name: CONTAINER_NAME
+          value: lti-service
+        - name: DEPLOYMENT_NAME
+          value: lti-service
+        - name: SERVICE_NAME
+          value: lti-service
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT
+        - name: ISSUER
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: ISSUER
+        - name: LTI_SERVICE_PUBLIC_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: LTI_SERVICE_PUBLIC_KEY
+        - name: LTI_SERVICE_PRIVATE_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: LTI_SERVICE_PRIVATE_KEY
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60
