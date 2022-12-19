@@ -7,7 +7,7 @@ import requests
 from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE
 from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e
 
-USER_EMAIL, USER_PASSWORD = get_user_email_and_password_for_e2e()
+USER_EMAIL_PASSWORD_DICT = get_user_email_and_password_for_e2e()
 
 # Redis Configuration for testing
 red_con = redis.StrictRedis(host="localhost", port=6379, db=0)
@@ -47,7 +47,6 @@ def user_login() -> None:
   Function to do firebase login
   """
 
-  req_body = {"email": USER_EMAIL, "password": USER_PASSWORD}
   #   req = requests.post(
   #       f"{API_URL_AUTHENTICATION_SERVICE}/sign-up/credentials",
   # json=req_body)
@@ -57,12 +56,12 @@ def user_login() -> None:
   #         f"{API_URL_AUTHENTICATION_SERVICE}/sign-in/credentials",
   # json=req_body)
   req = requests.post(f"{API_URL_AUTHENTICATION_SERVICE}/sign-in/credentials",
-                      json=req_body,
+                      json=USER_EMAIL_PASSWORD_DICT,
                       timeout=60)
   res = req.json()
   if res is None or res["data"] is None:
     raise Exception("User sign-in failed")
-  print(f"User with {USER_EMAIL} was logged in with "
+  print(f"User with {USER_EMAIL_PASSWORD_DICT['email']} was logged in with "
         f"token {req.json()['data']['idToken']}")
   set_cache(key="id_token", value=req.json()["data"]["idToken"])
 

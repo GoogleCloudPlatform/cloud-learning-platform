@@ -39,6 +39,7 @@ env:
   CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+  USE_GKE_GCLOUD_AUTH_PLUGIN: True
 # cookiecutter:raw 
 jobs:
   deploy:
@@ -76,6 +77,10 @@ jobs:
     - name: Download Skaffold cache if exists
       run: |
         gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
+
+    - name: Install GKE Auth Plugin
+      run: | 
+        gcloud components install gke-gcloud-auth-plugin
 
     - name: Set up Kubernetes namespace and Service Account
       run: |
@@ -158,6 +163,10 @@ jobs:
       run: |
         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
+    - name: Install GKE Auth Plugin
+      run: |
+         gcloud components install gke-gcloud-auth-plugin
+
     - name: Set up port forwarding
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
@@ -175,6 +184,16 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python classroom_cleanup.py
+    - name: Setup redis
+      uses: supercharge/redis-github-action@1.2.0
+      with:
+        redis-version: 6
+
+    - name: Install redis cli
+      run: sudo apt-get install -y redis-tools
+
+    - name: Verify that redis is up
+      run: redis-cli ping
 
     - name: Wait for 5s for database cleaning up
       run: sleep 5s
@@ -267,6 +286,10 @@ jobs:
       run: |
         curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v$SKAFFOLD_VERSION/skaffold-linux-amd64
         sudo install skaffold /usr/local/bin/skaffold
+
+    - name: Install GKE Auth Plugin
+      run: |
+         gcloud components install gke-gcloud-auth-plugin
 
     - name: Set default repo for Skaffold
       run: |
