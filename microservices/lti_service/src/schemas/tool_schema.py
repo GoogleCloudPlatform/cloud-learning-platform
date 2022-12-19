@@ -33,8 +33,8 @@ class FullToolModel(BasicToolModel):
   platform_token_url: str = f"{ISSUER}/lti-service/api/v1/token"
   platform_keyset_url: str = f"{ISSUER}/lti-service/api/v1/jwks"
   is_archived: Optional[bool] = False
-  created_time: str
-  last_modified_time: str
+  created_timestamp: str
+  last_updated_timestamp: str
 
 
 class ToolModel(BasicToolModel):

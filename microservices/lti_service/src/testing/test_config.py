@@ -6,8 +6,8 @@ API_URL = "http://localhost/lti-service/api/v1"
 DEL_KEYS = [
     "is_archived",
     "uuid",
-    "created_time",
-    "last_modified_time",
+    "created_timestamp",
+    "last_updated_timestamp",
 ]
 
 

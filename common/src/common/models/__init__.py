@@ -21,3 +21,4 @@ from .user import *
 from .course_template import *
 from .cohort import *
 from .section import *
+from .lti import *

@@ -24,8 +24,8 @@ FULL_TOOL_EXAMPLE = {
     "platform_token_url": f"{ISSUER}/lti-service/api/v1/token",
     "platform_keyset_url": f"{ISSUER}/lti-service/api/v1/jwks",
     "is_archived": False,
-    "created_time": "2022-03-03 09:22:49.843674+00:00",
-    "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
+    "created_timestamp": "2022-03-03 09:22:49.843674+00:00",
+    "last_updated_timestamp": "2022-03-03 09:22:49.843674+00:00"
 }
 
 BASIC_PLATFORM_EXAMPLE = {
@@ -64,6 +64,6 @@ BASIC_CONTENT_ITEM_EXAMPLE = {
 FULL_CONTENT_ITEM_EXAMPLE = {
     "uuid": "aC72Vos31iFQt09c",
     **BASIC_CONTENT_ITEM_EXAMPLE, "is_archived": False,
-    "created_time": "2022-03-03 09:22:49.843674+00:00",
-    "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
+    "created_timestamp": "2022-03-03 09:22:49.843674+00:00",
+    "last_updated_timestamp": "2022-03-03 09:22:49.843674+00:00"
 }

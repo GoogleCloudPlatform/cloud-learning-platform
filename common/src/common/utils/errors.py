@@ -24,3 +24,11 @@ class ValidationError(Exception):
     self.message = message
     self.data = data
     super().__init__(self.message)
+
+
+class ConflictError(Exception):
+  """Error class to be raised when there is a conflict"""
+
+  def __init__(self, message="Conflict"):
+    self.message = message
+    super().__init__(self.message)
