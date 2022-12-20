@@ -10,7 +10,7 @@ from testing_objects.session_fixture import get_session
 
 
 course_template_uuid=None
-@pytest.fixture(scope="session",autouse=True)
+@pytest.fixture(scope="module",autouse=True)
 def create_course_template(get_session):
   "create a course template for reference"
   url =  f"{API_URL}/course_templates"
