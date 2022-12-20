@@ -252,7 +252,7 @@ def get_section(section_id: str):
 
 @router.delete("/{section_id}", response_model=DeleteSectionResponseModel)
 def delete_section(section_id: str):
-  """Get a section details from db and delete record from section collection and
+  """Get a section details from db and archive record from section collection and
   google classroom course
 
   Args:
@@ -265,18 +265,26 @@ def delete_section(section_id: str):
   """
   try:
     section_details = Section.find_by_uuid(section_id)
-    classroom_crud.delete_course_by_id(section_details.classroom_id)
-    section_details = Section.archive_by_uuid(section_id)
     if section_details:
+      classroom_crud.update_course_state(section_details.classroom_id,"ARCHIVED")
+      section_details = Section.archive_by_uuid(section_id)
       return {
-        "message": f"Successfully deleted the Section with uuid {section_id}"
+        "message": f"Successfully archived the Section with uuid {section_id}"
       }
+
     else:
       raise ResourceNotFoundException(
           f"Section with uuid {section_id} is not found")
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
+  except HttpError as ae:
+    print("In Except")
+    print(ae)
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
