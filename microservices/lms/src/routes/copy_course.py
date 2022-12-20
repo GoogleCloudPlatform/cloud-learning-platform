@@ -10,13 +10,17 @@ from common.utils.errors import ResourceNotFoundException, InvalidTokenError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, InvalidToken, CustomHTTPException
 from googleapiclient.errors import HttpError
 from schemas.course_details import CourseDetails
-from schemas.section import SectionDetails, AddStudentToSectionModel, AddStudentResponseModel,DeleteSectionResponseModel
+from schemas.section import (SectionDetails, AddStudentToSectionModel,
+ AddStudentResponseModel,DeleteSectionResponseModel,SectionListResponseModel,
+ CreateSectiontResponseModel,GetSectiontResponseModel,UpdateResponseModel)
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.update_section import UpdateSection
 from services import classroom_crud
+from utils.helper import convert_section_to_section_model
+
 # disabling for linting to pass
 # pylint: disable = broad-except
 
@@ -41,7 +45,7 @@ SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
 
 
-@router.get("/get_courses/")
+@router.get("/get_courses/",response_model= SectionListResponseModel)
 def get_courses():
   """Get courses list
   Raises:
@@ -53,11 +57,11 @@ def get_courses():
   """
   try:
     course_list = classroom_crud.get_course_list()
-    SUCCESS_RESPONSE["result"] = list(course_list)
-    return SUCCESS_RESPONSE
+    return {"data" :  list(course_list)}
   except Exception as e:
     Logger.error(e)
-    traceback.format_exc().replace("\n", " ")
+    error= traceback.format_exc().replace("\n", " ")
+    print(error)
     raise InternalServerError(str(e)) from e
 
 
@@ -103,7 +107,7 @@ def copy_courses(course_details: CourseDetails):
     raise InternalServerError(str(e)) from e
 
 
-@router.post("")
+@router.post("",response_model= CreateSectiontResponseModel)
 def create_section(sections_details: SectionDetails):
   """Create section API
   Args:
@@ -171,8 +175,8 @@ def create_section(sections_details: SectionDetails):
     section.created_timestamp = datetime.datetime.now()
     section.uuid = section.save().id
     section.save()
-    SUCCESS_RESPONSE["new_course"] = new_course
-    return SUCCESS_RESPONSE
+    new_section =  convert_section_to_section_model(section)
+    return {"data" :new_section }
   except ResourceNotFound as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -181,7 +185,7 @@ def create_section(sections_details: SectionDetails):
     raise InternalServerError(str(e)) from e
 
 
-@router.get("/cohort/{cohort_id}/sections")
+@router.get("/cohort/{cohort_id}/sections",response_model=SectionListResponseModel)
 def list_section(cohort_id: str):
   """ Get a list of sections of one cohort from db
 
@@ -206,9 +210,9 @@ def list_section(cohort_id: str):
     # of section of a perticular cohort
     result = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections_list = list(map(lambda x: x.to_dict(), result))
-
-    SUCCESS_RESPONSE["data"] = sections_list
-    return SUCCESS_RESPONSE
+    return {"data" :  sections_list}
+    # SUCCESS_RESPONSE["data"] = sections_list
+    # return SUCCESS_RESPONSE
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -218,7 +222,7 @@ def list_section(cohort_id: str):
     raise InternalServerError(str(e)) from e
 
 
-@router.get("/{section_id}")
+@router.get("/{section_id}",response_model=GetSectiontResponseModel)
 def get_section(section_id: str):
   """Get a section details from db
 
@@ -238,8 +242,8 @@ def get_section(section_id: str):
       raise ResourceNotFoundException(
           f"Section with uuid {section_id} is not found")
     # Get course by course id
-    SUCCESS_RESPONSE["section_details"] = section_details
-    return SUCCESS_RESPONSE
+    new_section =  convert_section_to_section_model(section_details)
+    return {"data" :new_section}
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -279,7 +283,7 @@ def delete_section(section_id: str):
     raise InternalServerError(str(e)) from e
 
 
-@router.get("")
+@router.get("",response_model=SectionListResponseModel)
 def section_list():
   """Get a all section details from db
 
@@ -295,8 +299,10 @@ def section_list():
   try:
     sections = Section.collection.filter("is_deleted", "==", False).fetch()
     result = list(map(lambda x: x.to_dict(), sections))
-    SUCCESS_RESPONSE["sections"] = result
-    return SUCCESS_RESPONSE
+    return {"data" :  list(result)}
+
+    # SUCCESS_RESPONSE["sections"] = result
+    # return SUCCESS_RESPONSE
 
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")

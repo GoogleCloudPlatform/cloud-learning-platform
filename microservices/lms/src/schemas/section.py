@@ -3,8 +3,26 @@ Pydantic Model for copy course API's
 """
 from typing import Optional
 from pydantic import BaseModel
-from schemas.schema_examples import CREDENTIAL_JSON
+from schemas.schema_examples import CREDENTIAL_JSON,SECTION_EXAMPLE
 
+
+class Sections(BaseModel):
+  """Sections Details """
+  uuid : Optional[str]
+  name:  Optional[str]
+  section: Optional[str]
+  description: Optional[str]
+  classroom_id:Optional[str]
+  classroom_code: Optional[str]
+  teachers_list: Optional[list]
+  is_deleted: Optional[bool]
+  created_timestamp: Optional[str]
+  last_updated_timestamp:Optional[str]
+  deleted_at_timestamp: Optional[bool]
+  id: Optional[str]
+  key: Optional[str]
+  course_template: Optional[str]
+  cohort: Optional[str]
 
 class SectionDetails(BaseModel):
   """Course Detail model"""
@@ -16,22 +34,86 @@ class SectionDetails(BaseModel):
   teachers_list: list
 
 
-class SectionResponseModel(BaseModel):
-  """Delete Course Template Model"""
+class SectionListResponseModel(BaseModel):
+  """Get a list of sections"""
   success: Optional[bool] = True
-  message: Optional[str] = "Successfully deleted the course template"
-  data: Optional[str] = None
+  message: Optional[str] = "Success list"
+  data: Optional[list] = []
 
   class Config():
     orm_mode = True
     schema_extra = {
         "example": {
             "success": True,
-            "message": "Successfully deleted the course template",
-            "data": None
+            "message": "Successfully send the list of  course ",
+            "data": [SECTION_EXAMPLE]
         }
     }
 
+class CreateSectiontResponseModel(BaseModel):
+  """Create Section Response Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully created the cohort"
+  data: Optional[SectionDetails]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully created the cohort",
+           "section":SECTION_EXAMPLE
+        }
+    }
+
+class GetSectiontResponseModel(BaseModel):
+  """Get  Section Response Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success"
+  data: Optional[dict] = {}
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+           "data":SECTION_EXAMPLE
+        }
+    }
+
+
+class UpdateResponseModel(BaseModel):
+  """Update  Section Response Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success"
+  data: Optional[dict] = {}
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Section Updated successfully",
+           "data":SECTION_EXAMPLE
+        }
+    }
+
+class SectionResponseModel(BaseModel):
+  """Get a list of sections"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success list"
+  data: Optional[list] = None
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully send the list of  course ",
+            "data": []
+        }
+    }
 
 class CredentialKeys(BaseModel):
   """Credential model"""
