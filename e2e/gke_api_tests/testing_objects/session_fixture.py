@@ -23,7 +23,7 @@ def user_login():
 @pytest.fixture(scope="module")
 def get_session():
   token = user_login()
-  session=httpx.Client(headers={"Authorization": f"Bearer {token}"})
+  session=httpx.Client(headers={"Authorization": f"Bearer {token}"},timeout=None)
   # session = requests.Session()
   # session.headers.update({"Authorization": f"Bearer {token}"})
   yield session

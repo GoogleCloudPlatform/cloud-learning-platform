@@ -97,7 +97,7 @@ def get_session(context):
         f"token {token}")
 #   session = requests.Session()
 #   session.headers.update({"Authorization": f"Bearer {token}"})
-  session=httpx.Client(headers={"Authorization": f"Bearer {token}"})
+  session=httpx.Client(headers={"Authorization": f"Bearer {token}"},timeout=None)
   context.session = session
   yield context.session
 
