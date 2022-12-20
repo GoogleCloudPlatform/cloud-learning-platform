@@ -252,7 +252,7 @@ def get_section(section_id: str):
 
 @router.delete("/{section_id}", response_model=DeleteSectionResponseModel)
 def delete_section(section_id: str):
-  """Get a section details from db and archive record 
+  """Get a section details from db and archive record
   from section collection and
   google classroom course
 
