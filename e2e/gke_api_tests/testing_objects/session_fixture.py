@@ -1,3 +1,4 @@
+import httpx
 import pytest
 import requests
 from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE
@@ -22,6 +23,7 @@ def user_login():
 @pytest.fixture(scope="module")
 def get_session():
   token = user_login()
-  session = requests.Session()
-  session.headers.update({"Authorization": f"Bearer {token}"})
+  session=httpx.Client(headers={"Authorization": f"Bearer {token}"})
+  # session = requests.Session()
+  # session.headers.update({"Authorization": f"Bearer {token}"})
   yield session

@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import httpx
 from behave import fixture, use_fixture
 from common.models import CourseTemplate, Cohort,Section
 from common.testing.example_objects import TEST_SECTION,TEST_COHORT
@@ -94,8 +95,9 @@ def get_session(context):
   token = req.json()['data']['idToken']
   print(f"User with {user_email_password_dict['email']} was logged in with "
         f"token {token}")
-  session = requests.Session()
-  session.headers.update({"Authorization": f"Bearer {token}"})
+#   session = requests.Session()
+#   session.headers.update({"Authorization": f"Bearer {token}"})
+  session=httpx.Client(headers={"Authorization": f"Bearer {token}"})
   context.session = session
   yield context.session
 
