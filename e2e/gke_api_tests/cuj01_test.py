@@ -4,7 +4,7 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from common.utils.errors import ResourceNotFoundException
 from testing_objects.test_config import API_URL
-from testing_objects.session_fixture import get_session
+from testing_objects.session_fixture import get_session,user_login
 # from microservices.lms.src import routes
 
 

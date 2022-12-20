@@ -1,5 +1,5 @@
 from testing_objects.test_config import API_URL
-from testing_objects.session_fixture import get_session
+from testing_objects.session_fixture import get_session,user_login
 
 
 def test_get_progress_percentage(get_session):

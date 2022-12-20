@@ -8,7 +8,7 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from common.testing.example_objects import create_fake_data, TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2
 from testing_objects.test_config import API_URL
-from testing_objects.session_fixture import get_session
+from testing_objects.session_fixture import get_session,user_login
 
 DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 EMAILS = get_required_emails_from_secret_manager()
