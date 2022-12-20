@@ -41,6 +41,7 @@ def convert_cohort_to_cohort_model(cohort):
   loaded_cohort["course_template"] = course_template["key"]
   return loaded_cohort
 
+
 def convert_section_to_section_model(section):
   """Convert Section Object to Section Model Object
 
@@ -55,4 +56,3 @@ def convert_section_to_section_model(section):
   cohort = loaded_section.pop("cohort").to_dict()
   loaded_section["cohort"] = cohort["key"]
   return loaded_section
-  
