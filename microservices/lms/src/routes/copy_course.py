@@ -429,3 +429,5 @@ def copy_courses(course_details: CourseDetails):
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
+    
+

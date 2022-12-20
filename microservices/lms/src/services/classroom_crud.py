@@ -8,8 +8,6 @@ from common.utils.errors import InvalidTokenError
 from common.utils.logging_handler import Logger
 from config import CLASSROOM_ADMIN_EMAIL
 from utils import helper
-# Disabling pylint which conflict with drive and forms api code
-# pylint: disable=inconsistent-quotes
 
 
 SUCCESS_RESPONSE = {"status": "Success"}
@@ -308,7 +306,7 @@ def get_edit_url_and_view_url_mapping_of_form():
   page_token = None
   while True:
     response = service.files().list(
-              q="mimeType='application/vnd.google-apps.form'",
+              q="mimeType=\"application/vnd.google-apps.form\"",
                                       spaces="drive",
                                       fields="nextPageToken, "
                           "files(id, name,webViewLink,thumbnailLink)",
