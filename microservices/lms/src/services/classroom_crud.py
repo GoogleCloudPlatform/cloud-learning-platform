@@ -98,23 +98,19 @@ def update_course(course_id,
 
 def update_course_state(course_id,
                   course_state):
-                  
   """Update course state
-  Possible states a course can be ACTIVE,ARCHIVED	
+  Possible states a course can be ACTIVE,ARCHIVED
   PROVISIONED,DECLINED,SUSPENDED
   Args: course_id ,course_state
   Returns:
     new created course details
     """
   service = build("classroom", "v1", credentials=get_credentials())
-  new_course = {}
   course = service.courses().get(id=course_id).execute()
   course["course_state"] = course_state
   course = service.courses().update(id=course_id, body=course).execute()
   course_id = course.get("id")
   return course
-
-
 
 def get_course_list():
   """Get courses list from classroom

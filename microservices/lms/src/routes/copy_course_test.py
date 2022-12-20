@@ -346,7 +346,7 @@ def test_delete_section(client_with_emulator):
       "course_state": "ACTIVE"
   }
   url = BASE_URL + "/sections/fake-section-id"
-  with mock.patch("routes.copy_course.classroom_crud.delete_course_by_id",
+  with mock.patch("routes.copy_course.classroom_crud.update_course_state",
   return_value=[]):
     resp = client_with_emulator.delete(url, json=data)
   print(resp.json())
