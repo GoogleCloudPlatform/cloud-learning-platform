@@ -45,7 +45,7 @@ class SectionListResponseModel(BaseModel):
     schema_extra = {
         "example": {
             "success": True,
-            "message": "Successfully send the list of  course ",
+            "message": "Success",
             "data": [SECTION_EXAMPLE]
         }
     }
@@ -53,7 +53,7 @@ class SectionListResponseModel(BaseModel):
 class CreateSectiontResponseModel(BaseModel):
   """Create Section Response Model"""
   success: Optional[bool] = True
-  message: Optional[str] = "Successfully created the cohort"
+  message: Optional[str] = "Successfully created the section"
   data: Optional[SectionDetails]
 
   class Config():
@@ -61,7 +61,7 @@ class CreateSectiontResponseModel(BaseModel):
     schema_extra = {
         "example": {
             "success": True,
-            "message": "Successfully created the cohort",
+            "message": "Successfully created the section",
            "section":SECTION_EXAMPLE
         }
     }
@@ -83,7 +83,7 @@ class GetSectiontResponseModel(BaseModel):
     }
 
 
-class UpdateResponseModel(BaseModel):
+class UpdateSectionResponseModel(BaseModel):
   """Update  Section Response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Success"
