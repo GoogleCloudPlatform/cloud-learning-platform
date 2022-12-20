@@ -12,7 +12,8 @@ from googleapiclient.errors import HttpError
 from schemas.course_details import CourseDetails
 from schemas.section import (SectionDetails, AddStudentToSectionModel,
  AddStudentResponseModel,DeleteSectionResponseModel,SectionListResponseModel,
- CreateSectiontResponseModel,GetSectiontResponseModel,UpdateSectionResponseModel)
+ CreateSectiontResponseModel,GetSectiontResponseModel,
+ UpdateSectionResponseModel)
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
@@ -60,8 +61,8 @@ def get_courses():
     return {"data" :  list(course_list)}
   except Exception as e:
     Logger.error(e)
-    traceback.format_exc().replace("\n", " ")
-    Logger(error)
+    error=traceback.format_exc().replace("\n", " ")
+    Logger.error(error)
     raise InternalServerError(str(e)) from e
 
 
@@ -184,8 +185,8 @@ def create_section(sections_details: SectionDetails):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-
-@router.get("/cohort/{cohort_id}/sections",response_model=SectionListResponseModel)
+@router.get("/cohort/{cohort_id}/sections",
+response_model=SectionListResponseModel)
 def list_section(cohort_id: str):
   """ Get a list of sections of one cohort from db
 
@@ -340,8 +341,6 @@ def update_section(sections_details: UpdateSection):
     section.description = sections_details.description
     section.last_updated_timestamp = datetime.datetime.utcnow()
     section.save()
-    # SUCCESS_RESPONSE["data"] = new_course
-    # return SUCCESS_RESPONSE
     updated_section =  convert_section_to_section_model(section)
     return {"data" :updated_section}
   except ResourceNotFound as err:
