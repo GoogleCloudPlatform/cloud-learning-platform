@@ -1,3 +1,4 @@
+@fixture.get.session
 Feature: Create, Read, Retive all and delete APIs for Course Template
 
   Scenario: Create Course Template with correct request payload

@@ -8,8 +8,7 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from common.testing.example_objects import create_fake_data, TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2
 from testing_objects.test_config import API_URL
-from testing_objects.login_fixture import user_login_fixture
-from setup import get_method, post_method, patch_method
+from testing_objects.session_fixture import get_session
 
 DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 EMAILS = get_required_emails_from_secret_manager()
@@ -46,7 +45,7 @@ def create_course(name, description, section, owner_id):
   return course
 
 
-def test_create_section():
+def test_create_section(get_session):
   """
   create a Course template and cohort is created  by  user  
   then user clicks on create section button and makes a section 
@@ -70,12 +69,12 @@ def test_create_section():
       "cohort": "fake_cohort_id",
       "teachers_list": [TEACHER_EMAIL]
   }
-  resp = post_method(url=url, request_body=data)
+  resp = get_session.post(url=url, json=data)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
 
 
-def test_create_section_course_template_not_found():
+def test_create_section_course_template_not_found(get_session):
   """ 
   create a Course template and cohort is created  by  user  
   then user clicks on create section button and makes a section 
@@ -100,12 +99,12 @@ def test_create_section_course_template_not_found():
       "teachers_list": [TEACHER_EMAIL]
   }
 
-  resp = post_method(url=url, request_body=data)
+  resp = get_session.post(url=url, json=data)
   resp_json = resp.json()
   assert resp.status_code == 404
 
 
-def test_get_list_sections():
+def test_get_list_sections(get_session):
   """ 
   Get a sections list for a perticular cohort by giving cohort_id as query paramter 
   """
@@ -115,12 +114,12 @@ def test_get_list_sections():
   create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
                    classroom_id)
   url = f"{API_URL}/sections/cohort/fake_cohort_id/sections"
-  resp = get_method(url=url)
+  resp = get_session.get(url=url)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
 
 
-def test_get_section():
+def test_get_section(get_session):
   """
     Get a sections details for a  section by giving section_id as query paramter 
   """
@@ -130,12 +129,12 @@ def test_get_section():
   create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
                    classroom_id)
   url = f"{API_URL}/sections/fake_section_id"
-  resp = get_method(url=url)
+  resp = get_session.get(url=url)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
 
 
-def test_list_sections():
+def test_list_sections(get_session):
   """
     List all the sections
   """
@@ -145,12 +144,12 @@ def test_list_sections():
   create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
                    classroom_id)
   url = f"{API_URL}/sections"
-  resp = get_method(url=url)
+  resp = get_session.get(url=url)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
 
 
-def test_update_section():
+def test_update_section(get_session):
   """ 
   User click on edit button for a section 
   User Updates the section name ,description,course_state by providing expected 
@@ -172,12 +171,12 @@ def test_update_section():
       "description": "test_description_updated",
       "course_state": "ACTIVE"
   }
-  resp = patch_method(url=url, request_body=data)
+  resp = get_session.patch(url=url, json=data)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
 
 
-def test_update_section_course_not_found_in_classroom():
+def test_update_section_course_not_found_in_classroom(get_session):
   """ 
   User click on edit button for a section 
   User Updates the section name ,description,course_state by providing expected 
@@ -199,5 +198,5 @@ def test_update_section_course_not_found_in_classroom():
       "description": "test_description_updated",
       "course_state": "ACTIVE"
   }
-  resp = patch_method(url=url, request_body=data)
+  resp = get_session.patch(url=url, json=data)
   assert resp.status_code == 500

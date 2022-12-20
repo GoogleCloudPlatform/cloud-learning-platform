@@ -4,17 +4,16 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from common.utils.errors import ResourceNotFoundException
 from testing_objects.test_config import API_URL
-from testing_objects.login_fixture import user_login_fixture
-from setup import get_method, post_method
+from testing_objects.session_fixture import get_session
 # from microservices.lms.src import routes
 
 
-def test_get_course_list():
-  res = get_method(f"{API_URL}/sections/get_courses/")
+def test_get_course_list(get_session):
+  res = get_session.get(f"{API_URL}/sections/get_courses/")
   assert res.status_code == 200
 
 
-def test_copy_course():
+def test_copy_course(get_session):
   DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
   # Creating a course  with DATABASE_PREFIX NAME
   SCOPES = [
@@ -38,6 +37,6 @@ def test_copy_course():
   course_id = course.get("id")
   # Get the course_id of course and hit the copy API to copy the given course
   course_details = {"course_id": course_id}
-  res = post_method(url=API_URL + "/sections/copy_course/",
-                    request_body=course_details)
+  res = get_session.post(url=API_URL + "/sections/copy_course/",
+                    json=course_details)
   assert res.status_code == 200
