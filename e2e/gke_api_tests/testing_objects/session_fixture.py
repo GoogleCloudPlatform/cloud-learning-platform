@@ -4,7 +4,7 @@ import requests
 from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE
 from secrets_helper import get_user_email_and_password_for_e2e
 
-
+@pytest.fixture(scope="module")
 def user_login():
   """
   Function to do firebase login
@@ -18,12 +18,11 @@ def user_login():
     raise Exception("User sign-in failed")
   print(f"User with {user_email_password['email']} was logged in with "
         f"token {req.json()['data']['idToken']}")
-  return req.json()['data']['idToken']
+  yield req.json()['data']['idToken']
 
-@pytest.fixture(scope="module")
-def get_session():
-  token = user_login()
-  session=httpx.Client(headers={"Authorization": f"Bearer {token}"},timeout=None)
+@pytest.fixture
+def get_session(user_login):
+  session=httpx.Client(headers={"Authorization": f"Bearer {user_login}"})
   # session = requests.Session()
   # session.headers.update({"Authorization": f"Bearer {token}"})
   yield session
