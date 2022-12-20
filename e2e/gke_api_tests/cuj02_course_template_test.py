@@ -5,7 +5,7 @@ from common.testing.example_objects import TEST_COURSE_TEMPLATE
 from common.utils.errors import ResourceNotFoundException
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.test_config import API_URL
-from testing_objects.session_fixture import get_session,user_login
+from testing_objects.session_fixture import get_session
 
 
 @pytest.fixture

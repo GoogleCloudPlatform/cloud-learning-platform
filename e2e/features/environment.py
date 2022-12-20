@@ -95,9 +95,9 @@ def get_session(context):
   token = req.json()['data']['idToken']
   print(f"User with {user_email_password_dict['email']} was logged in with "
         f"token {token}")
-#   session = requests.Session()
-#   session.headers.update({"Authorization": f"Bearer {token}"})
-  session=httpx.Client(headers={"Authorization": f"Bearer {token}"},timeout=None)
+  session = requests.Session()
+  session.headers.update({"Authorization": f"Bearer {token}"})
+#   session=httpx.Client(headers={"Authorization": f"Bearer {token}"})
   context.session = session
   yield context.session
 

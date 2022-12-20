@@ -6,7 +6,7 @@ from common.testing.example_objects import TEST_COHORT
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.cohort import COHORT_INPUT_DATA
 from testing_objects.test_config import API_URL
-from testing_objects.session_fixture import get_session,user_login
+from testing_objects.session_fixture import get_session
 
 
 course_template_uuid=None
