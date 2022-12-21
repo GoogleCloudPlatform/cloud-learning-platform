@@ -1,7 +1,6 @@
 import os
 import json
 import requests
-import httpx
 from behave import fixture, use_fixture
 from common.models import CourseTemplate, Cohort,Section
 from common.testing.example_objects import TEST_SECTION,TEST_COHORT
@@ -84,7 +83,7 @@ def create_section(context):
     yield context.sections
 
 @fixture
-def get_session(context):
+def get_header(context):
   user_email_password_dict = get_user_email_and_password_for_e2e()
   req = requests.post(f"{API_URL_AUTHENTICATION_SERVICE}/sign-in/credentials",
                       json=user_email_password_dict,
@@ -95,17 +94,15 @@ def get_session(context):
   token = req.json()['data']['idToken']
   print(f"User with {user_email_password_dict['email']} was logged in with "
         f"token {token}")
-  session = requests.Session()
-  session.headers.update({"Authorization": f"Bearer {token}"})
+  context.header={"Authorization": f"Bearer {token}"}
 #   session=httpx.Client(headers={"Authorization": f"Bearer {token}"})
-  context.session = session
-  yield context.session
+  yield context.header
 
 fixture_registry = {
     "fixture.create.course_template": create_course_templates,
     "fixture.create.cohort": create_cohort,
     "fixture.create.section":create_section,
-    "fixture.get.session":get_session
+    "fixture.get.header":get_header
 }
 
 def before_tag(context, tag):
