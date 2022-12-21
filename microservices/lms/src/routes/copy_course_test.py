@@ -334,3 +334,21 @@ def test_enroll_student_negative(client_with_emulator):
 
   assert resp.status_code == 404, "Status 404"
   assert resp.json()["success"] is False, "Check success"
+
+def test_delete_section(client_with_emulator):
+
+  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
+  data = {
+      "uuid": "fake-section-id",
+      "course_id": "561822649300",
+      "section_name": "tsection",
+      "description": "tdescription",
+      "course_state": "ACTIVE"
+  }
+  url = BASE_URL + "/sections/fake-section-id"
+  with mock.patch("routes.copy_course.classroom_crud.update_course_state",
+  return_value=[]):
+    resp = client_with_emulator.delete(url, json=data)
+  print(resp.json())
+  assert resp.status_code == 200
+  

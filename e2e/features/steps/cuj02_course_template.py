@@ -1,7 +1,7 @@
 import behave
+import requests
 from testing_objects.test_config import API_URL
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
-from setup import get_method,post_method,patch_method,delete_method
 
 # -------------------------------CREATE Course Template-------------------------------------
 # ----Positive Scenario-----
@@ -17,7 +17,7 @@ def step_impl_1(context):
     "API request is sent to create Course Template Record with correct request payload"
 )
 def step_impl_2(context):
-  resp = post_method(url=context.url, request_body=context.payload)
+  resp = requests.post(url=context.url, json=context.payload,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -51,7 +51,7 @@ def step_impl_4(context):
     "API request is sent to create Course Template Record with incorrect request payload"
 )
 def step_impl_5(context):
-  resp = post_method(context.url, request_body=context.payload)
+  resp = requests.post(context.url, json=context.payload,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -83,7 +83,7 @@ def setp_impl_7(context):
     "API request is sent to retrieve Course Template Record by providing correct uuid"
 )
 def step_impl_8(context):
-  resp = get_method(context.url)
+  resp = requests.get(context.url,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -110,7 +110,7 @@ def setp_impl_10(context):
     "API request is sent to retrieve Course Template Record by providing invalid uuid"
 )
 def step_impl_11(context):
-  resp = get_method(context.url)
+  resp = requests.get(context.url,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -137,7 +137,7 @@ def setp_impl_13(context):
     "API request is sent to update Course Template Record by providing correct uuid and request payload"
 )
 def step_impl_14(context):
-  resp = patch_method(context.url,request_body=context.payload)
+  resp = requests.patch(context.url,json=context.payload,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -164,7 +164,7 @@ def setp_impl_16(context):
     "API request is sent to delete Course Template Record by providing invalid uuid and valid payload"
 )
 def step_impl_17(context):
-  resp = patch_method(context.url, request_body=context.payload)
+  resp = requests.patch(context.url, json=context.payload,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -189,7 +189,7 @@ def setp_impl_19(context):
     "API request is sent to delete Course Template Record by providing correct uuid"
 )
 def step_impl_20(context):
-  resp = delete_method(context.url)
+  resp = requests.delete(context.url,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -214,7 +214,7 @@ def setp_impl_22(context):
     "API request is sent to delete Course Template Record by providing invalid uuid"
 )
 def step_impl_23(context):
-  resp = delete_method(context.url)
+  resp = requests.delete(context.url,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -239,7 +239,7 @@ def step_impl_25(context):
 
 @behave.when("API request is sent to fetch all Course Template Records")
 def step_impl_26(context):
-  resp = get_method(context.url)
+  resp = requests.get(context.url,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -267,7 +267,7 @@ def step_impl_28(context):
     "API request is sent to fetch all Cohorts Records by providing Course template valid uuid"
 )
 def step_impl_29(context):
-  resp = get_method(context.url)
+  resp = requests.get(context.url,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -293,7 +293,7 @@ def setp_impl_31(context):
     "API request is sent to fetch all Cohorts Records by providing Course template invalid uuid"
 )
 def step_impl_32(context):
-  resp = delete_method(context.url)
+  resp = requests.delete(context.url,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
