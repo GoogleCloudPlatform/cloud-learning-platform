@@ -8,22 +8,23 @@ from schemas.schema_examples import CREDENTIAL_JSON,SECTION_EXAMPLE
 
 class Sections(BaseModel):
   """Sections Details """
-  uuid : Optional[str]
-  name:  Optional[str]
-  section: Optional[str]
-  description: Optional[str]
-  classroom_id:Optional[str]
-  classroom_code: Optional[str]
-  classroom_url: Optional[str]
-  teachers_list: Optional[list]
-  is_deleted: Optional[bool]
-  created_timestamp: Optional[str]
-  last_updated_timestamp:Optional[str]
-  deleted_at_timestamp: Optional[bool]
-  id: Optional[str]
-  key: Optional[str]
-  course_template: Optional[str]
-  cohort: Optional[str]
+  uuid : str
+  name:  str
+  section: str
+  description: str
+  classroom_id: str
+  classroom_code: str
+  classroom_url: str
+  teachers_list: list
+  course_template: str
+  cohort: str
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            SECTION_EXAMPLE
+        }
+    }
 
 class SectionDetails(BaseModel):
   """Course Detail model"""
@@ -32,7 +33,6 @@ class SectionDetails(BaseModel):
   description: str
   course_template: str
   cohort: str
-  classroom_url: str
   teachers_list: list
 
 
@@ -56,7 +56,7 @@ class CreateSectiontResponseModel(BaseModel):
   """Create Section Response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully created the section"
-  data: Optional[SectionDetails]
+  data: Optional[Sections]
 
   class Config():
     orm_mode = True
@@ -72,7 +72,7 @@ class GetSectiontResponseModel(BaseModel):
   """Get  Section Response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[dict] = {}
+  data: Optional[Sections] =None
 
   class Config():
     orm_mode = True
@@ -89,7 +89,7 @@ class UpdateSectionResponseModel(BaseModel):
   """Update  Section Response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[dict] = {}
+  data: Optional[Sections]=None
 
   class Config():
     orm_mode = True
@@ -105,7 +105,7 @@ class SectionResponseModel(BaseModel):
   """Get a list of sections"""
   success: Optional[bool] = True
   message: Optional[str] = "Success list"
-  data: Optional[list] = None
+  data: Optional[list[Sections]] = None
 
   class Config():
     orm_mode = True
