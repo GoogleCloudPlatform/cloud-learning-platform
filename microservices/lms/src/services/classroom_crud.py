@@ -1,6 +1,5 @@
 """ Hepler functions for classroom crud API """
 from asyncio.log import logger
-
 from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -10,6 +9,7 @@ from common.utils.logging_handler import Logger
 from config import CLASSROOM_ADMIN_EMAIL
 from utils import helper
 
+
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
 
@@ -18,7 +18,9 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.rosters",
     "https://www.googleapis.com/auth/classroom.topics",
     "https://www.googleapis.com/auth/classroom.coursework.students",
-    "https://www.googleapis.com/auth/classroom.coursework.me"
+    "https://www.googleapis.com/auth/classroom.coursework.me",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/forms.body.readonly"
 ]
 
 
@@ -96,6 +98,21 @@ def update_course(course_id,
     logger.error(error)
     raise HttpError from error
 
+def update_course_state(course_id,
+                  course_state):
+  """Update course state
+  Possible states a course can be ACTIVE,ARCHIVED
+  PROVISIONED,DECLINED,SUSPENDED
+  Args: course_id ,course_state
+  Returns:
+    new created course details
+    """
+  service = build("classroom", "v1", credentials=get_credentials())
+  course = service.courses().get(id=course_id).execute()
+  course["course_state"] = course_state
+  course = service.courses().update(id=course_id, body=course).execute()
+  course_id = course.get("id")
+  return course
 
 def get_course_list():
   """Get courses list from classroom
@@ -149,12 +166,16 @@ def create_topics(course_id, topics):
     """ ""
 
   service = build("classroom", "v1", credentials=get_credentials())
+  topic_id_map= {}
   for topic in topics:
+    old_topic_id = topic["topicId"]
     topic_name = topic["name"]
     topic = {"name": topic_name}
-    service.courses().topics().create(courseId=course_id, body=topic).execute()
+    response = service.courses().topics().\
+      create(courseId=course_id, body=topic).execute()
+    topic_id_map[old_topic_id]=response["topicId"]
   Logger.info(f"Topics created for course_id{course_id}")
-  return "success"
+  return topic_id_map
 
 
 def get_coursework(course_id):
@@ -291,3 +312,32 @@ def enroll_student(token, course_id, student_email, course_code):
   student = {"userId": student_email}
   return service.courses().students().create(
       courseId=course_id, body=student, enrollmentCode=course_code).execute()
+
+def get_edit_url_and_view_url_mapping_of_form():
+  """  Query google drive api and get all the forms a user owns
+      return a dictionary of view link as keys and edit link as values
+  """
+  service = build("drive", "v3", credentials=get_credentials())
+  page_token = None
+  while True:
+    response = service.files().list(
+              q="mimeType=\"application/vnd.google-apps.form\"",
+                                      spaces="drive",
+                                      fields="nextPageToken, "
+                          "files(id, name,webViewLink,thumbnailLink)",
+                                      pageToken=page_token).execute()
+    view_link_and_edit_link_matching ={}
+    for file in response.get("files", []):
+      result = get_view_link_from_id(file.get("id"))
+      view_link_and_edit_link_matching[result["responderUri"]] = \
+        file.get("webViewLink")
+    if page_token is None:
+      break
+  return view_link_and_edit_link_matching
+
+def get_view_link_from_id (form_id):
+  "Query google forms api  using form id and get view url of  google form"
+
+  service = build("forms", "v1", credentials=get_credentials())
+  result = service.forms().get(formId=form_id).execute()
+  return result
