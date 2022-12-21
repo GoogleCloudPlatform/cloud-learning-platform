@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormControl, FormGroup, FormBuilder, Validators, Form } from '@angular/forms';
+import { FormControl, UntypedFormGroup, UntypedFormBuilder, Validators, Form } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HomeService } from '../service/home.service';
 
@@ -17,13 +17,13 @@ interface LooseObject {
   styleUrls: ['./create-section.component.scss']
 })
 export class CreateSectionComponent implements OnInit {
-  addSectionForm: FormGroup
+  addSectionForm: UntypedFormGroup
   showProgressSpinner: boolean = false
 
   addOnBlur = true;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   teachingStaff: any[] = [];
-  constructor(public dialogRef: MatDialogRef<CreateSectionComponent>, @Inject(MAT_DIALOG_DATA) public requiredDetails: any, private fb: FormBuilder,
+  constructor(public dialogRef: MatDialogRef<CreateSectionComponent>, @Inject(MAT_DIALOG_DATA) public requiredDetails: any, private fb: UntypedFormBuilder,
     private _snackBar: MatSnackBar, private _HomeService: HomeService) { }
 
   ngOnInit(): void {

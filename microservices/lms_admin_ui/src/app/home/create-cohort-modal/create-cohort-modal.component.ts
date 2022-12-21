@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormControl, FormGroup, FormBuilder, Validators, Form } from '@angular/forms';
+import { FormControl, UntypedFormGroup, UntypedFormBuilder, Validators, Form } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HomeService } from '../service/home.service';
 
@@ -10,9 +10,9 @@ import { HomeService } from '../service/home.service';
   styleUrls: ['./create-cohort-modal.component.scss']
 })
 export class CreateCohortModalComponent implements OnInit {
-  createCohortForm: FormGroup
+  createCohortForm: UntypedFormGroup
   showProgressSpinner: boolean = false
-  constructor(public dialogRef: MatDialogRef<CreateCohortModalComponent>, @Inject(MAT_DIALOG_DATA) public courseTemplateData: any, private fb: FormBuilder,
+  constructor(public dialogRef: MatDialogRef<CreateCohortModalComponent>, @Inject(MAT_DIALOG_DATA) public courseTemplateData: any, private fb: UntypedFormBuilder,
     private _snackBar: MatSnackBar, private _HomeService: HomeService) { }
   ngOnInit(): void {
     console.log('data', this.courseTemplateData)

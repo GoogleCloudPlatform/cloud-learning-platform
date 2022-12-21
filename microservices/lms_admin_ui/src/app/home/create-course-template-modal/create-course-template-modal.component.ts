@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormControl, FormGroup, FormBuilder, Validators, Form } from '@angular/forms';
+import { FormControl, UntypedFormGroup, UntypedFormBuilder, Validators, Form } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HomeService } from '../service/home.service';
 
@@ -13,9 +13,9 @@ interface LooseObject {
   styleUrls: ['./create-course-template-modal.component.scss']
 })
 export class CreateCourseTemplateModalComponent implements OnInit {
-  courseTemplateForm: FormGroup
+  courseTemplateForm: UntypedFormGroup
   showProgressSpinner: boolean = false
-  constructor(public dialogRef: MatDialogRef<CreateCourseTemplateModalComponent>, private fb: FormBuilder,
+  constructor(public dialogRef: MatDialogRef<CreateCourseTemplateModalComponent>, private fb: UntypedFormBuilder,
     private _snackBar: MatSnackBar, private _HomeService: HomeService) { }
 
   ngOnInit(): void {
