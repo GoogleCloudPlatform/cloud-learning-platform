@@ -1,5 +1,6 @@
-from e2e.gke_api_tests.endpoint_proxy import get_baseurl
+from endpoint_proxy import get_baseurl
 from common.utils.errors import ResourceNotFoundException
+
 base_url = get_baseurl("lms")
 auth_url = get_baseurl("authentication")
 if not base_url:
@@ -11,4 +12,3 @@ if not auth_url:
       "Unable to locate the service URL for authentication")
 else:
   API_URL_AUTHENTICATION_SERVICE = f"{auth_url}/authentication/api/v1"
-

@@ -1,11 +1,12 @@
 import requests
-from endpoint_proxy import get_baseurl
-from common.utils.errors import ResourceNotFoundException
+from testing_objects.test_config import API_URL
+from testing_objects.token_fixture import get_token
 
-def test_get_progress_percentage():
-  base_url = get_baseurl("lms")
-  if not base_url:
-    raise ResourceNotFoundException("Unable to locate the service URL for lms")
-  res = requests.get(base_url + "/student/get_progress_percentage/?course_id=504551481098&student_email=test_user_1@dhodun.altostrat.com")
+
+def test_get_progress_percentage(get_token):
+  res = requests.get(
+      API_URL +
+      "/student/get_progress_percentage/?course_id=504551481098&student_email=test_user_1@dhodun.altostrat.com",headers=get_token
+  )
   result = res.json()
   assert res.status_code == 200

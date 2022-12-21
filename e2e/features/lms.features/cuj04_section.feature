@@ -1,3 +1,4 @@
+@fixture.get.header
 Feature: Add student to section
     @fixture.create.section
     Scenario: Add student to a section using a payload
