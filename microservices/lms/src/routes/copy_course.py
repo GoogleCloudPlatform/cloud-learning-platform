@@ -1,28 +1,32 @@
 """ User endpoints """
-import traceback
 import datetime
-from fastapi import APIRouter
-from common.utils.logging_handler import Logger
-from common.models.section import Section
-from common.models.course_template import CourseTemplate
+import traceback
+
 from common.models.cohort import Cohort
-from common.utils.errors import ResourceNotFoundException, InvalidTokenError
-from common.utils.http_exceptions import ResourceNotFound, InternalServerError, InvalidToken, CustomHTTPException
+from common.models.course_template import CourseTemplate
+from common.models.section import Section
+from common.utils.errors import InvalidTokenError, ResourceNotFoundException
+from common.utils.http_exceptions import (CustomHTTPException,
+                                          InternalServerError, InvalidToken,
+                                          ResourceNotFound)
+from common.utils.logging_handler import Logger
+
+from fastapi import APIRouter
 from googleapiclient.errors import HttpError
-from services import classroom_crud
-from services.classroom_crud import (
-                            get_edit_url_and_view_url_mapping_of_form)
 from schemas.course_details import CourseDetails
-from schemas.section import (SectionDetails, AddStudentToSectionModel,
- AddStudentResponseModel,DeleteSectionResponseModel,SectionListResponseModel,
- CreateSectiontResponseModel,GetSectiontResponseModel,
- UpdateSectionResponseModel)
-from schemas.error_schema import (InternalServerErrorResponseModel,
+from schemas.error_schema import (ConflictResponseModel,
+                                  InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
-                                  ConflictResponseModel,
                                   ValidationErrorResponseModel)
+from schemas.section import (AddStudentResponseModel, AddStudentToSectionModel,
+                             CreateSectiontResponseModel,
+                             DeleteSectionResponseModel,
+                             GetSectiontResponseModel, SectionDetails,
+                             SectionListResponseModel,
+                             UpdateSectionResponseModel)
 from schemas.update_section import UpdateSection
 from services import classroom_crud
+from services.classroom_crud import get_edit_url_and_view_url_mapping_of_form
 from utils.helper import convert_section_to_section_model
 
 # disabling for linting to pass
@@ -49,7 +53,7 @@ SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
 
 
-@router.get("/get_courses/",response_model= SectionListResponseModel)
+@router.get("/get_courses/", response_model=SectionListResponseModel)
 def get_courses():
   """Get courses list
   Raises:
@@ -61,17 +65,15 @@ def get_courses():
   """
   try:
     course_list = classroom_crud.get_course_list()
-    return {"data" :  list(course_list)}
+    return {"data": list(course_list)}
   except Exception as e:
     Logger.error(e)
-    error=traceback.format_exc().replace("\n", " ")
+    error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
     raise InternalServerError(str(e)) from e
 
 
-
-
-@router.post("",response_model= CreateSectiontResponseModel)
+@router.post("", response_model=CreateSectiontResponseModel)
 def create_section(sections_details: SectionDetails):
   """Create section API
   Args:
@@ -121,34 +123,34 @@ def create_section(sections_details: SectionDetails):
       topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(
-      course_template_details.classroom_id)
+        course_template_details.classroom_id)
     for coursework in coursework_list:
       #Check if a coursework is linked to a topic if yes then
       # replace the old topic id to new topic id using topic_id_map
       if "topicId" in coursework.keys():
-        coursework["topicId"]=topic_id_map[coursework["topicId"]]
+        coursework["topicId"] = topic_id_map[coursework["topicId"]]
       #Check if a material is present in coursework
       if "materials" in coursework.keys():
         # Calling function to get edit_url and view url of
         # google form which returns
         # a dictionary of view_links as keys and edit
         #  likns as values of google form
-        url_mapping=get_edit_url_and_view_url_mapping_of_form()
+        url_mapping = get_edit_url_and_view_url_mapping_of_form()
         # Loop to check if a material in courssework has a google
         # form attached to it
         # update the  view link to edit link and attach it as a form
         for material in coursework["materials"]:
           if "form" in material.keys():
-            material["link"]={
-              "title":material["form"]["title"],
-              "url":url_mapping[material["form"]["formUrl"]]
+            material["link"] = {
+                "title": material["form"]["title"],
+                "url": url_mapping[material["form"]["formUrl"]]
             }
             # remove form from  material dict
             material.pop("form")
             # material["form"]["formUrl"]=
             # url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
-    if coursework_list is  not None:
+    if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
 
     for teacher_email in sections_details.teachers_list:
@@ -167,19 +169,20 @@ def create_section(sections_details: SectionDetails):
     section.created_timestamp = datetime.datetime.now()
     section.uuid = section.save().id
     section.save()
-    new_section =  convert_section_to_section_model(section)
-    return {"data" :new_section }
+    new_section = convert_section_to_section_model(section)
+    return {"data": new_section}
   except ResourceNotFound as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Exception as e:
-    error =traceback.format_exc().replace("\n", " ")
+    error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
 @router.get("/cohort/{cohort_id}/sections",
-response_model=SectionListResponseModel)
+            response_model=SectionListResponseModel)
 def list_section(cohort_id: str):
   """ Get a list of sections of one cohort from db
 
@@ -204,7 +207,7 @@ def list_section(cohort_id: str):
     # of section of a perticular cohort
     result = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections_list = list(map(convert_section_to_section_model, result))
-    return {"data" :  sections_list}
+    return {"data": sections_list}
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -214,7 +217,7 @@ def list_section(cohort_id: str):
     raise InternalServerError(str(e)) from e
 
 
-@router.get("/{section_id}",response_model=GetSectiontResponseModel)
+@router.get("/{section_id}", response_model=GetSectiontResponseModel)
 def get_section(section_id: str):
   """Get a section details from db
 
@@ -234,14 +237,15 @@ def get_section(section_id: str):
       raise ResourceNotFoundException(
           f"Section with uuid {section_id} is not found")
     # Get course by course id
-    new_section =  convert_section_to_section_model(section_details)
-    return {"data" :new_section}
+    new_section = convert_section_to_section_model(section_details)
+    return {"data": new_section}
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
 
 @router.delete("/{section_id}", response_model=DeleteSectionResponseModel)
 def delete_section(section_id: str):
@@ -264,7 +268,8 @@ def delete_section(section_id: str):
         "ARCHIVED")
       section_details = Section.archive_by_uuid(section_id)
       return {
-        "message": f"Successfully archived the Section with uuid {section_id}"
+          "message":
+          f"Successfully archived the Section with uuid {section_id}"
       }
 
     else:
@@ -285,7 +290,7 @@ def delete_section(section_id: str):
     raise InternalServerError(str(e)) from e
 
 
-@router.get("",response_model=SectionListResponseModel)
+@router.get("", response_model=SectionListResponseModel)
 def section_list():
   """Get a all section details from db
 
@@ -301,11 +306,12 @@ def section_list():
   try:
     sections = Section.collection.filter("is_deleted", "==", False).fetch()
     sections_list = list(map(convert_section_to_section_model, sections))
-    return {"data" :  sections_list}
+    return {"data": sections_list}
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
+
 
 @router.patch("", response_model=UpdateSectionResponseModel)
 def update_section(sections_details: UpdateSection):
@@ -344,14 +350,15 @@ def update_section(sections_details: UpdateSection):
     section.description = sections_details.description
     section.last_updated_timestamp = datetime.datetime.utcnow()
     section.save()
-    updated_section =  convert_section_to_section_model(section)
-    return {"data" :updated_section}
+    updated_section = convert_section_to_section_model(section)
+    return {"data": updated_section}
   except ResourceNotFound as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
 
 @router.post("/{sections_id}/students", response_model=AddStudentResponseModel)
 def enroll_student_section(sections_id: str,
@@ -397,6 +404,7 @@ def enroll_student_section(sections_id: str,
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
 @router.post("/copy_course/")
 def copy_courses(course_details: CourseDetails):
   """Copy course  API
@@ -422,7 +430,7 @@ def copy_courses(course_details: CourseDetails):
     new_course = classroom_crud.create_course(current_course["name"],
                                               current_course["description"],
                                               current_course["section"],
-                                               current_course["ownerId"])
+                                              current_course["ownerId"])
 
     # Get topics of current course
     topics = classroom_crud.get_topics(course_id)
@@ -438,7 +446,7 @@ def copy_courses(course_details: CourseDetails):
       # replace the old topic id to new
       # topic id using topic_id_map
       if "topicId" in coursework.keys():
-        coursework["topicId"]=topic_id_map[coursework["topicId"]]
+        coursework["topicId"] = topic_id_map[coursework["topicId"]]
       #Check if a material is present in coursework
       if "materials" in coursework.keys():
         # Calling function to get edit_url and view url of google
@@ -451,16 +459,16 @@ def copy_courses(course_details: CourseDetails):
         # update the  view link to edit link and attach it as a form
         for material in coursework["materials"]:
           if "form" in material.keys():
-            material["link"]={
-              "title":material["form"]["title"],
-              "url":url_mapping[material["form"]["formUrl"]]
+            material["link"] = {
+                "title": material["form"]["title"],
+                "url": url_mapping[material["form"]["formUrl"]]
             }
             # remove form from  material dict
             material.pop("form")
             # material["form"]["formUrl"]=
             # url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
-    if coursework_list is  not None:
+    if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
     SUCCESS_RESPONSE["new_course"] = new_course
     SUCCESS_RESPONSE["coursework_list"] = coursework_list
