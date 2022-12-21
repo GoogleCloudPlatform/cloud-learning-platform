@@ -14,6 +14,7 @@ class Sections(BaseModel):
   description: Optional[str]
   classroom_id:Optional[str]
   classroom_code: Optional[str]
+  classroom_url: Optional[str]
   teachers_list: Optional[list]
   is_deleted: Optional[bool]
   created_timestamp: Optional[str]
@@ -31,6 +32,7 @@ class SectionDetails(BaseModel):
   description: str
   course_template: str
   cohort: str
+  classroom_url: str
   teachers_list: list
 
 

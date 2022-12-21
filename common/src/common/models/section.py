@@ -33,6 +33,7 @@ class Section(BaseModel):
   description=TextField()
   classroom_id = TextField(required=True)
   classroom_code = TextField(required=True)
+  classroom_url = TextField(required=True)
   course_template=ReferenceField(CourseTemplate,required=True)
   cohort=ReferenceField(Cohort,required=True)
   teachers_list=ListField(required=True)

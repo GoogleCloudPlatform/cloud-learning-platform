@@ -76,6 +76,7 @@ SECTION_EXAMPLE ={
     "description": "This is updated create section test",
     "classroom_id": "123456789100",
     "classroom_code": "abcdef",
+    "classroom_url": "https://classroom.google.com",
     "teachers_list": [
       "test_user_1@gmail.com"
     ],

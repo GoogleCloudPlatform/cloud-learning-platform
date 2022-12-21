@@ -44,6 +44,7 @@ def create_fake_data(course_template_id, cohort_id, section_id):
       "description": "description",
       "classroom_id": "cl_id",
       "classroom_code": "cl_code",
+      "classroom_url": "https://classroom.google.com",
       "course_template": course_template,
       "cohort": cohort,
       "teachers_list": ["teachera@gmail.com", "teacherb@gmail.com"]
@@ -105,7 +106,8 @@ def test_create_section(client_with_emulator):
   mock_return_course = {
       "id": "57690009090",
       "enrollmentCode": "as3rr",
-      "name": "Jhjiuiui"
+      "name": "Jhjiuiui",
+      "alternateLink":"https://classroom.google.com"
   }
   with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
     with mock.patch("routes.copy_course.classroom_crud.create_course",
@@ -135,7 +137,8 @@ def test_create_section_course_template_not_found(client_with_emulator):
   mock_return_course = {
       "id": "57690009090",
       "enrollmentCode": "as3rr",
-      "name": "Jhjiuiui"
+      "name": "Jhjiuiui",
+      "alternateLink":"https://classroom.google.com"
   }
   with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
     with mock.patch("routes.copy_course.classroom_crud.create_course",
@@ -161,7 +164,8 @@ def test_create_section_course_template_not_found(client_with_emulator):
   mock_return_course = {
       "id": "57690009090",
       "enrollmentCode": "as3rr",
-      "name": "Jhjiuiui"
+      "name": "Jhjiuiui",
+      "alternateLink":"https://classroom.google.com"
   }
   with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
     with mock.patch("routes.copy_course.classroom_crud.create_course",
@@ -190,7 +194,8 @@ def test_create_section_cohort_not_found(client_with_emulator):
   mock_return_course = {
       "id": "57690009090",
       "enrollmentCode": "as3rr",
-      "name": "Jhjiuiui"
+      "name": "Jhjiuiui",
+      "alternateLink":"https://classroom.google.com"
   }
   with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
     with mock.patch("routes.copy_course.classroom_crud.create_course",
