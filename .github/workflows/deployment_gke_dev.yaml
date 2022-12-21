@@ -38,6 +38,7 @@ env:
   CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+  USE_GKE_GCLOUD_AUTH_PLUGIN: True
 # cookiecutter:raw 
 jobs:
   deploy_backends:
@@ -57,6 +58,10 @@ jobs:
       - name: Connect to cluster
         run: |
           gcloud container clusters get-credentials "$GKE_CLUSTER" --region $GKE_REGION --project $PROJECT_ID
+      
+      - name: Install GKE Auth Plugin
+        run: |
+         gcloud components install gke-gcloud-auth-plugin
 
       - name: Set up Service Account
         run: |
