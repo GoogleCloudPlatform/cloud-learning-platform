@@ -1,15 +1,16 @@
 import os
 import json
-import traceback
+import requests
 from behave import fixture, use_fixture
 from common.models import CourseTemplate, Cohort,Section
 from common.testing.example_objects import TEST_SECTION,TEST_COHORT
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE
+from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.cohort import COHORT_INPUT_DATA
 import logging
-from setup import user_login
 
 def create_course(name,section,description,ownerId):
   """Create course Function in classroom
@@ -82,10 +83,27 @@ def create_section(context):
     context.sections=section
     yield context.sections
 
+@fixture
+def get_header(context):
+  user_email_password_dict = get_user_email_and_password_for_e2e()
+  req = requests.post(f"{API_URL_AUTHENTICATION_SERVICE}/sign-in/credentials",
+                      json=user_email_password_dict,
+                      timeout=60)
+  res = req.json()
+  if res is None or res["data"] is None:
+    raise Exception("User sign-in failed")
+  token = req.json()['data']['idToken']
+  print(f"User with {user_email_password_dict['email']} was logged in with "
+        f"token {token}")
+  context.header={"Authorization": f"Bearer {token}"}
+#   session=httpx.Client(headers={"Authorization": f"Bearer {token}"})
+  yield context.header
+
 fixture_registry = {
     "fixture.create.course_template": create_course_templates,
     "fixture.create.cohort": create_cohort,
-    "fixture.create.section":create_section
+    "fixture.create.section":create_section,
+    "fixture.get.header":get_header
 }
 
 def before_tag(context, tag):
@@ -99,9 +117,3 @@ def before_tag(context, tag):
             print(e)
             logging.error(str(e))
 
-def before_all(context):
-  try:
-    user_login()
-  except Exception as e:
-    print("Failed in before_all hook with error:", str(e))
-    print(traceback.print_exc())
