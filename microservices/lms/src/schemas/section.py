@@ -18,12 +18,11 @@ class Sections(BaseModel):
   teachers_list: list
   course_template: str
   cohort: str
+
   class Config():
     orm_mode = True
     schema_extra = {
-        "example": {
-            SECTION_EXAMPLE
-        }
+        "example": SECTION_EXAMPLE
     }
 
 class SectionDetails(BaseModel):
