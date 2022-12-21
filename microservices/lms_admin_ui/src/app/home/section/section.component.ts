@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatSort, Sort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table'
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
+import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { CreateSectionComponent } from '../create-section/create-section.component';
 import { HomeService } from '../service/home.service';
 import { Router, NavigationStart, NavigationEnd, Event as NavigationEvent } from '@angular/router';

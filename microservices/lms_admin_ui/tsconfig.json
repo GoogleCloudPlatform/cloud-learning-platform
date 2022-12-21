@@ -23,7 +23,10 @@
       "dom"
     ],
     "strictPropertyInitialization": false,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "types": [
+      "node"
+    ]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
