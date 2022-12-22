@@ -31,7 +31,7 @@ class User(BaseModel):
   class Meta:
     ignore_none_field = False
     collection_name = BaseModel.DATABASE_PREFIX + "users"
-  
+
   @classmethod
   def find_by_email(cls, email):
     """Find a user using email (string)

@@ -49,4 +49,4 @@ def test_delete_user(clean_firestore):
   assert User.find_by_id(new_user.id) is not None
   User.soft_delete_by_id(new_user.id)
   with pytest.raises(ResourceNotFoundException):
-      User.soft_delete_by_id(new_user.id)
+    User.soft_delete_by_id(new_user.id)

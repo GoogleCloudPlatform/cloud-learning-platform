@@ -3,6 +3,7 @@
 """
 import os
 import mock
+import pytest
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from common.models.section import Section
