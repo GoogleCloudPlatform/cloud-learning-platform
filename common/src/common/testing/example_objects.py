@@ -18,7 +18,8 @@ TEST_COURSE_TEMPLATE={
             "admin" : "admin",
             "instructional_designer": "IDesiner",
             "classroom_id":"clID",
-            "classroom_code":"clcode"
+            "classroom_code":"clcode",
+            "classroom_url": "https://classroom.google.com"
         }
 
 TEST_COHORT={
@@ -54,7 +55,8 @@ TEST_COURSE_TEMPLATE2 = {
       "admin": "test-admin@gmail.com",
       "instructional_designer": "IDesiner@gmail.com",
       "classroom_id": "fake_classroom_id",
-      "classroom_code": "fake-classroom_code"
+      "classroom_code": "fake-classroom_code",
+      "classroom_url": "https://classroom.google.com"
     }
 
 TEST_COHORT2 = {

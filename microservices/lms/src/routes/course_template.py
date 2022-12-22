@@ -168,6 +168,7 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
     # Storing classroom details
     course_template.classroom_id = classroom.get("id")
     course_template.classroom_code = classroom.get("enrollmentCode")
+    course_template.classroom_url = classroom.get("alternateLink")
     # adding timestamp
     timestamp = datetime.datetime.utcnow()
     course_template.created_timestamp = timestamp

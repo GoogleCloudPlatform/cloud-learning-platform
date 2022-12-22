@@ -44,6 +44,7 @@ def create_course_templates(context):
         course_template.name, "master", course_template.description,course_template.admin)
     course_template.classroom_id=classroom["id"]
     course_template.classroom_code=classroom["enrollmentCode"]
+    course_template.classroom_url = classroom["alternateLink"]
     course_template.save()
     course_template.uuid = course_template.id
     course_template.update()
