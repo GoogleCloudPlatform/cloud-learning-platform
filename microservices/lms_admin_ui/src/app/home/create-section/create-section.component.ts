@@ -1,11 +1,11 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormControl, FormGroup, FormBuilder, Validators, Form } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
+import { FormControl, UntypedFormGroup, UntypedFormBuilder, Validators, Form } from '@angular/forms';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { HomeService } from '../service/home.service';
 
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { MatChipInputEvent } from '@angular/material/chips';
+import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 
 interface LooseObject {
   [key: string]: any
@@ -17,13 +17,13 @@ interface LooseObject {
   styleUrls: ['./create-section.component.scss']
 })
 export class CreateSectionComponent implements OnInit {
-  addSectionForm: FormGroup
+  addSectionForm: UntypedFormGroup
   showProgressSpinner: boolean = false
 
   addOnBlur = true;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   teachingStaff: any[] = [];
-  constructor(public dialogRef: MatDialogRef<CreateSectionComponent>, @Inject(MAT_DIALOG_DATA) public requiredDetails: any, private fb: FormBuilder,
+  constructor(public dialogRef: MatDialogRef<CreateSectionComponent>, @Inject(MAT_DIALOG_DATA) public requiredDetails: any, private fb: UntypedFormBuilder,
     private _snackBar: MatSnackBar, private _HomeService: HomeService) { }
 
   ngOnInit(): void {

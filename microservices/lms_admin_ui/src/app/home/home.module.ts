@@ -15,7 +15,7 @@ import { SectionComponent } from './section/section.component';
 import { CreateSectionComponent } from './create-section/create-section.component';
 // import { BrowserModule } from '@angular/platform-browser';
 // import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatChipsModule } from '@angular/material/chips';
+import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips';
 import { EditSectionComponent } from './edit-section/edit-section.component';
 
 @NgModule({

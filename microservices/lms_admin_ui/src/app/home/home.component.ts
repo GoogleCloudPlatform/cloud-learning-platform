@@ -1,8 +1,10 @@
 import { CreateCourseTemplateModalComponent } from './create-course-template-modal/create-course-template-modal.component';
 import { Component, OnInit } from '@angular/core';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
+import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { CreateCohortModalComponent } from './create-cohort-modal/create-cohort-modal.component';
 import { HomeService } from './service/home.service';
+import { environment } from 'src/environments/environment';
+
 
 @Component({
   selector: 'app-home',
@@ -17,7 +19,9 @@ export class HomeComponent implements OnInit {
   cohortLoader: boolean = true
   searchCohortTerm: string
   searchCourseTemplate: string
-  constructor(public dialog: MatDialog, public _HomeService: HomeService) { }
+  constructor(public dialog: MatDialog, public _HomeService: HomeService) {
+    // console.log('env var', environment.apiurl);
+  }
 
   ngOnInit(): void {
     this.getCohortList()
