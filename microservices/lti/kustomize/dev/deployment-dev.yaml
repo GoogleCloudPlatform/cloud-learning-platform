@@ -12,20 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Master Skaffold
-apiVersion: skaffold/v2beta12
-kind: Config
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: backends
-requires:
-- path: ./common
-  configs: [common]
-
-- path: ./microservices/lms
-  configs: [lms]
-
-- path: ./microservices/lms_admin_ui
-  configs: [lms-admin-ui]
-
-- path: ./microservices/lti
-  configs: [lti]
+  name: 
+spec:
+  replicas: 1
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: 
+        image: gcr.io/core-learning-services-dev/
+        imagePullPolicy: Always
