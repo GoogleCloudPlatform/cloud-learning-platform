@@ -10,12 +10,15 @@
             <button mat-menu-item>Item 2</button>
         </mat-menu>
 
-        <div class="user-profile" style="cursor:pointer;">
+        <div class="user-profile" style="cursor:pointer;" [matMenuTriggerFor]="logoutMenu">
             <span class="material-symbols-rounded">
                 account_circle
             </span>
             <span class="profile-name">{{userShowName}}</span>
 
         </div>
+        <mat-menu #logoutMenu="matMenu">
+            <button mat-menu-item (click)="logout()">Logout</button>
+        </mat-menu>
     </div>
 </nav>
