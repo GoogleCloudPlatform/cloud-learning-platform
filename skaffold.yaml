@@ -24,5 +24,8 @@ requires:
 - path: ./microservices/lms
   configs: [lms]
 
+- path: ./microservices/lti_service
+  configs: [lti-service]
+
 - path: ./microservices/lms_admin_ui
   configs: [lms-admin-ui]

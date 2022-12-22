@@ -120,16 +120,16 @@ def test_post_tool(clean_firestore):
   assert post_resp.status_code == 200, "Status code not 200"
 
   post_json_response = post_resp.json()
-  del post_json_response["data"]["created_timestamp"]
-  del post_json_response["data"]["last_updated_timestamp"]
+  del post_json_response["data"]["created_time"]
+  del post_json_response["data"]["last_modified_time"]
   uuid = post_json_response.get("data").get("uuid")
 
   # now see if GET endpoint returns same data
   url = f"{api_url}/{uuid}"
   get_resp = client_with_emulator.get(url)
   get_json_response = get_resp.json()
-  del get_json_response["data"]["created_timestamp"]
-  del get_json_response["data"]["last_updated_timestamp"]
+  del get_json_response["data"]["created_time"]
+  del get_json_response["data"]["last_modified_time"]
   assert get_json_response.get("data") == post_json_response.get("data")
 
 
@@ -141,7 +141,7 @@ def test_update_tool(clean_firestore, create_tool):
 
   modified_del_keys = DEL_KEYS + [
       "is_deleted", "last_modified_by", "created_by", "client_id",
-      "deployment_id", "created_timestamp", "last_updated_timestamp"
+      "deployment_id", "created_time", "last_modified_time"
   ]
 
   for key in modified_del_keys:

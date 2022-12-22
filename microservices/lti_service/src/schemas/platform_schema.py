@@ -26,8 +26,8 @@ class FullPlatformModel(BasicPlatformModel):
   tool_login_url: str
   tool_keyset_url: str
   is_archived: Optional[bool] = False
-  created_timestamp: str
-  last_updated_timestamp: str
+  created_time: str
+  last_modified_time: str
 
 
 class PlatformModel(BasicPlatformModel):

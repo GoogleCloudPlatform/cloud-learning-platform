@@ -80,7 +80,7 @@ def get_all_tools(skip: int = 0,
       collection_manager = collection_manager\
                             .filter("is_archived", "==", fetch_archive)
 
-    tools = collection_manager.order("-created_timestamp").offset(skip).fetch(limit)
+    tools = collection_manager.order("-created_time").offset(skip).fetch(limit)
     tools = [i.get_fields(reformat_datetime=True) for i in tools]
 
     return {

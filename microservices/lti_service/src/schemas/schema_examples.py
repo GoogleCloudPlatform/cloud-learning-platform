@@ -24,8 +24,8 @@ FULL_TOOL_EXAMPLE = {
     "platform_token_url": f"{ISSUER}/lti-service/api/v1/token",
     "platform_keyset_url": f"{ISSUER}/lti-service/api/v1/jwks",
     "is_archived": False,
-    "created_timestamp": "2022-03-03 09:22:49.843674+00:00",
-    "last_updated_timestamp": "2022-03-03 09:22:49.843674+00:00"
+    "created_time": "2022-03-03 09:22:49.843674+00:00",
+    "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
 }
 
 BASIC_PLATFORM_EXAMPLE = {
@@ -47,6 +47,49 @@ FULL_PLATFORM_EXAMPLE = {
     "tool_keyset_url": f"{ISSUER}/lti-service/api/v1/jwks/SoD1uf9V1nc9",
 }
 
+BASIC_LINE_ITEM_EXAMPLE = {
+    "scoreMaximum": 50,
+    "label": "50",
+    "tag": "50",
+    "resourceId": "50",
+    "resourceLinkId": "50",
+    "startDateTime": "2022-02-05T22:23:11+0000",
+    "endDateTime": "2022-02-07T22:23:11+0000"
+}
+
+FULL_LINE_ITEM_EXAMPLE = {
+    "uuid": "https://platformurl.com/line_items/line_item_id",
+    **BASIC_LINE_ITEM_EXAMPLE
+}
+
+BASIC_SCORE_EXAMPLE = {
+    "userId": "ATc1ob81ca1vb98",
+    "scoreGiven": 50,
+    "scoreMaximum": 50,
+    "comment": "",
+    "timestamp": "2017-04-16T18:54:36.736+00:00",
+    "activityProgress": "Completed",
+    "gradingProgress": "FullyGraded"
+}
+
+FULL_SCORE_EXAMPLE = {
+    "uuid": "https://platformurl.com/line_items/line_item_id/scores",
+    **BASIC_SCORE_EXAMPLE
+}
+
+BASIC_RESULT_EXAMPLE = {
+    "userId": "ATc1ob81ca1vb98",
+    "resultScore": 50,
+    "resultMaximum": 50,
+    "comment": "Test comment",
+    "scoreOf": "https://platformurl.com/line_items/line_item_id"
+}
+
+FULL_RESULT_EXAMPLE = {
+    "uuid": "https://platformurl.com/line_items/line_item_id/results",
+    **BASIC_RESULT_EXAMPLE
+}
+
 BASIC_CONTENT_ITEM_EXAMPLE = {
     "tool_id": "A6cS8vaCsOavO",
     "content_item_type": "ltiResourceLink",
@@ -64,6 +107,6 @@ BASIC_CONTENT_ITEM_EXAMPLE = {
 FULL_CONTENT_ITEM_EXAMPLE = {
     "uuid": "aC72Vos31iFQt09c",
     **BASIC_CONTENT_ITEM_EXAMPLE, "is_archived": False,
-    "created_timestamp": "2022-03-03 09:22:49.843674+00:00",
-    "last_updated_timestamp": "2022-03-03 09:22:49.843674+00:00"
+    "created_time": "2022-03-03 09:22:49.843674+00:00",
+    "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
 }

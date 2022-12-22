@@ -1,5 +1,4 @@
 """Content Item  Return endpoint for LTI Service as Platform"""
-from jose import jws
 from copy import deepcopy
 from config import ERROR_RESPONSES
 from fastapi import APIRouter, Form
@@ -8,7 +7,7 @@ from common.utils.errors import (ResourceNotFoundException)
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound)
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.keys_manager import get_remote_keyset
-from services.lti_token import decode_token, lti_claim_field
+from services.lti_token import decode_token, lti_claim_field, get_unverified_token_claims
 
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
 del ERROR_RESPONSE_DICT[401]
@@ -35,7 +34,7 @@ def content_item_return(JWT: str = Form()):
   """
   try:
     # decode token to fetch claims without token verification
-    unverified_claims = jws.get_unverified_claims(token=JWT)
+    unverified_claims = get_unverified_token_claims(token=JWT)
 
     tool_config = Tool.find_by_client_id(unverified_claims.get("iss"))
 

@@ -1,16 +1,18 @@
 """LTI Platform Auth endpoints"""
 from copy import deepcopy
-from config import ERROR_RESPONSES
-from fastapi import APIRouter, Request
+from datetime import datetime
+from config import ERROR_RESPONSES, ISSUER, TOKEN_TTL
+from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
 from common.utils.errors import (ResourceNotFoundException, ValidationError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
-                                          ResourceNotFound, APINotImplemented)
-from services.keys_manager import get_platform_public_keyset
-from services.lti_token import generate_token_claims, encode_token
+                                          ResourceNotFound)
+from common.models import Tool
+from services.keys_manager import get_platform_public_keyset, get_remote_keyset
+from services.lti_token import generate_token_claims, encode_token, decode_token, get_unverified_token_claims
 from schemas.error_schema import NotFoundErrorResponseModel
-
 # pylint: disable=too-many-function-args
+# pylint: disable=line-too-long
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
 del ERROR_RESPONSE_DICT[401]
 templates = Jinja2Templates(directory="templates")
@@ -96,8 +98,67 @@ def authorize(request: Request,
 
 
 @router.post("/token", name="Token Endpoint")
-def generate_token():
-  """The generate token endpoint will be used to generate the id token
-  APINotImplemented: The API is not yet implemented
-  """
-  raise APINotImplemented()
+def generate_token(
+    grant_type: str = Form(default="client_credentials"),
+    client_assertion_type: str = Form(
+        default="urn:ietf:params:oauth:client-assertion-type:jwt-bearer"),
+    client_assertion: str = Form(),
+    scope: str = Form()):
+  """The generate token endpoint will be used to generate the id token"""
+  try:
+    valid_scopes = [
+        "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+        "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly",
+        "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
+        "https://purl.imsglobal.org/spec/lti-ags/scope/score"
+    ]
+    scopes = scope.split(" ")
+    invalid_scopes = []
+    for received_scope in scopes:
+      if received_scope not in valid_scopes:
+        invalid_scopes.append(received_scope)
+
+    if grant_type != "client_credentials":
+      raise ValidationError("Invalid grant_type")
+    if client_assertion_type != "urn:ietf:params:oauth:client-assertion-type:jwt-bearer":
+      raise ValidationError("Invalid client_assertion_type")
+    if len(scopes) == 0 or len(invalid_scopes) != 0:
+      raise ValidationError("Invalid scope")
+    # client_assertion jwt should consist of following claims when requesting
+    # for token
+    # iss :- Issuer (Domain of the application which requests the access token)
+    # iat :- Token generated time
+    # exp :- Token expiration time
+    # aud :- Audience (endpoint URL of this access token api [/token])
+    # sub :- Client ID (client ID provided by the platform after the external
+    # tool creation)
+
+    unverified_claims = get_unverified_token_claims(token=client_assertion)
+    tool_config = Tool.find_by_client_id(unverified_claims.get("sub"))
+
+    if tool_config.tool_url != unverified_claims.get("iss"):
+      raise ValidationError("Invalid issuer")
+
+    if tool_config.public_key_type == "JWK URL":
+      key = get_remote_keyset(tool_config.tool_keyset_url)
+    elif tool_config.public_key_type == "Public Key":
+      key = tool_config.tool_public_key
+
+    claims = decode_token(client_assertion, key)
+
+    token_claims = {
+        "iss": ISSUER,
+        "aud": claims.get("sub"),
+        "iat": int(datetime.now().timestamp()),
+        "exp": int(datetime.now().timestamp()) + TOKEN_TTL,
+        "sub": unverified_claims.get("sub"),
+        "scope": scope
+    }
+
+    return token_claims
+  except ResourceNotFoundException as e:
+    raise ResourceNotFound(str(e)) from e
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
+  except Exception as e:
+    raise InternalServerError(str(e)) from e

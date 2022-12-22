@@ -78,7 +78,7 @@ def get_all_content_items(skip: int = 0,
       collection_manager = collection_manager\
                             .filter("is_archived", "==", fetch_archive)
 
-    content_items = collection_manager.order("-created_timestamp").offset(
+    content_items = collection_manager.order("-created_time").offset(
         skip).fetch(limit)
     content_items = [
         i.get_fields(reformat_datetime=True) for i in content_items

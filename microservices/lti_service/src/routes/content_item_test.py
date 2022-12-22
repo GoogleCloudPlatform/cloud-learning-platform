@@ -112,16 +112,16 @@ def test_post_content_item(clean_firestore, create_tool):
   assert post_resp.status_code == 200, "Status code not 200"
 
   post_json_response = post_resp.json()
-  del post_json_response["data"]["created_timestamp"]
-  del post_json_response["data"]["last_updated_timestamp"]
+  del post_json_response["data"]["created_time"]
+  del post_json_response["data"]["last_modified_time"]
   uuid = post_json_response.get("data").get("uuid")
 
   # now see if GET endpoint returns same data
   url = f"{api_url}/{uuid}"
   get_resp = client_with_emulator.get(url)
   get_json_response = get_resp.json()
-  del get_json_response["data"]["created_timestamp"]
-  del get_json_response["data"]["last_updated_timestamp"]
+  del get_json_response["data"]["created_time"]
+  del get_json_response["data"]["last_modified_time"]
   assert get_json_response.get("data") == post_json_response.get("data")
 
 

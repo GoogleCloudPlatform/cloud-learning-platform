@@ -3,7 +3,7 @@ from datetime import datetime
 from config import TOKEN_TTL, ISSUER
 from common.models import Tool, User, LTIContentItem
 from services.keys_manager import get_platform_public_keyset
-from jose import jwt
+from jose import jwt, jws
 
 
 def lti_claim_field(field_type, claim_type, suffix=None):
@@ -101,6 +101,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
 
 
 def encode_token(claims):
+  """Generates a token by encoding the given claims using the private key"""
   key_set = get_platform_public_keyset()
   token = jwt.encode(
       claims,
@@ -111,6 +112,13 @@ def encode_token(claims):
 
 
 def decode_token(token, key):
+  """Decodes a given token and verifies it using the provided public key"""
   decoded_token = jwt.decode(
       token=token, algorithms="RS256", key=key, audience=ISSUER)
   return decoded_token
+
+
+def get_unverified_token_claims(token):
+  """Decodes a given token using the provided public key"""
+  unverified_claims = jws.get_unverified_claims(token=token).decode("UTF-8")
+  return unverified_claims

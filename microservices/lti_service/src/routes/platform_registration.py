@@ -88,7 +88,7 @@ def get_all_platforms(skip: int = 0,
     if fetch_archive is not None:
       collection_manager = collection_manager\
                             .filter("is_archived", "==", fetch_archive)
-    platforms = collection_manager.order("-created_timestamp").offset(skip).fetch(
+    platforms = collection_manager.order("-created_time").offset(skip).fetch(
         limit)
 
     platforms_list = []
