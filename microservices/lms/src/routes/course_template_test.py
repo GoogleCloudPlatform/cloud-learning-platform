@@ -108,11 +108,11 @@ def test_create_course_template(client_with_emulator):
 
 
 def test_get_nonexist_course_template(client_with_emulator):
-  id = "non_exist_id"
-  url = API_URL + f"/{id}"
+  course_template_id = "non_exist_id"
+  url = API_URL + f"/{course_template_id}"
   data = {
       "success": False,
-      "message": f"course_templates with id {id} is not found",
+      "message": f"course_templates with id {course_template_id} is not found",
       "data": None
   }
   with mock.patch("routes.course_template.Logger"):
@@ -125,11 +125,11 @@ def test_delete_course_template(client_with_emulator):
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
 
-  id = course_template.id
-  url = API_URL + f"/{id}"
+  course_template_id = course_template.id
+  url = API_URL + f"/{course_template_id}"
   data = {
       "success": True,
-      "message": f"Successfully deleted the course template with id {id}",
+      "message": f"Successfully deleted the course template with id {course_template_id}",
       "data": None
   }
   with mock.patch("routes.course_template.Logger"):
@@ -140,11 +140,11 @@ def test_delete_course_template(client_with_emulator):
 
 
 def test_delete_nonexist_course_template(client_with_emulator):
-  id = "non_exist_id"
-  url = API_URL + f"/{id}"
+  course_template_id = "non_exist_id"
+  url = API_URL + f"/{course_template_id}"
   data = {
       "success": False,
-      "message": f"course_templates with id {id} is not found",
+      "message": f"course_templates with id {course_template_id} is not found",
       "data": None
   }
   with mock.patch("routes.course_template.Logger"):
@@ -157,11 +157,11 @@ def test_update_course_template(client_with_emulator):
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
 
-  id = course_template.id
-  url = API_URL + f"/{id}"
+  course_template_id = course_template.id
+  url = API_URL + f"/{course_template_id}"
   data = {
       "success": True,
-      "message": f"Successfully Updated the Course Template with id {id}"
+      "message": f"Successfully Updated the Course Template with id {course_template_id}"
   }
   json_body = {"name": "update_name", "description": "updated_description"}
   with mock.patch("routes.course_template.Logger"):
@@ -177,11 +177,11 @@ def test_update_course_template(client_with_emulator):
 
 
 def test_update_nonexists_course_template(client_with_emulator):
-  id = "non_exists_id"
-  url = API_URL + f"/{id}"
+  course_template_id = "non_exists_id"
+  url = API_URL + f"/{course_template_id}"
   data = {
       "success": False,
-      "message": f"course_templates with id {id} is not found",
+      "message": f"course_templates with id {course_template_id} is not found",
       "data": None
   }
   json_body = {"name": "update_name", "description": "updated_description"}

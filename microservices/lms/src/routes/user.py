@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """ User endpoints """
-import datetime
 from fastapi import APIRouter
 from google.api_core.exceptions import PermissionDenied
 from common.models import User

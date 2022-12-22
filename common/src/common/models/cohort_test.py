@@ -32,7 +32,7 @@ def test_new_cohort(clean_firestore):
   course_template.save()
   new_cohort.course_template=course_template
   new_cohort.save()
-  cohort=Cohort.find_by_id(new_cohort.uuid)
+  cohort=Cohort.find_by_id(new_cohort.id)
   assert cohort.name == TEST_COHORT["name"]
   assert cohort.max_students == TEST_COHORT["max_students"]
 

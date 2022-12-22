@@ -42,6 +42,7 @@ def create_fake_data():
       "description": "description",
       "classroom_id": "cl_id",
       "classroom_code": "cl_code",
+      "classroom_url": "https://classroom.google.com",
       "course_template": course_template,
       "cohort": cohort,
       "teachers_list": ["teachera@gmail.com", "teacherb@gmail.com"]

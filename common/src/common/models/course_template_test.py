@@ -29,7 +29,7 @@ def test_new_course(clean_firestore):
   """Test for creating and loading a new course"""
   new_course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
   new_course_template.save()
-  course_template=CourseTemplate.find_by_id(new_course_template.uuid)
+  course_template=CourseTemplate.find_by_id(new_course_template.id)
   assert course_template.name==TEST_COURSE_TEMPLATE["name"]
   assert course_template.description == TEST_COURSE_TEMPLATE["description"]
 

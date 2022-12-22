@@ -1,5 +1,4 @@
 '''Cohort Endpoint'''
-import datetime
 from fastapi import APIRouter
 from common.models import Cohort, CourseTemplate
 from common.utils.logging_handler import Logger

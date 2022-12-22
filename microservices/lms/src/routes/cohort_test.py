@@ -89,11 +89,11 @@ def test_create_course_template(client_with_emulator, create_course_template):
 
 
 def test_get_nonexist_cohort(client_with_emulator):
-  id = "non_exist_id"
-  url = API_URL + f"/{id}"
+  cohort_id = "non_exist_id"
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": False,
-      "message": f"cohorts with id {id} is not found",
+      "message": f"cohorts with id {cohort_id} is not found",
       "data": None
   }
   with mock.patch("routes.cohort.Logger"):
@@ -107,11 +107,11 @@ def test_update_cohort(client_with_emulator, create_course_template):
   cohort.course_template = create_course_template
   cohort.save()
 
-  id = cohort.id
-  url = API_URL + f"/{id}"
+  cohort_id = cohort.id
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": True,
-      "message": f"Successfully Updated the Cohort with id {id}"
+      "message": f"Successfully Updated the Cohort with id {cohort_id}"
   }
   json_body = {"max_students": 5000, "end_date": "2023-01-25T00:00:00"}
   with mock.patch("routes.cohort.Logger"):
@@ -131,8 +131,8 @@ def test_update_cohort_nonexits_course_template(client_with_emulator,
   cohort.course_template = create_course_template
   cohort.save()
 
-  id = cohort.id
-  url = API_URL + f"/{id}"
+  cohort_id = cohort.id
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": False,
       "message": "course_templates with id non_exits_id is not found",
@@ -146,11 +146,11 @@ def test_update_cohort_nonexits_course_template(client_with_emulator,
 
 
 def test_update_nonexists_cohort(client_with_emulator):
-  id = "non_exists_id"
-  url = API_URL + f"/{id}"
+  cohort_id = "non_exists_id"
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": False,
-      "message": f"cohorts with id {id} is not found",
+      "message": f"cohorts with id {cohort_id} is not found",
       "data": None
   }
   json_body = {"max_students": 5000, "end_date": "2023-01-25T00:00:00"}
@@ -165,11 +165,11 @@ def test_delete_cohort(client_with_emulator, create_course_template):
   cohort.course_template = create_course_template
   cohort.save()
 
-  id = cohort.id
-  url = API_URL + f"/{id}"
+  cohort_id = cohort.id
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": True,
-      "message": f"Successfully deleted the Cohort with id {id}",
+      "message": f"Successfully deleted the Cohort with id {cohort_id}",
       "data": None
   }
   with mock.patch("routes.cohort.Logger"):
@@ -180,11 +180,11 @@ def test_delete_cohort(client_with_emulator, create_course_template):
 
 
 def test_delete_nonexist_cohort(client_with_emulator):
-  id = "non_exist_id"
-  url = API_URL + f"/{id}"
+  cohort_id = "non_exist_id"
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": False,
-      "message": f"cohorts with id {id} is not found",
+      "message": f"cohorts with id {cohort_id} is not found",
       "data": None
   }
   with mock.patch("routes.cohort.Logger"):

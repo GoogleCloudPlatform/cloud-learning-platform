@@ -48,11 +48,11 @@ def test_get_user(client_with_emulator):
 
 
 def test_get_nonexist_user(client_with_emulator):
-  id = "non_exist_id"
-  url = BASE_URL + f"/users/{id}"
+  user_id = "non_exist_id"
+  url = BASE_URL + f"/users/{user_id}"
   data = {
       "success": False,
-      "message": f"users with id {id} is not found",
+      "message": f"users with id {user_id} is not found",
       "data": None
   }
   resp = client_with_emulator.get(url)
