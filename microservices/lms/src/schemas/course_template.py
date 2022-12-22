@@ -15,6 +15,7 @@ class CourseTemplateModel(BaseModel):
   instructional_designer: str
   classroom_id: Optional[str]
   classroom_code: Optional[str]
+  classroom_url: Optional[str]
 
   class Config():
     orm_mode = True
@@ -29,6 +30,7 @@ class UpdateCourseTemplateModel(BaseModel):
   instructional_designer: Optional[str]=None
   classroom_id: Optional[str]=None
   classroom_code: Optional[str]=None
+  classroom_url: Optional[str]=None
 
   class Config():
     orm_mode = True

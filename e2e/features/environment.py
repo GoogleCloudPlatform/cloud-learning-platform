@@ -1,10 +1,13 @@
 import os
 import json
+import requests
 from behave import fixture, use_fixture
 from common.models import CourseTemplate, Cohort,Section
 from common.testing.example_objects import TEST_SECTION,TEST_COHORT
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE
+from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.cohort import COHORT_INPUT_DATA
 import logging
@@ -41,6 +44,7 @@ def create_course_templates(context):
         course_template.name, "master", course_template.description,course_template.admin)
     course_template.classroom_id=classroom["id"]
     course_template.classroom_code=classroom["enrollmentCode"]
+    course_template.classroom_url = classroom["alternateLink"]
     course_template.save()
     course_template.uuid = course_template.id
     course_template.update()
@@ -73,16 +77,34 @@ def create_section(context):
     classroom=create_course(cohort.course_template.name,section.section,section.description,cohort.course_template.admin)
     section.classroom_id=classroom["id"]
     section.classroom_code = classroom["enrollmentCode"]
+    section.classroom_url = classroom["alternateLink"]
     section.save()
     section.uuid=section.id
     section.update()
     context.sections=section
     yield context.sections
 
+@fixture
+def get_header(context):
+  user_email_password_dict = get_user_email_and_password_for_e2e()
+  req = requests.post(f"{API_URL_AUTHENTICATION_SERVICE}/sign-in/credentials",
+                      json=user_email_password_dict,
+                      timeout=60)
+  res = req.json()
+  if res is None or res["data"] is None:
+    raise Exception("User sign-in failed")
+  token = req.json()['data']['idToken']
+  print(f"User with {user_email_password_dict['email']} was logged in with "
+        f"token {token}")
+  context.header={"Authorization": f"Bearer {token}"}
+#   session=httpx.Client(headers={"Authorization": f"Bearer {token}"})
+  yield context.header
+
 fixture_registry = {
     "fixture.create.course_template": create_course_templates,
     "fixture.create.cohort": create_cohort,
-    "fixture.create.section":create_section
+    "fixture.create.section":create_section,
+    "fixture.get.header":get_header
 }
 
 def before_tag(context, tag):
@@ -95,3 +117,4 @@ def before_tag(context, tag):
         except Exception as e:
             print(e)
             logging.error(str(e))
+

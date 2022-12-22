@@ -165,6 +165,7 @@ def create_section(sections_details: SectionDetails):
     section.cohort = cohort_details
     section.classroom_id = new_course["id"]
     section.classroom_code = new_course["enrollmentCode"]
+    section.classroom_url = new_course["alternateLink"]
     section.teachers_list = sections_details.teachers_list
     section.created_timestamp = datetime.datetime.now()
     section.uuid = section.save().id
@@ -386,6 +387,10 @@ def enroll_student_section(sections_id: str,
                                   student_email=input_data.email,
                                   course_id=section.classroom_id,
                                   course_code=section.classroom_code)
+    cohort = section.cohort
+    cohort.enrolled_students_count += 1
+    cohort.last_updated_timestamp = datetime.datetime.utcnow()
+    cohort.update()
     return {
         "message":
         f"Successfully Added the Student with email {input_data.email}"

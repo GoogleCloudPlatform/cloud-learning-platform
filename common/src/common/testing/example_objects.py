@@ -18,7 +18,8 @@ TEST_COURSE_TEMPLATE={
             "admin" : "admin",
             "instructional_designer": "IDesiner",
             "classroom_id":"clID",
-            "classroom_code":"clcode"
+            "classroom_code":"clcode",
+            "classroom_url": "https://classroom.google.com"
         }
 
 TEST_COHORT={
@@ -44,6 +45,7 @@ TEST_SECTION={
             "description": "description",
             "classroom_id" :"cl_id",
             "classroom_code" :"cl_code",
+            "classroom_url": "https://classroom.google.com",
             "teachers_list":["teachera@gmail.com","teacherb@gmail.com"]
         }
 
@@ -54,7 +56,8 @@ TEST_COURSE_TEMPLATE2 = {
       "admin": "test-admin@gmail.com",
       "instructional_designer": "IDesiner@gmail.com",
       "classroom_id": "fake_classroom_id",
-      "classroom_code": "fake-classroom_code"
+      "classroom_code": "fake-classroom_code",
+      "classroom_url": "https://classroom.google.com"
     }
 
 TEST_COHORT2 = {
@@ -77,6 +80,7 @@ TEST_SECTION2 = {
     "description": "description",
     "classroom_id" :"cl_id",
     "classroom_code" :"cl_code",
+    "classroom_url": "https://classroom.google.com",
     "course_template":"fake_template_id",
     "cohort":"fake_cohort_id",
     "teachers_list":["fake_email_id@gmail.com"]
