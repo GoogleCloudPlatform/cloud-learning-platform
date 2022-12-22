@@ -1,5 +1,4 @@
 """ User endpoints """
-import datetime
 import traceback
 
 from common.models.cohort import Cohort
@@ -79,8 +78,8 @@ def create_section(sections_details: SectionDetails):
   Args:
     name (section): Section name
     description (str):Description
-    classroom_template_id(str):course_template_id uuid from firestore
-    cohort_id(str):cohort uuid from firestore
+    classroom_template_id(str):course_template_id id from firestore
+    cohort_id(str):cohort id from firestore
     teachers_list(list):List of teachers to be added
   Raises:
     HTTPException: 500 Internal Server Error if something fails
@@ -90,25 +89,16 @@ def create_section(sections_details: SectionDetails):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    course_template_details = CourseTemplate.find_by_uuid(
+    course_template_details = CourseTemplate.find_by_id(
         sections_details.course_template)
-    if course_template_details is None:
-      raise ResourceNotFound(
-          "Course Template with uuid" +
-          " {sections_details.course_template} is not found")
-    cohort_details = Cohort.find_by_uuid(sections_details.cohort)
-
-    if cohort_details is None:
-      raise ResourceNotFound(
-          f"cohort with uuid {sections_details.cohort} is not found")
-
+    cohort_details = Cohort.find_by_id(sections_details.cohort)
     name = course_template_details.name
     # Get course by course id for copying from master course
     current_course = classroom_crud.get_course_by_id(
         course_template_details.classroom_id)
     if current_course is None:
-      raise ResourceNotFound(
-          "classroom  with uuid" +
+      raise ResourceNotFoundException(
+          "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
     # Create a new course
 
@@ -167,12 +157,10 @@ def create_section(sections_details: SectionDetails):
     section.classroom_code = new_course["enrollmentCode"]
     section.classroom_url = new_course["alternateLink"]
     section.teachers_list = sections_details.teachers_list
-    section.created_timestamp = datetime.datetime.now()
-    section.uuid = section.save().id
     section.save()
     new_section = convert_section_to_section_model(section)
     return {"data": new_section}
-  except ResourceNotFound as err:
+  except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Exception as e:
@@ -188,7 +176,7 @@ def list_section(cohort_id: str):
   """ Get a list of sections of one cohort from db
 
   Args:
-    cohort_id(str):cohort uuid from firestore db
+    cohort_id(str):cohort id from firestore db
   Raises:
     HTTPException: 500 Internal Server Error if something fails
     ResourceNotFound: 404 Resource not found exception
@@ -200,10 +188,7 @@ def list_section(cohort_id: str):
 
     # Get cohort Id and create a reference of cohort object
 
-    cohort = Cohort.find_by_uuid(cohort_id)
-    if cohort is None:
-      raise ResourceNotFoundException(
-          f"Cohort with uuid {cohort_id} is not found")
+    cohort = Cohort.find_by_id(cohort_id)
     # Using the cohort object reference key query sections model to get a list
     # of section of a perticular cohort
     result = Section.collection.filter("cohort", "==", cohort.key).fetch()
@@ -233,10 +218,7 @@ def get_section(section_id: str):
   """
   try:
     section_details = []
-    section_details = Section.find_by_uuid(section_id)
-    if section_details is None:
-      raise ResourceNotFoundException(
-          f"Section with uuid {section_id} is not found")
+    section_details = Section.find_by_id(section_id)
     # Get course by course id
     new_section = convert_section_to_section_model(section_details)
     return {"data": new_section}
@@ -263,19 +245,13 @@ def delete_section(section_id: str):
     {"message": "Successfully deleted section"}
   """
   try:
-    section_details = Section.find_by_uuid(section_id)
-    if section_details:
-      classroom_crud.update_course_state(section_details.classroom_id,\
-        "ARCHIVED")
-      section_details = Section.archive_by_uuid(section_id)
-      return {
-          "message":
-          f"Successfully archived the Section with uuid {section_id}"
-      }
-
-    else:
-      raise ResourceNotFoundException(
-          f"Section with uuid {section_id} is not found")
+    section_details = Section.find_by_id(section_id)
+    classroom_crud.update_course_state(section_details.classroom_id,\
+      "ARCHIVED")
+    Section.soft_delete_by_id(section_id)
+    return {
+        "message": f"Successfully archived the Section with id {section_id}"
+    }
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -305,7 +281,7 @@ def section_list():
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    sections = Section.collection.filter("is_deleted", "==", False).fetch()
+    sections = Section.fetch_all()
     sections_list = list(map(convert_section_to_section_model, sections))
     return {"data": sections_list}
   except Exception as e:
@@ -319,7 +295,7 @@ def update_section(sections_details: UpdateSection):
   """Update section API
 
   Args:
-    uuid(str): uuid of the section in firestore
+    id(str): id of the section in firestore
     course_state:Updated course state it can be any one of
     [ACTIVE,ARCHIVED,PROVISIONED,DECLINED,SUSPENDED]
     section_name (section): Section name
@@ -334,26 +310,21 @@ def update_section(sections_details: UpdateSection):
   """
   try:
 
-    section = Section.find_by_uuid(sections_details.uuid)
-    if section is None:
-      raise ResourceNotFound(
-          f"Section with uuid {sections_details.uuid} is not found")
-
+    section = Section.find_by_id(sections_details.id)
     new_course = classroom_crud.update_course(sections_details.course_id,
                                               sections_details.section_name,
                                               sections_details.description,
                                               sections_details.course_state)
     if new_course is None:
-      raise ResourceNotFound(
+      raise ResourceNotFoundException(
           "Course with Course_id"
           f" {sections_details.course_id} is not found in classroom")
     section.section = sections_details.section_name
     section.description = sections_details.description
-    section.last_updated_timestamp = datetime.datetime.utcnow()
-    section.save()
+    section.update()
     updated_section = convert_section_to_section_model(section)
     return {"data": updated_section}
-  except ResourceNotFound as err:
+  except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Exception as e:
@@ -379,17 +350,13 @@ def enroll_student_section(sections_id: str,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
   try:
-    section = Section.find_by_uuid(sections_id)
-    if section is None:
-      raise ResourceNotFoundException(
-          f"Section with uuid {sections_id} is not found")
+    section = Section.find_by_id(sections_id)
     classroom_crud.enroll_student(token={**input_data.credentials.dict()},
                                   student_email=input_data.email,
                                   course_id=section.classroom_id,
                                   course_code=section.classroom_code)
     cohort = section.cohort
     cohort.enrolled_students_count += 1
-    cohort.last_updated_timestamp = datetime.datetime.utcnow()
     cohort.update()
     return {
         "message":

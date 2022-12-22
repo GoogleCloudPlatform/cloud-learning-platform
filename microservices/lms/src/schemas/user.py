@@ -21,7 +21,7 @@ from schemas.schema_examples import USER_EXAMPLE
 
 class UserModel(BaseModel):
   """User Pydantic Model"""
-  uuid: Optional[str] = None
+  id: Optional[str] = None
   auth_id: str
   email: str
   role: Optional[str] = None

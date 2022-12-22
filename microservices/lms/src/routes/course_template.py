@@ -1,5 +1,4 @@
 '''Course Template Endpoint'''
-import datetime
 from fastapi import APIRouter
 from common.models import CourseTemplate, Cohort
 from common.utils.logging_handler import Logger
@@ -8,7 +7,7 @@ from common.utils.http_exceptions import ResourceNotFound, InternalServerError, 
 from services import classroom_crud
 from utils.helper import convert_cohort_to_cohort_model
 from schemas.cohort import CohortListResponseModel
-from schemas.course_template import CourseTemplateModel, CourseTemplateListModel, CreateCourseTemplateResponseModel, InputCourseTemplateModel, DeleteCourseTemplateModel,UpdateCourseTemplateModel,UpdateCourseTemplateResponseModel
+from schemas.course_template import CourseTemplateModel, CourseTemplateListModel, CreateCourseTemplateResponseModel, InputCourseTemplateModel, DeleteCourseTemplateModel, UpdateCourseTemplateModel, UpdateCourseTemplateResponseModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
@@ -45,8 +44,7 @@ def get_course_template_list():
             if the get Course Template list raises an exception.
     """
   try:
-    course_template_list = CourseTemplate.collection.filter(
-        "is_deleted", "==", False).fetch()
+    course_template_list = CourseTemplate.fetch_all()
     if course_template_list is None:
       return {
           "message":
@@ -77,10 +75,7 @@ def get_course_template(course_template_id: str):
             if the get Course Template raises an exception
     """
   try:
-    course_template = CourseTemplate.find_by_uuid(course_template_id)
-    if course_template is None:
-      raise ResourceNotFoundException(
-          f"Course Template with uuid {course_template_id} is not found")
+    course_template = CourseTemplate.find_by_id(course_template_id)
     return course_template
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
@@ -109,12 +104,9 @@ def get_cohort_list_by_course_template_id(course_template_id: str):
           if the get cohort list raises an exception
     """
   try:
-    course_template = CourseTemplate.find_by_uuid(course_template_id)
-    if course_template is None:
-      raise ResourceNotFoundException(
-          f"Course Template with uuid {course_template_id} is not found")
-    fetched_cohort_list = Cohort.collection.filter(
-        "course_template", "==", course_template.key).fetch()
+    course_template = CourseTemplate.find_by_id(course_template_id)
+    fetched_cohort_list = Cohort.fetch_all_by_course_template(
+        course_template_key=course_template.key)
     if fetched_cohort_list is None:
       return {
           "message":
@@ -126,7 +118,7 @@ def get_cohort_list_by_course_template_id(course_template_id: str):
     ]
     return {
         "message": "Successfully get the Cohort list" +
-        f" by Course template uuid {course_template_id}",
+        f" by Course template id {course_template_id}",
         "cohort_list": cohort_list
     }
   except ResourceNotFoundException as re:
@@ -169,13 +161,7 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
     course_template.classroom_id = classroom.get("id")
     course_template.classroom_code = classroom.get("enrollmentCode")
     course_template.classroom_url = classroom.get("alternateLink")
-    # adding timestamp
-    timestamp = datetime.datetime.utcnow()
-    course_template.created_timestamp = timestamp
-    course_template.last_updated_timestamp = timestamp
     course_template.save()
-    course_template.uuid = course_template.id
-    course_template.update()
     return {"course_template": course_template}
   except Exception as e:
     Logger.error(e)
@@ -184,8 +170,9 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
 
 @router.patch("/{course_template_id}",
               response_model=UpdateCourseTemplateResponseModel)
-def update_course_template(course_template_id:str,
-                  update_course_template_model: UpdateCourseTemplateModel):
+def update_course_template(
+    course_template_id: str,
+    update_course_template_model: UpdateCourseTemplateModel):
   """Update Course Template Api
 
   Args:
@@ -206,25 +193,21 @@ def update_course_template(course_template_id:str,
           If the update course template raises an exception
   """
   try:
-    course_template = CourseTemplate.find_by_uuid(course_template_id)
-    if course_template is None:
-      raise ResourceNotFoundException(
-          f"Course Template with uuid {course_template_id} is not found")
-    update_course_template_dict={**update_course_template_model.dict()}
+    course_template = CourseTemplate.find_by_id(course_template_id)
+    update_course_template_dict = {**update_course_template_model.dict()}
     if not any(update_course_template_dict.values()):
-      raise ValidationError("Invalid request please provide some " +
-          f"data to update the Course Template with uuid {course_template_id}")
-      # return {"message": "Please provide some data to update the" +
-      #         f" Course Template with uuid {course_template_id}",
-      #         "course_template": course_template}
+      raise ValidationError(
+          "Invalid request please provide some " +
+          f"data to update the Course Template with id {course_template_id}")
     for key in update_course_template_dict:
       if update_course_template_dict[key] is not None:
-        setattr(course_template,key,update_course_template_dict.get(key))
-    course_template.last_updated_timestamp=datetime.datetime.utcnow()
+        setattr(course_template, key, update_course_template_dict.get(key))
     course_template.update()
-    return {"message": "Successfully Updated the "+
-            f"Course Template with uuid {course_template_id}",
-            "course_template":course_template}
+    return {
+        "message": "Successfully Updated the " +
+        f"Course Template with id {course_template_id}",
+        "course_template": course_template
+    }
   except ValidationError as ve:
     raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as re:
@@ -232,6 +215,7 @@ def update_course_template(course_template_id:str,
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
 
 @router.delete("/{course_template_id}",
                response_model=DeleteCourseTemplateModel)
@@ -251,15 +235,12 @@ def delete_course_template(course_template_id: str):
             if the Course Template deletion raises an exception
     """
   try:
-    if CourseTemplate.archive_by_uuid(course_template_id):
-      return {
-          "message":
-          "Successfully deleted the course template with" +
-          f" uuid {course_template_id}"
-      }
-    else:
-      raise ResourceNotFoundException(
-          f"Course Template with uuid {course_template_id} is not found")
+    CourseTemplate.soft_delete_by_id(course_template_id)
+    return {
+        "message":
+        "Successfully deleted the course template with" +
+        f" id {course_template_id}"
+    }
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:

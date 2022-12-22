@@ -14,8 +14,6 @@ def setup_course_templates():
   """Fixture to create temprory data"""
   course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
   course_template.save()
-  course_template.uuid = course_template.id
-  course_template.update()
   return course_template
 
 
@@ -33,7 +31,7 @@ def test_create_course_template(get_token):
   assert resp_json["course_template"]["classroom_code"] not in [
       "", None
   ], "Course Template classroom check"
-  assert resp_json["course_template"]["uuid"] not in [
+  assert resp_json["course_template"]["id"] not in [
       "", None
   ], "Course Template Firebase check"
 
@@ -56,7 +54,7 @@ def test_create_course_template_validation(get_token):
 
 def test_get_course_template(setup_course_templates, get_token):
   """
-  CUJ03 get a Course template by providing a valid uuid
+  CUJ03 get a Course template by providing a valid id
   as a path variable and calling get course template api.
   Which will return a course template object.
   """
@@ -64,7 +62,7 @@ def test_get_course_template(setup_course_templates, get_token):
   url = f"{API_URL}/course_templates/{setup_course_templates.id}"
   resp = requests.get(url=url,headers=get_token)
   data = TEST_COURSE_TEMPLATE
-  data["uuid"] = setup_course_templates.id
+  data["id"] = setup_course_templates.id
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
   assert resp_json == data, "Data doesn't Match"
@@ -72,11 +70,11 @@ def test_get_course_template(setup_course_templates, get_token):
 
 def test_get_course_template_negative(get_token):
   """
-  CUJ04 get a course template by providing a invalid uuid
+  CUJ04 get a course template by providing a invalid id
   as a path variable and calling get course template api.
   Which will return a not found error response.
   """
-  url = f"{API_URL}/course_templates/fake-uuid"
+  url = f"{API_URL}/course_templates/fake-id"
   resp = requests.get(url=url,headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 404, "Status 404"
@@ -85,7 +83,7 @@ def test_get_course_template_negative(get_token):
 
 def test_delete_course_template(setup_course_templates, get_token):
   """
-  CUJ05 delete a course template by providing a valid uuid
+  CUJ05 delete a course template by providing a valid id
   as a path variable and calling delete course template api.
   Which will return a DeleteCourseTemplateModel object as a response.
   """
@@ -98,11 +96,11 @@ def test_delete_course_template(setup_course_templates, get_token):
 
 def test_delete_course_template_negative(get_token):
   """
-  CUJ06 delete a course template by providing a invalid uuid
+  CUJ06 delete a course template by providing a invalid id
   as a path variable and calling delete course template api.
   Which will return a not found error response.
   """
-  url = f"{API_URL}/course_templates/fake-uuid"
+  url = f"{API_URL}/course_templates/fake-id"
   resp = requests.delete(url=url,headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 404, "Status 404"

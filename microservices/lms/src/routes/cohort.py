@@ -45,8 +45,7 @@ def get_cohort_list():
             if the get cohort list raises an exception.
     """
   try:
-    fetched_cohort_list = Cohort.collection.filter("is_deleted", "==",
-                                                   False).fetch()
+    fetched_cohort_list = Cohort.fetch_all()
     if fetched_cohort_list is None:
       return {
           "message":
@@ -82,10 +81,7 @@ def get_cohort(cohort_id: str):
         InternalServerErrorResponseModel: if the get Cohort raises an exception
     """
   try:
-    cohort = Cohort.find_by_uuid(cohort_id)
-    if cohort is None:
-      raise ResourceNotFoundException(
-          f"Cohort with uuid {cohort_id} is not found")
+    cohort = Cohort.find_by_id(cohort_id)
     loaded_cohort = convert_cohort_to_cohort_model(cohort)
     return loaded_cohort
   except ResourceNotFoundException as re:
@@ -114,20 +110,12 @@ def create_cohort(input_cohort: InputCohortModel):
   """
   try:
     cohort_dict = {**input_cohort.dict()}
-    course_template = CourseTemplate.find_by_uuid(
-        cohort_dict["course_template_uuid"])
-    if course_template is None:
-      raise ResourceNotFoundException(f'Course Template with uuid\
-              {cohort_dict["course_template_uuid"]} is not found')
-    cohort_dict.pop("course_template_uuid")
+    course_template = CourseTemplate.find_by_id(
+        cohort_dict["course_template_id"])
+    cohort_dict.pop("course_template_id")
     cohort = Cohort.from_dict(cohort_dict)
     cohort.course_template = course_template
-    timestamp = datetime.datetime.utcnow()
-    cohort.created_timestamp = timestamp
-    cohort.last_updated_timestamp = timestamp
     cohort.save()
-    cohort.uuid = cohort.id
-    cohort.update()
     return {"cohort": convert_cohort_to_cohort_model(cohort)}
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
@@ -136,8 +124,8 @@ def create_cohort(input_cohort: InputCohortModel):
     raise InternalServerError(str(e)) from e
 
 
-@router.patch("/{cohort_uuid}", response_model=UpdateCohortResponseModel)
-def update_cohort(cohort_uuid: str, update_cohort_model: UpdateCohortModel):
+@router.patch("/{cohort_id}", response_model=UpdateCohortResponseModel)
+def update_cohort(cohort_id: str, update_cohort_model: UpdateCohortModel):
   """Update Cohort API
 
     Args:
@@ -153,32 +141,22 @@ def update_cohort(cohort_uuid: str, update_cohort_model: UpdateCohortModel):
             if the Cohort updation raises an exception
     """
   try:
-    cohort_details = Cohort.find_by_uuid(cohort_uuid)
-    if cohort_details is None:
-      raise ResourceNotFoundException("Cohort with uuid "+
-                                      f"{cohort_uuid} is not found")
+    cohort_details = Cohort.find_by_id(cohort_id)
     update_cohort_dict = {**update_cohort_model.dict()}
     if not any(update_cohort_dict.values()):
       raise ValidationError("Invalid request please provide some data " +
-                            f"to update the Cohort with uuid {cohort_uuid}")
-      # return {"message": "Please provide some data to update the" +
-      #         f" Cohort with uuid {cohort_uuid}",
-      #         "cohort": cohort_details}
+                            f"to update the Cohort with id {cohort_id}")
     for key in update_cohort_dict:
       if update_cohort_dict[key] is not None:
         if key == "course_template":
-          course_template = CourseTemplate.find_by_uuid(
+          course_template = CourseTemplate.find_by_id(
               update_cohort_dict[key])
-          if course_template is None:
-            raise ResourceNotFoundException("Course template with uuid" +
-                                   f" {update_cohort_dict[key]} is not found")
           setattr(cohort_details, key, course_template)
         else:
           setattr(cohort_details, key, update_cohort_dict[key])
-    cohort_details.last_updated_timestamp = datetime.datetime.utcnow()
     cohort_details.update()
     return {
-        "message": f"Successfully Updated the Cohort with uuid {cohort_uuid}",
+        "message": f"Successfully Updated the Cohort with id {cohort_id}",
         "cohort": convert_cohort_to_cohort_model(cohort_details)
     }
   except ValidationError as ve:
@@ -208,13 +186,10 @@ def delete_cohort(cohort_id: str):
             if the Cohort deletion raises an exception
     """
   try:
-    if Cohort.archive_by_uuid(cohort_id):
-      return {
-          "message": f"Successfully deleted the Cohort with uuid {cohort_id}"
+    Cohort.soft_delete_by_id(cohort_id)
+    return {
+          "message": f"Successfully deleted the Cohort with id {cohort_id}"
       }
-    else:
-      raise ResourceNotFoundException(
-          f"Cohort with uuid {cohort_id} is not found")
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:

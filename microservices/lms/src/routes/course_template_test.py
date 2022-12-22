@@ -20,8 +20,6 @@ def test_get_course_template_list(client_with_emulator):
   for i in COURSE_TEMPLATE_LIST_TEST_DATA:
     course_template = CourseTemplate.from_dict(i)
     course_template.save()
-    course_template.uuid = course_template.id
-    course_template.update()
   data = {
       "success": True,
       "message": "Successfully get the course template list"
@@ -40,12 +38,10 @@ def test_get_course_template_list(client_with_emulator):
 def test_get_course_template(client_with_emulator):
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
-  course_template.uuid = course_template.id
-  course_template.update()
 
-  url = API_URL + f"/{course_template.uuid}"
+  url = API_URL + f"/{course_template.id}"
   data = COURSE_TEMPLATE_EXAMPLE
-  data["uuid"] = course_template.uuid
+  data["id"] = course_template.id
   with mock.patch("routes.course_template.Logger"):
     response = client_with_emulator.get(url)
   response_course_template = response.json()
@@ -56,22 +52,18 @@ def test_get_course_template(client_with_emulator):
 def test_get_cohort_list_by_course_template(client_with_emulator):
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
-  course_template.uuid = course_template.id
-  course_template.update()
   for i in COHORT_LIST_TEST_DATA:
     cohort = Cohort.from_dict(i)
     cohort.course_template = course_template
     cohort.save()
-    cohort.uuid = cohort.id
-    cohort.update()
 
-  url = API_URL + f"/{course_template.uuid}/cohorts"
+  url = API_URL + f"/{course_template.id}/cohorts"
   data = {
       "success":
       True,
       "message":
       "Successfully get the Cohort list by" +
-      f" Course template uuid {course_template.uuid}"
+      f" Course template id {course_template.id}"
   }
   with mock.patch("routes.course_template.Logger"):
     response = client_with_emulator.get(url)
@@ -84,10 +76,10 @@ def test_get_cohort_list_by_course_template(client_with_emulator):
 
 
 def test_get_cohort_list_by_nonexist_course_template(client_with_emulator):
-  url = API_URL + "/fake_uuid/cohorts"
+  url = API_URL + "/fake_id/cohorts"
   data = {
       "success": False,
-      "message": "Course Template with uuid fake_uuid is not found",
+      "message": "course_templates with id fake_id is not found",
       "data": None
   }
   with mock.patch("routes.course_template.Logger"):
@@ -116,11 +108,11 @@ def test_create_course_template(client_with_emulator):
 
 
 def test_get_nonexist_course_template(client_with_emulator):
-  uuid = "non_exist_uuid"
-  url = API_URL + f"/{uuid}"
+  id = "non_exist_id"
+  url = API_URL + f"/{id}"
   data = {
       "success": False,
-      "message": f"Course Template with uuid {uuid} is not found",
+      "message": f"course_templates with id {id} is not found",
       "data": None
   }
   with mock.patch("routes.course_template.Logger"):
@@ -132,14 +124,12 @@ def test_get_nonexist_course_template(client_with_emulator):
 def test_delete_course_template(client_with_emulator):
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
-  course_template.uuid = course_template.id
-  course_template.update()
 
-  uuid = course_template.uuid
-  url = API_URL + f"/{uuid}"
+  id = course_template.id
+  url = API_URL + f"/{id}"
   data = {
       "success": True,
-      "message": f"Successfully deleted the course template with uuid {uuid}",
+      "message": f"Successfully deleted the course template with id {id}",
       "data": None
   }
   with mock.patch("routes.course_template.Logger"):
@@ -150,11 +140,11 @@ def test_delete_course_template(client_with_emulator):
 
 
 def test_delete_nonexist_course_template(client_with_emulator):
-  uuid = "non_exist_uuid"
-  url = API_URL + f"/{uuid}"
+  id = "non_exist_id"
+  url = API_URL + f"/{id}"
   data = {
       "success": False,
-      "message": f"Course Template with uuid {uuid} is not found",
+      "message": f"course_templates with id {id} is not found",
       "data": None
   }
   with mock.patch("routes.course_template.Logger"):
@@ -162,37 +152,36 @@ def test_delete_nonexist_course_template(client_with_emulator):
   assert response.status_code == 404, "Status 404"
   assert response.json() == data, "Return data doesn't match."
 
+
 def test_update_course_template(client_with_emulator):
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
-  course_template.uuid = course_template.id
-  course_template.update()
 
-  uuid = course_template.uuid
-  url = API_URL + f"/{uuid}"
+  id = course_template.id
+  url = API_URL + f"/{id}"
   data = {
       "success": True,
-      "message": f"Successfully Updated the Course Template with uuid {uuid}"
+      "message": f"Successfully Updated the Course Template with id {id}"
   }
-  json_body = {"name":"update_name","description": "updated_description"}
+  json_body = {"name": "update_name", "description": "updated_description"}
   with mock.patch("routes.course_template.Logger"):
     response = client_with_emulator.patch(url, json=json_body)
   response_course_template = response.json()
   loaded_course_template = response_course_template.pop("course_template")
   assert response.status_code == 200, "Status 200"
   assert response_course_template == data, "Return data doesn't match."
-  assert loaded_course_template[
-      "name"] == json_body["name"], "Updated data doesn't match"
-  assert loaded_course_template[
-    "description"] == json_body["description"], "Updated data doesn't match"
+  assert loaded_course_template["name"] == json_body[
+      "name"], "Updated data doesn't match"
+  assert loaded_course_template["description"] == json_body[
+      "description"], "Updated data doesn't match"
 
 
 def test_update_nonexists_course_template(client_with_emulator):
-  uuid = "non_exists_uuid"
-  url = API_URL + f"/{uuid}"
+  id = "non_exists_id"
+  url = API_URL + f"/{id}"
   data = {
       "success": False,
-      "message": f"Course Template with uuid {uuid} is not found",
+      "message": f"course_templates with id {id} is not found",
       "data": None
   }
   json_body = {"name": "update_name", "description": "updated_description"}

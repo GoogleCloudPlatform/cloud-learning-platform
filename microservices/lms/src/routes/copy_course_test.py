@@ -17,7 +17,8 @@ os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 SUCCESS_RESPONSE = {"status": "Success"}
 
 
-def create_fake_data(course_template_id, cohort_id, section_id):
+@pytest.fixture
+def create_fake_data():
   """_summary_
 
   Args:
@@ -28,23 +29,18 @@ def create_fake_data(course_template_id, cohort_id, section_id):
   Returns:
       _type_: _description_
   """
-  COURSE_TEMPLATE_EXAMPLE["uuid"] = course_template_id
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
-
-  COHORT_EXAMPLE["uuid"] = cohort_id
   COHORT_EXAMPLE["course_template"] = course_template
   cohort = Cohort.from_dict(COHORT_EXAMPLE)
   cohort.save()
 
   test_section_dict = {
-      "uuid": "fake-section-id",
       "name": "section_name",
       "section": "section c",
       "description": "description",
       "classroom_id": "cl_id",
       "classroom_code": "cl_code",
-      "classroom_url": "https://classroom.google.com",
       "course_template": course_template,
       "cohort": cohort,
       "teachers_list": ["teachera@gmail.com", "teacherb@gmail.com"]
@@ -52,7 +48,11 @@ def create_fake_data(course_template_id, cohort_id, section_id):
 
   section = Section.from_dict(test_section_dict)
   section.save()
-  return course_template, cohort, section
+  return {
+      "cohort": cohort.id,
+      "course_template": course_template.id,
+      "section": section.id
+  }
 
 
 def test_get_user(client_with_emulator):
@@ -92,22 +92,20 @@ def test_copy_course_not_found(client_with_emulator):
   assert resp.status_code == 200
 
 
-def test_create_section(client_with_emulator):
-
-  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
+def test_create_section(client_with_emulator, create_fake_data):
   url = BASE_URL + "/sections"
   section_details = {
       "name": "section_20",
       "description": "This is description",
-      "course_template": "fake-classroom-id",
-      "cohort": "fake-cohort-id",
+      "course_template": create_fake_data["course_template"],
+      "cohort": create_fake_data["cohort"],
       "teachers_list": [os.environ.get("CLASSROOM_ADMIN_EMAIL")]
   }
   mock_return_course = {
       "id": "57690009090",
       "enrollmentCode": "as3rr",
       "name": "Jhjiuiui",
-      "alternateLink":"https://classroom.google.com"
+      "alternateLink": "https://classroom.google.com"
   }
   with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
     with mock.patch("routes.copy_course.classroom_crud.create_course",
@@ -123,7 +121,8 @@ def test_create_section(client_with_emulator):
   assert resp.status_code == 200
 
 
-def test_create_section_course_template_not_found(client_with_emulator):
+def test_create_section_course_template_not_found(client_with_emulator,
+                                                  create_fake_data):
 
   # create_fake_data()
   url = BASE_URL + "/section"
@@ -131,14 +130,14 @@ def test_create_section_course_template_not_found(client_with_emulator):
       "name": "section_20",
       "description": "This is description",
       "course_template": "fake-classroom-id_new",
-      "cohort": "7888888",
+      "cohort": create_fake_data["cohort"],
       "teachers_list": ["string"]
   }
   mock_return_course = {
       "id": "57690009090",
       "enrollmentCode": "as3rr",
       "name": "Jhjiuiui",
-      "alternateLink":"https://classroom.google.com"
+      "alternateLink": "https://classroom.google.com"
   }
   with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
     with mock.patch("routes.copy_course.classroom_crud.create_course",
@@ -152,42 +151,42 @@ def test_create_section_course_template_not_found(client_with_emulator):
   # json_response = json.loads(resp.text)
   assert resp.status_code == 404
 
-  # create_fake_data()
+  # FIXME: Remove it if this is duplicate
+  # url = BASE_URL + "/sections"
+  # section_details = {
+  #     "name": "section_20",
+  #     "description": "This is description",
+  #     "course_template": "fake-classroom-id_new",
+  #     "cohort": "7888888",
+  #     "teachers_list": ["string"]
+  # }
+  # mock_return_course = {
+  #     "id": "57690009090",
+  #     "enrollmentCode": "as3rr",
+  #     "name": "Jhjiuiui",
+  #     "alternateLink":"https://classroom.google.com"
+  # }
+  # with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
+  #   with mock.patch("routes.copy_course.classroom_crud.create_course",
+  #                   return_value=mock_return_course):
+  #     with mock.patch("routes.copy_course.classroom_crud.get_topics"):
+  #       with mock.patch("routes.copy_course.classroom_crud.create_topics"):
+  #         with mock.patch("routes.copy_course.classroom_crud.get_coursework"):
+  #           with mock.patch(
+  #               "routes.copy_course.classroom_crud.create_coursework"):
+  #             resp = client_with_emulator.post(url, json=section_details)
+  # # json_response = json.loads(resp.text)
+  # assert resp.status_code == 404
+
+
+def test_create_section_cohort_not_found(client_with_emulator,
+                                         create_fake_data):
+
   url = BASE_URL + "/sections"
   section_details = {
       "name": "section_20",
       "description": "This is description",
-      "course_template": "fake-classroom-id_new",
-      "cohort": "7888888",
-      "teachers_list": ["string"]
-  }
-  mock_return_course = {
-      "id": "57690009090",
-      "enrollmentCode": "as3rr",
-      "name": "Jhjiuiui",
-      "alternateLink":"https://classroom.google.com"
-  }
-  with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
-    with mock.patch("routes.copy_course.classroom_crud.create_course",
-                    return_value=mock_return_course):
-      with mock.patch("routes.copy_course.classroom_crud.get_topics"):
-        with mock.patch("routes.copy_course.classroom_crud.create_topics"):
-          with mock.patch("routes.copy_course.classroom_crud.get_coursework"):
-            with mock.patch(
-                "routes.copy_course.classroom_crud.create_coursework"):
-              resp = client_with_emulator.post(url, json=section_details)
-  # json_response = json.loads(resp.text)
-  assert resp.status_code == 404
-
-
-def test_create_section_cohort_not_found(client_with_emulator):
-
-  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
-  url = BASE_URL + "/sections"
-  section_details = {
-      "name": "section_20",
-      "description": "This is description",
-      "course_template": "fake-classroom-id",
+      "course_template": create_fake_data["course_template"],
       "cohort": "fake-cohort-id-new",
       "teachers_list": ["string"]
   }
@@ -195,7 +194,7 @@ def test_create_section_cohort_not_found(client_with_emulator):
       "id": "57690009090",
       "enrollmentCode": "as3rr",
       "name": "Jhjiuiui",
-      "alternateLink":"https://classroom.google.com"
+      "alternateLink": "https://classroom.google.com"
   }
   with mock.patch("routes.copy_course.classroom_crud.get_course_by_id"):
     with mock.patch("routes.copy_course.classroom_crud.create_course",
@@ -210,18 +209,16 @@ def test_create_section_cohort_not_found(client_with_emulator):
   assert resp.status_code == 404
 
 
-def test_list_section_for_one_cohort(client_with_emulator):
+def test_list_section_for_one_cohort(client_with_emulator, create_fake_data):
 
-  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
-  url = BASE_URL + "/sections/cohort/fake-cohort-id/sections"
+  url = BASE_URL + f"/sections/cohort/{create_fake_data['cohort']}/sections"
   resp = client_with_emulator.get(url)
   # json_response = resp.json()
   assert resp.status_code == 200
 
 
-def test_list_section(client_with_emulator):
+def test_list_section(client_with_emulator, create_fake_data):
 
-  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
   url = BASE_URL + "/sections"
   resp = client_with_emulator.get(url)
   # json_response = resp.json()
@@ -230,7 +227,6 @@ def test_list_section(client_with_emulator):
 
 def test_list_section_cohort_not_found(client_with_emulator):
 
-  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
   url = BASE_URL + "/sections/cohort/fake-cohort-id22/sections"
 
   resp = client_with_emulator.get(url)
@@ -239,11 +235,9 @@ def test_list_section_cohort_not_found(client_with_emulator):
   assert resp.status_code == 404
 
 
-def test_get_section(client_with_emulator):
+def test_get_section(client_with_emulator, create_fake_data):
 
-  fake_data_result = create_fake_data("fake-classroom-id", "fake-cohort-id",
-                                      "fake-section-id")
-  url = BASE_URL + f"/sections/{fake_data_result[2].uuid}"
+  url = BASE_URL + f"/sections/{create_fake_data['section']}"
 
   resp = client_with_emulator.get(url)
   # json_response = resp.json()
@@ -252,7 +246,6 @@ def test_get_section(client_with_emulator):
 
 def test_get_section_not_found(client_with_emulator):
 
-  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
   url = BASE_URL + "/sections/test_case_id_does_not_exists"
   resp = client_with_emulator.get(url)
   # json_response = resp.json()
@@ -260,11 +253,10 @@ def test_get_section_not_found(client_with_emulator):
   assert resp.status_code == 404
 
 
-def test_update_section(client_with_emulator):
+def test_update_section(client_with_emulator, create_fake_data):
 
-  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
   data = {
-      "uuid": "fake-section-id",
+      "id": create_fake_data["section"],
       "course_id": "561822649300",
       "section_name": "tsection",
       "description": "tdescription",
@@ -279,10 +271,8 @@ def test_update_section(client_with_emulator):
 
 def test_update_section_section_id_not_found(client_with_emulator):
 
-  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
-
   data = {
-      "uuid": "fake-section-id_new",
+      "id": "fake-section-id_new",
       "course_id": "561822649300",
       "section_name": "tsection",
       "description": "tdescription",
@@ -296,11 +286,11 @@ def test_update_section_section_id_not_found(client_with_emulator):
   assert resp.status_code == 404
 
 
-def test_update_section_course_id_not_found(client_with_emulator):
+def test_update_section_course_id_not_found(client_with_emulator,
+                                            create_fake_data):
 
-  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
   data = {
-      "uuid": "fake-section-id_new",
+      "id": create_fake_data["section"],
       "course_id": "561822649300",
       "section_name": "tsection",
       "description": "tdescription",
@@ -314,9 +304,9 @@ def test_update_section_course_id_not_found(client_with_emulator):
   assert resp.status_code == 404
 
 
-def test_enroll_student(client_with_emulator):
-  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
-  url = BASE_URL + "/sections/fake-section-id/students"
+def test_enroll_student(client_with_emulator, create_fake_data):
+
+  url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
   input_data = {"email": "student@gmail.com", "credentials": CREDENTIAL_JSON}
   data = {
       "success": True,
@@ -331,7 +321,7 @@ def test_enroll_student(client_with_emulator):
 
 
 def test_enroll_student_negative(client_with_emulator):
-  url = BASE_URL + "/sections/fake_uuid_section/students"
+  url = BASE_URL + "/sections/fake_id_section/students"
   input_data = {"email": "student@gmail.com", "credentials": CREDENTIAL_JSON}
   with mock.patch("routes.copy_course.classroom_crud.enroll_student"):
     with mock.patch("routes.copy_course.Logger"):
@@ -340,20 +330,11 @@ def test_enroll_student_negative(client_with_emulator):
   assert resp.status_code == 404, "Status 404"
   assert resp.json()["success"] is False, "Check success"
 
-def test_delete_section(client_with_emulator):
 
-  create_fake_data("fake-classroom-id", "fake-cohort-id", "fake-section-id")
-  data = {
-      "uuid": "fake-section-id",
-      "course_id": "561822649300",
-      "section_name": "tsection",
-      "description": "tdescription",
-      "course_state": "ACTIVE"
-  }
-  url = BASE_URL + "/sections/fake-section-id"
+def test_delete_section(client_with_emulator, create_fake_data):
+
+  url = BASE_URL + f"/sections/{create_fake_data['section']}"
   with mock.patch("routes.copy_course.classroom_crud.update_course_state",
-  return_value=[]):
-    resp = client_with_emulator.delete(url, json=data)
-  print(resp.json())
+                  return_value=[]):
+    resp = client_with_emulator.delete(url)
   assert resp.status_code == 200
-  

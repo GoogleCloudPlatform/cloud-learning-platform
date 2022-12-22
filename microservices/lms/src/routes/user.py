@@ -61,11 +61,8 @@ def get_user(user_id: str):
     [user]: user object for the provided user id
   """
   try:
-    user = User.find_by_uuid(user_id)
-    if user is None:
-      raise ResourceNotFoundException(f"User with uuid {user_id} is not found")
-    else:
-      return user
+    user = User.find_by_id(user_id)
+    return user
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
@@ -86,24 +83,21 @@ def create_user(input_user: UserModel):
     [JSON]: user ID of the user if the user is successfully created,
     InternalServerErrorResponseModel if the user creation raises an exception
   """
-  existing_user = None
   try:
     new_user = User()
     input_user_dict = {**input_user.dict()}
     new_user = new_user.from_dict(input_user_dict)
-    existing_user = User.find_by_email(input_user_dict["email"])
+    User.find_by_email(input_user_dict["email"])
+    raise Conflict(f"User Already Exist with email {input_user_dict['email']}")
+  except ResourceNotFoundException:
+    pass
+  except Conflict as ce:
+    raise Conflict(str(ce)) from ce
   except Exception as e:
     raise InternalServerError(str(e)) from e
-  if existing_user is not None:
-    raise Conflict()
   try:
-    timestamp = datetime.datetime.utcnow()
-    new_user.created_timestamp = timestamp
-    new_user.last_updated_timestamp = timestamp
     new_user.save()
-    new_user.uuid = new_user.id
-    new_user.update()
-    return new_user.uuid
+    return new_user.id
   except PermissionDenied as e:
     # Firestore auth misconfigured usually
     Logger.error(e)
@@ -130,21 +124,17 @@ def update_user(input_user: UserModel):
     InternalServerErrorResponseModel if the user updation raises an exception
   """
   try:
-    user = User()
     input_user_dict = {**input_user.dict()}
-    user = user.from_dict(input_user_dict)
-    existing_user = User.find_by_uuid(input_user_dict["uuid"])
-    if existing_user is None:
-      raise ResourceNotFoundException(
-          f'User with uuid {input_user_dict["uuid"]} is not found')
-    timestamp = datetime.datetime.utcnow()
-    user.last_updated_timestamp = timestamp
-    user.created_timestamp = existing_user.created_timestamp
-    user.update(existing_user.id)
+    existing_user = User.find_by_id(input_user_dict["id"])
+    for key in input_user_dict:
+      if input_user_dict.get(key) is not None:
+        setattr(existing_user, key, input_user_dict.get(key))
+    existing_user.update()
     return SUCCESS_RESPONSE
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -165,10 +155,8 @@ def delete_user(user_id: str):
     InternalServerErrorResponseModel if the user deletion raises an exception
   """
   try:
-    if User.archive_by_uuid(user_id):
-      return SUCCESS_RESPONSE
-    else:
-      raise ResourceNotFoundException(f"User with uuid {user_id} is not found")
+    User.soft_delete_by_id(user_id)
+    return SUCCESS_RESPONSE
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
