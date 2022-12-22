@@ -77,6 +77,7 @@ def create_section(context):
     classroom=create_course(cohort.course_template.name,section.section,section.description,cohort.course_template.admin)
     section.classroom_id=classroom["id"]
     section.classroom_code = classroom["enrollmentCode"]
+    section.classroom_url = classroom["alternateLink"]
     section.save()
     section.uuid=section.id
     section.update()

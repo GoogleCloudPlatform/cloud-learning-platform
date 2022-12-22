@@ -45,6 +45,7 @@ TEST_SECTION={
             "description": "description",
             "classroom_id" :"cl_id",
             "classroom_code" :"cl_code",
+            "classroom_url": "https://classroom.google.com",
             "teachers_list":["teachera@gmail.com","teacherb@gmail.com"]
         }
 
@@ -79,6 +80,7 @@ TEST_SECTION2 = {
     "description": "description",
     "classroom_id" :"cl_id",
     "classroom_code" :"cl_code",
+    "classroom_url": "https://classroom.google.com",
     "course_template":"fake_template_id",
     "cohort":"fake_cohort_id",
     "teachers_list":["fake_email_id@gmail.com"]

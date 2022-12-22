@@ -76,15 +76,10 @@ SECTION_EXAMPLE ={
     "description": "This is updated create section test",
     "classroom_id": "123456789100",
     "classroom_code": "abcdef",
+    "classroom_url": "https://classroom.google.com",
     "teachers_list": [
       "test_user_1@gmail.com"
     ],
-    "is_deleted": "false",
-    "created_timestamp": datetime.datetime(year=2022, month=11, day=14),
-    "last_updated_timestamp": None,
-    "deleted_at_timestamp": None,
-    "id": "DLx0TNnYpCCwtCAJHUir",
-    "key": "sections/DLx0TNnYpCCwtCAJHUir",
     "course_template": "course_templates/7d2zTApDFE6yEvUn8JFu",
     "cohort": "cohorts/1j4YsDuylLWtzHVszcAf"
 }

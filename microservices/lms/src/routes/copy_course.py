@@ -165,6 +165,7 @@ def create_section(sections_details: SectionDetails):
     section.cohort = cohort_details
     section.classroom_id = new_course["id"]
     section.classroom_code = new_course["enrollmentCode"]
+    section.classroom_url = new_course["alternateLink"]
     section.teachers_list = sections_details.teachers_list
     section.created_timestamp = datetime.datetime.now()
     section.uuid = section.save().id
