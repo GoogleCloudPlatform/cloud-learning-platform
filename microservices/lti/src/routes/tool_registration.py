@@ -158,11 +158,11 @@ def create_tool(input_tool: ToolModel):
     client_id = str(uuid4())
     deployment_id = str(uuid4())
 
-    existing_tool = Tool.find_by_tool_url(input_tool_dict["tool_url"])
+    tool_url = input_tool_dict["tool_url"]
+    existing_tool = Tool.find_by_tool_url(tool_url)
     if existing_tool:
-      raise ConflictError(
-          "Tool with the provided tool url {} already exists".format(
-              input_tool_dict["tool_url"]))
+      error_msg = f"Tool with the provided tool url {tool_url} already exists"
+      raise ConflictError(error_msg)
 
     if not input_tool_dict.get("tool_public_key") and not input_tool_dict.get(
         "tool_keyset_url"):

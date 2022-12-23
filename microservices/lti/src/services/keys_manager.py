@@ -1,20 +1,21 @@
 """ Creating public key, private key and jwks url """
-import requests
-import hashlib
-from Crypto.PublicKey import RSA
 from base64 import urlsafe_b64encode
+import hashlib
+import requests
+from Crypto.PublicKey import RSA
 from config import (LTI_SERVICE_PLATFORM_PRIVATE_KEY,
                     LTI_SERVICE_TOOL_PRIVATE_KEY)
 #pylint: disable=broad-except
 
 
-def base64urlUInt_encode(val):
+def urlsafe_encode(val):
   """ Encoding the base64 url and decoding as string """
   val_bytes = val.to_bytes((val.bit_length() + 7) // 8, byteorder="big")
   return urlsafe_b64encode(val_bytes).decode()
 
 
 def create_public_keyset(private_key):
+  """ This function generates a public key from the passed private key"""
   try:
     key = RSA.importKey(private_key)
     key_hash = hashlib.sha256()
@@ -26,8 +27,8 @@ def create_public_keyset(private_key):
             "alg": "RS256",
             "kid": key_id,
             "use": "sig",
-            "e": base64urlUInt_encode(key.publickey().e),
-            "n": base64urlUInt_encode(key.publickey().n)
+            "e": urlsafe_encode(key.publickey().e),
+            "n": urlsafe_encode(key.publickey().n)
         }]
     }
     web_key = {
@@ -35,9 +36,9 @@ def create_public_keyset(private_key):
         "alg": "RS256",
         "use": "sig",
         "kid": key_id,
-        "e": base64urlUInt_encode(key.e),
-        "d": base64urlUInt_encode(key.d),
-        "n": base64urlUInt_encode(key.n)
+        "e": urlsafe_encode(key.e),
+        "d": urlsafe_encode(key.d),
+        "n": urlsafe_encode(key.n)
     }
 
     return {

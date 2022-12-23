@@ -1,12 +1,13 @@
 """
 Pydantic Model for Tool API's
 """
-from pydantic import BaseModel
 from typing import List, Optional
+from pydantic import BaseModel
 from typing_extensions import Literal
 from schemas.schema_examples import (BASIC_TOOL_EXAMPLE, FULL_TOOL_EXAMPLE)
 from config import ISSUER
 
+# pylint: disable-next = invalid-name
 ALLOWED_PUBLIC_KEY_TYPES = Literal["JWK URL", "Public Key"]
 
 

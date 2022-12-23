@@ -8,6 +8,7 @@ from schemas.schema_examples import (BASIC_LINE_ITEM_EXAMPLE,
                                      FULL_RESULT_EXAMPLE)
 
 
+# pylint: disable = invalid-name
 class BasicScoreModel(BaseModel):
   """Basic Score Pydantic Model"""
   userId: str

@@ -1,16 +1,16 @@
 """ LTI Token utils """
 from datetime import datetime
-from config import TOKEN_TTL, ISSUER
+from jose import jwt, jws
 from common.models import Tool, TempUser, LTIContentItem
 from services.keys_manager import get_platform_public_keyset
-from jose import jwt, jws
+from config import TOKEN_TTL, ISSUER
 
 
 def lti_claim_field(field_type, claim_type, suffix=None):
   """ Add claims field in the token """
   lti_suffix = ("-" + suffix) if suffix else ""
-  return "https://purl.imsglobal.org/spec/lti{}/{}/{}".format(
-      lti_suffix, field_type, claim_type)
+  # pylint: disable-next=line-too-long
+  return f"https://purl.imsglobal.org/spec/lti{lti_suffix}/{field_type}/{claim_type}"
 
 
 def generate_token_claims(lti_request_type, client_id, login_hint,

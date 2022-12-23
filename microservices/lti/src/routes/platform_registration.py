@@ -171,12 +171,12 @@ def create_platform(input_platform: PlatformModel):
   # and issuer should be unique
   try:
     input_platform_dict = {**input_platform.dict()}
-    platform = Platform.find_by_issuer(input_platform_dict.get("issuer"))
+    issuer = input_platform_dict.get("issuer")
+    platform = Platform.find_by_issuer(issuer)
 
     if platform:
-      raise ConflictError(
-          "Platform with the provided issuer '{}' already exists".format(
-              input_platform_dict.get("issuer")))
+      error_msg = f"Platform with the provided issuer '{issuer}' already exists"
+      raise ConflictError(error_msg)
 
     new_platform = Platform()
     new_platform = new_platform.from_dict(input_platform_dict)

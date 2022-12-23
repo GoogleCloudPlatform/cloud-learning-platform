@@ -9,6 +9,8 @@ from schemas.error_schema import NotFoundErrorResponseModel
 from services.keys_manager import get_remote_keyset
 from services.lti_token import decode_token, lti_claim_field, get_unverified_token_claims
 
+# pylint: disable=invalid-name
+
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
 del ERROR_RESPONSE_DICT[401]
 
