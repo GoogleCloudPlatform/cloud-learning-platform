@@ -53,7 +53,7 @@ api.include_router(tool_launch.router)
 
 add_exception_handlers(app)
 add_exception_handlers(api)
-app.mount("//api/v1", api)
+app.mount("/lti/api/v1", api)
 
 if __name__ == "__main__":
   uvicorn.run(
