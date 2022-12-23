@@ -11,73 +11,74 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 User object in the ORM
 """
 
-import datetime
 import os
-from fireo.fields import TextField,DateTime,BooleanField
+from fireo.fields import TextField, NumberField, ListField, BooleanField
 from common.models import BaseModel
+from common.utils.errors import ResourceNotFoundException
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PROJECT_ID = os.environ.get("PROJECT_ID", "")
 
 
+def check_user_type(field_val):
+  """validator method for user type field"""
+  user_types = ["learner", "faculty", "other"]
+  if field_val.lower() in user_types:
+    return True
+  return (False, "User Type must be one of " +
+          ",".join("'" + i + "'" for i in user_types))
+
+
+def check_status(field_val):
+  """validator method for status field"""
+  status = ["active", "inactive"]
+  if field_val.lower() in ["active", "inactive"]:
+    return True
+  return (False,
+          "Status must be one of " + ",".join("'" + i + "'" for i in status))
+
+
 class User(BaseModel):
-  """
-  User ORM class
-  """
-  uuid=TextField()
-  auth_id=TextField(required=True)
-  email=TextField(required=True)
-  role=TextField()
-  is_deleted = BooleanField(default=False)
-  created_timestamp = DateTime()
-  last_updated_timestamp = DateTime()
-  deleted_at_timestamp = DateTime()
+  """User Class"""
+  user_id = TextField(required=True)
+  first_name = TextField(required=True)
+  last_name = TextField(required=True)
+  email = TextField(required=True)
+  user_type = TextField(required=True, validator=check_user_type)
+  user_type_ref = TextField()
+  user_groups = ListField()
+  status = TextField(validator=check_status)
+  is_registered = BooleanField()
+  failed_login_attempts_count = NumberField()
+  access_api_docs = BooleanField(default=False)
 
   class Meta:
+    collection_name = BaseModel.DATABASE_PREFIX + "users"
     ignore_none_field = False
-    collection_name = DATABASE_PREFIX + "users"
+
+  @classmethod
+  def find_by_user_id(cls, user_id):
+    """Find the user using user_id
+    Args:
+        user_id (string): user_id of user
+    Returns:
+        user Object
+    """
+    user = User.collection.filter("user_id", "==", user_id).get()
+    if user is None:
+      raise ResourceNotFoundException(f"User with user_id {user_id} not found")
+    return user
 
   @classmethod
   def find_by_email(cls, email):
-    """Find a user using email (string)
+    """Find the user using email
     Args:
-        email (string): User Email
+        email (string): user's email address
     Returns:
         User: User Object
     """
-    user = User.collection.filter("email", "==", email).filter(
-        "is_deleted", "==", False).get()
-    return user
-
-  @classmethod
-  def find_by_uuid(cls, uuid):
-    """Find a user using uuid (UUID)
-    Args:
-        uuid (string): User ID
-    Returns:
-        User: User Object
-    """
-    user = User.collection.filter("uuid", "==", uuid).filter(
-        "is_deleted", "==", False).get()
-    return user
-
-  @classmethod
-  def archive_by_uuid(cls, uuid):
-    '''Soft Delete a User by using uuid
-      Args:
-          uuid (String): User ID
-      '''
-    user = User.collection.filter("uuid", "==", uuid).filter(
-        "is_deleted", "==", False).get()
-    if user is None:
-      return False
-    else:
-      user.is_deleted = True
-      user.deleted_at_timestamp = datetime.datetime.utcnow()
-      user.update()
-      return True
+    return cls.collection.filter("email", "==", email).get()
