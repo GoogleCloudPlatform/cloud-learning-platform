@@ -1,7 +1,7 @@
 """ LTI Token utils """
 from datetime import datetime
 from config import TOKEN_TTL, ISSUER
-from common.models import Tool, User, LTIContentItem
+from common.models import Tool, TempUser, LTIContentItem
 from services.keys_manager import get_platform_public_keyset
 from jose import jwt, jws
 
@@ -22,7 +22,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
   if redirect_uri not in tool_info.get("redirect_uris"):
     raise Exception(f"Unknown redirect_uri {redirect_uri}")
 
-  user = User.find_by_user_id(login_hint)
+  user = TempUser.find_by_user_id(login_hint)
   user = user.get_fields(reformat_datetime=True)
   token_claims = {
       "iss": ISSUER,
