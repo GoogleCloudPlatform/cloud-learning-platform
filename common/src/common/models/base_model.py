@@ -204,7 +204,7 @@ class BaseModel(Model):
         break
       all_docs.extend(batch_docs)
       docs.next_fetch(limit)
-    return all_docs  
+    return all_docs
 
   @classmethod
   def delete_by_uuid(cls, uuid):

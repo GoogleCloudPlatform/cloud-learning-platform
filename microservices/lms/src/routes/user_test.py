@@ -85,6 +85,8 @@ def test_post_user_new(client_with_emulator):
   loaded_user_dict.pop("archived_at_timestamp")
   loaded_user_dict.pop("deleted_by")
   loaded_user_dict.pop("archived_by")
+  loaded_user_dict.pop("created_by")
+  loaded_user_dict.pop("last_modified_by")
 
   timestamp = datetime.datetime.utcnow()
 
