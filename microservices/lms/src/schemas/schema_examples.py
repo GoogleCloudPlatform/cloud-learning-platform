@@ -15,7 +15,8 @@ COURSE_TEMPLATE_EXAMPLE = {
     "admin": "admin",
     "instructional_designer": "IDesiner",
     "classroom_id": "clID",
-    "classroom_code": "clcode"
+    "classroom_code": "clcode",
+    "classroom_url": "https://classroom.google.com"
 }
 UPDATE_COURSE_TEMPLATE_EXAMPLE = {
     "name": "name",
@@ -23,7 +24,8 @@ UPDATE_COURSE_TEMPLATE_EXAMPLE = {
     "admin": "admin",
     "instructional_designer": "IDesiner",
     "classroom_id": "clID",
-    "classroom_code": "clcode"
+    "classroom_code": "clcode",
+    "classroom_url": "https://classroom.google.com"
 }
 
 INSERT_COURSE_TEMPLATE_EXAMPLE = {
@@ -65,6 +67,21 @@ INSERT_COHORT_EXAMPLE = {
     "registration_end_date": datetime.datetime(year=2022, month=11, day=14),
     "max_students": 0,
     "course_template": "fake-uuid"
+}
+
+SECTION_EXAMPLE ={
+    "uuid": "DLx0TNnYpCCwtCAJHUir",
+    "name": "science 101",
+    "section": "create_section_test C",
+    "description": "This is updated create section test",
+    "classroom_id": "123456789100",
+    "classroom_code": "abcdef",
+    "classroom_url": "https://classroom.google.com",
+    "teachers_list": [
+      "test_user_1@gmail.com"
+    ],
+    "course_template": "course_templates/7d2zTApDFE6yEvUn8JFu",
+    "cohort": "cohorts/1j4YsDuylLWtzHVszcAf"
 }
 
 CREDENTIAL_JSON = {

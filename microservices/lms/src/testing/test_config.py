@@ -11,7 +11,8 @@ COURSE_TEMPLATE_LIST_TEST_DATA = [{
     "admin": "test-admin_1@gmail.com",
     "instructional_designer": "IDesiner_1@gmail.com",
     "classroom_id": "fake-classroom_id_1",
-    "classroom_code": "fake-classroom_code_1"
+    "classroom_code": "fake-classroom_code_1",
+    "classroom_url": "https://classroom.google.com/1"
 }, {
     "uuid": "",
     "name": "test-name_2",
@@ -19,7 +20,8 @@ COURSE_TEMPLATE_LIST_TEST_DATA = [{
     "admin": "test-admin_2@gmail.com",
     "instructional_designer": "IDesiner_2@gmail.com",
     "classroom_id": "fake-classroom_id_2",
-    "classroom_code": "fake-classroom_code_2"
+    "classroom_code": "fake-classroom_code_2",
+    "classroom_url": "https://classroom.google.com/2"
 }, {
     "uuid": "",
     "name": "test-name_3",
@@ -27,7 +29,8 @@ COURSE_TEMPLATE_LIST_TEST_DATA = [{
     "admin": "test-admin@gmail.com_3",
     "instructional_designer": "IDesiner_3@gmail.com",
     "classroom_id": "fake-classroom_id_3",
-    "classroom_code": "fake-classroom_code_3"
+    "classroom_code": "fake-classroom_code_3",
+    "classroom_url": "https://classroom.google.com/3"
 }]
 
 COHORT_LIST_TEST_DATA = [{

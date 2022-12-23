@@ -35,6 +35,7 @@ class CourseTemplate(BaseModel):
   instructional_designer=TextField(required=True)
   classroom_id=TextField()
   classroom_code=TextField()
+  classroom_url=TextField()
   is_deleted = BooleanField(default=False)
   created_timestamp = DateTime()
   last_updated_timestamp = DateTime()

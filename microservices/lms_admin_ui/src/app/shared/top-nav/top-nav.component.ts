@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../service/auth.service';
+
 
 @Component({
   selector: 'app-top-nav',
@@ -7,9 +9,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TopNavComponent implements OnInit {
   userShowName: string = 'John Doe'
-  constructor() { }
+  constructor(private _AuthService: AuthService) { }
 
   ngOnInit(): void {
   }
-
+  logout() {
+    if (localStorage.getItem('idToken')) {
+      localStorage.removeItem('idToken')
+    }
+    this._AuthService.signOut()
+  }
 }

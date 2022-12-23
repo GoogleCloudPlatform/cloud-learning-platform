@@ -118,3 +118,46 @@ class Conflict(CustomHTTPException):
   def __init__(self, message: Any = "Conflict"):
     super().__init__(status_code=409, message=message, \
       success=False, data=None)
+
+
+class Unauthenticated(CustomHTTPException):
+  """Exception raised when permission is denied.
+  Request is not authenticated due to missing,
+  invalid or expired OAuth token.
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "Unauthenticated"):
+    super().__init__(status_code=401,
+                     message=message,
+                     success=False,
+                     data=None)
+
+
+class PermissionDenied(CustomHTTPException):
+  """Exception raised when permission is denied.
+  Client does not have sufficient permission
+  or privilege to make a particular request.
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "Permission Denied"):
+    super().__init__(status_code=403,
+                     message=message,
+                     success=False,
+                     data=None)
+
+
+class Unauthorized(CustomHTTPException):
+  """Exception raised for an unauthorized user.
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "Unauthorized"):
+    super().__init__(status_code=401,
+                     message=message,
+                     success=False,
+                     data=None)
