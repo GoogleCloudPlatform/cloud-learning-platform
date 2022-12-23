@@ -14,13 +14,14 @@
 """
 Module to add section in Fireo
 """
-from fireo.fields import TextField, ReferenceField, ListField
+from fireo.fields import TextField, ReferenceField, ListField,IDField
 from common.models import BaseModel, CourseTemplate, Cohort
 
 
 class Section(BaseModel):
   """Section ORM class
   """
+  id=IDField()
   name = TextField(required=True)
   section = TextField(required=True)
   description = TextField()

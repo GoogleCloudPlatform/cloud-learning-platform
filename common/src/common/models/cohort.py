@@ -14,13 +14,14 @@
 """
 Module to add cohort in Fireo
 """
-from fireo.fields import TextField, DateTime, NumberField, ReferenceField
+from fireo.fields import TextField, DateTime, NumberField, ReferenceField,IDField
 from common.models import BaseModel, CourseTemplate
 
 
 class Cohort(BaseModel):
   """Cohort ORM class
   """
+  id=IDField()
   name = TextField(required=True)
   description = TextField(required=True)
   start_date = DateTime(required=True)

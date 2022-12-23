@@ -16,7 +16,7 @@
 User object in the ORM
 """
 
-from fireo.fields import TextField
+from fireo.fields import TextField,IDField
 from common.models import BaseModel
 from common.utils.errors import ResourceNotFoundException
 
@@ -24,6 +24,7 @@ class User(BaseModel):
   """
   User ORM class
   """
+  id=IDField()
   auth_id=TextField(required=True)
   email=TextField(required=True)
   role=TextField()

@@ -15,13 +15,14 @@
 Module to add course in Fireo
 """
 
-from fireo.fields import TextField
+from fireo.fields import TextField,IDField
 from common.models import BaseModel
 
 
 class CourseTemplate(BaseModel):
   """Course ORM class
   """
+  id=IDField()
   name = TextField(required=True)
   description = TextField(required=True)
   admin = TextField(required=True)
