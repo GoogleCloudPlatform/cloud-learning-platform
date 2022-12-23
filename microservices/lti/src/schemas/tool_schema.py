@@ -29,9 +29,9 @@ class FullToolModel(BasicToolModel):
   client_id: str
   deployment_id: str
   issuer: str = ISSUER
-  platform_auth_url: str = f"{ISSUER}//api/v1/authorize"
-  platform_token_url: str = f"{ISSUER}//api/v1/token"
-  platform_keyset_url: str = f"{ISSUER}//api/v1/jwks"
+  platform_auth_url: str = f"{ISSUER}/lti/api/v1/authorize"
+  platform_token_url: str = f"{ISSUER}/lti/api/v1/token"
+  platform_keyset_url: str = f"{ISSUER}/lti/api/v1/jwks"
   is_archived: Optional[bool] = False
   created_time: str
   last_modified_time: str

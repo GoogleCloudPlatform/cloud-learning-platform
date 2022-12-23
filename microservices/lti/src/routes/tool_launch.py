@@ -38,7 +38,7 @@ def content_selection_launch(request: Request,
       lti_claim_field("claim", "deep_linking_settings",
                       "dl")).get("deep_link_return_url")
 
-  content_return_url = ISSUER + "//api/v1/content-selection-response"
+  content_return_url = ISSUER + "/lti/api/v1/content-selection-response"
   # decoded_token = jwt.decode(token=id_token, algorithms="RS256")
   # decoded_token = decode_token(id_token, key)
   return templates.TemplateResponse(

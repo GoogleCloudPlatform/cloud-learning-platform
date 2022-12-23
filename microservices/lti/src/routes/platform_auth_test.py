@@ -21,7 +21,7 @@ with mock.patch(
 
 app = FastAPI()
 add_exception_handlers(app)
-app.include_router(router, prefix="//api/v1")
+app.include_router(router, prefix="/lti/api/v1")
 
 client_with_emulator = TestClient(app)
 
@@ -107,10 +107,14 @@ def test_token(mock_token, mock_claims, mock_key_set, clean_firestore,
   mock_claims.return_value = test_claims
 
   req_data = {
-      "grant_type": "client_credentials",
-      "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-      "client_assertion": "ey7ot812b.t3s4vb7kra3.tb7i3vsatb92va2tovn",
-      "scope": "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"
+      "grant_type":
+          "client_credentials",
+      "client_assertion_type":
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+      "client_assertion":
+          "ey7ot812b.t3s4vb7kra3.tb7i3vsatb92va2tovn",
+      "scope":
+          "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"
   }
   mock_key_set.return_value = test_key_set
   url = f"{API_URL}/token"

@@ -27,7 +27,7 @@ with mock.patch(
 
 app = FastAPI()
 add_exception_handlers(app)
-app.include_router(router, prefix="//api/v1")
+app.include_router(router, prefix="/lti/api/v1")
 
 client_with_emulator = TestClient(app)
 

@@ -1,7 +1,7 @@
 """ Config used for testing in unit tests """
 from Crypto.PublicKey import RSA
 
-API_URL = "http://localhost//api/v1"
+API_URL = "http://localhost/lti/api/v1"
 
 DEL_KEYS = [
     "is_archived",

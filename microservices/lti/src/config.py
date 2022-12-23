@@ -37,22 +37,24 @@ TOKEN_TTL = 300
 
 ISSUER = os.getenv("ISSUER", "http://localhost")
 
-LTI_SERVICE_PLATFORM_PUBLIC_KEY = secrets.access_secret_version(
-    request={
-        "name": f"projects/{PROJECT_ID}/secrets/lti-service-public-key/versions/latest"
-    }).payload.data.decode("utf-8")
+LTI_SERVICE_PLATFORM_PUBLIC_KEY = secrets.access_secret_version(request={
+    "name":
+        f"projects/{PROJECT_ID}/secrets/lti-service-public-key/versions/latest"
+}).payload.data.decode("utf-8")
 
 LTI_SERVICE_PLATFORM_PRIVATE_KEY = secrets.access_secret_version(
     request={
-        "name": f"projects/{PROJECT_ID}/secrets/lti-service-private-key/versions/latest"
+        "name":
+            f"projects/{PROJECT_ID}/secrets/lti-service-private-key/versions/latest"
     }).payload.data.decode("utf-8")
 
-LTI_SERVICE_TOOL_PUBLIC_KEY = secrets.access_secret_version(
-    request={
-        "name": f"projects/{PROJECT_ID}/secrets/lti-service-public-key/versions/latest"
-    }).payload.data.decode("utf-8")
+LTI_SERVICE_TOOL_PUBLIC_KEY = secrets.access_secret_version(request={
+    "name":
+        f"projects/{PROJECT_ID}/secrets/lti-service-public-key/versions/latest"
+}).payload.data.decode("utf-8")
 
 LTI_SERVICE_TOOL_PRIVATE_KEY = secrets.access_secret_version(
     request={
-        "name": f"projects/{PROJECT_ID}/secrets/lti-service-private-key/versions/latest"
+        "name":
+            f"projects/{PROJECT_ID}/secrets/lti-service-private-key/versions/latest"
     }).payload.data.decode("utf-8")

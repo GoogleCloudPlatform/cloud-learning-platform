@@ -18,9 +18,9 @@ router = APIRouter(
 
 
 def add_tool_key_set(fields, uuid):
-  fields["tool_url"] = f"{ISSUER}//api/v1"
-  fields["tool_login_url"] = f"{ISSUER}//api/v1/oidc-login"
-  fields["tool_keyset_url"] = f"{ISSUER}//api/v1/jwks/{uuid}"
+  fields["tool_url"] = f"{ISSUER}/lti/api/v1"
+  fields["tool_login_url"] = f"{ISSUER}/lti/api/v1/oidc-login"
+  fields["tool_keyset_url"] = f"{ISSUER}/lti/api/v1/jwks/{uuid}"
   return fields
 
 

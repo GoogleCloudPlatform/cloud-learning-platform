@@ -45,8 +45,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
         "auto_create": False,
         "title": "",
         "text": "",
-        "deep_link_return_url": ISSUER +
-                                "//api/v1/content-item-return"
+        "deep_link_return_url": ISSUER + "/lti/api/v1/content-item-return"
     }
 
     token_claims[lti_claim_field("claim",
