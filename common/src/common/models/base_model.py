@@ -30,22 +30,15 @@ class BaseModel(Model):
     An interface, intended to be subclassed.
 
     """
-  created_timestamp = DateTime()
-  last_updated_timestamp = DateTime()
+  created_time = DateTime()
+  last_modified_time = DateTime()
   deleted_at_timestamp = DateTime(default=None)
   deleted_by = TextField(default="")
   archived_at_timestamp = DateTime(default=None)
   archived_by = TextField(default="")
+  created_by = TextField(default="")
+  last_modified_by = TextField(default="")
   DATABASE_PREFIX = common.config.DATABASE_PREFIX
-
-  class Meta:
-    # TODO: uncomment when bug is fixed
-    # ignore_none_field seems not to inherit
-    # will need to set on all end Models
-    # https://github.com/octabytes/FireO/issues/106
-    # ignore_none_field = False
-    # commenting until it does something
-    abstract = True
 
   def save(self,
            provided_timestamp=None,
@@ -67,8 +60,8 @@ class BaseModel(Model):
       date_timestamp = provided_timestamp
     else:
       date_timestamp = datetime.datetime.utcnow()
-    self.created_timestamp = date_timestamp
-    self.last_updated_timestamp = date_timestamp
+    self.created_time = date_timestamp
+    self.last_modified_time = date_timestamp
     return super().save(transaction, batch, merge, no_return)
 
   def update(self,
@@ -89,8 +82,25 @@ class BaseModel(Model):
       date_timestamp = provided_timestamp
     else:
       date_timestamp = datetime.datetime.utcnow()
-    self.last_updated_timestamp = date_timestamp
+    self.last_modified_time = date_timestamp
     return super().update(key, transaction, batch)
+
+  def get_fields(self, reformat_datetime=False):
+    """overrides default method to fix data type for datetime fields"""
+    fields = super()._get_fields()
+    if reformat_datetime:
+      fields["created_time"] = str(fields["created_time"])
+      fields["last_modified_time"] = str(fields["last_modified_time"])
+    return fields
+
+  class Meta:
+    # TODO: uncomment when bug is fixed
+    # ignore_none_field seems not to inherit
+    # will need to set on all end Models
+    # https://github.com/octabytes/FireO/issues/106
+    # ignore_none_field = False
+    # commenting until it does something
+    abstract = True
 
   @classmethod
   def find_by_id(cls, object_id):
@@ -175,3 +185,45 @@ class BaseModel(Model):
     objects = cls.collection.filter("deleted_at_timestamp", "==",
                                     None).fetch(limit)
     return list(objects)
+
+  @classmethod
+  def fetch_all_documents(cls, limit=1000):
+    """Fetches all documents of the collection in batches
+
+    Args:
+      limit (int): the number of documents to fetch in a batch
+
+    Returns:
+      list (document objects): list of firestore document objects
+    """
+    all_docs = []
+    docs = cls.collection.fetch(limit)
+    while True:
+      batch_docs = list(docs)
+      if not batch_docs:
+        break
+      all_docs.extend(batch_docs)
+      docs.next_fetch(limit)
+    return all_docs  
+
+  @classmethod
+  def delete_by_uuid(cls, uuid):
+    doc = cls.collection.filter(
+      "uuid", "==", uuid).filter("is_deleted", "==", False).get()
+    if doc is not None:
+      doc.is_deleted = True
+      doc.update()
+    else:
+      raise ResourceNotFoundException(
+        f"{cls.__name__} with uuid {uuid} not found")
+
+  @classmethod
+  def archive_by_uuid(cls, uuid, archive=True):
+    doc = cls.collection.filter(
+      "uuid", "==", uuid).filter("is_deleted", "==", False).get()
+    if doc is not None:
+      doc.is_archived = archive
+      doc.update()
+    else:
+      raise ResourceNotFoundException\
+        (f"{cls.__name__} with uuid {uuid} not found")

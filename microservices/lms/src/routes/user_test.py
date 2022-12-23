@@ -91,12 +91,12 @@ def test_post_user_new(client_with_emulator):
   # remove the timestamps since they aren't returned in the API
   # response doesn't include
   acceptable_sec_diff = 15
-  created_timestamp = loaded_user_dict.pop("created_timestamp")
-  last_updated_timestamp = loaded_user_dict.pop("last_updated_timestamp")
+  created_time = loaded_user_dict.pop("created_time")
+  last_modified_time = loaded_user_dict.pop("last_modified_time")
 
-  assert (timestamp.second - created_timestamp.second) < acceptable_sec_diff
+  assert (timestamp.second - created_time.second) < acceptable_sec_diff
   assert (timestamp.second -
-          last_updated_timestamp.second) < acceptable_sec_diff
+          last_modified_time.second) < acceptable_sec_diff
   # assert that rest of the fields are equivalent
   assert loaded_user_dict == input_user
 
@@ -131,9 +131,9 @@ def test_put_user(client_with_emulator):
   # assert timestamp has been updated
   # loading from DB since not surfaced in API
   loaded_user = User.find_by_id(input_user["id"])
-  created_timestamp = loaded_user.created_timestamp
-  last_updated_timestamp = loaded_user.last_updated_timestamp
-  assert created_timestamp < last_updated_timestamp
+  created_time = loaded_user.created_time
+  last_modified_time = loaded_user.last_modified_time
+  assert created_time < last_modified_time
 
 
 def test_put_user_negative(client_with_emulator):
