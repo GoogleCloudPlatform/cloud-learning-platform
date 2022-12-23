@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """
 FireO BaseModel to be inherited by all other objects in ORM
 """
@@ -26,15 +27,6 @@ class BaseModel(Model):
     An interface, intended to be subclassed.
 
     """
-
-  def get_fields(self, reformat_datetime=False):
-    """overrides default method to fix data type for datetime fields"""
-    fields = super()._get_fields()
-    if reformat_datetime:
-      fields["created_timestamp"] = str(fields["created_timestamp"])
-      fields["last_updated_timestamp"] = str(fields["last_updated_timestamp"])
-    return fields
-
   class Meta:
     # TODO: uncomment when bug is fixed
     # ignore_none_field seems not to inherit

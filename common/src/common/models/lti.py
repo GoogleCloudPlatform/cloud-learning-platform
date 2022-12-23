@@ -21,7 +21,7 @@ from common.utils.errors import ResourceNotFoundException
 
 
 # pylint: disable = too-few-public-methods,pointless-string-statement,arguments-renamed,invalid-name
-class BaseModel(Model):
+class TempBaseModel(Model):
   """BaseModel to add common helper methods to all FireO objects
 
   An interface, intended to be subclassed.
@@ -149,7 +149,7 @@ class BaseModel(Model):
 """
 
 
-class Tool(BaseModel):
+class Tool(TempBaseModel):
   """LTI Tool Data Model"""
   uuid = TextField(required=True)
   name = TextField(required=True)
@@ -167,7 +167,7 @@ class Tool(BaseModel):
   is_deleted = BooleanField(default=False)
 
   class Meta:
-    collection_name = BaseModel.DATABASE_PREFIX + "tools"
+    collection_name = TempBaseModel.DATABASE_PREFIX + "tools"
     ignore_none_field = False
 
   @classmethod
@@ -209,7 +209,7 @@ class Tool(BaseModel):
           f"{cls.__name__} with uuid {uuid} not found")
 
 
-class Platform(BaseModel):
+class Platform(TempBaseModel):
   """LTI Platform Data Model"""
   uuid = TextField(required=True)
   name = TextField(required=True)
@@ -224,7 +224,7 @@ class Platform(BaseModel):
   is_deleted = BooleanField(default=False)
 
   class Meta:
-    collection_name = BaseModel.DATABASE_PREFIX + "platforms"
+    collection_name = TempBaseModel.DATABASE_PREFIX + "platforms"
     ignore_none_field = False
 
   @classmethod
@@ -263,7 +263,7 @@ class Platform(BaseModel):
           f"{cls.__name__} with uuid {uuid} not found")
 
 
-class LTIContentItem(BaseModel):
+class LTIContentItem(TempBaseModel):
   """LTI Content Item Data Model"""
   uuid = TextField(required=True)
   tool_id = TextField(required=True)
@@ -273,7 +273,7 @@ class LTIContentItem(BaseModel):
   is_deleted = BooleanField(default=False)
 
   class Meta:
-    collection_name = BaseModel.DATABASE_PREFIX + "lti_content_items"
+    collection_name = TempBaseModel.DATABASE_PREFIX + "lti_content_items"
     ignore_none_field = False
 
   @classmethod
@@ -303,7 +303,7 @@ class LTIContentItem(BaseModel):
     return lti_content_item_doc
 
 
-class LTISession(BaseModel):
+class LTISession(TempBaseModel):
   """LTI Session Data Model"""
   uuid = TextField(required=True)
   state = TextField(required=True)
@@ -312,7 +312,7 @@ class LTISession(BaseModel):
   client_id = TextField(required=True)
 
   class Meta:
-    collection_name = BaseModel.DATABASE_PREFIX + "lti_sessions"
+    collection_name = TempBaseModel.DATABASE_PREFIX + "lti_sessions"
     ignore_none_field = False
 
   @classmethod
@@ -340,7 +340,7 @@ class LTISession(BaseModel):
     return session
 
 
-class LineItem(BaseModel):
+class LineItem(TempBaseModel):
   """LTI Line Item Data Model"""
   uuid = TextField()
   startDateTime = TextField()
@@ -352,7 +352,7 @@ class LineItem(BaseModel):
   resourceLinkId = TextField()
 
   class Meta:
-    collection_name = BaseModel.DATABASE_PREFIX + "line_items"
+    collection_name = TempBaseModel.DATABASE_PREFIX + "line_items"
     ignore_none_field = False
 
   @classmethod
@@ -363,7 +363,7 @@ class LineItem(BaseModel):
     return line_item
 
 
-class Result(BaseModel):
+class Result(TempBaseModel):
   """LTI Result Data Model"""
   uuid = TextField()
   userId = TextField()
@@ -373,7 +373,7 @@ class Result(BaseModel):
   scoreOf = TextField()
 
   class Meta:
-    collection_name = BaseModel.DATABASE_PREFIX + "results"
+    collection_name = TempBaseModel.DATABASE_PREFIX + "results"
     ignore_none_field = False
 
   @classmethod
@@ -384,7 +384,7 @@ class Result(BaseModel):
     return result
 
 
-class Score(BaseModel):
+class Score(TempBaseModel):
   """LTI Score Data Model"""
   uuid = TextField()
   userId = TextField()
@@ -396,7 +396,7 @@ class Score(BaseModel):
   gradingProgress = TextField()
 
   class Meta:
-    collection_name = BaseModel.DATABASE_PREFIX + "scores"
+    collection_name = TempBaseModel.DATABASE_PREFIX + "scores"
     ignore_none_field = False
 
   @classmethod
