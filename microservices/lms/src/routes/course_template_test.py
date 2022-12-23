@@ -129,8 +129,8 @@ def test_delete_course_template(client_with_emulator):
   url = API_URL + f"/{course_template_id}"
   data = {
       "success": True,
-      "message": f"Successfully deleted the \
-        course template with id {course_template_id}",
+      "message": "Successfully deleted the "+
+      f"course template with id {course_template_id}",
       "data": None
   }
   with mock.patch("routes.course_template.Logger"):
@@ -162,8 +162,8 @@ def test_update_course_template(client_with_emulator):
   url = API_URL + f"/{course_template_id}"
   data = {
       "success": True,
-      "message": f"Successfully Updated the Course \
-        Template with id {course_template_id}"
+      "message": "Successfully Updated the Course "+
+      f"Template with id {course_template_id}"
   }
   json_body = {"name": "update_name", "description": "updated_description"}
   with mock.patch("routes.course_template.Logger"):
