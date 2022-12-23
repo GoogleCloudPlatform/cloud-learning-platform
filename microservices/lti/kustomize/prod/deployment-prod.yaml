@@ -15,13 +15,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: 
+  name: lti
 spec:
   replicas: 3
   template:
     spec:
       serviceAccountName: ksa
       containers:
-      - name: 
-        image: 
+      - name: lti
+        image: lti
         imagePullPolicy: Always

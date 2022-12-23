@@ -25,7 +25,7 @@ build:
   local:
     concurrency: 0
   artifacts:
-  - image: 
+  - image: lti
     requires:
       - image: common
         alias: BASE_IMG
@@ -35,7 +35,7 @@ build:
         - '**/*.json'
 portForward:
 - resourceType: service
-  resourceName: 
+  resourceName: lti
   port: 80
   localPort: 9030
 deploy:
@@ -47,7 +47,7 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: 
+    - image: lti
       requires:
       - image: common
         alias: BASE_IMG
@@ -68,11 +68,11 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: 
+    - image: lti
       docker:
         cacheFrom:
-          - 
-          - :latest
+          - lti
+          - lti:latest
       requires:
       - image: common
         alias: BASE_IMG
@@ -82,11 +82,11 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: gcr.io/core-learning-services-dev/
+    - image: gcr.io/core-learning-services-dev/lti
       docker:
         cacheFrom:
-          - gcr.io/core-learning-services-dev/
-          - gcr.io/core-learning-services-dev/:latest
+          - gcr.io/core-learning-services-dev/lti
+          - gcr.io/core-learning-services-dev/lti:latest
       requires:
         - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG

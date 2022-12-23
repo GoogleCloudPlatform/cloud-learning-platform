@@ -15,12 +15,12 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: cpu-pod-scaling-
+  name: cpu-pod-scaling-lti
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: 
+    name: lti
   minReplicas: 3
   maxReplicas: 110
   metrics:

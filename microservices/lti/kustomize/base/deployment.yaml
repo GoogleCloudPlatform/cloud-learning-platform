@@ -15,20 +15,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: 
+  name: lti
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: 
+      app: lti
   template:
     metadata:
       labels:
-        app: 
+        app: lti
     spec:
       containers:
-      - name: 
-        image: 
+      - name: lti
+        image: lti
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:

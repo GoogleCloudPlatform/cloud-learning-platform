@@ -15,13 +15,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: 
+  name: lti
 spec:
   replicas: 1
   template:
     spec:
       serviceAccountName: ksa
       containers:
-      - name: 
-        image: gcr.io/core-learning-services-dev/
+      - name: lti
+        image: gcr.io/core-learning-services-dev/lti
         imagePullPolicy: Always
