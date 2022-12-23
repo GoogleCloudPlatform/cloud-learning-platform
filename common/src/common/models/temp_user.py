@@ -17,7 +17,7 @@ User object in the ORM
 
 import os
 from fireo.fields import TextField, NumberField, ListField, BooleanField
-from common.models import BaseModel
+from common.models import TempBaseModel
 from common.utils.errors import ResourceNotFoundException
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
@@ -42,7 +42,7 @@ def check_status(field_val):
           "Status must be one of " + ",".join("'" + i + "'" for i in status))
 
 
-class TempUser(BaseModel):
+class TempUser(TempBaseModel):
   """User Class"""
   user_id = TextField(required=True)
   first_name = TextField(required=True)
@@ -57,7 +57,7 @@ class TempUser(BaseModel):
   access_api_docs = BooleanField(default=False)
 
   class Meta:
-    collection_name = BaseModel.DATABASE_PREFIX + "users"
+    collection_name = TempBaseModel.DATABASE_PREFIX + "users"
     ignore_none_field = False
 
   @classmethod
