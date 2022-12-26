@@ -41,7 +41,7 @@ class BaseModel(Model):
   DATABASE_PREFIX = common.config.DATABASE_PREFIX
 
   def save(self,
-           provided_timestamp=None,
+           input_datetime=None,
            transaction=None,
            batch=None,
            merge=None,
@@ -56,8 +56,8 @@ class BaseModel(Model):
     Returns:
       _type_: _description_
     """
-    if provided_timestamp:
-      date_timestamp = provided_timestamp
+    if input_datetime:
+      date_timestamp = input_datetime
     else:
       date_timestamp = datetime.datetime.utcnow()
     self.created_time = date_timestamp
@@ -65,7 +65,7 @@ class BaseModel(Model):
     return super().save(transaction, batch, merge, no_return)
 
   def update(self,
-             provided_timestamp=None,
+             input_datetime=None,
              key=None,
              transaction=None,
              batch=None):
@@ -78,8 +78,8 @@ class BaseModel(Model):
     Returns:
       _type_: _description_
     """
-    if provided_timestamp:
-      date_timestamp = provided_timestamp
+    if input_datetime:
+      date_timestamp = input_datetime
     else:
       date_timestamp = datetime.datetime.utcnow()
     self.last_modified_time = date_timestamp
@@ -208,19 +208,19 @@ class BaseModel(Model):
 
   @classmethod
   def delete_by_uuid(cls, uuid):
-    doc = cls.collection.filter(
-      "uuid", "==", uuid).filter("is_deleted", "==", False).get()
+    doc = cls.collection.filter("uuid", "==",
+                                uuid).filter("is_deleted", "==", False).get()
     if doc is not None:
       doc.is_deleted = True
       doc.update()
     else:
       raise ResourceNotFoundException(
-        f"{cls.__name__} with uuid {uuid} not found")
+          f"{cls.__name__} with uuid {uuid} not found")
 
   @classmethod
   def archive_by_uuid(cls, uuid, archive=True):
-    doc = cls.collection.filter(
-      "uuid", "==", uuid).filter("is_deleted", "==", False).get()
+    doc = cls.collection.filter("uuid", "==",
+                                uuid).filter("is_deleted", "==", False).get()
     if doc is not None:
       doc.is_archived = archive
       doc.update()
