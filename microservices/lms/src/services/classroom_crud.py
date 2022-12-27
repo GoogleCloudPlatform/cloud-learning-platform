@@ -347,6 +347,19 @@ def get_view_link_from_id(form_id):
 
 
 def invite_teacher(course_id, teacher_email):
+  """Invite teacher to google classroom using course id and email
+
+  Args:
+      course_id (str): google classroom unique id
+      teacher_email (str): teacher email id
+
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
+
+  Returns:
+      dict: response from create invitation method
+  """
   service = build("classroom", "v1", credentials=get_credentials())
   body = {"courseId": course_id, "role": "TEACHER", "userId": teacher_email}
   try:
