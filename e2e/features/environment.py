@@ -46,8 +46,6 @@ def create_course_templates(context):
     course_template.classroom_code=classroom["enrollmentCode"]
     course_template.classroom_url = classroom["alternateLink"]
     course_template.save()
-    course_template.uuid = course_template.id
-    course_template.update()
     context.course_template=course_template
     yield context.course_template
 
@@ -58,8 +56,6 @@ def create_cohort(context):
     course_template=use_fixture(create_course_templates,context)
     cohort.course_template=course_template
     cohort.save()
-    cohort.uuid=cohort.id
-    cohort.update()
     context.cohort=cohort
     yield context.cohort
 
@@ -79,8 +75,6 @@ def create_section(context):
     section.classroom_code = classroom["enrollmentCode"]
     section.classroom_url = classroom["alternateLink"]
     section.save()
-    section.uuid=section.id
-    section.update()
     context.sections=section
     yield context.sections
 

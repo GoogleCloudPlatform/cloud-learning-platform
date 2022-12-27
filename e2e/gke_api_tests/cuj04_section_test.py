@@ -60,15 +60,15 @@ def test_create_section(get_token):
                          "test", "me")
   # Create fake Mastr course in Firestore
   classroom_id = course["id"]
-  create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
+  fake_data=create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
                    classroom_id)
   url = f"{API_URL}/sections"
 
   data = {
       "name": "string",
       "description": "string",
-      "course_template": "fake_template_id",
-      "cohort": "fake_cohort_id",
+      "course_template": fake_data[0].id,
+      "cohort": fake_data[1].id,
       "teachers_list": [TEACHER_EMAIL]
   }
   resp = requests.post(url=url, json=data,headers=get_token)
@@ -89,7 +89,7 @@ def test_create_section_course_template_not_found(get_token):
                          "test", "me")
   # Create fake Mastr course in Firestore
   classroom_id = course["id"]
-  create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
+  fake_data=create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
                    classroom_id)
   url = f"{API_URL}/sections"
 
@@ -97,7 +97,7 @@ def test_create_section_course_template_not_found(get_token):
       "name": "string",
       "description": "string",
       "course_template": "fake_template_id_new",
-      "cohort": "fake_cohort_id",
+      "cohort": fake_data[1].id,
       "teachers_list": [TEACHER_EMAIL]
   }
 
@@ -113,9 +113,9 @@ def test_get_list_sections(get_token):
   course = create_course(DATABASE_PREFIX + "test_course", "This is test",
                          "test", "me")
   classroom_id = course["id"]
-  create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
+  fake_data=create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
                    classroom_id)
-  url = f"{API_URL}/sections/cohort/fake_cohort_id/sections"
+  url = f"{API_URL}/sections/cohort/{fake_data[1].id}/sections"
   resp = requests.get(url=url,headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
@@ -123,14 +123,14 @@ def test_get_list_sections(get_token):
 
 def test_get_section(get_token):
   """
-    Get a sections details for a  section by giving section_id as query paramter 
+    Get a sections details for a  section by giving section_id as query paramter
   """
   course = create_course(DATABASE_PREFIX + "test_course", "This is test",
                          "test", "me")
   classroom_id = course["id"]
-  create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
+  fake_data=create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
                    classroom_id)
-  url = f"{API_URL}/sections/fake_section_id"
+  url = f"{API_URL}/sections/{fake_data[2].id}"
   resp = requests.get(url=url,headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
@@ -162,12 +162,12 @@ def test_update_section(get_token):
                          "test", "me")
   # Create fake Mastr course in Firestore
   classroom_id = course["id"]
-  create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
+  fake_data=create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
                    classroom_id)
   url = f"{API_URL}/sections"
 
   data = {
-      "uuid": "fake_section_id",
+      "id": fake_data[2].id,
       "course_id": classroom_id,
       "section_name": "section_updated",
       "description": "test_description_updated",
@@ -189,12 +189,12 @@ def test_update_section_course_not_found_in_classroom(get_token):
                          "test", "me")
   # Create fake Mastr course in Firestore
   classroom_id = course["id"]
-  create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
+  fake_data=create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
                    classroom_id)
   url = f"{API_URL}/sections"
 
   data = {
-      "uuid": "fake_section_id",
+      "id": fake_data[2].id,
       "course_id": "test1222",
       "section_name": "section_updated",
       "description": "test_description_updated",
