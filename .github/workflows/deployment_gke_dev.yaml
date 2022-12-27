@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-        
+
       - name: 'Set up Gcloud auth'
         id: 'gcloud_auth'
         uses: 'google-github-actions/auth@v1'
@@ -56,13 +56,13 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v1'
 
-      - name: Connect to cluster
-        run: |
-          gcloud container clusters get-credentials "$GKE_CLUSTER" --region $GKE_REGION --project $PROJECT_ID
-      
       - name: Install GKE Auth Plugin
         run: |
          gcloud components install gke-gcloud-auth-plugin
+
+      - name: Connect to cluster
+        run: |
+          gcloud container clusters get-credentials "$GKE_CLUSTER" --region $GKE_REGION --project $PROJECT_ID
 
       - name: Set up Service Account
         run: |

@@ -57,6 +57,10 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
     
+    - name: Install GKE Auth Plugin
+      run: | 
+        gcloud components install gke-gcloud-auth-plugin
+      
     - name: Connect to cluster
       run: |
         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
@@ -78,10 +82,6 @@ jobs:
     - name: Download Skaffold cache if exists
       run: |
         gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
-
-    - name: Install GKE Auth Plugin
-      run: | 
-        gcloud components install gke-gcloud-auth-plugin
 
     - name: Set up Kubernetes namespace and Service Account
       run: |
