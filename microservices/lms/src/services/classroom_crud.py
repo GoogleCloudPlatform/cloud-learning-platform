@@ -5,10 +5,10 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from common.utils.errors import InvalidTokenError
+from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
 from config import CLASSROOM_ADMIN_EMAIL
 from utils import helper
-
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
@@ -98,8 +98,8 @@ def update_course(course_id,
     logger.error(error)
     raise HttpError from error
 
-def update_course_state(course_id,
-                  course_state):
+
+def update_course_state(course_id, course_state):
   """Update course state
   Possible states a course can be ACTIVE,ARCHIVED
   PROVISIONED,DECLINED,SUSPENDED
@@ -113,6 +113,7 @@ def update_course_state(course_id,
   course = service.courses().update(id=course_id, body=course).execute()
   course_id = course.get("id")
   return course
+
 
 def get_course_list():
   """Get courses list from classroom
@@ -166,14 +167,14 @@ def create_topics(course_id, topics):
     """ ""
 
   service = build("classroom", "v1", credentials=get_credentials())
-  topic_id_map= {}
+  topic_id_map = {}
   for topic in topics:
     old_topic_id = topic["topicId"]
     topic_name = topic["name"]
     topic = {"name": topic_name}
     response = service.courses().topics().\
       create(courseId=course_id, body=topic).execute()
-    topic_id_map[old_topic_id]=response["topicId"]
+    topic_id_map[old_topic_id] = response["topicId"]
   Logger.info(f"Topics created for course_id{course_id}")
   return topic_id_map
 
@@ -313,6 +314,7 @@ def enroll_student(token, course_id, student_email, course_code):
   return service.courses().students().create(
       courseId=course_id, body=student, enrollmentCode=course_code).execute()
 
+
 def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns
       return a dictionary of view link as keys and edit link as values
@@ -321,12 +323,12 @@ def get_edit_url_and_view_url_mapping_of_form():
   page_token = None
   while True:
     response = service.files().list(
-              q="mimeType=\"application/vnd.google-apps.form\"",
-                                      spaces="drive",
-                                      fields="nextPageToken, "
-                          "files(id, name,webViewLink,thumbnailLink)",
-                                      pageToken=page_token).execute()
-    view_link_and_edit_link_matching ={}
+        q="mimeType=\"application/vnd.google-apps.form\"",
+        spaces="drive",
+        fields="nextPageToken, "
+        "files(id, name,webViewLink,thumbnailLink)",
+        pageToken=page_token).execute()
+    view_link_and_edit_link_matching = {}
     for file in response.get("files", []):
       result = get_view_link_from_id(file.get("id"))
       view_link_and_edit_link_matching[result["responderUri"]] = \
@@ -335,9 +337,39 @@ def get_edit_url_and_view_url_mapping_of_form():
       break
   return view_link_and_edit_link_matching
 
-def get_view_link_from_id (form_id):
+
+def get_view_link_from_id(form_id):
   "Query google forms api  using form id and get view url of  google form"
 
   service = build("forms", "v1", credentials=get_credentials())
   result = service.forms().get(formId=form_id).execute()
   return result
+
+
+def invite_teacher(course_id, teacher_email):
+  """Invite teacher to google classroom using course id and email
+
+  Args:
+      course_id (str): google classroom unique id
+      teacher_email (str): teacher email id
+
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
+
+  Returns:
+      dict: response from create invitation method
+  """
+  service = build("classroom", "v1", credentials=get_credentials())
+  body = {"courseId": course_id, "role": "TEACHER", "userId": teacher_email}
+  try:
+    course = service.invitations().create(body=body).execute()
+    return course
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    print(str(e))
+    raise InternalServerError(str(e)) from e

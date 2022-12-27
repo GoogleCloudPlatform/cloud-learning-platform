@@ -27,8 +27,6 @@ os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 def create_course_template(client_with_emulator):
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
-  course_template.uuid = course_template.id
-  course_template.update()
   return course_template
 
 
@@ -38,8 +36,6 @@ def test_get_cohort_list(client_with_emulator, create_course_template):
     cohort = Cohort.from_dict(i)
     cohort.course_template = create_course_template
     cohort.save()
-    cohort.uuid = cohort.id
-    cohort.update()
   data = {"success": True, "message": "Successfully get the Cohort list"}
   # mock logger
   with mock.patch("routes.cohort.Logger"):
@@ -56,12 +52,10 @@ def test_get_cohort(client_with_emulator, create_course_template):
   cohort = Cohort.from_dict(COHORT_EXAMPLE)
   cohort.course_template = create_course_template
   cohort.save()
-  cohort.uuid = cohort.id
-  cohort.update()
 
-  url = API_URL + f"/{cohort.uuid}"
+  url = API_URL + f"/{cohort.id}"
   data = COHORT_EXAMPLE
-  data["uuid"] = cohort.uuid
+  data["id"] = cohort.id
   data["course_template"] = create_course_template.key
   with mock.patch("routes.cohort.Logger"):
     response = client_with_emulator.get(url)
@@ -81,7 +75,7 @@ def test_get_cohort(client_with_emulator, create_course_template):
 
 
 def test_create_course_template(client_with_emulator, create_course_template):
-  INPUT_COHORT_TEST_DATA["course_template_uuid"] = create_course_template.uuid
+  INPUT_COHORT_TEST_DATA["course_template_id"] = create_course_template.id
   with mock.patch("routes.cohort.Logger"):
     response = client_with_emulator.post(API_URL, json=INPUT_COHORT_TEST_DATA)
   response_json = json.loads(response.text)
@@ -95,11 +89,11 @@ def test_create_course_template(client_with_emulator, create_course_template):
 
 
 def test_get_nonexist_cohort(client_with_emulator):
-  uuid = "non_exist_uuid"
-  url = API_URL + f"/{uuid}"
+  cohort_id = "non_exist_id"
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": False,
-      "message": f"Cohort with uuid {uuid} is not found",
+      "message": f"cohorts with id {cohort_id} is not found",
       "data": None
   }
   with mock.patch("routes.cohort.Logger"):
@@ -112,14 +106,12 @@ def test_update_cohort(client_with_emulator, create_course_template):
   cohort = Cohort.from_dict(COHORT_EXAMPLE)
   cohort.course_template = create_course_template
   cohort.save()
-  cohort.uuid = cohort.id
-  cohort.update()
 
-  uuid = cohort.uuid
-  url = API_URL + f"/{uuid}"
+  cohort_id = cohort.id
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": True,
-      "message": f"Successfully Updated the Cohort with uuid {uuid}"
+      "message": f"Successfully Updated the Cohort with id {cohort_id}"
   }
   json_body = {"max_students": 5000, "end_date": "2023-01-25T00:00:00"}
   with mock.patch("routes.cohort.Logger"):
@@ -138,17 +130,15 @@ def test_update_cohort_nonexits_course_template(client_with_emulator,
   cohort = Cohort.from_dict(COHORT_EXAMPLE)
   cohort.course_template = create_course_template
   cohort.save()
-  cohort.uuid = cohort.id
-  cohort.update()
 
-  uuid = cohort.uuid
-  url = API_URL + f"/{uuid}"
+  cohort_id = cohort.id
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": False,
-      "message": "Course template with uuid non_exits_uuid is not found",
+      "message": "course_templates with id non_exits_id is not found",
       "data": None
   }
-  json_body = {"max_students": 5000, "course_template": "non_exits_uuid"}
+  json_body = {"max_students": 5000, "course_template": "non_exits_id"}
   with mock.patch("routes.cohort.Logger"):
     response = client_with_emulator.patch(url, json=json_body)
   assert response.status_code == 404, "Status 404"
@@ -156,11 +146,11 @@ def test_update_cohort_nonexits_course_template(client_with_emulator,
 
 
 def test_update_nonexists_cohort(client_with_emulator):
-  uuid = "non_exists_uuid"
-  url = API_URL + f"/{uuid}"
+  cohort_id = "non_exists_id"
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": False,
-      "message": f"Cohort with uuid {uuid} is not found",
+      "message": f"cohorts with id {cohort_id} is not found",
       "data": None
   }
   json_body = {"max_students": 5000, "end_date": "2023-01-25T00:00:00"}
@@ -174,14 +164,12 @@ def test_delete_cohort(client_with_emulator, create_course_template):
   cohort = Cohort.from_dict(COHORT_EXAMPLE)
   cohort.course_template = create_course_template
   cohort.save()
-  cohort.uuid = cohort.id
-  cohort.update()
 
-  uuid = cohort.uuid
-  url = API_URL + f"/{uuid}"
+  cohort_id = cohort.id
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": True,
-      "message": f"Successfully deleted the Cohort with uuid {uuid}",
+      "message": f"Successfully deleted the Cohort with id {cohort_id}",
       "data": None
   }
   with mock.patch("routes.cohort.Logger"):
@@ -192,11 +180,11 @@ def test_delete_cohort(client_with_emulator, create_course_template):
 
 
 def test_delete_nonexist_cohort(client_with_emulator):
-  uuid = "non_exist_uuid"
-  url = API_URL + f"/{uuid}"
+  cohort_id = "non_exist_id"
+  url = API_URL + f"/{cohort_id}"
   data = {
       "success": False,
-      "message": f"Cohort with uuid {uuid} is not found",
+      "message": f"cohorts with id {cohort_id} is not found",
       "data": None
   }
   with mock.patch("routes.cohort.Logger"):

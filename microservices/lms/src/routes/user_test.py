@@ -20,12 +20,11 @@ import datetime
 import mock
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
-from common.models import User
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from common.testing.client_with_emulator import client_with_emulator
-from testing.test_config import BASE_URL
+from common.models import User
 from schemas.schema_examples import USER_EXAMPLE
-
+from testing.test_config import BASE_URL
 # assigning url
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
@@ -38,8 +37,9 @@ def test_get_user(client_with_emulator):
   user = User.from_dict(user_dict)
   user.save()
 
-  url = BASE_URL + f"/users/{user.uuid}"
+  url = BASE_URL + f"/users/{user.id}"
   data = USER_EXAMPLE
+  data["id"] = user.id
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
 
@@ -48,11 +48,11 @@ def test_get_user(client_with_emulator):
 
 
 def test_get_nonexist_user(client_with_emulator):
-  uuid = "non_exist_uuid"
-  url = BASE_URL + f"/users/{uuid}"
+  user_id = "non_exist_id"
+  url = BASE_URL + f"/users/{user_id}"
   data = {
       "success": False,
-      "message": f"User with uuid {uuid} is not found",
+      "message": f"users with id {user_id} is not found",
       "data": None
   }
   resp = client_with_emulator.get(url)
@@ -66,37 +66,39 @@ def test_post_user_new(client_with_emulator):
   url = BASE_URL + "/users"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.post(url, json=input_user)
-  print(resp.json())
   assert resp.status_code == 200, "Status 200"
 
   # now see if GET endpoint returns same data
-  input_user["uuid"] = resp.json()
-  url = BASE_URL + f"/users/{input_user['uuid']}"
+  input_user["id"] = resp.json()
+  url = BASE_URL + f"/users/{input_user['id']}"
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
   assert json_response == input_user
 
   # now check and confirm it is properly in the databse
-  loaded_user = User.find_by_uuid(input_user["uuid"])
+  loaded_user = User.find_by_id(input_user["id"])
   loaded_user_dict = loaded_user.to_dict()
 
-  # popping id and key for equivalency test
-  loaded_user_dict.pop("id")
+  # popping key and some fields for equivalency test
   loaded_user_dict.pop("key")
-  loaded_user_dict.pop("is_deleted")
   loaded_user_dict.pop("deleted_at_timestamp")
+  loaded_user_dict.pop("archived_at_timestamp")
+  loaded_user_dict.pop("deleted_by")
+  loaded_user_dict.pop("archived_by")
+  loaded_user_dict.pop("created_by")
+  loaded_user_dict.pop("last_modified_by")
 
   timestamp = datetime.datetime.utcnow()
 
   # remove the timestamps since they aren't returned in the API
   # response doesn't include
   acceptable_sec_diff = 15
-  created_timestamp = loaded_user_dict.pop("created_timestamp")
-  last_updated_timestamp = loaded_user_dict.pop("last_updated_timestamp")
+  created_time = loaded_user_dict.pop("created_time")
+  last_modified_time = loaded_user_dict.pop("last_modified_time")
 
-  assert (timestamp.second - created_timestamp.second) < acceptable_sec_diff
+  assert (timestamp.second - created_time.second) < acceptable_sec_diff
   assert (timestamp.second -
-          last_updated_timestamp.second) < acceptable_sec_diff
+          last_modified_time.second) < acceptable_sec_diff
   # assert that rest of the fields are equivalent
   assert loaded_user_dict == input_user
 
@@ -110,7 +112,7 @@ def test_put_user(client_with_emulator):
 
   # modify user
   input_user["role"] = "User Admin"
-  input_user["uuid"] = resp.json()
+  input_user["id"] = resp.json()
 
   url = BASE_URL + "/users"
   resp_data = SUCCESS_RESPONSE
@@ -122,7 +124,7 @@ def test_put_user(client_with_emulator):
   assert json_response == resp_data, "Response received"
 
   # now make sure user is updated and updated_timestamp is changed
-  url = BASE_URL + f"/users/{input_user['uuid']}"
+  url = BASE_URL + f"/users/{input_user['id']}"
   resp = client_with_emulator.get(url)
   json_response = json.loads(resp.text)
 
@@ -130,10 +132,10 @@ def test_put_user(client_with_emulator):
 
   # assert timestamp has been updated
   # loading from DB since not surfaced in API
-  loaded_user = User.find_by_uuid(input_user["uuid"])
-  created_timestamp = loaded_user.created_timestamp
-  last_updated_timestamp = loaded_user.last_updated_timestamp
-  assert created_timestamp < last_updated_timestamp
+  loaded_user = User.find_by_id(input_user["id"])
+  created_time = loaded_user.created_time
+  last_modified_time = loaded_user.last_modified_time
+  assert created_time < last_modified_time
 
 
 def test_put_user_negative(client_with_emulator):
@@ -142,7 +144,7 @@ def test_put_user_negative(client_with_emulator):
   user.save()
 
   input_user = USER_EXAMPLE
-  input_user["uuid"] = "U2DDBkl3Ayg0PWudzhI"
+  input_user["id"] = "U2DDBkl3Ayg0PWudzhI"
 
   url = BASE_URL + "/users"
   with mock.patch("routes.user.Logger"):
@@ -157,19 +159,19 @@ def test_delete_user(client_with_emulator):
   user.save()
 
   # confirm in backend with API
-  url = BASE_URL + f"/users/{user.uuid}"
+  url = BASE_URL + f"/users/{user.id}"
   resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
 
   # now delete user with API
-  url = BASE_URL + f"/users/{user.uuid}"
+  url = BASE_URL + f"/users/{user.id}"
   with mock.patch("routes.user.Logger"):
     resp = client_with_emulator.delete(url)
 
   assert resp.status_code == 200, "Status 200"
 
   # now confirm user gone with API
-  url = BASE_URL + f"/users/{user.uuid}"
+  url = BASE_URL + f"/users/{user.id}"
   resp = client_with_emulator.get(url)
   assert resp.status_code == 404, "Status 404"
 
@@ -185,7 +187,7 @@ def test_delete_user_negative(client_with_emulator):
 
   data = {
       "success": False,
-      "message": "User with uuid U2DDBkl3Ayg0PWudzhIi is not found",
+      "message": "users with id U2DDBkl3Ayg0PWudzhIi is not found",
       "data": None
   }
   resp = client_with_emulator.delete(url)

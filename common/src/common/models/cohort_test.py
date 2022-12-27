@@ -18,7 +18,9 @@ Unit test for cohort.py
 # disabling these rules, as they cause issues with pytest fixtures
 # pylint: disable=unused-import
 # pylint: disable=unused-argument,redefined-outer-name
-from common.models import Cohort,CourseTemplate
+import pytest
+from common.models import Cohort, CourseTemplate
+from common.utils.errors import ResourceNotFoundException
 from common.testing.example_objects import TEST_COHORT,TEST_COURSE_TEMPLATE
 from common.testing.firestore_emulator import  firestore_emulator, clean_firestore
 
@@ -30,9 +32,7 @@ def test_new_cohort(clean_firestore):
   course_template.save()
   new_cohort.course_template=course_template
   new_cohort.save()
-  new_cohort.uuid = new_cohort.id
-  new_cohort.update()
-  cohort=Cohort.find_by_uuid(new_cohort.uuid)
+  cohort=Cohort.find_by_id(new_cohort.id)
   assert cohort.name == TEST_COHORT["name"]
   assert cohort.max_students == TEST_COHORT["max_students"]
 
@@ -44,9 +44,8 @@ def test_delete_cohort(clean_firestore):
   course_template.save()
   new_cohort.course_template = course_template
   new_cohort.save()
-  new_cohort.uuid = new_cohort.id
-  new_cohort.update()
-  assert Cohort.archive_by_uuid("fakeuuid") is False, "Cohort not found"
-  assert Cohort.archive_by_uuid(
-      new_cohort.uuid) is True, "Cohort successfully deleted"
+  assert Cohort.find_by_id(new_cohort.id) is not None
+  Cohort.soft_delete_by_id(new_cohort.id)
+  with pytest.raises(ResourceNotFoundException):
+    Cohort.soft_delete_by_id(new_cohort.id)
   

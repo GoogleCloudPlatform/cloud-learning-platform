@@ -23,7 +23,7 @@ def step_impl_2(context):
 
 
 @behave.then(
-    "Course Template Record will be created in a third party tool and classroom master course will be create with provided payload and all metadata will be ingested and stored in Cousre Template service and uuid for learning experiences will be stored in Cousre Template service"
+    "Course Template Record will be created in a third party tool and classroom master course will be create with provided payload and all metadata will be ingested and stored in Cousre Template service and id for learning experiences will be stored in Cousre Template service"
 )
 def step_impl_3(context):
   assert context.status == 200, "Status 200"
@@ -31,7 +31,7 @@ def step_impl_3(context):
   assert context.response["course_template"]["classroom_code"] not in [
       "", None
   ], "Course Template classroom check"
-  assert context.response["course_template"]["uuid"] not in [
+  assert context.response["course_template"]["id"] not in [
       "", None
   ], "Course Template Firebase check"
 
@@ -70,7 +70,7 @@ def step_impl_6(context):
     "A user has access privileges and needs to retrieve a Course Template Record"
 )
 def setp_impl_7(context):
-  COURSE_TEMPLATE_INPUT_DATA["uuid"] = context.course_template.uuid
+  COURSE_TEMPLATE_INPUT_DATA["id"] = context.course_template.id
   COURSE_TEMPLATE_INPUT_DATA[
       "classroom_id"] = context.course_template.classroom_id
   COURSE_TEMPLATE_INPUT_DATA[
@@ -78,11 +78,11 @@ def setp_impl_7(context):
   COURSE_TEMPLATE_INPUT_DATA[
       "classroom_url"] = context.course_template.classroom_url
   context.test_data = COURSE_TEMPLATE_INPUT_DATA
-  context.url = f'{API_URL}/course_templates/{context.course_template.uuid}'
+  context.url = f'{API_URL}/course_templates/{context.course_template.id}'
 
 
 @behave.when(
-    "API request is sent to retrieve Course Template Record by providing correct uuid"
+    "API request is sent to retrieve Course Template Record by providing correct id"
 )
 def step_impl_8(context):
   resp = requests.get(context.url,headers=context.header)
@@ -91,7 +91,7 @@ def step_impl_8(context):
 
 
 @behave.then(
-    "Course Template Record corresponding to given uuid will be returned successfully"
+    "Course Template Record corresponding to given id will be returned successfully"
 )
 def step_impl_9(context):
   assert context.status == 200, "Status 200"
@@ -105,11 +105,11 @@ def step_impl_9(context):
     "A user has access to admin portal and wants to retrieve a Course Template Record"
 )
 def setp_impl_10(context):
-  context.url = f'{API_URL}/course_templates/fake_non_exist_uuid'
+  context.url = f'{API_URL}/course_templates/fake_non_exist_id'
 
 
 @behave.when(
-    "API request is sent to retrieve Course Template Record by providing invalid uuid"
+    "API request is sent to retrieve Course Template Record by providing invalid id"
 )
 def step_impl_11(context):
   resp = requests.get(context.url,headers=context.header)
@@ -130,13 +130,13 @@ def step_impl_12(context):
 
 @behave.given("A user has access privileges and needs to update a Course Template Record")
 def setp_impl_13(context):
-  context.url = f'{API_URL}/course_templates/{context.course_template.uuid}'
+  context.url = f'{API_URL}/course_templates/{context.course_template.id}'
   context.payload={"name":"updated_name","description":"updated_description"}
   
 
 
 @behave.when(
-    "API request is sent to update Course Template Record by providing correct uuid and request payload"
+    "API request is sent to update Course Template Record by providing correct id and request payload"
 )
 def step_impl_14(context):
   resp = requests.patch(context.url,json=context.payload,headers=context.header)
@@ -157,13 +157,13 @@ def step_impl_15(context):
     "A user has access to admin portal and wants to update a Course Template Record"
 )
 def setp_impl_16(context):
-  context.url = f'{API_URL}/course_templates/fake_non_exist_uuid'
+  context.url = f'{API_URL}/course_templates/fake_non_exist_id'
   context.payload = {"name": "updated_name",
                      "description": "updated_description"}
 
 
 @behave.when(
-    "API request is sent to delete Course Template Record by providing invalid uuid and valid payload"
+    "API request is sent to delete Course Template Record by providing invalid id and valid payload"
 )
 def step_impl_17(context):
   resp = requests.patch(context.url, json=context.payload,headers=context.header)
@@ -184,11 +184,11 @@ def step_impl_18(context):
     "A user has access privileges and needs to delete a Course Template Record"
 )
 def setp_impl_19(context):
-  context.url = f'{API_URL}/course_templates/{context.course_template.uuid}'
+  context.url = f'{API_URL}/course_templates/{context.course_template.id}'
 
 
 @behave.when(
-    "API request is sent to delete Course Template Record by providing correct uuid"
+    "API request is sent to delete Course Template Record by providing correct id"
 )
 def step_impl_20(context):
   resp = requests.delete(context.url,headers=context.header)
@@ -209,11 +209,11 @@ def step_impl_21(context):
     "A user has access to admin portal and wants to delete a Course Template Record"
 )
 def setp_impl_22(context):
-  context.url = f'{API_URL}/course_templates/fake_non_exist_uuid'
+  context.url = f'{API_URL}/course_templates/fake_non_exist_id'
 
 
 @behave.when(
-    "API request is sent to delete Course Template Record by providing invalid uuid"
+    "API request is sent to delete Course Template Record by providing invalid id"
 )
 def step_impl_23(context):
   resp = requests.delete(context.url,headers=context.header)
@@ -262,11 +262,11 @@ def step_impl_27(context):
     "A user has access privileges and needs to fetch all Cohort Records using course template"
 )
 def step_impl_28(context):
-  context.url = f'{API_URL}/course_templates/{context.cohort.course_template.uuid}/cohorts'
+  context.url = f'{API_URL}/course_templates/{context.cohort.course_template.id}/cohorts'
 
 
 @behave.when(
-    "API request is sent to fetch all Cohorts Records by providing Course template valid uuid"
+    "API request is sent to fetch all Cohorts Records by providing Course template valid id"
 )
 def step_impl_29(context):
   resp = requests.get(context.url,headers=context.header)
@@ -288,11 +288,11 @@ def step_impl_30(context):
     "A user has access to admin portal and wants to retrieve list of Cohort Records using course template"
 )
 def setp_impl_31(context):
-  context.url = f'{API_URL}/course_templates/fake_non_exist_uuid'
+  context.url = f'{API_URL}/course_templates/fake_non_exist_id'
 
 
 @behave.when(
-    "API request is sent to fetch all Cohorts Records by providing Course template invalid uuid"
+    "API request is sent to fetch all Cohorts Records by providing Course template invalid id"
 )
 def step_impl_32(context):
   resp = requests.delete(context.url,headers=context.header)

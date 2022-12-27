@@ -13,7 +13,7 @@ class CohortModel(BaseModel):
   Args:
       BaseModel (_type_): _description_
   """
-  uuid: str
+  id: str
   name: str
   description: str
   start_date: datetime.datetime
@@ -98,7 +98,7 @@ class InputCohortModel(BaseModel):
   registration_start_date: datetime.datetime
   registration_end_date: datetime.datetime
   max_students: int
-  course_template_uuid: str
+  course_template_id: str
 
   class Config():
     orm_mode = True

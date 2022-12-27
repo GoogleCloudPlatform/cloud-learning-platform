@@ -2,14 +2,14 @@
 import datetime
 
 USER_EXAMPLE = {
-    "uuid": "fake-user-id",
+    "id": "fake-user-id",
     "auth_id": "fake-user-id",
     "email": "user@gmail.com",
     "role": "Admin"
 }
 
 COURSE_TEMPLATE_EXAMPLE = {
-    "uuid": "id",
+    "id": "id",
     "name": "name",
     "description": "description",
     "admin": "admin",
@@ -36,7 +36,7 @@ INSERT_COURSE_TEMPLATE_EXAMPLE = {
 }
 
 COHORT_EXAMPLE = {
-    "uuid": "fake-cohort-id",
+    "id": "fake-cohort-id",
     "name": "name",
     "description": "description",
     "start_date": datetime.datetime(year=2022, month=10, day=14),
@@ -45,7 +45,7 @@ COHORT_EXAMPLE = {
     "registration_end_date": datetime.datetime(year=2022, month=11, day=14),
     "max_students": 0,
     "enrolled_students_count": 0,
-    "course_template": "course_template/fake-uuid"
+    "course_template": "course_template/fake-id"
 }
 UPDATE_COHORT_EXAMPLE = {
     "name": "name",
@@ -56,7 +56,7 @@ UPDATE_COHORT_EXAMPLE = {
     "registration_end_date": datetime.datetime(year=2022, month=11, day=14),
     "max_students": 0,
     "enrolled_students_count": 0,
-    "course_template": "course_template/fake-uuid"
+    "course_template": "course_template/fake-id"
 }
 INSERT_COHORT_EXAMPLE = {
     "name": "name",
@@ -66,20 +66,18 @@ INSERT_COHORT_EXAMPLE = {
     "registration_start_date": datetime.datetime(year=2022, month=10, day=20),
     "registration_end_date": datetime.datetime(year=2022, month=11, day=14),
     "max_students": 0,
-    "course_template": "fake-uuid"
+    "course_template": "fake-id"
 }
 
-SECTION_EXAMPLE ={
-    "uuid": "DLx0TNnYpCCwtCAJHUir",
+SECTION_EXAMPLE = {
+    "id": "DLx0TNnYpCCwtCAJHUir",
     "name": "science 101",
     "section": "create_section_test C",
     "description": "This is updated create section test",
     "classroom_id": "123456789100",
     "classroom_code": "abcdef",
     "classroom_url": "https://classroom.google.com",
-    "teachers_list": [
-      "test_user_1@gmail.com"
-    ],
+    "teachers_list": ["test_user_1@gmail.com"],
     "course_template": "course_templates/7d2zTApDFE6yEvUn8JFu",
     "cohort": "cohorts/1j4YsDuylLWtzHVszcAf"
 }
