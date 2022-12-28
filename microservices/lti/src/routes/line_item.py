@@ -277,6 +277,8 @@ def create_score_for_line_item(line_item_id: str, input_score: BasicScoreModel):
     new_score = Score()
     new_score = new_score.from_dict(input_score_dict)
     new_score.save()
+    new_score.uuid = new_score.id
+    new_score.update()
     score_fields = new_score.get_fields(reformat_datetime=True)
 
     return score_fields

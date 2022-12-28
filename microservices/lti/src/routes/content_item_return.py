@@ -1,6 +1,6 @@
 """Content Item  Return endpoint for LTI Service as Platform"""
 from copy import deepcopy
-from config import ERROR_RESPONSES
+from config import ERROR_RESPONSES, ISSUER
 from fastapi import APIRouter, Form
 from common.models import Tool
 from common.utils.errors import (ResourceNotFoundException)
@@ -18,7 +18,7 @@ router = APIRouter(
     tags=["Content Item Return Endpoint"], responses=ERROR_RESPONSE_DICT)
 
 
-@router.get(
+@router.post(
     "/content-item-return",
     responses={404: {
         "model": NotFoundErrorResponseModel
@@ -26,7 +26,7 @@ router = APIRouter(
     name="DeepLinking Response API for Content Item")
 def content_item_return(JWT: str = Form()):
   """
-    This endpoint which will be used by tool for sending deeplinking response
+    This endpoint which will be used by tool for sending deep linking response
     for content selection.
     Args:
       JWT: jwt token encoded using private key of tool
@@ -40,15 +40,15 @@ def content_item_return(JWT: str = Form()):
 
     tool_config = Tool.find_by_client_id(unverified_claims.get("iss"))
 
-    if tool_config.get("public_key_type") == "JWK URL":
-      key = get_remote_keyset(tool_config.get("tool_keyset_url"))
-    elif tool_config.get("public_key_type") == "Public Key":
-      key = tool_config.get("tool_public_key")
+    if tool_config.public_key_type == "JWK URL":
+      key = get_remote_keyset(tool_config.tool_keyset_url)
+    elif tool_config.public_key_type == "Public Key":
+      key = tool_config.tool_public_key
 
-    decoded_data = decode_token(JWT, key)
+    decoded_data = decode_token(JWT, key, ISSUER)
     content_item_key = lti_claim_field("claim", "content_items", "dl")
     content_item_data = decoded_data[content_item_key]
-    # TODO: Once the content-item datamodel is implemented, save the
+    # TODO: Once the content-item data model is implemented, save the
     # decoded_data[content_item_key] in it and link it to the learning resource.
     return {
         "success": True,

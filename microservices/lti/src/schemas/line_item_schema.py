@@ -12,7 +12,7 @@ from schemas.schema_examples import (BASIC_LINE_ITEM_EXAMPLE,
 class BasicScoreModel(BaseModel):
   """Basic Score Pydantic Model"""
   userId: str
-  scoreGiven: str
+  scoreGiven: int
   scoreMaximum: int
   comment: str
   timestamp: str
@@ -24,7 +24,7 @@ class ScoreResponseModel(BaseModel):
   """Score Response Model"""
   uuid: str
   userId: str
-  scoreGiven: str
+  scoreGiven: int
   scoreMaximum: int
   comment: str
   timestamp: str
