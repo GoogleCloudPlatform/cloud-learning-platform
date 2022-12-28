@@ -3,13 +3,13 @@ Pydantic Model for copy course API's
 """
 from typing import Optional
 from pydantic import BaseModel
-from schemas.schema_examples import CREDENTIAL_JSON,SECTION_EXAMPLE
+from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE
 
 
 class Sections(BaseModel):
   """Sections Details """
-  uuid : str
-  name:  str
+  id: str
+  name: str
   section: str
   description: str
   classroom_id: str
@@ -21,13 +21,12 @@ class Sections(BaseModel):
 
   class Config():
     orm_mode = True
-    schema_extra = {
-        "example": SECTION_EXAMPLE
-    }
+    schema_extra = {"example": SECTION_EXAMPLE}
+
 
 class SectionDetails(BaseModel):
   """Course Detail model"""
-  uuid: Optional[str]
+  id: Optional[str]
   name: str
   description: str
   course_template: str
@@ -51,6 +50,7 @@ class SectionListResponseModel(BaseModel):
         }
     }
 
+
 class CreateSectiontResponseModel(BaseModel):
   """Create Section Response Model"""
   success: Optional[bool] = True
@@ -63,15 +63,16 @@ class CreateSectiontResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully created the section",
-           "section":SECTION_EXAMPLE
+            "section": SECTION_EXAMPLE
         }
     }
+
 
 class GetSectiontResponseModel(BaseModel):
   """Get  Section Response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[Sections] =None
+  data: Optional[Sections] = None
 
   class Config():
     orm_mode = True
@@ -79,7 +80,7 @@ class GetSectiontResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Success",
-           "data":SECTION_EXAMPLE
+            "data": SECTION_EXAMPLE
         }
     }
 
@@ -88,7 +89,7 @@ class UpdateSectionResponseModel(BaseModel):
   """Update  Section Response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[Sections]=None
+  data: Optional[Sections] = None
 
   class Config():
     orm_mode = True
@@ -96,9 +97,10 @@ class UpdateSectionResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Section Updated successfully",
-           "data":SECTION_EXAMPLE
+            "data": SECTION_EXAMPLE
         }
     }
+
 
 class SectionResponseModel(BaseModel):
   """Get a list of sections"""
@@ -115,6 +117,7 @@ class SectionResponseModel(BaseModel):
             "data": []
         }
     }
+
 
 class CredentialKeys(BaseModel):
   """Credential model"""
@@ -161,6 +164,7 @@ class AddStudentResponseModel(BaseModel):
             "data": None
         }
     }
+
 
 class DeleteSectionResponseModel(BaseModel):
   """Delete section Model"""

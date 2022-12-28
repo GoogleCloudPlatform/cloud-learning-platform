@@ -11,13 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 FireO BaseModel to be inherited by all other objects in ORM
 """
 
+import datetime
 import fireo
 from fireo.models import Model
+from fireo.fields import DateTime, TextField
+from common.utils.errors import ResourceNotFoundException
+import common.config
 
 
 # pylint: disable = too-few-public-methods
@@ -27,6 +30,69 @@ class BaseModel(Model):
     An interface, intended to be subclassed.
 
     """
+  created_time = DateTime()
+  last_modified_time = DateTime()
+  deleted_at_timestamp = DateTime(default=None)
+  deleted_by = TextField(default="")
+  archived_at_timestamp = DateTime(default=None)
+  archived_by = TextField(default="")
+  created_by = TextField(default="")
+  last_modified_by = TextField(default="")
+  DATABASE_PREFIX = common.config.DATABASE_PREFIX
+
+  def save(self,
+           input_datetime=None,
+           transaction=None,
+           batch=None,
+           merge=None,
+           no_return=False):
+    """overrides default method to save items with timestamp
+    Args:
+      provided_timestamp (_type_, optional): _description_. Defaults to None.
+      transaction (_type_, optional): _description_. Defaults to None.
+      batch (_type_, optional): _description_. Defaults to None.
+      merge (_type_, optional): _description_. Defaults to None.
+      no_return (bool, optional): _description_. Defaults to False.
+    Returns:
+      _type_: _description_
+    """
+    if input_datetime:
+      date_timestamp = input_datetime
+    else:
+      date_timestamp = datetime.datetime.utcnow()
+    self.created_time = date_timestamp
+    self.last_modified_time = date_timestamp
+    return super().save(transaction, batch, merge, no_return)
+
+  def update(self,
+             input_datetime=None,
+             key=None,
+             transaction=None,
+             batch=None):
+    """overrides default method to update items with timestamp
+    Args:
+      provided_timestamp (_type_, optional): _description_. Defaults to None.
+      key (_type_, optional): _description_. Defaults to None.
+      transaction (_type_, optional): _description_. Defaults to None.
+      batch (_type_, optional): _description_. Defaults to None.
+    Returns:
+      _type_: _description_
+    """
+    if input_datetime:
+      date_timestamp = input_datetime
+    else:
+      date_timestamp = datetime.datetime.utcnow()
+    self.last_modified_time = date_timestamp
+    return super().update(key, transaction, batch)
+
+  def get_fields(self, reformat_datetime=False):
+    """overrides default method to fix data type for datetime fields"""
+    fields = super()._get_fields()
+    if reformat_datetime:
+      fields["created_time"] = str(fields["created_time"])
+      fields["last_modified_time"] = str(fields["last_modified_time"])
+    return fields
+
   class Meta:
     # TODO: uncomment when bug is fixed
     # ignore_none_field seems not to inherit
@@ -37,22 +103,24 @@ class BaseModel(Model):
     abstract = True
 
   @classmethod
-  def find_by_id(cls, doc_id):
+  def find_by_id(cls, object_id):
     """Looks up in the Database and returns an object of this type by id
        (not key)
-
         An interface, intended to be subclassed.
-
         Args:
             doc_id (string): the document id without collection_name
             (i.e. not the key)
-
         Returns:
             [any]: an instance of object returned by the database, type is
             the subclassed Model
         """
-    key = fireo.utils.utils.generateKeyFromId(cls, doc_id)
-    return cls.collection.get(key)
+    obj = cls.collection.filter("id", "in",
+                                [object_id]).filter("deleted_at_timestamp",
+                                                    "==", None).get()
+    if obj is None:
+      raise ResourceNotFoundException(
+          f"{cls.collection_name} with id {object_id} is not found")
+    return obj
 
   @classmethod
   def delete_by_id(cls, doc_id):
@@ -67,3 +135,95 @@ class BaseModel(Model):
         """
     key = fireo.utils.utils.generateKeyFromId(cls, doc_id)
     return cls.collection.delete(key)
+
+  @classmethod
+  def soft_delete_by_id(cls, object_id, by_user=None):
+    """Soft delete a object by id
+      Args:
+          id (str): unique id
+      Raises:
+          ResourceNotFoundException: If the object does not exist
+      """
+    obj = cls.collection.filter("id", "in",
+                                [object_id]).filter("deleted_at_timestamp",
+                                                    "==", None).get()
+    if obj is None:
+      raise ResourceNotFoundException(
+          f"{cls.collection_name} with id {object_id} is not found")
+    else:
+      obj.deleted_at_timestamp = datetime.datetime.utcnow()
+      obj.deleted_by = by_user
+      obj.update()
+
+  @classmethod
+  def archive_by_id(cls, object_id, by_user=None):
+    """_summary_
+    Args:
+      id (str): unique id
+    """
+    obj = cls.collection.filter("id", "in",
+                                [object_id]).filter("deleted_at_timestamp",
+                                                    "==", None).get()
+    if obj is None:
+      raise ResourceNotFoundException(
+          f"{cls.collection_name} with id {object_id} is not found")
+    else:
+      obj.archived_at_timestamp = datetime.datetime.utcnow()
+      obj.archived_by = by_user
+      obj.update()
+
+  @classmethod
+  def fetch_all(cls, limit=1000):
+    """ fetch all documents
+
+    Args:
+        limit (int, optional):  Defaults to 1000.
+
+    Returns:
+        _type_: list of objects
+    """
+    objects = cls.collection.filter("deleted_at_timestamp", "==",
+                                    None).fetch(limit)
+    return list(objects)
+
+  @classmethod
+  def fetch_all_documents(cls, limit=1000):
+    """Fetches all documents of the collection in batches
+
+    Args:
+      limit (int): the number of documents to fetch in a batch
+
+    Returns:
+      list (document objects): list of firestore document objects
+    """
+    all_docs = []
+    docs = cls.collection.fetch(limit)
+    while True:
+      batch_docs = list(docs)
+      if not batch_docs:
+        break
+      all_docs.extend(batch_docs)
+      docs.next_fetch(limit)
+    return all_docs
+
+  @classmethod
+  def delete_by_uuid(cls, uuid):
+    doc = cls.collection.filter("uuid", "==",
+                                uuid).filter("is_deleted", "==", False).get()
+    if doc is not None:
+      doc.is_deleted = True
+      doc.update()
+    else:
+      raise ResourceNotFoundException(
+          f"{cls.__name__} with uuid {uuid} not found")
+
+  @classmethod
+  def archive_by_uuid(cls, uuid, archive=True):
+    doc = cls.collection.filter("uuid", "==",
+                                uuid).filter("is_deleted", "==", False).get()
+    if doc is not None:
+      doc.is_archived = archive
+      doc.update()
+    else:
+      raise ResourceNotFoundException\
+        (f"{cls.__name__} with uuid {uuid} not found")

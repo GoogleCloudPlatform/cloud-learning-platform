@@ -3,12 +3,12 @@ Pydantic Model for Course template API's
 """
 from typing import Optional
 from pydantic import BaseModel
-from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, INSERT_COURSE_TEMPLATE_EXAMPLE,UPDATE_COURSE_TEMPLATE_EXAMPLE
+from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, INSERT_COURSE_TEMPLATE_EXAMPLE, UPDATE_COURSE_TEMPLATE_EXAMPLE
 
 
 class CourseTemplateModel(BaseModel):
   """Course Template Pydantic Model"""
-  uuid: str
+  id: str
   name: str
   description: str
   admin: str
@@ -24,13 +24,13 @@ class CourseTemplateModel(BaseModel):
 
 class UpdateCourseTemplateModel(BaseModel):
   """Update Course Template Pydantic Model"""
-  name: Optional[str]=None
-  description: Optional[str]=None
-  admin: Optional[str]=None
-  instructional_designer: Optional[str]=None
-  classroom_id: Optional[str]=None
-  classroom_code: Optional[str]=None
-  classroom_url: Optional[str]=None
+  name: Optional[str] = None
+  description: Optional[str] = None
+  admin: Optional[str] = None
+  instructional_designer: Optional[str] = None
+  classroom_id: Optional[str] = None
+  classroom_code: Optional[str] = None
+  classroom_url: Optional[str] = None
 
   class Config():
     orm_mode = True
@@ -98,6 +98,7 @@ class DeleteCourseTemplateModel(BaseModel):
             "data": None
         }
     }
+
 
 class UpdateCourseTemplateResponseModel(BaseModel):
   """Update Course Template response Model"""
