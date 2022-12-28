@@ -1,6 +1,5 @@
-""" User endpoints """
+""" Section endpoints """
 import traceback
-
 from common.models.cohort import Cohort
 from common.models.course_template import CourseTemplate
 from common.models.section import Section
@@ -27,7 +26,6 @@ from schemas.update_section import UpdateSection
 from services import classroom_crud
 from services.classroom_crud import get_edit_url_and_view_url_mapping_of_form
 from utils.helper import convert_section_to_section_model
-import time
 # disabling for linting to pass
 # pylint: disable = broad-except
 
