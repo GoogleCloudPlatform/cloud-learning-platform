@@ -15,7 +15,7 @@ class NotFoundErrorResponseModel(BaseModel):
     schema_extra = {
         "example": {
             "success": False,
-            "message": "Resource with uuid o1nv13n6sbu0ny not found",
+            "message": "Resource with id o1nv13n6sbu0ny not found",
             "data": {}
         }
     }

@@ -10,26 +10,24 @@ from testing_objects.test_config import API_URL
 from testing_objects.token_fixture import get_token
 
 
-course_template_uuid=None
+course_template_id=None
 @pytest.fixture(scope="module",autouse=True)
 def create_course_template(get_token):
   "create a course template for reference"
   url =  f"{API_URL}/course_templates"
   resp = requests.post(
     url=url, json=COURSE_TEMPLATE_INPUT_DATA,headers=get_token)
-  global course_template_uuid
-  course_template_uuid = resp.json()["course_template"]["uuid"]
+  global course_template_id
+  course_template_id = resp.json()["course_template"]["id"]
 
 
 @pytest.fixture
 def setup_cohort():
     """Fixture to create temprory data"""
     cohort = Cohort.from_dict(TEST_COHORT)
-    course_template=CourseTemplate.find_by_uuid(course_template_uuid)
+    course_template=CourseTemplate.find_by_id(course_template_id)
     cohort.course_template=course_template
     cohort.save()
-    cohort.uuid = cohort.id
-    cohort.update()
     return cohort
 
 
@@ -42,25 +40,25 @@ def test_create_cohort(get_token):
   """
    
   url = f"{API_URL}/cohorts"
-  COHORT_INPUT_DATA["course_template_uuid"]=course_template_uuid
+  COHORT_INPUT_DATA["course_template_id"]=course_template_id
   resp = requests.post(headers=get_token,
   url=url, json=COHORT_INPUT_DATA)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
   assert resp_json["success"] is True, "Check success"
   assert resp_json["cohort"]["start_date"].split("+")[0] == COHORT_INPUT_DATA["start_date"], "Check start_date of chort"
-  assert resp_json["cohort"]["uuid"] not in [
+  assert resp_json["cohort"]["id"] not in [
     "", None], "Cohort Firebase check"
 
 
 def test_create_cohort_negative_course_template(get_token):
   """ 
-  CUJ02 create a Cohort by providing a valid json object but invalid course_template uuid
+  CUJ02 create a Cohort by providing a valid json object but invalid course_template id
   as a input and calling create Cohort API.
   Which will return Resource not found exception.
   """
   url = f"{API_URL}/cohorts"
-  COHORT_INPUT_DATA["course_template_uuid"] = "fake-uuid"
+  COHORT_INPUT_DATA["course_template_id"] = "fake-id"
   resp = requests.post(
     url=url, json=COHORT_INPUT_DATA,headers=get_token)
   resp_json = resp.json()
@@ -84,16 +82,16 @@ def test_create_cohort_validation(get_token):
 
 def test_get_cohort(setup_cohort, get_token):
   """
-  CUJ04 get a Cohort by providing a valid uuid
+  CUJ04 get a Cohort by providing a valid id
   as a path variable and calling get cohort API.
   Which will return a Cohort object.
   """
   url =f"{API_URL}/cohorts/{setup_cohort.id}"
   resp = requests.get(url=url,headers=get_token)
   data = TEST_COHORT
-  data["uuid"] = setup_cohort.uuid
-  data["course_template"] = CourseTemplate.find_by_uuid(
-  course_template_uuid).key
+  data["id"] = setup_cohort.id
+  data["course_template"] = CourseTemplate.find_by_id(
+  course_template_id).key
   response_cohort = resp.json()
   response_cohort["start_date"] = datetime.datetime.strptime(
   response_cohort.pop("start_date").split("+")[0], '%Y-%m-%dT%H:%M:%S')
@@ -109,11 +107,11 @@ def test_get_cohort(setup_cohort, get_token):
 
 def test_get_cohort_negative(get_token):
   """ 
-  CUJ05 get a Cohort by providing a invalid uuid
+  CUJ05 get a Cohort by providing a invalid id
   as a path variable and calling get cohort api.
   Which will return a not found error response.
   """
-  url =f"{API_URL}/cohorts/fake-uuid"
+  url =f"{API_URL}/cohorts/fake-id"
   resp = requests.get(url=url,headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 404, "Status 404"
@@ -122,7 +120,7 @@ def test_get_cohort_negative(get_token):
 
 def test_update_chort(setup_cohort, get_token):
   """ 
-  CUJ06 update a cohort by providing a valid uuid
+  CUJ06 update a cohort by providing a valid id
   as a path variable and calling Update cohort api.
   Which will return a UpdateCohortResponseModel object as a response.
   """
@@ -140,8 +138,8 @@ def test_update_chort(setup_cohort, get_token):
 
 def test_update_chort_nonexits_course(setup_cohort, get_token):
   """ 
-  CUJ07 update a cohort by providing a valid as a path variable uuid 
-  and invalid course template uuid as json object and calling Update cohort api.
+  CUJ07 update a cohort by providing a valid as a path variable id 
+  and invalid course template id as json object and calling Update cohort api.
   Which will return a not found error response.
   """
   
@@ -158,11 +156,11 @@ def test_update_chort_nonexits_course(setup_cohort, get_token):
 
 def test_update_cohort_negative(get_token):
   """ 
-  CUJ09 update a cohort by providing a invalid uuid
+  CUJ09 update a cohort by providing a invalid id
   as a path variable and calling update cohort api.
   Which will return a not found error response.
   """
-  url = f"{API_URL}/cohorts/fake-uuid"
+  url = f"{API_URL}/cohorts/fake-id"
   resp = requests.patch(url=url, json={"max_student": 2000},headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 404, "Status 404"
@@ -171,7 +169,7 @@ def test_update_cohort_negative(get_token):
 
 def test_delete_chort(setup_cohort, get_token):
   """ 
-  CUJ09 delete a cohort by providing a valid uuid
+  CUJ09 delete a cohort by providing a valid id
   as a path variable and calling delete cohort api.
   Which will return a DeleteCohortResponseModel object as a response.
   """
@@ -185,11 +183,11 @@ def test_delete_chort(setup_cohort, get_token):
 
 def test_delete_cohort_negative(get_token):
   """ 
-  CUJ010 delete a cohort by providing a invalid uuid
+  CUJ010 delete a cohort by providing a invalid id
   as a path variable and calling delete cohort api.
   Which will return a not found error response.
   """
-  url = f"{API_URL}/cohorts/fake-uuid"
+  url = f"{API_URL}/cohorts/fake-id"
   resp = requests.delete(url=url,headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 404, "Status 404"
