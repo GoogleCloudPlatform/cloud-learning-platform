@@ -80,9 +80,8 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
               lti_claim_field("scope", "result.readonly", "ags"),
               lti_claim_field("scope", "score", "ags")
           ],
-          "lineitems": ISSUER + "/lti-service/api/v1/1234/line_items",
-          "lineitem": ISSUER + "/lti-service/api/v1/1234/line_items/" +
-                      line_item.uuid
+          "lineitems": ISSUER + "/lti/api/v1/1234/line_items",
+          "lineitem": ISSUER + "/lti/api/v1/1234/line_items/" + line_item.uuid
       }
 
     resource_link_claim_info = {

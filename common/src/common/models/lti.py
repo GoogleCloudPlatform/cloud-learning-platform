@@ -362,6 +362,12 @@ class LineItem(TempBaseModel):
       raise ResourceNotFoundException(f"Line item with uuid {uuid} not found")
     return line_item
 
+  @classmethod
+  def find_by_resource_link_id(cls, resource_link_id):
+    line_item = cls.collection.filter("resourceLinkId", "==",
+                                      resource_link_id).get()
+    return line_item
+
 
 class Result(TempBaseModel):
   """LTI Result Data Model"""
