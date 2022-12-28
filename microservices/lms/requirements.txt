@@ -9,3 +9,4 @@ google-auth-httplib2
 google-auth-oauthlib
 protobuf==3.20.*
 oauth2client
+ttl-cache==1.6

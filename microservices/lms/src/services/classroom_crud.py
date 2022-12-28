@@ -9,7 +9,6 @@ from common.utils.logging_handler import Logger
 from config import CLASSROOM_ADMIN_EMAIL
 from utils import helper
 
-
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
 
@@ -113,6 +112,7 @@ def update_course_state(course_id,
   course = service.courses().update(id=course_id, body=course).execute()
   course_id = course.get("id")
   return course
+
 
 def get_course_list():
   """Get courses list from classroom

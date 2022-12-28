@@ -2,8 +2,9 @@
 import json
 from google.cloud import secretmanager
 import google_crc32c
+import ttl_cache
 
-
+@ttl_cache(3600)
 def get_gke_pd_sa_key_from_secret_manager():
   """Copy course  API
 
@@ -26,7 +27,6 @@ def get_gke_pd_sa_key_from_secret_manager():
   payload = response.payload.data.decode("UTF-8")
   response = json.loads(payload)
   return response
-
 
 def convert_cohort_to_cohort_model(cohort):
   """Convert Cohort Object to Cohort Model Object
