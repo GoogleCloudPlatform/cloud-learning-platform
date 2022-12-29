@@ -23,6 +23,9 @@ export class SignInComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // this.authService.validate().subscribe((res: any) => {
+    //   console.log(res)
+    // })
   }
 
 }

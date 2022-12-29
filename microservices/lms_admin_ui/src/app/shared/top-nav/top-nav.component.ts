@@ -8,10 +8,13 @@ import { AuthService } from '../service/auth.service';
   styleUrls: ['./top-nav.component.scss']
 })
 export class TopNavComponent implements OnInit {
-  userShowName: string = 'John Doe'
+  userShowName: string
   constructor(private _AuthService: AuthService) { }
 
   ngOnInit(): void {
+    if (localStorage.getItem('idToken')) {
+      this.userShowName = localStorage.getItem('user')
+    }
   }
   logout() {
     if (localStorage.getItem('idToken')) {
