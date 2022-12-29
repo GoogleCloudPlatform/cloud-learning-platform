@@ -26,3 +26,6 @@ requires:
 
 - path: ./microservices/lms_admin_ui
   configs: [lms-admin-ui]
+
+- path: ./microservices/lti
+  configs: [lti]

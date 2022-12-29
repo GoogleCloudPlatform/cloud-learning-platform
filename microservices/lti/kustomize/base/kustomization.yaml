@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Flatten import namespace for models
-"""
-
-from .base_model import *
-from .user import *
-from .course_template import *
-from .cohort import *
-from .section import *
-from .lti import *
-from .temp_user import *
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ./deployment.yaml
+- ./service.yaml
+configMapGenerator:
+- name: env-vars
+  envs:
+  - env.properties

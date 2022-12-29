@@ -25,6 +25,7 @@ class ValidationError(Exception):
     self.data = data
     super().__init__(self.message)
 
+
 class TokenNotFoundError(Exception):
   """Error class to be raised when auth token is not found"""
 
@@ -37,5 +38,13 @@ class UnauthorizedUserError(Exception):
   """Error class to be raised when unknown user tries to sign_up/sign_in"""
 
   def __init__(self, message="Unauthorized"):
+    self.message = message
+    super().__init__(self.message)
+
+
+class ConflictError(Exception):
+  """Error class to be raised when there is a conflict"""
+
+  def __init__(self, message="Conflict"):
     self.message = message
     super().__init__(self.message)

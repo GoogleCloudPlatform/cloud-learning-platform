@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en">
+
+<body onload="document.forms[0].submit()">
+    <form action="{{ redirect_uri }}" method="POST">
+        <input type="hidden" name="state" value="{{ state }}">
+        <input type="hidden" name="id_token" value="{{ id_token }}">
+    </form>
+</body>
+
+</html>
