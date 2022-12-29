@@ -1,5 +1,5 @@
 fireo==1.6.2
-google-cloud-logging==3.3.1
+google-cloud-logging==3.4.0
 google-cloud-secret-manager==2.13.0
 jsonschema==4.17.3
 fastapi==0.85.1
