@@ -3,7 +3,7 @@ fireo==1.6.2
 google-cloud-logging==3.4.0
 google-cloud-secret-manager==2.13.0
 mock==4.0.3
-pylint==2.15.8
+pylint==2.15.9
 pytest==7.2.0
 pytest-cov==4.0.0
 pytest-custom_exit_code==0.3.0
