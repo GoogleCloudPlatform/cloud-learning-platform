@@ -4,5 +4,11 @@
         "secure": false,
         "logLevel": "debug",
         "changeOrigin": true
+    },
+    "/authentication/api/v1/*": {
+        "target": "http://127.0.0.1:8889",
+        "secure": false,
+        "logLevel": "debug",
+        "changeOrigin": true
     }
 }

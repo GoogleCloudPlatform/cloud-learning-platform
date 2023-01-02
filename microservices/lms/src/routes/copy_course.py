@@ -1,4 +1,4 @@
-""" User endpoints """
+""" Section endpoints """
 import traceback
 
 from common.models.cohort import Cohort
