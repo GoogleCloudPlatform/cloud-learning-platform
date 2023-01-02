@@ -14,6 +14,7 @@ from schemas.content_item_schema import (LTIContentItemModel,
                                          LTIContentItemSearchResponseModel,
                                          AllLTIContentItemsResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
+from services.line_item_service import create_new_line_item
 
 router = APIRouter(
     tags=["Content Item CRUD Endpoints"], responses=ERROR_RESPONSES)
@@ -166,6 +167,28 @@ def create_content_item(input_content_item: LTIContentItemModel):
     new_content_item.uuid = new_content_item.id
     new_content_item.update()
     content_item_fields = new_content_item.get_fields(reformat_datetime=True)
+
+    content_item_info = input_content_item_dict.get("content_item_info")
+
+    if "lineItem" in content_item_info.keys():
+      line_item_data = content_item_info.get("lineItem")
+      input_line_item = {
+          "startDateTime":
+              content_item_info.get("available", "").get("startDateTime", ""),
+          "endDateTime":
+              content_item_info.get("available", "").get("endDateTime", ""),
+          "scoreMaximum":
+              line_item_data.get("scoreMaximum", ""),
+          "label":
+              line_item_data.get("label", ""),
+          "tag":
+              line_item_data.get("tag", ""),
+          "resourceId":
+              line_item_data.get("resourceId", ""),
+          "resourceLinkId":
+              new_content_item.uuid
+      }
+      create_new_line_item(input_line_item)
 
     return {
         "success": True,

@@ -9,6 +9,7 @@ from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
                                       FullLineItemModel, BasicScoreModel,
                                       ScoreResponseModel, ResultResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
+from services.line_item_service import create_new_line_item
 from typing import List
 
 router = APIRouter(tags=["Line item"], responses=ERROR_RESPONSES)
@@ -130,13 +131,7 @@ def create_line_item(input_line_item: LineItemModel):
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
     input_line_item_dict = {**input_line_item.dict()}
-
-    new_line_item = LineItem()
-    new_line_item = new_line_item.from_dict(input_line_item_dict)
-    new_line_item.uuid = ""
-    new_line_item.save()
-    new_line_item.uuid = new_line_item.id
-    new_line_item.update()
+    new_line_item = create_new_line_item(input_line_item_dict)
     line_item_fields = new_line_item.get_fields(reformat_datetime=True)
 
     return line_item_fields
