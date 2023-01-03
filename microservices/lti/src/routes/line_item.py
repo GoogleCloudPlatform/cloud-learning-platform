@@ -3,6 +3,7 @@ from fastapi import APIRouter, Request
 from config import ERROR_RESPONSES
 from common.models import LineItem, Result, Score
 from common.utils.errors import (ResourceNotFoundException, ValidationError)
+from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound)
 from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
                                       UpdateLineItemModel, DeleteLineItem,
@@ -80,6 +81,7 @@ def get_all_line_items(request: Request,
 
     return line_items
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -114,6 +116,7 @@ def get_line_item(request: Request, context_id: str, uuid: str):
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -147,7 +150,7 @@ def create_line_item(request: Request, context_id: str,
 
     return line_item_fields
   except Exception as e:
-    raise e
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -191,8 +194,10 @@ def update_line_item(request: Request, context_id: str, uuid: str,
     return line_item_fields
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -220,8 +225,10 @@ def delete_line_item(context_id: str, uuid: str):
     LineItem.delete_by_id(uuid)
     return {}
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -275,8 +282,10 @@ def get_results_of_line_item(request: Request,
 
     return result_fields
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -315,8 +324,10 @@ def get_result(request: Request, context_id: str, line_item_id: str,
 
     return result_fields
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -357,6 +368,8 @@ def create_score_for_line_item(context_id: str, line_item_id: str,
 
     return score_fields
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e

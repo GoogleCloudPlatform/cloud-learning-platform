@@ -5,6 +5,7 @@ from config import ERROR_RESPONSES
 from common.models import LTIContentItem, Tool
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  ConflictError)
+from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, Conflict)
 from schemas.content_item_schema import (LTIContentItemModel,
@@ -44,6 +45,7 @@ def search_content_item(tool_id: str):
         "data": result
     }
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -91,10 +93,13 @@ def get_all_content_items(skip: int = 0,
         "data": content_items
     }
   except ValidationError as e:
+    Logger.error(e)
     raise BadRequest(str(e)) from e
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -128,8 +133,10 @@ def get_content_item(uuid: str):
         "data": content_item_fields
     }
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -201,10 +208,13 @@ def create_content_item(input_content_item: LTIContentItemModel):
         }
     }
   except ConflictError as e:
+    Logger.error(e)
     raise Conflict(str(e)) from e
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -250,8 +260,10 @@ def update_content_item(uuid: str,
         "data": content_item_fields
     }
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -278,6 +290,8 @@ def delete_content_item(uuid: str):
     LTIContentItem.delete_by_uuid(uuid)
     return {}
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e

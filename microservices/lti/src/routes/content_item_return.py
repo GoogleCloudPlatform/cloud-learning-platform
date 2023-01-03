@@ -3,7 +3,8 @@ from copy import deepcopy
 from config import ERROR_RESPONSES, ISSUER
 from fastapi import APIRouter, Form
 from common.models import Tool
-from common.utils.errors import (ResourceNotFoundException)
+from common.utils.errors import ResourceNotFoundException
+from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound)
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.keys_manager import get_remote_keyset
@@ -56,6 +57,8 @@ def content_item_return(JWT: str = Form()):
         "data": content_item_data
     }
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
