@@ -1,13 +1,11 @@
 """ Section endpoints """
 import traceback
 
-from common.models.cohort import Cohort
-from common.models.course_template import CourseTemplate
-from common.models.section import Section
-from common.utils.errors import InvalidTokenError, ResourceNotFoundException
+from common.models import Cohort, CourseTemplate, Section
+from common.utils.errors import InvalidTokenError, ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (CustomHTTPException,
                                           InternalServerError, InvalidToken,
-                                          ResourceNotFound)
+                                          ResourceNotFound, BadRequest)
 from common.utils.logging_handler import Logger
 
 from fastapi import APIRouter
@@ -268,7 +266,7 @@ def delete_section(section_id: str):
 
 
 @router.get("", response_model=SectionListResponseModel)
-def section_list():
+def section_list(skip: int = 0, limit: int = 10):
   """Get a all section details from db
 
   Args:
@@ -281,9 +279,17 @@ def section_list():
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    sections = Section.fetch_all()
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+    if limit < 1:
+      raise ValidationError(
+          "Invalid value passed to \"limit\" query parameter")
+
+    sections = Section.fetch_all(skip, limit)
     sections_list = list(map(convert_section_to_section_model, sections))
     return {"data": sections_list}
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)

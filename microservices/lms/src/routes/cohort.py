@@ -33,7 +33,7 @@ router = APIRouter(prefix="/cohorts",
 
 
 @router.get("", response_model=CohortListResponseModel)
-def get_cohort_list():
+def get_cohort_list(skip: int = 0, limit: int = 10):
   """Get a list of Cohort endpoint
     Raises:
         HTTPException: 500 Internal Server Error if something fails.
@@ -44,7 +44,12 @@ def get_cohort_list():
             if the get cohort list raises an exception.
     """
   try:
-    fetched_cohort_list = Cohort.fetch_all()
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+    if limit < 1:
+      raise ValidationError\
+        ("Invalid value passed to \"limit\" query parameter")
+    fetched_cohort_list = Cohort.fetch_all(skip=skip, limit=limit)
     if fetched_cohort_list is None:
       return {
           "message":
@@ -55,6 +60,8 @@ def get_cohort_list():
         convert_cohort_to_cohort_model(i) for i in fetched_cohort_list
     ]
     return {"cohort_list": cohort_list}
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
@@ -148,8 +155,7 @@ def update_cohort(cohort_id: str, update_cohort_model: UpdateCohortModel):
     for key in update_cohort_dict:
       if update_cohort_dict[key] is not None:
         if key == "course_template":
-          course_template = CourseTemplate.find_by_id(
-              update_cohort_dict[key])
+          course_template = CourseTemplate.find_by_id(update_cohort_dict[key])
           setattr(cohort_details, key, course_template)
         else:
           setattr(cohort_details, key, update_cohort_dict[key])
@@ -186,9 +192,7 @@ def delete_cohort(cohort_id: str):
     """
   try:
     Cohort.soft_delete_by_id(cohort_id)
-    return {
-          "message": f"Successfully deleted the Cohort with id {cohort_id}"
-      }
+    return {"message": f"Successfully deleted the Cohort with id {cohort_id}"}
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
