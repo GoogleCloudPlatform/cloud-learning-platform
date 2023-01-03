@@ -1,6 +1,7 @@
 export const environment = {
   production: true,
   apiurl: $ENV.API_URL,
+  auth_apiUrl: 'https://core-learning-services-dev-gclb-api.cloudpssolutions.com/authentication/api/v1/',
   firebase: {
     apiKey: "AIzaSyC7ZF4D98P6woFEYCeIpdFSY4S73btYA7Y",
     authDomain: "core-learning-services-dev.firebaseapp.com",
