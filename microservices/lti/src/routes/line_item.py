@@ -76,7 +76,7 @@ def get_all_line_items(request: Request,
     line_items = [i.get_fields(reformat_datetime=True) for i in line_items]
 
     for each_line_item in line_items:
-      each_line_item["id"] = request.url + each_line_item["uuid"]
+      each_line_item["id"] = str(request.url) + "/" + each_line_item["uuid"]
 
     return line_items
   except Exception as e:
@@ -108,7 +108,7 @@ def get_line_item(request: Request, context_id: str, uuid: str):
     # TODO: Add API call to check if the context_id (course_id) exists
     line_item = LineItem.find_by_uuid(uuid)
     line_item_fields = line_item.get_fields(reformat_datetime=True)
-    line_item_fields["id"] = request.url + line_item_fields["uuid"]
+    line_item_fields["id"] = str(request.url)
 
     return line_item_fields
   except ResourceNotFoundException as e:
@@ -143,10 +143,11 @@ def create_line_item(request: Request, context_id: str,
     input_line_item_dict = {**input_line_item.dict()}
     new_line_item = create_new_line_item(input_line_item_dict)
     line_item_fields = new_line_item.get_fields(reformat_datetime=True)
-    line_item_fields["id"] = request.url + line_item_fields["uuid"]
+    line_item_fields["id"] = str(request.url) + "/" + line_item_fields["uuid"]
 
     return line_item_fields
   except Exception as e:
+    raise e
     raise InternalServerError(str(e)) from e
 
 
@@ -176,7 +177,7 @@ def update_line_item(request: Request, context_id: str, uuid: str,
     # TODO: Add API call to check if the context_id (course_id) exists
     existing_line_item = LineItem.find_by_uuid(uuid)
     line_item_fields = existing_line_item.get_fields()
-    print("line_item_fields", line_item_fields)
+
     input_line_item_dict = {**input_line_item.dict()}
 
     for key, value in input_line_item_dict.items():
@@ -185,7 +186,7 @@ def update_line_item(request: Request, context_id: str, uuid: str,
       setattr(existing_line_item, key, value)
     existing_line_item.update()
     line_item_fields = existing_line_item.get_fields(reformat_datetime=True)
-    line_item_fields["id"] = request.url + line_item_fields["uuid"]
+    line_item_fields["id"] = str(request.url)
 
     return line_item_fields
 
@@ -270,7 +271,7 @@ def get_results_of_line_item(request: Request,
 
     result_fields = [i.get_fields(reformat_datetime=True) for i in result]
     for i in result_fields:
-      result_fields["id"] = request.url + result_fields["uuid"]
+      result_fields["id"] = str(request.url) + "/" + result_fields["uuid"]
 
     return result_fields
   except ResourceNotFoundException as e:
@@ -310,7 +311,7 @@ def get_result(request: Request, context_id: str, line_item_id: str,
       raise ResourceNotFoundException(
           "Incorrect result id provided for the given line item")
     result_fields = result.get_fields(reformat_datetime=True)
-    result_fields["id"] = request.url + result_fields["uuid"]
+    result_fields["id"] = str(request.url)
 
     return result_fields
   except ResourceNotFoundException as e:

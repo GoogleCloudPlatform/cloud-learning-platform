@@ -2,7 +2,7 @@
 Pydantic Model for Line item API's
 """
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
 from schemas.schema_examples import (BASIC_LINE_ITEM_EXAMPLE,
                                      UPDATE_LINE_ITEM_EXAMPLE,
                                      FULL_LINE_ITEM_EXAMPLE,
