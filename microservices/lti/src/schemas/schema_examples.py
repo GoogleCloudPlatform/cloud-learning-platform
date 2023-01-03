@@ -64,8 +64,16 @@ BASIC_LINE_ITEM_EXAMPLE = {
     "endDateTime": "2022-02-07T22:23:11+0000"
 }
 
+UPDATE_LINE_ITEM_EXAMPLE = {
+    "scoreMaximum": 50,
+    "label": "50",
+    "startDateTime": "2022-02-05T22:23:11+0000",
+    "endDateTime": "2022-02-07T22:23:11+0000"
+}
+
 FULL_LINE_ITEM_EXAMPLE = {
-    "uuid": "https://platformurl.com/line_items/line_item_id",
+    "uuid": "bv9oyqvq9no",
+    "id": "https://platformurl.com/context_id/line_items/bv9oyqvq9no",
     **BASIC_LINE_ITEM_EXAMPLE
 }
 
@@ -79,21 +87,21 @@ BASIC_SCORE_EXAMPLE = {
     "gradingProgress": "FullyGraded"
 }
 
-FULL_SCORE_EXAMPLE = {
-    "uuid": "https://platformurl.com/line_items/line_item_id/scores",
-    **BASIC_SCORE_EXAMPLE
-}
+FULL_SCORE_EXAMPLE = {"uuid": "Ar1F79GnqG8enw", **BASIC_SCORE_EXAMPLE}
 
 BASIC_RESULT_EXAMPLE = {
     "userId": "ATc1ob81ca1vb98",
     "resultScore": 50,
     "resultMaximum": 50,
     "comment": "Test comment",
-    "scoreOf": "https://platformurl.com/line_items/line_item_id"
+    "scoreOf": "https://platformurl.com/x1b62/line_items/1c82be"
 }
 
 FULL_RESULT_EXAMPLE = {
-    "uuid": "https://platformurl.com/line_items/line_item_id/results",
+    "uuid":
+        "DVad8vs5boSN",
+    "id":
+        "https://platformurl.com/x1b62/line_items/1c82be/results/DVad8vs5boSN",
     **BASIC_RESULT_EXAMPLE
 }
 

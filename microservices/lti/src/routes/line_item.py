@@ -1,15 +1,18 @@
 """Line item  Endpoints"""
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from config import ERROR_RESPONSES
 from common.models import LineItem, Result, Score
 from common.utils.errors import (ResourceNotFoundException, ValidationError)
+from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound)
 from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
                                       UpdateLineItemModel, DeleteLineItem,
                                       FullLineItemModel, BasicScoreModel,
                                       ScoreResponseModel, ResultResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
-from typing import List
+from services.line_item_service import create_new_line_item
+from typing import List, Optional
+# pylint: disable=unused-argument
 
 router = APIRouter(tags=["Line item"], responses=ERROR_RESPONSES)
 
@@ -21,7 +24,9 @@ router = APIRouter(tags=["Line item"], responses=ERROR_RESPONSES)
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_all_line_items(resource_id: str = None,
+def get_all_line_items(request: Request,
+                       context_id: str,
+                       resource_id: str = None,
                        resource_link_id: str = None,
                        tag: str = None,
                        skip: int = 0,
@@ -45,7 +50,7 @@ def get_all_line_items(resource_id: str = None,
   Exception:
     Internal Server Error Raised. Raised if something went wrong
   ### Returns:
-  Array of line items: `AllLineItemsResponseModel`
+  Array of line items: `FullLineItemModel`
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
@@ -68,10 +73,15 @@ def get_all_line_items(resource_id: str = None,
 
     line_items = collection_manager.order("-created_time").offset(skip).fetch(
         limit)
+
     line_items = [i.get_fields(reformat_datetime=True) for i in line_items]
+
+    for each_line_item in line_items:
+      each_line_item["id"] = str(request.url) + "/" + each_line_item["uuid"]
 
     return line_items
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -82,7 +92,7 @@ def get_all_line_items(resource_id: str = None,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_line_item(uuid: str):
+def get_line_item(request: Request, context_id: str, uuid: str):
   """The get line item endpoint will return the line item
   from firestore of which uuid is provided
   ### Args:
@@ -100,10 +110,13 @@ def get_line_item(uuid: str):
     # TODO: Add API call to check if the context_id (course_id) exists
     line_item = LineItem.find_by_uuid(uuid)
     line_item_fields = line_item.get_fields(reformat_datetime=True)
+    line_item_fields["id"] = str(request.url)
+
     return line_item_fields
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -114,7 +127,8 @@ def get_line_item(uuid: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def create_line_item(input_line_item: LineItemModel):
+def create_line_item(request: Request, context_id: str,
+                     input_line_item: LineItemModel):
   """The create line item endpoint will add a new line item to the firestore.
   ### Args:
   input_line_item: `LineItemModel`
@@ -130,17 +144,13 @@ def create_line_item(input_line_item: LineItemModel):
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
     input_line_item_dict = {**input_line_item.dict()}
-
-    new_line_item = LineItem()
-    new_line_item = new_line_item.from_dict(input_line_item_dict)
-    new_line_item.uuid = ""
-    new_line_item.save()
-    new_line_item.uuid = new_line_item.id
-    new_line_item.update()
+    new_line_item = create_new_line_item(input_line_item_dict)
     line_item_fields = new_line_item.get_fields(reformat_datetime=True)
+    line_item_fields["id"] = str(request.url) + "/" + line_item_fields["uuid"]
 
     return line_item_fields
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -150,7 +160,8 @@ def create_line_item(input_line_item: LineItemModel):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def update_line_item(uuid: str, input_line_item: UpdateLineItemModel):
+def update_line_item(request: Request, context_id: str, uuid: str,
+                     input_line_item: UpdateLineItemModel):
   """Update a line item
   ### Args:
   uuid: `str`
@@ -169,7 +180,7 @@ def update_line_item(uuid: str, input_line_item: UpdateLineItemModel):
     # TODO: Add API call to check if the context_id (course_id) exists
     existing_line_item = LineItem.find_by_uuid(uuid)
     line_item_fields = existing_line_item.get_fields()
-    print("line_item_fields", line_item_fields)
+
     input_line_item_dict = {**input_line_item.dict()}
 
     for key, value in input_line_item_dict.items():
@@ -178,12 +189,15 @@ def update_line_item(uuid: str, input_line_item: UpdateLineItemModel):
       setattr(existing_line_item, key, value)
     existing_line_item.update()
     line_item_fields = existing_line_item.get_fields(reformat_datetime=True)
+    line_item_fields["id"] = str(request.url)
 
     return line_item_fields
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -193,7 +207,7 @@ def update_line_item(uuid: str, input_line_item: UpdateLineItemModel):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def delete_line_item(uuid: str):
+def delete_line_item(context_id: str, uuid: str):
   """Delete a line item from firestore
   ### Args:
   uuid: `str`
@@ -211,24 +225,37 @@ def delete_line_item(uuid: str):
     LineItem.delete_by_id(uuid)
     return {}
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
 @router.get(
     "/{context_id}/line_items/{line_item_id}/results",
-    name="Get the result of a specific line item",
+    name="Get all the results of a specific line item",
     response_model=ResultResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_result_of_line_item(line_item_id: str):
-  """The get result of line item endpoint will return the result of a
-  line item from firestore
+def get_results_of_line_item(request: Request,
+                             context_id: str,
+                             line_item_id: str,
+                             skip: int = 0,
+                             limit: int = 10,
+                             user_id: Optional[str] = None):
+  """The get all results of a line item endpoint will return all the
+  results of a line item from firestore
   ### Args:
   line_item_id: `str`
     Unique identifier for line item
+  skip: `int`
+    Number of results to be skipped <br/>
+  limit: `int`
+    Size of results array to be returned <br/>
+  user_id: `str`
+    Unique identifier of the user <br/>
   ### Raises:
   ResourceNotFoundException:
     If the line item does not exist. <br/>
@@ -239,12 +266,68 @@ def get_result_of_line_item(line_item_id: str):
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    result = Result.find_by_line_item_id(line_item_id)
-    result_fields = result.get_fields(reformat_datetime=True)
+    if user_id:
+      result = [
+          Result.collection.filter("lineItemId", "==",
+                                   line_item_id).filter("userId", "==",
+                                                        user_id).get()
+      ]
+    else:
+      result = Result.collection.filter("lineItemId", "==",
+                                        line_item_id).offset(skip).fetch(limit)
+
+    result_fields = [i.get_fields(reformat_datetime=True) for i in result]
+    for i in result_fields:
+      result_fields["id"] = str(request.url) + "/" + result_fields["uuid"]
+
     return result_fields
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.get(
+    "/{context_id}/line_items/{line_item_id}/results/{result_id}",
+    name="Get the specific result of a line item",
+    response_model=ResultResponseModel,
+    responses={404: {
+        "model": NotFoundErrorResponseModel
+    }})
+def get_result(request: Request, context_id: str, line_item_id: str,
+               result_id: str):
+  """The get result of a line item endpoint will return the specific result
+  of a line item from firestore
+  ### Args:
+  line_item_id: `str`
+    Unique identifier for line item
+  result_id: `str`
+    Unique identifier for result
+  ### Raises:
+  ResourceNotFoundException:
+    If the line item does not exist. <br/>
+  Exception:
+    Internal Server Error. Raised if something went wrong
+  ### Returns:
+  Result: `ResultResponseModel`
+  """
+  try:
+    # TODO: Add API call to check if the context_id (course_id) exists
+    result = Result.collection.find_by_uuid(result_id)
+    if result.lineItemId != line_item_id:
+      raise ResourceNotFoundException(
+          "Incorrect result id provided for the given line item")
+    result_fields = result.get_fields(reformat_datetime=True)
+    result_fields["id"] = str(request.url)
+
+    return result_fields
+  except ResourceNotFoundException as e:
+    Logger.error(e)
+    raise ResourceNotFound(str(e)) from e
+  except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -255,7 +338,8 @@ def get_result_of_line_item(line_item_id: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def create_score_for_line_item(line_item_id: str, input_score: BasicScoreModel):
+def create_score_for_line_item(context_id: str, line_item_id: str,
+                               input_score: BasicScoreModel):
   """The create score for line item endpoint will add a score for a line item
   to the firestore.
   ### Args:
@@ -273,14 +357,19 @@ def create_score_for_line_item(line_item_id: str, input_score: BasicScoreModel):
     # TODO: Add API call to check if the context_id (course_id) exists
     LineItem.find_by_id(line_item_id)
     input_score_dict = {**input_score.dict()}
+    input_score_dict["lineItemId"] = line_item_id
 
     new_score = Score()
     new_score = new_score.from_dict(input_score_dict)
     new_score.save()
+    new_score.uuid = new_score.id
+    new_score.update()
     score_fields = new_score.get_fields(reformat_datetime=True)
 
     return score_fields
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e

@@ -1,7 +1,8 @@
 """ LTI Token utils """
+import json
 from datetime import datetime
 from jose import jwt, jws
-from common.models import Tool, TempUser, LTIContentItem
+from common.models import Tool, TempUser, LTIContentItem, LineItem
 from services.keys_manager import get_platform_public_keyset
 from config import TOKEN_TTL, ISSUER
 
@@ -70,6 +71,19 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       token_claims[lti_claim_field("claim",
                                    "custom")] = content_item_info.get("custom")
 
+    if "lineItem" in content_item_info.keys():
+      line_item = LineItem.find_by_resource_link_id(lti_content_item.uuid)
+
+      token_claims[lti_claim_field("claim", "endpoint", "ags")] = {
+          "scope": [
+              lti_claim_field("scope", "lineitem", "ags"),
+              lti_claim_field("scope", "result.readonly", "ags"),
+              lti_claim_field("scope", "score", "ags")
+          ],
+          "lineitems": ISSUER + "/lti/api/v1/1234/line_items",
+          "lineitem": ISSUER + "/lti/api/v1/1234/line_items/" + line_item.uuid
+      }
+
     resource_link_claim_info = {
         "id": lti_message_hint,
         "title": content_item_info.get("title"),
@@ -110,14 +124,14 @@ def encode_token(claims):
   return token
 
 
-def decode_token(token, key):
+def decode_token(token, key, audience):
   """Decodes a given token and verifies it using the provided public key"""
   decoded_token = jwt.decode(
-      token=token, algorithms="RS256", key=key, audience=ISSUER)
+      token=token, algorithms="RS256", key=key, audience=audience)
   return decoded_token
 
 
 def get_unverified_token_claims(token):
   """Decodes a given token using the provided public key"""
   unverified_claims = jws.get_unverified_claims(token=token).decode("UTF-8")
-  return unverified_claims
+  return json.loads(unverified_claims)
