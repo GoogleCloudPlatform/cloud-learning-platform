@@ -1,5 +1,5 @@
 backports-unittest-mock==1.5
-mock==4.0.3
+mock==5.0.0
 pylint==2.15.9
 pytest==7.2.0
 pytest-cov==4.0.0
