@@ -249,6 +249,14 @@ jobs:
         python -m pip install pytest pytest-custom_exit_code pytest-cov pylint pytest-mock mock
         python -m pip install -r e2e/requirements.txt
 
+    - name: Removing firestore indexes
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+        cd utils/
+        python -m pip install -r requirements.txt
+        PYTHONPATH=../common/src python firestore_indexing_cleanup.py
+
     - name: Cleaning up database
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
