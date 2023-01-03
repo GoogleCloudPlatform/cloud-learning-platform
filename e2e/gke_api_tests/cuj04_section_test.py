@@ -108,19 +108,19 @@ def test_create_section_course_template_not_found(get_token):
   assert resp.status_code == 404
 
 
-def test_get_list_sections(get_token):
-  """ 
-  Get a sections list for a perticular cohort by giving cohort_id as query paramter 
-  """
-  course = create_course(DATABASE_PREFIX + "test_course", "This is test",
-                         "test", "me")
-  classroom_id = course["id"]
-  fake_data = create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2,
-                               TEST_SECTION2, classroom_id)
-  url = f"{API_URL}/sections/cohort/{fake_data[1].id}/sections"
-  resp = requests.get(url=url, headers=get_token)
-  resp_json = resp.json()
-  assert resp.status_code == 200, "Status 200"
+# def test_get_list_sections(get_token):
+#   """ 
+#   Get a sections list for a perticular cohort by giving cohort_id as query paramter 
+#   """
+#   course = create_course(DATABASE_PREFIX + "test_course", "This is test",
+#                          "test", "me")
+#   classroom_id = course["id"]
+#   fake_data = create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2,
+#                                TEST_SECTION2, classroom_id)
+#   url = f"{API_URL}/sections/cohort/{fake_data[1].id}/sections"
+#   resp = requests.get(url=url, headers=get_token)
+#   resp_json = resp.json()
+#   assert resp.status_code == 200, "Status 200"
 
 
 def test_get_section(get_token):

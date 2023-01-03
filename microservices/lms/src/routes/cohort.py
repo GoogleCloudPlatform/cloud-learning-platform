@@ -14,7 +14,7 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
-from schemas.section import  SectionListResponseModel                                 
+from schemas.section import  SectionListResponseModel
 from utils.helper import (convert_cohort_to_cohort_model,convert_section_to_section_model)
 
 router = APIRouter(prefix="/cohorts",
