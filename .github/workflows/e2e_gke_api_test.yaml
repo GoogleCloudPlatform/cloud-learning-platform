@@ -91,12 +91,12 @@ jobs:
         NAMESPACE=${NAMESPACE} bash setup/setup_ksa.sh
 
     - name: Add indexing to collections in firestore
-        run: |
-          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-          export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
-          cd utils/
-          python -m pip install -r requirements.txt
-          PYTHONPATH=../common/src python firestore_e2e_indexing_setup.py
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+        cd utils/
+        python -m pip install -r requirements.txt
+        PYTHONPATH=../common/src python firestore_e2e_indexing_setup.py
 
     - name: Build and deploy to cluster
       run: |
