@@ -12,6 +12,7 @@ import { Router } from '@angular/router'
 
 import { Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,9 @@ export class AuthService {
   constructor(
     private afAuth: AngularFireAuth,
     private afs: AngularFirestore,
-    private router: Router
+    private router: Router,
+    private http: HttpClient,
+    private _snackBar: MatSnackBar,
   ) {
 
     this.user$ = this.afAuth.authState.pipe(
@@ -51,11 +54,24 @@ export class AuthService {
   async googleSignin() {
     const provider = new auth.GoogleAuthProvider();
     const credential = await this.afAuth.signInWithPopup(provider);
+    console.log('user', credential.user.displayName)
+    localStorage.setItem('user', credential.user.displayName)
     credential.user?.getIdToken().then(idToken => {
       localStorage.setItem('idToken', idToken)
-      if (idToken) {
-        this.router.navigate(['/home'])
-      }
+      this.validate().subscribe((res: any) => {
+        // console.log(res)
+        if (res.success == true) {
+          if (idToken) {
+            this.router.navigate(['/home'])
+          }
+        }
+        else {
+          this.openFailureSnackBar('Authentication Failed', 'Close')
+        }
+      }, (error: any) => {
+        this.openFailureSnackBar('Authentication Failed', 'Close')
+      })
+
     });
   }
 
@@ -79,5 +95,14 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  validate() {
+    return this.http.get(`${environment.auth_apiUrl}validate`)
+  }
+  openFailureSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 6000,
+      panelClass: ['red-snackbar'],
+    });
+  }
 
 }

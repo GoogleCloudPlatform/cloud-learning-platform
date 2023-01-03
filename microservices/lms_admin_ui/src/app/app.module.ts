@@ -14,6 +14,9 @@ import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AuthenticationInterceptor } from './interceptors/authentication.interceptor';
+import { ErrorInterceptor } from './interceptors/error.interceptor';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -32,11 +35,18 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
     AngularFireStorageModule,
     AngularFireAuthModule,
   ],
-  // providers: [
-  //   { provide: MatDialogRef, useValue: {} },
-
-  //   { provide: MAT_DIALOG_DATA, useValue: {} }
-  // ],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthenticationInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
+      multi: true
+    },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
