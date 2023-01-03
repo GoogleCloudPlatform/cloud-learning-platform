@@ -96,7 +96,7 @@ jobs:
         export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
         cd utils/
         python -m pip install -r requirements.txt
-        PYTHONPATH=../common/src python firestore_e2e_indexing_setup.py
+        PYTHONPATH=../common/src python firestore_indexing.py
 
     - name: Build and deploy to cluster
       run: |
