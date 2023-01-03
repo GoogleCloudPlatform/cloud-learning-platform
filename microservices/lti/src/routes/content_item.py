@@ -172,21 +172,24 @@ def create_content_item(input_content_item: LTIContentItemModel):
 
     if "lineItem" in content_item_info.keys():
       line_item_data = content_item_info.get("lineItem")
+
+      start_date_time = ""
+      end_date_time = ""
+
+      if content_item_info.get("available", ""):
+        start_date_time = content_item_info.get("available",
+                                                "").get("startDateTime", "")
+        end_date_time = content_item_info.get("available",
+                                              "").get("endDateTime", "")
+
       input_line_item = {
-          "startDateTime":
-              content_item_info.get("available", "").get("startDateTime", ""),
-          "endDateTime":
-              content_item_info.get("available", "").get("endDateTime", ""),
-          "scoreMaximum":
-              line_item_data.get("scoreMaximum", ""),
-          "label":
-              line_item_data.get("label", ""),
-          "tag":
-              line_item_data.get("tag", ""),
-          "resourceId":
-              line_item_data.get("resourceId", ""),
-          "resourceLinkId":
-              new_content_item.uuid
+          "startDateTime": start_date_time,
+          "endDateTime": end_date_time,
+          "scoreMaximum": line_item_data.get("scoreMaximum"),
+          "label": line_item_data.get("label"),
+          "tag": line_item_data.get("tag", ""),
+          "resourceId": line_item_data.get("resourceId", ""),
+          "resourceLinkId": new_content_item.uuid
       }
       create_new_line_item(input_line_item)
 
