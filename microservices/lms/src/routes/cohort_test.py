@@ -239,7 +239,7 @@ def test_list_section_for_one_cohort(client_with_emulator, create_fake_data):
 
 def test_list_section_cohort_not_found(client_with_emulator):
 
-  url = API_URL+f"/fake-cohort-id22/sections"
+  url = API_URL+"/fake-cohort-id22/sections"
 
   resp = client_with_emulator.get(url)
   # json_response = resp.json()

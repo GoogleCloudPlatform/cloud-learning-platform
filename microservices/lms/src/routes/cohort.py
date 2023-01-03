@@ -14,9 +14,8 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
-                                  
+from schemas.section import  SectionListResponseModel                                 
 from utils.helper import (convert_cohort_to_cohort_model,convert_section_to_section_model)
-from schemas.section import  SectionListResponseModel
 
 router = APIRouter(prefix="/cohorts",
                    tags=["Cohort"],
@@ -199,7 +198,7 @@ def delete_cohort(cohort_id: str):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-@router.get("{cohort_id}/sections",
+@router.get("/{cohort_id}/sections",
             response_model=SectionListResponseModel)
 def list_section(cohort_id: str):
   """ Get a list of sections of one cohort from db
