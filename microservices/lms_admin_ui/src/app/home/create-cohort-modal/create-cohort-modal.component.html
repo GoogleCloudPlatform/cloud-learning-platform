@@ -18,8 +18,8 @@
 
         <mat-form-field appearance="fill" style="width: 100%;">
             <mat-label>Select Course Template</mat-label>
-            <mat-select formControlName="course_template_uuid">
-                <mat-option *ngFor="let courseTemplate of courseTemplateData" [value]="courseTemplate.uuid">
+            <mat-select formControlName="course_template_id">
+                <mat-option *ngFor="let courseTemplate of courseTemplateData" [value]="courseTemplate.id">
                     {{courseTemplate.name}}</mat-option>
             </mat-select>
         </mat-form-field>

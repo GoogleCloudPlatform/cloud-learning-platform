@@ -85,8 +85,8 @@ export class CreateSectionComponent implements OnInit {
     let sectionObj: LooseObject = {}
     sectionObj['name'] = this.addSectionForm.value.section_name.trim()
     sectionObj['description'] = this.addSectionForm.value.section_description.trim()
-    sectionObj['course_template'] = this.requiredDetails.course_template_uuid
-    sectionObj['cohort'] = this.requiredDetails.cohort_uuid
+    sectionObj['course_template'] = this.requiredDetails.course_template_id
+    sectionObj['cohort'] = this.requiredDetails.cohort_id
     tempTeacherList.push(this.requiredDetails.instructional_desiner)
     for (let x of this.teachingStaff) {
       tempTeacherList.push(x)
