@@ -170,7 +170,7 @@ def create_section(sections_details: SectionDetails):
 
 @router.get("/cohort/{cohort_id}/sections",
             response_model=SectionListResponseModel)
-def list_section(cohort_id: str):
+def list_section(cohort_id: str, skip: int = 0, limit: int = 10):
   """ Get a list of sections of one cohort from db
 
   Args:
@@ -189,7 +189,9 @@ def list_section(cohort_id: str):
     cohort = Cohort.find_by_id(cohort_id)
     # Using the cohort object reference key query sections model to get a list
     # of section of a perticular cohort
-    result = Section.collection.filter("cohort", "==", cohort.key).fetch()
+    result = Section.fetch_all_by_cohort(cohort_key=cohort.key,
+                                         skip=skip,
+                                         limit=limit)
     sections_list = list(map(convert_section_to_section_model, result))
     return {"data": sections_list}
   except ResourceNotFoundException as err:

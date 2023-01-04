@@ -1,4 +1,4 @@
-pyyaml
+pyyaml==6.0
 fireo==1.6.2
-firebase_admin
-google-cloud-firestore
+firebase_admin==4.5.2
+google-cloud-firestore==2.3.4

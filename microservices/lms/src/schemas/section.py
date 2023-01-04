@@ -38,7 +38,7 @@ class SectionListResponseModel(BaseModel):
   """Get a list of sections"""
   success: Optional[bool] = True
   message: Optional[str] = "Success list"
-  data: Optional[list] = []
+  data: Optional[list[Sections]] = []
 
   class Config():
     orm_mode = True

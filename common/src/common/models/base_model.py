@@ -177,10 +177,12 @@ class BaseModel(Model):
     """ fetch all documents
 
     Args:
-        limit (int, optional):  Defaults to 1000.
+        skip (int, optional): _description_. Defaults to 0.
+        limit (int, optional): _description_. Defaults to 1000.
+        order_by (str, optional): _description_. Defaults to "-created_time".
 
     Returns:
-        _type_: list of objects
+        list: list of objects
     """
     objects = cls.collection.filter(
         "deleted_at_timestamp", "==",

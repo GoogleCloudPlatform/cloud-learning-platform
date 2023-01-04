@@ -45,8 +45,10 @@ class Cohort(BaseModel):
     """_summary_
 
     Args:
-        course_template_key (_type_): _description_
-        limit (int, optional): _description_. Defaults to 1000.
+        course_template_key (str): course_template unique key to filter data.
+        skip (int, optional): number of cohorts to be skip.
+        order_by (str, optional): order list according to order_by field.
+        limit (int, optional): limit till cohorts to be fetched.
 
     Returns:
         _type_: _description_
