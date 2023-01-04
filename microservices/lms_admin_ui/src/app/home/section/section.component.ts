@@ -40,36 +40,35 @@ export class SectionComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataSource.sort = this.sort;
-    let uuid
+    let id
     console.log(this.router.url)
-    uuid = this.router.url.split('/')[2]
-    console.log('uuid', uuid)
-    this.getCohortDetails(uuid)
+    id = this.router.url.split('/')[2]
+    this.getCohortDetails(id)
 
 
   }
 
-  getCohortDetails(uuid: any) {
+  getCohortDetails(id: any) {
     this.loadCard = true
     this.loadSection = true
-    this._HomeService.getCohort(uuid).subscribe((res: any) => {
+    this._HomeService.getCohort(id).subscribe((res: any) => {
       this.cohortDetails = res
       console.log('cohort details', this.cohortDetails)
       this.getCourseTemplateDetails(res.course_template.split('/')[1])
     })
   }
-  getCourseTemplateDetails(uuid: any) {
-    this._HomeService.getCourseTemplate(uuid).subscribe((res: any) => {
+  getCourseTemplateDetails(id: any) {
+    this._HomeService.getCourseTemplate(id).subscribe((res: any) => {
       this.courseTemplateDetails = res
       this.loadCard = false
       console.log('course template', this.courseTemplateDetails)
-      this.getSectionList(this.cohortDetails.uuid)
+      this.getSectionList(this.cohortDetails.id)
     })
   }
 
-  getSectionList(cohortUuid: any) {
+  getSectionList(cohortid: any) {
     this.loadSection = true
-    this._HomeService.getSectionList(cohortUuid).subscribe((res: any) => {
+    this._HomeService.getSectionList(cohortid).subscribe((res: any) => {
       this.sectionDetails = res.data
       if (this.sectionDetails.length > 0) {
         this.selectedSection = this.sectionDetails[0]
@@ -112,8 +111,8 @@ export class SectionComponent implements OnInit {
     let tempObj: LooseObject = {}
     tempObj['cohort_name'] = this.cohortDetails.name
     tempObj['course_template_name'] = this.courseTemplateDetails.name
-    tempObj['cohort_uuid'] = this.cohortDetails.uuid
-    tempObj['course_template_uuid'] = this.courseTemplateDetails.uuid
+    tempObj['cohort_id'] = this.cohortDetails.id
+    tempObj['course_template_id'] = this.courseTemplateDetails.id
     tempObj['instructional_desiner'] = this.courseTemplateDetails.instructional_designer
     tempObj['admin'] = this.courseTemplateDetails.admin
 
@@ -124,7 +123,7 @@ export class SectionComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result.data == 'success') {
-        this.getSectionList(this.cohortDetails.uuid)
+        this.getSectionList(this.cohortDetails.id)
       }
     });
   }
@@ -133,11 +132,11 @@ export class SectionComponent implements OnInit {
     let tempObj: LooseObject = {}
     tempObj['cohort_name'] = this.cohortDetails.name
     tempObj['course_template_name'] = this.courseTemplateDetails.name
-    tempObj['cohort_uuid'] = this.cohortDetails.uuid
-    tempObj['course_template_uuid'] = this.courseTemplateDetails.uuid
+    tempObj['cohort_id'] = this.cohortDetails.id
+    tempObj['course_template_id'] = this.courseTemplateDetails.id
     tempObj['instructional_desiner'] = this.courseTemplateDetails.instructional_designer
     tempObj['admin'] = this.courseTemplateDetails.admin
-    tempObj['section_uuid'] = this.selectedSection.uuid
+    tempObj['section_id'] = this.selectedSection.id
     tempObj['course_state'] = 'ACTIVE'
     const dialogRef = this.dialog.open(CreateSectionComponent, {
       width: '500px',
@@ -146,7 +145,7 @@ export class SectionComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result.data == 'success') {
-        this.getSectionList(this.cohortDetails.uuid)
+        this.getSectionList(this.cohortDetails.id)
       }
     });
   }
