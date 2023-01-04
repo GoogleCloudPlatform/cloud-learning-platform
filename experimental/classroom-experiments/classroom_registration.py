@@ -8,7 +8,6 @@ from googleapiclient.discovery import build
 
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.push-notifications",
-    # "https://www.googleapis.com/auth/classroom.coursework.students.readonly",
     "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
     "https://www.googleapis.com/auth/classroom.rosters.readonly"
 ]
@@ -30,13 +29,11 @@ def registration_func(creds):
           "feedType": "COURSE_WORK_CHANGES",
           "courseWorkChangesInfo": {
               "courseId": "579547971345"
-              # "courseId": "NTgxMjAwNjMxMTEw"
           }
       },
       "cloudPubsubTopic": {
           "topicName":
           "projects/core-learning-services-dev/topics/classroom-messeges"
-          # "projects/improper-pay-test-6/topics/classroom-test"
       }
   }
   service.registrations().create(body=body).execute()
@@ -61,5 +58,4 @@ def registration_func(creds):
 
 if __name__ == "__main__":
   creds = get_creds()
-  # accept_invite(creds)
   registration_func(creds)
