@@ -2,7 +2,7 @@
 from copy import deepcopy
 from config import ERROR_RESPONSES, ISSUER
 from fastapi import APIRouter, Form
-from common.models import Tool
+from common.models import Tool, LTIContentItem
 from common.utils.errors import (ResourceNotFoundException)
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound)
 from schemas.error_schema import NotFoundErrorResponseModel
@@ -48,8 +48,31 @@ def content_item_return(JWT: str = Form()):
     decoded_data = decode_token(JWT, key, ISSUER)
     content_item_key = lti_claim_field("claim", "content_items", "dl")
     content_item_data = decoded_data[content_item_key]
-    # TODO: Once the content-item data model is implemented, save the
-    # decoded_data[content_item_key] in it and link it to the learning resource.
+    if isinstance(content_item_data, list):
+      for received_content_item in content_item_data:
+        content_item = LTIContentItem()
+        data = {
+            "uuid": "",
+            "tool_id": tool_config.uuid,
+            "content_item_type": received_content_item.get("type"),
+            "content_item_info": received_content_item
+        }
+        content_item.from_dict(data)
+        content_item.save()
+        content_item.uuid = content_item.id
+        content_item.update()
+    elif isinstance(content_item_data, dict):
+      content_item = LTIContentItem()
+      data = {
+          "uuid": "",
+          "tool_id": tool_config.uuid,
+          "content_item_type": content_item_data.get("type"),
+          "content_item_info": content_item_data
+      }
+      content_item.from_dict(data)
+      content_item.save()
+      content_item.uuid = content_item.id
+      content_item.update()
     return {
         "success": True,
         "message": "Successfully received and decoded content item",
