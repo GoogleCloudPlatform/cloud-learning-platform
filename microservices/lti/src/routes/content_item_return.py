@@ -51,25 +51,20 @@ def content_item_return(JWT: str = Form()):
     if isinstance(content_item_data, list):
       for received_content_item in content_item_data:
         content_item = LTIContentItem()
-        data = {
-            "uuid": "",
-            "tool_id": tool_config.uuid,
-            "content_item_type": received_content_item.get("type"),
-            "content_item_info": received_content_item
-        }
-        content_item.from_dict(data)
+        print(received_content_item.get("type"), tool_config.uuid)
+        content_item.tool_id = tool_config.uuid
+        content_item.content_item_type = received_content_item.get("type")
+        content_item.content_item_info = received_content_item
+        content_item.uuid = ""
         content_item.save()
         content_item.uuid = content_item.id
         content_item.update()
     elif isinstance(content_item_data, dict):
       content_item = LTIContentItem()
-      data = {
-          "uuid": "",
-          "tool_id": tool_config.uuid,
-          "content_item_type": content_item_data.get("type"),
-          "content_item_info": content_item_data
-      }
-      content_item.from_dict(data)
+      content_item.tool_id = tool_config.uuid
+      content_item.content_item_type = received_content_item.get("type")
+      content_item.content_item_info = received_content_item
+      content_item.uuid = ""
       content_item.save()
       content_item.uuid = content_item.id
       content_item.update()
