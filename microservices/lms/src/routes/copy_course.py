@@ -169,40 +169,6 @@ def create_section(sections_details: SectionDetails):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-
-@router.get("/cohort/{cohort_id}/sections",
-            response_model=SectionListResponseModel)
-def list_section(cohort_id: str):
-  """ Get a list of sections of one cohort from db
-
-  Args:
-    cohort_id(str):cohort id from firestore db
-  Raises:
-    HTTPException: 500 Internal Server Error if something fails
-    ResourceNotFound: 404 Resource not found exception
-  Returns:
-    {"status":"Success","data":{}}: Returns list of sections
-    {'status': 'Failed',"data":null}
-  """
-  try:
-
-    # Get cohort Id and create a reference of cohort object
-
-    cohort = Cohort.find_by_id(cohort_id)
-    # Using the cohort object reference key query sections model to get a list
-    # of section of a perticular cohort
-    result = Section.collection.filter("cohort", "==", cohort.key).fetch()
-    sections_list = list(map(convert_section_to_section_model, result))
-    return {"data": sections_list}
-  except ResourceNotFoundException as err:
-    Logger.error(err)
-    raise ResourceNotFound(str(err)) from err
-  except Exception as e:
-    Logger.error(e)
-    err = traceback.format_exc().replace("\n", " ")
-    raise InternalServerError(str(e)) from e
-
-
 @router.get("/{section_id}", response_model=GetSectiontResponseModel)
 def get_section(section_id: str):
   """Get a section details from db

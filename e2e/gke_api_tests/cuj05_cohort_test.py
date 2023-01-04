@@ -2,13 +2,15 @@
 import datetime
 import pytest
 import requests
+import os
 from common.models import Cohort, CourseTemplate
-from common.testing.example_objects import TEST_COHORT
+from common.testing.example_objects import TEST_COHORT,create_fake_data,\
+  TEST_COURSE_TEMPLATE2,TEST_COHORT2, TEST_SECTION2
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.cohort import COHORT_INPUT_DATA
 from testing_objects.test_config import API_URL
 from testing_objects.token_fixture import get_token
-
+DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 
 course_template_id=None
 @pytest.fixture(scope="module",autouse=True)
@@ -204,3 +206,4 @@ def test_get_list_cohort(get_token):
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
   assert resp_json["success"] is True, "Check success"
+
