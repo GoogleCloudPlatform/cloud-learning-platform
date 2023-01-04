@@ -137,16 +137,31 @@ class CredentialKeys(BaseModel):
 class AddStudentToSectionModel(BaseModel):
   """Input Model to add student in section"""
   email: str
-  credentials: CredentialKeys
-
+  # credentials: CredentialKeys
+  token: str
   class Config():
     orm_mode = True
     schema_extra = {
         "example": {
             "email": "email@gmail.com",
-            "credentials": CREDENTIAL_JSON
+            # "credentials": CREDENTIAL_JSON,
+            "token":"ytyisudisudisudissudi"
         }
     }
+
+# class AddStudentToSectionModel(BaseModel):
+#   """Input Model to add student in section"""
+#   email: str
+#   token: str
+
+#   class Config():
+#     orm_mode = True
+#     schema_extra = {
+#         "example": {
+#             "email": "email@gmail.com",
+#             "credentials": "ya29.a0AX9GBdXzn4-_6qYhvE41CZ7dbxxST8eHqb3zLdBxzMSTenUbxlVWpPasz8Cw2610QoIPvCYMyOPFvLrT-z6gRlJwMbnQ7lNZ4XJ_N3wWVq3UfXIUMGmS92FupXnd3oMmYYGHLsm7zbKMTYZLDyVY98N0t_iVaCgYKAZUSARMSFQHUCsbCgyKibZ8Ny8RlZQgdgU2QUg0163"
+#         }
+#     }
 
 
 class AddStudentResponseModel(BaseModel):

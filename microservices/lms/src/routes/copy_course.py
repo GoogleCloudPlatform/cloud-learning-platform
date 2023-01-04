@@ -335,6 +335,8 @@ def update_section(sections_details: UpdateSection):
 @router.post("/{sections_id}/students", response_model=AddStudentResponseModel)
 def enroll_student_section(sections_id: str,
                            input_data: AddStudentToSectionModel):
+# def enroll_student_section(sections_id: str,
+#                            input_data: AddStudentToSectionModel):
   """
   Args:
     input_data(AddStudentToSectionModel):
@@ -351,7 +353,11 @@ def enroll_student_section(sections_id: str,
   """
   try:
     section = Section.find_by_id(sections_id)
-    classroom_crud.enroll_student(token={**input_data.credentials.dict()},
+    # classroom_crud.enroll_student(token={**input_data.credentials.dict()},
+    #                               student_email=input_data.email,
+    #                               course_id=section.classroom_id,
+    #                               course_code=section.classroom_code)
+    classroom_crud.enroll_student(token=input_data.token,
                                   student_email=input_data.email,
                                   course_id=section.classroom_id,
                                   course_code=section.classroom_code)
@@ -374,6 +380,8 @@ def enroll_student_section(sections_id: str,
                               data=None) from ae
   except Exception as e:
     Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    print(err)
     raise InternalServerError(str(e)) from e
 
 
