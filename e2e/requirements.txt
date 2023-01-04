@@ -1,7 +1,7 @@
 firebase_admin
 fireo==1.4.1
 google-cloud-logging
-google-cloud-secret-manager==2.12.6
+google-cloud-secret-manager==2.14.0
 mock
 pylint
 pytest
