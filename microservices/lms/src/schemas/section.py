@@ -51,6 +51,23 @@ class SectionListResponseModel(BaseModel):
     }
 
 
+class ClassroomCourseListResponseModel(BaseModel):
+  """Get a list of Classroom Courses"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success list"
+  data: Optional[list] = []
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data": []
+        }
+    }
+
+
 class CreateSectiontResponseModel(BaseModel):
   """Create Section Response Model"""
   success: Optional[bool] = True

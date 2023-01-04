@@ -15,12 +15,11 @@ from schemas.error_schema import (ConflictResponseModel,
                                   InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
-from schemas.section import (AddStudentResponseModel, AddStudentToSectionModel,
-                             CreateSectiontResponseModel,
-                             DeleteSectionResponseModel,
-                             GetSectiontResponseModel, SectionDetails,
-                             SectionListResponseModel,
-                             UpdateSectionResponseModel)
+from schemas.section import (
+    AddStudentResponseModel, AddStudentToSectionModel,
+    CreateSectiontResponseModel, DeleteSectionResponseModel,
+    GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
+    ClassroomCourseListResponseModel, UpdateSectionResponseModel)
 from schemas.update_section import UpdateSection
 from services import classroom_crud
 from services.classroom_crud import get_edit_url_and_view_url_mapping_of_form
@@ -50,7 +49,7 @@ SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
 
 
-@router.get("/get_courses/", response_model=SectionListResponseModel)
+@router.get("/get_courses/", response_model=ClassroomCourseListResponseModel)
 def get_courses():
   """Get courses list
   Raises:
