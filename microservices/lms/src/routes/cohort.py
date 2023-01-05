@@ -220,7 +220,11 @@ def list_section(cohort_id: str, skip: int = 0, limit: int = 10):
   try:
 
     # Get cohort Id and create a reference of cohort object
-
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+    if limit < 1:
+      raise ValidationError\
+        ("Invalid value passed to \"limit\" query parameter")
     cohort = Cohort.find_by_id(cohort_id)
     # Using the cohort object reference key query sections model to get a list
     # of section of a perticular cohort
@@ -232,6 +236,8 @@ def list_section(cohort_id: str, skip: int = 0, limit: int = 10):
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")

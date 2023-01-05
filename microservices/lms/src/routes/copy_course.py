@@ -50,7 +50,7 @@ FAILED_RESPONSE = {"status": "Failed"}
 
 
 @router.get("/get_courses/", response_model=ClassroomCourseListResponseModel)
-def get_courses():
+def get_courses(skip: int = 0, limit: int = 10):
   """Get courses list
   Raises:
     HTTPException: 500 Internal Server Error if something fails
@@ -60,8 +60,15 @@ def get_courses():
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+    if limit < 1:
+      raise ValidationError(
+          "Invalid value passed to \"limit\" query parameter")
     course_list = classroom_crud.get_course_list()
     return {"data": list(course_list)}
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     error = traceback.format_exc().replace("\n", " ")

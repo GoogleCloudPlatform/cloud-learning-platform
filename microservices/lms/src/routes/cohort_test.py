@@ -10,7 +10,7 @@ import mock
 
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
-from common.models import CourseTemplate, Cohort,Section
+from common.models import CourseTemplate, Cohort, Section
 from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, COHORT_EXAMPLE
@@ -28,6 +28,7 @@ def create_course_template(client_with_emulator):
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
   return course_template
+
 
 @pytest.fixture
 def create_fake_data():
@@ -84,6 +85,14 @@ def test_get_cohort_list(client_with_emulator, create_course_template):
       COHORT_LIST_TEST_DATA), "Return data list len doesn't match."
   response_json.pop("cohort_list")
   assert response_json == data, "Return data doesn't match."
+
+
+def test_get_cohort_list_negative_skip(client_with_emulator):
+
+  url = f"{API_URL}?skip=-1&limit=10"
+  with mock.patch("routes.cohort.Logger"):
+    response = client_with_emulator.get(url)
+  assert response.status_code == 422, "Status 422"
 
 
 def test_get_cohort(client_with_emulator, create_course_template):
@@ -230,16 +239,27 @@ def test_delete_nonexist_cohort(client_with_emulator):
   assert response.status_code == 404, "Status 404"
   assert response.json() == data, "Return data doesn't match."
 
+
 def test_list_section_for_one_cohort(client_with_emulator, create_fake_data):
 
-  url = API_URL+f"/{create_fake_data['cohort']}/sections"
+  url = API_URL + f"/{create_fake_data['cohort']}/sections"
   resp = client_with_emulator.get(url)
   # json_response = resp.json()
   assert resp.status_code == 200
 
+
+def test_list_section_for_one_cohort_negative_skip(client_with_emulator,
+                                                   create_fake_data):
+
+  url = API_URL + f"/{create_fake_data['cohort']}/sections?skip=-1&limit=10"
+  resp = client_with_emulator.get(url)
+  # json_response = resp.json()
+  assert resp.status_code == 422, "Status 422"
+
+
 def test_list_section_cohort_not_found(client_with_emulator):
 
-  url = API_URL+"/fake-cohort-id22/sections"
+  url = API_URL + "/fake-cohort-id22/sections"
 
   resp = client_with_emulator.get(url)
   # json_response = resp.json()

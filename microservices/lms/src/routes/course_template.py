@@ -82,6 +82,8 @@ def get_course_template(course_template_id: str):
   try:
     course_template = CourseTemplate.find_by_id(course_template_id)
     return course_template
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
@@ -133,6 +135,8 @@ def get_cohort_list_by_course_template_id(course_template_id: str,
         f" by Course template id {course_template_id}",
         "cohort_list": cohort_list
     }
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
