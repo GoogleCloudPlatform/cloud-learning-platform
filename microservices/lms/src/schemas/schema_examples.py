@@ -70,7 +70,7 @@ INSERT_COHORT_EXAMPLE = {
 }
 
 SECTION_EXAMPLE = {
-    "id": "DLx0TNnYpCCwtCAJHUir",
+    "id": "id",
     "name": "science 101",
     "section": "create_section_test C",
     "description": "This is updated create section test",
@@ -78,8 +78,8 @@ SECTION_EXAMPLE = {
     "classroom_code": "abcdef",
     "classroom_url": "https://classroom.google.com",
     "teachers_list": ["test_user_1@gmail.com"],
-    "course_template": "course_templates/7d2zTApDFE6yEvUn8JFu",
-    "cohort": "cohorts/1j4YsDuylLWtzHVszcAf"
+    "course_template": "course_templates/7d2zTApD-id",
+    "cohort": "cohorts/1j-id"
 }
 
 CREDENTIAL_JSON = {

@@ -1,6 +1,8 @@
 '''Cohort Endpoint'''
+import traceback
 from fastapi import APIRouter
 from common.models import Cohort, CourseTemplate
+from common.models.section import Section
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest
@@ -12,7 +14,9 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
-from utils.helper import convert_cohort_to_cohort_model
+from schemas.section import SectionListResponseModel
+from utils.helper import (convert_cohort_to_cohort_model,
+                          convert_section_to_section_model)
 
 router = APIRouter(prefix="/cohorts",
                    tags=["Cohort"],
@@ -197,4 +201,38 @@ def delete_cohort(cohort_id: str):
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
     Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.get("/{cohort_id}/sections", response_model=SectionListResponseModel)
+def list_section(cohort_id: str, skip: int = 0, limit: int = 10):
+  """ Get a list of sections of one cohort from db
+
+  Args:
+    cohort_id(str):cohort id from firestore db
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+    ResourceNotFound: 404 Resource not found exception
+  Returns:
+    {"status":"Success","data":{}}: Returns list of sections
+    {'status': 'Failed',"data":null}
+  """
+  try:
+
+    # Get cohort Id and create a reference of cohort object
+
+    cohort = Cohort.find_by_id(cohort_id)
+    # Using the cohort object reference key query sections model to get a list
+    # of section of a perticular cohort
+    result = Section.fetch_all_by_cohort(cohort_key=cohort.key,
+                                         skip=skip,
+                                         limit=limit)
+    sections_list = list(map(convert_section_to_section_model, result))
+    return {"data": sections_list}
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
     raise InternalServerError(str(e)) from e
