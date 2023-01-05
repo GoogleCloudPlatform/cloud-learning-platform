@@ -39,6 +39,7 @@ env:
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
+  ISSUER: https://core-learning-services-dev.cloudpssolutions.com
 # cookiecutter:raw 
 jobs:
   deploy_backends:
