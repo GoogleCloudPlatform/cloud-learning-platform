@@ -57,6 +57,8 @@ def get_course_template_list(skip: int = 0, limit: int = 10):
           "course_template_list": []
       }
     return {"course_template_list": list(course_template_list)}
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -82,8 +84,6 @@ def get_course_template(course_template_id: str):
   try:
     course_template = CourseTemplate.find_by_id(course_template_id)
     return course_template
-  except ValidationError as ve:
-    raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
