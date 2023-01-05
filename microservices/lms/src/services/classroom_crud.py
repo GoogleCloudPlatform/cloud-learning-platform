@@ -310,31 +310,32 @@ def enroll_student(token, course_id, student_email, course_code):
   scopes = ["https://www.googleapis.com/auth/classroom.rosters"]
   # creds = Credentials.from_authorized_user_info(token, scopes)
   # creds = google.oauth2.credentials.Credentials(token)
-  # if not creds or not creds.valid:
-  #   raise InvalidTokenError("Invalid token please provide a valid token")
-  # creds = google.oauth2.credentials.Credentials(token)
-  # service = build("classroom", "v1", credentials=creds)
+  
+  creds = google.oauth2.credentials.Credentials(token)
+  if not creds or not creds.valid:
+    raise InvalidTokenError("Invalid token please provide a valid token")
+  service = build("classroom", "v1", credentials=creds)
   student = {"userId": student_email}
-  # service.courses().students().create(
-  #     courseId=course_id, body=student, enrollmentCode=course_code).execute()
+  service.courses().students().create(
+      courseId=course_id, body=student, enrollmentCode=course_code).execute()
   # Get the gaia ID of the course
-  # people_service = build('people', 'v1', credentials=creds)
-  # profile = people_service.people().get(resourceName='people/me',personFields="metadata").execute()
-  # print(profile)
- 
-  response = requests.post("http://user-management/user-management/api/v1/user",json={
-  "first_name": "",
-  "last_name": "",
-  "email": "lms1@gmail.com",
-  "user_type": "learner",
-  "user_type_ref": "hjhuuuyuy",
-  "user_groups": [],
-  "status": "active",
-  "is_registered": True,
-  "failed_login_attempts_count": 0,
-  "access_api_docs": False
-})
-  print(response)
+  people_service = build('people', 'v1', credentials=creds)
+  profile = people_service.people().get(resourceName='people/me',personFields="metadata").execute()
+  print(profile)
+#  Call user API 
+#   response = requests.post("http://user-management/user-management/api/v1/user",json={
+#   "first_name": "",
+#   "last_name": "",
+#   "email": "lms2@gmail.com",
+#   "user_type": "other",
+#   "user_type_ref": "hjhuuuyuy",
+#   "user_groups": [],
+#   "status": "active",
+#   "is_registered": True,
+#   "failed_login_attempts_count": 0,
+#   "access_api_docs": False
+# })
+#   print(response)
   return "success"
 
 

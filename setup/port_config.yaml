@@ -21,3 +21,5 @@ data:
   authentication.PORT: "8889"
   user-managemen.PORT : "9011"
   student-learner-profile : "9014"
+  learning-record-service : "9020"
+    
