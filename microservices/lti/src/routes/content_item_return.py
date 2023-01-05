@@ -52,7 +52,6 @@ def content_item_return(JWT: str = Form()):
     if isinstance(content_item_data, list):
       for received_content_item in content_item_data:
         content_item = LTIContentItem()
-        print(received_content_item.get("type"), tool_config.uuid)
         content_item.tool_id = tool_config.uuid
         content_item.content_item_type = received_content_item.get("type")
         content_item.content_item_info = received_content_item

@@ -136,8 +136,6 @@ def generate_token(
 
     unverified_claims = get_unverified_token_claims(token=client_assertion)
     tool_config = Tool.find_by_client_id(unverified_claims.get("sub"))
-    if tool_config.tool_url != unverified_claims.get("iss"):
-      raise ValidationError("Invalid issuer")
 
     if tool_config.public_key_type == "JWK URL":
       key = get_remote_keyset(tool_config.tool_keyset_url)
