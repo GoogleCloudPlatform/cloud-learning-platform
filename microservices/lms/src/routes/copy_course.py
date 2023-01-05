@@ -1,13 +1,11 @@
 """ Section endpoints """
 import traceback
 
-from common.models.cohort import Cohort
-from common.models.course_template import CourseTemplate
-from common.models.section import Section
-from common.utils.errors import InvalidTokenError, ResourceNotFoundException
+from common.models import Cohort, CourseTemplate, Section
+from common.utils.errors import InvalidTokenError, ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (CustomHTTPException,
                                           InternalServerError, InvalidToken,
-                                          ResourceNotFound)
+                                          ResourceNotFound, BadRequest)
 from common.utils.logging_handler import Logger
 
 from fastapi import APIRouter
@@ -17,12 +15,11 @@ from schemas.error_schema import (ConflictResponseModel,
                                   InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
-from schemas.section import (AddStudentResponseModel, AddStudentToSectionModel,
-                             CreateSectiontResponseModel,
-                             DeleteSectionResponseModel,
-                             GetSectiontResponseModel, SectionDetails,
-                             SectionListResponseModel,
-                             UpdateSectionResponseModel)
+from schemas.section import (
+    AddStudentResponseModel, AddStudentToSectionModel,
+    CreateSectiontResponseModel, DeleteSectionResponseModel,
+    GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
+    ClassroomCourseListResponseModel, UpdateSectionResponseModel)
 from schemas.update_section import UpdateSection
 from services import classroom_crud
 from services.classroom_crud import get_edit_url_and_view_url_mapping_of_form
@@ -52,8 +49,8 @@ SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
 
 
-@router.get("/get_courses/", response_model=SectionListResponseModel)
-def get_courses():
+@router.get("/get_courses/", response_model=ClassroomCourseListResponseModel)
+def get_courses(skip: int = 0, limit: int = 10):
   """Get courses list
   Raises:
     HTTPException: 500 Internal Server Error if something fails
@@ -63,8 +60,15 @@ def get_courses():
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+    if limit < 1:
+      raise ValidationError(
+          "Invalid value passed to \"limit\" query parameter")
     course_list = classroom_crud.get_course_list()
     return {"data": list(course_list)}
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     error = traceback.format_exc().replace("\n", " ")
@@ -169,6 +173,7 @@ def create_section(sections_details: SectionDetails):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
 @router.get("/{section_id}", response_model=GetSectiontResponseModel)
 def get_section(section_id: str):
   """Get a section details from db
@@ -234,7 +239,7 @@ def delete_section(section_id: str):
 
 
 @router.get("", response_model=SectionListResponseModel)
-def section_list():
+def section_list(skip: int = 0, limit: int = 10):
   """Get a all section details from db
 
   Args:
@@ -247,9 +252,17 @@ def section_list():
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    sections = Section.fetch_all()
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+    if limit < 1:
+      raise ValidationError(
+          "Invalid value passed to \"limit\" query parameter")
+
+    sections = Section.fetch_all(skip, limit)
     sections_list = list(map(convert_section_to_section_model, sections))
     return {"data": sections_list}
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)

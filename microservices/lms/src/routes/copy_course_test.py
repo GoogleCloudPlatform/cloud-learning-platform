@@ -149,6 +149,7 @@ def test_create_section_course_template_not_found(client_with_emulator,
               resp = client_with_emulator.post(url, json=section_details)
   assert resp.status_code == 404
 
+
 def test_create_section_cohort_not_found(client_with_emulator,
                                          create_fake_data):
 
@@ -177,11 +178,20 @@ def test_create_section_cohort_not_found(client_with_emulator,
               resp = client_with_emulator.post(url, json=section_details)
   assert resp.status_code == 404
 
+
 def test_list_section(client_with_emulator, create_fake_data):
 
   url = BASE_URL + "/sections"
   resp = client_with_emulator.get(url)
   assert resp.status_code == 200
+
+
+def test_list_section_validation_error(client_with_emulator, create_fake_data):
+
+  url = BASE_URL + "/sections?skip=-1&limit=10"
+  resp = client_with_emulator.get(url)
+  assert resp.status_code == 422
+
 
 def test_get_section(client_with_emulator, create_fake_data):
 

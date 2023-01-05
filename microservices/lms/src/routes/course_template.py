@@ -32,7 +32,7 @@ router = APIRouter(prefix="/course_templates",
 
 
 @router.get("", response_model=CourseTemplateListModel)
-def get_course_template_list():
+def get_course_template_list(skip: int = 0, limit: int = 10):
   """Get a list of Course Template endpoint
     Raises:
         HTTPException: 500 Internal Server Error if something fails.
@@ -44,7 +44,12 @@ def get_course_template_list():
             if the get Course Template list raises an exception.
     """
   try:
-    course_template_list = CourseTemplate.fetch_all()
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+    if limit < 1:
+      raise ValidationError\
+        ("Invalid value passed to \"limit\" query parameter")
+    course_template_list = CourseTemplate.fetch_all(skip=skip, limit=limit)
     if course_template_list is None:
       return {
           "message":
@@ -52,6 +57,8 @@ def get_course_template_list():
           "course_template_list": []
       }
     return {"course_template_list": list(course_template_list)}
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -86,7 +93,9 @@ def get_course_template(course_template_id: str):
 
 @router.get("/{course_template_id}/cohorts",
             response_model=CohortListResponseModel)
-def get_cohort_list_by_course_template_id(course_template_id: str):
+def get_cohort_list_by_course_template_id(course_template_id: str,
+                                          skip: int = 0,
+                                          limit: int = 10):
   """Get list of cohorts inside a course template endpoint
 
     Args:
@@ -104,9 +113,14 @@ def get_cohort_list_by_course_template_id(course_template_id: str):
           if the get cohort list raises an exception
     """
   try:
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+    if limit < 1:
+      raise ValidationError\
+        ("Invalid value passed to \"limit\" query parameter")
     course_template = CourseTemplate.find_by_id(course_template_id)
     fetched_cohort_list = Cohort.fetch_all_by_course_template(
-        course_template_key=course_template.key)
+        course_template_key=course_template.key, skip=skip, limit=limit)
     if fetched_cohort_list is None:
       return {
           "message":
@@ -121,6 +135,8 @@ def get_cohort_list_by_course_template_id(course_template_id: str):
         f" by Course template id {course_template_id}",
         "cohort_list": cohort_list
     }
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:

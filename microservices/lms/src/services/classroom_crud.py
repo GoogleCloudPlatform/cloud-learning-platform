@@ -46,6 +46,7 @@ def create_course(name, description, section, owner_id):
   new_course["section"] = section
   new_course["description"] = description
   new_course["ownerId"] = owner_id
+  new_course["courseState"] = "ACTIVE"
   course = service.courses().create(body=new_course).execute()
   return course
 

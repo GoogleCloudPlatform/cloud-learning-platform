@@ -165,9 +165,9 @@ def test_update_section(get_token):
 
 
 def test_update_section_course_not_found_in_classroom(get_token):
-  """ 
-  User click on edit button for a section 
-  User Updates the section name ,description,course_state by providing expected 
+  """
+  User click on edit button for a section
+  User Updates the section name ,description,course_state by providing expected
   values but given course_id of classroom is incorrect so it gives course not found error
   """
   # Create fake classroom in google classroom
