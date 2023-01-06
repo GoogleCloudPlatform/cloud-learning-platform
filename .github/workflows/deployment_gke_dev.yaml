@@ -28,6 +28,7 @@ on:
 env:
   PROJECT_ID: core-learning-services-dev
   SKAFFOLD_DEFAULT_REPO: gcr.io/core-learning-services-dev
+  NAMESPACE: default
   GKE_CLUSTER: core-learning-services-dev-us-central1
   GKE_REGION: us-central1
   KUSTOMIZE_VERSION: 4.1.3
@@ -64,7 +65,7 @@ jobs:
 
       - name: Set up Service Account
         run: |
-          NAMESPACE=${SKAFFOLD_NAMESPACE} bash setup/setup_ksa.sh
+          bash setup/setup_ksa.sh
 
       - name: Install Kustomize
         run: |
@@ -88,7 +89,7 @@ jobs:
         run: |
           skaffold run \
           --profile dev \
-          --namespace default \
+          --namespace $NAMESPACE \
           -l commit=$GITHUB_SHA \
           --tag latest 
 
@@ -108,7 +109,7 @@ jobs:
           export GCP_PROJECT=$PROJECT_ID
           skaffold run \
           -p custom \
-          --namespace default \
+          --namespace $NAMESPACE \
           --module authentication,redis \
           -l commit=$GITHUB_SHA \
           --tag PR${{ github.event.pull_request.number }} \
