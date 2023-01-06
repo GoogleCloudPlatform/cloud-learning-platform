@@ -104,6 +104,7 @@ jobs:
 
       - name: Build and deploy external services to cluster
         run: |
+          cat /home/runner/.skaffold/config
           pushd ${{ format('ailearning-backend_{0}', github.run_id) }}
           export GCP_PROJECT=$PROJECT_ID
           skaffold run \
