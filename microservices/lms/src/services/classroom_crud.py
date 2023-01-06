@@ -2,7 +2,6 @@
 from asyncio.log import logger
 from google.oauth2 import service_account
 import google.oauth2.credentials
-from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from common.utils.errors import InvalidTokenError
@@ -309,7 +308,7 @@ def enroll_student(token, course_id, student_email, course_code):
 
   # scopes = ["https://www.googleapis.com/auth/classroom.rosters"]
   # creds = Credentials.from_authorized_user_info(token, scopes)
-  creds = google.oauth2.credentials.Credentials(token=token)
+  
   if not creds or not creds.valid:
     raise InvalidTokenError("Invalid token please provide a valid token")
   service = build("classroom", "v1", credentials=creds)

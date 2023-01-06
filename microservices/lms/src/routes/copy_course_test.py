@@ -260,7 +260,8 @@ def test_update_section_course_id_not_found(client_with_emulator,
 def test_enroll_student(client_with_emulator, create_fake_data):
 
   url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
-  input_data = {"email": "student@gmail.com", "access_token": CREDENTIAL_JSON["token"]}
+  input_data = {"email": "student@gmail.com", "access_token": 
+  CREDENTIAL_JSON["token"]}
   data = {
       "success": True,
       "message": "Successfully Added the Student with email student@gmail.com",
@@ -275,7 +276,8 @@ def test_enroll_student(client_with_emulator, create_fake_data):
 
 def test_enroll_student_negative(client_with_emulator):
   url = BASE_URL + "/sections/fake_id_section/students"
-  input_data = {"email": "student@gmail.com", "access_token":CREDENTIAL_JSON["token"]}
+  input_data = {"email": "student@gmail.com", "access_token":
+  CREDENTIAL_JSON["token"]}
   with mock.patch("routes.copy_course.classroom_crud.enroll_student"):
     with mock.patch("routes.copy_course.Logger"):
       resp = client_with_emulator.post(url, json=input_data)
