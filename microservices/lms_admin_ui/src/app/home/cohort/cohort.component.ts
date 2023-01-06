@@ -14,7 +14,7 @@ export class CohortComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  reRout(cohortUUid: any) {
-    this.router.navigate(['/home/' + cohortUUid])
+  reRout(cohortid: any) {
+    this.router.navigate(['/home/' + cohortid])
   }
 }

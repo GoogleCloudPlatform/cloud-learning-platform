@@ -2,29 +2,35 @@
 Pydantic Model for Line item API's
 """
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
 from schemas.schema_examples import (BASIC_LINE_ITEM_EXAMPLE,
-                                     FULL_LINE_ITEM_EXAMPLE, FULL_SCORE_EXAMPLE,
-                                     FULL_RESULT_EXAMPLE)
+                                     UPDATE_LINE_ITEM_EXAMPLE,
+                                     FULL_LINE_ITEM_EXAMPLE,
+                                     BASIC_SCORE_EXAMPLE, FULL_SCORE_EXAMPLE,
+                                     BASIC_RESULT_EXAMPLE, FULL_RESULT_EXAMPLE)
 
 
 # pylint: disable = invalid-name
 class BasicScoreModel(BaseModel):
   """Basic Score Pydantic Model"""
   userId: str
-  scoreGiven: str
-  scoreMaximum: int
-  comment: str
-  timestamp: str
   activityProgress: str
   gradingProgress: str
+  timestamp: str
+  scoreGiven: Optional[int]
+  scoreMaximum: Optional[int]
+  comment: Optional[str]
+
+  class Config():
+    orm_mode = True
+    schem_extra = {"example": BASIC_SCORE_EXAMPLE}
 
 
 class ScoreResponseModel(BaseModel):
   """Score Response Model"""
   uuid: str
   userId: str
-  scoreGiven: str
+  scoreGiven: int
   scoreMaximum: int
   comment: str
   timestamp: str
@@ -44,6 +50,10 @@ class BasicResultModel(BaseModel):
   comment: str
   scoreOf: str
 
+  class Config():
+    orm_mode = True
+    schema_extra = {"example": BASIC_RESULT_EXAMPLE}
+
 
 class ResultResponseModel(BaseModel):
   """Result Response Model"""
@@ -61,18 +71,23 @@ class ResultResponseModel(BaseModel):
 
 class BasicLineItemModel(BaseModel):
   """Basic Line Item Pydantic Model"""
-  startDateTime: str
-  endDateTime: str
   scoreMaximum: int
   label: str
-  tag: str
-  resourceId: str
-  resourceLinkId: str
+  resourceId: Optional[str]
+  tag: Optional[str]
+  resourceLinkId: Optional[str]
+  startDateTime: Optional[str]
+  endDateTime: Optional[str]
 
 
 class FullLineItemModel(BasicLineItemModel):
   """Full Line Item Model"""
+  id: str
   uuid: str
+
+  class Config():
+    orm_mode = True
+    schema_extra = {"example": FULL_LINE_ITEM_EXAMPLE}
 
 
 class LineItemModel(BasicLineItemModel):
@@ -85,17 +100,14 @@ class LineItemModel(BasicLineItemModel):
 
 class UpdateLineItemModel(BaseModel):
   """Update Line Item Pydantic Model"""
-  startDateTime: str
-  endDateTime: str
   scoreMaximum: int
   label: str
-  tag: str
-  resourceId: str
-  resourceLinkId: str
+  startDateTime: str
+  endDateTime: str
 
   class Config():
     orm_mode = True
-    schema_extra = {"example": BASIC_LINE_ITEM_EXAMPLE}
+    schema_extra = {"example": UPDATE_LINE_ITEM_EXAMPLE}
 
 
 class LineItemResponseModel(FullLineItemModel):
@@ -119,14 +131,3 @@ class DeleteLineItem(BaseModel):
             "message": "Successfully deleted the Line item"
         }
     }
-
-
-class AllLineItemsResponseModel(BaseModel):
-  """Line Item Response Pydantic Model"""
-  success: Optional[bool] = True
-  message: Optional[str] = "Data fetched successfully"
-  data: List[FullLineItemModel]
-
-  class Config():
-    orm_mode = True
-    schema_extra = {"example": [FULL_LINE_ITEM_EXAMPLE]}

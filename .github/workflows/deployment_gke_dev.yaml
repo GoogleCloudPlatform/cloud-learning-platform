@@ -28,8 +28,7 @@ on:
 env:
   PROJECT_ID: core-learning-services-dev
   SKAFFOLD_DEFAULT_REPO: gcr.io/core-learning-services-dev
-  SKAFFOLD_PROFILE: dev
-  SKAFFOLD_NAMESPACE: default
+  NAMESPACE: default
   GKE_CLUSTER: core-learning-services-dev-us-central1
   GKE_REGION: us-central1
   KUSTOMIZE_VERSION: 4.1.3
@@ -39,6 +38,8 @@ env:
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
+  API_DOMAIN: ${{ secrets.API_DOMAIN }}
+  ISSUER: https://core-learning-services-dev.cloudpssolutions.com
 # cookiecutter:raw 
 jobs:
   deploy_backends:
@@ -66,7 +67,7 @@ jobs:
 
       - name: Set up Service Account
         run: |
-          NAMESPACE=${SKAFFOLD_NAMESPACE} bash setup/setup_ksa.sh
+          bash setup/setup_ksa.sh
 
       - name: Install Kustomize
         run: |
@@ -90,6 +91,7 @@ jobs:
         run: |
           skaffold run \
           --profile dev \
+          --namespace $NAMESPACE \
           -l commit=$GITHUB_SHA \
           --tag latest 
 
@@ -108,9 +110,10 @@ jobs:
           export GCP_PROJECT=$PROJECT_ID
           skaffold run \
           -p custom \
+          --namespace $NAMESPACE \
           --module authentication,redis \
           -l commit=$GITHUB_SHA \
-          --tag PR${{ github.event.pull_request.number }} 
+          --tag PR${{ github.event.pull_request.number }}
           popd
 
       - name: Upload Skaffold cache

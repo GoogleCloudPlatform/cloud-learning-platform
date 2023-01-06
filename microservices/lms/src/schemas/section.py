@@ -38,7 +38,7 @@ class SectionListResponseModel(BaseModel):
   """Get a list of sections"""
   success: Optional[bool] = True
   message: Optional[str] = "Success list"
-  data: Optional[list] = []
+  data: Optional[list[Sections]] = []
 
   class Config():
     orm_mode = True
@@ -47,6 +47,23 @@ class SectionListResponseModel(BaseModel):
             "success": True,
             "message": "Success",
             "data": [SECTION_EXAMPLE]
+        }
+    }
+
+
+class ClassroomCourseListResponseModel(BaseModel):
+  """Get a list of Classroom Courses"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success list"
+  data: Optional[list] = []
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data": []
         }
     }
 
@@ -137,31 +154,15 @@ class CredentialKeys(BaseModel):
 class AddStudentToSectionModel(BaseModel):
   """Input Model to add student in section"""
   email: str
-  # credentials: CredentialKeys
-  token: str
+  access_token:str
   class Config():
     orm_mode = True
     schema_extra = {
         "example": {
             "email": "email@gmail.com",
-            # "credentials": CREDENTIAL_JSON,
-            "token":"ytyisudisudisudissudi"
+            "access_token":"test_token"
         }
     }
-
-# class AddStudentToSectionModel(BaseModel):
-#   """Input Model to add student in section"""
-#   email: str
-#   token: str
-
-#   class Config():
-#     orm_mode = True
-#     schema_extra = {
-#         "example": {
-#             "email": "email@gmail.com",
-#             "credentials": "ya29.a0AX9GBdXzn4-_6qYhvE41CZ7dbxxST8eHqb3zLdBxzMSTenUbxlVWpPasz8Cw2610QoIPvCYMyOPFvLrT-z6gRlJwMbnQ7lNZ4XJ_N3wWVq3UfXIUMGmS92FupXnd3oMmYYGHLsm7zbKMTYZLDyVY98N0t_iVaCgYKAZUSARMSFQHUCsbCgyKibZ8Ny8RlZQgdgU2QUg0163"
-#         }
-#     }
 
 
 class AddStudentResponseModel(BaseModel):

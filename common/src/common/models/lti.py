@@ -362,6 +362,12 @@ class LineItem(TempBaseModel):
       raise ResourceNotFoundException(f"Line item with uuid {uuid} not found")
     return line_item
 
+  @classmethod
+  def find_by_resource_link_id(cls, resource_link_id):
+    line_item = cls.collection.filter("resourceLinkId", "==",
+                                      resource_link_id).get()
+    return line_item
+
 
 class Result(TempBaseModel):
   """LTI Result Data Model"""
@@ -371,6 +377,7 @@ class Result(TempBaseModel):
   resultMaximum = NumberField()
   comment = TextField()
   scoreOf = TextField()
+  lineItemId = TextField()
 
   class Meta:
     collection_name = TempBaseModel.DATABASE_PREFIX + "results"
@@ -381,6 +388,11 @@ class Result(TempBaseModel):
     result = cls.collection.filter("uuid", "==", uuid).get()
     if result is None:
       raise ResourceNotFoundException(f"Result with uuid {uuid} not found")
+    return result
+
+  @classmethod
+  def find_by_line_item_id(cls, line_item_id):
+    result = cls.collection.filter("lineItemId", "==", line_item_id)
     return result
 
 
@@ -394,6 +406,7 @@ class Score(TempBaseModel):
   timestamp = TextField()
   activityProgress = TextField()
   gradingProgress = TextField()
+  lineItemId = TextField()
 
   class Meta:
     collection_name = TempBaseModel.DATABASE_PREFIX + "scores"
