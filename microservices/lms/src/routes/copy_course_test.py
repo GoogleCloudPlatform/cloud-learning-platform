@@ -210,12 +210,13 @@ def test_get_section_not_found(client_with_emulator):
 
 def test_update_section(client_with_emulator, create_fake_data):
 
+  section = Section.find_by_id(create_fake_data["section"])
   data = {
       "id": create_fake_data["section"],
       "course_id": "561822649300",
       "section_name": "tsection",
       "description": "tdescription",
-      "course_state": "ACTIVE"
+      "teachers_list": section.teachers_list
   }
   url = BASE_URL + "/sections"
   with mock.patch("routes.copy_course.classroom_crud.update_course"):
@@ -230,7 +231,7 @@ def test_update_section_section_id_not_found(client_with_emulator):
       "course_id": "561822649300",
       "section_name": "tsection",
       "description": "tdescription",
-      "course_state": "ACTIVEu"
+      "teachers_list": ["teachera@gmail.com", "teacherb@gmail.com"]
   }
   url = BASE_URL + "/sections"
 
@@ -247,7 +248,7 @@ def test_update_section_course_id_not_found(client_with_emulator,
       "course_id": "561822649300",
       "section_name": "tsection",
       "description": "tdescription",
-      "course_state": "ACTIVEu"
+      "teachers_list": ["teachera@gmail.com", "teacherb@gmail.com"]
   }
   url = BASE_URL + "/sections"
   with mock.patch("routes.copy_course.classroom_crud.update_course",

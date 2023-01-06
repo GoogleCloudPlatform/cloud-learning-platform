@@ -292,14 +292,19 @@ def update_section(sections_details: UpdateSection):
     section = Section.find_by_id(sections_details.id)
     new_course = classroom_crud.update_course(sections_details.course_id,
                                               sections_details.section_name,
-                                              sections_details.description,
-                                              sections_details.course_state)
+                                              sections_details.description)
     if new_course is None:
       raise ResourceNotFoundException(
           "Course with Course_id"
           f" {sections_details.course_id} is not found in classroom")
+    teacher_list = list(
+        set(sections_details.teachers_list) - set(section.teachers_list))
+    if teacher_list:
+      for i in teacher_list:
+        classroom_crud.add_teacher(sections_details.course_id, i)
     section.section = sections_details.section_name
     section.description = sections_details.description
+    section.teachers_list = sections_details.teachers_list
     section.update()
     updated_section = convert_section_to_section_model(section)
     return {"data": updated_section}

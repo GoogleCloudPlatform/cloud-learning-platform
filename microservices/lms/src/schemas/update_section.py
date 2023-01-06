@@ -2,6 +2,7 @@
 Pydantic Model for copy course API's
 """
 from pydantic import BaseModel
+from schemas.schema_examples import UPDATE_SECTION
 
 
 class UpdateSection(BaseModel):
@@ -10,4 +11,8 @@ class UpdateSection(BaseModel):
   course_id: str
   section_name: str
   description: str
-  course_state: str
+  teachers_list: list[str]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {"example": UPDATE_SECTION}

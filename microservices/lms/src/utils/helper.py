@@ -4,6 +4,7 @@ from google.cloud import secretmanager
 import google_crc32c
 import ttl_cache
 
+
 @ttl_cache(3600)
 def get_gke_pd_sa_key_from_secret_manager():
   """Copy course  API
@@ -28,6 +29,7 @@ def get_gke_pd_sa_key_from_secret_manager():
   response = json.loads(payload)
   return response
 
+
 def convert_cohort_to_cohort_model(cohort):
   """Convert Cohort Object to Cohort Model Object
 
@@ -39,6 +41,7 @@ def convert_cohort_to_cohort_model(cohort):
   loaded_cohort = cohort.to_dict()
   course_template = loaded_cohort.pop("course_template").to_dict()
   loaded_cohort["course_template"] = course_template["key"]
+  loaded_cohort["course_template_name"] = course_template["name"]
   return loaded_cohort
 
 

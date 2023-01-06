@@ -107,6 +107,7 @@ def test_create_section_course_template_not_found(get_token):
   resp_json = resp.json()
   assert resp.status_code == 404
 
+
 def test_get_section(get_token):
   """
     Get a sections details for a  section by giving section_id as query paramter
@@ -157,7 +158,7 @@ def test_update_section(get_token):
       "course_id": classroom_id,
       "section_name": "section_updated",
       "description": "test_description_updated",
-      "course_state": "ACTIVE"
+      "teachers_list": fake_data[2].teachers_list
   }
   resp = requests.patch(url=url, json=data, headers=get_token)
   resp_json = resp.json()
@@ -184,7 +185,7 @@ def test_update_section_course_not_found_in_classroom(get_token):
       "course_id": "test1222",
       "section_name": "section_updated",
       "description": "test_description_updated",
-      "course_state": "ACTIVE"
+      "teachers_list": fake_data[2].teachers_list
   }
   resp = requests.patch(url=url, json=data, headers=get_token)
   assert resp.status_code == 500

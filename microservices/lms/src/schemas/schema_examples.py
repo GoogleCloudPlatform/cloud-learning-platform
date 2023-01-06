@@ -91,3 +91,11 @@ CREDENTIAL_JSON = {
     "scopes": ["Scopes"],
     "expiry": "2022-11-23T12:01:17Z"
 }
+
+UPDATE_SECTION = {
+    "id": "string",
+    "course_id": "string",
+    "section_name": "string",
+    "description": "string",
+    "teachers_list": ["test_user_1@gmail.com"]
+}
