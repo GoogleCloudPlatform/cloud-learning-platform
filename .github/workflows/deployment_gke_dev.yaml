@@ -110,7 +110,8 @@ jobs:
           -p custom \
           --module authentication,redis \
           -l commit=$GITHUB_SHA \
-          --tag PR${{ github.event.pull_request.number }} 
+          --tag PR${{ github.event.pull_request.number }} \
+          -v debug
           popd
 
       - name: Upload Skaffold cache
