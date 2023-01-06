@@ -42,7 +42,7 @@ export class SectionComponent implements OnInit {
     this.dataSource.sort = this.sort;
     let id
     console.log(this.router.url)
-    id = this.router.url.split('/')[2]
+    id = this.router.url.split('/')[3]
     this.getCohortDetails(id)
 
 
