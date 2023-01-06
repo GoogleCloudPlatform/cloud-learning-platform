@@ -260,7 +260,7 @@ def test_update_section_course_id_not_found(client_with_emulator,
 def test_enroll_student(client_with_emulator, create_fake_data):
 
   url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
-  input_data = {"email": "student@gmail.com", "access_token": 
+  input_data = {"email": "student@gmail.com", "access_token":
   CREDENTIAL_JSON["token"]}
   data = {
       "success": True,
