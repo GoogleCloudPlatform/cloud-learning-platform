@@ -57,7 +57,8 @@ def get_student_email_and_token():
       credentials_dict = creds.to_json()
   data = {
       "email": student_email_response.payload.data.decode("UTF-8"),
-      "credentials": json.loads(credentials_dict)
+      # "credentials": json.loads(credentials_dict)
+      "access_token":credentials_dict["token"]
   }
   return data
 
