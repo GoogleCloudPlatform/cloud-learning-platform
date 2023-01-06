@@ -5,6 +5,7 @@ from config import ERROR_RESPONSES
 from common.models import LTIContentItem, Tool
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  ConflictError)
+from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, Conflict)
 from schemas.content_item_schema import (LTIContentItemModel,
@@ -14,6 +15,7 @@ from schemas.content_item_schema import (LTIContentItemModel,
                                          LTIContentItemSearchResponseModel,
                                          AllLTIContentItemsResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
+from services.line_item_service import create_new_line_item
 
 router = APIRouter(
     tags=["Content Item CRUD Endpoints"], responses=ERROR_RESPONSES)
@@ -43,6 +45,7 @@ def search_content_item(tool_id: str):
         "data": result
     }
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -90,10 +93,13 @@ def get_all_content_items(skip: int = 0,
         "data": content_items
     }
   except ValidationError as e:
+    Logger.error(e)
     raise BadRequest(str(e)) from e
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -127,8 +133,10 @@ def get_content_item(uuid: str):
         "data": content_item_fields
     }
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -167,6 +175,31 @@ def create_content_item(input_content_item: LTIContentItemModel):
     new_content_item.update()
     content_item_fields = new_content_item.get_fields(reformat_datetime=True)
 
+    content_item_info = input_content_item_dict.get("content_item_info")
+
+    if "lineItem" in content_item_info.keys():
+      line_item_data = content_item_info.get("lineItem")
+
+      start_date_time = ""
+      end_date_time = ""
+
+      if content_item_info.get("available", ""):
+        start_date_time = content_item_info.get("available",
+                                                "").get("startDateTime", "")
+        end_date_time = content_item_info.get("available",
+                                              "").get("endDateTime", "")
+
+      input_line_item = {
+          "startDateTime": start_date_time,
+          "endDateTime": end_date_time,
+          "scoreMaximum": line_item_data.get("scoreMaximum"),
+          "label": line_item_data.get("label"),
+          "tag": line_item_data.get("tag", ""),
+          "resourceId": line_item_data.get("resourceId", ""),
+          "resourceLinkId": new_content_item.uuid
+      }
+      create_new_line_item(input_line_item)
+
     return {
         "success": True,
         "message": "Content item has been created successfully",
@@ -175,10 +208,13 @@ def create_content_item(input_content_item: LTIContentItemModel):
         }
     }
   except ConflictError as e:
+    Logger.error(e)
     raise Conflict(str(e)) from e
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -224,8 +260,10 @@ def update_content_item(uuid: str,
         "data": content_item_fields
     }
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -252,6 +290,8 @@ def delete_content_item(uuid: str):
     LTIContentItem.delete_by_uuid(uuid)
     return {}
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e

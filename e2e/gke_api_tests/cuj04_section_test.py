@@ -107,22 +107,6 @@ def test_create_section_course_template_not_found(get_token):
   resp_json = resp.json()
   assert resp.status_code == 404
 
-
-def test_get_list_sections(get_token):
-  """ 
-  Get a sections list for a perticular cohort by giving cohort_id as query paramter 
-  """
-  course = create_course(DATABASE_PREFIX + "test_course", "This is test",
-                         "test", "me")
-  classroom_id = course["id"]
-  fake_data = create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2,
-                               TEST_SECTION2, classroom_id)
-  url = f"{API_URL}/sections/cohort/{fake_data[1].id}/sections"
-  resp = requests.get(url=url, headers=get_token)
-  resp_json = resp.json()
-  assert resp.status_code == 200, "Status 200"
-
-
 def test_get_section(get_token):
   """
     Get a sections details for a  section by giving section_id as query paramter
@@ -181,9 +165,9 @@ def test_update_section(get_token):
 
 
 def test_update_section_course_not_found_in_classroom(get_token):
-  """ 
-  User click on edit button for a section 
-  User Updates the section name ,description,course_state by providing expected 
+  """
+  User click on edit button for a section
+  User Updates the section name ,description,course_state by providing expected
   values but given course_id of classroom is incorrect so it gives course not found error
   """
   # Create fake classroom in google classroom

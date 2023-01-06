@@ -38,7 +38,7 @@ class SectionListResponseModel(BaseModel):
   """Get a list of sections"""
   success: Optional[bool] = True
   message: Optional[str] = "Success list"
-  data: Optional[list] = []
+  data: Optional[list[Sections]] = []
 
   class Config():
     orm_mode = True
@@ -47,6 +47,23 @@ class SectionListResponseModel(BaseModel):
             "success": True,
             "message": "Success",
             "data": [SECTION_EXAMPLE]
+        }
+    }
+
+
+class ClassroomCourseListResponseModel(BaseModel):
+  """Get a list of Classroom Courses"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success list"
+  data: Optional[list] = []
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data": []
         }
     }
 

@@ -24,7 +24,7 @@ export class CreateCohortModalComponent implements OnInit {
       registration_start_date: this.fb.control('', [Validators.required]),
       registration_end_date: this.fb.control('', [Validators.required]),
       max_students: this.fb.control('', [Validators.required]),
-      course_template_uuid: this.fb.control('', [Validators.required]),
+      course_template_id: this.fb.control('', [Validators.required]),
     });
   }
   openSuccessSnackBar(message: string, action: string) {

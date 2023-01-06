@@ -35,6 +35,14 @@ def test_get_course_template_list(client_with_emulator):
   assert response_json == data, "Return data doesn't match."
 
 
+def test_get_course_template_list_negative_skip(client_with_emulator):
+  url = f"{API_URL}?skip=-1&limit=10"
+  # mock logger
+  with mock.patch("routes.course_template.Logger"):
+    response = client_with_emulator.get(url)
+  assert response.status_code == 422, "Status 422"
+
+
 def test_get_course_template(client_with_emulator):
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
@@ -73,6 +81,17 @@ def test_get_cohort_list_by_course_template(client_with_emulator):
       COHORT_LIST_TEST_DATA), "Return data list len doesn't match."
   response_json.pop("cohort_list")
   assert response_json == data, "Return data doesn't match."
+
+
+def test_get_cohort_list_by_course_template_negative_skip(
+    client_with_emulator):
+  course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
+  course_template.save()
+
+  url = API_URL + f"/{course_template.id}/cohorts?skip=-1&limit=10"
+  with mock.patch("routes.course_template.Logger"):
+    response = client_with_emulator.get(url)
+  assert response.status_code == 422, "Status 422"
 
 
 def test_get_cohort_list_by_nonexist_course_template(client_with_emulator):
@@ -129,7 +148,7 @@ def test_delete_course_template(client_with_emulator):
   url = API_URL + f"/{course_template_id}"
   data = {
       "success": True,
-      "message": "Successfully deleted the "+
+      "message": "Successfully deleted the " +
       f"course template with id {course_template_id}",
       "data": None
   }
@@ -161,8 +180,10 @@ def test_update_course_template(client_with_emulator):
   course_template_id = course_template.id
   url = API_URL + f"/{course_template_id}"
   data = {
-      "success": True,
-      "message": "Successfully Updated the Course "+
+      "success":
+      True,
+      "message":
+      "Successfully Updated the Course " +
       f"Template with id {course_template_id}"
   }
   json_body = {"name": "update_name", "description": "updated_description"}

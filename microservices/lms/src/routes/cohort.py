@@ -1,6 +1,8 @@
 '''Cohort Endpoint'''
+import traceback
 from fastapi import APIRouter
 from common.models import Cohort, CourseTemplate
+from common.models.section import Section
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest
@@ -12,7 +14,9 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
-from utils.helper import convert_cohort_to_cohort_model
+from schemas.section import SectionListResponseModel
+from utils.helper import (convert_cohort_to_cohort_model,
+                          convert_section_to_section_model)
 
 router = APIRouter(prefix="/cohorts",
                    tags=["Cohort"],
@@ -33,7 +37,7 @@ router = APIRouter(prefix="/cohorts",
 
 
 @router.get("", response_model=CohortListResponseModel)
-def get_cohort_list():
+def get_cohort_list(skip: int = 0, limit: int = 10):
   """Get a list of Cohort endpoint
     Raises:
         HTTPException: 500 Internal Server Error if something fails.
@@ -44,7 +48,12 @@ def get_cohort_list():
             if the get cohort list raises an exception.
     """
   try:
-    fetched_cohort_list = Cohort.fetch_all()
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+    if limit < 1:
+      raise ValidationError\
+        ("Invalid value passed to \"limit\" query parameter")
+    fetched_cohort_list = Cohort.fetch_all(skip=skip, limit=limit)
     if fetched_cohort_list is None:
       return {
           "message":
@@ -55,6 +64,8 @@ def get_cohort_list():
         convert_cohort_to_cohort_model(i) for i in fetched_cohort_list
     ]
     return {"cohort_list": cohort_list}
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
@@ -148,8 +159,7 @@ def update_cohort(cohort_id: str, update_cohort_model: UpdateCohortModel):
     for key in update_cohort_dict:
       if update_cohort_dict[key] is not None:
         if key == "course_template":
-          course_template = CourseTemplate.find_by_id(
-              update_cohort_dict[key])
+          course_template = CourseTemplate.find_by_id(update_cohort_dict[key])
           setattr(cohort_details, key, course_template)
         else:
           setattr(cohort_details, key, update_cohort_dict[key])
@@ -186,11 +196,49 @@ def delete_cohort(cohort_id: str):
     """
   try:
     Cohort.soft_delete_by_id(cohort_id)
-    return {
-          "message": f"Successfully deleted the Cohort with id {cohort_id}"
-      }
+    return {"message": f"Successfully deleted the Cohort with id {cohort_id}"}
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
     Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.get("/{cohort_id}/sections", response_model=SectionListResponseModel)
+def list_section(cohort_id: str, skip: int = 0, limit: int = 10):
+  """ Get a list of sections of one cohort from db
+
+  Args:
+    cohort_id(str):cohort id from firestore db
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+    ResourceNotFound: 404 Resource not found exception
+  Returns:
+    {"status":"Success","data":{}}: Returns list of sections
+    {'status': 'Failed',"data":null}
+  """
+  try:
+
+    # Get cohort Id and create a reference of cohort object
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+    if limit < 1:
+      raise ValidationError\
+        ("Invalid value passed to \"limit\" query parameter")
+    cohort = Cohort.find_by_id(cohort_id)
+    # Using the cohort object reference key query sections model to get a list
+    # of section of a perticular cohort
+    result = Section.fetch_all_by_cohort(cohort_key=cohort.key,
+                                         skip=skip,
+                                         limit=limit)
+    sections_list = list(map(convert_section_to_section_model, result))
+    return {"data": sections_list}
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
     raise InternalServerError(str(e)) from e

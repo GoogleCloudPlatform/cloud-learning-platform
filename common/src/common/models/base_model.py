@@ -173,17 +173,20 @@ class BaseModel(Model):
       obj.update()
 
   @classmethod
-  def fetch_all(cls, limit=1000):
+  def fetch_all(cls, skip=0, limit=1000, order_by="-created_time"):
     """ fetch all documents
 
     Args:
-        limit (int, optional):  Defaults to 1000.
+        skip (int, optional): _description_. Defaults to 0.
+        limit (int, optional): _description_. Defaults to 1000.
+        order_by (str, optional): _description_. Defaults to "-created_time".
 
     Returns:
-        _type_: list of objects
+        list: list of objects
     """
-    objects = cls.collection.filter("deleted_at_timestamp", "==",
-                                    None).fetch(limit)
+    objects = cls.collection.filter(
+        "deleted_at_timestamp", "==",
+        None).order(order_by).offset(skip).fetch(limit)
     return list(objects)
 
   @classmethod

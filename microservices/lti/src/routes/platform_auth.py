@@ -113,16 +113,17 @@ def generate_token(
         "https://purl.imsglobal.org/spec/lti-ags/scope/score"
     ]
     scopes = scope.split(" ")
-    invalid_scopes = []
+    required_scopes = []
     for received_scope in scopes:
-      if received_scope not in valid_scopes:
-        invalid_scopes.append(received_scope)
+      if received_scope in valid_scopes:
+        required_scopes.append(received_scope)
 
     if grant_type != "client_credentials":
       raise ValidationError("Invalid grant_type")
     if client_assertion_type != "urn:ietf:params:oauth:client-assertion-type:jwt-bearer":
       raise ValidationError("Invalid client_assertion_type")
-    if len(scopes) == 0 or len(invalid_scopes) != 0:
+
+    if len(required_scopes) == 0:
       raise ValidationError("Invalid scope")
     # client_assertion jwt should consist of following claims when requesting
     # for token
@@ -136,15 +137,13 @@ def generate_token(
     unverified_claims = get_unverified_token_claims(token=client_assertion)
     tool_config = Tool.find_by_client_id(unverified_claims.get("sub"))
 
-    if tool_config.tool_url != unverified_claims.get("iss"):
-      raise ValidationError("Invalid issuer")
-
     if tool_config.public_key_type == "JWK URL":
       key = get_remote_keyset(tool_config.tool_keyset_url)
     elif tool_config.public_key_type == "Public Key":
       key = tool_config.tool_public_key
 
-    claims = decode_token(client_assertion, key)
+    claims = decode_token(
+        token=client_assertion, key=key, audience=unverified_claims.get("aud"))
 
     token_claims = {
         "iss": ISSUER,
