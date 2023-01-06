@@ -28,8 +28,6 @@ on:
 env:
   PROJECT_ID: core-learning-services-dev
   SKAFFOLD_DEFAULT_REPO: gcr.io/core-learning-services-dev
-  SKAFFOLD_PROFILE: dev
-  SKAFFOLD_NAMESPACE: default
   GKE_CLUSTER: core-learning-services-dev-us-central1
   GKE_REGION: us-central1
   KUSTOMIZE_VERSION: 4.1.3
@@ -90,6 +88,7 @@ jobs:
         run: |
           skaffold run \
           --profile dev \
+          --namespace default \
           -l commit=$GITHUB_SHA \
           --tag latest 
 
@@ -109,6 +108,7 @@ jobs:
           export GCP_PROJECT=$PROJECT_ID
           skaffold run \
           -p custom \
+          --namespace default \
           --module authentication,redis \
           -l commit=$GITHUB_SHA \
           --tag PR${{ github.event.pull_request.number }} \
