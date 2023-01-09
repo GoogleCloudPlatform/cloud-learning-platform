@@ -22,8 +22,18 @@ class CourseEnrollmentMapping(BaseModel):
   """Course Enrollment Mapping ORM class
   """
   id = IDField()
-  section = ReferenceField(Section)
-  user = TextField()
+  section = ReferenceField(Section,required=True)
+  user = TextField(required=True)
   class Meta:
     ignore_none_field = False
     collection_name = BaseModel.DATABASE_PREFIX + "course_enrollment_mapping"
+
+  @classmethod
+  def find_by_user(cls, user_id):
+    """Find the rubric item using name
+    Args:
+        name (string): node item name
+    Returns:
+        Rubric: Rubric Object
+    """
+    return CourseEnrollmentMapping.collection.filter("user", "==", user_id).fetch()

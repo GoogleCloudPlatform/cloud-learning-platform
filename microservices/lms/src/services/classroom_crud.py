@@ -319,9 +319,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   people_service = build("people", "v1", credentials=creds)
   profile = people_service.people().get(resourceName="people/me",
   personFields="metadata").execute()
-  print(profile)
   gaia_id = profile["metadata"]["sources"][0]["id"]
-  print("This is gaiaid------",gaia_id)
 # Call user API
   data = {
   "first_name": "",
@@ -333,16 +331,13 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   "status": "active",
   "is_registered": True,
   "failed_login_attempts_count": 0,
-  "access_api_docs": False
+  "access_api_docs": False,
+  "gaia_id":gaia_id
 }
-  print("_________Calling student API ___________________")
   response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
   json=data,headers=headers)
   if response.status_code != 200:
     raise UserManagementServiceError(response.json()["message"])
-  print(response.json())
-  print("________________________________________")
-  print(response.json()["data"])
   return response.json()["data"]
 
 def get_edit_url_and_view_url_mapping_of_form():
@@ -401,5 +396,4 @@ def invite_teacher(course_id, teacher_email):
                               message=str(ae),
                               data=None) from ae
   except Exception as e:
-    print(str(e))
     raise InternalServerError(str(e)) from e
