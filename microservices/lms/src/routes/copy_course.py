@@ -330,7 +330,7 @@ def enroll_student_section(sections_id: str,
   """
   try:
     section = Section.find_by_id(sections_id)
-    classroom_crud.enroll_student(token={**input_data.credentials.dict()},
+    classroom_crud.enroll_student(token=input_data.access_token,
                                   student_email=input_data.email,
                                   course_id=section.classroom_id,
                                   course_code=section.classroom_code)
