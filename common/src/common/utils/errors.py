@@ -48,3 +48,10 @@ class ConflictError(Exception):
   def __init__(self, message="Conflict"):
     self.message = message
     super().__init__(self.message)
+
+class UserManagementServiceError(Exception):
+  """Error class to be raised when there is error in user management service"""
+
+  def __init__(self, message="Create User failed"):
+    self.message = message
+    super().__init__(self.message)
