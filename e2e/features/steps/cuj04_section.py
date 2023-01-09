@@ -16,12 +16,20 @@ def step_impl_1(context):
 @behave.when("API request is sent to enroll student to a section with correct request payload and valid section id")
 def step_impl_2(context):
     resp = requests.post(context.url, json=context.payload,headers=context.header)
+    print("-----------Step imp2--------")
+    print("resp.status",resp.status_code ,context.status)
+    print("resp.response",resp.json())
+    print("Context response",context.response)
     context.status = resp.status_code
     context.response = resp.json()
 
 
 @behave.then("Section will be fetch using the given id and student is enrolled using student credentials and a response model object will be return")
 def step_impl_3(context):
+
+    print("-----------Step imp3--------")
+    print("resp.status",context.status)
+    print("Context response",context.response)
     assert context.status == 200, "Status 200"
     assert context.response["success"] is True, "Check success"
 
