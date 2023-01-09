@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Unit test for section.py
+Unit test for course enrollment.py
 """
 # disabling these rules, as they cause issues with pytest fixtures
 # pylint: disable=unused-import
 # pylint: disable=unused-argument,redefined-outer-name
 import pytest
-from common.models import Section, CourseTemplate, Cohort,CourseEnrollmentMapping
+from common.models import Section, CourseTemplate, Cohort, CourseEnrollmentMapping
 from common.utils.errors import ResourceNotFoundException
 from common.testing.example_objects import TEST_SECTION, TEST_COURSE_TEMPLATE, TEST_COHORT
 from common.testing.firestore_emulator import clean_firestore, firestore_emulator
@@ -41,5 +41,6 @@ def test_course_enrollment(clean_firestore):
   course_enrollment.user ="test_user_id"
   course_enrollment.save()
   course_enrollment = CourseEnrollmentMapping.find_by_user("test_user_id")
+  print("----------------IN test case ....",course_enrollment.user)
   assert course_enrollment.user == "test_user_id"
 

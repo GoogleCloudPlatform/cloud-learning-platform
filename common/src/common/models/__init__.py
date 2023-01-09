@@ -18,9 +18,9 @@ Flatten import namespace for models
 
 from .base_model import *
 from .user import *
+from .course_enrollment_mapping import *
 from .course_template import *
 from .cohort import *
 from .section import *
 from .lti import *
 from .temp_user import *
-from .course_enrollment_mapping import *

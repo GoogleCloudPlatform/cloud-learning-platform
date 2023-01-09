@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Module to add cohort in Fireo
+Module to add course enrollment in Fireo
 """
 from fireo.fields import TextField, ReferenceField, IDField
 from common.models import BaseModel,Section
@@ -36,4 +36,5 @@ class CourseEnrollmentMapping(BaseModel):
     Returns:
         Rubric: Rubric Object
     """
-    return CourseEnrollmentMapping.collection.filter("user", "==", user_id).fetch()
+    return CourseEnrollmentMapping.collection.filter("user","==",user_id).\
+      fetch()
