@@ -267,7 +267,8 @@ def test_enroll_student(client_with_emulator, create_fake_data):
       "message": "Successfully Added the Student with email student@gmail.com",
       "data": None
   }
-  with mock.patch("routes.copy_course.classroom_crud.enroll_student",return_value ={"user_id":"test_user_id"}):
+  with mock.patch("routes.copy_course.classroom_crud.enroll_student",
+  return_value ={"user_id":"test_user_id"}):
     with mock.patch("routes.copy_course.Logger"):
       resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 200, "Status 200"
