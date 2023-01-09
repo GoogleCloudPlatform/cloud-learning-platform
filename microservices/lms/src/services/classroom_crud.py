@@ -11,8 +11,6 @@ from config import CLASSROOM_ADMIN_EMAIL,USER_MANAGEMENT_BASE_URL
 from utils import helper
 import requests
 
-import google.oauth2.credentials
-
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
 
@@ -296,7 +294,7 @@ def add_teacher(course_id, teacher_email):
   return course
 
 
-def enroll_student(headers ,access_token, course_id, student_email, course_code):
+def enroll_student(headers ,access_token, course_id,student_email,course_code):
   """Add student to the classroom using student google auth token
   Args:
     headers :Bearer token
@@ -318,13 +316,13 @@ def enroll_student(headers ,access_token, course_id, student_email, course_code)
   service.courses().students().create(
       courseId=course_id, body=student, enrollmentCode=course_code).execute()
   # Get the gaia ID of the course
-  people_service = build('people', 'v1', credentials=creds)
-  profile = people_service.people().get(resourceName='people/me',
+  people_service = build("people", "v1", credentials=creds)
+  profile = people_service.people().get(resourceName="people/me",
   personFields="metadata").execute()
   print(profile)
   gaia_id = profile["metadata"]["sources"][0]["id"]
   print("This is gaiaid------",gaia_id)
-#  Call user API 
+# Call user API
   data = {
   "first_name": "",
   "last_name": "",

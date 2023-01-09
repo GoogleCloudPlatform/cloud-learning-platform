@@ -26,27 +26,4 @@ class CourseEnrollmentMapping(BaseModel):
   user = TextField()
   class Meta:
     ignore_none_field = False
-    collection_name = BaseModel.DATABASE_PREFIX + "courseenrollmentmapping"
-
-  @classmethod
-  def fetch_all_by_courseenrollmentmapping(cls,
-                                   course_template_key,
-                                   skip=0,
-                                   order_by="-created_time",
-                                   limit=1000):
-    """_summary_
-
-    Args:
-        course_template_key (str): course_template unique key to filter data.
-        skip (int, optional): number of cohorts to be skip.
-        order_by (str, optional): order list according to order_by field.
-        limit (int, optional): limit till cohorts to be fetched.
-
-    Returns:
-        _type_: _description_
-    """
-    objects = cls.collection.filter(
-        "course_template", "==", course_template_key).filter(
-            "deleted_at_timestamp", "==",
-            None).order(order_by).offset(skip).fetch(limit)
-    return list(objects)
+    collection_name = BaseModel.DATABASE_PREFIX + "course_enrollment_mapping"

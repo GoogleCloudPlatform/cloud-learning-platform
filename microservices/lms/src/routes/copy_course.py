@@ -311,7 +311,7 @@ def update_section(sections_details: UpdateSection):
 
 @router.post("/{sections_id}/students", response_model=AddStudentResponseModel)
 def enroll_student_section(sections_id: str,
-                           input_data: AddStudentToSectionModel,request: Request):
+              input_data: AddStudentToSectionModel,request: Request):
   """
   Args:
     input_data(AddStudentToSectionModel):
@@ -329,11 +329,12 @@ def enroll_student_section(sections_id: str,
   try:
     section = Section.find_by_id(sections_id)
     headers = {"Authorization": request.headers.get("Authorization")}
-    user_object = classroom_crud.enroll_student(headers,access_token=input_data.access_token,
+    user_object = classroom_crud.enroll_student(headers,
+                                  access_token=input_data.access_token,
                                   student_email=input_data.email,
                                   course_id=section.classroom_id,
                                   course_code=section.classroom_code)
-    
+
     cohort = section.cohort
     cohort.enrolled_students_count += 1
     cohort.update()
