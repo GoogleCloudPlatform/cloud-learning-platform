@@ -320,21 +320,21 @@ def enroll_student(token, course_id, student_email, course_code):
   profile = people_service.people().get(resourceName='people/me',personFields="metadata").execute()
   print(profile)
 #  Call user API 
-#   response = requests.post("http://user-management/user-management/api/v1/user",json={
-#   "first_name": "",
-#   "last_name": "",
-#   "email": "lms2@gmail.com",
-#   "user_type": "other",
-#   "user_type_ref": "hjhuuuyuy",
-#   "user_groups": [],
-#   "status": "active",
-#   "is_registered": True,
-#   "failed_login_attempts_count": 0,
-#   "access_api_docs": False
-# })
-#   print(response)
-  return "success"
-
+  data = {
+  "first_name": "",
+  "last_name": "",
+  "email":student_email,
+  "user_type": "learner",
+  "user_type_ref": "hjhuuuyuy",
+  "user_groups": [],
+  "status": "active",
+  "is_registered": True,
+  "failed_login_attempts_count": 0,
+  "access_api_docs": False
+}
+  response = requests.post("http://user-management/user-management/api/v1/user",json=data,headers={"Authorization": token})
+  print(response.json())
+  return response.json()["data"]
 
 def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns
