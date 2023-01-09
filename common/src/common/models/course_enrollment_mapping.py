@@ -30,11 +30,11 @@ class CourseEnrollmentMapping(BaseModel):
 
   @classmethod
   def find_by_user(cls, user_id):
-    """Find the rubric item using name
+    """Find user using using user_id
     Args:
-        name (string): node item name
+        user_id (string): node item name
     Returns:
-        Rubric: Rubric Object
+        user_object
     """
     return CourseEnrollmentMapping.collection.filter("user","==",user_id).\
-      fetch()
+    fetch()
