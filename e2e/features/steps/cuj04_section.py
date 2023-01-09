@@ -19,7 +19,6 @@ def step_impl_2(context):
     print("-----------Step imp2--------")
     print("resp.status",resp.status_code)
     print("resp.response",resp.json())
-    print("Context response",context.response)
     context.status = resp.status_code
     context.response = resp.json()
 
@@ -28,8 +27,6 @@ def step_impl_2(context):
 def step_impl_3(context):
 
     print("-----------Step imp3--------")
-    print("resp.status",context.status)
-    print("Context response",context.response)
     assert context.status == 200, "Status 200"
     assert context.response["success"] is True, "Check success"
 
