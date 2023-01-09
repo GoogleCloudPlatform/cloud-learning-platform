@@ -55,9 +55,11 @@ def get_student_email_and_token():
     if creds and creds.expired and creds.refresh_token:
       creds.refresh(Request())
       credentials_dict = creds.to_json()
+  print("TYPE OF CREDENTIAL DICT",type(credentials_dict))
+  print(credentials_dict)
   data = {
       "email": student_email_response.payload.data.decode("UTF-8"),
-      "access_token":credentials_dict["token"]
+      "access_token":json.loads(credentials_dict)["token"]
   }
   return data
 
