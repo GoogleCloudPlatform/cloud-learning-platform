@@ -17,7 +17,7 @@ def step_impl_1(context):
 def step_impl_2(context):
     resp = requests.post(context.url, json=context.payload,headers=context.header)
     print("-----------Step imp2--------")
-    print("resp.status",resp.status_code ,context.status)
+    print("resp.status",resp.status_code)
     print("resp.response",resp.json())
     print("Context response",context.response)
     context.status = resp.status_code
