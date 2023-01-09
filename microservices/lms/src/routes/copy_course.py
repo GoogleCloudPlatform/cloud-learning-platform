@@ -345,7 +345,7 @@ def enroll_student_section(sections_id: str,
 
     return {
         "message":
-        f"Successfully Added the Student with email {input_data.email} "
+        f"Successfully Added the Student with email {input_data.email}"
     }
   except InvalidTokenError as ive:
     raise InvalidToken(str(ive)) from ive
