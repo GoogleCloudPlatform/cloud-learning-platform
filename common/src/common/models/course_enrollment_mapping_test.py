@@ -42,6 +42,4 @@ def test_course_enrollment(clean_firestore):
   course_enrollment.save()
   course_enrollment = CourseEnrollmentMapping.find_by_user("test_user_id")
   for i in list(course_enrollment):
-    print("In lop")
     assert i.user == "test_user_id"
-

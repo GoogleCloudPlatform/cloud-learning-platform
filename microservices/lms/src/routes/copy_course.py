@@ -327,11 +327,6 @@ def enroll_student_section(sections_id: str,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
   try:
-    # Temp code comment will be removed
-    # conn = CourseEnrollmentMapping.find_by_user("cDiBVKuUtbJtOoFBjiE1")
-    # for i in list(conn):
-    #   print("In lop")
-    #   print(i.user)
     section = Section.find_by_id(sections_id)
     headers = {"Authorization": request.headers.get("Authorization")}
     user_object = classroom_crud.enroll_student(headers,
