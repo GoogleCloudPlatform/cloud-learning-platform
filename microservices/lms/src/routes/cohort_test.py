@@ -57,7 +57,7 @@ def create_fake_data():
       "classroom_url": "https://classroom.google.com",
       "course_template": course_template,
       "cohort": cohort,
-      "teachers_list": ["teachera@gmail.com", "teacherb@gmail.com"]
+      "teachers": ["teachera@gmail.com", "teacherb@gmail.com"]
   }
 
   section = Section.from_dict(test_section_dict)
@@ -104,6 +104,7 @@ def test_get_cohort(client_with_emulator, create_course_template):
   data = COHORT_EXAMPLE
   data["id"] = cohort.id
   data["course_template"] = create_course_template.key
+  data["course_template_name"] = create_course_template.name
   with mock.patch("routes.cohort.Logger"):
     response = client_with_emulator.get(url)
   response_cohort = json.loads(response.text)
@@ -121,7 +122,7 @@ def test_get_cohort(client_with_emulator, create_course_template):
   assert response_cohort == data, "Return data doesn't match."
 
 
-def test_create_course_template(client_with_emulator, create_course_template):
+def test_create_cohort(client_with_emulator, create_course_template):
   INPUT_COHORT_TEST_DATA["course_template_id"] = create_course_template.id
   with mock.patch("routes.cohort.Logger"):
     response = client_with_emulator.post(API_URL, json=INPUT_COHORT_TEST_DATA)

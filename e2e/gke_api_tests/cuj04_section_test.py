@@ -71,7 +71,7 @@ def test_create_section(get_token):
       "description": "string",
       "course_template": fake_data[0].id,
       "cohort": fake_data[1].id,
-      "teachers_list": [TEACHER_EMAIL]
+      "teachers": [TEACHER_EMAIL]
   }
   resp = requests.post(url=url, json=data, headers=get_token)
   resp_json = resp.json()
@@ -100,12 +100,13 @@ def test_create_section_course_template_not_found(get_token):
       "description": "string",
       "course_template": "fake_template_id_new",
       "cohort": fake_data[1].id,
-      "teachers_list": [TEACHER_EMAIL]
+      "teachers": [TEACHER_EMAIL]
   }
 
   resp = requests.post(url=url, json=data, headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 404
+
 
 def test_get_section(get_token):
   """
@@ -157,7 +158,7 @@ def test_update_section(get_token):
       "course_id": classroom_id,
       "section_name": "section_updated",
       "description": "test_description_updated",
-      "course_state": "ACTIVE"
+      "teachers": fake_data[2].teachers
   }
   resp = requests.patch(url=url, json=data, headers=get_token)
   resp_json = resp.json()
@@ -184,7 +185,7 @@ def test_update_section_course_not_found_in_classroom(get_token):
       "course_id": "test1222",
       "section_name": "section_updated",
       "description": "test_description_updated",
-      "course_state": "ACTIVE"
+      "teachers": fake_data[2].teachers
   }
   resp = requests.patch(url=url, json=data, headers=get_token)
   assert resp.status_code == 500

@@ -15,7 +15,7 @@ class Sections(BaseModel):
   classroom_id: str
   classroom_code: str
   classroom_url: str
-  teachers_list: list
+  teachers: list
   course_template: str
   cohort: str
 
@@ -31,7 +31,7 @@ class SectionDetails(BaseModel):
   description: str
   course_template: str
   cohort: str
-  teachers_list: list
+  teachers: list
 
 
 class SectionListResponseModel(BaseModel):
@@ -154,14 +154,13 @@ class CredentialKeys(BaseModel):
 class AddStudentToSectionModel(BaseModel):
   """Input Model to add student in section"""
   email: str
-  credentials: CredentialKeys
-
+  access_token:str
   class Config():
     orm_mode = True
     schema_extra = {
         "example": {
             "email": "email@gmail.com",
-            "credentials": CREDENTIAL_JSON
+            "access_token":"test_token"
         }
     }
 

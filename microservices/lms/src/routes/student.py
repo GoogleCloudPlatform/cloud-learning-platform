@@ -3,10 +3,29 @@ import traceback
 from fastapi import APIRouter, HTTPException
 from common.utils.logging_handler import Logger
 from services import classroom_crud
+from schemas.error_schema import (InternalServerErrorResponseModel,
+                                  NotFoundErrorResponseModel,
+                                  ConflictResponseModel,
+                                  ValidationErrorResponseModel)
 # disabling for linting to pass
 # pylint: disable = broad-except
 
-router = APIRouter(prefix="/student", tags=["Student"])
+router = APIRouter(prefix="/student",
+                   tags=["Student"],
+                   responses={
+                       500: {
+                           "model": InternalServerErrorResponseModel
+                       },
+                       404: {
+                           "model": NotFoundErrorResponseModel
+                       },
+                       409: {
+                           "model": ConflictResponseModel
+                       },
+                       422: {
+                           "model": ValidationErrorResponseModel
+                       }
+                   })
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}

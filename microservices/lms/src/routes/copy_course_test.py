@@ -45,7 +45,7 @@ def create_fake_data():
       "classroom_url": "https://classroom.google.com",
       "course_template": course_template,
       "cohort": cohort,
-      "teachers_list": ["teachera@gmail.com", "teacherb@gmail.com"]
+      "teachers": ["teachera@gmail.com", "teacherb@gmail.com"]
   }
 
   section = Section.from_dict(test_section_dict)
@@ -100,7 +100,7 @@ def test_create_section(client_with_emulator, create_fake_data):
       "description": "This is description",
       "course_template": create_fake_data["course_template"],
       "cohort": create_fake_data["cohort"],
-      "teachers_list": [os.environ.get("CLASSROOM_ADMIN_EMAIL")]
+      "teachers": [os.environ.get("CLASSROOM_ADMIN_EMAIL")]
   }
   mock_return_course = {
       "id": "57690009090",
@@ -130,7 +130,7 @@ def test_create_section_course_template_not_found(client_with_emulator,
       "description": "This is description",
       "course_template": "fake-classroom-id_new",
       "cohort": create_fake_data["cohort"],
-      "teachers_list": ["string"]
+      "teachers": ["string"]
   }
   mock_return_course = {
       "id": "57690009090",
@@ -159,7 +159,7 @@ def test_create_section_cohort_not_found(client_with_emulator,
       "description": "This is description",
       "course_template": create_fake_data["course_template"],
       "cohort": "fake-cohort-id-new",
-      "teachers_list": ["string"]
+      "teachers": ["string"]
   }
   mock_return_course = {
       "id": "57690009090",
@@ -210,12 +210,13 @@ def test_get_section_not_found(client_with_emulator):
 
 def test_update_section(client_with_emulator, create_fake_data):
 
+  section = Section.find_by_id(create_fake_data["section"])
   data = {
       "id": create_fake_data["section"],
       "course_id": "561822649300",
       "section_name": "tsection",
       "description": "tdescription",
-      "course_state": "ACTIVE"
+      "teachers": section.teachers
   }
   url = BASE_URL + "/sections"
   with mock.patch("routes.copy_course.classroom_crud.update_course"):
@@ -230,7 +231,7 @@ def test_update_section_section_id_not_found(client_with_emulator):
       "course_id": "561822649300",
       "section_name": "tsection",
       "description": "tdescription",
-      "course_state": "ACTIVEu"
+      "teachers": ["teachera@gmail.com", "teacherb@gmail.com"]
   }
   url = BASE_URL + "/sections"
 
@@ -247,7 +248,7 @@ def test_update_section_course_id_not_found(client_with_emulator,
       "course_id": "561822649300",
       "section_name": "tsection",
       "description": "tdescription",
-      "course_state": "ACTIVEu"
+      "teachers": ["teachera@gmail.com", "teacherb@gmail.com"]
   }
   url = BASE_URL + "/sections"
   with mock.patch("routes.copy_course.classroom_crud.update_course",
@@ -260,7 +261,8 @@ def test_update_section_course_id_not_found(client_with_emulator,
 def test_enroll_student(client_with_emulator, create_fake_data):
 
   url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
-  input_data = {"email": "student@gmail.com", "credentials": CREDENTIAL_JSON}
+  input_data = {"email": "student@gmail.com", "access_token":
+  CREDENTIAL_JSON["token"]}
   data = {
       "success": True,
       "message": "Successfully Added the Student with email student@gmail.com",
@@ -275,7 +277,8 @@ def test_enroll_student(client_with_emulator, create_fake_data):
 
 def test_enroll_student_negative(client_with_emulator):
   url = BASE_URL + "/sections/fake_id_section/students"
-  input_data = {"email": "student@gmail.com", "credentials": CREDENTIAL_JSON}
+  input_data = {"email": "student@gmail.com", "access_token":
+  CREDENTIAL_JSON["token"]}
   with mock.patch("routes.copy_course.classroom_crud.enroll_student"):
     with mock.patch("routes.copy_course.Logger"):
       resp = client_with_emulator.post(url, json=input_data)
