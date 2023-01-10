@@ -64,7 +64,33 @@ def test_jwks(mock_key_set, clean_firestore):
 
 @mock.patch("routes.platform_auth.generate_token_claims")
 @mock.patch("routes.platform_auth.encode_token")
-def test_authorize(mock_token, mock_key_set, clean_firestore):
+def test_post_authorize(mock_token, mock_key_set, clean_firestore):
+  test_token = "ey7abos8f.8astvd9q.87cb"
+  mock_token.return_value = test_token
+  form_data = {
+      "client_id": "test_client_id",
+      "login_hint": "test_user_id",
+      "lti_message_hint": "test_resource_id",
+      "redirect_uri": "test_redirect_uri",
+      "nonce": "1tr8b174b7134813v",
+      "state": "b54b725vt9y9",
+      "scope": "openid",
+      "response_type": "id_token",
+      "response_mode": "form_post",
+      "prompt": "none"
+  }
+  mock_key_set.return_value = test_key_set
+  url = f"{API_URL}/authorize"
+  headers = {"Content-Type": "application/x-www-form-urlencoded"}
+  resp = client_with_emulator.post(url, data=form_data, headers=headers)
+
+  assert resp.status_code == 200
+  assert resp.context.get("id_token") == test_token
+
+
+@mock.patch("routes.platform_auth.generate_token_claims")
+@mock.patch("routes.platform_auth.encode_token")
+def test_get_authorize(mock_token, mock_key_set, clean_firestore):
   test_token = "ey7abos8f.8astvd9q.87cb"
   mock_token.return_value = test_token
   req_params = {
