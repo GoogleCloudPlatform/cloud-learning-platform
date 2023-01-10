@@ -154,14 +154,13 @@ class CredentialKeys(BaseModel):
 class AddStudentToSectionModel(BaseModel):
   """Input Model to add student in section"""
   email: str
-  credentials: CredentialKeys
-
+  access_token:str
   class Config():
     orm_mode = True
     schema_extra = {
         "example": {
             "email": "email@gmail.com",
-            "credentials": CREDENTIAL_JSON
+            "access_token":"test_token"
         }
     }
 
