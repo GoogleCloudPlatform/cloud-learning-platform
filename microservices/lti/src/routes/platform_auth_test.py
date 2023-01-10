@@ -67,7 +67,7 @@ def test_jwks(mock_key_set, clean_firestore):
 def test_post_authorize(mock_token, mock_key_set, clean_firestore):
   test_token = "ey7abos8f.8astvd9q.87cb"
   mock_token.return_value = test_token
-  req_params = {
+  form_data = {
       "client_id": "test_client_id",
       "login_hint": "test_user_id",
       "lti_message_hint": "test_resource_id",
@@ -81,7 +81,8 @@ def test_post_authorize(mock_token, mock_key_set, clean_firestore):
   }
   mock_key_set.return_value = test_key_set
   url = f"{API_URL}/authorize"
-  resp = client_with_emulator.post(url, params=req_params)
+  headers = {"Content-Type": "application/x-www-form-urlencoded"}
+  resp = client_with_emulator.post(url, data=form_data, headers=headers)
 
   assert resp.status_code == 200
   assert resp.context.get("id_token") == test_token
