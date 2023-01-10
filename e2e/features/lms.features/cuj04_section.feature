@@ -17,3 +17,8 @@ Feature: Add student to section
     Given A user has access to the portal and wants to enroll a student into a section
     When API request is sent to enroll student to a section with incorrect request payload and valid section id
     Then Student will not be enrolled and API will throw a validation error
+
+  Scenario: Register a course to a Pub/Sub topic using a payload
+    Given A user has access privileges and wants to register a course to a pub/sub topic
+    When API request is sent to register a course to a pub/sub topic with correct request payload and valid course id
+    Then Course will be register using unique course id and feed type to a pub/sub topic and a response model object will be return

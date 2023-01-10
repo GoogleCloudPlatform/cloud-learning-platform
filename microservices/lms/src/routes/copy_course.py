@@ -111,6 +111,9 @@ def create_section(sections_details: SectionDetails):
                                               sections_details.name, "me")
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
+    # add new_course to pubsub topic for both course work and roaster changes
+    classroom_crud.register_course(new_course["id"], "COURSE_WORK_CHANGES")
+    classroom_crud.register_course(new_course["id"], "COURSE_ROSTER_CHANGES")
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
     if topics is not None:
@@ -196,6 +199,12 @@ def get_section(section_id: str):
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
+  except HttpError as ae:
+    Logger.error(ae)
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -450,7 +459,7 @@ def section_pub_sub_registration(registeration_details: RegistrationDetails):
   """
   try:
     response = classroom_crud.register_course(
-      registeration_details.classroom_id, registeration_details.feed_type)
+      registeration_details.course_id, registeration_details.feed_type)
     return {
         "message": "Successfully registered the course using " +
         f"{registeration_details.course_id} id",
