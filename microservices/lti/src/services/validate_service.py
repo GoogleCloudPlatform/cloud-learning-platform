@@ -1,9 +1,7 @@
 """Validate Service"""
 from functools import wraps
-from fastapi import Depends
 from fastapi.security import HTTPBearer
 from common.utils.errors import InvalidTokenError
-from common.utils.http_exceptions import Unauthenticated, InternalServerError
 from config import ISSUER
 from services.keys_manager import get_platform_public_keyset
 from services.lti_token import decode_token

@@ -28,13 +28,18 @@ router = APIRouter(tags=["Line item"], responses=ERROR_RESPONSES)
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
+@validate_access(allowed_scopes=[
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
+])
 def get_all_line_items(request: Request,
                        context_id: str,
                        resource_id: str = None,
                        resource_link_id: str = None,
                        tag: str = None,
                        skip: int = 0,
-                       limit: int = 10):
+                       limit: int = 10,
+                       token: auth_scheme = Depends()):
   """The get line items endpoint will return an array of line items
   from firestore
   ### Args:
@@ -96,7 +101,14 @@ def get_all_line_items(request: Request,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_line_item(request: Request, context_id: str, uuid: str):
+@validate_access(allowed_scopes=[
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
+])
+def get_line_item(request: Request,
+                  context_id: str,
+                  uuid: str,
+                  token: auth_scheme = Depends()):
   """The get line item endpoint will return the line item
   from firestore of which uuid is provided
   ### Args:
@@ -131,8 +143,12 @@ def get_line_item(request: Request, context_id: str, uuid: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def create_line_item(request: Request, context_id: str,
-                     input_line_item: LineItemModel):
+@validate_access(
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+def create_line_item(request: Request,
+                     context_id: str,
+                     input_line_item: LineItemModel,
+                     token: auth_scheme = Depends()):
   """The create line item endpoint will add a new line item to the firestore.
   ### Args:
   input_line_item: `LineItemModel`
@@ -164,8 +180,13 @@ def create_line_item(request: Request, context_id: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def update_line_item(request: Request, context_id: str, uuid: str,
-                     input_line_item: UpdateLineItemModel):
+@validate_access(
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+def update_line_item(request: Request,
+                     context_id: str,
+                     uuid: str,
+                     input_line_item: UpdateLineItemModel,
+                     token: auth_scheme = Depends()):
   """Update a line item
   ### Args:
   uuid: `str`
@@ -211,7 +232,10 @@ def update_line_item(request: Request, context_id: str, uuid: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def delete_line_item(context_id: str, uuid: str):
+@validate_access(
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+def delete_line_item(context_id: str, uuid: str,
+                     token: auth_scheme = Depends()):
   """Delete a line item from firestore
   ### Args:
   uuid: `str`
@@ -243,12 +267,16 @@ def delete_line_item(context_id: str, uuid: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
+@validate_access(allowed_scopes=[
+    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
+])
 def get_results_of_line_item(request: Request,
                              context_id: str,
                              line_item_id: str,
                              skip: int = 0,
                              limit: int = 10,
-                             user_id: Optional[str] = None):
+                             user_id: Optional[str] = None,
+                             token: auth_scheme = Depends()):
   """The get all results of a line item endpoint will return all the
   results of a line item from firestore
   ### Args:
@@ -300,8 +328,14 @@ def get_results_of_line_item(request: Request,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_result(request: Request, context_id: str, line_item_id: str,
-               result_id: str):
+@validate_access(allowed_scopes=[
+    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
+])
+def get_result(request: Request,
+               context_id: str,
+               line_item_id: str,
+               result_id: str,
+               token: auth_scheme = Depends()):
   """The get result of a line item endpoint will return the specific result
   of a line item from firestore
   ### Args:
@@ -343,7 +377,7 @@ def get_result(request: Request, context_id: str, line_item_id: str,
         "model": NotFoundErrorResponseModel
     }})
 @validate_access(
-    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/score"])
 def create_score_for_line_item(context_id: str,
                                line_item_id: str,
                                input_score: BasicScoreModel,

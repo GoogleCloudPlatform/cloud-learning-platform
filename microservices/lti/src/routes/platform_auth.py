@@ -9,7 +9,9 @@ from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound)
 from common.models import Tool
 from services.keys_manager import get_platform_public_keyset, get_remote_keyset
-from services.lti_token import generate_token_claims, encode_token, decode_token, get_unverified_token_claims
+from services.lti_token import (lti_claim_field, generate_token_claims,
+                                encode_token, decode_token,
+                                get_unverified_token_claims)
 from schemas.error_schema import NotFoundErrorResponseModel
 # pylint: disable=too-many-function-args
 # pylint: disable=line-too-long
@@ -67,6 +69,9 @@ def authorize(request: Request,
       token_claims = generate_token_claims("resource_link", client_id,
                                            login_hint, lti_message_hint, nonce,
                                            redirect_uri)
+      if token_claims.get(lti_claim_field("claim", "target_link_uri")):
+        redirect_uri = token_claims.get(
+            lti_claim_field("claim", "target_link_uri"))
 
     token = encode_token(token_claims)
 
@@ -145,16 +150,22 @@ def generate_token(
     claims = decode_token(
         token=client_assertion, key=key, audience=unverified_claims.get("aud"))
 
+    required_scopes_str = " ".join(required_scopes)
     token_claims = {
         "iss": ISSUER,
         "aud": claims.get("sub"),
         "iat": int(datetime.now().timestamp()),
         "exp": int(datetime.now().timestamp()) + TOKEN_TTL,
-        "sub": unverified_claims.get("sub"),
-        "scope": scope
+        "sub": claims.get("sub"),
+        "scope": required_scopes_str
     }
 
-    return token_claims
+    return {
+        "access_token": encode_token(token_claims),
+        "token_type": "bearer",
+        "expires_in": 3600,
+        "scope": required_scopes_str
+    }
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
   except ValidationError as e:
