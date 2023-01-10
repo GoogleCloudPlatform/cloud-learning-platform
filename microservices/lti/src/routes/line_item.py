@@ -1,5 +1,6 @@
 """Line item  Endpoints"""
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
+from fastapi.security import HTTPBearer
 from config import ERROR_RESPONSES
 from common.models import LineItem, Result, Score
 from common.utils.errors import (ResourceNotFoundException, ValidationError)
@@ -12,7 +13,10 @@ from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
 from typing import List, Optional
+from services.validate_service import validate_access
 # pylint: disable=unused-argument
+
+auth_scheme = HTTPBearer(auto_error=False)
 
 router = APIRouter(tags=["Line item"], responses=ERROR_RESPONSES)
 
@@ -338,8 +342,12 @@ def get_result(request: Request, context_id: str, line_item_id: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def create_score_for_line_item(context_id: str, line_item_id: str,
-                               input_score: BasicScoreModel):
+@validate_access(
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+def create_score_for_line_item(context_id: str,
+                               line_item_id: str,
+                               input_score: BasicScoreModel,
+                               token: auth_scheme = Depends()):
   """The create score for line item endpoint will add a score for a line item
   to the firestore.
   ### Args:
