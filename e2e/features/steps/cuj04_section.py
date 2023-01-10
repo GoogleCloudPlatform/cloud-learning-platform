@@ -10,7 +10,10 @@ from e2e.gke_api_tests.secrets_helper import get_student_email_and_token
 @behave.given("A user has access privileges and wants to enroll a student into a section")
 def step_impl_1(context):
     context.url = f'{API_URL}/sections/{context.sections.id}/students'
+    print("-PAYLOAD FOR student enroll---")
+    print(get_student_email_and_token())
     context.payload = get_student_email_and_token()
+
 
 
 @behave.when("API request is sent to enroll student to a section with correct request payload and valid section id")
