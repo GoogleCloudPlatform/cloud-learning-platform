@@ -10,7 +10,7 @@ from common.utils.logging_handler import Logger
 
 from fastapi import APIRouter
 from googleapiclient.errors import HttpError
-from schemas.course_details import CourseDetails
+from schemas.course_details import CourseDetails, RegistrationDetails, RegistrationResponse
 from schemas.error_schema import (ConflictResponseModel,
                                   InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
@@ -432,4 +432,40 @@ def copy_courses(course_details: CourseDetails):
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+
+@router.post("/register", response_model=RegistrationResponse)
+def section_pub_sub_registration(registeration_details: RegistrationDetails):
+  """Resgister course with a pub/sub topic
+
+  Args:
+      registeration_details (RegistrationDetails):
+      An object of the RegistrationDetails Model which contains required details
+  Raises:
+      InternalServerError: 500 Internal Server Error if something fails
+      CustomHTTPException: raise error according to the HTTPError exception
+  Returns:
+      _type_: _description_
+  """
+  try:
+    response = classroom_crud.register_course(
+      registeration_details.classroom_id, registeration_details.feed_type)
+    return {
+        "message": "Successfully registered the course using " +
+        f"{registeration_details.course_id} id",
+        "data": response
+    }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except InternalServerError as ie:
+    raise InternalServerError(str(ie)) from ie
+  except HttpError as hte:
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
+  except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e

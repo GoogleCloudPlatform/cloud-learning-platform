@@ -292,3 +292,30 @@ def test_delete_section(client_with_emulator, create_fake_data):
                   return_value=[]):
     resp = client_with_emulator.delete(url)
   assert resp.status_code == 200
+
+
+def test_register_course(client_with_emulator):
+
+  url = BASE_URL + "/sections/register"
+  input_data = {"section_id": "57690009090", "feed_type": "COURSE_WORK_CHANGES"}
+  data = {
+      "success": True,
+      "message": "Successfully registered the course using " +
+      f"{input_data['course_id']} id",
+      "data": {
+          "registrationId": "2345667",
+          "feed": {
+              "feedType": "COURSE_ROSTER_CHANGES",
+              "courseRosterChangesInfo": {
+                  "courseId": input_data["course_id"]
+              }
+          },
+          "expiryTime": "20xx-0x-x0T1x:xx:0x.x1xZ"
+      }
+  }
+  with mock.patch("routes.copy_course.classroom_crud.register_course",
+                  return_value=data["data"]):
+    with mock.patch("routes.copy_course.Logger"):
+      resp = client_with_emulator.post(url, json=input_data)
+  assert resp.status_code == 200, "Status 200"
+  assert resp.json() == data, "Data doesn't Match"
