@@ -15,7 +15,7 @@ class Sections(BaseModel):
   classroom_id: str
   classroom_code: str
   classroom_url: str
-  teachers_list: list
+  teachers: list
   course_template: str
   cohort: str
 
@@ -31,7 +31,7 @@ class SectionDetails(BaseModel):
   description: str
   course_template: str
   cohort: str
-  teachers_list: list
+  teachers: list
 
 
 class SectionListResponseModel(BaseModel):

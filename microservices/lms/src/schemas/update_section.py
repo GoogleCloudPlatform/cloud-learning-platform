@@ -11,7 +11,7 @@ class UpdateSection(BaseModel):
   course_id: str
   section_name: str
   description: str
-  teachers_list: list[str]
+  teachers: list[str]
 
   class Config():
     orm_mode = True
