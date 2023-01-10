@@ -4,7 +4,7 @@ Pydantic Model for cohort API's
 import datetime
 from typing import Optional
 from pydantic import BaseModel
-from schemas.schema_examples import COHORT_EXAMPLE, INSERT_COHORT_EXAMPLE,UPDATE_COHORT_EXAMPLE
+from schemas.schema_examples import COHORT_EXAMPLE, INSERT_COHORT_EXAMPLE, UPDATE_COHORT_EXAMPLE
 
 
 class CohortModel(BaseModel):
@@ -23,6 +23,7 @@ class CohortModel(BaseModel):
   max_students: Optional[int] = 0
   enrolled_students_count: Optional[int] = 0
   course_template: str
+  course_template_name: str
 
   class Config():
     "Pydantic Config Class"

@@ -77,7 +77,7 @@ SECTION_EXAMPLE = {
     "classroom_id": "123456789100",
     "classroom_code": "abcdef",
     "classroom_url": "https://classroom.google.com",
-    "teachers_list": ["test_user_1@gmail.com"],
+    "teachers": ["test_user_1@gmail.com"],
     "course_template": "course_templates/7d2zTApD-id",
     "cohort": "cohorts/1j-id"
 }
@@ -90,4 +90,12 @@ CREDENTIAL_JSON = {
     "client_secret": "client_fake_secrets",
     "scopes": ["Scopes"],
     "expiry": "2022-11-23T12:01:17Z"
+}
+
+UPDATE_SECTION = {
+    "id": "string",
+    "course_id": "string",
+    "section_name": "string",
+    "description": "string",
+    "teachers": ["test_user_1@gmail.com"]
 }

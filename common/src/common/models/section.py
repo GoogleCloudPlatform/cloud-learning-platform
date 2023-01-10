@@ -30,7 +30,7 @@ class Section(BaseModel):
   classroom_url = TextField(required=True)
   course_template = ReferenceField(CourseTemplate, required=True)
   cohort = ReferenceField(Cohort, required=True)
-  teachers_list = ListField(required=True)
+  teachers = ListField(required=True)
 
   class Meta:
     ignore_none_field = False

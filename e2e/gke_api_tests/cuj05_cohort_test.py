@@ -108,7 +108,9 @@ def test_get_cohort(setup_cohort, get_token):
   resp = requests.get(url=url, headers=get_token)
   data = TEST_COHORT
   data["id"] = setup_cohort.id
-  data["course_template"] = CourseTemplate.find_by_id(course_template_id).key
+  course_template = CourseTemplate.find_by_id(course_template_id)
+  data["course_template"] = course_template.key
+  data["course_template_name"] = course_template.name
   response_cohort = resp.json()
   response_cohort["start_date"] = datetime.datetime.strptime(
       response_cohort.pop("start_date").split("+")[0], '%Y-%m-%dT%H:%M:%S')
