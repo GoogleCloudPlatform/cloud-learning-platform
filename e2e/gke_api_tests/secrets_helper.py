@@ -74,3 +74,4 @@ def get_user_email_and_password_for_e2e():
       request={"name": user_email_password_secret_name})
   return json.loads(user_email_password_response.payload.data.decode(
       "UTF-8"))
+
