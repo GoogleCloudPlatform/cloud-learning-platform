@@ -12,6 +12,7 @@ from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
                                       ScoreResponseModel, ResultResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
+from services.lti_token import lti_claim_field
 from typing import List, Optional
 from services.validate_service import validate_access
 # pylint: disable=unused-argument
@@ -29,8 +30,8 @@ router = APIRouter(tags=["Line item"], responses=ERROR_RESPONSES)
         "model": NotFoundErrorResponseModel
     }})
 @validate_access(allowed_scopes=[
-    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
-    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
+    lti_claim_field("scope", "lineitem", "ags"),
+    lti_claim_field("scope", "lineitem.readonly", "ags")
 ])
 def get_all_line_items(request: Request,
                        context_id: str,
@@ -102,8 +103,8 @@ def get_all_line_items(request: Request,
         "model": NotFoundErrorResponseModel
     }})
 @validate_access(allowed_scopes=[
-    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
-    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
+    lti_claim_field("scope", "lineitem", "ags"),
+    lti_claim_field("scope", "lineitem.readonly", "ags")
 ])
 def get_line_item(request: Request,
                   context_id: str,
@@ -143,8 +144,7 @@ def get_line_item(request: Request,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-@validate_access(
-    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+@validate_access(allowed_scopes=[lti_claim_field("scope", "lineitem", "ags")])
 def create_line_item(request: Request,
                      context_id: str,
                      input_line_item: LineItemModel,
@@ -180,8 +180,7 @@ def create_line_item(request: Request,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-@validate_access(
-    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+@validate_access(allowed_scopes=[lti_claim_field("scope", "lineitem", "ags")])
 def update_line_item(request: Request,
                      context_id: str,
                      uuid: str,
@@ -232,8 +231,7 @@ def update_line_item(request: Request,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-@validate_access(
-    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+@validate_access(allowed_scopes=[lti_claim_field("scope", "lineitem", "ags")])
 def delete_line_item(context_id: str, uuid: str,
                      token: auth_scheme = Depends()):
   """Delete a line item from firestore
@@ -267,9 +265,8 @@ def delete_line_item(context_id: str, uuid: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-@validate_access(allowed_scopes=[
-    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
-])
+@validate_access(
+    allowed_scopes=[lti_claim_field("scope", "result.readonly", "ags")])
 def get_results_of_line_item(request: Request,
                              context_id: str,
                              line_item_id: str,
@@ -328,9 +325,8 @@ def get_results_of_line_item(request: Request,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-@validate_access(allowed_scopes=[
-    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
-])
+@validate_access(
+    allowed_scopes=[lti_claim_field("scope", "result.readonly", "ags")])
 def get_result(request: Request,
                context_id: str,
                line_item_id: str,
@@ -376,8 +372,7 @@ def get_result(request: Request,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-@validate_access(
-    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/score"])
+@validate_access(allowed_scopes=[lti_claim_field("scope", "score", "ags")])
 def create_score_for_line_item(context_id: str,
                                line_item_id: str,
                                input_score: BasicScoreModel,
