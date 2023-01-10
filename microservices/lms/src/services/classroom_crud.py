@@ -311,8 +311,7 @@ def enroll_student(token, course_id, student_email, course_code):
     dict: returns a dict which contains student and classroom details
   """
 
-  scopes = ["https://www.googleapis.com/auth/classroom.rosters"]
-  creds = Credentials.from_authorized_user_info(token, scopes)
+  creds = Credentials(token=token)
   if not creds or not creds.valid:
     raise InvalidTokenError("Invalid token please provide a valid token")
   service = build("classroom", "v1", credentials=creds)
