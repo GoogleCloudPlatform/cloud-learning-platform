@@ -29,10 +29,44 @@ def platform_jwks():
   return key_set.get("public_keyset")
 
 
-# TODO: add post method for /authorize endpoint(optional)
+@router.post(
+    "/authorize",
+    name="POST method for Authorization Endpoint",
+    responses={404: {
+        "model": NotFoundErrorResponseModel
+    }})
+def post_authorize(request: Request,
+                   client_id: str = Form(),
+                   login_hint: str = Form(),
+                   lti_message_hint: str = Form(),
+                   redirect_uri: str = Form(),
+                   nonce: str = Form(),
+                   state: str = Form(),
+                   scope: str = Form(default="openid"),
+                   response_type: str = Form(default="id_token"),
+                   response_mode: str = Form(default="form_post"),
+                   prompt: str = Form(default="none")):
+  """
+    Generate a LTI Message (jwt token) which is encoded using a private rsa key
+    of platform and return it back to provided redirect_uri
+  """
+  return authorize(
+      request=request,
+      client_id=client_id,
+      login_hint=login_hint,
+      lti_message_hint=lti_message_hint,
+      redirect_uri=redirect_uri,
+      nonce=nonce,
+      state=state,
+      scope=scope,
+      response_type=response_type,
+      response_mode=response_mode,
+      prompt=prompt)
+
+
 @router.get(
     "/authorize",
-    name="Authorization Endpoint",
+    name="GET method for Authorization Endpoint",
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
