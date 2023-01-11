@@ -61,6 +61,36 @@ def get_student_email_and_token():
   }
   return data
 
+
+def get_workspace_student_email_and_token():
+  """Get student workspace email and token
+
+    Returns:
+        dict: returns a dict which contains student email and token
+    """
+  client = secretmanager.SecretManagerServiceClient()
+  student_email_secret_id = "org-test-user-1-username"
+  student_token_secret_id = "enroll_workspace_student"
+  student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
+  student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
+  student_email_response = client.access_secret_version(
+      request={"name": student_email_name})
+  student_token_response = client.access_secret_version(
+      request={"name": student_token_name})
+  credentials_dict = json.loads(
+      student_token_response.payload.data.decode("UTF-8"))
+  creds = Credentials.from_authorized_user_info(
+      credentials_dict, scopes=credentials_dict["scopes"])
+  if not creds or not creds.valid:
+    if creds and creds.expired and creds.refresh_token:
+      creds.refresh(Request())
+      credentials_dict = json.loads(creds.to_json())
+  data = {
+      "email": student_email_response.payload.data.decode("UTF-8"),
+      "access_token": credentials_dict["token"]
+  }
+  return data
+
 def get_user_email_and_password_for_e2e():
   client = secretmanager.SecretManagerServiceClient()
   user_email_password_secret_id = "e2e_test_email_password"

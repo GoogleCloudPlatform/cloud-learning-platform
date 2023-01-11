@@ -1,7 +1,7 @@
 import behave
 import requests
 from testing_objects.test_config import API_URL
-from e2e.gke_api_tests.secrets_helper import get_student_email_and_token
+from e2e.gke_api_tests.secrets_helper import get_student_email_and_token,get_workspace_student_email_and_token
 
 # -------------------------------Enroll student to Section-------------------------------------
 # ----Positive Scenario-----
@@ -66,6 +66,29 @@ def step_impl_8(context):
 def step_impl_9(context):
     assert context.status == 422, "Status 422"
     assert context.response["success"] is False, "Check success"
+
+# -----Positive Scenario--------
+
+
+@behave.given("A user has access privileges and wants to enroll a student using his/her workspace email into a section")
+def step_impl_10(context):
+    context.url = f'{API_URL}/sections/{context.sections.id}/students'
+    context.payload = get_workspace_student_email_and_token()
+
+
+@behave.when("API request is sent to enroll workspace email as a student to a section with correct request payload and valid section id")
+def step_impl_11(context):
+    resp = requests.post(context.url, json=context.payload,
+                         headers=context.header)
+    context.status = resp.status_code
+    context.response = resp.json()
+
+
+@behave.then("Section will be fetch using the given id and student is enrolled using student access token and his workspace email and a response model object will be return")
+def step_impl_12(context):
+
+    assert context.status == 200, "Status 200"
+    assert context.response["success"] is True, "Check success"
 
 
 
