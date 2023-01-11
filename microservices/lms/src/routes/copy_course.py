@@ -84,7 +84,7 @@ def create_section(sections_details: SectionDetails):
     description (str):Description
     classroom_template_id(str):course_template_id id from firestore
     cohort_id(str):cohort id from firestore
-    teachers_list(list):List of teachers to be added
+    teachers(list):List of teachers to be added
   Raises:
     HTTPException: 500 Internal Server Error if something fails
 
@@ -147,7 +147,7 @@ def create_section(sections_details: SectionDetails):
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
 
-    for teacher_email in sections_details.teachers_list:
+    for teacher_email in sections_details.teachers:
       classroom_crud.add_teacher(new_course["id"], teacher_email)
     # Save the new record of seecion in firestore
     section = Section()
@@ -160,7 +160,7 @@ def create_section(sections_details: SectionDetails):
     section.classroom_id = new_course["id"]
     section.classroom_code = new_course["enrollmentCode"]
     section.classroom_url = new_course["alternateLink"]
-    section.teachers_list = sections_details.teachers_list
+    section.teachers = sections_details.teachers
     section.save()
     new_section = convert_section_to_section_model(section)
     return {"data": new_section}
@@ -292,14 +292,19 @@ def update_section(sections_details: UpdateSection):
     section = Section.find_by_id(sections_details.id)
     new_course = classroom_crud.update_course(sections_details.course_id,
                                               sections_details.section_name,
-                                              sections_details.description,
-                                              sections_details.course_state)
+                                              sections_details.description)
     if new_course is None:
       raise ResourceNotFoundException(
           "Course with Course_id"
           f" {sections_details.course_id} is not found in classroom")
+    teacher_list = list(
+        set(sections_details.teachers) - set(section.teachers))
+    if teacher_list:
+      for i in teacher_list:
+        classroom_crud.add_teacher(sections_details.course_id, i)
     section.section = sections_details.section_name
     section.description = sections_details.description
+    section.teachers = sections_details.teachers
     section.update()
     updated_section = convert_section_to_section_model(section)
     return {"data": updated_section}
@@ -330,7 +335,7 @@ def enroll_student_section(sections_id: str,
   """
   try:
     section = Section.find_by_id(sections_id)
-    classroom_crud.enroll_student(token={**input_data.credentials.dict()},
+    classroom_crud.enroll_student(token=input_data.access_token,
                                   student_email=input_data.email,
                                   course_id=section.classroom_id,
                                   course_code=section.classroom_code)

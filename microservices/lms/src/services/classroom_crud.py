@@ -1,7 +1,7 @@
 """ Hepler functions for classroom crud API """
 from asyncio.log import logger
 from google.oauth2 import service_account
-from google.oauth2.credentials import Credentials
+import google.oauth2.credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from common.utils.errors import InvalidTokenError
@@ -70,11 +70,7 @@ def get_course_by_id(course_id):
     return None
 
 
-def update_course(course_id,
-                  section_name,
-                  description,
-                  course_state,
-                  course_name=None):
+def update_course(course_id, section_name, description, course_name=None):
   """Update course Function in classroom
 
   Args: section_name ,description of course, section,owner_id of course
@@ -90,7 +86,6 @@ def update_course(course_id,
       new_course["name"] = course_name
     course["section"] = section_name
     course["description"] = description
-    course["course_state"] = course_state
     course = service.courses().update(id=course_id, body=course).execute()
     course_name = course.get("name")
     course_id = course.get("id")
@@ -306,8 +301,7 @@ def enroll_student(token, course_id, student_email, course_code):
     dict: returns a dict which contains student and classroom details
   """
 
-  scopes = ["https://www.googleapis.com/auth/classroom.rosters"]
-  creds = Credentials.from_authorized_user_info(token, scopes)
+  creds = google.oauth2.credentials.Credentials(token=token)
   if not creds or not creds.valid:
     raise InvalidTokenError("Invalid token please provide a valid token")
   service = build("classroom", "v1", credentials=creds)
