@@ -18,7 +18,7 @@ def validate_access(allowed_scopes):
     def wrapper(*args, **kwargs):
       token = kwargs.get("token")
       if token is None:
-        raise InvalidTokenError("Unauthorized")
+        raise InvalidTokenError("Token is missing")
       token_dict = dict(token)
 
       if token_dict["credentials"]:
@@ -31,7 +31,7 @@ def validate_access(allowed_scopes):
           if scope in user_scopes:
             return func(*args, **kwargs)
 
-        raise InvalidTokenError("Unauthorized due to invalid scope")
+      raise InvalidTokenError("Unauthorized due to invalid scope")
 
     return wrapper
 
