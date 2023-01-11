@@ -17,3 +17,9 @@ Feature: Add student to section
     Given A user has access to the portal and wants to enroll a student into a section
     When API request is sent to enroll student to a section with incorrect request payload and valid section id
     Then Student will not be enrolled and API will throw a validation error
+
+  @fixture.create.section
+  Scenario: Add student to a section using a workspace email and a payload
+    Given A user has access privileges and wants to enroll a student using his/her workspace email into a section
+    When API request is sent to enroll workspace email as a student to a section with correct request payload and valid section id
+    Then Section will be fetch using the given id and student is enrolled using student access token and his workspace email and a response model object will be return
