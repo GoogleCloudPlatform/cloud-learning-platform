@@ -1,6 +1,5 @@
 """ Helper Functions"""
 import json
-import os
 from google.cloud import secretmanager
 import google_crc32c
 import ttl_cache

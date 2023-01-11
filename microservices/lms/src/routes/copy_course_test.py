@@ -117,7 +117,9 @@ def test_create_section(client_with_emulator, create_fake_data):
             with mock.patch(
                 "routes.copy_course.classroom_crud.create_coursework"):
               with mock.patch("routes.copy_course.classroom_crud.add_teacher"):
-                resp = client_with_emulator.post(url, json=section_details)
+                with mock.patch(
+                    "routes.copy_course.classroom_crud.register_course"):
+                  resp = client_with_emulator.post(url, json=section_details)
   assert resp.status_code == 200
 
 
@@ -261,8 +263,10 @@ def test_update_section_course_id_not_found(client_with_emulator,
 def test_enroll_student(client_with_emulator, create_fake_data):
 
   url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
-  input_data = {"email": "student@gmail.com", "access_token":
-  CREDENTIAL_JSON["token"]}
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
   data = {
       "success": True,
       "message": "Successfully Added the Student with email student@gmail.com",
@@ -277,8 +281,10 @@ def test_enroll_student(client_with_emulator, create_fake_data):
 
 def test_enroll_student_negative(client_with_emulator):
   url = BASE_URL + "/sections/fake_id_section/students"
-  input_data = {"email": "student@gmail.com", "access_token":
-  CREDENTIAL_JSON["token"]}
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
   with mock.patch("routes.copy_course.classroom_crud.enroll_student"):
     with mock.patch("routes.copy_course.Logger"):
       resp = client_with_emulator.post(url, json=input_data)
@@ -299,7 +305,7 @@ def test_delete_section(client_with_emulator, create_fake_data):
 def test_register_course(client_with_emulator):
 
   url = BASE_URL + "/sections/register"
-  input_data = {"section_id": "57690009090", "feed_type": "COURSE_WORK_CHANGES"}
+  input_data = {"course_id": "57690009090", "feed_type": "COURSE_WORK_CHANGES"}
   data = {
       "success": True,
       "message": "Successfully registered the course using " +
