@@ -360,7 +360,7 @@ def enroll_student_section(sections_id: str,
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
-    print(err)
+    Logger.error(err)
     raise InternalServerError(str(e)) from e
 
 
