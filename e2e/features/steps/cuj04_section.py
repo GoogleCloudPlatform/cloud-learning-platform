@@ -10,8 +10,6 @@ from e2e.gke_api_tests.secrets_helper import get_student_email_and_token
 @behave.given("A user has access privileges and wants to enroll a student into a section")
 def step_impl_1(context):
     context.url = f'{API_URL}/sections/{context.sections.id}/students'
-    print("-PAYLOAD FOR student enroll---")
-    print(get_student_email_and_token())
     context.payload = get_student_email_and_token()
 
 
@@ -19,9 +17,6 @@ def step_impl_1(context):
 @behave.when("API request is sent to enroll student to a section with correct request payload and valid section id")
 def step_impl_2(context):
     resp = requests.post(context.url, json=context.payload,headers=context.header)
-    print("-----------Step imp2--------")
-    print("resp.status",resp.status_code)
-    print("resp.response",resp.json())
     context.status = resp.status_code
     context.response = resp.json()
 
@@ -29,7 +24,6 @@ def step_impl_2(context):
 @behave.then("Section will be fetch using the given id and student is enrolled using student credentials and a response model object will be return")
 def step_impl_3(context):
 
-    print("-----------Step imp3--------")
     assert context.status == 200, "Status 200"
     assert context.response["success"] is True, "Check success"
 
