@@ -59,7 +59,7 @@ def get_student_email_and_token():
   print(credentials_dict)
   data = {
       "email": student_email_response.payload.data.decode("UTF-8"),
-      "access_token":json.loads(credentials_dict)["token"]
+      "access_token":(credentials_dict)["token"]
   }
   print("-----------Body for E2E ---------")
   print(data)
