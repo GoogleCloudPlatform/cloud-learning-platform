@@ -111,7 +111,7 @@ jobs:
           skaffold run \
           -p custom \
           --namespace $NAMESPACE \
-          --module authentication,redis \
+          --module authentication,redis,user-management,student-learner-profile,learning-record-service \
           -l commit=$GITHUB_SHA \
           --tag PR${{ github.event.pull_request.number }}
           popd

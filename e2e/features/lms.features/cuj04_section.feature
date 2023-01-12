@@ -22,3 +22,9 @@ Feature: Add student to section
     Given A user has access privileges and wants to register a course to a pub/sub topic
     When API request is sent to register a course to a pub/sub topic with correct request payload and valid course id
     Then Course will be register using unique course id and feed type to a pub/sub topic and a response model object will be return
+
+  @fixture.create.section
+  Scenario: Add student to a section using a workspace email and a payload
+    Given A user has access privileges and wants to enroll a student using his/her workspace email into a section
+    When API request is sent to enroll workspace email as a student to a section with correct request payload and valid section id
+    Then Section will be fetch using the given id and student is enrolled using student access token and his workspace email and a response model object will be return

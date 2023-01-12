@@ -1,10 +1,13 @@
 """Line item  Endpoints"""
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
+from fastapi.security import HTTPBearer
 from config import ERROR_RESPONSES
 from common.models import LineItem, Result, Score
-from common.utils.errors import (ResourceNotFoundException, ValidationError)
+from common.utils.errors import (ResourceNotFoundException, ValidationError,
+                                 InvalidTokenError)
 from common.utils.logging_handler import Logger
-from common.utils.http_exceptions import (InternalServerError, ResourceNotFound)
+from common.utils.http_exceptions import (InternalServerError, ResourceNotFound,
+                                          Unauthenticated)
 from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
                                       UpdateLineItemModel, DeleteLineItem,
                                       FullLineItemModel, BasicScoreModel,
@@ -12,11 +15,15 @@ from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
 from typing import List, Optional
+from services.validate_service import validate_access
 # pylint: disable=unused-argument
+
+auth_scheme = HTTPBearer(auto_error=False)
 
 router = APIRouter(tags=["Line item"], responses=ERROR_RESPONSES)
 
 
+# TODO: Update the scope validation decorator using FastAPI dependencies
 @router.get(
     "/{context_id}/line_items",
     name="Get all line items",
@@ -24,13 +31,18 @@ router = APIRouter(tags=["Line item"], responses=ERROR_RESPONSES)
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
+@validate_access(allowed_scopes=[
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
+])
 def get_all_line_items(request: Request,
                        context_id: str,
                        resource_id: str = None,
                        resource_link_id: str = None,
                        tag: str = None,
                        skip: int = 0,
-                       limit: int = 10):
+                       limit: int = 10,
+                       token: auth_scheme = Depends()):
   """The get line items endpoint will return an array of line items
   from firestore
   ### Args:
@@ -80,6 +92,10 @@ def get_all_line_items(request: Request,
       each_line_item["id"] = str(request.url) + "/" + each_line_item["uuid"]
 
     return line_items
+
+  except InvalidTokenError as e:
+    Logger.error(e)
+    raise Unauthenticated(str(e)) from e
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -92,7 +108,14 @@ def get_all_line_items(request: Request,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_line_item(request: Request, context_id: str, uuid: str):
+@validate_access(allowed_scopes=[
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
+])
+def get_line_item(request: Request,
+                  context_id: str,
+                  uuid: str,
+                  token: auth_scheme = Depends()):
   """The get line item endpoint will return the line item
   from firestore of which uuid is provided
   ### Args:
@@ -113,6 +136,9 @@ def get_line_item(request: Request, context_id: str, uuid: str):
     line_item_fields["id"] = str(request.url)
 
     return line_item_fields
+  except InvalidTokenError as e:
+    Logger.error(e)
+    raise Unauthenticated(str(e)) from e
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
@@ -127,8 +153,12 @@ def get_line_item(request: Request, context_id: str, uuid: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def create_line_item(request: Request, context_id: str,
-                     input_line_item: LineItemModel):
+@validate_access(
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+def create_line_item(request: Request,
+                     context_id: str,
+                     input_line_item: LineItemModel,
+                     token: auth_scheme = Depends()):
   """The create line item endpoint will add a new line item to the firestore.
   ### Args:
   input_line_item: `LineItemModel`
@@ -149,6 +179,9 @@ def create_line_item(request: Request, context_id: str,
     line_item_fields["id"] = str(request.url) + "/" + line_item_fields["uuid"]
 
     return line_item_fields
+  except InvalidTokenError as e:
+    Logger.error(e)
+    raise Unauthenticated(str(e)) from e
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -160,8 +193,13 @@ def create_line_item(request: Request, context_id: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def update_line_item(request: Request, context_id: str, uuid: str,
-                     input_line_item: UpdateLineItemModel):
+@validate_access(
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+def update_line_item(request: Request,
+                     context_id: str,
+                     uuid: str,
+                     input_line_item: UpdateLineItemModel,
+                     token: auth_scheme = Depends()):
   """Update a line item
   ### Args:
   uuid: `str`
@@ -193,6 +231,9 @@ def update_line_item(request: Request, context_id: str, uuid: str,
 
     return line_item_fields
 
+  except InvalidTokenError as e:
+    Logger.error(e)
+    raise Unauthenticated(str(e)) from e
   except ResourceNotFoundException as e:
     Logger.error(e)
     raise ResourceNotFound(str(e)) from e
@@ -207,7 +248,10 @@ def update_line_item(request: Request, context_id: str, uuid: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def delete_line_item(context_id: str, uuid: str):
+@validate_access(
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+def delete_line_item(context_id: str, uuid: str,
+                     token: auth_scheme = Depends()):
   """Delete a line item from firestore
   ### Args:
   uuid: `str`
@@ -224,6 +268,10 @@ def delete_line_item(context_id: str, uuid: str):
     # TODO: Add API call to check if the context_id (course_id) exists
     LineItem.delete_by_id(uuid)
     return {}
+
+  except InvalidTokenError as e:
+    Logger.error(e)
+    raise Unauthenticated(str(e)) from e
   except ResourceNotFoundException as e:
     Logger.error(e)
     raise ResourceNotFound(str(e)) from e
@@ -239,12 +287,16 @@ def delete_line_item(context_id: str, uuid: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
+@validate_access(allowed_scopes=[
+    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
+])
 def get_results_of_line_item(request: Request,
                              context_id: str,
                              line_item_id: str,
                              skip: int = 0,
                              limit: int = 10,
-                             user_id: Optional[str] = None):
+                             user_id: Optional[str] = None,
+                             token: auth_scheme = Depends()):
   """The get all results of a line item endpoint will return all the
   results of a line item from firestore
   ### Args:
@@ -281,6 +333,10 @@ def get_results_of_line_item(request: Request,
       result_fields["id"] = str(request.url) + "/" + result_fields["uuid"]
 
     return result_fields
+
+  except InvalidTokenError as e:
+    Logger.error(e)
+    raise Unauthenticated(str(e)) from e
   except ResourceNotFoundException as e:
     Logger.error(e)
     raise ResourceNotFound(str(e)) from e
@@ -296,8 +352,14 @@ def get_results_of_line_item(request: Request,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_result(request: Request, context_id: str, line_item_id: str,
-               result_id: str):
+@validate_access(allowed_scopes=[
+    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
+])
+def get_result(request: Request,
+               context_id: str,
+               line_item_id: str,
+               result_id: str,
+               token: auth_scheme = Depends()):
   """The get result of a line item endpoint will return the specific result
   of a line item from firestore
   ### Args:
@@ -323,6 +385,10 @@ def get_result(request: Request, context_id: str, line_item_id: str,
     result_fields["id"] = str(request.url)
 
     return result_fields
+
+  except InvalidTokenError as e:
+    Logger.error(e)
+    raise Unauthenticated(str(e)) from e
   except ResourceNotFoundException as e:
     Logger.error(e)
     raise ResourceNotFound(str(e)) from e
@@ -338,8 +404,12 @@ def get_result(request: Request, context_id: str, line_item_id: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def create_score_for_line_item(context_id: str, line_item_id: str,
-                               input_score: BasicScoreModel):
+@validate_access(
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/score"])
+def create_score_for_line_item(context_id: str,
+                               line_item_id: str,
+                               input_score: BasicScoreModel,
+                               token: auth_scheme = Depends()):
   """The create score for line item endpoint will add a score for a line item
   to the firestore.
   ### Args:
@@ -367,6 +437,10 @@ def create_score_for_line_item(context_id: str, line_item_id: str,
     score_fields = new_score.get_fields(reformat_datetime=True)
 
     return score_fields
+
+  except InvalidTokenError as e:
+    Logger.error(e)
+    raise Unauthenticated(str(e)) from e
   except ResourceNotFoundException as e:
     Logger.error(e)
     raise ResourceNotFound(str(e)) from e

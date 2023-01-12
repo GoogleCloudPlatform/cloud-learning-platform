@@ -117,8 +117,9 @@ def test_get_authorize(mock_token, mock_key_set, clean_firestore):
 @mock.patch("routes.platform_auth.get_remote_keyset")
 @mock.patch("routes.platform_auth.get_unverified_token_claims")
 @mock.patch("routes.platform_auth.decode_token")
-def test_token(mock_token, mock_claims, mock_key_set, clean_firestore,
-               create_tool):
+@mock.patch("routes.platform_auth.encode_token")
+def test_token(mock_encoded_token, mock_decoded_token, mock_claims,
+               mock_key_set, clean_firestore, create_tool):
 
   test_tool = create_tool
   test_claims = {
@@ -129,7 +130,14 @@ def test_token(mock_token, mock_claims, mock_key_set, clean_firestore,
       "sub": test_tool.client_id
   }
 
-  mock_token.return_value = test_claims
+  test_encoded_token = {
+      "access_token": "test_token_value",
+      "token_type": "bearer",
+      "expires_in": 3600
+  }
+
+  mock_decoded_token.return_value = test_claims
+  mock_encoded_token.return_value = "test_token_value"
   mock_claims.return_value = test_claims
 
   req_data = {
@@ -149,4 +157,4 @@ def test_token(mock_token, mock_claims, mock_key_set, clean_firestore,
 
   assert resp.status_code == 200
   json_res = resp.json()
-  assert json_res.get("sub") == test_claims.get("sub")
+  assert json_res.get("access_token") == test_encoded_token.get("access_token")

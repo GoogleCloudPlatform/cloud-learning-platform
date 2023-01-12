@@ -32,8 +32,8 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       "iat": int(datetime.now().timestamp()),
       "exp": int(datetime.now().timestamp()) + TOKEN_TTL,
       "sub": login_hint,
-      "given_name": user.get("last_name"),
-      "first_name": user.get("first_name"),
+      "given_name": user.get("first_name"),
+      "family_name": user.get("last_name"),
       "name": user.get("first_name") + " " + user.get("last_name"),
       "email": user.get("email")
   }
@@ -97,12 +97,21 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
   token_claims[lti_claim_field("claim",
                                "deployment_id")] = tool_info["deployment_id"]
 
+  # TODO: Update the context claim with the actual context/course data
+  token_claims[lti_claim_field("claim", "context")] = {
+      "id": "2qi7b3vh83hq3vesfd",
+      "label": "Test Course",
+      "title": "Test title of the course",
+      "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"]
+  }
+
   if user.get("user_type") == "learner":
     token_claims[lti_claim_field("claim", "roles")] = [
         "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
     ]
   elif user.get("user_type") == "faculty":
     token_claims[lti_claim_field("claim", "roles")] = [
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor",
         "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Faculty",
         "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
     ]
