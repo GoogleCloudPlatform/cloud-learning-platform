@@ -33,6 +33,15 @@ COLLECTION = os.getenv("COLLECTION")
 
 API_BASE_URL = os.getenv("API_BASE_URL")
 
-SERVICE_NAME = os.getenv("SERVICE_NAME")
-
 CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL")
+
+SERVICES = {
+  "user-management": {
+    "host": "user-management",
+    "port": 80
+  }
+}
+
+USER_MANAGEMENT_BASE_URL = f"http://{SERVICES['user-management']['host']}:" \
+                  f"{SERVICES['user-management']['port']}" \
+                  f"/user-management/api/v1"

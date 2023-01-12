@@ -4,11 +4,12 @@ from google.oauth2 import service_account
 import google.oauth2.credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from common.utils.errors import InvalidTokenError
+from common.utils.errors import InvalidTokenError,UserManagementServiceError
 from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
-from config import CLASSROOM_ADMIN_EMAIL
+from config import CLASSROOM_ADMIN_EMAIL,USER_MANAGEMENT_BASE_URL
 from utils import helper
+import requests
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
@@ -288,10 +289,11 @@ def add_teacher(course_id, teacher_email):
   return course
 
 
-def enroll_student(token, course_id, student_email, course_code):
+def enroll_student(headers ,access_token, course_id,student_email,course_code):
   """Add student to the classroom using student google auth token
   Args:
-    token(dict): dict object which contains student credentials
+    headers :Bearer token
+    access_token(str): Oauth access token which contains student credentials
     course_id(str): unique classroom id which is required to get the classroom
     student_email(str): student email id
     course_code(str): unique classroom enrollment code
@@ -301,14 +303,37 @@ def enroll_student(token, course_id, student_email, course_code):
     dict: returns a dict which contains student and classroom details
   """
 
-  creds = google.oauth2.credentials.Credentials(token=token)
+  creds = google.oauth2.credentials.Credentials(token=access_token)
   if not creds or not creds.valid:
-    raise InvalidTokenError("Invalid token please provide a valid token")
+    raise InvalidTokenError("Invalid access_token please provide a valid token")
   service = build("classroom", "v1", credentials=creds)
   student = {"userId": student_email}
-  return service.courses().students().create(
+  service.courses().students().create(
       courseId=course_id, body=student, enrollmentCode=course_code).execute()
-
+  # Get the gaia ID of the course
+  people_service = build("people", "v1", credentials=creds)
+  profile = people_service.people().get(resourceName="people/me",
+  personFields="metadata").execute()
+  gaia_id = profile["metadata"]["sources"][0]["id"]
+# Call user API
+  data = {
+  "first_name": "",
+  "last_name": "",
+  "email":student_email,
+  "user_type": "learner",
+  "user_type_ref": "",
+  "user_groups": [],
+  "status": "active",
+  "is_registered": True,
+  "failed_login_attempts_count": 0,
+  "access_api_docs": False,
+  "gaia_id":gaia_id
+}
+  response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
+  json=data,headers=headers)
+  if response.status_code != 200:
+    raise UserManagementServiceError(response.json()["message"])
+  return response.json()["data"]
 
 def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns
@@ -366,5 +391,4 @@ def invite_teacher(course_id, teacher_email):
                               message=str(ae),
                               data=None) from ae
   except Exception as e:
-    print(str(e))
     raise InternalServerError(str(e)) from e
