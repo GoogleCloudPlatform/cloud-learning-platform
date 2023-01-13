@@ -10,14 +10,15 @@ class CourseDetails(BaseModel):
   course_id: str
 
 
-class RegistrationDetails(BaseModel):
-  """Registration API Details Model"""
+class EnableNotificationsDetails(BaseModel):
+  """Enable Notifications API Details Model"""
   feed_type: Literal["COURSE_WORK_CHANGES", "COURSE_ROSTER_CHANGES"]
-  course_id: str
+  course_id: Optional[str]=""
+  section_id: Optional[str]=""
 
 
-class RegistrationResponse(BaseModel):
-  """Registration API Response Model"""
+class EnableNotificationsResponse(BaseModel):
+  """Enable Notifications API Response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully registered the course"
   data: Optional[dict] = None

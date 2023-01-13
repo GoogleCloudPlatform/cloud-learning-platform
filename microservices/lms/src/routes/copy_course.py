@@ -8,7 +8,7 @@ from common.utils.http_exceptions import (CustomHTTPException,
 from common.utils.logging_handler import Logger
 from fastapi import APIRouter,Request
 from googleapiclient.errors import HttpError
-from schemas.course_details import CourseDetails, RegistrationDetails, RegistrationResponse
+from schemas.course_details import CourseDetails, EnableNotificationsDetails, EnableNotificationsResponse
 from schemas.error_schema import (ConflictResponseModel,
                                   InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
@@ -110,8 +110,9 @@ def create_section(sections_details: SectionDetails):
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
     # add new_course to pubsub topic for both course work and roaster changes
-    classroom_crud.register_course(new_course["id"], "COURSE_WORK_CHANGES")
-    classroom_crud.register_course(new_course["id"], "COURSE_ROSTER_CHANGES")
+    classroom_crud.enable_notifications(new_course["id"], "COURSE_WORK_CHANGES")
+    classroom_crud.enable_notifications(new_course["id"],
+                                        "COURSE_ROSTER_CHANGES")
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
     if topics is not None:
@@ -452,13 +453,16 @@ def copy_courses(course_details: CourseDetails):
     raise InternalServerError(str(e)) from e
 
 
-@router.post("/register", response_model=RegistrationResponse)
-def section_pub_sub_registration(registeration_details: RegistrationDetails):
+@router.post("/enable_notifications",
+             response_model=EnableNotificationsResponse)
+def section_enable_notifications_pub_sub(
+    enable_notifications_details: EnableNotificationsDetails):
   """Resgister course with a pub/sub topic
 
   Args:
-      registeration_details (RegistrationDetails):
-      An object of the RegistrationDetails Model which contains required details
+      enable_notifications_details (EnableNotificationsDetails):
+      An object of the EnableNotificationsDetails
+      Model which contains required details
   Raises:
       InternalServerError: 500 Internal Server Error if something fails
       CustomHTTPException: raise error according to the HTTPError exception
@@ -466,13 +470,34 @@ def section_pub_sub_registration(registeration_details: RegistrationDetails):
       _type_: _description_
   """
   try:
-    response = classroom_crud.register_course(
-      registeration_details.course_id, registeration_details.feed_type)
+    # check both the id's
+    if(not enable_notifications_details.course_id and
+       not enable_notifications_details.section_id):
+      raise ValidationError("Either Section id or course id is required")
+    # if course_id is empty and section id is passed then get course_id
+    if not enable_notifications_details.course_id :
+      section=Section.find_by_id(enable_notifications_details.section_id)
+      enable_notifications_details.course_id=section.classroom_id
+
+    response = classroom_crud.enable_notifications(
+      enable_notifications_details.course_id,
+      enable_notifications_details.feed_type)
+    if enable_notifications_details.section_id:
+      return {
+          "message":
+          "Successfully enable the notifications of the course using section " +
+          f"{enable_notifications_details.section_id} id",
+          "data":
+          response
+      }
     return {
-        "message": "Successfully registered the course using " +
-        f"{registeration_details.course_id} id",
+        "message":
+        "Successfully enable the notifications of the course using " +
+        f"{enable_notifications_details.course_id} id",
         "data": response
     }
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err

@@ -50,6 +50,7 @@ def step_impl_6(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
 
+# ----
 
 @behave.given("A user has access to the portal and wants to enroll a student into a section")
 def step_impl_7(context):
@@ -95,10 +96,10 @@ def step_impl_12(context):
 # ----Positive Scenario-----
 
 @behave.given(
-    "A user has access privileges and wants to register a course to a pub/sub topic"
+    "A user has access privileges and wants to enable notifications for a course"
 )
 def step_impl_13(context):
-  context.url = f'{API_URL}/sections/register'
+  context.url = f'{API_URL}/sections/enable_notifications'
   course=create_course(
         COURSE_TEMPLATE_INPUT_DATA["name"],"testing_section",
         COURSE_TEMPLATE_INPUT_DATA["description"],
@@ -110,7 +111,7 @@ def step_impl_13(context):
 
 
 @behave.when(
-    "API request is sent to register a course to a pub/sub topic with correct request payload and valid course id"
+    "API request is sent to enable notifications for a course with correct request payload which contains valid course id"
 )
 def step_impl_14(context):
   resp = requests.post(context.url,
@@ -121,8 +122,102 @@ def step_impl_14(context):
 
 
 @behave.then(
-    "Course will be register using unique course id and feed type to a pub/sub topic and a response model object will be return"
+    "Notifications will be enabled using unique course id and feed type and a response model object will be return"
 )
 def step_impl_15(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
+
+# ----
+
+@behave.given(
+    "A user has access privileges and wants to enable notifications for a course using section id"
+)
+def step_impl_16(context):
+  context.url = f'{API_URL}/sections/enable_notifications'
+  context.payload = {
+      "section_id": context.sections.id,
+      "feed_type": "COURSE_WORK_CHANGES"
+  }
+
+
+@behave.when(
+    "API request is sent to enable notifications for a course with correct request payload which contains valid section id"
+)
+def step_impl_17(context):
+  resp = requests.post(context.url,
+                       json=context.payload,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Notifications will be enabled using unique section id and feed type and a response model object will be return"
+)
+def step_impl_18(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "Check success"
+
+# -----Negative Scenario-----
+
+@behave.given(
+    "A user has access to portal and needs to enable notifications for a course using section id"
+)
+def step_impl_16(context):
+  context.url = f'{API_URL}/sections/enable_notifications'
+  context.payload = {
+      "section_id": "fake_section_id",
+      "feed_type": "COURSE_WORK_CHANGES"
+  }
+
+
+@behave.when(
+    "API request is sent to enable notifications for a course with correct request payload which contains invalid section id"
+)
+def step_impl_17(context):
+  resp = requests.post(context.url,
+                       json=context.payload,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Notifications will not be enabled and API will throw a resource not found error"
+)
+def step_impl_18(context):
+  assert context.status == 404, "Status 404"
+  assert context.response["success"] is False, "Check success"
+
+# ----
+
+@behave.given(
+    "A user has access to portal and needs to enable notifications for a course using payload"
+)
+def step_impl_19(context):
+  context.url = f'{API_URL}/sections/enable_notifications'
+  context.payload = {
+      "section_id": "",
+      "course_id": "",
+      "feed_type": "COURSE_WORK_CHANGES"
+  }
+
+
+@behave.when(
+    "API request is sent to enable notifications for a course with incorrect request payload"
+)
+def step_impl_20(context):
+  resp = requests.post(context.url,
+                       json=context.payload,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Notifications will not be enabled and API will throw a validation error"
+)
+def step_impl_21(context):
+  assert context.status == 422, "Status 422"
+  assert context.response["success"] is False, "Check success"

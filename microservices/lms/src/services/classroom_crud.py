@@ -2,13 +2,12 @@
 from asyncio.log import logger
 from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from common.utils.errors import InvalidTokenError,UserManagementServiceError
 from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
-from config import CLASSROOM_ADMIN_EMAIL, PROJECT_ID,USER_MANAGEMENT_BASE_URL
+from config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
 from utils import helper
 import requests
 
@@ -325,7 +324,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   profile = people_service.people().get(resourceName="people/me",
   personFields="metadata").execute()
   gaia_id = profile["metadata"]["sources"][0]["id"]
-# Call user API
+  # Call user API
   data = {
   "first_name": "",
   "last_name": "",
@@ -338,7 +337,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   "failed_login_attempts_count": 0,
   "access_api_docs": False,
   "gaia_id":gaia_id
-}
+  }
   response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
   json=data,headers=headers)
   if response.status_code != 200:
@@ -404,7 +403,7 @@ def invite_teacher(course_id, teacher_email):
     raise InternalServerError(str(e)) from e
 
 
-def register_course(course_id, feed_type):
+def enable_notifications(course_id, feed_type):
   """_summary_
 
   Args:
@@ -417,14 +416,9 @@ def register_course(course_id, feed_type):
   Returns:
       _type_: _description_
   """
-  creds_dict = helper.get_offline_access_token_from_secret_manager()
-  creds = Credentials.from_authorized_user_info(creds_dict,
-                                                scopes=REGISTER_SCOPES)
-  if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-      creds.refresh(Request())
-    else:
-      raise InternalServerError("Token got expired")
+  creds =service_account.Credentials.from_service_account_info(
+      helper.get_gke_pd_sa_key_from_secret_manager(), scopes=REGISTER_SCOPES)
+  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
   body = {
       "feed": {
@@ -434,7 +428,8 @@ def register_course(course_id, feed_type):
           }
       },
       "cloudPubsubTopic": {
-          "topicName": f"projects/{PROJECT_ID}/topics/classroom-messeges"
+          "topicName":"projects/"+
+          f"{PUB_SUB_PROJECT_ID}/topics/{DATABASE_PREFIX}classroom-messeges"
       }
   }
   return service.registrations().create(body=body).execute()
