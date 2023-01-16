@@ -1,11 +1,7 @@
 FROM node:16.17.0-alpine as builder
 WORKDIR /app
 COPY . .
-
 RUN npm install
-ARG API_DOMAIN
-RUN echo "${API_DOMAIN}"
-ENV API_DOMAIN="${API_DOMAIN}"
 RUN npm run build
 
 FROM nginx:1.17.10-alpine
