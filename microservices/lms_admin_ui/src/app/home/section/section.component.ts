@@ -78,9 +78,13 @@ export class SectionComponent implements OnInit {
       console.log('section', this.sectionDetails)
     })
   }
+  openClassroom() {
+    window.open(this.selectedSection.classroom_url
+      , '_blank');
+  }
   createTableData() {
     this.tableData = []
-    for (let x of this.selectedSection.teachers_list) {
+    for (let x of this.selectedSection.teachers) {
       let staffObj: staff = { name: '', email: '', role: '' }
       staffObj.name = 'TBD'
       staffObj.email = x

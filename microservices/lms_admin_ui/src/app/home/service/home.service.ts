@@ -29,7 +29,7 @@ export class HomeService {
     return this.http.get(`${environment.apiurl}course_templates/${data}`)
   }
   getSectionList(data: any) {
-    return this.http.get(`${environment.apiurl}sections/cohort/${data}/sections`)
+    return this.http.get(`${environment.apiurl}cohorts/${data}/sections`)
   }
   createSection(data: any) {
     return this.http.post(`${environment.apiurl}sections`, data)
