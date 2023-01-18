@@ -8,7 +8,7 @@ from common.utils.http_exceptions import (CustomHTTPException,
 from common.utils.logging_handler import Logger
 from fastapi import APIRouter,Request
 from googleapiclient.errors import HttpError
-from schemas.course_details import CourseDetails
+from schemas.course_details import CourseDetails, EnableNotificationsDetails, EnableNotificationsResponse
 from schemas.error_schema import (ConflictResponseModel,
                                   InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
@@ -64,7 +64,7 @@ def get_courses(skip: int = 0, limit: int = 10):
       raise ValidationError(
           "Invalid value passed to \"limit\" query parameter")
     course_list = classroom_crud.get_course_list()
-    return {"data": list(course_list)}
+    return {"data": list(course_list)[skip:limit]}
   except ValidationError as ve:
     raise BadRequest(str(ve)) from ve
   except Exception as e:
@@ -109,6 +109,10 @@ def create_section(sections_details: SectionDetails):
                                               sections_details.name, "me")
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
+    # add new_course to pubsub topic for both course work and roaster changes
+    classroom_crud.enable_notifications(new_course["id"], "COURSE_WORK_CHANGES")
+    classroom_crud.enable_notifications(new_course["id"],
+                                        "COURSE_ROSTER_CHANGES")
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
     if topics is not None:
@@ -194,6 +198,12 @@ def get_section(section_id: str):
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
+  except HttpError as ae:
+    Logger.error(ae)
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -295,11 +305,14 @@ def update_section(sections_details: UpdateSection):
       raise ResourceNotFoundException(
           "Course with Course_id"
           f" {sections_details.course_id} is not found in classroom")
-    teacher_list = list(
+    add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
-    if teacher_list:
-      for i in teacher_list:
-        classroom_crud.add_teacher(sections_details.course_id, i)
+    for i in add_teacher_list:
+      classroom_crud.add_teacher(sections_details.course_id, i)
+    remove_teacher_list = list(
+      set(section.teachers)-set(sections_details.teachers))
+    for i in remove_teacher_list:
+      classroom_crud.delete_teacher(sections_details.course_id, i)
     section.section = sections_details.section_name
     section.description = sections_details.description
     section.teachers = sections_details.teachers
@@ -440,4 +453,64 @@ def copy_courses(course_details: CourseDetails):
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+
+@router.post("/enable_notifications",
+             response_model=EnableNotificationsResponse)
+def section_enable_notifications_pub_sub(
+    enable_notifications_details: EnableNotificationsDetails):
+  """Resgister course with a pub/sub topic
+
+  Args:
+      enable_notifications_details (EnableNotificationsDetails):
+      An object of the EnableNotificationsDetails
+      Model which contains required details
+  Raises:
+      InternalServerError: 500 Internal Server Error if something fails
+      CustomHTTPException: raise error according to the HTTPError exception
+  Returns:
+      _type_: _description_
+  """
+  try:
+    # check both the id's
+    if(not enable_notifications_details.course_id and
+       not enable_notifications_details.section_id):
+      raise ValidationError("Either Section id or course id is required")
+    # if course_id is empty and section id is passed then get course_id
+    if not enable_notifications_details.course_id :
+      section=Section.find_by_id(enable_notifications_details.section_id)
+      enable_notifications_details.course_id=section.classroom_id
+
+    response = classroom_crud.enable_notifications(
+      enable_notifications_details.course_id,
+      enable_notifications_details.feed_type)
+    if enable_notifications_details.section_id:
+      return {
+          "message":
+          "Successfully enable the notifications of the course using section " +
+          f"{enable_notifications_details.section_id} id",
+          "data":
+          response
+      }
+    return {
+        "message":
+        "Successfully enable the notifications of the course using " +
+        f"{enable_notifications_details.course_id} id",
+        "data": response
+    }
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except InternalServerError as ie:
+    raise InternalServerError(str(ie)) from ie
+  except HttpError as hte:
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
+  except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e

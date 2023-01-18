@@ -1,19 +1,28 @@
 """ Hepler functions for classroom crud API """
 from asyncio.log import logger
 from google.oauth2 import service_account
-import google.oauth2.credentials
+from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from common.utils.errors import InvalidTokenError,UserManagementServiceError
 from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
-from config import CLASSROOM_ADMIN_EMAIL,USER_MANAGEMENT_BASE_URL
+from config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
 from utils import helper
 import requests
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
-
+FEED_TYPE_DICT = {
+    "COURSE_WORK_CHANGES": "courseWorkChangesInfo",
+    "COURSE_ROSTER_CHANGES": "courseRosterChangesInfo"
+}
+REGISTER_SCOPES = [
+    "https://www.googleapis.com/auth/classroom.push-notifications",
+    "https://www.googleapis.com/auth/"+
+    "classroom.student-submissions.students.readonly",
+    "https://www.googleapis.com/auth/classroom.rosters.readonly"
+]
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.rosters",
@@ -289,6 +298,21 @@ def add_teacher(course_id, teacher_email):
   return course
 
 
+def delete_teacher(course_id, teacher_email):
+  """delete teacher in a classroom
+  Args:
+    course_id(str): Unique classroom id
+    teacher_email(str): teacher email which needs to be added
+  Return:
+    course(dict): returns a dict which contains classroom details
+  """
+
+  service = build("classroom", "v1", credentials=get_credentials())
+  course = service.courses().teachers().delete(courseId=course_id,
+                                               userId=teacher_email).execute()
+  return course
+
+
 def enroll_student(headers ,access_token, course_id,student_email,course_code):
   """Add student to the classroom using student google auth token
   Args:
@@ -303,7 +327,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
     dict: returns a dict which contains student and classroom details
   """
 
-  creds = google.oauth2.credentials.Credentials(token=access_token)
+  creds = Credentials(token=access_token)
   if not creds or not creds.valid:
     raise InvalidTokenError("Invalid access_token please provide a valid token")
   service = build("classroom", "v1", credentials=creds)
@@ -315,7 +339,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   profile = people_service.people().get(resourceName="people/me",
   personFields="metadata").execute()
   gaia_id = profile["metadata"]["sources"][0]["id"]
-# Call user API
+  # Call user API
   data = {
   "first_name": "",
   "last_name": "",
@@ -328,7 +352,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   "failed_login_attempts_count": 0,
   "access_api_docs": False,
   "gaia_id":gaia_id
-}
+  }
   response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
   json=data,headers=headers)
   if response.status_code != 200:
@@ -392,3 +416,35 @@ def invite_teacher(course_id, teacher_email):
                               data=None) from ae
   except Exception as e:
     raise InternalServerError(str(e)) from e
+
+
+def enable_notifications(course_id, feed_type):
+  """_summary_
+
+  Args:
+      course_id (str): _description_
+      feed_type (str): _description_
+
+  Raises:
+      InternalServerError: 500 Internal Server Error if something fails
+
+  Returns:
+      _type_: _description_
+  """
+  creds =service_account.Credentials.from_service_account_info(
+      helper.get_gke_pd_sa_key_from_secret_manager(), scopes=REGISTER_SCOPES)
+  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("classroom", "v1", credentials=creds)
+  body = {
+      "feed": {
+          "feedType": feed_type,
+          FEED_TYPE_DICT.get(feed_type): {
+              "courseId": course_id
+          }
+      },
+      "cloudPubsubTopic": {
+          "topicName":"projects/"+
+          f"{PUB_SUB_PROJECT_ID}/topics/{DATABASE_PREFIX}classroom-messeges"
+      }
+  }
+  return service.registrations().create(body=body).execute()
