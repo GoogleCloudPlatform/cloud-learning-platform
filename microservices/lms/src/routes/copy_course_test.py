@@ -118,8 +118,10 @@ def test_create_section(client_with_emulator, create_fake_data):
                 "routes.copy_course.classroom_crud.create_coursework"):
               with mock.patch("routes.copy_course.classroom_crud.add_teacher"):
                 with mock.patch(
+                    "routes.copy_course.classroom_crud.delete_teacher"):
+                  with mock.patch(
                     "routes.copy_course.classroom_crud.enable_notifications"):
-                  resp = client_with_emulator.post(url, json=section_details)
+                    resp = client_with_emulator.post(url, json=section_details)
   assert resp.status_code == 200
 
 

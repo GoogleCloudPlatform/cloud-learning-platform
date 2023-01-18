@@ -64,7 +64,7 @@ def get_courses(skip: int = 0, limit: int = 10):
       raise ValidationError(
           "Invalid value passed to \"limit\" query parameter")
     course_list = classroom_crud.get_course_list()
-    return {"data": list(course_list)}
+    return {"data": list(course_list)[skip:limit]}
   except ValidationError as ve:
     raise BadRequest(str(ve)) from ve
   except Exception as e:
@@ -305,11 +305,14 @@ def update_section(sections_details: UpdateSection):
       raise ResourceNotFoundException(
           "Course with Course_id"
           f" {sections_details.course_id} is not found in classroom")
-    teacher_list = list(
+    add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
-    if teacher_list:
-      for i in teacher_list:
-        classroom_crud.add_teacher(sections_details.course_id, i)
+    for i in add_teacher_list:
+      classroom_crud.add_teacher(sections_details.course_id, i)
+    remove_teacher_list = list(
+      set(section.teachers)-set(sections_details.teachers))
+    for i in remove_teacher_list:
+      classroom_crud.delete_teacher(sections_details.course_id, i)
     section.section = sections_details.section_name
     section.description = sections_details.description
     section.teachers = sections_details.teachers

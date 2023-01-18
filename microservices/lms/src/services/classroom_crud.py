@@ -298,6 +298,21 @@ def add_teacher(course_id, teacher_email):
   return course
 
 
+def delete_teacher(course_id, teacher_email):
+  """delete teacher in a classroom
+  Args:
+    course_id(str): Unique classroom id
+    teacher_email(str): teacher email which needs to be added
+  Return:
+    course(dict): returns a dict which contains classroom details
+  """
+
+  service = build("classroom", "v1", credentials=get_credentials())
+  course = service.courses().teachers().delete(courseId=course_id,
+                                               userId=teacher_email).execute()
+  return course
+
+
 def enroll_student(headers ,access_token, course_id,student_email,course_code):
   """Add student to the classroom using student google auth token
   Args:
