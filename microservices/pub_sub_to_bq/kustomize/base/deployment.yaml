@@ -12,16 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: scripts/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lms
+  name: pub-sub-to-bq
 spec:
-  replicas: 3
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pub-sub-to-bq
   template:
+    metadata:
+      labels:
+        app: pub-sub-to-bq
     spec:
-      serviceAccountName: ksa
       containers:
-      - name: lms
-        image: lms
-        imagePullPolicy: Always
+      - name: pub-sub-to-bq
+        image: pub-sub-to-bq
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: env-vars
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "100Mi"
+          limits:
+            memory: "5000Mi"
+            cpu: "2000m"

@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: scripts/v1
-kind: Deployment
-metadata:
-  name: lms
-spec:
-  replicas: 3
-  template:
-    spec:
-      serviceAccountName: ksa
-      containers:
-      - name: lms
-        image: lms
-        imagePullPolicy: Always
+ARG BASE_IMG
+FROM ${BASE_IMG}
+
+WORKDIR /opt
+COPY requirements.txt service_requirements.txt
+
+# add endline in case not there
+RUN awk 1 requirements.txt > requirements.txt
+RUN cat service_requirements.txt >> requirements.txt
+
+RUN pip install -r requirements.txt
+
+COPY src/ .
+
+ENTRYPOINT [ "python", "main.py" ]

@@ -12,16 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: scripts/v1
-kind: Deployment
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
 metadata:
-  name: lms
+  name: pub-sub-to-bq
 spec:
-  replicas: 3
-  template:
-    spec:
-      serviceAccountName: ksa
-      containers:
-      - name: lms
-        image: lms
-        imagePullPolicy: Always
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - external:
+      metricName:  pubsub.googleapis.com|subscription|num_undelivered_messages
+      metricSelector:
+        matchLabels:
+          resource.labels.subscription_id: echo-read
+      targetAverageValue: 2
+    type: External
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: pub-sub-to-bq

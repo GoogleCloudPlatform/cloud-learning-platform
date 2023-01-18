@@ -1,0 +1,2 @@
+google-cloud-pubsub==2.13.11
+google-cloud-bigquery==3.4.1

@@ -12,16 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: scripts/v1
-kind: Deployment
-metadata:
-  name: lms
-spec:
-  replicas: 3
-  template:
-    spec:
-      serviceAccountName: ksa
-      containers:
-      - name: lms
-        image: lms
-        imagePullPolicy: Always
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ./deployment.yaml
+configMapGenerator:
+- name: env-vars
+  envs:
+  - env.properties

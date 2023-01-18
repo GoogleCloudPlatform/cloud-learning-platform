@@ -29,3 +29,6 @@ requires:
 
 - path: ./microservices/lti
   configs: [lti]
+
+- path: ./microservices/pub_sub_to_bq
+  configs: [pub-sub-to-bq]

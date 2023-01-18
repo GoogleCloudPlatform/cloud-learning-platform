@@ -11,17 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+  Sample Service config file
+"""
+import os
 
-apiVersion: scripts/v1
-kind: Deployment
-metadata:
-  name: lms
-spec:
-  replicas: 3
-  template:
-    spec:
-      serviceAccountName: ksa
-      containers:
-      - name: lms
-        image: lms
-        imagePullPolicy: Always
+PROJECT_ID = os.environ.get("PROJECT_ID") or \
+    os.environ.get("GOOGLE_CLOUD_PROJECT")
+DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
+PUB_SUB_PROJECT_ID = os.getenv("PUB_SUB_PROJECT_ID") or \
+    PROJECT_ID
+
+

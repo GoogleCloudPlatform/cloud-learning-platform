@@ -12,16 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: scripts/v1
-kind: Deployment
-metadata:
-  name: lms
-spec:
-  replicas: 3
-  template:
-    spec:
-      serviceAccountName: ksa
-      containers:
-      - name: lms
-        image: lms
-        imagePullPolicy: Always
+pass

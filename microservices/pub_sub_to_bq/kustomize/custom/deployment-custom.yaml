@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: scripts/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lms
+  name: pub-sub-to-bq
 spec:
-  replicas: 3
   template:
     spec:
       serviceAccountName: ksa
       containers:
-      - name: lms
-        image: lms
+      - name: pub-sub-to-bq
+        image: pub-sub-to-bq
         imagePullPolicy: Always
