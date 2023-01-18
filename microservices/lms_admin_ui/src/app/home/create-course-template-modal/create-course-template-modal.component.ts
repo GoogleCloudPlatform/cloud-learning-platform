@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 import { FormControl, UntypedFormGroup, UntypedFormBuilder, Validators, Form } from '@angular/forms';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
@@ -16,15 +16,26 @@ export class CreateCourseTemplateModalComponent implements OnInit {
   courseTemplateForm: UntypedFormGroup
   showProgressSpinner: boolean = false
   constructor(public dialogRef: MatDialogRef<CreateCourseTemplateModalComponent>, private fb: UntypedFormBuilder,
-    private _snackBar: MatSnackBar, private _HomeService: HomeService) { }
+    private _snackBar: MatSnackBar, private _HomeService: HomeService, @Inject(MAT_DIALOG_DATA) public courseTemplateModalData: any) { }
 
   ngOnInit(): void {
-    this.courseTemplateForm = this.fb.group({
-      name: this.fb.control('', [Validators.required]),
-      description: this.fb.control('', [Validators.required]),
-      instructional_designer: this.fb.control('', [Validators.required]),
-      admin: this.fb.control('', [Validators.required]),
-    });
+    console.log("data ", this.courseTemplateModalData)
+    if (this.courseTemplateModalData.mode == 'Create') {
+      this.courseTemplateForm = this.fb.group({
+        name: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
+        description: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
+        instructional_designer: this.fb.control('', [Validators.required]),
+        admin: this.fb.control('', [Validators.required]),
+      });
+    }
+    else {
+      this.courseTemplateForm = this.fb.group({
+        name: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
+        description: this.fb.control({ value: this.courseTemplateModalData.init_data.description, disabled: false }, [Validators.required]),
+        instructional_designer: this.fb.control({ value: this.courseTemplateModalData.init_data.instructional_designer, disabled: true }, [Validators.required]),
+        admin: this.fb.control({ value: this.courseTemplateModalData.init_data.admin, disabled: true }, [Validators.required]),
+      });
+    }
 
   }
   openSuccessSnackBar(message: string, action: string) {
@@ -45,19 +56,40 @@ export class CreateCourseTemplateModalComponent implements OnInit {
 
   createCourseTemplate() {
     this.showProgressSpinner = true
-    this._HomeService.createCourseTemplate(this.courseTemplateForm.value).subscribe((res: any) => {
-      if (res.success == true) {
-        this.openSuccessSnackBar('Create course template', 'SUCCESS')
-        this.dialogRef.close({ data: 'success' });
-      }
-      else {
+
+
+    if (this.courseTemplateModalData.mode == 'Edit') {
+      this._HomeService.editCourseTemplate(this.courseTemplateForm.value, this.courseTemplateModalData.init_data.id).subscribe((res: any) => {
+        if (res.success == true) {
+          this.openSuccessSnackBar('Update course template', 'SUCCESS')
+          this.dialogRef.close({ data: 'success' });
+        }
+        else {
+          this.openFailureSnackBar('Update course template', 'FAILED')
+        }
+        this.showProgressSpinner = false
+      },
+        (error: any) => {
+          this.openFailureSnackBar('Update course template', 'FAILED')
+          this.showProgressSpinner = false
+        })
+    }
+    else {
+
+      this._HomeService.createCourseTemplate(this.courseTemplateForm.value).subscribe((res: any) => {
+        if (res.success == true) {
+          this.openSuccessSnackBar('Create course template', 'SUCCESS')
+          this.dialogRef.close({ data: 'success' });
+        }
+        else {
+          this.openFailureSnackBar('Create course template', 'FAILED')
+        }
+        this.showProgressSpinner = false
+      }, (error: any) => {
         this.openFailureSnackBar('Create course template', 'FAILED')
-      }
-      this.showProgressSpinner = false
-    }, (error: any) => {
-      this.openFailureSnackBar('Create course template', 'FAILED')
-      this.showProgressSpinner = false
-    })
+        this.showProgressSpinner = false
+      })
+    }
 
   }
 

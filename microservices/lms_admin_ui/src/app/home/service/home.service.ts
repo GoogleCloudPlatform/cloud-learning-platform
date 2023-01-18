@@ -16,6 +16,9 @@ export class HomeService {
     return this.http.get(`${environment.apiurl}course_templates`)
 
   }
+  editCourseTemplate(data: any, id: any) {
+    return this.http.patch(`${environment.apiurl}course_templates/${id}`, data)
+  }
   createCourseTemplate(data: any) {
     return this.http.post(`${environment.apiurl}course_templates`, data)
   }
@@ -25,6 +28,9 @@ export class HomeService {
   getCohort(data: any) {
     return this.http.get(`${environment.apiurl}cohorts/${data}`)
   }
+  editCohort(data: any, id: any) {
+    return this.http.patch(`${environment.apiurl}cohorts/${id}`, data)
+  }
   getCourseTemplate(data: any) {
     return this.http.get(`${environment.apiurl}course_templates/${data}`)
   }
@@ -33,5 +39,8 @@ export class HomeService {
   }
   createSection(data: any) {
     return this.http.post(`${environment.apiurl}sections`, data)
+  }
+  editSection(data: any) {
+    return this.http.patch(`${environment.apiurl}sections`, data)
   }
 }
