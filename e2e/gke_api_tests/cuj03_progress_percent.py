@@ -1,6 +1,6 @@
 import requests
 from testing_objects.test_config import API_URL
-from testing_objects.token_fixture import get_token
+from testing_objects.token_fixture import get_token,sign_up_user
 
 
 def test_get_progress_percentage(get_token):

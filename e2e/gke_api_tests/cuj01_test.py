@@ -5,7 +5,7 @@ from google.oauth2 import service_account
 import requests
 from common.utils.errors import ResourceNotFoundException
 from testing_objects.test_config import API_URL
-from testing_objects.token_fixture import get_token
+from testing_objects.token_fixture import get_token,sign_up_user
 # from microservices.lms.src import routes
 
 

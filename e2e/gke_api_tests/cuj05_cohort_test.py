@@ -8,7 +8,7 @@ from common.testing.example_objects import TEST_COHORT, TEST_SECTION2
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.cohort import COHORT_INPUT_DATA
 from testing_objects.test_config import API_URL
-from testing_objects.token_fixture import get_token
+from testing_objects.token_fixture import get_token,sign_up_user
 
 DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 
