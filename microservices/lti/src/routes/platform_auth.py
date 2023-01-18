@@ -187,7 +187,7 @@ def generate_token(
     required_scopes_str = " ".join(required_scopes)
     token_claims = {
         "iss": ISSUER,
-        "aud": claims.get("sub"),
+        "aud": claims.get("iss"),
         "iat": int(datetime.now().timestamp()),
         "exp": int(datetime.now().timestamp()) + TOKEN_TTL,
         "sub": claims.get("sub"),
