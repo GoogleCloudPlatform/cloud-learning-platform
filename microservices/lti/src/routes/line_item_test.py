@@ -47,8 +47,10 @@ test_keyset = {"public_keyset": "gGet21v2brb"}
 
 @mock.patch("services.validate_service.get_platform_public_keyset")
 @mock.patch("services.validate_service.decode_token")
-def test_post_and_get_line_item(mock_token_scopes, mock_keyset,
-                                clean_firestore):
+@mock.patch("services.validate_service.get_unverified_token_claims")
+def test_post_and_get_line_item(mock_unverified_token, mock_token_scopes,
+                                mock_keyset, clean_firestore):
+  mock_unverified_token.return_value = test_scope
   mock_token_scopes.return_value = test_scope
   mock_keyset.return_value = test_keyset
   input_line_item = copy.deepcopy(BASIC_LINE_ITEM_EXAMPLE)
@@ -72,8 +74,10 @@ def test_post_and_get_line_item(mock_token_scopes, mock_keyset,
 
 @mock.patch("services.validate_service.get_platform_public_keyset")
 @mock.patch("services.validate_service.decode_token")
-def test_negative_get_line_item(mock_token_scopes, mock_keyset,
-                                clean_firestore):
+@mock.patch("services.validate_service.get_unverified_token_claims")
+def test_negative_get_line_item(mock_unverified_token, mock_token_scopes,
+                                mock_keyset, clean_firestore):
+  mock_unverified_token.return_value = test_scope
   mock_token_scopes.return_value = test_scope
   mock_keyset.return_value = test_keyset
   # Hit GET endpoint with unknown id
@@ -85,7 +89,10 @@ def test_negative_get_line_item(mock_token_scopes, mock_keyset,
 
 @mock.patch("services.validate_service.get_platform_public_keyset")
 @mock.patch("services.validate_service.decode_token")
-def test_get_all_line_items(mock_token_scopes, mock_keyset, clean_firestore):
+@mock.patch("services.validate_service.get_unverified_token_claims")
+def test_get_all_line_items(mock_unverified_token, mock_token_scopes,
+                            mock_keyset, clean_firestore):
+  mock_unverified_token.return_value = test_scope
   mock_token_scopes.return_value = test_scope
   mock_keyset.return_value = test_keyset
 
@@ -105,7 +112,10 @@ def test_get_all_line_items(mock_token_scopes, mock_keyset, clean_firestore):
 
 @mock.patch("services.validate_service.get_platform_public_keyset")
 @mock.patch("services.validate_service.decode_token")
-def test_update_line_item(mock_token_scopes, mock_keyset, clean_firestore):
+@mock.patch("services.validate_service.get_unverified_token_claims")
+def test_update_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
+                          clean_firestore):
+  mock_unverified_token.return_value = test_scope
   mock_token_scopes.return_value = test_scope
   mock_keyset.return_value = test_keyset
 
@@ -141,7 +151,10 @@ def test_update_line_item(mock_token_scopes, mock_keyset, clean_firestore):
 
 @mock.patch("services.validate_service.get_platform_public_keyset")
 @mock.patch("services.validate_service.decode_token")
-def test_delete_line_item(mock_token_scopes, mock_keyset, clean_firestore):
+@mock.patch("services.validate_service.get_unverified_token_claims")
+def test_delete_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
+                          clean_firestore):
+  mock_unverified_token.return_value = test_scope
   mock_token_scopes.return_value = test_scope
   mock_keyset.return_value = test_keyset
 
