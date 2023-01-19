@@ -27,18 +27,6 @@ export class CreateSectionComponent implements OnInit {
     private _snackBar: MatSnackBar, private _HomeService: HomeService) { }
 
   ngOnInit(): void {
-<<<<<<< Updated upstream
-    console.log('required', this.requiredDetails)
-    this.addSectionForm = this.fb.group({
-      section_name: this.fb.control('', [Validators.required]),
-      section_description: this.fb.control('', [Validators.required]),
-      cohort: this.fb.control({ value: this.requiredDetails.cohort_name, disabled: true }, [Validators.required]),
-      course_template: this.fb.control({ value: this.requiredDetails.course_template_name, disabled: true }, [Validators.required]),
-      instructional_designer: this.fb.control({ value: this.requiredDetails.instructional_desiner, disabled: true }, [Validators.required]),
-      admin: this.fb.control({ value: this.requiredDetails.admin, disabled: true }, [Validators.required]),
-      teaching_staff: this.fb.control('')
-    });
-=======
     console.log('required det', this.requiredDetails)
     if (this.requiredDetails.mode == 'Create') {
       this.addSectionForm = this.fb.group({
@@ -63,7 +51,6 @@ export class CreateSectionComponent implements OnInit {
       });
       this.teachingStaff = this.requiredDetails.init_data.teachers
     }
->>>>>>> Stashed changes
   }
 
 
