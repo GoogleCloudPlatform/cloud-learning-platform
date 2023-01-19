@@ -22,4 +22,8 @@ DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PUB_SUB_PROJECT_ID = os.getenv("PUB_SUB_PROJECT_ID") or \
     PROJECT_ID
 
+BQ_DATASET = DATABASE_PREFIX + os.getenv("BQ_DATASET", "test")
+
+BQ_TABLE = os.getenv("BQ_TABLE", "pub_sub_test_table")
+
 
