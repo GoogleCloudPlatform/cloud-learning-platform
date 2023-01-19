@@ -35,7 +35,7 @@ export class CreateSectionComponent implements OnInit {
       course_template: this.fb.control({ value: this.requiredDetails.course_template_name, disabled: true }, [Validators.required]),
       instructional_designer: this.fb.control({ value: this.requiredDetails.instructional_desiner, disabled: true }, [Validators.required]),
       admin: this.fb.control({ value: this.requiredDetails.admin, disabled: true }, [Validators.required]),
-      teaching_staff: this.fb.control('')
+      teachers: this.fb.control('')
     });
   }
 
@@ -91,7 +91,7 @@ export class CreateSectionComponent implements OnInit {
     for (let x of this.teachingStaff) {
       tempTeacherList.push(x)
     }
-    sectionObj['teachers_list'] = tempTeacherList
+    sectionObj['teachers'] = tempTeacherList
 
     this._HomeService.createSection(sectionObj).subscribe((res: any) => {
       if (res.status == 'Success') {
