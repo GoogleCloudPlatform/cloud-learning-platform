@@ -30,5 +30,5 @@ requires:
 - path: ./microservices/lti
   configs: [lti]
 
-- path: ./microservices/pub_sub_to_bq
-  configs: [pub-sub-to-bq]
+- path: ./microservices/classroom_notification_service
+  configs: [classroom-notification-service]
