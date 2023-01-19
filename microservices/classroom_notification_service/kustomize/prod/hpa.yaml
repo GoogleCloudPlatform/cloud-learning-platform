@@ -15,7 +15,7 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: pub-sub-to-bq
+  name: classroom-notification-service
 spec:
   minReplicas: 1
   maxReplicas: 5
@@ -30,4 +30,4 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: pub-sub-to-bq
+    name: classroom-notification-service

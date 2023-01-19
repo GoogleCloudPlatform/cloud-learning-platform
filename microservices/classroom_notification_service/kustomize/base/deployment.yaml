@@ -15,20 +15,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pub-sub-to-bq
+  name: classroom-notification-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: pub-sub-to-bq
+      app: classroom-notification-service
   template:
     metadata:
       labels:
-        app: pub-sub-to-bq
+        app: classroom-notification-service
     spec:
       containers:
-      - name: pub-sub-to-bq
-        image: pub-sub-to-bq
+      - name: classroom-notification-service
+        image: classroom-notification-service
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:

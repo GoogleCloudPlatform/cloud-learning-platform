@@ -15,13 +15,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pub-sub-to-bq
+  name: classroom-notification-service
 spec:
   replicas: 1
   template:
     spec:
       serviceAccountName: ksa
       containers:
-      - name: pub-sub-to-bq
-        image: gcr.io/core-learning-services-dev/pub-sub-to-bq
+      - name: classroom-notification-service
+        image: gcr.io/core-learning-services-dev/classroom-notification-service
         imagePullPolicy: Always
