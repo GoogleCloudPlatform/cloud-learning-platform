@@ -15,4 +15,4 @@ google-auth==2.16.0
 google-api-python-client==2.73.0
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.8.0
-google-cloud-pubsub==2.13.11
+google-cloud-pubsub==2.14.0
