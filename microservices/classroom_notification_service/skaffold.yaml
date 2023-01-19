@@ -15,7 +15,7 @@
 apiVersion: skaffold/v2beta12
 kind: Config
 metadata:
-  name: pub-sub-to-bq
+  name: classroom-notification-service
 requires:
   - path: ../../common
     configs: [common]
@@ -25,7 +25,7 @@ build:
   local:
     concurrency: 0
   artifacts:
-  - image: pub-sub-to-bq
+  - image: classroom-notification-service
     requires:
       - image: common
         alias: BASE_IMG
@@ -42,7 +42,7 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: pub-sub-to-bq
+    - image: classroom-notification-service
       requires:
       - image: common
         alias: BASE_IMG
@@ -63,11 +63,11 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: pub-sub-to-bq
+    - image: classroom-notification-service
       docker:
         cacheFrom:
-          - pub-sub-to-bq
-          - pub-sub-to-bq:latest
+          - classroom-notification-service
+          - classroom-notification-service:latest
       requires:
       - image: common
         alias: BASE_IMG
@@ -77,11 +77,11 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: gcr.io/core-learning-services-dev/pub-sub-to-bq
+    - image: gcr.io/core-learning-services-dev/classroom-notification-service
       docker:
         cacheFrom:
-          - gcr.io/core-learning-services-dev/pub-sub-to-bq
-          - gcr.io/core-learning-services-dev/pub-sub-to-bq:latest
+          - gcr.io/core-learning-services-dev/classroom-notification-service
+          - gcr.io/core-learning-services-dev/classroom-notification-service:latest
       requires:
         - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG
