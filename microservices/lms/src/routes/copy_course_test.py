@@ -117,7 +117,11 @@ def test_create_section(client_with_emulator, create_fake_data):
             with mock.patch(
                 "routes.copy_course.classroom_crud.create_coursework"):
               with mock.patch("routes.copy_course.classroom_crud.add_teacher"):
-                resp = client_with_emulator.post(url, json=section_details)
+                with mock.patch(
+                    "routes.copy_course.classroom_crud.delete_teacher"):
+                  with mock.patch(
+                    "routes.copy_course.classroom_crud.enable_notifications"):
+                    resp = client_with_emulator.post(url, json=section_details)
   assert resp.status_code == 200
 
 
@@ -261,8 +265,10 @@ def test_update_section_course_id_not_found(client_with_emulator,
 def test_enroll_student(client_with_emulator, create_fake_data):
 
   url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
-  input_data = {"email": "student@gmail.com", "access_token":
-  CREDENTIAL_JSON["token"]}
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
   data = {
       "success": True,
       "message": "Successfully Added the Student with email student@gmail.com",
@@ -278,8 +284,10 @@ def test_enroll_student(client_with_emulator, create_fake_data):
 
 def test_enroll_student_negative(client_with_emulator):
   url = BASE_URL + "/sections/fake_id_section/students"
-  input_data = {"email": "student@gmail.com", "access_token":
-  CREDENTIAL_JSON["token"]}
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
   with mock.patch("routes.copy_course.classroom_crud.enroll_student"):
     with mock.patch("routes.copy_course.Logger"):
       resp = client_with_emulator.post(url, json=input_data)
@@ -295,3 +303,84 @@ def test_delete_section(client_with_emulator, create_fake_data):
                   return_value=[]):
     resp = client_with_emulator.delete(url)
   assert resp.status_code == 200
+
+
+def test_enable_notifications_using_course_id(client_with_emulator):
+
+  url = BASE_URL + "/sections/enable_notifications"
+  input_data = {"course_id": "57690009090", "feed_type": "COURSE_WORK_CHANGES"}
+  data = {
+      "success": True,
+      "message":
+      "Successfully enable the notifications of the course using " +
+      f"{input_data['course_id']} id",
+      "data": {
+          "registrationId": "2345667",
+          "feed": {
+              "feedType": "COURSE_ROSTER_CHANGES",
+              "courseRosterChangesInfo": {
+                  "courseId": input_data["course_id"]
+              }
+          },
+          "expiryTime": "20xx-0x-x0T1x:xx:0x.x1xZ"
+      }
+  }
+  with mock.patch("routes.copy_course.classroom_crud.enable_notifications",
+                  return_value=data["data"]):
+    with mock.patch("routes.copy_course.Logger"):
+      resp = client_with_emulator.post(url, json=input_data)
+  assert resp.status_code == 200, "Status 200"
+  assert resp.json() == data, "Data doesn't Match"
+
+
+def test_enable_notifications_using_section_id(client_with_emulator,
+                                               create_fake_data):
+
+  url = BASE_URL + "/sections/enable_notifications"
+  input_data = {"section_id": create_fake_data["section"], \
+    "feed_type": "COURSE_WORK_CHANGES"}
+  section=Section.find_by_id(create_fake_data["section"])
+  data = {
+      "success":
+      True,
+      "message":
+      "Successfully enable the notifications of the course using section " +
+      f"{section.id} id",
+      "data": {
+          "registrationId": "2345667",
+          "feed": {
+              "feedType": "COURSE_ROSTER_CHANGES",
+              "courseRosterChangesInfo": {
+                  "courseId": section.classroom_id
+              }
+          },
+          "expiryTime": "20xx-0x-x0T1x:xx:0x.x1xZ"
+      }
+  }
+  with mock.patch("routes.copy_course.classroom_crud.enable_notifications",
+                  return_value=data["data"]):
+    with mock.patch("routes.copy_course.Logger"):
+      resp = client_with_emulator.post(url, json=input_data)
+  assert resp.status_code == 200, "Status 200"
+  assert resp.json() == data, "Data doesn't Match"
+
+
+def test_enable_notifications_using_fake_section_id(client_with_emulator):
+
+  url = BASE_URL + "/sections/enable_notifications"
+  input_data = {"section_id": "fake_section_id", \
+    "feed_type": "COURSE_WORK_CHANGES"}
+  with mock.patch("routes.copy_course.classroom_crud.enable_notifications"):
+    with mock.patch("routes.copy_course.Logger"):
+      resp = client_with_emulator.post(url, json=input_data)
+  assert resp.status_code == 404, "Status 404"
+  assert resp.json()["success"] is False, "Data doesn't Match"
+
+def test_negative_enable_notifications(client_with_emulator):
+  url = BASE_URL + "/sections/enable_notifications"
+  input_data = {"section_id": "", "feed_type": "COURSE_WORK_CHANGES"}
+  with mock.patch("routes.copy_course.classroom_crud.enable_notifications"):
+    with mock.patch("routes.copy_course.Logger"):
+      resp = client_with_emulator.post(url, json=input_data)
+  assert resp.status_code==422,"Status 422"
+  assert resp.json()["success"] is False, "Data doesn't Match"
