@@ -31,3 +31,82 @@ Add an entry for front-end in addition to backend API
 - https://www.googleapis.com/auth/classroom.topics.readonly
 - https://www.googleapis.com/auth/drive
 - https://www.googleapis.com/auth/forms.body.readonly
+
+## Steps to add new user
+
+1. Hit POST method for users api in user-management microservice with new user's emain id in the api body
+
+API :
+
+``` POST https://<base url>/user-management/api/v1/user ```
+
+Authorization :
+
+``` Bearer Token = <id_token> ```
+
+Body :
+
+```
+{
+"first_name": "",
+"last_name": "",
+"email": "abc@def.com",  | Required
+"user_type": "other",    | Required  // should always be 'other'
+"user_type_ref": "",
+"user_groups": [],
+"status": "active",      | Required  // should always be true
+"is_registered": true,   | Required  // should always be true
+"failed_login_attempts_count": 0,
+"access_api_docs": false, | Required  // should always be false
+"gaia_id": ""
+}
+```
+
+Response samples:
+
+**200**
+```
+{
+"success": true,
+"message": "Successfully created the user",
+"data": {
+"user_id": "124hsgxR77QKS8uS7Zgm",
+"first_name": "",
+"last_name": "",
+"email": "steve.jobs@example.com",
+"user_type": "other",
+"user_type_ref": "",
+"user_groups": [],
+"status": "active",
+"is_registered": true,
+"failed_login_attempts_count": 0,
+"access_api_docs": false,
+"gaia_id": ""
+}
+}
+```
+**401**
+```
+{
+"success": false,
+"message": "Unauthorized",
+"data": { }
+}
+```
+**422**
+```
+{
+"success": false,
+"message": "Validation Failed",
+"data": [ ]
+}
+```
+
+**500**
+```
+{
+"success": false,
+"message": "Internal server error",
+"data": { }
+}
+```
