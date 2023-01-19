@@ -11,7 +11,7 @@ from common.utils.http_exceptions import (InternalServerError, ResourceNotFound,
 from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
                                       UpdateLineItemModel, DeleteLineItem,
                                       FullLineItemModel, BasicScoreModel,
-                                      ScoreResponseModel, ResultResponseModel)
+                                      ResultResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
 from typing import List, Optional
@@ -427,7 +427,7 @@ def create_score_for_line_item(context_id: str,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    LineItem.find_by_id(line_item_id)
+    LineItem.find_by_uuid(line_item_id)
     input_score_dict = {**input_score.dict()}
     input_score_dict["lineItemId"] = line_item_id
 
@@ -437,6 +437,7 @@ def create_score_for_line_item(context_id: str,
     new_score.uuid = new_score.id
     new_score.update()
 
+    # pylint: disable-next=line-too-long
     line_item_url = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
     result = Result.collection.filter("scoreOf", "==", line_item_id).get()
 
