@@ -1,7 +1,7 @@
 """Line item  Endpoints"""
 from fastapi import APIRouter, Request, Depends
 from fastapi.security import HTTPBearer
-from config import ERROR_RESPONSES
+from config import ERROR_RESPONSES, ISSUER
 from common.models import LineItem, Result, Score
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  InvalidTokenError)
@@ -16,7 +16,7 @@ from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
 from typing import List, Optional
 from services.validate_service import validate_access
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, use-maxsplit-arg
 
 auth_scheme = HTTPBearer(auto_error=False)
 
@@ -75,10 +75,10 @@ def get_all_line_items(request: Request,
     collection_manager = LineItem.collection
 
     if resource_id:
-      collection_manager = collection_manager.filter("resource_id", "==",
+      collection_manager = collection_manager.filter("resourceId", "==",
                                                      resource_id)
     if resource_link_id:
-      collection_manager = collection_manager.filter("resource_link_id", "==",
+      collection_manager = collection_manager.filter("resourceLinkId", "==",
                                                      resource_link_id)
     if tag:
       collection_manager = collection_manager.filter("tag", "==", tag)
@@ -89,7 +89,8 @@ def get_all_line_items(request: Request,
     line_items = [i.get_fields(reformat_datetime=True) for i in line_items]
 
     for each_line_item in line_items:
-      each_line_item["id"] = str(request.url) + "/" + each_line_item["uuid"]
+      each_line_item["id"] = str(
+          request.url).split("?")[0] + "/" + each_line_item["uuid"]
 
     return line_items
 
@@ -133,7 +134,7 @@ def get_line_item(request: Request,
     # TODO: Add API call to check if the context_id (course_id) exists
     line_item = LineItem.find_by_uuid(uuid)
     line_item_fields = line_item.get_fields(reformat_datetime=True)
-    line_item_fields["id"] = str(request.url)
+    line_item_fields["id"] = str(request.url).split("?")[0]
 
     return line_item_fields
   except InvalidTokenError as e:
@@ -176,7 +177,8 @@ def create_line_item(request: Request,
     input_line_item_dict = {**input_line_item.dict()}
     new_line_item = create_new_line_item(input_line_item_dict)
     line_item_fields = new_line_item.get_fields(reformat_datetime=True)
-    line_item_fields["id"] = str(request.url) + "/" + line_item_fields["uuid"]
+    line_item_fields["id"] = str(
+        request.url).split("?")[0] + "/" + line_item_fields["uuid"]
 
     return line_item_fields
   except InvalidTokenError as e:
@@ -227,7 +229,7 @@ def update_line_item(request: Request,
       setattr(existing_line_item, key, value)
     existing_line_item.update()
     line_item_fields = existing_line_item.get_fields(reformat_datetime=True)
-    line_item_fields["id"] = str(request.url)
+    line_item_fields["id"] = str(request.url).split("?")[0]
 
     return line_item_fields
 
@@ -283,7 +285,7 @@ def delete_line_item(context_id: str, uuid: str,
 @router.get(
     "/{context_id}/line_items/{line_item_id}/results",
     name="Get all the results of a specific line item",
-    response_model=ResultResponseModel,
+    response_model=List[ResultResponseModel],
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
@@ -318,6 +320,7 @@ def get_results_of_line_item(request: Request,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
+    result = []
     if user_id:
       result = [
           Result.collection.filter("lineItemId", "==",
@@ -327,11 +330,10 @@ def get_results_of_line_item(request: Request,
     else:
       result = Result.collection.filter("lineItemId", "==",
                                         line_item_id).offset(skip).fetch(limit)
-
     result_fields = [i.get_fields(reformat_datetime=True) for i in result]
-    for i in result_fields:
-      result_fields["id"] = str(request.url) + "/" + result_fields["uuid"]
-
+    for _ in result_fields:
+      result_fields["id"] = str(
+          request.url).split("?")[0] + "/" + result_fields["uuid"]
     return result_fields
 
   except InvalidTokenError as e:
@@ -382,7 +384,7 @@ def get_result(request: Request,
       raise ResourceNotFoundException(
           "Incorrect result id provided for the given line item")
     result_fields = result.get_fields(reformat_datetime=True)
-    result_fields["id"] = str(request.url)
+    result_fields["id"] = str(request.url).split("?")[0]
 
     return result_fields
 
@@ -400,7 +402,7 @@ def get_result(request: Request,
 @router.post(
     "/{context_id}/line_items/{line_item_id}/scores",
     name="Add a score for a Line item",
-    response_model=ScoreResponseModel,
+    response_model=ResultResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
@@ -421,7 +423,7 @@ def create_score_for_line_item(context_id: str,
   Exception:
     Internal Server Error. Raised if something went wrong
   ### Returns:
-  Score Data: `ScoreResponseModel`
+  Result Data: `ResultResponseModel`
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
@@ -434,9 +436,39 @@ def create_score_for_line_item(context_id: str,
     new_score.save()
     new_score.uuid = new_score.id
     new_score.update()
-    score_fields = new_score.get_fields(reformat_datetime=True)
 
-    return score_fields
+    line_item_url = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
+    result = Result.collection.filter("scoreOf", "==", line_item_id).get()
+
+    input_result_dict = {
+        "userId": input_score_dict["userId"],
+        "resultScore": input_score_dict["scoreGiven"],
+        "resultMaximum": input_score_dict["scoreMaximum"],
+        "comment": input_score_dict["comment"],
+        "scoreOf": line_item_id
+    }
+
+    if result:
+      result_fields = result.get_fields()
+
+      for key, value in input_result_dict.items():
+        result_fields[key] = value
+      for key, value in result_fields.items():
+        setattr(result, key, value)
+      result.update()
+      result_fields = result.get_fields(reformat_datetime=True)
+      result_fields["scoreOf"] = line_item_url
+
+    else:
+      new_result = Result()
+      new_result = new_result.from_dict(input_result_dict)
+      new_result.save()
+      new_result.uuid = new_result.id
+      new_result.update()
+      result_fields = new_result.get_fields(reformat_datetime=True)
+      result_fields["scoreOf"] = line_item_url
+
+    return result_fields
 
   except InvalidTokenError as e:
     Logger.error(e)
