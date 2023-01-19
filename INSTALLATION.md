@@ -1,13 +1,32 @@
 # Installation
 
-- Google workspace - allow all users
+## Google Classroom / Workspace Setup
+
+- Google workspace - allow all users to accomodate for other workspaces or Personal (gmail) accounts
   ![](docs/static/images/classroom_personal_accounts.png)
 
-## Enable Classroom API
+## Create an Account in Google Admin to be the designated Admin Account for CLP-LMS
 
-The Classroom API Needs to be enabled in the project where the backend Service Account lives
+- User Account with SuperAdmin Priveleges
+- Place this email in the `lms-service-user` secret in Google Secret Manager
 
-https://console.cloud.google.com/apis/api/classroom.googleapis.com
+## Domain Wide Delegation
+
+Get the unique id (numeric) for the gke-pod-sa Service Account in your project
+![](docs/static/images/sa_unique_value.png)
+
+Go to the Domain Wide Delegation page of Google Admin
+![](docs/static/images/domain_wide_delegation.png)
+
+Click __Add new__
+
+Add this numeric value, and the following scopes:
+https://www.googleapis.com/auth/classroom.announcements,https://www.googleapis.com/auth/classroom.announcements.readonly,https://www.googleapis.com/auth/classroom.courses,https://www.googleapis.com/auth/classroom.courses.readonly,https://www.googleapis.com/auth/classroom.coursework.me,https://www.googleapis.com/auth/classroom.student-submissions.me.readonly,https://www.googleapis.com/auth/classroom.coursework.students,https://www.googleapis.com/auth/classroom.student-submissions.students.readonly,https://www.googleapis.com/auth/classroom.courseworkmaterials,https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly,https://www.googleapis.com/auth/classroom.rosters,https://www.googleapis.com/auth/classroom.rosters.readonly,https://www.googleapis.com/auth/classroom.topics,https://www.googleapis.com/auth/classroom.topics.readonly,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/forms.body.readonly,https://www.googleapis.com/auth/classroom.push-notifications,https://www.googleapis.com/auth/pubsub,https://www.googleapis.com/auth/cloud-platform
+
+It should look like this when you're done:
+
+![](docs/static/images/client_id_access.png)
+
 
 ## DNS for Front-End
 
