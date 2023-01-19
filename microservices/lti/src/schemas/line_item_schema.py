@@ -23,7 +23,7 @@ class BasicScoreModel(BaseModel):
 
   class Config():
     orm_mode = True
-    schem_extra = {"example": BASIC_SCORE_EXAMPLE}
+    schema_extra = {"example": BASIC_SCORE_EXAMPLE}
 
 
 class ScoreResponseModel(BaseModel):
