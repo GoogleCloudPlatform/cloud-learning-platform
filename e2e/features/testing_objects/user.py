@@ -12,27 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version: 2
-updates:
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
+from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e
+
+email = get_user_email_and_password_for_e2e()["email"]
+user_name = email.split("@")[0]
+
+TEST_USER = {
+    "first_name": user_name,
+    "last_name": "last_name",
+    "email": email,
+    "status": "active",
+    "user_type": "other",
+    "user_type_ref": "",
+    "user_groups": [],
+    "is_registered": True,
+    "failed_login_attempts_count": 0
+}

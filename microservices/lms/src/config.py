@@ -19,6 +19,8 @@ import os
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
 PROJECT_ID = os.environ.get("PROJECT_ID") or \
     os.environ.get("GOOGLE_CLOUD_PROJECT")
+PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
+  PROJECT_ID
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
 SCOPES = [

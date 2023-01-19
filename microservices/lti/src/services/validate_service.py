@@ -2,9 +2,8 @@
 from functools import wraps
 from fastapi.security import HTTPBearer
 from common.utils.errors import InvalidTokenError
-from config import ISSUER
 from services.keys_manager import get_platform_public_keyset
-from services.lti_token import decode_token
+from services.lti_token import decode_token, get_unverified_token_claims
 
 auth_scheme = HTTPBearer(auto_error=False)
 
@@ -21,10 +20,13 @@ def validate_access(allowed_scopes):
         raise InvalidTokenError("Token is missing")
       token_dict = dict(token)
 
-      if token_dict["credentials"]:
+      access_token = token_dict.get("credentials")
+      if access_token:
+        unverified_claims = get_unverified_token_claims(token=access_token)
         decoded_token = decode_token(
-            token_dict["credentials"],
-            get_platform_public_keyset().get("public_keyset"), ISSUER)
+            access_token,
+            get_platform_public_keyset().get("public_keyset"),
+            unverified_claims.get("aud"))
 
         user_scopes = decoded_token["scope"].split(" ")
         for scope in allowed_scopes:
