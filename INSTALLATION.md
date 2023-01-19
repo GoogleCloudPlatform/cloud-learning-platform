@@ -20,7 +20,7 @@ Go to the Domain Wide Delegation page of Google Admin
 
 Click __Add new__
 
-Add this numerica value, and the following scopes:
+Add this numeric value, and the following scopes:
 https://www.googleapis.com/auth/classroom.announcements,https://www.googleapis.com/auth/classroom.announcements.readonly,https://www.googleapis.com/auth/classroom.courses,https://www.googleapis.com/auth/classroom.courses.readonly,https://www.googleapis.com/auth/classroom.coursework.me,https://www.googleapis.com/auth/classroom.student-submissions.me.readonly,https://www.googleapis.com/auth/classroom.coursework.students,https://www.googleapis.com/auth/classroom.student-submissions.students.readonly,https://www.googleapis.com/auth/classroom.courseworkmaterials,https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly,https://www.googleapis.com/auth/classroom.rosters,https://www.googleapis.com/auth/classroom.rosters.readonly,https://www.googleapis.com/auth/classroom.topics,https://www.googleapis.com/auth/classroom.topics.readonly,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/forms.body.readonly,https://www.googleapis.com/auth/classroom.push-notifications,https://www.googleapis.com/auth/pubsub,https://www.googleapis.com/auth/cloud-platform
 
 It should look like this when you're done:
