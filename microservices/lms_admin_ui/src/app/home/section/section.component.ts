@@ -42,7 +42,7 @@ export class SectionComponent implements OnInit {
     this.dataSource.sort = this.sort;
     let id
     console.log(this.router.url)
-    id = this.router.url.split('/')[3]
+    id = this.router.url.split('/')[2]
     this.getCohortDetails(id)
 
 
@@ -78,9 +78,13 @@ export class SectionComponent implements OnInit {
       console.log('section', this.sectionDetails)
     })
   }
+  openClassroom() {
+    window.open(this.selectedSection.classroom_url
+      , '_blank');
+  }
   createTableData() {
     this.tableData = []
-    for (let x of this.selectedSection.teachers_list) {
+    for (let x of this.selectedSection.teachers) {
       let staffObj: staff = { name: '', email: '', role: '' }
       staffObj.name = 'TBD'
       staffObj.email = x

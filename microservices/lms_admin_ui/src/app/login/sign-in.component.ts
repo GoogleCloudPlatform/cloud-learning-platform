@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../shared/service/auth.service';
 import { MatIconRegistry } from "@angular/material/icon";
 import { DomSanitizer } from "@angular/platform-browser";
-
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-sign-in',
@@ -12,6 +12,7 @@ import { DomSanitizer } from "@angular/platform-browser";
 export class SignInComponent implements OnInit {
 
   constructor(public authService: AuthService, private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
+    console.log('env var', environment.apiurl);
     this.matIconRegistry.addSvgIcon(
       'google-icon',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/img/Google.svg')
