@@ -16,7 +16,7 @@ from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
 from typing import List, Optional
 from services.validate_service import validate_access
-# pylint: disable=unused-argument, use-maxsplit-arg
+# pylint: disable=unused-argument, use-maxsplit-arg, line-too-long
 
 auth_scheme = HTTPBearer(auto_error=False)
 
@@ -31,20 +31,18 @@ router = APIRouter(tags=["Line item"], responses=ERROR_RESPONSES)
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-# @validate_access(allowed_scopes=[
-#     "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
-#     "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
-# ])
-def get_all_line_items(
-    request: Request,
-    context_id: str,
-    resource_id: str = None,
-    resource_link_id: str = None,
-    tag: str = None,
-    skip: int = 0,
-    limit: int = 10,
-    #  token: auth_scheme = Depends()
-):
+@validate_access(allowed_scopes=[
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
+])
+def get_all_line_items(request: Request,
+                       context_id: str,
+                       resource_id: str = None,
+                       resource_link_id: str = None,
+                       tag: str = None,
+                       skip: int = 0,
+                       limit: int = 10,
+                       token: auth_scheme = Depends()):
   """The get line items endpoint will return an array of line items
   from firestore
   ### Args:
@@ -291,18 +289,16 @@ def delete_line_item(context_id: str, uuid: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-# @validate_access(allowed_scopes=[
-#     "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
-# ])
-def get_results_of_line_item(
-    request: Request,
-    context_id: str,
-    line_item_id: str,
-    skip: int = 0,
-    limit: int = 10,
-    user_id: Optional[str] = None,
-    #  token: auth_scheme = Depends()
-):
+@validate_access(allowed_scopes=[
+    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
+])
+def get_results_of_line_item(request: Request,
+                             context_id: str,
+                             line_item_id: str,
+                             skip: int = 0,
+                             limit: int = 10,
+                             user_id: Optional[str] = None,
+                             token: auth_scheme = Depends()):
   """The get all results of a line item endpoint will return all the
   results of a line item from firestore
   ### Args:
@@ -360,16 +356,14 @@ def get_results_of_line_item(
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-# @validate_access(allowed_scopes=[
-#     "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
-# ])
-def get_result(
-    request: Request,
-    context_id: str,
-    line_item_id: str,
-    result_id: str,
-    #  token: auth_scheme = Depends()
-):
+@validate_access(allowed_scopes=[
+    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
+])
+def get_result(request: Request,
+               context_id: str,
+               line_item_id: str,
+               result_id: str,
+               token: auth_scheme = Depends()):
   """The get result of a line item endpoint will return the specific result
   of a line item from firestore
   ### Args:
@@ -414,8 +408,8 @@ def get_result(
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-# @validate_access(
-#     allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/score"])
+@validate_access(
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/score"])
 def create_score_for_line_item(context_id: str,
                                line_item_id: str,
                                input_score: BasicScoreModel,
@@ -445,7 +439,6 @@ def create_score_for_line_item(context_id: str,
     new_score.uuid = new_score.id
     new_score.update()
 
-    # pylint: disable-next=line-too-long
     line_item_url = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
     result = Result.collection.filter("scoreOf", "==", line_item_id).get()
 
@@ -454,7 +447,8 @@ def create_score_for_line_item(context_id: str,
         "resultScore": input_score_dict["scoreGiven"],
         "resultMaximum": input_score_dict["scoreMaximum"],
         "comment": input_score_dict["comment"],
-        "scoreOf": line_item_id
+        "scoreOf": line_item_id,
+        "lineItemId": line_item_id
     }
 
     if result:
