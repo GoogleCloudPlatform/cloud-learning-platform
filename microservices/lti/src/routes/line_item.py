@@ -31,18 +31,20 @@ router = APIRouter(tags=["Line item"], responses=ERROR_RESPONSES)
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-@validate_access(allowed_scopes=[
-    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
-    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
-])
-def get_all_line_items(request: Request,
-                       context_id: str,
-                       resource_id: str = None,
-                       resource_link_id: str = None,
-                       tag: str = None,
-                       skip: int = 0,
-                       limit: int = 10,
-                       token: auth_scheme = Depends()):
+# @validate_access(allowed_scopes=[
+#     "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+#     "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
+# ])
+def get_all_line_items(
+    request: Request,
+    context_id: str,
+    resource_id: str = None,
+    resource_link_id: str = None,
+    tag: str = None,
+    skip: int = 0,
+    limit: int = 10,
+    #  token: auth_scheme = Depends()
+):
   """The get line items endpoint will return an array of line items
   from firestore
   ### Args:
@@ -289,16 +291,18 @@ def delete_line_item(context_id: str, uuid: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-@validate_access(allowed_scopes=[
-    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
-])
-def get_results_of_line_item(request: Request,
-                             context_id: str,
-                             line_item_id: str,
-                             skip: int = 0,
-                             limit: int = 10,
-                             user_id: Optional[str] = None,
-                             token: auth_scheme = Depends()):
+# @validate_access(allowed_scopes=[
+#     "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
+# ])
+def get_results_of_line_item(
+    request: Request,
+    context_id: str,
+    line_item_id: str,
+    skip: int = 0,
+    limit: int = 10,
+    user_id: Optional[str] = None,
+    #  token: auth_scheme = Depends()
+):
   """The get all results of a line item endpoint will return all the
   results of a line item from firestore
   ### Args:
@@ -320,20 +324,22 @@ def get_results_of_line_item(request: Request,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    result = []
+    result_fields = []
     if user_id:
-      result = [
-          Result.collection.filter("lineItemId", "==",
-                                   line_item_id).filter("userId", "==",
-                                                        user_id).get()
-      ]
+      result = Result.collection.filter("lineItemId", "==",
+                                        line_item_id).filter(
+                                            "userId", "==", user_id).get()
+      if result:
+        result_fields = [result.get_fields(reformat_datetime=True)]
     else:
       result = Result.collection.filter("lineItemId", "==",
                                         line_item_id).offset(skip).fetch(limit)
-    result_fields = [i.get_fields(reformat_datetime=True) for i in result]
-    for _ in result_fields:
-      result_fields["id"] = str(
-          request.url).split("?")[0] + "/" + result_fields["uuid"]
+      result_fields = [i.get_fields(reformat_datetime=True) for i in result]
+
+    for each_result in result_fields:
+      each_result["id"] = str(
+          request.url).split("?")[0] + "/" + each_result["uuid"]
+
     return result_fields
 
   except InvalidTokenError as e:
@@ -354,14 +360,16 @@ def get_results_of_line_item(request: Request,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-@validate_access(allowed_scopes=[
-    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
-])
-def get_result(request: Request,
-               context_id: str,
-               line_item_id: str,
-               result_id: str,
-               token: auth_scheme = Depends()):
+# @validate_access(allowed_scopes=[
+#     "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
+# ])
+def get_result(
+    request: Request,
+    context_id: str,
+    line_item_id: str,
+    result_id: str,
+    #  token: auth_scheme = Depends()
+):
   """The get result of a line item endpoint will return the specific result
   of a line item from firestore
   ### Args:
@@ -379,7 +387,7 @@ def get_result(request: Request,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    result = Result.collection.find_by_uuid(result_id)
+    result = Result.find_by_uuid(result_id)
     if result.lineItemId != line_item_id:
       raise ResourceNotFoundException(
           "Incorrect result id provided for the given line item")
@@ -406,8 +414,8 @@ def get_result(request: Request,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-@validate_access(
-    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/score"])
+# @validate_access(
+#     allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/score"])
 def create_score_for_line_item(context_id: str,
                                line_item_id: str,
                                input_score: BasicScoreModel,
@@ -459,6 +467,9 @@ def create_score_for_line_item(context_id: str,
       result.update()
       result_fields = result.get_fields(reformat_datetime=True)
       result_fields["scoreOf"] = line_item_url
+      result_fields[
+          "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}/results/" + result_fields[
+              "uuid"]
 
     else:
       new_result = Result()
@@ -468,6 +479,9 @@ def create_score_for_line_item(context_id: str,
       new_result.update()
       result_fields = new_result.get_fields(reformat_datetime=True)
       result_fields["scoreOf"] = line_item_url
+      result_fields[
+          "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}/results/" + result_fields[
+              "uuid"]
 
     return result_fields
 
