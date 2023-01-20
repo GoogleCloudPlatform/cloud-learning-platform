@@ -17,21 +17,21 @@ class BasicScoreModel(BaseModel):
   activityProgress: str
   gradingProgress: str
   timestamp: str
-  scoreGiven: Optional[int]
-  scoreMaximum: Optional[int]
+  scoreGiven: Optional[float]
+  scoreMaximum: Optional[float]
   comment: Optional[str]
 
   class Config():
     orm_mode = True
-    schem_extra = {"example": BASIC_SCORE_EXAMPLE}
+    schema_extra = {"example": BASIC_SCORE_EXAMPLE}
 
 
 class ScoreResponseModel(BaseModel):
   """Score Response Model"""
   uuid: str
   userId: str
-  scoreGiven: int
-  scoreMaximum: int
+  scoreGiven: float
+  scoreMaximum: float
   comment: str
   timestamp: str
   activityProgress: str
@@ -45,8 +45,8 @@ class ScoreResponseModel(BaseModel):
 class BasicResultModel(BaseModel):
   """Basic Result Pydantic Model"""
   userId: str
-  resultScore: str
-  resultMaximum: str
+  resultScore: float
+  resultMaximum: float
   comment: str
   scoreOf: str
 
@@ -58,9 +58,10 @@ class BasicResultModel(BaseModel):
 class ResultResponseModel(BaseModel):
   """Result Response Model"""
   uuid: str
+  id: str
   userId: str
-  resultScore: str
-  resultMaximum: str
+  resultScore: float
+  resultMaximum: float
   comment: str
   scoreOf: str
 
@@ -71,7 +72,7 @@ class ResultResponseModel(BaseModel):
 
 class BasicLineItemModel(BaseModel):
   """Basic Line Item Pydantic Model"""
-  scoreMaximum: int
+  scoreMaximum: float
   label: str
   resourceId: Optional[str]
   tag: Optional[str]
@@ -100,7 +101,7 @@ class LineItemModel(BasicLineItemModel):
 
 class UpdateLineItemModel(BaseModel):
   """Update Line Item Pydantic Model"""
-  scoreMaximum: int
+  scoreMaximum: float
   label: str
   startDateTime: str
   endDateTime: str

@@ -103,7 +103,7 @@ export class CreateSectionComponent implements OnInit {
     for (let x of this.teachingStaff) {
       tempTeacherList.push(x)
     }
-    sectionObj['teachers_list'] = tempTeacherList
+    sectionObj['teachers'] = tempTeacherList
 
     if (this.requiredDetails.mode == 'Edit') {
       console.log('sec obj', sectionObj)

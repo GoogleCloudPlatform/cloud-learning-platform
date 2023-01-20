@@ -23,7 +23,6 @@ export class HomeComponent implements OnInit {
   searchCohortTerm: string
   searchCourseTemplate: string
   constructor(public dialog: MatDialog, public _HomeService: HomeService) {
-    // console.log('env var', environment.apiurl);
   }
 
   ngOnInit(): void {

@@ -10,7 +10,7 @@ import mock
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from testing.test_config import API_URL, DEL_KEYS
+from testing.test_config import API_URL
 from common.models import LineItem
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
@@ -20,7 +20,7 @@ with mock.patch(
     side_effect=mock.MagicMock()) as mok:
   from routes.line_item import router
   from schemas.schema_examples import (BASIC_LINE_ITEM_EXAMPLE,
-                                       BASIC_TOOL_EXAMPLE)
+                                       BASIC_SCORE_EXAMPLE)
 
 app = FastAPI()
 add_exception_handlers(app)
@@ -176,3 +176,27 @@ def test_delete_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
   print("delete_resp.text", delete_resp.text)
   assert delete_resp.status_code == 200, \
   "Status code not 200 for DELETE line_item"
+
+
+@mock.patch("services.validate_service.get_platform_public_keyset")
+@mock.patch("services.validate_service.decode_token")
+@mock.patch("services.validate_service.get_unverified_token_claims")
+@pytest.mark.parametrize(
+    "create_line_item", [BASIC_LINE_ITEM_EXAMPLE], indirect=True)
+def test_post_score(mock_unverified_token, mock_token_scopes, mock_keyset,
+                    clean_firestore, create_line_item):
+  mock_unverified_token.return_value = test_scope
+  mock_token_scopes.return_value = test_scope
+  mock_keyset.return_value = test_keyset
+
+  headers = {"Authorization": "Bearer test_token"}
+  line_item = create_line_item
+  line_item_id = line_item.uuid
+
+  input_score = copy.deepcopy(BASIC_SCORE_EXAMPLE)
+  url = f"{api_url}/{line_item_id}/scores"
+  post_resp = client_with_emulator.post(url, json=input_score, headers=headers)
+
+  assert post_resp.status_code == 200, "Status code not 200 for POST line_item"
+  json_resp = post_resp.json()
+  assert json_resp.get("userId") == input_score.get("userId")

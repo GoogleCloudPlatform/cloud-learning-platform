@@ -33,7 +33,7 @@ ERROR_RESPONSES = {
     }
 }
 
-TOKEN_TTL = 300
+TOKEN_TTL = 3600
 
 ISSUER = os.getenv("ISSUER", "http://localhost")
 
