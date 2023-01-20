@@ -27,16 +27,30 @@ export class CreateSectionComponent implements OnInit {
     private _snackBar: MatSnackBar, private _HomeService: HomeService) { }
 
   ngOnInit(): void {
-    console.log('required', this.requiredDetails)
-    this.addSectionForm = this.fb.group({
-      section_name: this.fb.control('', [Validators.required]),
-      section_description: this.fb.control('', [Validators.required]),
-      cohort: this.fb.control({ value: this.requiredDetails.cohort_name, disabled: true }, [Validators.required]),
-      course_template: this.fb.control({ value: this.requiredDetails.course_template_name, disabled: true }, [Validators.required]),
-      instructional_designer: this.fb.control({ value: this.requiredDetails.instructional_desiner, disabled: true }, [Validators.required]),
-      admin: this.fb.control({ value: this.requiredDetails.admin, disabled: true }, [Validators.required]),
-      teachers: this.fb.control('')
-    });
+    console.log('required det', this.requiredDetails)
+    if (this.requiredDetails.mode == 'Create') {
+      this.addSectionForm = this.fb.group({
+        section_name: this.fb.control('', [Validators.required]),
+        section_description: this.fb.control('', [Validators.required]),
+        cohort: this.fb.control({ value: this.requiredDetails.extra_data.cohort_name, disabled: true }, [Validators.required]),
+        course_template: this.fb.control({ value: this.requiredDetails.extra_data.course_template_name, disabled: true }, [Validators.required]),
+        instructional_designer: this.fb.control({ value: this.requiredDetails.extra_data.instructional_desiner, disabled: true }, [Validators.required]),
+        admin: this.fb.control({ value: this.requiredDetails.extra_data.admin, disabled: true }, [Validators.required]),
+        teachers: this.fb.control('')
+      });
+    }
+    else {
+      this.addSectionForm = this.fb.group({
+        section_name: this.fb.control({ value: this.requiredDetails.init_data.section, disabled: false }, [Validators.required]),
+        section_description: this.fb.control({ value: this.requiredDetails.init_data.description, disabled: false }, [Validators.required]),
+        cohort: this.fb.control({ value: this.requiredDetails.init_data.cohort_name, disabled: true }, [Validators.required]),
+        course_template: this.fb.control({ value: this.requiredDetails.init_data.course_template_name, disabled: true }, [Validators.required]),
+        instructional_designer: this.fb.control({ value: this.requiredDetails.init_data.instructional_desiner, disabled: true }, [Validators.required]),
+        admin: this.fb.control({ value: this.requiredDetails.init_data.admin, disabled: true }, [Validators.required]),
+        teachers: this.fb.control('')
+      });
+      this.teachingStaff = this.requiredDetails.init_data.teachers
+    }
   }
 
 
@@ -83,30 +97,51 @@ export class CreateSectionComponent implements OnInit {
     this.showProgressSpinner = true
     let tempTeacherList = []
     let sectionObj: LooseObject = {}
-    sectionObj['name'] = this.addSectionForm.value.section_name.trim()
     sectionObj['description'] = this.addSectionForm.value.section_description.trim()
-    sectionObj['course_template'] = this.requiredDetails.course_template_id
-    sectionObj['cohort'] = this.requiredDetails.cohort_id
-    tempTeacherList.push(this.requiredDetails.instructional_desiner)
+    sectionObj['cohort'] = this.requiredDetails.extra_data.cohort_id ? this.requiredDetails.extra_data.cohort_id : this.requiredDetails.init_data.cohort_id
+    this.requiredDetails.extra_data.instructional_desiner ? tempTeacherList.push(this.requiredDetails.extra_data.instructional_desiner) : tempTeacherList.push(this.requiredDetails.init_data.instructional_desiner)
     for (let x of this.teachingStaff) {
       tempTeacherList.push(x)
     }
     sectionObj['teachers'] = tempTeacherList
 
-    this._HomeService.createSection(sectionObj).subscribe((res: any) => {
-      if (res.status == 'Success') {
-        this.openSuccessSnackBar('Create section', 'SUCCESS')
-        this.dialogRef.close({ data: 'success' });
-      }
-      else {
+    if (this.requiredDetails.mode == 'Edit') {
+      console.log('sec obj', sectionObj)
+      sectionObj['section_name'] = this.addSectionForm.value.section_name.trim()
+      sectionObj['id'] = this.requiredDetails.init_data.section_id
+      sectionObj['course_id'] = this.requiredDetails.init_data.classroom_id
+      this._HomeService.editSection(sectionObj).subscribe((res: any) => {
+        if (res.success == true) {
+          this.openSuccessSnackBar('Update section', 'SUCCESS')
+          this.dialogRef.close({ data: 'success' });
+        }
+        else {
+          this.openFailureSnackBar('Update section', 'FAILED')
+        }
+        this.showProgressSpinner = false
+      }, (error: any) => {
+        this.openFailureSnackBar('Update section', 'FAILED')
+        this.showProgressSpinner = false
+      })
+    }
+    else {
+      sectionObj['name'] = this.addSectionForm.value.section_name.trim()
+      sectionObj['course_template'] = this.requiredDetails.extra_data.course_template_id
+      this._HomeService.createSection(sectionObj).subscribe((res: any) => {
+        if (res.success == true) {
+          this.openSuccessSnackBar('Create section', 'SUCCESS')
+          this.dialogRef.close({ data: 'success' });
+        }
+        else {
+          this.openFailureSnackBar('Create section', 'FAILED')
+        }
+        this.showProgressSpinner = false
+      }, (error: any) => {
         this.openFailureSnackBar('Create section', 'FAILED')
-      }
-      this.showProgressSpinner = false
-    }, (error: any) => {
-      this.openFailureSnackBar('Create section', 'FAILED')
-      this.showProgressSpinner = false
-    })
-    console.log('final obj', sectionObj)
+        this.showProgressSpinner = false
+      })
+      console.log('final obj', sectionObj)
+    }
   }
 
 

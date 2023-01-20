@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Create Cohort</h1>
+<h1 mat-dialog-title>{{cohortModalData.mode}} Cohort</h1>
 <div mat-dialog-content>
     <form [formGroup]="createCohortForm" class="create-cohort-form">
         <mat-form-field appearance="fill" style="width: 100%;">
@@ -16,13 +16,24 @@
             <input matInput formControlName="max_students" type="number">
         </mat-form-field>
 
-        <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-form-field appearance="fill" style="width: 100%;"
+            *ngIf="cohortModalData.mode == 'Create'; else elseTemplate">
             <mat-label>Select Course Template</mat-label>
             <mat-select formControlName="course_template_id">
-                <mat-option *ngFor="let courseTemplate of courseTemplateData" [value]="courseTemplate.id">
+                <mat-option *ngFor="let courseTemplate of cohortModalData.extra_data" [value]="courseTemplate.id">
                     {{courseTemplate.name}}</mat-option>
             </mat-select>
         </mat-form-field>
+
+        <ng-template #elseTemplate>
+            <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Select Course Template</mat-label>
+                <input matInput formControlName="course_template_id">
+            </mat-form-field>
+        </ng-template>
+
+
+
 
         <mat-form-field appearance="fill" style="width: 100%;">
             <mat-label>Start Date</mat-label>
@@ -60,6 +71,6 @@
     <button mat-flat-button color="primary" (click)="createCohort()" [disabled]="!createCohortForm.valid">
         <mat-icon *ngIf="showProgressSpinner" style="margin-right:5px;">
             <mat-spinner diameter="20"></mat-spinner>
-        </mat-icon>Create
+        </mat-icon>{{ (cohortModalData.mode == 'Create') ? 'Create' : 'Save' }}
     </button>
 </div>

@@ -75,7 +75,7 @@ export class SectionComponent implements OnInit {
         this.createTableData()
       }
       this.loadSection = false
-      console.log('section', this.sectionDetails)
+      // console.log('section', this.sectionDetails)
     })
   }
   openClassroom() {
@@ -83,6 +83,7 @@ export class SectionComponent implements OnInit {
       , '_blank');
   }
   createTableData() {
+    console.log('selected sec', this.selectedSection)
     this.tableData = []
     for (let x of this.selectedSection.teachers) {
       let staffObj: staff = { name: '', email: '', role: '' }
@@ -120,9 +121,15 @@ export class SectionComponent implements OnInit {
     tempObj['instructional_desiner'] = this.courseTemplateDetails.instructional_designer
     tempObj['admin'] = this.courseTemplateDetails.admin
 
+
+    let sectionModalData: LooseObject = {}
+    sectionModalData['mode'] = 'Create'
+    sectionModalData['init_data'] = ''
+    sectionModalData['extra_data'] = tempObj
+
     const dialogRef = this.dialog.open(CreateSectionComponent, {
       width: '500px',
-      data: tempObj
+      data: sectionModalData
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -141,10 +148,24 @@ export class SectionComponent implements OnInit {
     tempObj['instructional_desiner'] = this.courseTemplateDetails.instructional_designer
     tempObj['admin'] = this.courseTemplateDetails.admin
     tempObj['section_id'] = this.selectedSection.id
-    tempObj['course_state'] = 'ACTIVE'
+    tempObj['section'] = this.selectedSection.section
+    tempObj['description'] = this.selectedSection.description
+    tempObj['classroom_id'] = this.selectedSection.classroom_id
+    tempObj['teachers'] = []
+    for (let x of this.selectedSection.teachers) {
+      if (x != this.courseTemplateDetails.admin && x != this.courseTemplateDetails.instructional_designer) {
+        tempObj['teachers'].push(x)
+      }
+    }
+
+    let sectionModalData: LooseObject = {}
+    sectionModalData['mode'] = 'Edit'
+    sectionModalData['init_data'] = tempObj
+    sectionModalData['extra_data'] = ''
+
     const dialogRef = this.dialog.open(CreateSectionComponent, {
       width: '500px',
-      data: tempObj
+      data: sectionModalData
     });
 
     dialogRef.afterClosed().subscribe(result => {

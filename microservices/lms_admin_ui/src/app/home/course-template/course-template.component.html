@@ -5,7 +5,8 @@
                 <a class="text" color="primary">{{courseTemplate.name}}</a>
             </div>
             <div class="more-options" pTooltip="more options" tooltipPosition="top">
-                <span class="material-symbols-rounded" style="cursor:pointer;" [matMenuTriggerFor]="subMenu">
+                <span class="material-symbols-rounded" style="cursor:pointer;" [matMenuTriggerFor]="subMenu"
+                    (click)="setSelected(courseTemplate)">
                     more_vert
                 </span>
             </div>
@@ -53,7 +54,8 @@
 
 <mat-menu #subMenu="matMenu" yPosition="below">
     <div class="edit-menu">
-        <button mat-menu-item class="button"><span class="material-symbols-rounded" style="padding-right: 10px;">
+        <button mat-menu-item class="button" (click)="openEditCourseTemplate()"><span class="material-symbols-rounded"
+                style="padding-right: 10px;">
                 edit
             </span>Edit course template details</button>
     </div>

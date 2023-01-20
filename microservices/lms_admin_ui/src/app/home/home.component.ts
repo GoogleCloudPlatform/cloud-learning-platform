@@ -5,6 +5,9 @@ import { CreateCohortModalComponent } from './create-cohort-modal/create-cohort-
 import { HomeService } from './service/home.service';
 import { environment } from 'src/environments/environment';
 
+interface LooseObject {
+  [key: string]: any
+}
 
 @Component({
   selector: 'app-home',
@@ -49,9 +52,13 @@ export class HomeComponent implements OnInit {
 
 
   openDialog(): void {
+    let cohortModalData: LooseObject = {}
+    cohortModalData['mode'] = 'Create'
+    cohortModalData['init_data'] = ''
+    cohortModalData['extra_data'] = this.courseTemplateList
     const dialogRef = this.dialog.open(CreateCohortModalComponent, {
       width: '500px',
-      data: this.courseTemplateList
+      data: cohortModalData
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -62,8 +69,13 @@ export class HomeComponent implements OnInit {
   }
 
   openCourseTemplateDialog(): void {
+    let courseTemplateModalData: LooseObject = {}
+    courseTemplateModalData['mode'] = 'Create'
+    courseTemplateModalData['init_data'] = ''
+    courseTemplateModalData['extra_data'] = ''
     const dialogRef = this.dialog.open(CreateCourseTemplateModalComponent, {
-      width: '500px'
+      width: '500px',
+      data: courseTemplateModalData
     });
 
     dialogRef.afterClosed().subscribe(result => {

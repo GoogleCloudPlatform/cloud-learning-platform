@@ -66,7 +66,7 @@
                             insights
                         </span> View Reports</button>
 
-                    <button mat-button><span class="material-symbols-rounded">
+                    <button mat-button (click)="openEditSelectionDialog()"><span class="material-symbols-rounded">
                             edit
                         </span> View / Edit info</button>
                 </div>
@@ -77,7 +77,8 @@
             <div class="section-management">
                 <span class="heading">{{selectedSection.section}} management</span>
 
-                <button mat-flat-button color="primary"><span class="material-symbols-rounded">
+                <button mat-flat-button color="primary" (click)="openEditSelectionDialog()"><span
+                        class="material-symbols-rounded">
                         add
                     </span> Add Staff</button>
             </div>
