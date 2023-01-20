@@ -39,9 +39,9 @@ Add an entry for front-end in addition to backend API
 - https://www.googleapis.com/auth/classroom.courses
 - https://www.googleapis.com/auth/classroom.courses.readonly
 - https://www.googleapis.com/auth/classroom.coursework.me
-- https://www.googleapis.com/auth/classroom.coursework.me.readonly
+- https://www.googleapis.com/auth/classroom.student-submissions.me.readonly
 - https://www.googleapis.com/auth/classroom.coursework.students
-- https://www.googleapis.com/auth/classroom.coursework.students.readonly
+- https://www.googleapis.com/auth/classroom.student-submissions.students.readonly
 - https://www.googleapis.com/auth/classroom.courseworkmaterials
 - https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly
 - https://www.googleapis.com/auth/classroom.rosters
@@ -50,6 +50,9 @@ Add an entry for front-end in addition to backend API
 - https://www.googleapis.com/auth/classroom.topics.readonly
 - https://www.googleapis.com/auth/drive
 - https://www.googleapis.com/auth/forms.body.readonly
+- https://www.googleapis.com/auth/classroom.push-notifications
+- https://www.googleapis.com/auth/pubsub
+- https://www.googleapis.com/auth/cloud-platform
 
 
 ## LTI keys setup
