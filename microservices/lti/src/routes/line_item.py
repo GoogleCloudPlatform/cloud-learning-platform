@@ -16,7 +16,7 @@ from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
 from typing import List, Optional
 from services.validate_service import validate_access
-# pylint: disable=unused-argument, use-maxsplit-arg
+# pylint: disable=unused-argument, use-maxsplit-arg, line-too-long
 
 auth_scheme = HTTPBearer(auto_error=False)
 
@@ -320,20 +320,22 @@ def get_results_of_line_item(request: Request,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    result = []
+    result_fields = []
     if user_id:
-      result = [
-          Result.collection.filter("lineItemId", "==",
-                                   line_item_id).filter("userId", "==",
-                                                        user_id).get()
-      ]
+      result = Result.collection.filter("lineItemId", "==",
+                                        line_item_id).filter(
+                                            "userId", "==", user_id).get()
+      if result:
+        result_fields = [result.get_fields(reformat_datetime=True)]
     else:
       result = Result.collection.filter("lineItemId", "==",
                                         line_item_id).offset(skip).fetch(limit)
-    result_fields = [i.get_fields(reformat_datetime=True) for i in result]
-    for _ in result_fields:
-      result_fields["id"] = str(
-          request.url).split("?")[0] + "/" + result_fields["uuid"]
+      result_fields = [i.get_fields(reformat_datetime=True) for i in result]
+
+    for each_result in result_fields:
+      each_result["id"] = str(
+          request.url).split("?")[0] + "/" + each_result["uuid"]
+
     return result_fields
 
   except InvalidTokenError as e:
@@ -379,7 +381,7 @@ def get_result(request: Request,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    result = Result.collection.find_by_uuid(result_id)
+    result = Result.find_by_uuid(result_id)
     if result.lineItemId != line_item_id:
       raise ResourceNotFoundException(
           "Incorrect result id provided for the given line item")
@@ -437,7 +439,6 @@ def create_score_for_line_item(context_id: str,
     new_score.uuid = new_score.id
     new_score.update()
 
-    # pylint: disable-next=line-too-long
     line_item_url = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
     result = Result.collection.filter("scoreOf", "==", line_item_id).get()
 
@@ -446,7 +447,8 @@ def create_score_for_line_item(context_id: str,
         "resultScore": input_score_dict["scoreGiven"],
         "resultMaximum": input_score_dict["scoreMaximum"],
         "comment": input_score_dict["comment"],
-        "scoreOf": line_item_id
+        "scoreOf": line_item_id,
+        "lineItemId": line_item_id
     }
 
     if result:
@@ -459,6 +461,9 @@ def create_score_for_line_item(context_id: str,
       result.update()
       result_fields = result.get_fields(reformat_datetime=True)
       result_fields["scoreOf"] = line_item_url
+      result_fields[
+          "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}/results/" + result_fields[
+              "uuid"]
 
     else:
       new_result = Result()
@@ -468,6 +473,9 @@ def create_score_for_line_item(context_id: str,
       new_result.update()
       result_fields = new_result.get_fields(reformat_datetime=True)
       result_fields["scoreOf"] = line_item_url
+      result_fields[
+          "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}/results/" + result_fields[
+              "uuid"]
 
     return result_fields
 
