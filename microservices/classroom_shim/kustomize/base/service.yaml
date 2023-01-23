@@ -12,23 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Master Skaffold
-apiVersion: skaffold/v2beta12
-kind: Config
+apiVersion: v1
+kind: Service
 metadata:
-  name: backends
-requires:
-- path: ./common
-  configs: [common]
-
-- path: ./microservices/lms
-  configs: [lms]
-
-- path: ./microservices/lms_admin_ui
-  configs: [lms-admin-ui]
-
-- path: ./microservices/lti
-  configs: [lti]
-
-- path: ./microservices/classroom_shim
-  configs: [classroom-shim]
+  name: classroom-shim
+  labels:
+    app: classroom-shim
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}' # Creates a NEG after an Ingress is created
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: classroom-shim
