@@ -335,6 +335,8 @@ def get_results_of_line_item(request: Request,
     for each_result in result_fields:
       each_result["id"] = str(
           request.url).split("?")[0] + "/" + each_result["uuid"]
+      each_result[
+          "scoreOf"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
 
     return result_fields
 
@@ -387,6 +389,8 @@ def get_result(request: Request,
           "Incorrect result id provided for the given line item")
     result_fields = result.get_fields(reformat_datetime=True)
     result_fields["id"] = str(request.url).split("?")[0]
+    result_fields[
+        "scoreOf"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
 
     return result_fields
 
