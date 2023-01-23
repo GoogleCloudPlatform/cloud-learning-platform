@@ -75,10 +75,11 @@ def get_all_tools(skip: int = 0,
     if limit < 1:
       raise ValidationError("Invalid value passed to \"limit\" query parameter")
 
-    collection_manager = Tool.collection.filter("is_deleted", "==", False)
-    if fetch_archive is not None:
-      collection_manager = collection_manager\
-                            .filter("is_archived", "==", fetch_archive)
+    collection_manager = Tool.collection.filter("deleted_at_timestamp", "==",
+                                                None)
+    # if fetch_archive is not None:
+    #   collection_manager = collection_manager\
+    #                         .filter("is_archived", "==", fetch_archive)
 
     tools = collection_manager.order("-created_time").offset(skip).fetch(limit)
     tools = [i.get_fields(reformat_datetime=True) for i in tools]
@@ -97,32 +98,32 @@ def get_all_tools(skip: int = 0,
 
 
 @router.get(
-    "/tool/{uuid}",
+    "/tool/{tool_id}",
     name="Get a specific tool",
     response_model=ToolResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_tool(uuid: str):
+def get_tool(tool_id: str):
   """The get tool endpoint will return the tool
-  from firestore of which uuid is provided
+  from firestore of which tool_id is provided
   ### Args:
-  uuid: `str`
+  tool_id: `str`
     Unique identifier for tool
   ### Raises:
   ResourceNotFoundException:
-    If the tool with given uuid does not exist. <br/>
+    If the tool with given tool_id does not exist. <br/>
   Internal Server Error:
     Raised if something went wrong.
   ### Returns:
   Tool: `ToolResponseModel`
   """
   try:
-    tool = Tool.find_by_uuid(uuid)
+    tool = Tool.find_by_id(tool_id)
     tool_fields = tool.get_fields(reformat_datetime=True)
     return {
         "success": True,
-        "message": f"Tool with '{uuid}' has been fetched successfully",
+        "message": f"Tool with '{tool_id}' has been fetched successfully",
         "data": tool_fields
     }
   except ResourceNotFoundException as e:
@@ -172,12 +173,9 @@ def create_tool(input_tool: ToolModel):
     input_tool_dict["deployment_id"] = deployment_id
     new_tool = Tool()
     new_tool = new_tool.from_dict(input_tool_dict)
-    new_tool.uuid = ""
     new_tool.save()
-    new_tool.uuid = new_tool.id
-    new_tool.update()
     tool_fields = new_tool.get_fields(reformat_datetime=True)
-
+    print(tool_fields)
     return {
         "success": True,
         "message": "Tool has been created successfully",
@@ -194,28 +192,28 @@ def create_tool(input_tool: ToolModel):
 
 
 @router.put(
-    "/tool/{uuid}",
+    "/tool/{tool_id}",
     response_model=ToolResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def update_tool(uuid: str, input_tool: UpdateToolModel):
+def update_tool(tool_id: str, input_tool: UpdateToolModel):
   """Update a tool
   ### Args:
-  uuid: `str`
+  tool_id: `str`
     Unique identifier for tool
   input_tool: `UpdateToolModel`
     Required body of the tool
   ### Raises:
   ResourceNotFoundException:
-    If the tool with given uuid does not exist <br/>
+    If the tool with given tool_id does not exist <br/>
   Internal Server Error:
     Raised if something went wrong.
   ### Returns:
   Updated Tool: `ToolResponseModel`
   """
   try:
-    existing_tool = Tool.find_by_uuid(uuid)
+    existing_tool = Tool.find_by_id(tool_id)
     tool_fields = existing_tool.get_fields()
 
     input_tool_dict = {**input_tool.dict()}
@@ -242,26 +240,26 @@ def update_tool(uuid: str, input_tool: UpdateToolModel):
 
 
 @router.delete(
-    "/tool/{uuid}",
+    "/tool/{tool_id}",
     response_model=DeleteTool,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def delete_tool(uuid: str):
-  """Delete a tool with given uuid from firestore
+def delete_tool(tool_id: str):
+  """Delete a tool with given tool_id from firestore
   ### Args:
-  uuid: `str`
+  tool_id: `str`
     Unique ID of the tool
   ### Raises:
   ResourceNotFoundException:
-    If the tool with given uuid does not exist. <br/>
+    If the tool with given tool_id does not exist. <br/>
   Internal Server Error:
     Raised if something went wrong.
   ### Returns:
   Success/Fail Message: `JSON`
   """
   try:
-    Tool.delete_by_uuid(uuid)
+    Tool.delete_by_id(tool_id)
     return {}
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e

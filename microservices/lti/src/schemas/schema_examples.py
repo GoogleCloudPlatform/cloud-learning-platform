@@ -23,14 +23,13 @@ BASIC_TOOL_EXAMPLE = {
 }
 
 FULL_TOOL_EXAMPLE = {
-    "uuid": "asd98798as7dhjgkjsdfh",
+    "id": "asd98798as7dhjgkjsdfh",
     **BASIC_TOOL_EXAMPLE, "client_id": "174875a8-9c35-4963-89f7-cae31be3d78e",
     "deployment_id": "8434c79b-ba17-443d-a561-2e3ce7d7c804",
     "issuer": ISSUER,
     "platform_auth_url": f"{ISSUER}/lti/api/v1/authorize",
     "platform_token_url": f"{ISSUER}/lti/api/v1/token",
     "platform_keyset_url": f"{ISSUER}/lti/api/v1/jwks",
-    "is_archived": False,
     "created_time": "2022-03-03 09:22:49.843674+00:00",
     "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
 }

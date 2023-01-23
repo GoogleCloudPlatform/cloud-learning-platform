@@ -16,8 +16,9 @@ import os
 from datetime import datetime
 import fireo
 from fireo.models import Model
-from fireo.fields import DateTime, TextField, ListField, BooleanField, MapField, NumberField
+from fireo.fields import DateTime, TextField, ListField, BooleanField, MapField, NumberField, IDField
 from common.utils.errors import ResourceNotFoundException
+from common.models import BaseModel
 
 
 # pylint: disable = too-few-public-methods,pointless-string-statement,arguments-renamed,invalid-name
@@ -149,9 +150,9 @@ class TempBaseModel(Model):
 """
 
 
-class Tool(TempBaseModel):
+class Tool(BaseModel):
   """LTI Tool Data Model"""
-  uuid = TextField(required=True)
+  id = IDField()
   name = TextField(required=True)
   description = TextField()
   tool_url = TextField(required=True)
@@ -163,11 +164,9 @@ class Tool(TempBaseModel):
   content_selection_url = TextField()
   redirect_uris = ListField(required=True)
   deployment_id = TextField(required=True)
-  is_archived = BooleanField(default=False)
-  is_deleted = BooleanField(default=False)
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "tools"
+    collection_name = BaseModel.DATABASE_PREFIX + "tools"
     ignore_none_field = False
 
   @classmethod
@@ -183,8 +182,8 @@ class Tool(TempBaseModel):
   @classmethod
   def find_by_client_id(cls, client_id, is_deleted=False):
     tool = cls.collection.filter("client_id", "==",
-                                 client_id).filter("is_deleted", "==",
-                                                   is_deleted).get()
+                                 client_id).filter("deleted_at_timestamp", "==",
+                                                   None).get()
     if tool is None:
       raise ResourceNotFoundException(
           f"{cls.__name__} with client_id {client_id} not found")
@@ -193,20 +192,9 @@ class Tool(TempBaseModel):
   @classmethod
   def find_by_tool_url(cls, tool_url, is_deleted=False):
     tool = cls.collection.filter("tool_url", "==",
-                                 tool_url).filter("is_deleted", "==",
-                                                  is_deleted).get()
+                                 tool_url).filter("deleted_at_timestamp", "==",
+                                                  None).get()
     return tool
-
-  @classmethod
-  def delete_by_uuid(cls, uuid):
-    doc = cls.collection.filter("uuid", "==",
-                                uuid).filter("is_deleted", "==", False).get()
-    if doc is not None:
-      doc.is_deleted = True
-      doc.update()
-    else:
-      raise ResourceNotFoundException(
-          f"{cls.__name__} with uuid {uuid} not found")
 
 
 class Platform(TempBaseModel):
