@@ -30,8 +30,8 @@ class ScoreResponseModel(BaseModel):
   """Score Response Model"""
   uuid: str
   userId: str
-  scoreGiven: float
-  scoreMaximum: float
+  scoreGiven: Optional[float]
+  scoreMaximum: Optional[float]
   comment: str
   timestamp: str
   activityProgress: str
@@ -45,8 +45,8 @@ class ScoreResponseModel(BaseModel):
 class BasicResultModel(BaseModel):
   """Basic Result Pydantic Model"""
   userId: str
-  resultScore: float
-  resultMaximum: float
+  resultScore: Optional[float]
+  resultMaximum: Optional[float]
   comment: str
   scoreOf: str
 
@@ -60,8 +60,8 @@ class ResultResponseModel(BaseModel):
   uuid: str
   id: str
   userId: str
-  resultScore: float
-  resultMaximum: float
+  resultScore: Optional[float]
+  resultMaximum: Optional[float]
   comment: str
   scoreOf: str
 
@@ -101,7 +101,7 @@ class LineItemModel(BasicLineItemModel):
 
 class UpdateLineItemModel(BaseModel):
   """Update Line Item Pydantic Model"""
-  scoreMaximum: float
+  scoreMaximum: Optional[float]
   label: str
   startDateTime: str
   endDateTime: str
