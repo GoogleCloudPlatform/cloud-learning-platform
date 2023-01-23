@@ -29,3 +29,6 @@ requires:
 
 - path: ./microservices/lti
   configs: [lti]
+
+- path: ./microservices/classroom_shim
+  configs: [classroom-shim]
