@@ -27,13 +27,12 @@ def validate_access(allowed_scopes):
             access_token,
             get_platform_public_keyset().get("public_keyset"),
             unverified_claims.get("aud"))
-        client_id = unverified_claims.get("sub")
 
         user_scopes = decoded_token["scope"].split(" ")
         for scope in allowed_scopes:
           if scope in user_scopes:
 
-            return func(*args, **{**kwargs, "client_id": client_id})
+            return func(*args, **kwargs)
 
       raise InvalidTokenError("Unauthorized due to invalid scope")
 
