@@ -9,9 +9,10 @@ from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound,
                                           Unauthenticated)
 from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
-                                      UpdateLineItemModel, DeleteLineItem,
-                                      FullLineItemModel, BasicScoreModel,
-                                      ResultResponseModel)
+                                      UpdateLineItemModel,
+                                      UpdateLineItemUsingIdModel,
+                                      DeleteLineItem, FullLineItemModel,
+                                      BasicScoreModel, ResultResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
 from typing import List, Optional
@@ -222,6 +223,62 @@ def update_line_item(request: Request,
     line_item_fields = existing_line_item.get_fields()
 
     input_line_item_dict = {**input_line_item.dict()}
+
+    for key, value in input_line_item_dict.items():
+      line_item_fields[key] = value
+    for key, value in line_item_fields.items():
+      setattr(existing_line_item, key, value)
+    existing_line_item.update()
+    line_item_fields = existing_line_item.get_fields(reformat_datetime=True)
+    line_item_fields["id"] = str(request.url).split("?")[0]
+
+    return line_item_fields
+
+  except InvalidTokenError as e:
+    Logger.error(e)
+    raise Unauthenticated(str(e)) from e
+  except ResourceNotFoundException as e:
+    Logger.error(e)
+    raise ResourceNotFound(str(e)) from e
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.put(
+    "/{context_id}/line_items",
+    response_model=LineItemResponseModel,
+    responses={404: {
+        "model": NotFoundErrorResponseModel
+    }})
+@validate_access(
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+def update_line_item_using_id(request: Request,
+                              context_id: str,
+                              input_line_item: UpdateLineItemUsingIdModel,
+                              token: auth_scheme = Depends()):
+  """Update a line item using the id in the request body
+  ### Args:
+  uuid: `str`
+    Unique identifier for line item
+  input_line_item: `UpdateLineItemUsingIdModel`
+    Required body of the line item
+  ### Raises:
+  ResourceNotFoundException:
+    If the line item does not exist <br/>
+  Exception:
+    Internal Server Error. Raised if something went wrong
+  ### Returns:
+  Updated line item: `LineItemResponseModel`
+  """
+  try:
+    # # TODO: Add API call to check if the context_id (course_id) exists
+    input_line_item_dict = {**input_line_item.dict(exclude_unset=True)}
+    line_item_id = input_line_item_dict.get("id")
+    line_item_id = line_item_id.split("/")[-1]
+
+    existing_line_item = LineItem.find_by_uuid(line_item_id)
+    line_item_fields = existing_line_item.get_fields()
 
     for key, value in input_line_item_dict.items():
       line_item_fields[key] = value
