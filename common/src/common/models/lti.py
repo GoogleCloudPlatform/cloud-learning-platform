@@ -163,6 +163,7 @@ class Tool(TempBaseModel):
   content_selection_url = TextField()
   redirect_uris = ListField(required=True)
   deployment_id = TextField(required=True)
+  enable_grade_sync = BooleanField(default=False)
   is_archived = BooleanField(default=False)
   is_deleted = BooleanField(default=False)
 
