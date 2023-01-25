@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Pub Sub to BQ service
+"""
+
 from concurrent.futures import TimeoutError
 import json
 from google.cloud import pubsub_v1
 from common.utils.logging_handler import Logger
-from config import PUB_SUB_PROJECT_ID,DATABASE_PREFIX
-from service import bq_service
+from config import PUB_SUB_PROJECT_ID, DATABASE_PREFIX
+from service import roster_service,course_work_service
 subscriber = pubsub_v1.SubscriberClient()
 # The `subscription_path` method creates a fully qualified identifier
 # in the form `projects/{project_id}/subscriptions/{subscription_id}`
@@ -31,22 +35,23 @@ def callback(message: pubsub_v1.subscriber.message.Message) -> None:
   Args:
       message (pubsub_v1.subscriber.message.Message): _description_
   """
-  data=json.loads(message.data)
-  results = [{
-        # "id":f"{message.message_id}",
-        "collection":f"{data['collection']}",
-        "event_type":f"{data['eventType']}",
-        "resource":json.dumps(data["resourceId"])
-    }]
-  Logger.info(results)
-  if bq_service.save(results):
+  data = json.loads(message.data)
+  data["message_id"]=message.message_id
+  result_flag=False
+  if data["collection"].split(".")[1] == "courseWork":
+    result_flag=course_work_service.save_course_work(data)
+  else:
+    result_flag=roster_service.save_roster(data)
+
+  if result_flag:
     message.ack()
+  else:
+    message.nack()
 
 streaming_pull_future = subscriber.subscribe(
     subscription_path, callback=callback)
 Logger.info(f"Listening for messages on {subscription_path}..\n")
 
-# Wrap subscriber in a 'with' block to automatically call close() when done.
 with subscriber:
   try:
     # When `timeout` is not set, result() will block indefinitely,
@@ -55,3 +60,7 @@ with subscriber:
   except TimeoutError:
     streaming_pull_future.cancel()  # Trigger the shutdown.
     streaming_pull_future.result()  # Block until the shutdown is complete.
+  except Exception as e:
+    streaming_pull_future.cancel()  # Trigger the shutdown.
+    streaming_pull_future.result()  # Block until the shutdown is complete.
+    Logger.error(f"Some error occured.\nError:{e}")
