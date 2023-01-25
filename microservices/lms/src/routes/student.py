@@ -2,17 +2,18 @@
 import traceback
 from fastapi import APIRouter, HTTPException,Request
 from common.utils.logging_handler import Logger
+from common.utils.errors import (ResourceNotFoundException,
+ ValidationError)
+from common.utils.http_exceptions import (
+     InternalServerError,
+    ResourceNotFound, BadRequest)
 from services import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import StudentListResponseModel
-from common.utils.errors import (ResourceNotFoundException,
- ValidationError)
-from common.utils.http_exceptions import (
-     InternalServerError,
-    ResourceNotFound, BadRequest)
+
 
 
 # disabling for linting to pass
