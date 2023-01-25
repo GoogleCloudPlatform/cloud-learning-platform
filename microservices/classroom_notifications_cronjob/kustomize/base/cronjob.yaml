@@ -17,7 +17,7 @@ kind: CronJob
 metadata:
   name: classroom-notifications-cronjob
 spec:
-  schedule: "*/1 * * * *"
+  schedule: "25 3 * * *"
   jobTemplate:
     spec:
       template:
