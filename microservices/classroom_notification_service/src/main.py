@@ -16,12 +16,16 @@
 Pub Sub to BQ service
 """
 
-from concurrent.futures import TimeoutError
+from concurrent.futures import TimeoutError as TimeoutException
 import json
 from google.cloud import pubsub_v1
 from common.utils.logging_handler import Logger
 from config import PUB_SUB_PROJECT_ID, DATABASE_PREFIX
 from service import roster_service,course_work_service
+
+# disabling for linting to pass
+# pylint: disable = broad-except
+
 subscriber = pubsub_v1.SubscriberClient()
 # The `subscription_path` method creates a fully qualified identifier
 # in the form `projects/{project_id}/subscriptions/{subscription_id}`
@@ -57,7 +61,7 @@ with subscriber:
     # When `timeout` is not set, result() will block indefinitely,
     # unless an exception is encountered first.
     streaming_pull_future.result(timeout=40.0)
-  except TimeoutError:
+  except TimeoutException:
     streaming_pull_future.cancel()  # Trigger the shutdown.
     streaming_pull_future.result()  # Block until the shutdown is complete.
   except Exception as e:

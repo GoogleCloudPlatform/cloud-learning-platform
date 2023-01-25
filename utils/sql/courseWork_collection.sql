@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS courseWorkCollection (
         creationTime TIMESTAMP,
         updateTime TIMESTAMP,
         dueDate STRUCT<`year` INTEGER, `month` INTEGER, `day` INTEGER>,
-        dueTime STRUCT<`hours`: INTEGER,`minutes`: INTEGER,`seconds`: INTEGER,`nanos`: INTEGER>,
+        dueTime STRUCT<`hours` INTEGER,`minutes` INTEGER,`seconds` INTEGER,`nanos` INTEGER>,
         scheduledTime STRING,
         maxPoints INTEGER,
         workType STRING,

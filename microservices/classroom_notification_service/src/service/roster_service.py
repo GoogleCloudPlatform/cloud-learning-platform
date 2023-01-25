@@ -19,8 +19,10 @@ import uuid
 from common.utils.logging_handler import Logger
 from helper.bq_helper import insert_rows_to_bq
 from helper.classroom_helper import get_user
+from googleapiclient.errors import HttpError
 from config import BQ_COLL_USER_TABLE,BQ_LOG_RS_TABLE
-
+# disabling for linting to pass
+# pylint: disable = broad-except
 def save_roster(data):
   """_summary_
 
@@ -37,6 +39,8 @@ def save_roster(data):
     return insert_rows_to_bq(
           rows=rows, table_name=BQ_LOG_RS_TABLE) & save_user(
         data["resourceId"]["userId"], data["message_id"])
+  except HttpError as ae:
+    Logger.error(ae)
   except Exception as e:
     Logger.error(e)
     return False
