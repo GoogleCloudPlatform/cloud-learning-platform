@@ -42,7 +42,7 @@ export class SectionComponent implements OnInit {
     this.dataSource.sort = this.sort;
     let id
     console.log(this.router.url)
-    id = this.router.url.split('/')[3]
+    id = this.router.url.split('/')[2]
     this.getCohortDetails(id)
 
 
@@ -75,12 +75,17 @@ export class SectionComponent implements OnInit {
         this.createTableData()
       }
       this.loadSection = false
-      console.log('section', this.sectionDetails)
+      // console.log('section', this.sectionDetails)
     })
   }
+  openClassroom() {
+    window.open(this.selectedSection.classroom_url
+      , '_blank');
+  }
   createTableData() {
+    console.log('selected sec', this.selectedSection)
     this.tableData = []
-    for (let x of this.selectedSection.teachers_list) {
+    for (let x of this.selectedSection.teachers) {
       let staffObj: staff = { name: '', email: '', role: '' }
       staffObj.name = 'TBD'
       staffObj.email = x
@@ -116,9 +121,15 @@ export class SectionComponent implements OnInit {
     tempObj['instructional_desiner'] = this.courseTemplateDetails.instructional_designer
     tempObj['admin'] = this.courseTemplateDetails.admin
 
+
+    let sectionModalData: LooseObject = {}
+    sectionModalData['mode'] = 'Create'
+    sectionModalData['init_data'] = ''
+    sectionModalData['extra_data'] = tempObj
+
     const dialogRef = this.dialog.open(CreateSectionComponent, {
       width: '500px',
-      data: tempObj
+      data: sectionModalData
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -137,10 +148,24 @@ export class SectionComponent implements OnInit {
     tempObj['instructional_desiner'] = this.courseTemplateDetails.instructional_designer
     tempObj['admin'] = this.courseTemplateDetails.admin
     tempObj['section_id'] = this.selectedSection.id
-    tempObj['course_state'] = 'ACTIVE'
+    tempObj['section'] = this.selectedSection.section
+    tempObj['description'] = this.selectedSection.description
+    tempObj['classroom_id'] = this.selectedSection.classroom_id
+    tempObj['teachers'] = []
+    for (let x of this.selectedSection.teachers) {
+      if (x != this.courseTemplateDetails.admin && x != this.courseTemplateDetails.instructional_designer) {
+        tempObj['teachers'].push(x)
+      }
+    }
+
+    let sectionModalData: LooseObject = {}
+    sectionModalData['mode'] = 'Edit'
+    sectionModalData['init_data'] = tempObj
+    sectionModalData['extra_data'] = ''
+
     const dialogRef = this.dialog.open(CreateSectionComponent, {
       width: '500px',
-      data: tempObj
+      data: sectionModalData
     });
 
     dialogRef.afterClosed().subscribe(result => {

@@ -31,6 +31,7 @@ def validate_access(allowed_scopes):
         user_scopes = decoded_token["scope"].split(" ")
         for scope in allowed_scopes:
           if scope in user_scopes:
+
             return func(*args, **kwargs)
 
       raise InvalidTokenError("Unauthorized due to invalid scope")

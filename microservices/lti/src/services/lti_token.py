@@ -5,12 +5,12 @@ from jose import jwt, jws
 from common.models import Tool, TempUser, LTIContentItem, LineItem
 from services.keys_manager import get_platform_public_keyset
 from config import TOKEN_TTL, ISSUER
+# pylint: disable=line-too-long
 
 
 def lti_claim_field(field_type, claim_type, suffix=None):
   """ Add claims field in the token """
   lti_suffix = ("-" + suffix) if suffix else ""
-  # pylint: disable-next=line-too-long
   return f"https://purl.imsglobal.org/spec/lti{lti_suffix}/{field_type}/{claim_type}"
 
 
@@ -25,6 +25,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
 
   user = TempUser.find_by_user_id(login_hint)
   user = user.get_fields(reformat_datetime=True)
+
   token_claims = {
       "iss": ISSUER,
       "aud": client_id,
@@ -71,6 +72,16 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       token_claims[lti_claim_field("claim",
                                    "custom")] = content_item_info.get("custom")
 
+    if tool_info.get("enable_grade_sync"):
+      token_claims[lti_claim_field("claim", "endpoint", "ags")] = {
+          "scope": [
+              lti_claim_field("scope", "lineitem", "ags"),
+              lti_claim_field("scope", "result.readonly", "ags"),
+              lti_claim_field("scope", "score", "ags")
+          ],
+          "lineitems": ISSUER + "/lti/api/v1/1234/line_items",
+      }
+
     if "lineItem" in content_item_info.keys():
       line_item = LineItem.find_by_resource_link_id(lti_content_item.uuid)
 
@@ -115,9 +126,12 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
         "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Faculty",
         "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
     ]
-    # Role claims for Admin -
-    # http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator
-    # http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator
+  # Role claims for Admin -
+  elif user.get("user_type") == "admin":
+    token_claims[lti_claim_field("claim", "roles")] = [
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
+        "http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator",
+    ]
 
   return token_claims
 

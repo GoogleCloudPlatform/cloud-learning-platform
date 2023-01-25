@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import Optional
 from schemas.schema_examples import (BASIC_LINE_ITEM_EXAMPLE,
                                      UPDATE_LINE_ITEM_EXAMPLE,
+                                     UPDATE_LINE_ITEM_USING_ID_EXAMPLE,
                                      FULL_LINE_ITEM_EXAMPLE,
                                      BASIC_SCORE_EXAMPLE, FULL_SCORE_EXAMPLE,
                                      BASIC_RESULT_EXAMPLE, FULL_RESULT_EXAMPLE)
@@ -17,21 +18,21 @@ class BasicScoreModel(BaseModel):
   activityProgress: str
   gradingProgress: str
   timestamp: str
-  scoreGiven: Optional[int]
-  scoreMaximum: Optional[int]
+  scoreGiven: Optional[float]
+  scoreMaximum: Optional[float]
   comment: Optional[str]
 
   class Config():
     orm_mode = True
-    schem_extra = {"example": BASIC_SCORE_EXAMPLE}
+    schema_extra = {"example": BASIC_SCORE_EXAMPLE}
 
 
 class ScoreResponseModel(BaseModel):
   """Score Response Model"""
   uuid: str
   userId: str
-  scoreGiven: int
-  scoreMaximum: int
+  scoreGiven: Optional[float]
+  scoreMaximum: Optional[float]
   comment: str
   timestamp: str
   activityProgress: str
@@ -45,8 +46,8 @@ class ScoreResponseModel(BaseModel):
 class BasicResultModel(BaseModel):
   """Basic Result Pydantic Model"""
   userId: str
-  resultScore: str
-  resultMaximum: str
+  resultScore: Optional[float]
+  resultMaximum: Optional[float]
   comment: str
   scoreOf: str
 
@@ -58,9 +59,10 @@ class BasicResultModel(BaseModel):
 class ResultResponseModel(BaseModel):
   """Result Response Model"""
   uuid: str
+  id: str
   userId: str
-  resultScore: str
-  resultMaximum: str
+  resultScore: Optional[float]
+  resultMaximum: Optional[float]
   comment: str
   scoreOf: str
 
@@ -71,7 +73,7 @@ class ResultResponseModel(BaseModel):
 
 class BasicLineItemModel(BaseModel):
   """Basic Line Item Pydantic Model"""
-  scoreMaximum: int
+  scoreMaximum: float
   label: str
   resourceId: Optional[str]
   tag: Optional[str]
@@ -100,14 +102,22 @@ class LineItemModel(BasicLineItemModel):
 
 class UpdateLineItemModel(BaseModel):
   """Update Line Item Pydantic Model"""
-  scoreMaximum: int
-  label: str
-  startDateTime: str
-  endDateTime: str
+  scoreMaximum: Optional[float]
+  label: Optional[str]
+  startDateTime: Optional[str]
+  endDateTime: Optional[str]
 
   class Config():
     orm_mode = True
     schema_extra = {"example": UPDATE_LINE_ITEM_EXAMPLE}
+
+
+class UpdateLineItemUsingIdModel(UpdateLineItemModel):
+  id: str
+
+  class Config():
+    orm_mode = True
+    schema_extra = {"example": UPDATE_LINE_ITEM_USING_ID_EXAMPLE}
 
 
 class LineItemResponseModel(FullLineItemModel):

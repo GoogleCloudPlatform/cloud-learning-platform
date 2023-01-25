@@ -32,3 +32,7 @@ requires:
 
 - path: ./microservices/classroom_notification_service
   configs: [classroom-notification-service]
+
+- path: ./microservices/classroom_shim
+  configs: [classroom-shim]
+

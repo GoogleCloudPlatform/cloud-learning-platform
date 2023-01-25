@@ -48,7 +48,7 @@
                         </mat-select>
                     </mat-form-field>
 
-                    <div>
+                    <div style="margin-right: 1%;">
                         <mat-chip-list>
                             <mat-chip>Active</mat-chip>
                         </mat-chip-list>
@@ -58,11 +58,15 @@
                             add_circle
                         </span> Add Section</button>
 
+                    <button mat-button (click)="openClassroom()"><span class="material-symbols-rounded">
+                            account_box
+                        </span> Go to classroom</button>
+
                     <button mat-button><span class="material-symbols-rounded">
                             insights
                         </span> View Reports</button>
 
-                    <button mat-button><span class="material-symbols-rounded">
+                    <button mat-button (click)="openEditSelectionDialog()"><span class="material-symbols-rounded">
                             edit
                         </span> View / Edit info</button>
                 </div>
@@ -73,7 +77,8 @@
             <div class="section-management">
                 <span class="heading">{{selectedSection.section}} management</span>
 
-                <button mat-flat-button color="primary"><span class="material-symbols-rounded">
+                <button mat-flat-button color="primary" (click)="openEditSelectionDialog()"><span
+                        class="material-symbols-rounded">
                         add
                     </span> Add Staff</button>
             </div>

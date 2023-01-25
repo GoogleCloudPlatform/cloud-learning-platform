@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Create Course Template</h1>
+<h1 mat-dialog-title>{{courseTemplateModalData.mode}} Course Template</h1>
 <div mat-dialog-content>
 
 
@@ -14,22 +14,35 @@
             <input matInput formControlName="description">
         </mat-form-field>
 
+        <ng-container *ngIf="courseTemplateModalData.mode == 'Create'; else elseTemplate">
+            <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Instructional Designer</mat-label>
+                <mat-select formControlName="instructional_designer">
+                    <mat-option value="test_user_1@dhodun.altostrat.com">test_user_1@dhodun.altostrat.com</mat-option>
+                    <!-- <mat-option value="two">Second option</mat-option> -->
+                </mat-select>
+            </mat-form-field>
 
-        <mat-form-field appearance="fill" style="width: 100%;">
-            <mat-label>Instructional Designer</mat-label>
-            <mat-select formControlName="instructional_designer">
-                <mat-option value="test_user_1@dhodun.altostrat.com">test_user_1@dhodun.altostrat.com</mat-option>
-                <!-- <mat-option value="two">Second option</mat-option> -->
-            </mat-select>
-        </mat-form-field>
+            <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Course Admin</mat-label>
+                <mat-select formControlName="admin">
+                    <mat-option value="lms_service@dhodun.altostrat.com">lms_service@dhodun.altostrat.com</mat-option>
+                    <!-- <mat-option value="two">Second option</mat-option> -->
+                </mat-select>
+            </mat-form-field>
+        </ng-container>
 
-        <mat-form-field appearance="fill" style="width: 100%;">
-            <mat-label>Course Admin</mat-label>
-            <mat-select formControlName="admin">
-                <mat-option value="lms_service@dhodun.altostrat.com">lms_service@dhodun.altostrat.com</mat-option>
-                <!-- <mat-option value="two">Second option</mat-option> -->
-            </mat-select>
-        </mat-form-field>
+        <ng-template #elseTemplate>
+            <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Instructional Designer</mat-label>
+                <input matInput formControlName="instructional_designer">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Course Admin</mat-label>
+                <input matInput formControlName="admin">
+            </mat-form-field>
+        </ng-template>
 
     </form>
 
@@ -40,7 +53,7 @@
     <button mat-flat-button color="primary" (click)="createCourseTemplate()" [disabled]="!courseTemplateForm.valid">
         <mat-icon *ngIf="showProgressSpinner" style="margin-right:5px;">
             <mat-spinner diameter="20"></mat-spinner>
-        </mat-icon>Create
+        </mat-icon>{{ (courseTemplateModalData.mode == 'Create') ? 'Create' : 'Save' }}
     </button>
 </div>
 <!-- <button mat-button (click)="createCourseTemplate()">Create</button> -->

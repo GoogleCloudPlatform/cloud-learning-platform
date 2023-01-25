@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Create Section</h1>
+<h1 mat-dialog-title>{{requiredDetails.mode}} Section</h1>
 <div mat-dialog-content>
 
 
@@ -65,7 +65,7 @@
     <button mat-flat-button color="primary" (click)="createSection()" [disabled]="!addSectionForm.valid">
         <mat-icon *ngIf="showProgressSpinner" style="margin-right:5px;">
             <mat-spinner diameter="20"></mat-spinner>
-        </mat-icon>Create
+        </mat-icon>{{ (requiredDetails.mode == 'Create') ? 'Create' : 'Save' }}
     </button>
 </div>
 <!-- <button mat-button (click)="createCourseTemplate()">Create</button> -->

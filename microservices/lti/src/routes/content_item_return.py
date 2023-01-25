@@ -2,13 +2,14 @@
 from copy import deepcopy
 from config import ERROR_RESPONSES, ISSUER
 from fastapi import APIRouter, Form
-from common.models import Tool, LTIContentItem
+from common.models import Tool
 from common.utils.errors import ResourceNotFoundException
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound)
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.keys_manager import get_remote_keyset
 from services.lti_token import decode_token, lti_claim_field, get_unverified_token_claims
+from services.line_item_service import create_new_content_item
 
 # pylint: disable=invalid-name
 
@@ -49,30 +50,33 @@ def content_item_return(JWT: str = Form()):
     decoded_data = decode_token(JWT, key, ISSUER)
     content_item_key = lti_claim_field("claim", "content_items", "dl")
     content_item_data = decoded_data[content_item_key]
+
     if isinstance(content_item_data, list):
       for received_content_item in content_item_data:
-        content_item = LTIContentItem()
-        content_item.tool_id = tool_config.uuid
-        content_item.content_item_type = received_content_item.get("type")
-        content_item.content_item_info = received_content_item
-        content_item.uuid = ""
-        content_item.save()
-        content_item.uuid = content_item.id
-        content_item.update()
+        content_item_dict = {
+            "tool_id": tool_config.uuid,
+            "content_item_type": received_content_item.get("type"),
+            "content_item_info": received_content_item
+        }
+        content_item_fields = create_new_content_item(content_item_dict)
+        received_content_item["content_item_id"] = content_item_fields.get(
+            "uuid")
+
     elif isinstance(content_item_data, dict):
-      content_item = LTIContentItem()
-      content_item.tool_id = tool_config.uuid
-      content_item.content_item_type = received_content_item.get("type")
-      content_item.content_item_info = received_content_item
-      content_item.uuid = ""
-      content_item.save()
-      content_item.uuid = content_item.id
-      content_item.update()
+      content_item_dict = {
+          "tool_id": tool_config.uuid,
+          "content_item_type": content_item_data.get("type"),
+          "content_item_info": content_item_data
+      }
+      content_item_fields = create_new_content_item(content_item_dict)
+      content_item_data["content_item_id"] = content_item_fields.get("uuid")
+
     return {
         "success": True,
         "message": "Successfully received and decoded content item",
         "data": content_item_data
     }
+
   except ResourceNotFoundException as e:
     Logger.error(e)
     raise ResourceNotFound(str(e)) from e
