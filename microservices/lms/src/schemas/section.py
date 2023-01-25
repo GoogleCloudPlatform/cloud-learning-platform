@@ -223,7 +223,7 @@ class StudentListResponseModel(BaseModel):
       "user_id": "vtETClM9JdWBSUBB4ZEr",
       "created_time": "2023-01-24 17:38:32.689496+00:00",
       "last_modified_time": "2023-01-24 17:38:32.823430+00:00",
-      "user_type_ref": "cnkybYRTLPobwyo52JBR"}] 
+      "user_type_ref": "cnkybYRTLPobwyo52JBR"}]
       }
       }
      

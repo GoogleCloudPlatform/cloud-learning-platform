@@ -451,6 +451,13 @@ def enable_notifications(course_id, feed_type):
   return service.registrations().create(body=body).execute()
 
 def list_student_section(section_id,headers):
+  """List  student of section given firestore section id
+
+  Args:
+      section_id (str): firestore section id
+  Returns:
+      dict: list of students of section
+  """
   section_details = []
   section_details = Section.find_by_id(section_id)
   result = CourseEnrollmentMapping.\

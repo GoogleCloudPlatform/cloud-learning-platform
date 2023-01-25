@@ -7,12 +7,12 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
+from schemas.section import StudentListResponseModel
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (
      InternalServerError,
     ResourceNotFound, BadRequest)
-from schemas.section import (
-    StudentListResponseModel)
+
 
 # disabling for linting to pass
 # pylint: disable = broad-except

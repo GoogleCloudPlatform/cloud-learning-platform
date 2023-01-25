@@ -35,5 +35,5 @@ def test_list_student_of_section(client_with_emulator):
 
   with mock.patch("routes.student.classroom_crud.list_student_section",
                   return_value=[{}, {}]):
-      resp = client_with_emulator.get(url)
+    resp = client_with_emulator.get(url)
   assert resp.status_code == 200
