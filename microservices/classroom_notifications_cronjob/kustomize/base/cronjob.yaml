@@ -12,26 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Master Skaffold
-apiVersion: skaffold/v2beta12
-kind: Config
+apiVersion: batch/v1
+kind: CronJob
 metadata:
-  name: backends
-requires:
-- path: ./common
-  configs: [common]
-
-- path: ./microservices/lms
-  configs: [lms]
-
-- path: ./microservices/lms_admin_ui
-  configs: [lms-admin-ui]
-
-- path: ./microservices/lti
-  configs: [lti]
-
-- path: ./microservices/classroom_shim
-  configs: [classroom-shim]
-
-- path: ./microservices/classroom_notifications_cronjob
-  configs: [classroom-notifications-cronjob]
+  name: classroom-notifications-cronjob
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: ksa
+          containers:
+          - name: classroom-notifications-cronjob
+            image: classroom-notifications-cronjob
+            envFrom:
+            - configMapRef:
+                name: env-vars
+          restartPolicy: OnFailure
+          

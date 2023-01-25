@@ -11,27 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+  Sample Service config file
+"""
+import os
 
-# Master Skaffold
-apiVersion: skaffold/v2beta12
-kind: Config
-metadata:
-  name: backends
-requires:
-- path: ./common
-  configs: [common]
-
-- path: ./microservices/lms
-  configs: [lms]
-
-- path: ./microservices/lms_admin_ui
-  configs: [lms-admin-ui]
-
-- path: ./microservices/lti
-  configs: [lti]
-
-- path: ./microservices/classroom_shim
-  configs: [classroom-shim]
-
-- path: ./microservices/classroom_notifications_cronjob
-  configs: [classroom-notifications-cronjob]
+PROJECT_ID = os.environ.get("PROJECT_ID") or \
+    os.environ.get("GOOGLE_CLOUD_PROJECT")
+DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
