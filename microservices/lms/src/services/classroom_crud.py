@@ -453,10 +453,12 @@ def enable_notifications(course_id, feed_type):
 def list_student_section(section_id,headers):
   section_details = []
   section_details = Section.find_by_id(section_id)
-  result = CourseEnrollmentMapping.fetch_all_by_section(section_details.key,"learner")
+  result = CourseEnrollmentMapping.\
+    fetch_all_by_section(section_details.key,"learner")
   users = []
   for record in result:
     user_id =record.user
-    response = requests.get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+    response = requests.\
+      get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     users.append(response.json()["data"])
   return users

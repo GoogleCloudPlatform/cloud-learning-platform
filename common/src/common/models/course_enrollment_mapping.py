@@ -24,7 +24,7 @@ def check_status(field_val):
     return True
   return (False,
           "Status must be one of " + ",".join("'" + i + "'" for i in status))
-        
+
 def check_role(field_val):
   """validator method for status field"""
   role = ["learner", "faculty","other"]
@@ -45,8 +45,6 @@ class CourseEnrollmentMapping(BaseModel):
   class Meta:
     ignore_none_field = False
     collection_name = BaseModel.DATABASE_PREFIX + "course_enrollment_mapping"
-    
-
   @classmethod
   def find_by_user(cls, user_id):
     """Find user using using user_id
@@ -74,6 +72,7 @@ class CourseEnrollmentMapping(BaseModel):
     Returns:
         list: list of sections
     """
-    objects = CourseEnrollmentMapping.collection.filter("section", "==", section_key).filter(
+    objects = CourseEnrollmentMapping.collection.\
+      filter("section", "==", section_key).filter(
         "status", "==","active").filter("role", "==",role).fetch()
     return list(objects)

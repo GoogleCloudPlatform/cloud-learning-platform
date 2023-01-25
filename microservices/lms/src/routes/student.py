@@ -1,6 +1,6 @@
 """ Student endpoints """
 import traceback
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException,Request
 from common.utils.logging_handler import Logger
 from services import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
@@ -8,16 +8,11 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 from common.utils.errors import ResourceNotFoundException, ValidationError
-from services import classroom_crud
-from googleapiclient.errors import HttpError
-from common.utils.http_exceptions import (CustomHTTPException,
-                                          InternalServerError, InvalidToken,
-                                          ResourceNotFound, BadRequest)
-from common.utils.errors import ResourceNotFoundException, ValidationError
-from fastapi import APIRouter,Request
+from common.utils.http_exceptions import (
+     InternalServerError,
+    ResourceNotFound, BadRequest)
 from schemas.section import (
     StudentListResponseModel)
-import requests
 
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -91,12 +86,13 @@ def list_students(section_id: str, request : Request):
     HTTPException: 500 Internal Server Error if something fails
     ResourceNotFound: 404 Resource not found exception
   Returns:
-    {"status":"Success","data":{}}: Returns list of sections
+    {"status":"Success","data":{}}: Returns list of students in section
     {'status': 'Failed',"data":null}
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
-    users = classroom_crud.list_student_section(section_id=section_id,headers=headers)
+    users = classroom_crud.\
+      list_student_section(section_id=section_id,headers=headers)
     return {"data":users}
   except ResourceNotFoundException as err:
     Logger.error(err)
@@ -106,4 +102,5 @@ def list_students(section_id: str, request : Request):
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
     raise InternalServerError(str(e)) from e
