@@ -33,7 +33,7 @@ class ScoreResponseModel(BaseModel):
   userId: str
   scoreGiven: Optional[float]
   scoreMaximum: Optional[float]
-  comment: str
+  comment: Optional[str]
   timestamp: str
   activityProgress: str
   gradingProgress: str
@@ -48,7 +48,7 @@ class BasicResultModel(BaseModel):
   userId: str
   resultScore: Optional[float]
   resultMaximum: Optional[float]
-  comment: str
+  comment: Optional[str]
   scoreOf: str
 
   class Config():
@@ -63,7 +63,7 @@ class ResultResponseModel(BaseModel):
   userId: str
   resultScore: Optional[float]
   resultMaximum: Optional[float]
-  comment: str
+  comment: Optional[str]
   scoreOf: str
 
   class Config():
