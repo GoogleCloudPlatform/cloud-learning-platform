@@ -42,6 +42,11 @@
 
             <app-cohort [cohortList]="cohortList"></app-cohort>
 
+            <mat-paginator [length]="100" (page)="handleCohortPageEvent($event)" [pageSize]='10'
+                [pageSizeOptions]="[10,20,30]" aria-label="Select page">
+            </mat-paginator>
+
+
         </mat-tab>
         <mat-tab label="Course Template List">
 
@@ -84,6 +89,11 @@
 
             <app-course-template [courseTemplateList]="courseTemplateList">
             </app-course-template>
+
+            <mat-paginator [length]="100" (page)="handleCourseTemplatePageEvent($event)" [pageSize]='10'
+                [pageSizeOptions]="[10,20,30]" aria-label="Select page">
+            </mat-paginator>
+
         </mat-tab>
 
 
