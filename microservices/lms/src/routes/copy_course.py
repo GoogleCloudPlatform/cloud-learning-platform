@@ -359,6 +359,8 @@ def enroll_student_section(sections_id: str,
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = user_object["user_id"]
+    course_enrollment_mapping.status = "active"
+    course_enrollment_mapping.role = "learner"
     course_enrollment_mapping.save()
 
     return {

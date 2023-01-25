@@ -29,3 +29,11 @@ def test_get_student_course_progress_percent(client_with_emulator):
         }]):
       resp = client_with_emulator.get(url)
   assert resp.status_code == 200
+
+def test_(client_with_emulator):
+  url = BASE_URL + "/student/test_section_id}"
+
+  with mock.patch("routes.student.list_student_section",
+                  return_value=[{}, {}]):
+      resp = client_with_emulator.get(url)
+  assert resp.status_code == 200
