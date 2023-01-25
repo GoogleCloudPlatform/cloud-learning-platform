@@ -61,6 +61,8 @@ profiles:
         cacheFrom:
           - lms-admin-ui
           - lms-admin-ui:latest
+        buildArgs:
+          API_DOMAIN: "{{.API_DOMAIN}}"
 - name: dev
   activation:
   - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
@@ -77,6 +79,8 @@ profiles:
         cacheFrom:
           - gcr.io/core-learning-services-dev/lms-admin-ui
           - gcr.io/core-learning-services-dev/lms-admin-ui:latest
+        buildArgs:
+          API_DOMAIN: "{{.API_DOMAIN}}"
   deploy:
     kustomize:
       paths:
