@@ -8,12 +8,12 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class HomeService {
 
   constructor(private http: HttpClient) { }
-  getCohortList() {
-    return this.http.get(`${environment.apiurl}cohorts`)
+  getCohortList(skip: any, limit: any) {
+    return this.http.get(`${environment.apiurl}cohorts?skip=${skip}&limit=${limit}`)
 
   }
-  getCourseTemplateList() {
-    return this.http.get(`${environment.apiurl}course_templates`)
+  getCourseTemplateList(skip: any, limit: any) {
+    return this.http.get(`${environment.apiurl}course_templates?skip=${skip}&limit=${limit}`)
 
   }
   editCourseTemplate(data: any, id: any) {
