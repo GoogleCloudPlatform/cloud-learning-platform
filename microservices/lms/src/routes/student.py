@@ -8,7 +8,8 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import StudentListResponseModel
-from common.utils.errors import ResourceNotFoundException, ValidationError
+from common.utils.errors import (ResourceNotFoundException,
+ ValidationError)
 from common.utils.http_exceptions import (
      InternalServerError,
     ResourceNotFound, BadRequest)
