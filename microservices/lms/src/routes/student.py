@@ -94,7 +94,7 @@ section_student_router = APIRouter(prefix="/{section_id}/students",
                                    })
 
 
-@section_student_router.get("/", response_model=StudentListResponseModel)
+@section_student_router.get("", response_model=StudentListResponseModel)
 def list_students(section_id: str, request: Request):
   """ Get a list of students of one section from db
 

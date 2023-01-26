@@ -32,7 +32,7 @@ def test_get_student_course_progress_percent(client_with_emulator):
 
 
 def test_list_student_of_section(client_with_emulator):
-  url = BASE_URL + "/sections/test_section_id/stduents"
+  url = BASE_URL + "/sections/5/students"
 
   with mock.patch("routes.student.classroom_crud.list_student_section",
                   return_value=[{}, {}]):
