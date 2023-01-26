@@ -74,7 +74,7 @@ def get_progress_percentage(course_id: int, student_email: str):
     raise HTTPException(status_code=500) from e
 
 
-section_student_router = APIRouter(prefix="/{section_id}/students",
+section_student_router = APIRouter(prefix="/sections/{section_id}/students",
                                    tags=["Students"],
                                    responses={
                                        500: {
@@ -95,7 +95,7 @@ section_student_router = APIRouter(prefix="/{section_id}/students",
 
 
 @section_student_router.get("", response_model=StudentListResponseModel)
-def list_students(section_id: str, request: Request):
+def list_students_in_section(section_id: str, request: Request):
   """ Get a list of students of one section from db
 
   Args:

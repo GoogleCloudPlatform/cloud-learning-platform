@@ -77,6 +77,7 @@ api = FastAPI(title="LMS Service APIs",
 api.include_router(user.router)
 api.include_router(section.router)
 api.include_router(student.router)
+api.include_router(student.section_student_router)
 
 api.include_router(course_template.router)
 api.include_router(cohort.router)
