@@ -4,9 +4,9 @@ export const environment = {
   auth_apiUrl: 'https://' + $ENV.API_DOMAIN + '/authentication/api/v1/',
   firebase: {
     apiKey: $ENV.FIREBASE_API_KEY,
-    authDomain: $ENV.FIREBASE_AUTH_DOMAIN,
-    projectId: $ENV.FIREBASE_PROJECT_ID,
-    storageBucket: $ENV.FIREBASE_STORAGE_BUCKET,
+    authDomain: $ENV.PROJECT_ID + '.firebaseapp.com',
+    projectId: $ENV.PROJECT_ID,
+    storageBucket: $ENV.PROJECT_ID + '.appspot.com',
     appId: $ENV.FIREBASE_APP_ID,
   }
 };

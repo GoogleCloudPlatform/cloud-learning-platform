@@ -32,7 +32,7 @@ portForward:
 - resourceType: service
   resourceName: lms-admin-ui
   port: 80
-  localPort: 80
+  localPort: 8887
 deploy:
   kustomize:
     paths:
@@ -64,10 +64,8 @@ profiles:
         buildArgs:
           API_DOMAIN: "{{.API_DOMAIN}}"
           FIREBASE_API_KEY: "{{.FIREBASE_API_KEY}}"
-          FIREBASE_AUTH_DOMAIN: "{{.FIREBASE_AUTH_DOMAIN}}"
-          FIREBASE_PROJECT_ID: "{{.FIREBASE_PROJECT_ID}}"
-          FIREBASE_STORAGE_BUCKET: "{{.FIREBASE_STORAGE_BUCKET}}"
           FIREBASE_APP_ID: "{{.FIREBASE_APP_ID}}"
+          PROJECT_ID: "{{.PROJECT_ID}}"
 - name: dev
   activation:
   - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
@@ -87,10 +85,8 @@ profiles:
         buildArgs:
           API_DOMAIN: "{{.API_DOMAIN}}"
           FIREBASE_API_KEY: "{{.FIREBASE_API_KEY}}"
-          FIREBASE_AUTH_DOMAIN: "{{.FIREBASE_AUTH_DOMAIN}}"
-          FIREBASE_PROJECT_ID: "{{.FIREBASE_PROJECT_ID}}"
-          FIREBASE_STORAGE_BUCKET: "{{.FIREBASE_STORAGE_BUCKET}}"
           FIREBASE_APP_ID: "{{.FIREBASE_APP_ID}}"
+          PROJECT_ID: "{{.PROJECT_ID}}"
   deploy:
     kustomize:
       paths:
