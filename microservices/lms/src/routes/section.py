@@ -21,7 +21,7 @@ from schemas.section import (
 from schemas.update_section import UpdateSection
 from services import classroom_crud
 from services.classroom_crud import get_edit_url_and_view_url_mapping_of_form
-from student import section_student_router
+from routes.student import section_student_router
 from utils.helper import convert_section_to_section_model
 
 # disabling for linting to pass
