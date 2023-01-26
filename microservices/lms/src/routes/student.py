@@ -1,12 +1,10 @@
 """ Student endpoints """
 import traceback
-from fastapi import APIRouter, HTTPException,Request
+from fastapi import APIRouter, HTTPException, Request
 from common.utils.logging_handler import Logger
-from common.utils.errors import (ResourceNotFoundException,
- ValidationError)
-from common.utils.http_exceptions import (
-     InternalServerError,
-    ResourceNotFound, BadRequest)
+from common.utils.errors import (ResourceNotFoundException, ValidationError)
+from common.utils.http_exceptions import (InternalServerError,
+                                          ResourceNotFound, BadRequest)
 from services import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
@@ -14,13 +12,11 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import StudentListResponseModel
 
-
-
 # disabling for linting to pass
 # pylint: disable = broad-except
 
 router = APIRouter(prefix="/student",
-                   tags=["Student"],
+                   tags=["Students"],
                    responses={
                        500: {
                            "model": InternalServerErrorResponseModel
@@ -77,9 +73,29 @@ def get_progress_percentage(course_id: int, student_email: str):
     traceback.format_exc().replace("\n", " ")
     raise HTTPException(status_code=500) from e
 
-@router.get("/{section_id}/",response_model=StudentListResponseModel)
-def list_students(section_id: str, request : Request):
 
+section_student_router = APIRouter(prefix="/{section_id}/students",
+                                   tags=["Students"],
+                                   responses={
+                                       500: {
+                                           "model":
+                                           InternalServerErrorResponseModel
+                                       },
+                                       404: {
+                                           "model": NotFoundErrorResponseModel
+                                       },
+                                       409: {
+                                           "model": ConflictResponseModel
+                                       },
+                                       422: {
+                                           "model":
+                                           ValidationErrorResponseModel
+                                       }
+                                   })
+
+
+@section_student_router.get("/", response_model=StudentListResponseModel)
+def list_students(section_id: str, request: Request):
   """ Get a list of students of one section from db
 
   Args:
@@ -95,7 +111,7 @@ def list_students(section_id: str, request : Request):
     headers = {"Authorization": request.headers.get("Authorization")}
     users = classroom_crud.\
       list_student_section(section_id=section_id,headers=headers)
-    return {"data":users}
+    return {"data": users}
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
