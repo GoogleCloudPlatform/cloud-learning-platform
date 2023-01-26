@@ -12,7 +12,9 @@ import { environment } from 'src/environments/environment';
 export class SignInComponent implements OnInit {
 
   constructor(public authService: AuthService, private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
-    console.log('env var', environment.apiurl);
+    // console.log('env var', environment.apiurl);
+    // console.log('firebase var', environment.firebase.projectId);
+    // console.log('firebase var', environment.firebase.storageBucket);
     this.matIconRegistry.addSvgIcon(
       'google-icon',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/img/Google.svg')
