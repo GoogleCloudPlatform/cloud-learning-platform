@@ -7,6 +7,7 @@ from googleapiclient.errors import HttpError
 from common.utils.errors import InvalidTokenError,UserManagementServiceError
 from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
+from common.models import Section,CourseEnrollmentMapping
 from config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
 from utils import helper
 import requests
@@ -448,3 +449,23 @@ def enable_notifications(course_id, feed_type):
       }
   }
   return service.registrations().create(body=body).execute()
+
+def list_student_section(section_id,headers):
+  """List  student of section given firestore section id
+
+  Args:
+      section_id (str): firestore section id
+  Returns:
+      dict: list of students of section
+  """
+  section_details = []
+  section_details = Section.find_by_id(section_id)
+  result = CourseEnrollmentMapping.\
+    fetch_all_by_section(section_details.key,"learner")
+  users = []
+  for record in result:
+    user_id =record.user
+    response = requests.\
+      get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+    users.append(response.json()["data"])
+  return users
