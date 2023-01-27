@@ -53,7 +53,8 @@ class CourseEnrollmentMapping(BaseModel):
     Returns:
         user_object
     """
-    result = CourseEnrollmentMapping.collection.filter("user","==",user_id).filter(
+    result = CourseEnrollmentMapping.collection.filter("user","==",user_id).\
+      filter(
         "status", "==","active").fetch()
     return list(result)
 

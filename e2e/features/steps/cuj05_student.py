@@ -32,20 +32,20 @@ def step_impl_3(context):
 
 
 @behave.given("A section has a students enrolled and has course enrollment mapping present")
-def step_impl_1(context):
+def step_impl_4(context):
   print("IN given step1 implementation _______",context.section_id,context.user_id)
   context.url = f'{API_URL}/student/{context.user_id}/section/{context.section_id}'
 
 
-@behave.when("API request with valid section Id is sent")
-def step_impl_2(context):
+@behave.when("API request with valid section Id is sent to delete studen")
+def step_impl_5(context):
   resp = requests.delete(context.url,headers=context.header)
   print("This is Delete STudent API")
   print(resp.json())
   context.status = resp.status_code
   context.response = resp.json()
 
-@behave.then("Section will be fetch using the given id and list of studnets enrolled")
-def step_impl_3(context):
+@behave.then("student is marked as inactive in course enrollment mapping and removed from google classroom")
+def step_impl_6(context):
   
   assert context.status == 200, "Status 200"
