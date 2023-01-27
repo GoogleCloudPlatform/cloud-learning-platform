@@ -31,7 +31,7 @@ def step_impl_3(context):
 # ------------------------------Delete student to Section-------------------------------------
 
 
-@behave.given("A section has a students enrolled")
+@behave.given("A section has a students enrolled and has course enrollment mapping present")
 def step_impl_1(context):
   print("IN given step1 implementation _______",context.section_id,context.user_id)
   context.url = f'{API_URL}/student/{context.user_id}/section/{context.section_id}'
