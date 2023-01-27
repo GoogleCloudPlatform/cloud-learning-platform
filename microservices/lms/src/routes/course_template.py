@@ -14,7 +14,7 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 
 router = APIRouter(prefix="/course_templates",
-                   tags=["CourseTemplate"],
+                   tags=["CourseTemplates"],
                    responses={
                        500: {
                            "model": InternalServerErrorResponseModel

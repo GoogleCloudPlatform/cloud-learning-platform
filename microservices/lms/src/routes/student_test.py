@@ -30,8 +30,9 @@ def test_get_student_course_progress_percent(client_with_emulator):
       resp = client_with_emulator.get(url)
   assert resp.status_code == 200
 
+
 def test_list_student_of_section(client_with_emulator):
-  url = BASE_URL + "/student/test_section_id"
+  url = BASE_URL + "/sections/5/students"
 
   with mock.patch("routes.student.classroom_crud.list_student_section",
                   return_value=[{}, {}]):

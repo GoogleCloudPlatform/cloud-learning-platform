@@ -1,12 +1,12 @@
 """ Section endpoints """
 import traceback
-from common.models import Cohort, CourseTemplate, Section,CourseEnrollmentMapping
+from common.models import Cohort, CourseTemplate, Section, CourseEnrollmentMapping
 from common.utils.errors import InvalidTokenError, ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (CustomHTTPException,
                                           InternalServerError, InvalidToken,
                                           ResourceNotFound, BadRequest)
 from common.utils.logging_handler import Logger
-from fastapi import APIRouter,Request
+from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
 from schemas.course_details import CourseDetails, EnableNotificationsDetails, EnableNotificationsResponse
 from schemas.error_schema import (ConflictResponseModel,
@@ -110,7 +110,8 @@ def create_section(sections_details: SectionDetails):
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
     # add new_course to pubsub topic for both course work and roaster changes
-    classroom_crud.enable_notifications(new_course["id"], "COURSE_WORK_CHANGES")
+    classroom_crud.enable_notifications(new_course["id"],
+                                        "COURSE_WORK_CHANGES")
     classroom_crud.enable_notifications(new_course["id"],
                                         "COURSE_ROSTER_CHANGES")
     #If topics are present in course create topics returns a dict
@@ -310,7 +311,7 @@ def update_section(sections_details: UpdateSection):
     for i in add_teacher_list:
       classroom_crud.add_teacher(sections_details.course_id, i)
     remove_teacher_list = list(
-      set(section.teachers)-set(sections_details.teachers))
+        set(section.teachers) - set(sections_details.teachers))
     for i in remove_teacher_list:
       classroom_crud.delete_teacher(sections_details.course_id, i)
     section.section = sections_details.section_name
@@ -329,7 +330,8 @@ def update_section(sections_details: UpdateSection):
 
 @router.post("/{sections_id}/students", response_model=AddStudentResponseModel)
 def enroll_student_section(sections_id: str,
-              input_data: AddStudentToSectionModel,request: Request):
+                           input_data: AddStudentToSectionModel,
+                           request: Request):
   """
   Args:
     input_data(AddStudentToSectionModel):
@@ -347,11 +349,12 @@ def enroll_student_section(sections_id: str,
   try:
     section = Section.find_by_id(sections_id)
     headers = {"Authorization": request.headers.get("Authorization")}
-    user_object = classroom_crud.enroll_student(headers,
-                                  access_token=input_data.access_token,
-                                  student_email=input_data.email,
-                                  course_id=section.classroom_id,
-                                  course_code=section.classroom_code)
+    user_object = classroom_crud.enroll_student(
+        headers,
+        access_token=input_data.access_token,
+        student_email=input_data.email,
+        course_id=section.classroom_id,
+        course_code=section.classroom_code)
 
     cohort = section.cohort
     cohort.enrolled_students_count += 1
@@ -476,22 +479,22 @@ def section_enable_notifications_pub_sub(
   """
   try:
     # check both the id's
-    if(not enable_notifications_details.course_id and
-       not enable_notifications_details.section_id):
+    if (not enable_notifications_details.course_id
+        and not enable_notifications_details.section_id):
       raise ValidationError("Either Section id or course id is required")
     # if course_id is empty and section id is passed then get course_id
-    if not enable_notifications_details.course_id :
-      section=Section.find_by_id(enable_notifications_details.section_id)
-      enable_notifications_details.course_id=section.classroom_id
+    if not enable_notifications_details.course_id:
+      section = Section.find_by_id(enable_notifications_details.section_id)
+      enable_notifications_details.course_id = section.classroom_id
 
     response = classroom_crud.enable_notifications(
-      enable_notifications_details.course_id,
-      enable_notifications_details.feed_type)
+        enable_notifications_details.course_id,
+        enable_notifications_details.feed_type)
     if enable_notifications_details.section_id:
       return {
           "message":
-          "Successfully enable the notifications of the course using section " +
-          f"{enable_notifications_details.section_id} id",
+          "Successfully enable the notifications of the course using section "
+          + f"{enable_notifications_details.section_id} id",
           "data":
           response
       }
