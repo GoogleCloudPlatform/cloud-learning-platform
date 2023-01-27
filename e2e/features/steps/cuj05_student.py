@@ -47,5 +47,4 @@ def step_impl_5(context):
 
 @behave.then("student is marked as inactive in course enrollment mapping and removed from google classroom")
 def step_impl_6(context):
-  
   assert context.status == 200, "Status 200"
