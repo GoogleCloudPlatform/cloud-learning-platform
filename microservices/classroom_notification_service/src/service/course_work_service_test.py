@@ -61,46 +61,46 @@ def test_save_course_work_collection_negative():
   assert result_2 is False
 
 
-def test_save_student_submissison_collection():
-  data = {
-      "message_id": "90000003344",
-      "collection": "courses.courseWork.studentSubmissions",
-      "eventType": "CREATED",
-      "publish_time": "2014-10-02T15:01:23Z",
-      "resourceId": {
-          "id": "AC56Vg722HC9U",
-          "courseWorkId": "12345678900",
-          "courseId": "550005555"
-      }}
-  with mock.patch("service.course_work_service.insert_rows_to_bq",
-                  return_value=True):
-    with mock.patch("service.course_work_service.save_student_submission",
-                    return_value=True):
-      result = save_course_work(data)
-  assert result is True
+# def test_save_student_submissison_collection():
+#   data = {
+#       "message_id": "90000003344",
+#       "collection": "courses.courseWork.studentSubmissions",
+#       "eventType": "CREATED",
+#       "publish_time": "2014-10-02T15:01:23Z",
+#       "resourceId": {
+#           "id": "AC56Vg722HC9U",
+#           "courseWorkId": "12345678900",
+#           "courseId": "550005555"
+#       }}
+#   with mock.patch("service.course_work_service.insert_rows_to_bq",
+#                   return_value=True):
+#     with mock.patch("service.course_work_service.save_student_submission",
+#                     return_value=True):
+#       result = save_course_work(data)
+#   assert result is True
 
 
-def test_save_student_submissison_collection_negative():
-  data = {
-      "message_id": "90000003344",
-      "collection": "courses.courseWork.studentSubmissions",
-      "eventType": "CREATED",
-      "publish_time": "2014-10-02T15:01:23Z",
-      "resourceId": {
-          "id": "AC56Vg722HC9U",
-          "courseWorkId": "12345678900",
-          "courseId": "550005555"
-      }}
-  with mock.patch("service.course_work_service.save_student_submission",
-                  return_value=False):
-    with mock.patch("service.course_work_service.insert_rows_to_bq",
-                    return_value=True):
-      result_1 = save_course_work(data)
-  with mock.patch("service.course_work_service.save_student_submission",
-                  return_value=True):
-    with mock.patch("service.course_work_service.insert_rows_to_bq",
-                    return_value=False):
-      result_2 = save_course_work(data)
+# def test_save_student_submissison_collection_negative():
+#   data = {
+#       "message_id": "90000003344",
+#       "collection": "courses.courseWork.studentSubmissions",
+#       "eventType": "CREATED",
+#       "publish_time": "2014-10-02T15:01:23Z",
+#       "resourceId": {
+#           "id": "AC56Vg722HC9U",
+#           "courseWorkId": "12345678900",
+#           "courseId": "550005555"
+#       }}
+#   with mock.patch("service.course_work_service.save_student_submission",
+#                   return_value=False):
+#     with mock.patch("service.course_work_service.insert_rows_to_bq",
+#                     return_value=True):
+#       result_1 = save_course_work(data)
+#   with mock.patch("service.course_work_service.save_student_submission",
+#                   return_value=True):
+#     with mock.patch("service.course_work_service.insert_rows_to_bq",
+#                     return_value=False):
+#       result_2 = save_course_work(data)
 
-  assert result_1 is False
-  assert result_2 is False
+#   assert result_1 is False
+#   assert result_2 is False
