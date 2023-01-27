@@ -2,14 +2,15 @@ import os
 import json
 import requests
 from behave import fixture, use_fixture
-from common.models import CourseTemplate, Cohort,Section, TempUser
+from common.models import CourseTemplate, Cohort,Section, TempUser ,CourseEnrollmentMapping
 from common.testing.example_objects import TEST_SECTION,TEST_COHORT
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE
-from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e
+from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,get_student_email_and_token
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.user import TEST_USER
+from google.oauth2.credentials import Credentials
 import logging
 
 USER_EMAIL_PASSWORD_DICT = get_user_email_and_password_for_e2e()
@@ -37,6 +38,48 @@ def create_course(name,section,description,ownerId):
   new_course["courseState"] = "ACTIVE"
   course = service.courses().create(body=new_course).execute()
   return course
+
+def enroll_student_classroom(access_token,course_id,student_email,course_code):
+  """Add student to the classroom using student google auth token
+  Args:
+    headers :Bearer token
+    access_token(str): Oauth access token which contains student credentials
+    course_id(str): unique classroom id which is required to get the classroom
+    student_email(str): student email id
+    course_code(str): unique classroom enrollment code
+  Raise:
+    InvalidTokenError: Raised if the token is expired or not valid
+  Return:
+    dict: returns a dict which contains student and classroom details
+  """
+
+  creds = Credentials(token=access_token)
+  service = build("classroom", "v1", credentials=creds)
+  student = {"userId": student_email}
+  service.courses().students().create(
+      courseId=course_id, body=student, enrollmentCode=course_code).execute()
+  # Get the gaia ID of the course
+  people_service = build("people", "v1", credentials=creds)
+  profile = people_service.people().get(resourceName="people/me",
+  personFields="metadata").execute()
+  gaia_id = profile["metadata"]["sources"][0]["id"]
+  # Call user API
+  data = {
+  "first_name": "",
+  "last_name": "",
+  "email":student_email,
+  "user_type": "learner",
+  "user_type_ref": "",
+  "user_groups": [],
+  "status": "active",
+  "is_registered": True,
+  "failed_login_attempts_count": 0,
+  "access_api_docs": False,
+  "gaia_id":gaia_id
+  }
+  return data
+
+
 
 @fixture
 def create_course_templates(context):
@@ -81,6 +124,35 @@ def create_section(context):
   yield context.sections
 
 @fixture
+def enroll_student_course(context):
+  """Fixture to enroll studnet in course"""
+  # section = Section.from_dict(TEST_SECTION)
+  # cohort=use_fixture(create_cohort,context)
+  print("------------INside ENroll student Fixtureee------------------")
+  section = use_fixture(create_section,context)
+  section_id = section.id
+  context.section_id = section_id
+  classroom_code = section.classroom_code
+  classroom_id = section.classroom_id
+  student_email_and_token = get_student_email_and_token()
+  print("----------Details -----------",section_id,classroom_code,classroom_id)
+  print("Student email",student_email_and_token["email"]) 
+  print("Student Access token",student_email_and_token["access_token"])
+  student_data = enroll_student_classroom(student_email_and_token["access_token"],classroom_id,student_email_and_token["email"],classroom_code)  
+  course_enrollment_mapping = CourseEnrollmentMapping()
+  course_enrollment_mapping.role = "learner"
+  course_enrollment_mapping.section = section
+  course_enrollment_mapping.status ="active"
+  temp_user = TempUser.from_dict(student_data)
+  user_id = temp_user.save().id
+  course_enrollment_mapping = user_id
+  course_enrollment_mapping.save()
+  context.course_enrollment_mapping= course_enrollment_mapping
+  print("UsER ID from Temp User  -------------",user_id)
+  yield context.course_enrollment_mapping
+
+
+@fixture
 def get_header(context):
   req = requests.post(f"{API_URL_AUTHENTICATION_SERVICE}/sign-in/credentials",
                       json=USER_EMAIL_PASSWORD_DICT,
@@ -99,6 +171,7 @@ fixture_registry = {
     "fixture.create.course_template": create_course_templates,
     "fixture.create.cohort": create_cohort,
     "fixture.create.section":create_section,
+    "fixture.create.enroll_student_course":enroll_student_course,
     "fixture.get.header":get_header
 }
 
