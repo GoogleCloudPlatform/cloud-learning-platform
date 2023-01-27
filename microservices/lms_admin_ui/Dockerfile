@@ -1,4 +1,8 @@
 FROM node:16.17.0-alpine as builder
+ARG API_DOMAIN
+ARG FIREBASE_API_KEY
+ARG FIREBASE_APP_ID
+ARG PROJECT_ID
 WORKDIR /app
 COPY . .
 RUN npm install

@@ -197,3 +197,33 @@ class DeleteSectionResponseModel(BaseModel):
             "data": None
         }
     }
+class StudentListResponseModel(BaseModel):
+  """list student for section  response Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success"
+  data: Optional[list] =[]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data":[{
+      "first_name": "steve4",
+      "last_name": "jobs",
+      "email": "clplmstestuser1@gmail.com",
+      "user_type": "other",
+      "user_groups": [],
+      "status": "active",
+      "is_registered":True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id": "F2GGRg5etyty",
+      "user_id": "vtETClM9JdWBSUBB4ZEr",
+      "created_time": "2023-01-24 17:38:32.689496+00:00",
+      "last_modified_time": "2023-01-24 17:38:32.823430+00:00",
+      "user_type_ref": "cnkybYRTLPobwyo52JBR"}]
+      }
+      }
+     

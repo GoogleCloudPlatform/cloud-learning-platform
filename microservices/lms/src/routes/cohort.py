@@ -19,7 +19,7 @@ from utils.helper import (convert_cohort_to_cohort_model,
                           convert_section_to_section_model)
 
 router = APIRouter(prefix="/cohorts",
-                   tags=["Cohort"],
+                   tags=["Cohorts"],
                    responses={
                        500: {
                            "model": InternalServerErrorResponseModel
