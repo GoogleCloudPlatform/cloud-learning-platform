@@ -40,6 +40,7 @@ env:
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   ISSUER: https://core-learning-services-dev.cloudpssolutions.com
+  FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
 # cookiecutter:raw 
 jobs:
   deploy_backends:
