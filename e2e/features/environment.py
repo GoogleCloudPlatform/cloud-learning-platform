@@ -144,11 +144,19 @@ def enroll_student_course(context):
   course_enrollment_mapping.section = section
   course_enrollment_mapping.status ="active"
   temp_user = TempUser.from_dict(student_data)
+  temp_user.user_id = ""
+  print("Temp user before calling save------------------",temp_user)
+  temp_user.save()
+  temp_user.user_id = temp_user.id
+  temp_user.update()
+  user_id = temp_user.user_id
   user_id = temp_user.save().id
+  print("USER ID -----------------",user_id)
   course_enrollment_mapping = user_id
   course_enrollment_mapping.save()
   context.course_enrollment_mapping= course_enrollment_mapping
   print("UsER ID from Temp User  -------------",user_id)
+  print("COUSRSE Enrollment mapping done")
   yield context.course_enrollment_mapping
 
 

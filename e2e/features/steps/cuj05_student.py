@@ -25,4 +25,5 @@ def step_impl_2(context):
 
 @behave.then("Section will be fetch using the given id and list of studnets enrolled")
 def step_impl_3(context):
+  
   assert context.status == 200, "Status 200"
