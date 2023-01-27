@@ -11,10 +11,9 @@ from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from testing.test_config import BASE_URL
 from common.models.section import Section
-from common.models import CourseTemplate, Cohort
+from common.models import CourseTemplate, Cohort ,TempUser,CourseEnrollmentMapping
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
-   COHORT_EXAMPLE, CREDENTIAL_JSON
-
+   COHORT_EXAMPLE, TEMP_USER
 
 
 
@@ -55,10 +54,26 @@ def create_fake_data():
 
   section = Section.from_dict(test_section_dict)
   section.save()
+  temp_user = TempUser.from_dict(TempUser)
+  temp_user.user_id = ""
+  temp_user.save()
+  temp_user.user_id = temp_user.id
+  temp_user.update()
+  user_id = temp_user.user_id
+
+  course_enrollment_mapping= CourseEnrollmentMapping()
+  course_enrollment_mapping.role = "learner"
+  course_enrollment_mapping.user = user_id
+  course_enrollment_mapping.section = section
+  course_enrollment_mapping.status = "active"
+  course_enrollment_mapping.save()
+
+
   return {
       "cohort": cohort.id,
       "course_template": course_template.id,
-      "section": section.id
+      "section": section.id,
+      "user_id":user_id
   }
 
 
@@ -87,10 +102,11 @@ def test_list_student_of_section(client_with_emulator):
     resp = client_with_emulator.get(url)
   assert resp.status_code == 200
 
-# def test_delete_student_from_section(client_with_emulator):
-#   url = BASE_URL + "/sections/5/students"
-
-#   with mock.patch("routes.student.classroom_crud.list_student_section",
-#                   return_value=[{}, {}]):
-#     resp = client_with_emulator.get(url)
-#   assert resp.status_code == 200
+def test_delete_student_from_section(client_with_emulator,create_fake_data):
+  user_id = create_fake_data["user_id"]
+  section_id = create_fake_data["section_id"]
+  url = BASE_URL + f"/student/{user_id}/section/{section_id}"
+  with mock.patch("routes.student.classroom_crud.delete_student",
+                  return_value=[{}, {}]):
+    resp = client_with_emulator.delete(url)
+  assert resp.status_code == 200

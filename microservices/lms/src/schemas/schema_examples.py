@@ -91,6 +91,19 @@ CREDENTIAL_JSON = {
     "scopes": ["Scopes"],
     "expiry": "2022-11-23T12:01:17Z"
 }
+TEMP_USER = {
+  "first_name": "",
+  "last_name": "",
+  "email":"clplmstestuser1@gmail.com",
+  "user_type": "learner",
+  "user_type_ref": "",
+  "user_groups": [],
+  "status": "active",
+  "is_registered": True,
+  "failed_login_attempts_count": 0,
+  "access_api_docs": False,
+  "gaia_id":"1234577657333"
+  }
 
 UPDATE_SECTION = {
     "id": "string",

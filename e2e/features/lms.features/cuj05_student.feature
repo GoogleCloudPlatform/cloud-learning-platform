@@ -7,6 +7,7 @@ Feature: List students in section
     When API request with valid section Id is sent
     Then Section will be fetch using the given id and list of studnets enrolled
 
+  
   @fixture.create.enroll_student_course
   Scenario: Delete student in section
     Given A section has a students enrolled and has course enrollment mapping present 
