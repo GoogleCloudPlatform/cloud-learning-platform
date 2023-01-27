@@ -150,7 +150,7 @@ def enroll_student_course(context):
   temp_user.user_id = temp_user.id
   temp_user.update()
   user_id = temp_user.user_id
-  
+  context.user_id = user_id
   print("USER ID -----------------",user_id)
   course_enrollment_mapping = user_id
   course_enrollment_mapping.save()

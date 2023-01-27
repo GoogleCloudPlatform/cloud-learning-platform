@@ -81,3 +81,23 @@ def convert_section_to_section_model(section):
   cohort = loaded_section.pop("cohort").to_dict()
   loaded_section["cohort"] = cohort["key"]
   return loaded_section
+
+def convert_course_enrollment_model(course_enrollment_model):
+  """Convert course enrollment object to course_enrollment_model Model Object
+  Args:
+    section (Section): Section Object.
+  Returns:
+    return a dict in the section model format.
+  """ ""
+  loaded_course_enrollment_model = course_enrollment_model.to_dict()
+  print(loaded_course_enrollment_model.keys())
+  loaded_course_enrollment_model["section"]=loaded_course_enrollment_model["section"].to_dict()
+  print("--------------")
+  print(type(loaded_course_enrollment_model["section"]["course_template"]))
+  loaded_template=loaded_course_enrollment_model["section"].pop("course_template").to_dict()
+  loaded_course_enrollment_model["section"]["course_template"]=loaded_template["key"]
+  print("------------------------")
+  print(type(loaded_course_enrollment_model["section"]["cohort"]))
+  loaded_cohort=loaded_course_enrollment_model["section"].pop("cohort").to_dict()
+  loaded_course_enrollment_model["section"]["cohort"]=loaded_cohort["key"]
+  return loaded_course_enrollment_model

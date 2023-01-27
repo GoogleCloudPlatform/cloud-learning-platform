@@ -54,6 +54,8 @@ class CourseEnrollmentMapping(BaseModel):
         user_object
     """
     return CourseEnrollmentMapping.collection.filter("user","==",user_id).\
+    filter(
+        "status", "==","active")
     fetch()
 
   @classmethod
