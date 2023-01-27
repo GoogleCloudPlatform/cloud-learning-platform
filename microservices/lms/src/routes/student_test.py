@@ -10,8 +10,7 @@ import pytest
 from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from testing.test_config import BASE_URL
-from common.models.section import Section
-from common.models import CourseTemplate, Cohort ,TempUser,CourseEnrollmentMapping
+from common.models import CourseTemplate, Cohort ,TempUser,CourseEnrollmentMapping,Section
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
    COHORT_EXAMPLE, TEMP_USER
 
@@ -54,7 +53,7 @@ def create_fake_data():
 
   section = Section.from_dict(test_section_dict)
   section.save()
-  temp_user = TempUser.from_dict(TempUser)
+  temp_user = TempUser.from_dict(TEMP_USER)
   temp_user.user_id = ""
   temp_user.save()
   temp_user.user_id = temp_user.id
