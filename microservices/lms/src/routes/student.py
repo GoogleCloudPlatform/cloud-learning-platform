@@ -148,13 +148,16 @@ def delete_student(section_id: str,user_id:str,request: Request):
     if result == []:
       raise ResourceNotFoundException\
       ("User not found in course Enrollment Collection")
-    course_enrollment_result = list(map(convert_course_enrollment_model, result))
+    course_enrollment_result = \
+      list(map(convert_course_enrollment_model, result))
     print("COURSE ENROLLEMTT_______________",course_enrollment_result)
+    record = None
     for record in course_enrollment_result:
       if section_id == record["section"]["id"]:
         course_id =  record["section"]["classroom_id"]
         response_get_student = \
-        requests.get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+        requests.get\
+          (f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
         print("Get student email response")
         if response_get_student.status_code == 404:
           raise \

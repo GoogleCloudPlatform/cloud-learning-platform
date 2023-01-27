@@ -3,15 +3,63 @@
 """
 import os
 import mock
+import pytest
+
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from testing.test_config import BASE_URL
+from common.models.section import Section
+from common.models import CourseTemplate, Cohort
+from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
+   COHORT_EXAMPLE, CREDENTIAL_JSON
+
+
+
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 SUCCESS_RESPONSE = {"status": "Success"}
+
+
+@pytest.fixture
+def create_fake_data():
+  """_summary_
+
+  Args:
+      course_template_id (_type_): _description_
+      cohort_id (_type_): _description_
+      section_id (_type_): _description_
+
+  Returns:
+      _type_: _description_
+  """
+  course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
+  course_template.save()
+  COHORT_EXAMPLE["course_template"] = course_template
+  cohort = Cohort.from_dict(COHORT_EXAMPLE)
+  cohort.save()
+
+  test_section_dict = {
+      "name": "section_name",
+      "section": "section c",
+      "description": "description",
+      "classroom_id": "cl_id",
+      "classroom_code": "cl_code",
+      "classroom_url": "https://classroom.google.com",
+      "course_template": course_template,
+      "cohort": cohort,
+      "teachers": ["teachera@gmail.com", "teacherb@gmail.com"]
+  }
+
+  section = Section.from_dict(test_section_dict)
+  section.save()
+  return {
+      "cohort": cohort.id,
+      "course_template": course_template.id,
+      "section": section.id
+  }
 
 
 def test_get_student_course_progress_percent(client_with_emulator):
@@ -38,3 +86,11 @@ def test_list_student_of_section(client_with_emulator):
                   return_value=[{}, {}]):
     resp = client_with_emulator.get(url)
   assert resp.status_code == 200
+
+# def test_delete_student_from_section(client_with_emulator):
+#   url = BASE_URL + "/sections/5/students"
+
+#   with mock.patch("routes.student.classroom_crud.list_student_section",
+#                   return_value=[{}, {}]):
+#     resp = client_with_emulator.get(url)
+#   assert resp.status_code == 200

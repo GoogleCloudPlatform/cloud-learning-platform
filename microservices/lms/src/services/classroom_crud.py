@@ -482,7 +482,6 @@ def delete_student(course_id, student_email):
       dict: response from create invitation method
   """
   service = build("classroom", "v1", credentials=get_credentials())
-  
   student = {"userId": student_email}
   try:
     print("In side delete student ")
