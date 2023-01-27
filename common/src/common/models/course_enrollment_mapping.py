@@ -53,10 +53,9 @@ class CourseEnrollmentMapping(BaseModel):
     Returns:
         user_object
     """
-    return CourseEnrollmentMapping.collection.filter("user","==",user_id).\
-    filter(
-        "status", "==","active")
-    fetch()
+    result = CourseEnrollmentMapping.collection.filter("user","==",user_id).filter(
+        "status", "==","active").fetch()
+    return list(result)
 
   @classmethod
   def fetch_all_by_section(cls,

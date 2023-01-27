@@ -469,3 +469,34 @@ def list_student_section(section_id,headers):
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     users.append(response.json()["data"])
   return users
+
+def delete_student(course_id, student_email):
+  """Delete  student from google classroom using course id and email
+  Args:
+      course_id (str): google classroom unique id
+      teacher_email (str): teacher email id
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
+  Returns:
+      dict: response from create invitation method
+  """
+  service = build("classroom", "v1", credentials=get_credentials())
+  
+  student = {"userId": student_email}
+  try:
+    print("In side delete student ")
+    student = service.courses().students().delete(
+                courseId=course_id,userId = student_email).execute()
+                # body=student).execute()
+    print("STudent deleted")
+    return student
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+

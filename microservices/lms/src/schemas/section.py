@@ -197,6 +197,22 @@ class DeleteSectionResponseModel(BaseModel):
             "data": None
         }
     }
+
+class DeleteStudentFromSectionResponseModel(BaseModel):
+  """Delete student from section Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully deleted the student from course"
+  data: Optional[str] = None
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully deleted the section",
+            "data": None
+        }
+    }
 class StudentListResponseModel(BaseModel):
   """list student for section  response Model"""
   success: Optional[bool] = True
