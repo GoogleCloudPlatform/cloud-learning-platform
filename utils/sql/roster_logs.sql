@@ -3,4 +3,5 @@ CREATE TABLE IF NOT EXISTS rosterLogs (
         `collection` STRING NOT NULL,
         event_type STRING NOT NULL,
         `resource` STRUCT <userId STRING, courseId STRING>,
+        publish_time TIMESTAMP,
         `timestamp` TIMESTAMP);

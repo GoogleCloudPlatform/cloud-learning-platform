@@ -16,14 +16,15 @@ REGISTER_SCOPES = [
 ]
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.rosters",
+    "https://www.googleapis.com/auth/classroom.coursework.students.readonly",
+    "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
     "https://www.googleapis.com/auth/classroom.rosters.readonly",
     "https://www.googleapis.com/auth/classroom.profile.emails",
     "https://www.googleapis.com/auth/classroom.profile.photos"
 ]
-def get_user(user_id):
-  """
-  Args:
-    user_id (_type_): _description_
+
+def get_service():
+  """_summary_
 
   Returns:
     _type_: _description_
@@ -31,36 +32,45 @@ def get_user(user_id):
   creds = service_account.Credentials.from_service_account_info(
       get_gke_pd_sa_key_from_secret_manager(), scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-  service = build("classroom", "v1", credentials=creds)
+  return build("classroom", "v1", credentials=creds)
+
+def get_user(user_id):
+  """
+  Args:
+    user_id (String): Guy id of a user
+
+  Returns:
+    dict: User details
+  """
+  service=get_service()
   return service.userProfiles().get(userId=user_id).execute()
 
-def enable_notifications(course_id, feed_type):
+def get_course_work(course_id,course_work_id):
   """_summary_
 
   Args:
-      course_id (str): _description_
-      feed_type (str): _description_
-
-  Raises:
-      InternalServerError: 500 Internal Server Error if something fails
+    course_id (_type_): _description_
+    course_work_id (_type_): _description_
 
   Returns:
-      _type_: _description_
+    _type_: _description_
   """
-  creds = service_account.Credentials.from_service_account_info(
-      get_gke_pd_sa_key_from_secret_manager(), scopes=REGISTER_SCOPES)
-  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-  service = build("classroom", "v1", credentials=creds)
-  body = {
-      "feed": {
-          "feedType": feed_type,
-          FEED_TYPE_DICT.get(feed_type): {
-              "courseId": course_id
-          }
-      },
-      "cloudPubsubTopic": {
-          "topicName": "projects/" +
-          f"{PUB_SUB_PROJECT_ID}/topics/{DATABASE_PREFIX}classroom-messeges"
-      }
-  }
-  return service.registrations().create(body=body).execute()
+  service=get_service()
+  return service.courses().courseWork().get(
+    courseId=course_id,id=course_work_id).execute()
+
+
+def get_student_submissions(course_id, course_work_id,submissions_id):
+  """_summary_
+
+  Args:
+    course_id (_type_): _description_
+    course_work_id (_type_): _description_
+    submissions_id (_type_): _description_
+
+  Returns:
+    _type_: _description_
+  """
+  service = get_service()
+  return service.courses().courseWork().studentSubmissions().get(
+    courseId=course_id, courseWorkId=course_work_id,id=submissions_id).execute()

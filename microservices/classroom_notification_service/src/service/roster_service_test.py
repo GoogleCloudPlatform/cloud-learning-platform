@@ -21,6 +21,7 @@ def test_save_roster():
       "message_id": "90000003344",
       "collection": "courses.teachers",
       "eventType": "CREATED",
+      "publish_time": "2014-10-02T15:01:23Z",
       "resourceId": {
           "userId": "12345678900",
           "courseId": "550005555"
@@ -35,6 +36,7 @@ def test_save_roster_negative():
   data = {
       "message_id": "90000003344",
       "collection": "courses.teachers",
+      "publish_time": "2014-10-02T15:01:23Z",
       "eventType": "CREATED",
       "resourceId": {
           "userId": "12345678900",

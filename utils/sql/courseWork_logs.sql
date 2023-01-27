@@ -3,4 +3,5 @@ CREATE TABLE IF NOT EXISTS courseWorkLogs (
         `collection` STRING NOT NULL,
         event_type STRING NOT NULL,
         `resource` JSON,
+        publish_time TIMESTAMP,
         `timestamp` TIMESTAMP);

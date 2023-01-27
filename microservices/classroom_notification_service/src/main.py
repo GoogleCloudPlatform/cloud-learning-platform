@@ -41,6 +41,7 @@ def callback(message: pubsub_v1.subscriber.message.Message) -> None:
   """
   data = json.loads(message.data)
   data["message_id"]=message.message_id
+  data["publish_time"] = message.publish_time
   result_flag=False
   if data["collection"].split(".")[1] == "courseWork":
     result_flag=course_work_service.save_course_work(data)

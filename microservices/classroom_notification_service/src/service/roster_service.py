@@ -33,22 +33,24 @@ def save_roster(data):
       bool: _description_
   """
   try:
-    rows = [{"message_id": data["message_id"], "collection": data["collection"],
-            "event_type":data["eventType"], "resource":data["resourceId"],
-            "timestamp":datetime.datetime.utcnow()}]
+    rows = [{
+      "message_id": data["message_id"], "collection": data["collection"],
+      "event_type":data["eventType"], "resource":data["resourceId"],
+      "publish_time":data["publish_time"],"timestamp":datetime.datetime.utcnow()
+    }]
     return insert_rows_to_bq(
           rows=rows, table_name=BQ_LOG_RS_TABLE) & save_user(
         data["resourceId"]["userId"], data["message_id"])
   except HttpError as ae:
     Logger.error(ae)
+    return False
   except Exception as e:
     Logger.error(e)
     return False
 
 def save_user(user_id,message_id):
   user=get_user(user_id)
-  timestamp = datetime.datetime.utcnow()
   user["uuid"]=str(uuid.uuid4())
-  user["timestamp"]=timestamp
   user["message_id"]=message_id
+  user["timestamp"] = datetime.datetime.utcnow()
   return insert_rows_to_bq(rows=[user],table_name=BQ_COLL_USER_TABLE)
