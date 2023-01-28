@@ -43,13 +43,11 @@ def save_course_work(data):
     if len(data["collection"].split(".")) == 3:
       if data["collection"].split(".")[2] == "studentSubmissions":
         return insert_rows_to_bq(
-            rows=rows, table_name=BQ_LOG_CW_TABLE)
-        # get student submission not working
-        # & save_student_submission(
-                # course_id=data["resourceId"]["courseId"],
-                # message_id=data["message_id"],
-                # course_work_id=data["resourceId"]["courseWorkId"],
-                # submissions_id=data["resourceId"]["id"])
+            rows=rows, table_name=BQ_LOG_CW_TABLE) & save_student_submission(
+                course_id=data["resourceId"]["courseId"],
+                message_id=data["message_id"],
+                course_work_id=data["resourceId"]["courseWorkId"],
+                submissions_id=data["resourceId"]["id"])
     else:
       return insert_rows_to_bq(rows=rows,
         table_name=BQ_LOG_CW_TABLE) & save_course_work_collection(
