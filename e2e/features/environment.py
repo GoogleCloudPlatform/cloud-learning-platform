@@ -126,18 +126,13 @@ def create_section(context):
 @fixture
 def enroll_student_course(context):
   """Fixture to enroll studnet in course"""
-  # section = Section.from_dict(TEST_SECTION)
-  # cohort=use_fixture(create_cohort,context)
-  print("------------INside ENroll student Fixtureee------------------")
+ 
   section = use_fixture(create_section,context)
   section_id = section.id
   context.section_id = section_id
   classroom_code = section.classroom_code
   classroom_id = section.classroom_id
   student_email_and_token = get_student_email_and_token()
-  print("----------Details -----------",section_id,classroom_code,classroom_id)
-  print("Student email",student_email_and_token["email"]) 
-  print("Student Access token",student_email_and_token["access_token"])
   student_data = enroll_student_classroom(student_email_and_token["access_token"],classroom_id,student_email_and_token["email"],classroom_code)  
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.role = "learner"
@@ -145,18 +140,14 @@ def enroll_student_course(context):
   course_enrollment_mapping.status ="active"
   temp_user = TempUser.from_dict(student_data)
   temp_user.user_id = ""
-  print("Temp user before calling save------------------",temp_user)
   temp_user.save()
   temp_user.user_id = temp_user.id
   temp_user.update()
   user_id = temp_user.user_id
   context.user_id = user_id
-  print("USER ID -----------------",user_id)
   course_enrollment_mapping.user = user_id
   course_enrollment_mapping.save()
   context.course_enrollment_mapping= course_enrollment_mapping
-  print("UsER ID from Temp User  -------------",user_id)
-  print("COUSRSE Enrollment mapping done")
   yield context.course_enrollment_mapping
 
 
@@ -191,7 +182,6 @@ def before_tag(context, tag):
         raise LookupError("Unknown fixture-tag: %s" % tag)
       return use_fixture(fixture_data, context)
     except Exception as e:
-      print(e)
       logging.error(str(e))
 
 def sign_up_user():

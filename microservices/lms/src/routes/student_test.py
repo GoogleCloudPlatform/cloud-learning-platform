@@ -9,8 +9,8 @@ import pytest
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
-from testing.test_config import BASE_URL
 from common.models import CourseTemplate, Cohort ,TempUser,CourseEnrollmentMapping,Section
+from testing.test_config import BASE_URL
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
    COHORT_EXAMPLE, TEMP_USER
 
@@ -103,7 +103,7 @@ def test_list_student_of_section(client_with_emulator):
 
 def test_delete_student_from_section(client_with_emulator,create_fake_data):
   user_id = create_fake_data["user_id"]
-  section_id = create_fake_data["section_id"]
+  section_id = create_fake_data["section"]
   url = BASE_URL + f"/student/{user_id}/section/{section_id}"
   with mock.patch("routes.student.classroom_crud.delete_student",
                   return_value=[{}, {}]):

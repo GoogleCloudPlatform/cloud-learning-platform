@@ -144,13 +144,11 @@ def delete_student(section_id: str,user_id:str,request: Request):
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
     result = CourseEnrollmentMapping.find_by_user(user_id=user_id)
-    print("USSERRR !________________",result)
     if result == []:
       raise ResourceNotFoundException\
       ("User not found in course Enrollment Collection")
     course_enrollment_result = \
       list(map(convert_course_enrollment_model, result))
-    print("COURSE ENROLLEMTT_______________",course_enrollment_result)
     record = None
     for record in course_enrollment_result:
       if section_id == record["section"]["id"]:
@@ -158,15 +156,12 @@ def delete_student(section_id: str,user_id:str,request: Request):
         response_get_student = \
         requests.get\
           (f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-        print("Get student email response")
         if response_get_student.status_code == 404:
           raise \
             ResourceNotFoundException(response_get_student.json()["message"])
         student_email =  response_get_student.json()["data"]["email"]
         classroom_crud.delete_student(course_id=course_id,\
           student_email=student_email)
-        print("Record ID")
-        print(record["id"])
         course_enrollment = CourseEnrollmentMapping.find_by_id(record["id"])
         course_enrollment.status = "inactive"
         course_enrollment.update()
