@@ -34,7 +34,9 @@ def search_tool(client_id: str):
     # fetch tool that matches client_id
     tool = Tool.find_by_client_id(client_id)
     if tool:
-      result = [tool.get_fields(reformat_datetime=True)]
+      tool_data = tool.get_fields(reformat_datetime=True)
+      tool_data["id"] = tool.id
+      result = [tool_data]
     return {
         "success": True,
         "message": "Successfully fetched the tools",
@@ -82,12 +84,16 @@ def get_all_tools(skip: int = 0,
     #                         .filter("is_archived", "==", fetch_archive)
 
     tools = collection_manager.order("-created_time").offset(skip).fetch(limit)
-    tools = [i.get_fields(reformat_datetime=True) for i in tools]
+    tools_list = []
+    for i in tools:
+      tool_data = i.get_fields(reformat_datetime=True)
+      tool_data["id"] = i.id
+      tools_list.append(tool_data)
 
     return {
         "success": True,
         "message": "Tools has been fetched successfully",
-        "data": tools
+        "data": tools_list
     }
   except ValidationError as e:
     raise BadRequest(str(e)) from e
@@ -121,6 +127,7 @@ def get_tool(tool_id: str):
   try:
     tool = Tool.find_by_id(tool_id)
     tool_fields = tool.get_fields(reformat_datetime=True)
+    tool_fields["id"] = tool.id
     return {
         "success": True,
         "message": f"Tool with '{tool_id}' has been fetched successfully",
@@ -157,6 +164,8 @@ def create_tool(input_tool: ToolModel):
     input_tool_dict = {**input_tool.dict()}
 
     client_id = str(uuid4())
+
+    # TODO: deployment_id needs to be defined for single-tenant and multi-tenant model
     deployment_id = str(uuid4())
 
     tool_url = input_tool_dict["tool_url"]
@@ -175,7 +184,7 @@ def create_tool(input_tool: ToolModel):
     new_tool = new_tool.from_dict(input_tool_dict)
     new_tool.save()
     tool_fields = new_tool.get_fields(reformat_datetime=True)
-    print(tool_fields)
+    tool_fields["id"] = new_tool.id
     return {
         "success": True,
         "message": "Tool has been created successfully",
@@ -185,8 +194,6 @@ def create_tool(input_tool: ToolModel):
     }
   except ConflictError as e:
     raise Conflict(str(e)) from e
-  except ResourceNotFoundException as e:
-    raise ResourceNotFound(str(e)) from e
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
@@ -228,6 +235,7 @@ def update_tool(tool_id: str, input_tool: UpdateToolModel):
       setattr(existing_tool, key, value)
     existing_tool.update()
     tool_fields = existing_tool.get_fields(reformat_datetime=True)
+    tool_fields["id"] = existing_tool.id
     return {
         "success": True,
         "message": "Successfully updated the tool",
@@ -259,6 +267,7 @@ def delete_tool(tool_id: str):
   Success/Fail Message: `JSON`
   """
   try:
+    Tool.find_by_id(tool_id)
     Tool.delete_by_id(tool_id)
     return {}
   except ResourceNotFoundException as e:

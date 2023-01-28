@@ -57,8 +57,7 @@ def firestore_emulator():
   if is_windows:
     os.kill(emulator.pid, signal.SIGTERM)
   else:
-    pass
-    # os.killpg(os.getpgid(emulator.pid), signal.SIGTERM)
+    os.killpg(os.getpgid(emulator.pid), signal.SIGTERM)
 
   # delete debug files
   # some get deleted, not all

@@ -3,20 +3,13 @@
 from config import ISSUER
 
 BASIC_TOOL_EXAMPLE = {
-    "name":
-        "Test tool",
-    "description":
-        "Test tool integration",
-    "tool_url":
-        "https://example-tool.com",
-    "tool_login_url":
-        "https://example-tool.com/admin/api/ltilaunch/oidclogin",
-    "public_key_type":
-        "JWK URL",
-    "tool_keyset_url":
-        "https://example-tool.com/admin/ui/jwks",
-    "content_selection_url":
-        "https://example-tool.com/admin/ui/deep_link",
+    "name": "Test tool",
+    "description": "Test tool integration",
+    "tool_url": "https://example-tool.com",
+    "tool_login_url": "https://example-tool.com/admin/api/ltilaunch/oidclogin",
+    "public_key_type": "JWK URL",
+    "tool_keyset_url": "https://example-tool.com/admin/ui/jwks",
+    "content_selection_url": "https://example-tool.com/admin/ui/deep_link",
     "redirect_uris": [
         "https://example-tool.com/admin/api/ltilaunch/ltitoollaunch"
     ],
@@ -47,11 +40,10 @@ BASIC_PLATFORM_EXAMPLE = {
 }
 
 FULL_PLATFORM_EXAMPLE = {
-    "uuid": "asd98798as7dhjgkjsdfh",
-    **BASIC_PLATFORM_EXAMPLE,
-    "tool_auth_url": f"{ISSUER}/lti/api/v1/authorize",
+    "id": "asd98798as7dhjgkjsdfh",
+    **BASIC_PLATFORM_EXAMPLE, "tool_auth_url": f"{ISSUER}/lti/api/v1/authorize",
     "tool_token_url": f"{ISSUER}/lti/api/v1/token",
-    "tool_keyset_url": f"{ISSUER}/lti/api/v1/jwks/SoD1uf9V1nc9",
+    "tool_keyset_url": f"{ISSUER}/lti/api/v1/jwks/SoD1uf9V1nc9"
 }
 
 BASIC_LINE_ITEM_EXAMPLE = {

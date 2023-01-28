@@ -20,12 +20,11 @@ class BasicPlatformModel(BaseModel):
 
 
 class FullPlatformModel(BasicPlatformModel):
-  """Platform Model with uuid, created and last modified time"""
-  uuid: str
+  """Platform Model with id, created and last modified time"""
+  id: str
   tool_url: str
   tool_login_url: str
   tool_keyset_url: str
-  is_archived: Optional[bool] = False
   created_time: str
   last_modified_time: str
 
@@ -49,7 +48,6 @@ class UpdatePlatformModel(BaseModel):
   platform_auth_url: Optional[str]
   platform_token_url: Optional[str]
   deployment_ids: Optional[list]
-  is_archived: Optional[bool]
 
   class Config():
     orm_mode = True

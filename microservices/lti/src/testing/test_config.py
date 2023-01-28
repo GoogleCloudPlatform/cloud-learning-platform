@@ -4,10 +4,15 @@ from Crypto.PublicKey import RSA
 API_URL = "http://localhost/lti/api/v1"
 
 DEL_KEYS = [
-    "is_archived",
-    "uuid",
+    "id",
     "created_time",
     "last_modified_time",
+    "archived_at_timestamp",
+    "archived_by",
+    "created_by",
+    "deleted_at_timestamp",
+    "deleted_by",
+    "last_modified_by",
 ]
 
 

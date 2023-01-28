@@ -6,12 +6,13 @@
 # pylint: disable=wrong-import-position
 # """ For Local Development
 """ For Local Development
+"""
 import sys
+import os
+
 sys.path.append("../../../common/src")
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
-"""
-import os
 
 os.environ["DATABASE_PREFIX"] = "ram_"
 import config
@@ -46,9 +47,9 @@ api.include_router(content_item.router)
 api.include_router(line_item.router)
 
 # LTI as a tool routes
-api.include_router(platform_registration.router)
-api.include_router(tool_auth.router)
-api.include_router(tool_launch.router)
+# api.include_router(platform_registration.router)
+# api.include_router(tool_auth.router)
+# api.include_router(tool_launch.router)
 
 add_exception_handlers(app)
 add_exception_handlers(api)

@@ -8,6 +8,7 @@ from common.models import Tool, Platform, LTIContentItem, LineItem
 def create_tool(request):
   tool = Tool.from_dict(request.param)
   tool.client_id = str(uuid4())
+  tool.id = str(uuid4())
   tool.deployment_id = str(uuid4())
   tool.save()
   return tool
@@ -16,10 +17,8 @@ def create_tool(request):
 @pytest.fixture(name="create_platform")
 def create_platform(request):
   platform = Platform.from_dict(request.param)
-  platform.uuid = ""
+  platform.id = str(uuid4())
   platform.save()
-  platform.uuid = platform.id
-  platform.update()
   return platform
 
 

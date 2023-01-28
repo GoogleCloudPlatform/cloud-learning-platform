@@ -171,16 +171,6 @@ class Tool(BaseModel):
     ignore_none_field = False
 
   @classmethod
-  def find_by_uuid(cls, uuid, is_deleted=False):
-    tool = cls.collection.filter("uuid", "==",
-                                 uuid).filter("is_deleted", "==",
-                                              is_deleted).get()
-    if tool is None:
-      raise ResourceNotFoundException(
-          f"{cls.__name__} with uuid {uuid} not found")
-    return tool
-
-  @classmethod
   def find_by_client_id(cls, client_id):
     tool = cls.collection.filter("client_id", "==",
                                  client_id).filter("deleted_at_timestamp", "==",
@@ -198,9 +188,9 @@ class Tool(BaseModel):
     return tool
 
 
-class Platform(TempBaseModel):
+class Platform(BaseModel):
   """LTI Platform Data Model"""
-  uuid = TextField(required=True)
+  id = IDField()
   name = TextField(required=True)
   description = TextField()
   issuer = TextField(required=True)
@@ -209,47 +199,24 @@ class Platform(TempBaseModel):
   platform_auth_url = TextField(required=True)
   platform_token_url = TextField(required=True)
   deployment_ids = ListField(required=True)
-  is_archived = BooleanField(default=False)
-  is_deleted = BooleanField(default=False)
 
   class Meta:
     collection_name = TempBaseModel.DATABASE_PREFIX + "platforms"
     ignore_none_field = False
 
   @classmethod
-  def find_by_uuid(cls, uuid, is_deleted=False):
-    platform = cls.collection.filter("uuid", "==",
-                                     uuid).filter("is_deleted", "==",
-                                                  is_deleted).get()
-    if platform is None:
-      raise ResourceNotFoundException(
-          f"{cls.__name__} with uuid {uuid} not found")
-    return platform
-
-  @classmethod
-  def find_by_issuer(cls, issuer, is_deleted=False):
+  def find_by_issuer(cls, issuer):
     platform = cls.collection.filter("issuer", "==",
-                                     issuer).filter("is_deleted", "==",
-                                                    is_deleted).get()
+                                     issuer).filter("deleted_at_timestamp",
+                                                    "==", None).get()
     return platform
 
   @classmethod
-  def find_by_client_id(cls, client_id, is_deleted=False):
+  def find_by_client_id(cls, client_id):
     platform = cls.collection.filter("client_id", "==",
-                                     client_id).filter("is_deleted", "==",
-                                                       is_deleted).get()
+                                     client_id).filter("deleted_at_timestamp",
+                                                       "==", None).get()
     return platform
-
-  @classmethod
-  def delete_by_uuid(cls, uuid):
-    doc = cls.collection.filter("uuid", "==",
-                                uuid).filter("is_deleted", "==", False).get()
-    if doc is not None:
-      doc.is_deleted = True
-      doc.update()
-    else:
-      raise ResourceNotFoundException(
-          f"{cls.__name__} with uuid {uuid} not found")
 
 
 class LTIContentItem(TempBaseModel):
