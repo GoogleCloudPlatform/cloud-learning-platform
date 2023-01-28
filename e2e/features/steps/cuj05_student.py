@@ -12,7 +12,8 @@ from environment import create_course
 @behave.given("A section has a students enrolled")
 def step_impl_1(context):
   print("IN given step1 implementation _______",context.section_id)
-  context.url = f'{API_URL}/student/{context.section_id}'
+  # context.url = f'{API_URL}/student/{context.section_id}'
+  context.url = f'{API_URL}/sections/{context.section_id}/students'
 
 
 @behave.when("API request with valid section Id is sent")
