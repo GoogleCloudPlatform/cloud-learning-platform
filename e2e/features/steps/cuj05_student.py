@@ -38,7 +38,7 @@ def step_impl_4(context):
   context.url = f'{API_URL}/student/{context.user_id}/section/{context.section_id}'
 
 
-@behave.when("API request with valid section Id is sent to delete studen")
+@behave.when("API request with valid section Id is sent to delete student")
 def step_impl_5(context):
   resp = requests.delete(context.url,headers=context.header)
   print("This is Delete STudent API =---++")
@@ -46,7 +46,6 @@ def step_impl_5(context):
   context.status = resp.status_code
   context.response = resp.json()
 
-@behave.then("student is marked as inactive in course enrollment mapping and removed from google classroom")
+@behave.then("Student is marked as inactive in course enrollment mapping and removed from google classroom")
 def step_impl_6(context):
-
   assert context.status == 200, "Status 200"
