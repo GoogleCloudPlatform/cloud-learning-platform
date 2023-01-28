@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import Optional
 from schemas.schema_examples import (BASIC_LINE_ITEM_EXAMPLE,
                                      UPDATE_LINE_ITEM_EXAMPLE,
+                                     UPDATE_LINE_ITEM_USING_ID_EXAMPLE,
                                      FULL_LINE_ITEM_EXAMPLE,
                                      BASIC_SCORE_EXAMPLE, FULL_SCORE_EXAMPLE,
                                      BASIC_RESULT_EXAMPLE, FULL_RESULT_EXAMPLE)
@@ -30,9 +31,9 @@ class ScoreResponseModel(BaseModel):
   """Score Response Model"""
   uuid: str
   userId: str
-  scoreGiven: float
-  scoreMaximum: float
-  comment: str
+  scoreGiven: Optional[float]
+  scoreMaximum: Optional[float]
+  comment: Optional[str]
   timestamp: str
   activityProgress: str
   gradingProgress: str
@@ -45,9 +46,9 @@ class ScoreResponseModel(BaseModel):
 class BasicResultModel(BaseModel):
   """Basic Result Pydantic Model"""
   userId: str
-  resultScore: float
-  resultMaximum: float
-  comment: str
+  resultScore: Optional[float]
+  resultMaximum: Optional[float]
+  comment: Optional[str]
   scoreOf: str
 
   class Config():
@@ -60,9 +61,9 @@ class ResultResponseModel(BaseModel):
   uuid: str
   id: str
   userId: str
-  resultScore: float
-  resultMaximum: float
-  comment: str
+  resultScore: Optional[float]
+  resultMaximum: Optional[float]
+  comment: Optional[str]
   scoreOf: str
 
   class Config():
@@ -101,14 +102,22 @@ class LineItemModel(BasicLineItemModel):
 
 class UpdateLineItemModel(BaseModel):
   """Update Line Item Pydantic Model"""
-  scoreMaximum: float
-  label: str
-  startDateTime: str
-  endDateTime: str
+  scoreMaximum: Optional[float]
+  label: Optional[str]
+  startDateTime: Optional[str]
+  endDateTime: Optional[str]
 
   class Config():
     orm_mode = True
     schema_extra = {"example": UPDATE_LINE_ITEM_EXAMPLE}
+
+
+class UpdateLineItemUsingIdModel(UpdateLineItemModel):
+  id: str
+
+  class Config():
+    orm_mode = True
+    schema_extra = {"example": UPDATE_LINE_ITEM_USING_ID_EXAMPLE}
 
 
 class LineItemResponseModel(FullLineItemModel):

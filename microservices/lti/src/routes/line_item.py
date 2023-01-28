@@ -1,5 +1,5 @@
 """Line item  Endpoints"""
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 from config import ERROR_RESPONSES, ISSUER
 from common.models import LineItem, Result, Score
@@ -9,9 +9,10 @@ from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound,
                                           Unauthenticated)
 from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
-                                      UpdateLineItemModel, DeleteLineItem,
-                                      FullLineItemModel, BasicScoreModel,
-                                      ResultResponseModel)
+                                      UpdateLineItemModel,
+                                      UpdateLineItemUsingIdModel,
+                                      DeleteLineItem, FullLineItemModel,
+                                      BasicScoreModel, ResultResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
 from typing import List, Optional
@@ -35,8 +36,7 @@ router = APIRouter(tags=["Line item"], responses=ERROR_RESPONSES)
     "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
     "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
 ])
-def get_all_line_items(request: Request,
-                       context_id: str,
+def get_all_line_items(context_id: str,
                        resource_id: str = None,
                        resource_link_id: str = None,
                        tag: str = None,
@@ -89,8 +89,9 @@ def get_all_line_items(request: Request,
     line_items = [i.get_fields(reformat_datetime=True) for i in line_items]
 
     for each_line_item in line_items:
-      each_line_item["id"] = str(
-          request.url).split("?")[0] + "/" + each_line_item["uuid"]
+      each_line_item[
+          "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/" + each_line_item[
+              "uuid"]
 
     return line_items
 
@@ -113,10 +114,7 @@ def get_all_line_items(request: Request,
     "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
     "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
 ])
-def get_line_item(request: Request,
-                  context_id: str,
-                  uuid: str,
-                  token: auth_scheme = Depends()):
+def get_line_item(context_id: str, uuid: str, token: auth_scheme = Depends()):
   """The get line item endpoint will return the line item
   from firestore of which uuid is provided
   ### Args:
@@ -134,7 +132,9 @@ def get_line_item(request: Request,
     # TODO: Add API call to check if the context_id (course_id) exists
     line_item = LineItem.find_by_uuid(uuid)
     line_item_fields = line_item.get_fields(reformat_datetime=True)
-    line_item_fields["id"] = str(request.url).split("?")[0]
+    line_item_fields[
+        "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/" + line_item_fields[
+            "uuid"]
 
     return line_item_fields
   except InvalidTokenError as e:
@@ -156,8 +156,7 @@ def get_line_item(request: Request,
     }})
 @validate_access(
     allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
-def create_line_item(request: Request,
-                     context_id: str,
+def create_line_item(context_id: str,
                      input_line_item: LineItemModel,
                      token: auth_scheme = Depends()):
   """The create line item endpoint will add a new line item to the firestore.
@@ -177,8 +176,9 @@ def create_line_item(request: Request,
     input_line_item_dict = {**input_line_item.dict()}
     new_line_item = create_new_line_item(input_line_item_dict)
     line_item_fields = new_line_item.get_fields(reformat_datetime=True)
-    line_item_fields["id"] = str(
-        request.url).split("?")[0] + "/" + line_item_fields["uuid"]
+    line_item_fields[
+        "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/" + line_item_fields[
+            "uuid"]
 
     return line_item_fields
   except InvalidTokenError as e:
@@ -197,8 +197,7 @@ def create_line_item(request: Request,
     }})
 @validate_access(
     allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
-def update_line_item(request: Request,
-                     context_id: str,
+def update_line_item(context_id: str,
                      uuid: str,
                      input_line_item: UpdateLineItemModel,
                      token: auth_scheme = Depends()):
@@ -229,7 +228,66 @@ def update_line_item(request: Request,
       setattr(existing_line_item, key, value)
     existing_line_item.update()
     line_item_fields = existing_line_item.get_fields(reformat_datetime=True)
-    line_item_fields["id"] = str(request.url).split("?")[0]
+    line_item_fields[
+        "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/" + line_item_fields[
+            "uuid"]
+
+    return line_item_fields
+
+  except InvalidTokenError as e:
+    Logger.error(e)
+    raise Unauthenticated(str(e)) from e
+  except ResourceNotFoundException as e:
+    Logger.error(e)
+    raise ResourceNotFound(str(e)) from e
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.put(
+    "/{context_id}/line_items",
+    response_model=LineItemResponseModel,
+    responses={404: {
+        "model": NotFoundErrorResponseModel
+    }})
+@validate_access(
+    allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+def update_line_item_using_id(context_id: str,
+                              input_line_item: UpdateLineItemUsingIdModel,
+                              token: auth_scheme = Depends()):
+  """Update a line item using the id in the request body
+  ### Args:
+  uuid: `str`
+    Unique identifier for line item
+  input_line_item: `UpdateLineItemUsingIdModel`
+    Required body of the line item
+  ### Raises:
+  ResourceNotFoundException:
+    If the line item does not exist <br/>
+  Exception:
+    Internal Server Error. Raised if something went wrong
+  ### Returns:
+  Updated line item: `LineItemResponseModel`
+  """
+  try:
+    # # TODO: Add API call to check if the context_id (course_id) exists
+    input_line_item_dict = {**input_line_item.dict(exclude_unset=True)}
+    line_item_id = input_line_item_dict.get("id")
+    line_item_id = line_item_id.split("/")[-1]
+
+    existing_line_item = LineItem.find_by_uuid(line_item_id)
+    line_item_fields = existing_line_item.get_fields()
+
+    for key, value in input_line_item_dict.items():
+      line_item_fields[key] = value
+    for key, value in line_item_fields.items():
+      setattr(existing_line_item, key, value)
+    existing_line_item.update()
+    line_item_fields = existing_line_item.get_fields(reformat_datetime=True)
+    line_item_fields[
+        "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/" + line_item_fields[
+            "uuid"]
 
     return line_item_fields
 
@@ -292,8 +350,7 @@ def delete_line_item(context_id: str, uuid: str,
 @validate_access(allowed_scopes=[
     "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
 ])
-def get_results_of_line_item(request: Request,
-                             context_id: str,
+def get_results_of_line_item(context_id: str,
                              line_item_id: str,
                              skip: int = 0,
                              limit: int = 10,
@@ -333,8 +390,12 @@ def get_results_of_line_item(request: Request,
       result_fields = [i.get_fields(reformat_datetime=True) for i in result]
 
     for each_result in result_fields:
-      each_result["id"] = str(
-          request.url).split("?")[0] + "/" + each_result["uuid"]
+      each_result[
+          "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}/results/" + each_result[
+              "uuid"]
+
+      each_result[
+          "scoreOf"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
 
     return result_fields
 
@@ -359,8 +420,7 @@ def get_results_of_line_item(request: Request,
 @validate_access(allowed_scopes=[
     "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
 ])
-def get_result(request: Request,
-               context_id: str,
+def get_result(context_id: str,
                line_item_id: str,
                result_id: str,
                token: auth_scheme = Depends()):
@@ -386,7 +446,12 @@ def get_result(request: Request,
       raise ResourceNotFoundException(
           "Incorrect result id provided for the given line item")
     result_fields = result.get_fields(reformat_datetime=True)
-    result_fields["id"] = str(request.url).split("?")[0]
+    result_fields[
+        "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}/results/" + result_fields[
+            "uuid"]
+
+    result_fields[
+        "scoreOf"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
 
     return result_fields
 

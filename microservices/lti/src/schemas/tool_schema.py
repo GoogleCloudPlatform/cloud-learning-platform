@@ -22,6 +22,7 @@ class BasicToolModel(BaseModel):
   tool_keyset_url: Optional[str]
   content_selection_url: Optional[str]
   redirect_uris: list
+  enable_grade_sync: Optional[bool]
 
 
 class FullToolModel(BasicToolModel):
@@ -57,6 +58,7 @@ class UpdateToolModel(BaseModel):
   tool_keyset_url: Optional[str]
   content_selection_url: Optional[str]
   redirect_uris: Optional[list]
+  enable_grade_sync: Optional[bool]
 
   class Config():
     orm_mode = True

@@ -39,6 +39,8 @@ def test_course_enrollment(clean_firestore):
   course_enrollment = CourseEnrollmentMapping()
   course_enrollment.section = section
   course_enrollment.user ="test_user_id"
+  course_enrollment.role = "learner"
+  course_enrollment.status = "active"
   course_enrollment.save()
   course_enrollment = CourseEnrollmentMapping.find_by_user("test_user_id")
   for i in list(course_enrollment):

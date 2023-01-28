@@ -17,6 +17,7 @@ import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-c
 import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips';
 import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
     declarations: [
@@ -41,7 +42,8 @@ import { MatDividerModule } from '@angular/material/divider';
         MatCardModule,
         MatChipsModule,
         MatTableModule,
-        MatDividerModule
+        MatDividerModule,
+        MatPaginatorModule
     ]
 })
 export class MaterialSharedModule { }

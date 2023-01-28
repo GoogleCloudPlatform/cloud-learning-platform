@@ -19,7 +19,8 @@ BASIC_TOOL_EXAMPLE = {
         "https://example-tool.com/admin/ui/deep_link",
     "redirect_uris": [
         "https://example-tool.com/admin/api/ltilaunch/ltitoollaunch"
-    ]
+    ],
+    "enable_grade_sync": False
 }
 
 FULL_TOOL_EXAMPLE = {
@@ -68,6 +69,11 @@ UPDATE_LINE_ITEM_EXAMPLE = {
     "label": "50",
     "startDateTime": "2022-02-05T22:23:11+0000",
     "endDateTime": "2022-02-07T22:23:11+0000"
+}
+
+UPDATE_LINE_ITEM_USING_ID_EXAMPLE = {
+    **UPDATE_LINE_ITEM_EXAMPLE, "id":
+        "https://platformurl.com/context_id/line_items/bv9oyqvq9no"
 }
 
 FULL_LINE_ITEM_EXAMPLE = {

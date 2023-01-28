@@ -164,6 +164,7 @@ class Tool(BaseModel):
   content_selection_url = TextField()
   redirect_uris = ListField(required=True)
   deployment_id = TextField(required=True)
+  enable_grade_sync = BooleanField(default=False)
 
   class Meta:
     collection_name = BaseModel.DATABASE_PREFIX + "tools"
@@ -180,7 +181,7 @@ class Tool(BaseModel):
     return tool
 
   @classmethod
-  def find_by_client_id(cls, client_id, is_deleted=False):
+  def find_by_client_id(cls, client_id):
     tool = cls.collection.filter("client_id", "==",
                                  client_id).filter("deleted_at_timestamp", "==",
                                                    None).get()
@@ -190,7 +191,7 @@ class Tool(BaseModel):
     return tool
 
   @classmethod
-  def find_by_tool_url(cls, tool_url, is_deleted=False):
+  def find_by_tool_url(cls, tool_url):
     tool = cls.collection.filter("tool_url", "==",
                                  tool_url).filter("deleted_at_timestamp", "==",
                                                   None).get()
