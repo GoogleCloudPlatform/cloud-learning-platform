@@ -39,7 +39,7 @@ def validate_token(token: auth_scheme = Depends()):
           timeout=60)
       data = res.json()
       if res.status_code == 200 and data["success"] is True:
-        return True
+        return data.get("data")
       else:
         raise InvalidTokenError(data["message"])
     else:

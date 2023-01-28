@@ -16,12 +16,21 @@ import config
 import uvicorn
 from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 from routes import launch
 from common.utils.http_exceptions import add_exception_handlers
 
 templates = Jinja2Templates(directory="templates")
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/ping")
@@ -34,6 +43,13 @@ def health_check():
 
 
 api = FastAPI(title="Classroom Shim Service APIs", version="latest")
+api.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 api.include_router(launch.router)
 

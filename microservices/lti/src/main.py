@@ -15,6 +15,7 @@ os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 import config
 import uvicorn
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from routes import (tool_registration, content_item, content_item_return,
                     platform_registration, platform_auth, platform_launch,
                     tool_auth, tool_launch, line_item)
@@ -23,6 +24,13 @@ from common.utils.auth_service import validate_token
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/ping")
 def health_check():
@@ -35,6 +43,13 @@ def health_check():
 
 api = FastAPI(
     title="LTI Service APIs", version="latest", docs_url=None, redoc_url=None)
+api.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # LTI as a platform routes
 api.include_router(
