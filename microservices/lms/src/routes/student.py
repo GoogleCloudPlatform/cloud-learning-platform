@@ -13,8 +13,6 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import StudentListResponseModel, DeleteStudentFromSectionResponseModel
-from config import USER_MANAGEMENT_BASE_URL
-import requests
 
 # disabling for linting to pass
 # pylint: disable = broad-except

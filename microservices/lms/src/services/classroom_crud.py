@@ -498,7 +498,7 @@ def delete_student(course_id, student_email):
     raise InternalServerError(str(e)) from e
 
 def get_user_details(user_id, headers):
-  """Get user from user collection 
+  """Get user from user collection
   Args:
       user_id (str): user_id from user collection
       headers : Auth headers
@@ -510,7 +510,7 @@ def get_user_details(user_id, headers):
   response_get_student = requests.get\
       (f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
   if response_get_student.status_code == 404:
-      raise \
+    raise \
         ResourceNotFoundException(response_get_student.json()["message"])
   return response_get_student.json()
-   
+

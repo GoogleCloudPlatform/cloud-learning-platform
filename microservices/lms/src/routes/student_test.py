@@ -4,7 +4,6 @@
 import os
 import mock
 import pytest
-import requests_mock
 
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
@@ -111,27 +110,17 @@ def test_delete_student_from_section(client_with_emulator,create_fake_data):
   with mock.patch("routes.student.classroom_crud.delete_student",
                   return_value=[{}, {}]):
     with mock.patch("routes.student.classroom_crud.get_user_details",
-                  return_value={"data":{"email":"clplmstestuser1@gmail.com"}}):   
-    # with requests_mock.Mocker() as mock_request:
-    #   mock_resp = mock_request.get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}")
-    #   mock_resp.status_code = 200
-    #   mock_resp.mock_requests.return_value.data = \
-    #   {"email":"clplmstestuser1@gmail.com"}
+                  return_value={"data":{"email":"clplmstestuser1@gmail.com"}}):
       resp = client_with_emulator.delete(url)
   assert resp.status_code == 200
 
-def test_delete_student_from_section(client_with_emulator,create_fake_data):
+def test_delete_student_section_sectionid_not_found(client_with_emulator,create_fake_data):
   user_id = create_fake_data["user_id"]
   section_id = "test_section_id"
   url = BASE_URL + f"/student/{user_id}/section/{section_id}"
   with mock.patch("routes.student.classroom_crud.delete_student",
                   return_value=[{}, {}]):
     with mock.patch("routes.student.classroom_crud.get_user_details",
-                  return_value={"data":{"email":"clplmstestuser1@gmail.com"}}):   
-    # with requests_mock.Mocker() as mock_request:
-    #   mock_resp = mock_request.get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}")
-    #   mock_resp.status_code = 200
-    #   mock_resp.mock_requests.return_value.data = \
-    #   {"email":"clplmstestuser1@gmail.com"}
+                  return_value={"data":{"email":"clplmstestuser1@gmail.com"}}):
       resp = client_with_emulator.delete(url)
   assert resp.status_code == 404
