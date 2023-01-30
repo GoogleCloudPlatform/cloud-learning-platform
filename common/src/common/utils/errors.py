@@ -56,11 +56,4 @@ class UserManagementServiceError(Exception):
     self.message = message
     super().__init__(self.message)
 
-class UpdateUserManagementServiceError(Exception):
-  """Error class to be raised when there is error in user management service"""
-
-  def __init__(self, message="Change  User status failed"):
-    self.message = message
-    super().__init__(self.message)
-
 
