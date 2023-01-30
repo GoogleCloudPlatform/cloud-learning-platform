@@ -35,13 +35,13 @@
         ],
         callbacks: {
           signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ltiContentItemId = urlParams.get("lti_content_item_id");
             let user = authResult.user;
             console.log("fetched user token");
             let token = user._delegate.accessToken;
             const userId = "fr4oI7jFAG5SBhefLQKl";
-            const ltiContentItemId = "EC5jjROdU9WQINf8UI3S";
             const url = `https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/resource-launch-init?lti_content_item_id=${ltiContentItemId}&user_id=${userId}`;
-            console.log("before making request");
 
             axios
               .get(url, {
@@ -51,12 +51,12 @@
               })
               .then((response) => {
                 console.log("received response from launch");
-                window.open(response.data.url, "_self").focus();
                 response.data
-                  ? window.open(response.data.url, "_self").focus()
-                  : console.log("No URL found in the response");
+                  ? response.data.url
+                    ? window.open(response.data.url, "_self").focus()
+                    : console.log("No URL found in the response")
+                  : console.log("No response data");
               });
-            console.log("after making request");
             return false;
           },
         },
