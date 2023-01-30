@@ -67,7 +67,8 @@ def resource_launch_init(lti_content_item_id: str, user_id: str):
         redirect_url = urlunparse(
             (login_url.scheme, login_url.netloc, login_url.path,
              login_url.params, urlencode(query_params), login_url.fragment))
-        return RedirectResponse(url=redirect_url, status_code=302)
+        # return RedirectResponse(url=redirect_url, status_code=302)
+        return {"url": redirect_url}
       else:
         raise ResourceNotFoundException(
             "Tool for the requested resource is not available")
