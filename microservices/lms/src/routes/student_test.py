@@ -114,7 +114,8 @@ def test_delete_student_from_section(client_with_emulator,create_fake_data):
       resp = client_with_emulator.delete(url)
   assert resp.status_code == 200
 
-def test_delete_student_section_sectionid_not_found(client_with_emulator,create_fake_data):
+def test_delete_student_sectionid_not_found\
+(client_with_emulator,create_fake_data):
   user_id = create_fake_data["user_id"]
   section_id = "test_section_id"
   url = BASE_URL + f"/student/{user_id}/section/{section_id}"
