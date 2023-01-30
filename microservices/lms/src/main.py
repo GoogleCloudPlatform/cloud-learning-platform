@@ -72,7 +72,8 @@ def hello():
 
 api = FastAPI(title="LMS Service APIs",
               version="latest",
-              dependencies=[Depends(validate_token)])
+              dependencies=[Depends(validate_token)]
+              )
 
 api.include_router(user.router)
 api.include_router(section.router)

@@ -4,6 +4,8 @@
 import os
 import mock
 import pytest
+import requests
+import requests_mock
 
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
@@ -13,6 +15,8 @@ from common.models import CourseTemplate, Cohort ,TempUser,CourseEnrollmentMappi
 from testing.test_config import BASE_URL
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
    COHORT_EXAMPLE, TEMP_USER
+from config import USER_MANAGEMENT_BASE_URL
+
 
 
 
@@ -107,5 +111,9 @@ def test_delete_student_from_section(client_with_emulator,create_fake_data):
   url = BASE_URL + f"/student/{user_id}/section/{section_id}"
   with mock.patch("routes.student.classroom_crud.delete_student",
                   return_value=[{}, {}]):
-    resp = client_with_emulator.delete(url)
+    with requests_mock.Mocker() as mock_request:
+      mock_resp = mock_request.get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}", text="Hello!")
+      mock_resp.status_code = 200
+      mock_resp.mock_requests.return_value.data = {"email":"clplmstestuser1@gmail.com"}
+      resp = client_with_emulator.delete(url)
   assert resp.status_code == 200

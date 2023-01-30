@@ -78,3 +78,20 @@ class CourseEnrollmentMapping(BaseModel):
       filter("section", "==", section_key).filter(
         "status", "==","active").filter("role", "==",role).fetch()
     return list(objects)
+
+  @classmethod
+  def find_course_enrollment_record(cls,
+                          section_key,
+                          user_id,
+                        ):
+    """_summary_
+
+    Args:
+        section_key (str): section unique key to filter data
+        user_id(str, optional): user_id from user collection
+
+    Returns:
+        course_enrollment object
+    """
+    return CourseEnrollmentMapping.collection.filter("user","==",user_id).\
+    filter("status", "==","active").filter("section","==",section_key).get()

@@ -6,7 +6,7 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException, ValidationError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
                                           ResourceNotFound, BadRequest)
-from common.models import CourseEnrollmentMapping
+from common.models import CourseEnrollmentMapping,Section
 from services import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
@@ -134,38 +134,35 @@ def delete_student(section_id: str,user_id:str,request: Request):
   """Get a section details from db
   Args:
       section_id (str): section_id in firestore
+      user_id (str): user_id in firestore User collection
   Raises:
       HTTPException: 500 Internal Server Error if something fails
-      HTTPException: 404 Section with section id is not found
+      HTTPException: 404 user with section id is not found
   Returns:
-    {"status":"Success","new_course":{}}: Returns section details from  db,
+    {"status":"Success","data":{course_enrollment_id}},
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
-    result = CourseEnrollmentMapping.find_by_user(user_id=user_id)
-    if result == []:
+    section_details = Section.find_by_id(section_id)
+    result = CourseEnrollmentMapping.\
+      find_course_enrollment_record(section_details.key,user_id)
+    if result == None:
       raise ResourceNotFoundException\
       ("User not found in course Enrollment Collection")
-    course_enrollment_result = \
-      list(map(convert_course_enrollment_model, result))
-    record = None
-    for record in course_enrollment_result:
-      if section_id == record["section"]["id"]:
-        course_id =  record["section"]["classroom_id"]
-        response_get_student = \
-        requests.get\
-          (f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-        if response_get_student.status_code == 404:
-          raise \
-            ResourceNotFoundException(response_get_student.json()["message"])
-        student_email =  response_get_student.json()["data"]["email"]
-        classroom_crud.delete_student(course_id=course_id,\
-          student_email=student_email)
-        course_enrollment = CourseEnrollmentMapping.find_by_id(record["id"])
-        course_enrollment.status = "inactive"
-        course_enrollment.update()
-    return {"data": record["id"]}
+    course_id = section_details.classroom_id
+    response_get_student = \
+    requests.get\
+      (f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+    if response_get_student.status_code == 404:
+      raise \
+        ResourceNotFoundException(response_get_student.json()["message"])
+    student_email =  response_get_student.json()["data"]["email"]
+    classroom_crud.delete_student(course_id=course_id,\
+      student_email=student_email)
+    result.status = "inactive"
+    result.update()
+    return{"data":result.id}
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
