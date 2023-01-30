@@ -11,28 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Master Skaffold
-apiVersion: skaffold/v2beta12
-kind: Config
-metadata:
-  name: backends
-requires:
-- path: ./common
-  configs: [common]
-
-- path: ./microservices/lms
-  configs: [lms]
-
-- path: ./microservices/lms_admin_ui
-  configs: [lms-admin-ui]
-
-- path: ./microservices/lti
-  configs: [lti]
-
-- path: ./microservices/classroom_notification_service
-  configs: [classroom-notification-service]
-
-- path: ./microservices/classroom_shim
-  configs: [classroom-shim]
-

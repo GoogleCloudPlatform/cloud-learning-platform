@@ -12,27 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Master Skaffold
-apiVersion: skaffold/v2beta12
-kind: Config
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
 metadata:
-  name: backends
-requires:
-- path: ./common
-  configs: [common]
-
-- path: ./microservices/lms
-  configs: [lms]
-
-- path: ./microservices/lms_admin_ui
-  configs: [lms-admin-ui]
-
-- path: ./microservices/lti
-  configs: [lti]
-
-- path: ./microservices/classroom_notification_service
-  configs: [classroom-notification-service]
-
-- path: ./microservices/classroom_shim
-  configs: [classroom-shim]
-
+  name: classroom-notification-service
+spec:
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - external:
+      metricName:  pubsub.googleapis.com|subscription|num_undelivered_messages
+      metricSelector:
+        matchLabels:
+          resource.labels.subscription_id: echo-read
+      targetAverageValue: 2
+    type: External
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: classroom-notification-service

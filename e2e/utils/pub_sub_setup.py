@@ -44,7 +44,8 @@ try:
   print(f"Created Pub/Sub topic: {topic.name}")
   subscription = subscriber.create_subscription(request={
       "name": subscription_path,
-      "topic": topic_path
+      "topic": topic_path,
+      "ack_deadline_seconds":600
   })
   print(f"Subscription created: {subscription.name}")
 except AlreadyExists:
