@@ -18,11 +18,14 @@ interface LooseObject {
 export class HomeComponent implements OnInit {
   searchText: string = '';
   cohortList: any[]
+  sectionList: any[]
   courseTemplateList: any[]
   courseTemplateLoader: boolean = true
   cohortLoader: boolean = true
+  sectionLoader: boolean = true
   searchCohortTerm: string
   searchCourseTemplate: string
+  searchSection: string
   pageEvent: PageEvent;
 
   cohortSkip: number = 0
@@ -32,12 +35,17 @@ export class HomeComponent implements OnInit {
   courseTemplateSkip: number = 0
   courseTemplateLimit: number = 10
   courseTemplatePageSize: number = 10
+
+  sectionSkip: number = 0
+  sectionLimit: number = 10
+  sectionPageSize: number = 10
   constructor(public dialog: MatDialog, public _HomeService: HomeService) {
   }
 
   ngOnInit(): void {
     this.getCohortList()
     this.getCourseTemplateList()
+    this.getAllSectionsList()
   }
   handleCohortPageEvent(e: PageEvent) {
     this.pageEvent = e;
@@ -106,6 +114,17 @@ export class HomeComponent implements OnInit {
       if (res.success == true) {
         this.cohortList = res.cohort_list
         this.cohortLoader = false
+      }
+    })
+  }
+
+  getAllSectionsList() {
+    this.sectionLoader = true
+    this.sectionList = []
+    this._HomeService.getAllSectionList(this.cohortSkip, this.cohortLimit).subscribe((res: any) => {
+      if (res.success == true) {
+        this.sectionList = res.data
+        this.sectionLoader = false
       }
     })
   }
