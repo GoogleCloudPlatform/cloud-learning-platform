@@ -4,7 +4,6 @@ from config import ERROR_RESPONSES, ISSUER
 from fastapi import APIRouter
 from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
 from common.models import Tool, LTIContentItem
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  TokenNotFoundError)
@@ -67,7 +66,6 @@ def resource_launch_init(lti_content_item_id: str, user_id: str):
         redirect_url = urlunparse(
             (login_url.scheme, login_url.netloc, login_url.path,
              login_url.params, urlencode(query_params), login_url.fragment))
-        # return RedirectResponse(url=redirect_url, status_code=302)
         return {"url": redirect_url}
       else:
         raise ResourceNotFoundException(
@@ -133,7 +131,6 @@ def content_selection_launch_init(tool_id: str, user_id: str):
       redirect_url = urlunparse(
           (login_url.scheme, login_url.netloc, login_url.path, login_url.params,
            urlencode(query_params), login_url.fragment))
-      # return RedirectResponse(url=redirect_url, status_code=302)
       return {"url": redirect_url}
 
   except ValidationError as e:
