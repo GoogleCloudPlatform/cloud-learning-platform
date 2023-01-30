@@ -13,7 +13,6 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import StudentListResponseModel, DeleteStudentFromSectionResponseModel
-from utils.helper import convert_course_enrollment_model
 from config import USER_MANAGEMENT_BASE_URL
 import requests
 
@@ -147,7 +146,7 @@ def delete_student(section_id: str,user_id:str,request: Request):
     section_details = Section.find_by_id(section_id)
     result = CourseEnrollmentMapping.\
       find_course_enrollment_record(section_details.key,user_id)
-    if result == None:
+    if result is None:
       raise ResourceNotFoundException\
       ("User not found in course Enrollment Collection")
     course_id = section_details.classroom_id

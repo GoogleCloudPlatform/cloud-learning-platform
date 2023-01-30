@@ -4,7 +4,6 @@
 import os
 import mock
 import pytest
-import requests
 import requests_mock
 
 # disabling pylint rules that conflict with pytest fixtures
@@ -112,8 +111,9 @@ def test_delete_student_from_section(client_with_emulator,create_fake_data):
   with mock.patch("routes.student.classroom_crud.delete_student",
                   return_value=[{}, {}]):
     with requests_mock.Mocker() as mock_request:
-      mock_resp = mock_request.get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}", text="Hello!")
+      mock_resp = mock_request.get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}")
       mock_resp.status_code = 200
-      mock_resp.mock_requests.return_value.data = {"email":"clplmstestuser1@gmail.com"}
+      mock_resp.mock_requests.return_value.data = \
+      {"email":"clplmstestuser1@gmail.com"}
       resp = client_with_emulator.delete(url)
   assert resp.status_code == 200
