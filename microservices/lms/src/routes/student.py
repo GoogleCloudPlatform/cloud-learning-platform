@@ -150,13 +150,8 @@ def delete_student(section_id: str,user_id:str,request: Request):
       raise ResourceNotFoundException\
       ("User not found in course Enrollment Collection")
     course_id = section_details.classroom_id
-    response_get_student = \
-    requests.get\
-      (f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-    if response_get_student.status_code == 404:
-      raise \
-        ResourceNotFoundException(response_get_student.json()["message"])
-    student_email =  response_get_student.json()["data"]["email"]
+    response_get_student = classroom_crud.get_user_details(user_id,headers)
+    student_email =  response_get_student["data"]["email"]
     classroom_crud.delete_student(course_id=course_id,\
       student_email=student_email)
     result.status = "inactive"
