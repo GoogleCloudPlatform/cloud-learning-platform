@@ -1,6 +1,5 @@
 """Tool Registration Endpoints"""
 from uuid import uuid4
-from typing import Optional
 from fastapi import APIRouter
 from config import ERROR_RESPONSES
 from common.models import Tool
@@ -53,9 +52,7 @@ def search_tool(client_id: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_all_tools(skip: int = 0,
-                  limit: int = 10,
-                  fetch_archive: Optional[bool] = None):
+def get_all_tools(skip: int = 0, limit: int = 10):
   """The get tools endpoint will return an array of tools from firestore
   ### Args:
   skip: `int`
@@ -79,9 +76,6 @@ def get_all_tools(skip: int = 0,
 
     collection_manager = Tool.collection.filter("deleted_at_timestamp", "==",
                                                 None)
-    # if fetch_archive is not None:
-    #   collection_manager = collection_manager\
-    #                         .filter("is_archived", "==", fetch_archive)
 
     tools = collection_manager.order("-created_time").offset(skip).fetch(limit)
     tools_list = []
@@ -164,8 +158,6 @@ def create_tool(input_tool: ToolModel):
     input_tool_dict = {**input_tool.dict()}
 
     client_id = str(uuid4())
-
-    # TODO: deployment_id needs to be defined for single-tenant and multi-tenant model
     deployment_id = str(uuid4())
 
     tool_url = input_tool_dict["tool_url"]

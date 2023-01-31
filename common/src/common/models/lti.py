@@ -201,7 +201,7 @@ class Platform(BaseModel):
   deployment_ids = ListField(required=True)
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "platforms"
+    collection_name = BaseModel.DATABASE_PREFIX + "platforms"
     ignore_none_field = False
 
   @classmethod
@@ -227,7 +227,7 @@ class LTIContentItem(BaseModel):
   content_item_info = MapField(required=True)
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "lti_content_items"
+    collection_name = BaseModel.DATABASE_PREFIX + "lti_content_items"
     ignore_none_field = False
 
   @classmethod

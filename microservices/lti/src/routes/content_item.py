@@ -1,5 +1,4 @@
 """LTI Content Item endpoints"""
-from typing import Optional
 from fastapi import APIRouter
 from config import ERROR_RESPONSES
 from common.models import LTIContentItem, Tool
@@ -58,9 +57,7 @@ def search_content_item(tool_id: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_all_content_items(skip: int = 0,
-                          limit: int = 10,
-                          fetch_archive: Optional[bool] = None):
+def get_all_content_items(skip: int = 0, limit: int = 10):
   """The get content items endpoint will return an array of content
   items from firestore
   ### Args:
@@ -79,9 +76,6 @@ def get_all_content_items(skip: int = 0,
   try:
     collection_manager = LTIContentItem.collection.filter(
         "deleted_at_timestamp", "==", None)
-    # if fetch_archive is not None:
-    #   collection_manager = collection_manager\
-    #                         .filter("is_archived", "==", fetch_archive)
 
     content_items = collection_manager.order("-created_time").offset(
         skip).fetch(limit)

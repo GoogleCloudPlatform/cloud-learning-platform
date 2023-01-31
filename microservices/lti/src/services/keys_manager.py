@@ -5,7 +5,7 @@ import requests
 from Crypto.PublicKey import RSA
 from config import (LTI_SERVICE_PLATFORM_PRIVATE_KEY,
                     LTI_SERVICE_TOOL_PRIVATE_KEY)
-#pylint: disable=broad-except
+#pylint: disable=broad-except, missing-timeout
 
 
 def urlsafe_encode(val):

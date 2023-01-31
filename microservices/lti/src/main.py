@@ -6,15 +6,12 @@
 # pylint: disable=wrong-import-position
 # """ For Local Development
 """ For Local Development
-"""
 import sys
-import os
-
 sys.path.append("../../../common/src")
+import os
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
-
-os.environ["DATABASE_PREFIX"] = "ram_"
+"""
 import config
 import uvicorn
 from fastapi import FastAPI, Depends
@@ -36,20 +33,23 @@ def health_check():
   }
 
 
-api = FastAPI(title="LTI Service APIs", version="latest")
+api = FastAPI(
+    title="LTI Service APIs", version="latest", docs_url=None, redoc_url=None)
 
 # LTI as a platform routes
-api.include_router(tool_registration.router)
-api.include_router(platform_launch.router)
+api.include_router(
+    tool_registration.router, dependencies=[Depends(validate_token)])
+api.include_router(
+    platform_launch.router, dependencies=[Depends(validate_token)])
 api.include_router(platform_auth.router)
 api.include_router(content_item_return.router)
 api.include_router(content_item.router)
 api.include_router(line_item.router)
 
 # LTI as a tool routes
-# api.include_router(platform_registration.router)
-# api.include_router(tool_auth.router)
-# api.include_router(tool_launch.router)
+api.include_router(platform_registration.router)
+api.include_router(tool_auth.router)
+api.include_router(tool_launch.router)
 
 add_exception_handlers(app)
 add_exception_handlers(api)
@@ -57,4 +57,8 @@ app.mount("/lti/api/v1", api)
 
 if __name__ == "__main__":
   uvicorn.run(
-      "main:app", host="0.0.0.0", port=9030, log_level="debug", reload=True)
+      "main:app",
+      host="0.0.0.0",
+      port=int(config.PORT),
+      log_level="debug",
+      reload=True)

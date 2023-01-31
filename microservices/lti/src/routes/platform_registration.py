@@ -1,5 +1,4 @@
 """Platform Registration endpoints"""
-from typing import Optional
 from fastapi import APIRouter
 from config import ERROR_RESPONSES, ISSUER
 from common.models import Platform
@@ -61,9 +60,7 @@ def search_platform(client_id: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_all_platforms(skip: int = 0,
-                      limit: int = 10,
-                      fetch_archive: Optional[bool] = None):
+def get_all_platforms(skip: int = 0, limit: int = 10):
   """The get platforms endpoint will return an array of platforms from firestore
   ### Args:
   skip: `int`
@@ -85,10 +82,8 @@ def get_all_platforms(skip: int = 0,
     if limit < 1:
       raise ValidationError("Invalid value passed to \"limit\" query parameter")
 
-    collection_manager = Platform.collection.filter("is_deleted", "==", False)
-    # if fetch_archive is not None:
-    #   collection_manager = collection_manager\
-    #                         .filter("is_archived", "==", fetch_archive)
+    collection_manager = Platform.collection.filter("deleted_at_timestamp",
+                                                    "==", None)
     platforms = collection_manager.order("-created_time").offset(skip).fetch(
         limit)
 
@@ -173,8 +168,8 @@ def create_platform(input_platform: PlatformModel):
   ### Returns:
   Platform Data: `PlatformResponseModel`
   """
-  # TODO: Currently the issuer should be unique. But later, the combination of client_id
-  # and issuer should be unique
+  # TODO: Currently the issuer should be unique. But later, the combination of
+  # client_id and issuer should be unique
   try:
     input_platform_dict = {**input_platform.dict()}
     issuer = input_platform_dict.get("issuer")
