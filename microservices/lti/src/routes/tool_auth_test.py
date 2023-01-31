@@ -37,7 +37,7 @@ client_with_emulator = TestClient(app)
 def test_jwks(clean_firestore, create_platform, mocker):
   platform = create_platform
   platform_dict = platform.get_fields(reformat_datetime=True)
-  platform_id = platform_dict["uuid"] = platform.id
+  platform_id = platform_dict["id"] = platform.id
 
   url = f"{API_URL}/jwks/{platform_id}"
   private_key = generate_test_rsa_private_key()
@@ -60,7 +60,7 @@ def test_jwks_negative(clean_firestore):
 def test_oidc_login(clean_firestore, create_platform):
   platform = create_platform
   platform_dict = platform.get_fields(reformat_datetime=True)
-  platform_dict["uuid"] = platform.id
+  platform_dict["id"] = platform.id
 
   url = f"{API_URL}/oidc-login"
 
@@ -81,7 +81,7 @@ def test_oidc_login(clean_firestore, create_platform):
 def test_oidc_login_negative_client_id(clean_firestore, create_platform):
   platform = create_platform
   platform_dict = platform.get_fields(reformat_datetime=True)
-  platform_dict["uuid"] = platform.id
+  platform_dict["id"] = platform.id
 
   url = f"{API_URL}/oidc-login"
 

@@ -44,7 +44,7 @@ def tool_jwks(platform_id: str):
     Returns public key set JSON
   """
   try:
-    Platform.find_by_uuid(platform_id)
+    Platform.find_by_id(platform_id)
     keyset = get_tool_public_keyset()
     return keyset.get("public_keyset")
   except ResourceNotFoundException as e:
