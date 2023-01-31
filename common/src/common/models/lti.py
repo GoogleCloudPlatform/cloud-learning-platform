@@ -219,43 +219,22 @@ class Platform(BaseModel):
     return platform
 
 
-class LTIContentItem(TempBaseModel):
+class LTIContentItem(BaseModel):
   """LTI Content Item Data Model"""
-  uuid = TextField(required=True)
+  id = IDField()
   tool_id = TextField(required=True)
   content_item_type = TextField(required=True)
   content_item_info = MapField(required=True)
-  is_archived = BooleanField(default=False)
-  is_deleted = BooleanField(default=False)
 
   class Meta:
     collection_name = TempBaseModel.DATABASE_PREFIX + "lti_content_items"
     ignore_none_field = False
 
   @classmethod
-  def find_by_uuid(cls, uuid, is_deleted=False):
-    lti_content_item = cls.collection.filter("uuid", "==", uuid).filter(
-        "is_deleted", "==", is_deleted).get()
-    if lti_content_item is None:
-      raise ResourceNotFoundException(
-          f"LTI Content item with uuid {uuid} not found")
-    return lti_content_item
-
-  @classmethod
-  def delete_by_uuid(cls, uuid):
-    doc = cls.collection.filter("uuid", "==",
-                                uuid).filter("is_deleted", "==", False).get()
-    if doc is not None:
-      doc.is_deleted = True
-      doc.update()
-    else:
-      raise ResourceNotFoundException(
-          f"LTI Content item with uuid {uuid} not found")
-
-  @classmethod
   def find_by_tool_id(cls, tool_id):
     lti_content_item_doc = cls.collection.filter(
-        "tool_id", "==", tool_id).filter("is_deleted", "==", False).get()
+        "tool_id", "==", tool_id).filter("deleted_at_timestamp", "==",
+                                         None).get()
     return lti_content_item_doc
 
 

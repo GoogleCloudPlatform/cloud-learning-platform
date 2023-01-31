@@ -117,8 +117,7 @@ BASIC_CONTENT_ITEM_EXAMPLE = {
 }
 
 FULL_CONTENT_ITEM_EXAMPLE = {
-    "uuid": "aC72Vos31iFQt09c",
-    **BASIC_CONTENT_ITEM_EXAMPLE, "is_archived": False,
+    **BASIC_CONTENT_ITEM_EXAMPLE, "id": "aC72Vos31iFQt09c",
     "created_time": "2022-03-03 09:22:49.843674+00:00",
     "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
 }

@@ -25,12 +25,9 @@ def create_platform(request):
 @pytest.fixture(name="create_content_item")
 def create_content_item(request):
   content_item = LTIContentItem.from_dict(request.param)
-  content_item.uuid = ""
   content_item.client_id = str(uuid4())
   content_item.deployment_id = str(uuid4())
   content_item.save()
-  content_item.uuid = content_item.id
-  content_item.update()
   return content_item
 
 
