@@ -1,67 +1,78 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Assignment launch</title>
     <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.js"></script>
-    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css" />
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css"
+    />
     <script type="text/javascript">
-        const firebaseConfig = {
-            apiKey: "AIzaSyDyr4yG7khoWYsteBcYqVy-t00YlCevtkY",
-            projectId: "core-learning-services-dev",
-            authDomain: "core-learning-services-dev.firebaseapp.com"
-        };
+      const firebaseConfig = {
+        apiKey: "AIzaSyDyr4yG7khoWYsteBcYqVy-t00YlCevtkY",
+        projectId: "core-learning-services-dev",
+        authDomain: "core-learning-services-dev.firebaseapp.com",
+      };
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        // FirebaseUI config.
-        let uiConfig = {
-            signInOptions: [
-                {
-                    provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                    customParameters: {
-                        // Forces account selection even when one account
-                        // is available.
-                        prompt: 'select_account'
-                    }
-                }
-            ],
-            callbacks: {
-                signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-                    let user = authResult.user;
-                    console.log(user._delegate.accessToken)
-                    let token = user._delegate.accessToken
-                    const userId = "fr4oI7jFAG5SBhefLQKl"
-                    const ltiContentItemId = "sWMKxxbf55nAsojRVxZ7"
-                    const url = `https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/resource-launch-init?lti_content_item_id=${ltiContentItemId}&user_id=${userId}`
-                    fetch(url, {
-                        redirect: 'follow', headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }).then(response => {
-                        console.log(response)
-                        if (response.redirected) {
-                            window.location.href = response.url;
-                        }
-                    })
-                    return false;
-                },
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      // FirebaseUI config.
+      let uiConfig = {
+        signInOptions: [
+          {
+            provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+            customParameters: {
+              // Forces account selection even when one account
+              // is available.
+              prompt: "select_account",
             },
-        };
+          },
+        ],
+        callbacks: {
+          signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ltiContentItemId = urlParams.get("lti_content_item_id");
+            let user = authResult.user;
+            console.log("fetched user token");
+            let token = user._delegate.accessToken;
+            const userId = "fr4oI7jFAG5SBhefLQKl";
+            const url = `https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/resource-launch-init?lti_content_item_id=${ltiContentItemId}&user_id=${userId}`;
 
-        // Initialize the FirebaseUI Widget using Firebase.
-        let ui = new firebaseui.auth.AuthUI(firebase.auth());
-        // The start method will wait until the DOM is loaded.
-        ui.start('#firebaseui-auth-container', uiConfig);
+            axios
+              .get(url, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              })
+              .then((response) => {
+                console.log("received response from launch");
+                response.data
+                  ? response.data.url
+                    ? window.open(response.data.url, "_self").focus()
+                    : console.log("No URL found in the response")
+                  : console.log("No response data");
+              });
+            return false;
+          },
+        },
+      };
+
+      // Initialize the FirebaseUI Widget using Firebase.
+      let ui = new firebaseui.auth.AuthUI(firebase.auth());
+      // The start method will wait until the DOM is loaded.
+      ui.start("#firebaseui-auth-container", uiConfig);
     </script>
-</head>
+  </head>
 
-<body>
-    <h1 style="text-align: center; margin-bottom: 3rem;">You are required to sign in before we proceed further</h1>
+  <body>
+    <h1 style="text-align: center; margin-bottom: 3rem">
+      You are required to sign in before we proceed further
+    </h1>
     <div id="firebaseui-auth-container"></div>
-</body>
-
+  </body>
 </html>

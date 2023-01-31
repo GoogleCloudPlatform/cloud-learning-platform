@@ -4,10 +4,12 @@ from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from common.utils.errors import InvalidTokenError,UserManagementServiceError
+from common.utils.errors import InvalidTokenError,UserManagementServiceError,ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
+
 from common.models import Section,CourseEnrollmentMapping
+
 from config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
 from utils import helper
 import requests
@@ -469,3 +471,46 @@ def list_student_section(section_id,headers):
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     users.append(response.json()["data"])
   return users
+
+def delete_student(course_id, student_email):
+  """Delete  student from google classroom using course id and email
+  Args:
+      course_id (str): google classroom unique id
+      teacher_email (str): teacher email id
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
+  Returns:
+      dict: response from create invitation method
+  """
+  service = build("classroom", "v1", credentials=get_credentials())
+  student = {"userId": student_email}
+  try:
+    student = service.courses().students().delete(
+                courseId=course_id,userId = student_email).execute()
+    return student
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+def get_user_details(user_id, headers):
+  """Get user from user collection
+  Args:
+      user_id (str): user_id from user collection
+      headers : Auth headers
+
+  Returns:
+      dict: response from user API
+  """
+
+  response_get_student = requests.get\
+      (f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+  if response_get_student.status_code == 404:
+    raise \
+        ResourceNotFoundException(response_get_student.json()["message"])
+  return response_get_student.json()
+
