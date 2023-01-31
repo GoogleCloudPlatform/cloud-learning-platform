@@ -17,6 +17,7 @@ import { CreateSectionComponent } from './create-section/create-section.componen
 // import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips';
 import { EditSectionComponent } from './edit-section/edit-section.component';
+import { SectionListComponent } from './section-list/section-list.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { EditSectionComponent } from './edit-section/edit-section.component';
     SectionComponent,
     CreateSectionComponent,
     EditSectionComponent,
+    SectionListComponent,
 
   ],
   // entryComponents: [CreateCohortModalComponent],

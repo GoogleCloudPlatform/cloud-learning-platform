@@ -96,6 +96,36 @@
 
         </mat-tab>
 
+        <mat-tab label="Section List">
+            <div class="search-bar">
+                <div style="width: 87%;">
+                    <div class="full-width">
+
+                        <mat-form-field appearance="outline" style="width: 100%;">
+                            <mat-label>Enter section name, keyword</mat-label>
+                            <input matInput [(ngModel)]="searchSection">
+                            <button *ngIf="searchSection" matSuffix mat-icon-button aria-label="Clear"
+                                (click)="searchSection=''">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="search-button">
+
+                    <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"><span
+                            class="material-symbols-rounded">
+                            search
+                        </span> Search</button>
+                </div>
+            </div>
+
+            <app-section-list [sectionList]="sectionList"></app-section-list>
+
+
+
+        </mat-tab>
+
 
     </mat-tab-group>
 

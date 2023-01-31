@@ -16,6 +16,9 @@ export class HomeService {
     return this.http.get(`${environment.apiurl}course_templates?skip=${skip}&limit=${limit}`)
 
   }
+  getAllSectionList(skip: any, limit: any) {
+    return this.http.get(`${environment.apiurl}sections?skip=${skip}&limit=${limit}`)
+  }
   editCourseTemplate(data: any, id: any) {
     return this.http.patch(`${environment.apiurl}course_templates/${id}`, data)
   }
