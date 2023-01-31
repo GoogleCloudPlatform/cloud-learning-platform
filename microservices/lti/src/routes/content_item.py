@@ -260,6 +260,7 @@ def delete_content_item(content_item_id: str):
   Success/Fail Message: `JSON`
   """
   try:
+    LTIContentItem.find_by_id(content_item_id)
     LTIContentItem.delete_by_id(content_item_id)
     return {}
   except ResourceNotFoundException as e:

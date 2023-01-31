@@ -48,7 +48,6 @@ def test_search_content_item(clean_firestore, create_content_item):
   url = f"{api_url}/search"
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
-  print("json_response", json_response)
   modified_del_keys = DEL_KEYS + ["created_by", "last_modified_by"]
   for key in modified_del_keys:
     if key in json_response["data"][0]:
@@ -90,7 +89,6 @@ def test_get_content_item_negative(clean_firestore):
 
   resp = client_with_emulator.get(url)
   json_response = resp.json()
-  print("json_response", json_response)
   assert resp.status_code == 404, "Status code not 404"
   assert json_response == data, "Response received"
 
@@ -164,7 +162,7 @@ def test_update_content_item_negative(clean_firestore, create_content_item):
   url = f"{api_url}/{content_item_id}"
   response = {
       "success": False,
-      "message": "LTI Content item with uuid U2DDBkl3Ayg0PWudzhI not found",
+      "message": "lti_content_items with id U2DDBkl3Ayg0PWudzhI is not found",
       "data": None
   }
 
@@ -177,82 +175,49 @@ def test_update_content_item_negative(clean_firestore, create_content_item):
   assert resp.status_code == 404, "Status code not 404"
   assert json_response == response, "Expected response not same"
 
-# @pytest.mark.parametrize(
-#     "create_content_item", [BASIC_CONTENT_ITEM_EXAMPLE], indirect=True)
-# def test_delete_content_item(clean_firestore, create_content_item):
-#   content_item = create_content_item
-#   uuid = content_item.uuid
 
-#   url = f"{api_url}/{uuid}"
-#   resp = client_with_emulator.delete(url)
-#   del_json_response = resp.json()
+@pytest.mark.parametrize(
+    "create_content_item", [BASIC_CONTENT_ITEM_EXAMPLE], indirect=True)
+def test_delete_content_item(clean_firestore, create_content_item):
+  content_item = create_content_item
+  content_item = content_item.id
 
-#   expected_data = {
-#       "success": True,
-#       "message": "Successfully deleted the content item"
-#   }
-#   assert resp.status_code == 200, "Status code not 200"
-#   assert del_json_response == expected_data, "Expected response not same"
+  url = f"{api_url}/{content_item}"
+  resp = client_with_emulator.delete(url)
+  del_json_response = resp.json()
 
-#   # assert that the content_item exists in the database and is soft deleted
-#   content_item = LTIContentItem.find_by_uuid(uuid, is_deleted=True)
-#   assert content_item
+  expected_data = {
+      "success": True,
+      "message": "Successfully deleted the content item"
+  }
+  assert resp.status_code == 200, "Status code not 200"
+  assert del_json_response == expected_data, "Expected response not same"
 
-# def test_delete_content_item_negative(clean_firestore):
-#   content_item_uuid = "U2DDBkl3Ayg0PWudzhI"
-#   url = f"{api_url}/{content_item_uuid}"
-#   response = {
-#       "success": False,
-#       "message": "LTI Content item with uuid U2DDBkl3Ayg0PWudzhI not found",
-#       "data": None
-#   }
-#   resp = client_with_emulator.delete(url)
-#   json_response = resp.json()
 
-#   assert resp.status_code == 404, "Status code not404"
-#   assert json_response == response, "Expected response not same"
+def test_delete_content_item_negative(clean_firestore):
+  content_item_id = "U2DDBkl3Ayg0PWudzhI"
+  url = f"{api_url}/{content_item_id}"
+  response = {
+      "success": False,
+      "message": "lti_content_items with id U2DDBkl3Ayg0PWudzhI is not found",
+      "data": None
+  }
+  resp = client_with_emulator.delete(url)
+  json_response = resp.json()
 
-# @pytest.mark.parametrize(
-#     "create_content_item", [(BASIC_CONTENT_ITEM_EXAMPLE)], indirect=True)
-# def test_get_content_items(clean_firestore, create_content_item):
-#   content_item = create_content_item
+  assert resp.status_code == 404, "Status code not 404"
+  assert json_response == response, "Expected response not same"
 
-#   # create an archived object
-#   archived_content_item_dict = copy.deepcopy(BASIC_CONTENT_ITEM_EXAMPLE)
 
-#   archived_content_item = LTIContentItem.from_dict(archived_content_item_dict)
-#   archived_content_item.uuid = ""
-#   archived_content_item.save()
-#   archived_content_item.uuid = archived_content_item.id
-#   archived_content_item.is_archived = True
-#   archived_content_item.update()
+@pytest.mark.parametrize(
+    "create_content_item", [(BASIC_CONTENT_ITEM_EXAMPLE)], indirect=True)
+def test_get_content_items(clean_firestore, create_content_item):
+  content_item = create_content_item
 
-#   params = {"skip": 0, "limit": "50"}
-
-#   params = {"skip": 0, "limit": "50"}
-#   url = f"{api_url}s"
-#   resp = client_with_emulator.get(url, params=params)
-#   json_response = resp.json()
-#   assert resp.status_code == 200, "Status code not 200"
-#   saved_resources = [i.get("uuid") for i in json_response.get("data")]
-#   assert content_item.uuid in saved_resources, "all data not retrieved"
-#   assert archived_content_item.uuid in saved_resources, (
-#       "all data not retrieved")
-
-#   # Test archival functionality: Fetch all archived objects
-#   params = {"skip": 0, "limit": "50", "fetch_archive": True}
-#   url = f"{api_url}s"
-#   resp = client_with_emulator.get(url, params=params)
-#   json_response = resp.json()
-#   assert resp.status_code == 200, "Status code not 200"
-#   saved_uuids = [i.get("uuid") for i in json_response.get("data")]
-#   assert archived_content_item.uuid in saved_uuids
-
-#   # Test archival functionality: Fetch all non archived objects
-#   params = {"skip": 0, "limit": "50", "fetch_archive": False}
-#   url = f"{api_url}s"
-#   resp = client_with_emulator.get(url, params=params)
-#   json_response = resp.json()
-#   assert resp.status_code == 200, "Status code not 200"
-#   saved_uuids = [i.get("uuid") for i in json_response.get("data")]
-#   assert content_item.uuid in saved_uuids
+  params = {"skip": 0, "limit": "50"}
+  url = f"{api_url}s"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+  assert resp.status_code == 200, "Status code not 200"
+  saved_resources = [i.get("id") for i in json_response.get("data")]
+  assert content_item.id in saved_resources, "all data not retrieved"
