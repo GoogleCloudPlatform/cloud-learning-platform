@@ -7,6 +7,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css" />
     <script type="text/javascript">
         const firebaseConfig = {
@@ -25,34 +26,28 @@
                     customParameters: {
                         // Forces account selection even when one account
                         // is available.
-                        prompt: 'select_account'
+                        prompt: "select_account"
                     }
                 }
             ],
             callbacks: {
                 signInSuccessWithAuthResult: function (authResult, redirectUrl) {
                     let user = authResult.user;
-                    console.log(user._delegate.accessToken)
                     let token = user._delegate.accessToken
-                    let url = "https://core-learning-services-dev.cloudpssolutions.com/classroom-shim/api/v1/launch-assignment"
-                    assignment_id = getParameterByName("assignment_id")
-                    if (assignment_id) {
-                        url = `${url}?assignment_id=${assignment_id}`
-                    }
-                    fetch(url, {
-                        redirect: "follow", headers: {
-                            Authorization: `Bearer ${token}`
-                        },
-                        mode: 'cors', // no-cors, *cors, same-origin
-                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                        // credentials: 'same-origin'
-                        referrerPolicy: 'no-referrer'
-                    }).then(response => {
-                        console.log("redirected with response", response)
-                        if (response.redirected) {
-                            window.location.href = response.url;
-                        }
-                    })
+                    axios
+                        .get('{{redirect_url}}', {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        })
+                        .then((response) => {
+                            console.log("received response from launch-assignment");
+                            response.data
+                                ? response.data.url
+                                    ? window.open(response.data.url, "_self").focus()
+                                    : console.log("No URL found in the response")
+                                : console.log("No response data");
+                        })
                     return false;
                 },
             },
@@ -75,7 +70,9 @@
 </head>
 
 <body>
-    <h1 style="text-align: center; margin-bottom: 3rem;">You are required to sign in before we proceed further</h1>
+    <h1 style="text-align: center; margin-bottom: 3rem">
+        You are required to sign in before we proceed further
+    </h1>
     <div id="firebaseui-auth-container"></div>
 </body>
 
