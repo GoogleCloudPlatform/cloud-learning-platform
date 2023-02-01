@@ -11,6 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Enable Notifications API Nightly CronJob
+
+    Continusouly hits the /enable_notifications API nightly to keep
+    the 7 day TTL for Class Notifications running
+
+    https://developers.google.com/classroom/best-practices/push-notifications#overview
+
+"""
 
 import requests
 from common.utils.secrets import get_backend_robot_id_token
@@ -20,6 +28,15 @@ from common.utils.errors import CronJobException
 
 
 def enable_notifications(section, id_token):
+  """Enable notifications for a given section
+
+  Args:
+      section : LMS Section API response object
+      id_token : id_token to use
+
+  Raises:
+      CronJobException: If any issue hitting the internal APIs
+  """
   api_endpoint = "http://lms/lms/api/v1/sections/enable_notifications"
 
   for feed_type in ["COURSE_WORK_CHANGES", "COURSE_ROSTER_CHANGES"]:
@@ -41,11 +58,22 @@ def enable_notifications(section, id_token):
       continue
 
     raise CronJobException(
-        "Could not enable Classroom notifications with error: {}".format(
-            res_json["message"]))
+        f"Could not enable Classroom notifications with error: {res_json['message']}"
+    )
 
 
 def get_sections(id_token):
+  """Get list of sections from LMS API
+
+  Args:
+      id_token : id_token to use
+
+  Raises:
+      CronJobException: If any issue hitting the internal APIs
+
+  Returns:
+      list(section): list of section API JSON output
+  """
   api_endpoint = "http://lms/lms/api/v1/sections"
 
   res = requests.get(url=api_endpoint,
@@ -60,8 +88,8 @@ def get_sections(id_token):
   if res_json["success"]:
     return res_json["data"]
 
-  raise CronJobException("Could not get sections with error: {}".format(
-      res_json["message"]))
+  raise CronJobException(
+      f"Could not get sections with error: {res_json['message']}")
 
 
 def main():
@@ -71,7 +99,6 @@ def main():
   id_token = get_backend_robot_id_token()
 
   sections = get_sections(id_token)
-  # sections = [{"id": "5"}]
   for section in sections:
     enable_notifications(section, id_token)
 
