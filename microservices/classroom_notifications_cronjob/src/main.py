@@ -57,9 +57,8 @@ def enable_notifications(section, id_token):
       logger.info(res_json)
       continue
 
-    raise CronJobException(
-        f"Could not enable Classroom notifications with error: {res_json['message']}"
-    )
+    raise CronJobException(f"Could not enable Classroom notifications" +
+                           "with error: {res_json['message']}")
 
 
 def get_sections(id_token):
