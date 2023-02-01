@@ -8,8 +8,8 @@ from config import PROJECT_ID
 
 @ttl_cache(3600)
 def get_gke_pd_sa_key_from_secret_manager():
-  """Copy course  API
-
+  """Get GKE Pod service account keys from 
+    Secret manager
   Args:
   Returns:
   return the POD service account keys in JSON format

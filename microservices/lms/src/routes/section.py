@@ -22,7 +22,7 @@ from schemas.section import (
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     ClassroomCourseListResponseModel, UpdateSectionResponseModel)
 from schemas.update_section import UpdateSection
-from services import classroom_crud
+from services import classroom_crud,student_service
 from services.classroom_crud import get_edit_url_and_view_url_mapping_of_form
 from utils.helper import convert_section_to_section_model
 
@@ -331,8 +331,8 @@ def update_section(sections_details: UpdateSection):
     raise InternalServerError(str(e)) from e
 
 
-@router.post("/{sections_id}/students", response_model=AddStudentResponseModel)
-def enroll_student_section(sections_id: str,
+@router.post("/{cohort_id}/students", response_model=AddStudentResponseModel)
+def enroll_student_section(cohort_id: str,
                            input_data: AddStudentToSectionModel,
                            request: Request):
   """
@@ -350,7 +350,15 @@ def enroll_student_section(sections_id: str,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
   try:
-    section = Section.find_by_id(sections_id)
+    # section = Section.find_by_id(sections_id)
+    cohort = Cohort.find_by_id(cohort_id)
+    print("THIS IS COHORT KEYuuuuu",cohort.key)
+    sections = Section.collection.filter("cohort","==",cohort.key).fetch()
+    print("List of sections",list(sections))
+    # if list(sections) == []:
+    #   raise ResourceNotFoundException("Given CohortId does not have any sections")
+    section = student_service.get_section_with_minimum_student(sections)
+    # print(section.id, section.count)
     headers = {"Authorization": request.headers.get("Authorization")}
     user_object = classroom_crud.enroll_student(
         headers,
@@ -358,6 +366,7 @@ def enroll_student_section(sections_id: str,
         student_email=input_data.email,
         course_id=section.classroom_id,
         course_code=section.classroom_code)
+
 
     cohort = section.cohort
     cohort.enrolled_students_count += 1
@@ -524,51 +533,4 @@ def section_enable_notifications_pub_sub(
     raise InternalServerError(str(e)) from e
 
 
-@router.post("/test_firestore_client")
-def test_firestore_client():
-  """
-  Args:
-    input_data(AddStudentToSectionModel):
-      An AddStudentToSectionModel object which contains email and credentials
-  Raises:
-    InternalServerError: 500 Internal Server Error if something fails
-    ResourceNotFound : 404 if the section or classroom does not exist
-    Conflict: 409 if the student already exists
-  Returns:
-    AddStudentResponseModel: if the student successfully added,
-    NotFoundErrorResponseModel: if the section and course not found,
-    ConflictResponseModel: if any conflict occurs,
-    InternalServerErrorResponseModel: if the add student raises an exception
-  """
-  try:
-    # app = firebase_admin.initialize_app()
-    # db = firestore.client()
-    # users_ref = db.collection(u'users')
-    # docs = users_ref.
-    user_list = Section.collection.fetch().count
-    for i in user_list:
-      print(i)
-    # for doc in docs:
-    #   print(f'{doc.id} => {doc.to_dict()}')
 
-    print("This is the number of documents",)
-    # snapshot =  getCountFromServer(coll);
-    return {
-        "message":
-        f"Successfully Added the Student with email"
-    }
-  except InvalidTokenError as ive:
-    raise InvalidToken(str(ive)) from ive
-  except ResourceNotFoundException as err:
-    Logger.error(err)
-    raise ResourceNotFound(str(err)) from err
-  except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
-  except Exception as e:
-    Logger.error(e)
-    err = traceback.format_exc().replace("\n", " ")
-    Logger.error(err)
-    raise InternalServerError(str(e)) from e
