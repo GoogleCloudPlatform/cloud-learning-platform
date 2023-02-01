@@ -6,6 +6,9 @@ from common.utils.http_exceptions import (CustomHTTPException,
                                           InternalServerError, InvalidToken,
                                           ResourceNotFound, BadRequest)
 from common.utils.logging_handler import Logger
+import firebase_admin
+from firebase_admin import firestore
+
 from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
 from schemas.course_details import CourseDetails, EnableNotificationsDetails, EnableNotificationsResponse
@@ -518,4 +521,54 @@ def section_enable_notifications_pub_sub(
                               data=None) from hte
   except Exception as e:
     Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.post("/test_firestore_client")
+def test_firestore_client():
+  """
+  Args:
+    input_data(AddStudentToSectionModel):
+      An AddStudentToSectionModel object which contains email and credentials
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    AddStudentResponseModel: if the student successfully added,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    # app = firebase_admin.initialize_app()
+    # db = firestore.client()
+    # users_ref = db.collection(u'users')
+    # docs = users_ref.
+    user_list = Section.collection.fetch().count
+    for i in user_list:
+      print(i)
+    # for doc in docs:
+    #   print(f'{doc.id} => {doc.to_dict()}')
+
+    print("This is the number of documents",)
+    # snapshot =  getCountFromServer(coll);
+    return {
+        "message":
+        f"Successfully Added the Student with email"
+    }
+  except InvalidTokenError as ive:
+    raise InvalidToken(str(ive)) from ive
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
     raise InternalServerError(str(e)) from e
