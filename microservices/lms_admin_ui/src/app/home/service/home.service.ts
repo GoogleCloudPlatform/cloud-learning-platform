@@ -8,13 +8,16 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class HomeService {
 
   constructor(private http: HttpClient) { }
-  getCohortList() {
-    return this.http.get(`${environment.apiurl}cohorts`)
+  getCohortList(skip: any, limit: any) {
+    return this.http.get(`${environment.apiurl}cohorts?skip=${skip}&limit=${limit}`)
 
   }
-  getCourseTemplateList() {
-    return this.http.get(`${environment.apiurl}course_templates`)
+  getCourseTemplateList(skip: any, limit: any) {
+    return this.http.get(`${environment.apiurl}course_templates?skip=${skip}&limit=${limit}`)
 
+  }
+  getAllSectionList(skip: any, limit: any) {
+    return this.http.get(`${environment.apiurl}sections?skip=${skip}&limit=${limit}`)
   }
   editCourseTemplate(data: any, id: any) {
     return this.http.patch(`${environment.apiurl}course_templates/${id}`, data)
@@ -42,5 +45,8 @@ export class HomeService {
   }
   editSection(data: any) {
     return this.http.patch(`${environment.apiurl}sections`, data)
+  }
+  getStudentsInSection(sectionId: any) {
+    return this.http.get(`${environment.apiurl}sections/${sectionId}/students`)
   }
 }

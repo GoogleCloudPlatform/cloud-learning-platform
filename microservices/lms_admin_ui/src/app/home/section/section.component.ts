@@ -17,6 +17,13 @@ export interface staff {
   role: string;
 }
 
+export interface student {
+  first_name: string;
+  last_name: string;
+  email: string;
+  created_time: string;
+}
+
 @Component({
   selector: 'app-section',
   templateUrl: './section.component.html',
@@ -25,8 +32,10 @@ export interface staff {
 export class SectionComponent implements OnInit {
   selectedSection: any
   displayedColumns: string[] = ['name', 'email', 'role'];
+  studentDisplayedColumns: string[] = ['first name', 'last name', 'email', 'created time', 'action'];
 
   tableData: staff[] = []
+  studentTableData: student[] = []
   dataSource = new MatTableDataSource(this.tableData);
 
   cohortDetails: any
@@ -44,8 +53,6 @@ export class SectionComponent implements OnInit {
     console.log(this.router.url)
     id = this.router.url.split('/')[2]
     this.getCohortDetails(id)
-
-
   }
 
   getCohortDetails(id: any) {
@@ -78,12 +85,22 @@ export class SectionComponent implements OnInit {
       // console.log('section', this.sectionDetails)
     })
   }
+
   openClassroom() {
     window.open(this.selectedSection.classroom_url
       , '_blank');
   }
+  getSectionStudents() {
+    this._HomeService.getStudentsInSection(this.selectedSection.id).subscribe((res: any) => {
+      this.studentTableData = []
+      this.studentTableData = res.data
+      console.log('student data', this.studentTableData)
+    })
+  }
+
   createTableData() {
     console.log('selected sec', this.selectedSection)
+    this.getSectionStudents()
     this.tableData = []
     for (let x of this.selectedSection.teachers) {
       let staffObj: staff = { name: '', email: '', role: '' }
