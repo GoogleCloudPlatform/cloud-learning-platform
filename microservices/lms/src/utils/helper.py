@@ -17,7 +17,7 @@ def get_gke_pd_sa_key_from_secret_manager():
 
   client = secretmanager.SecretManagerServiceClient()
   secret_id = "gke-pod-sa-key"
-  secret_name = (f"projects/{PROJECT_ID}/secrets/{secret_id}/versions/latest")
+  secret_name = f"projects/{PROJECT_ID}/secrets/{secret_id}/versions/latest"
 
   response = client.access_secret_version(request={"name": secret_name})
   crc32c = google_crc32c.Checksum()
@@ -39,7 +39,7 @@ def get_offline_access_token_from_secret_manager():
   """
   client = secretmanager.SecretManagerServiceClient()
   secret_id = "registration_access_token"
-  secret_name = (f"projects/{PROJECT_ID}/secrets/{secret_id}/versions/latest")
+  secret_name = f"projects/{PROJECT_ID}/secrets/{secret_id}/versions/latest"
 
   response = client.access_secret_version(request={"name": secret_name})
   crc32c = google_crc32c.Checksum()
@@ -81,4 +81,3 @@ def convert_section_to_section_model(section):
   cohort = loaded_section.pop("cohort").to_dict()
   loaded_section["cohort"] = cohort["key"]
   return loaded_section
-

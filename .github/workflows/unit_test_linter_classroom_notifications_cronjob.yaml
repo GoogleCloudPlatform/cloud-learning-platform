@@ -22,7 +22,7 @@ on:
       - main
     paths:
       # TODO: Add all microservice folders below.
-      - 'microservices/**'
+      - 'microservices/classroom_notifications_cronjob'
       - 'common/**'
       - '.github/workflows/unit_test_linter_classroom_notifications_cronjob.yaml'
       - '.pylintrc'
