@@ -28,7 +28,6 @@ def login(request: Request, assignment_id: Optional[str] = ""):
 def launch_assignment(request: Request,
                       assignment_id: Optional[str] = "",
                       user_details: dict = Depends(validate_token)):
-  # decode token => done by depends
   # verify user if it exists
   user_email = user_details.get("email")
   headers = {"Authorization": request.headers.get("Authorization")}
@@ -53,6 +52,6 @@ def launch_assignment(request: Request,
 
   clp_domain = "https://core-learning-services-dev.cloudpssolutions.com"
   url = f"{clp_domain}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}"
-  # verify assignment and user relationship
-  # fetch data from request for custom param substitution
+  # TODO: verify assignment and user relationship
+  # TODO: fetch data from request for custom param substitution
   return RedirectResponse(url=url, headers=headers, status_code=302)

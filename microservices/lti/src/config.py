@@ -35,7 +35,7 @@ ERROR_RESPONSES = {
 
 TOKEN_TTL = 3600
 
-ISSUER = "https://core-learning-services-dev.cloudpssolutions.com"
+ISSUER = os.getenv("ISSUER", "http://localhost")
 
 LTI_SERVICE_PLATFORM_PUBLIC_KEY = secrets.access_secret_version(request={
     "name":
