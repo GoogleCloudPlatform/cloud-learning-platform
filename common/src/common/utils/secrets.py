@@ -19,6 +19,7 @@ def get_secret(secret_id):
   return payload
 
 
+# TODO: this should be built into a class that can use refresh token to get new id_token, cache token, etc
 def get_backend_robot_id_token():
   api_endpoint = "http://authentication/authentication/api/v1/sign-in/credentials"
   res = requests.post(url=api_endpoint,
