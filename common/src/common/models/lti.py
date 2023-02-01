@@ -238,16 +238,16 @@ class LTIContentItem(BaseModel):
     return lti_content_item_doc
 
 
-class LTISession(TempBaseModel):
+class LTISession(BaseModel):
   """LTI Session Data Model"""
-  uuid = TextField(required=True)
+  id = IDField()
   state = TextField(required=True)
   nonce = TextField(required=True)
   user_id = TextField(required=True)
   client_id = TextField(required=True)
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "lti_sessions"
+    collection_name = BaseModel.DATABASE_PREFIX + "lti_sessions"
     ignore_none_field = False
 
   @classmethod

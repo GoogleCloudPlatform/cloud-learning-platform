@@ -92,14 +92,11 @@ def oidc_login(iss: str = Form(),
 
     # save state and nonce in database
     new_lti_session = LTISession()
-    new_lti_session.uuid = ""
     new_lti_session.state = state
     new_lti_session.nonce = nonce
     new_lti_session.user_id = login_hint
     new_lti_session.client_id = client_id
     new_lti_session.save()
-    new_lti_session.uuid = new_lti_session.id
-    new_lti_session.update()
 
     auth_url = urlparse(platform_data.get("platform_auth_url"))
     query_params = parse_qsl(auth_url.query)
