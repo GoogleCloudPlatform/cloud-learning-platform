@@ -13,48 +13,70 @@
 # limitations under the License.
 
 import requests
+from common.utils.secrets import get_backend_robot_id_token
 
-ID_TOKEN = "<INSERT_ID_TOKEN>"
+from common.utils.logging_handler import Logger as logger
+from common.utils.errors import CronJobException
 
 
-def enable_notifications(section):
-  api_endpoint = "https://core-learning-services-dev.cloudpssolutions.com/lms/api/v1/sections/enable_notifications"
+def enable_notifications(section, id_token):
+  api_endpoint = "http://lms/lms/api/v1/sections/enable_notifications"
 
   for feed_type in ["COURSE_WORK_CHANGES", "COURSE_ROSTER_CHANGES"]:
     res = requests.post(url=api_endpoint,
                         headers={
                             "Content-Type": "application/json",
-                            "Authorization": f"Bearer {ID_TOKEN}"
+                            "Authorization": f"Bearer {id_token}"
                         },
                         json={
                             "feed_type": feed_type,
                             "section_id": section["id"]
                         },
                         timeout=60)
-    print(res.text)
+    res.raise_for_status()
+
+    res_json = res.json()
+    if res_json["success"]:
+      logger.info(res_json)
+      continue
+
+    raise CronJobException(
+        "Could not enable Classroom notifications with error: {}".format(
+            res_json["message"]))
 
 
-def get_sections():
-  print("cronjob starting")
-  api_endpoint = "https://core-learning-services-dev.cloudpssolutions.com/lms/api/v1/sections"
+def get_sections(id_token):
+  api_endpoint = "http://lms/lms/api/v1/sections"
+
   res = requests.get(url=api_endpoint,
                      headers={
                          "Content-Type": "application/json",
-                         "Authorization": f"Bearer {ID_TOKEN}"
+                         "Authorization": f"Bearer {id_token}"
                      },
                      timeout=60)
-  res = res.json()
+  res.raise_for_status()
 
-  if res["success"]:
-    return res["data"]
+  res_json = res.json()
+  if res_json["success"]:
+    return res_json["data"]
 
-  return False
+  raise CronJobException("Could not get sections with error: {}".format(
+      res_json["message"]))
 
 
 def main():
-  sections = get_sections()
+  logger.info(
+      "Classroom Pubsub Registration / Notifications API Cronjob STARTING")
+
+  id_token = get_backend_robot_id_token()
+
+  sections = get_sections(id_token)
+  # sections = [{"id": "5"}]
   for section in sections:
-    enable_notifications(section)
+    enable_notifications(section, id_token)
+
+  logger.info(
+      "Classroom Pubsub Registration / Notifications API Cronjob FINISHED")
 
 
 if __name__ == "__main__":
