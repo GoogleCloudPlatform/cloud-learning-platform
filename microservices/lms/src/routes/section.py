@@ -365,11 +365,13 @@ def enroll_student_section(cohort_id: str,
     # print(sections is [])
     if len(sections) == 0:
       print("IN IFFFF")
-      raise ResourceNotFoundException("Given CohortId does not have any sections")
+      raise ResourceNotFoundException("Given CohortId\
+         does not have any sections")
     print("BELOW EXCEPION called get minimum section student")
     section = student_service.get_section_with_minimum_student(sections)
     # print(section.id, section.count)
-    print(section.id,section.enrolled_students_count ,section.classroom_id,section.classroom_code)
+    print(section.id,section.enrolled_students_count \
+      ,section.classroom_id,section.classroom_code)
     headers = {"Authorization": request.headers.get("Authorization")}
     user_object = classroom_crud.enroll_student(
         headers,
