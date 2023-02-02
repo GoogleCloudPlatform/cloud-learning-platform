@@ -69,7 +69,6 @@ UPDATE_LINE_ITEM_USING_ID_EXAMPLE = {
 }
 
 FULL_LINE_ITEM_EXAMPLE = {
-    "uuid": "bv9oyqvq9no",
     "id": "https://platformurl.com/context_id/line_items/bv9oyqvq9no",
     **BASIC_LINE_ITEM_EXAMPLE
 }
@@ -84,7 +83,7 @@ BASIC_SCORE_EXAMPLE = {
     "gradingProgress": "FullyGraded"
 }
 
-FULL_SCORE_EXAMPLE = {"uuid": "Ar1F79GnqG8enw", **BASIC_SCORE_EXAMPLE}
+FULL_SCORE_EXAMPLE = {**BASIC_SCORE_EXAMPLE}
 
 BASIC_RESULT_EXAMPLE = {
     "userId": "ATc1ob81ca1vb98",
@@ -95,8 +94,6 @@ BASIC_RESULT_EXAMPLE = {
 }
 
 FULL_RESULT_EXAMPLE = {
-    "uuid":
-        "DVad8vs5boSN",
     "id":
         "https://platformurl.com/x1b62/line_items/1c82be/results/DVad8vs5boSN",
     **BASIC_RESULT_EXAMPLE
