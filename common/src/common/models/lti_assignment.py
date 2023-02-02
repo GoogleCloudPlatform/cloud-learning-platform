@@ -11,17 +11,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
-Flatten import namespace for models
+Module to add course enrollment in FireO
 """
+from fireo.fields import TextField, DateTime, IDField
+from common.models import BaseModel
 
-from .base_model import *
-from .user import *
-from .course_template import *
-from .cohort import *
-from .section import *
-from .lti import *
-from .course_enrollment_mapping import *
-from .temp_user import *
-from .lti_assignment import *
+
+class LTIAssignment(BaseModel):
+  """LTI Assignment Data Model"""
+  id = IDField()
+  section_id = TextField()
+  lti_content_item_id = TextField()
+  tool_id = TextField()
+  course_work_id = TextField()
+  start_date = DateTime()
+  end_date = DateTime()
+  due_date = DateTime()
+
+  class Meta:
+    collection_name = BaseModel.DATABASE_PREFIX + "lti_assignments"
+    ignore_none_field = False
