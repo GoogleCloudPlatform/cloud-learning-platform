@@ -47,13 +47,12 @@ def get_lti_assignments_list(skip: int = 0, limit: int = 10):
     if limit < 1:
       raise ValidationError\
         ("Invalid value passed to \"limit\" query parameter")
-    fetched_lti_assignment_list = LTIAssignment.fetch_all(
-        skip=skip, limit=limit)
+    lti_assignment_list = LTIAssignment.fetch_all(skip=skip, limit=limit)
 
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": fetched_lti_assignment_list
+        "data": lti_assignment_list
     }
   except ValidationError as e:
     Logger.error(e)
@@ -87,9 +86,9 @@ def get_lti_assignment(lti_assignment_id: str):
   try:
 
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
-    loaded_lti_assignment = lti_assignment.to_dict()
+    lti_assignment_data = lti_assignment.to_dict()
 
-    return {"data": loaded_lti_assignment}
+    return {"data": lti_assignment_data}
 
   except ResourceNotFoundException as e:
     Logger.error(e)
@@ -121,8 +120,9 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
     lti_assignment_dict = {**input_lti_assignment.dict()}
     lti_assignment = LTIAssignment.from_dict(lti_assignment_dict)
     lti_assignment.save()
+    lti_assignment_data = lti_assignment.to_dict()
 
-    return {"data": lti_assignment.to_dict()}
+    return {"data": lti_assignment_data}
 
   except ResourceNotFoundException as e:
     Logger.error(e)
