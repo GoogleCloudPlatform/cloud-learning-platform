@@ -100,7 +100,7 @@ jobs:
       run: |
         cd ${{ matrix.target-folder }}
         python -m pip install --upgrade pip
-        python -m pip install pylint
+        python -m pip install pylint==2.15.10
 
     - name: Lint with pylint
       run: |
