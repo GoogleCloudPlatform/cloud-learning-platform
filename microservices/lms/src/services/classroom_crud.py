@@ -322,7 +322,8 @@ def create_student_in_course(access_token,student_email,course_id,course_code):
   Return:
     enrolled student object
   """
-  service = build("classroom", "v1", credentials=get_oauth_credentials(access_token))
+  service = build("classroom", "v1",\
+     credentials=get_oauth_credentials(access_token))
   student = {"userId": student_email}
   result = service.courses().students().create(
       courseId=course_id, body=student, enrollmentCode=course_code).execute()
@@ -331,11 +332,13 @@ def create_student_in_course(access_token,student_email,course_id,course_code):
 def get_person_information (access_token):
   """
   Args:
-    access_token(str): Oauth access token which contains student credentials
+    access_token(str): Oauth access token which contains 
+    student credentials
   Return:
     profile: dictionary of users personal information
   """
-  people_service = build("people", "v1", credentials=get_oauth_credentials(access_token))
+  people_service = build("people", "v1",\
+     credentials=get_oauth_credentials(access_token))
   profile = people_service.people().get(resourceName="people/me",
   personFields="metadata,photos,names").execute()
   return profile
@@ -366,20 +369,23 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   Return:
     dict: returns a dict which contains student and classroom details
   """
-  # Call search by email usermanagement API to get the student data 
-  response = requests.get(f"{USER_MANAGEMENT_BASE_URL}/user/search?email={student_email}",\
+  # Call search by email usermanagement API to get the student data
+  response = requests.get(f"\
+  {USER_MANAGEMENT_BASE_URL}/user/search?email={student_email}",\
     headers=headers)
   print("Search User response ________",response.status_code)
   print(response.json())
-  # If the response is success check if student is inactive i.e  raise error 
+  # If the response is success check if student is inactive i.e  raise error
   if response.status_code == 200:
     searched_student = response.json()["data"]
     if searched_student != []:
       if searched_student[0]["status"]=="inactive":
-        raise InternalServerError("Student inactive in database is trying to enroll.\
-        Please update the student status")
+        raise InternalServerError("Student inactive in \
+          database is trying to enroll.Please update\
+             the student status")
   print("IN ENROLL STUDNET CREATE COURSE_______ ")
-  # Given student is active then call create student in classroom course function
+  # Given student is active then call create 
+  # student in classroom course function
   create_student_in_course(access_token,student_email,course_id,course_code)
   # Get the gaia ID , first name ,last_name of the student
   # Call_people api function
@@ -405,7 +411,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   print("BODY OF USER ",data)
   print("Searched studnet___",searched_student)
   # Check if searched user is [] ,i.e student is enrolling for first time
-  # then call create user usermanagement API and return user data else 
+  # then call create user usermanagement API and return user data else
   # return searched user data
   if searched_student == []:
     response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
