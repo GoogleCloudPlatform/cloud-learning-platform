@@ -76,7 +76,7 @@ def get_tool_private_key():
 def get_remote_keyset(jwks_uri: str) -> dict:
   """ Returns the remote keyset and specifying the algorithm as RS256 is not
   present """
-  keyset = requests.get(jwks_uri).json()
+  keyset = requests.get(jwks_uri, timeout=60).json()
   for k in keyset["keys"]:
     if not "alg" in k:
       k["alg"] = "RS256"
