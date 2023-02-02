@@ -373,6 +373,8 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   response = requests.get(f"\
   {USER_MANAGEMENT_BASE_URL}/user/search?email={student_email}",\
     headers=headers)
+  print("Inside Enroll student serch USER REsponse",response.status_code)
+  print(response.json())
   # If the response is success check if student is inactive i.e  raise error
   if response.status_code == 200:
     searched_student = response.json()["data"]
@@ -385,6 +387,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   # Given student is active then call create
   # student in classroom course function
   create_student_in_course(access_token,student_email,course_id,course_code)
+  print("STUDENT CRATED IN CLASSROOM ",student_email , course_id)
   # Get the gaia ID , first name ,last_name of the student
   # Call_people api function
   profile = get_person_information(access_token)
@@ -411,7 +414,8 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   if searched_student == []:
     response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
     json=data,headers=headers)
-
+    print("Create  User post usermangent response___________",response.status_code)
+    print(response.json())
     if response.status_code != 200:
       raise UserManagementServiceError(response.json()["message"])
     return response.json()["data"]
