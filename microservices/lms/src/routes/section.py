@@ -237,8 +237,7 @@ def delete_section(section_id: str):
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except HttpError as ae:
-    print("In Except")
-    print(ae)
+    Logger.error(ae)
     raise CustomHTTPException(status_code=ae.resp.status,
                               success=False,
                               message=str(ae),
@@ -350,24 +349,14 @@ def enroll_student_section(cohort_id: str,
   try:
     # section = Section.find_by_id(sections_id)
     cohort = Cohort.find_by_id(cohort_id)
-    print("THIS IS COHORT KEYuuuuu",cohort.key)
     sections = Section.collection.filter("cohort","==",cohort.key).fetch()
-    # print("List of sections",len(list(sections)),sections)
-    # print(list(sections))
-    # sections_list = list(sections)
-    # print("THIS IS SECTIONS LIST",sections_list)
+   
     sections = list(sections)
-    print("SECTIONS_______",sections)
-    # print(sections == [])
-    # print(sections is [])
+
     if len(sections) == 0:
-      print("IN IFFFF")
       raise ResourceNotFoundException("Given CohortId\
          does not have any sections")
-    print("BELOW EXCEPION called get minimum section student")
     section = student_service.get_section_with_minimum_student(sections)
-    print(section.id,section.enrolled_students_count \
-      ,section.classroom_id,section.classroom_code)
     headers = {"Authorization": request.headers.get("Authorization")}
     user_object = classroom_crud.enroll_student(
         headers,

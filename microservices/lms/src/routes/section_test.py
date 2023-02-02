@@ -269,16 +269,12 @@ def test_enroll_student(client_with_emulator, create_fake_data):
       "email": "student@gmail.com",
       "access_token": CREDENTIAL_JSON["token"]
   }
-  data = {
-      "success": True,
-      "message": "Successfully Added the Student with email student@gmail.com",
-      "data": None
-  }
   with mock.patch("routes.section.classroom_crud.enroll_student",
   return_value ={"user_id":"test_user_id"}):
     with mock.patch("routes.section.Logger"):
       resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 200, "Status 200"
+  assert resp.json()["success"] == True
 
 
 def test_enroll_student_negative(client_with_emulator):

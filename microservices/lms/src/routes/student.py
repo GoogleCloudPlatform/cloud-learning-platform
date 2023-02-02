@@ -12,14 +12,9 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
-from schemas.section import(StudentListResponseModel, DeleteStudentFromSectionResponseModel)
-# from schemas.section import (
-#     AddStudentResponseModel, AddStudentToSectionModel,
-#     CreateSectiontResponseModel, DeleteSectionResponseModel,
-#     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
-#     ClassroomCourseListResponseModel, UpdateSectionResponseModel
-# disabling for linting to pass
-# pylint: disable = broad-except
+from schemas.section import(StudentListResponseModel,\
+   DeleteStudentFromSectionResponseModel)
+
 
 router = APIRouter(prefix="/student",
                    tags=["Students"],

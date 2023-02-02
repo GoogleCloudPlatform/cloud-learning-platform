@@ -373,8 +373,6 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   response = requests.get(f"\
   {USER_MANAGEMENT_BASE_URL}/user/search?email={student_email}",\
     headers=headers)
-  print("Search User response ________",response.status_code)
-  print(response.json())
   # If the response is success check if student is inactive i.e  raise error
   if response.status_code == 200:
     searched_student = response.json()["data"]
@@ -383,8 +381,8 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
         raise InternalServerError("Student inactive in \
           database is trying to enroll.Please update\
              the student status")
-  print("IN ENROLL STUDNET CREATE COURSE_______ ")
-  # Given student is active then call create 
+
+  # Given student is active then call create
   # student in classroom course function
   create_student_in_course(access_token,student_email,course_id,course_code)
   # Get the gaia ID , first name ,last_name of the student
@@ -393,7 +391,6 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   gaia_id = profile["metadata"]["sources"][0]["id"]
   first_name=profile["names"][0]["givenName"]
   last_name =profile["names"][0]["familyName"]
-  print(first_name,last_name)
   # Call user API
   data = {
   "first_name": first_name,
@@ -408,17 +405,13 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   "access_api_docs": False,
   "gaia_id":gaia_id
   }
-  print("BODY OF USER ",data)
-  print("Searched studnet___",searched_student)
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user usermanagement API and return user data else
   # return searched user data
   if searched_student == []:
     response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
     json=data,headers=headers)
-    print("USER MANAGEMENT SERVICE RESPONSE")
-    print(response.status_code)
-    print(response.json())
+
     if response.status_code != 200:
       raise UserManagementServiceError(response.json()["message"])
     return response.json()["data"]
