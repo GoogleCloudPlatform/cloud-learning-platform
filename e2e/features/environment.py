@@ -143,6 +143,7 @@ def enroll_student_course(context):
   temp_user.user_id = ""
   temp_user.save()
   temp_user.user_id = temp_user.id
+  print("THIS IS USER_ID",temp_user.id)
   temp_user.update()
   user_id = temp_user.user_id
   context.user_id = user_id
