@@ -6,9 +6,6 @@ from common.utils.http_exceptions import (CustomHTTPException,
                                           InternalServerError, InvalidToken,
                                           ResourceNotFound, BadRequest)
 from common.utils.logging_handler import Logger
-import firebase_admin
-from firebase_admin import firestore
-
 from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
 from schemas.course_details import CourseDetails, EnableNotificationsDetails, EnableNotificationsResponse
