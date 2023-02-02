@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Module to add course enrollment in FireO
+Module to add lti assignment in FireO
 """
 from fireo.fields import TextField, DateTime, IDField
 from common.models import BaseModel

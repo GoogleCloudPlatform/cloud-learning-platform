@@ -1,5 +1,5 @@
 """
-  Tests for Course Template endpoints
+  Tests for LTI Assignment endpoints
 """
 import os
 import json

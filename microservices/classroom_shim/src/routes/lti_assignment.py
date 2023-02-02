@@ -1,4 +1,4 @@
-'''LTI Assignment Endpoint'''
+'''LTI Assignment Endpoints'''
 from fastapi import APIRouter
 from common.models import LTIAssignment
 from common.utils.logging_handler import Logger
