@@ -12,7 +12,8 @@ from environment import create_course
 
 @behave.given("A user has access privileges and wants to enroll a student into a section")
 def step_impl_1(context):
-  context.url = f'{API_URL}/sections/{context.sections.id}/students'
+  # context.url = f'{API_URL}/sections/{context.sections.id}/students'
+  context.url = f'{API_URL}/sections/{context.cohort.id}/students'
   context.payload = get_student_email_and_token()
 
 

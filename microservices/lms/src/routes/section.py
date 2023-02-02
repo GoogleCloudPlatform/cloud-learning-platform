@@ -167,6 +167,7 @@ def create_section(sections_details: SectionDetails):
     section.classroom_code = new_course["enrollmentCode"]
     section.classroom_url = new_course["alternateLink"]
     section.teachers = sections_details.teachers
+    section.enrolled_students_count=0
     section.save()
     new_section = convert_section_to_section_model(section)
     return {"data": new_section}
@@ -354,11 +355,21 @@ def enroll_student_section(cohort_id: str,
     cohort = Cohort.find_by_id(cohort_id)
     print("THIS IS COHORT KEYuuuuu",cohort.key)
     sections = Section.collection.filter("cohort","==",cohort.key).fetch()
-    print("List of sections",list(sections))
-    # if list(sections) == []:
-    #   raise ResourceNotFoundException("Given CohortId does not have any sections")
+    # print("List of sections",len(list(sections)),sections)
+    # print(list(sections))
+    # sections_list = list(sections)
+    # print("THIS IS SECTIONS LIST",sections_list)
+    sections = list(sections)
+    print("SECTIONS_______",sections)
+    # print(sections == [])
+    # print(sections is [])
+    if len(sections) == 0:
+      print("IN IFFFF")
+      raise ResourceNotFoundException("Given CohortId does not have any sections")
+    print("BELOW EXCEPION called get minimum section student")
     section = student_service.get_section_with_minimum_student(sections)
     # print(section.id, section.count)
+    print(section.id,section.enrolled_students_count ,section.classroom_id,section.classroom_code)
     headers = {"Authorization": request.headers.get("Authorization")}
     user_object = classroom_crud.enroll_student(
         headers,
@@ -366,21 +377,22 @@ def enroll_student_section(cohort_id: str,
         student_email=input_data.email,
         course_id=section.classroom_id,
         course_code=section.classroom_code)
-
-
     cohort = section.cohort
     cohort.enrolled_students_count += 1
     cohort.update()
+    section.enrolled_students_count +=1
+    section.update()
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = user_object["user_id"]
     course_enrollment_mapping.status = "active"
     course_enrollment_mapping.role = "learner"
-    course_enrollment_mapping.save()
+    course_enrollment_id = course_enrollment_mapping.save().id
 
     return {
         "message":
-        f"Successfully Added the Student with email {input_data.email}"
+        f"Successfully Added the Student with email {input_data.email}",
+        "data" : course_enrollment_id
     }
   except InvalidTokenError as ive:
     raise InvalidToken(str(ive)) from ive

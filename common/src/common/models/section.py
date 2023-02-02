@@ -31,7 +31,7 @@ class Section(BaseModel):
   course_template = ReferenceField(CourseTemplate, required=True)
   cohort = ReferenceField(Cohort, required=True)
   teachers = ListField(required=True)
-  count =  NumberField(default=0)
+  enrolled_students_count =  NumberField( default=0)
 
   class Meta:
     ignore_none_field = False
