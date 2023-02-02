@@ -1,5 +1,5 @@
 """main.py Testing"""
 
 
-def placeholder_test():
-  pass
+def test_placeholder():
+  assert True
