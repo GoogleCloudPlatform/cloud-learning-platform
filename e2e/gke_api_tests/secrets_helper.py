@@ -39,8 +39,8 @@ def get_student_email_and_token():
         dict: returns a dict which contains student email and token
     """
   client = secretmanager.SecretManagerServiceClient()
-#   student_email_secret_id = "personal-test-user-1-username"
-  student_email_secret_id = "personal-test-user-2-username"
+  student_email_secret_id = "personal-test-user-1-username"
+  # student_email_secret_id = "personal-test-user-2-username"
   student_token_secret_id = "add_student_token"
   student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
   student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
