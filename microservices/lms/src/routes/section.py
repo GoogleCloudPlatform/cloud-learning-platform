@@ -347,18 +347,14 @@ def enroll_student_section(cohort_id: str,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
   try:
-    # section = Section.find_by_id(sections_id)
     cohort = Cohort.find_by_id(cohort_id)
-    print("Cohort Found  ",cohort.key)
     sections = Section.collection.filter("cohort","==",cohort.key).fetch()
     sections = list(sections)
-    print("SECTIONSS___________",sections)
     if len(sections) == 0:
       raise ResourceNotFoundException("Given CohortId\
          does not have any sections")
     section = student_service.get_section_with_minimum_student(sections)
-    print("Get Section with minimum students result",\
-      section.id ,section.classroom_id)
+
     headers = {"Authorization": request.headers.get("Authorization")}
     user_object = classroom_crud.enroll_student(
         headers,
@@ -372,15 +368,12 @@ def enroll_student_section(cohort_id: str,
     section.enrolled_students_count +=1
     section.update()
 
-    print("After Enrolled count update",\
-      section.enrolled_students_count,cohort.enrolled_students_count )
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = user_object["user_id"]
     course_enrollment_mapping.status = "active"
     course_enrollment_mapping.role = "learner"
     course_enrollment_id = course_enrollment_mapping.save().id
-    print("ADDED EMAIL SUCEESS",input_data.email)
     return {
         "message":
         f"Successfully Added the Student with email {input_data.email}",
@@ -400,7 +393,6 @@ def enroll_student_section(cohort_id: str,
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
-    print(traceback)
     raise InternalServerError(str(e)) from e
 
 
