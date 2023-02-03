@@ -8,7 +8,7 @@ from config import PROJECT_ID
 
 @ttl_cache(3600)
 def get_gke_pd_sa_key_from_secret_manager():
-  """Get GKE Pod service account keys from 
+  """Get GKE Pod service account keys from
     Secret manager
   Args:
   Returns:

@@ -1,9 +1,9 @@
 """Student API services"""
 
 def get_section_with_minimum_student(sections):
-  """Get section with minimum count of students 
+  """Get section with minimum count of students
   Args:
-  sections :list of section objects with same cohort 
+  sections :list of section objects with same cohort
   Returns: sectioons object with minimum count of studnet
 
   """

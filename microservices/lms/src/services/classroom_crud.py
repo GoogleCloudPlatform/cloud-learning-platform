@@ -332,7 +332,7 @@ def create_student_in_course(access_token,student_email,course_id,course_code):
 def get_person_information (access_token):
   """
   Args:
-    access_token(str): Oauth access token which contains 
+    access_token(str): Oauth access token which contains
     student credentials
   Return:
     profile: dictionary of users personal information
@@ -346,7 +346,6 @@ def get_person_information (access_token):
 def get_oauth_credentials(access_token):
   """
   Args:
-   
     access_token(str): Oauth access token which contains student credentials
   Return:
     creds: user credential object
@@ -396,8 +395,8 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   last_name =profile["names"][0]["familyName"]
   # Call user API
   data = {
-  "first_name":"",
-  "last_name": "",
+  "first_name":first_name,
+  "last_name": last_name,
   "email":student_email,
   "user_type": "learner",
   "user_type_ref": "",

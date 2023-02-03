@@ -351,14 +351,14 @@ def enroll_student_section(cohort_id: str,
     cohort = Cohort.find_by_id(cohort_id)
     print("Cohort Found  ",cohort.key)
     sections = Section.collection.filter("cohort","==",cohort.key).fetch()
-   
     sections = list(sections)
     print("SECTIONSS___________",sections)
     if len(sections) == 0:
       raise ResourceNotFoundException("Given CohortId\
          does not have any sections")
     section = student_service.get_section_with_minimum_student(sections)
-    print("Get Section with minimum students result",section.id ,section.classroom_id)
+    print("Get Section with minimum students result",\
+      section.id ,section.classroom_id)
     headers = {"Authorization": request.headers.get("Authorization")}
     user_object = classroom_crud.enroll_student(
         headers,
@@ -372,7 +372,8 @@ def enroll_student_section(cohort_id: str,
     section.enrolled_students_count +=1
     section.update()
 
-    print("After Enrolled count update",section.enrolled_students_count,cohort.enrolled_students_count )
+    print("After Enrolled count update",\
+      section.enrolled_students_count,cohort.enrolled_students_count )
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = user_object["user_id"]
