@@ -391,7 +391,6 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   # first_name=profile["names"][0]["givenName"]
   # last_name =profile["names"][0]["familyName"]
   # Call user API
-
   data = {
   "first_name":"",
   "last_name": "",
