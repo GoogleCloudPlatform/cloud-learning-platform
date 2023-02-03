@@ -110,11 +110,9 @@ class BaseModel(Model):
             [any]: an instance of object returned by the database, type is
             the subclassed Model
         """
-    # obj = cls.collection.filter("id", "in",
-    #                             [object_id]).filter("deleted_at_timestamp",
-    #                                                 "==", None).get()
     obj = cls.collection.filter("id", "in",
-                                [object_id]).get()
+                                [object_id]).filter("deleted_at_timestamp",
+                                                    "==", None).get()
     if obj is None:
       raise ResourceNotFoundException(
           f"{cls.collection_name} with id {object_id} is not found")
