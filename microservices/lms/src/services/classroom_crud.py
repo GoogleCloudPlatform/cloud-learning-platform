@@ -394,6 +394,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   first_name=profile["names"][0]["givenName"]
   last_name =profile["names"][0]["familyName"]
   # Call user API
+  print(f"_____FIRST NAME AND LAAST NAME_______",first_name,last_name)
   data = {
   "first_name":first_name,
   "last_name": last_name,
@@ -407,6 +408,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   "access_api_docs": False,
   "gaia_id":gaia_id
   }
+  print("BODY OF CREATE USER",data)
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user usermanagement API and return user data else
   # return searched user data
