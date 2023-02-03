@@ -139,6 +139,7 @@ def enroll_student_course(context):
   course_enrollment_mapping.section = section
   course_enrollment_mapping.status ="active"
   temp_user = TempUser.from_dict(student_data)
+
   temp_user.user_id = ""
   temp_user.save()
   temp_user.user_id = temp_user.id
