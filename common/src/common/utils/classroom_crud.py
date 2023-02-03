@@ -43,6 +43,7 @@ def get_credentials():
   creds = service_account.Credentials.from_service_account_info(classroom_key,
                                                                 scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+
   return creds
 
 

@@ -532,5 +532,3 @@ def section_enable_notifications_pub_sub(
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-
-
