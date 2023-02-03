@@ -35,7 +35,7 @@ class Section(BaseModel):
 
   class Meta:
     ignore_none_field = False
-    collection_name = BaseModel.DATABASE_PREFIX + "sections_shruti"
+    collection_name = BaseModel.DATABASE_PREFIX + "sections"
 
   @classmethod
   def fetch_all_by_cohort(cls,

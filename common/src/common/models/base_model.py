@@ -185,12 +185,12 @@ class BaseModel(Model):
         list: list of objects
     """
     print("In fetch__all_________")
-    # objects = cls.collection.filter(
-    #     "deleted_at_timestamp", "==",
-    #     None).order(order_by).offset(skip).fetch(limit)
     objects = cls.collection.filter(
         "deleted_at_timestamp", "==",
-        None).offset(skip).fetch(limit)
+        None).order(order_by).offset(skip).fetch(limit)
+    # objects = cls.collection.filter(
+    #     "deleted_at_timestamp", "==",
+    #     None).offset(skip).fetch(limit)
     return list(objects)
 
   @classmethod
