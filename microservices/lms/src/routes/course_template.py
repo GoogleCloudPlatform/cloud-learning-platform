@@ -4,7 +4,8 @@ from common.models import CourseTemplate, Cohort
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest
-from services import classroom_crud
+# from services import classroom_crud
+from common.utils import classroom_crud
 from utils.helper import convert_cohort_to_cohort_model
 from schemas.cohort import CohortListResponseModel
 from schemas.course_template import CourseTemplateModel, CourseTemplateListModel, CreateCourseTemplateResponseModel, InputCourseTemplateModel, DeleteCourseTemplateModel, UpdateCourseTemplateModel, UpdateCourseTemplateResponseModel
