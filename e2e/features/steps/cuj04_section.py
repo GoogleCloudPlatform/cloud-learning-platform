@@ -22,6 +22,7 @@ def step_impl_2(context):
   resp = requests.post(context.url, json=context.payload,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
+  print("ADD_STUDENT RESPONSE _________",resp.json())
 
 
 @behave.then("Section will be fetch using the given id and student is enrolled using student credentials and a response model object will be return")

@@ -69,7 +69,6 @@ jobs:
         BASE_DIR=$(pwd)
         cd ${{ matrix.target-folder }}
         python -m pip install --upgrade pip
-        python -m pip install pytest pytest-custom_exit_code pytest-cov pylint pytest-mock mock
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
         if [ -f $BASE_DIR/common/requirements.txt ]; then pip install -r $BASE_DIR/common/requirements.txt; fi
@@ -100,7 +99,7 @@ jobs:
       run: |
         cd ${{ matrix.target-folder }}
         python -m pip install --upgrade pip
-        python -m pip install pylint==2.15.10
+        if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
 
     - name: Lint with pylint
       run: |
