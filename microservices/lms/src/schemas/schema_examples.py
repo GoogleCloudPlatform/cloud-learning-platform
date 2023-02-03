@@ -79,7 +79,8 @@ SECTION_EXAMPLE = {
     "classroom_url": "https://classroom.google.com",
     "teachers": ["test_user_1@gmail.com"],
     "course_template": "course_templates/7d2zTApD-id",
-    "cohort": "cohorts/1j-id"
+    "cohort": "cohorts/1j-id",
+    "enrolled_students_count":2
 }
 
 CREDENTIAL_JSON = {
