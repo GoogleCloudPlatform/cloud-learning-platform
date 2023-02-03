@@ -21,8 +21,6 @@ import os
 
 PROJECT_ID = os.environ.get("PROJECT_ID", "")
 
-# if PROJECT_ID != "":
-#   os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
 PROJECT_ID = os.environ.get("PROJECT_ID") or \
     os.environ.get("GOOGLE_CLOUD_PROJECT")
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")

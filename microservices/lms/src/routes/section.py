@@ -5,6 +5,7 @@ from common.utils.errors import InvalidTokenError, ResourceNotFoundException, Va
 from common.utils.http_exceptions import (CustomHTTPException,
                                           InternalServerError, InvalidToken,
                                           ResourceNotFound, BadRequest)
+from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
@@ -20,9 +21,6 @@ from schemas.section import (
     ClassroomCourseListResponseModel, UpdateSectionResponseModel)
 from schemas.update_section import UpdateSection
 from services import student_service
-# from services import classroom_crud,student_service
-from common.utils import classroom_crud
-# from services.classroom_crud import get_edit_url_and_view_url_mapping_of_form
 from utils.helper import convert_section_to_section_model
 
 # disabling for linting to pass

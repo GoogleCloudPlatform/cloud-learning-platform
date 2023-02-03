@@ -11,7 +11,6 @@ from common.utils.logging_handler import Logger
 from common.models import Section,CourseEnrollmentMapping
 
 from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
-# from utils import helper
 from common.utils import helper
 import requests
 
