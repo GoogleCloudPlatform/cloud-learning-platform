@@ -80,7 +80,6 @@ SECTION_EXAMPLE = {
     "teachers": ["test_user_1@gmail.com"],
     "course_template": "course_templates/7d2zTApD-id",
     "cohort": "cohorts/1j-id",
-    ,
     "enrolled_students_count":2
 }
 
