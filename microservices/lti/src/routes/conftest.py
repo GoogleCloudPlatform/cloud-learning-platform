@@ -34,10 +34,7 @@ def create_content_item(request):
 @pytest.fixture(name="create_line_item")
 def create_line_item(request):
   line_item = LineItem.from_dict(request.param)
-  line_item.uuid = ""
   line_item.client_id = str(uuid4())
   line_item.deployment_id = str(uuid4())
   line_item.save()
-  line_item.uuid = line_item.id
-  line_item.update()
   return line_item

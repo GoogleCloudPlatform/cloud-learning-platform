@@ -59,8 +59,7 @@ def content_item_return(JWT: str = Form()):
             "content_item_info": received_content_item
         }
         content_item_fields = create_new_content_item(content_item_dict)
-        received_content_item["content_item_id"] = content_item_fields.get(
-            "uuid")
+        received_content_item["content_item_id"] = content_item_fields.get("id")
 
     elif isinstance(content_item_data, dict):
       content_item_dict = {
@@ -69,7 +68,7 @@ def content_item_return(JWT: str = Form()):
           "content_item_info": content_item_data
       }
       content_item_fields = create_new_content_item(content_item_dict)
-      content_item_data["content_item_id"] = content_item_fields.get("uuid")
+      content_item_data["content_item_id"] = content_item_fields.get("id")
 
     return {
         "success": True,

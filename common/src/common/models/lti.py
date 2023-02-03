@@ -40,8 +40,7 @@ class Tool(BaseModel):
   @classmethod
   def find_by_client_id(cls, client_id):
     tool = cls.collection.filter("client_id", "==",
-                                 client_id).filter("deleted_at_timestamp", "==",
-                                                   None).get()
+                                 client_id).get()
     if tool is None:
       raise ResourceNotFoundException(
           f"{cls.__name__} with client_id {client_id} not found")
