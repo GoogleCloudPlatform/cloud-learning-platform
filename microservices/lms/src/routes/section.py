@@ -19,7 +19,7 @@ from schemas.section import (
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     ClassroomCourseListResponseModel, UpdateSectionResponseModel)
 from schemas.update_section import UpdateSection
-from services import classroom_crud
+from services import classroom_crud,student_service
 from services.classroom_crud import get_edit_url_and_view_url_mapping_of_form
 from utils.helper import convert_section_to_section_model
 
@@ -164,6 +164,7 @@ def create_section(sections_details: SectionDetails):
     section.classroom_code = new_course["enrollmentCode"]
     section.classroom_url = new_course["alternateLink"]
     section.teachers = sections_details.teachers
+    section.enrolled_students_count=0
     section.save()
     new_section = convert_section_to_section_model(section)
     return {"data": new_section}
@@ -236,8 +237,7 @@ def delete_section(section_id: str):
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except HttpError as ae:
-    print("In Except")
-    print(ae)
+    Logger.error(ae)
     raise CustomHTTPException(status_code=ae.resp.status,
                               success=False,
                               message=str(ae),
@@ -328,8 +328,8 @@ def update_section(sections_details: UpdateSection):
     raise InternalServerError(str(e)) from e
 
 
-@router.post("/{sections_id}/students", response_model=AddStudentResponseModel)
-def enroll_student_section(sections_id: str,
+@router.post("/{cohort_id}/students", response_model=AddStudentResponseModel)
+def enroll_student_section(cohort_id: str,
                            input_data: AddStudentToSectionModel,
                            request: Request):
   """
@@ -347,7 +347,18 @@ def enroll_student_section(sections_id: str,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
   try:
-    section = Section.find_by_id(sections_id)
+    # section = Section.find_by_id(sections_id)
+    cohort = Cohort.find_by_id(cohort_id)
+    print("Cohort Found  ",cohort.key)
+    sections = Section.collection.filter("cohort","==",cohort.key).fetch()
+    sections = list(sections)
+    print("SECTIONSS___________",sections)
+    if len(sections) == 0:
+      raise ResourceNotFoundException("Given CohortId\
+         does not have any sections")
+    section = student_service.get_section_with_minimum_student(sections)
+    print("Get Section with minimum students result",\
+      section.id ,section.classroom_id)
     headers = {"Authorization": request.headers.get("Authorization")}
     user_object = classroom_crud.enroll_student(
         headers,
@@ -355,20 +366,25 @@ def enroll_student_section(sections_id: str,
         student_email=input_data.email,
         course_id=section.classroom_id,
         course_code=section.classroom_code)
-
     cohort = section.cohort
     cohort.enrolled_students_count += 1
     cohort.update()
+    section.enrolled_students_count +=1
+    section.update()
+
+    print("After Enrolled count update",\
+      section.enrolled_students_count,cohort.enrolled_students_count )
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = user_object["user_id"]
     course_enrollment_mapping.status = "active"
     course_enrollment_mapping.role = "learner"
-    course_enrollment_mapping.save()
-
+    course_enrollment_id = course_enrollment_mapping.save().id
+    print("ADDED EMAIL SUCEESS",input_data.email)
     return {
         "message":
-        f"Successfully Added the Student with email {input_data.email}"
+        f"Successfully Added the Student with email {input_data.email}",
+        "data" : course_enrollment_id
     }
   except InvalidTokenError as ive:
     raise InvalidToken(str(ive)) from ive
@@ -384,6 +400,7 @@ def enroll_student_section(sections_id: str,
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
+    print(traceback)
     raise InternalServerError(str(e)) from e
 
 
@@ -519,3 +536,6 @@ def section_enable_notifications_pub_sub(
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
+
+
