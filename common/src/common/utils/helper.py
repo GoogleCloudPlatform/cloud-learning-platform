@@ -50,3 +50,4 @@ def get_offline_access_token_from_secret_manager():
   payload = response.payload.data.decode("UTF-8")
   response = json.loads(payload)
   return response
+
