@@ -55,6 +55,12 @@ Add an entry for front-end in addition to backend API
 - https://www.googleapis.com/auth/classroom.profile.photos
 
 
+## Firebase Authentication Settings
+- Adding Google and email/passwor auth options
+![](docs/static/images/auth_providers.png)
+- Add frontend domain as an "Authorized Domain"
+![](docs/static/images/authorized_domain.png)
+
 ## LTI keys setup
 
 LTI Service requires a pair of rsa private and public keys for signing the jwt token (also referred as lti_message in LTI documentation) and a issuer url.

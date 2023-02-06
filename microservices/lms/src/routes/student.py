@@ -7,15 +7,15 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
                                           ResourceNotFound, BadRequest)
 from common.models import CourseEnrollmentMapping,Section
-from services import classroom_crud
+# from services import classroom_crud
+from common.utils import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
-from schemas.section import StudentListResponseModel, DeleteStudentFromSectionResponseModel
+from schemas.section import(StudentListResponseModel,\
+   DeleteStudentFromSectionResponseModel)
 
-# disabling for linting to pass
-# pylint: disable = broad-except
 
 router = APIRouter(prefix="/student",
                    tags=["Students"],

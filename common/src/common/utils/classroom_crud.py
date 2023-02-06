@@ -10,8 +10,8 @@ from common.utils.logging_handler import Logger
 
 from common.models import Section,CourseEnrollmentMapping
 
-from config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
-from utils import helper
+from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
+from common.utils import helper
 import requests
 
 SUCCESS_RESPONSE = {"status": "Success"}
@@ -42,6 +42,7 @@ def get_credentials():
   creds = service_account.Credentials.from_service_account_info(classroom_key,
                                                                 scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+
   return creds
 
 
@@ -315,6 +316,45 @@ def delete_teacher(course_id, teacher_email):
                                                userId=teacher_email).execute()
   return course
 
+def create_student_in_course(access_token,student_email,course_id,course_code):
+  """
+  Args:
+    access_token(str): Oauth access token which contains student credentials
+  Return:
+    enrolled student object
+  """
+  service = build("classroom", "v1",\
+     credentials=get_oauth_credentials(access_token))
+  student = {"userId": student_email}
+  result = service.courses().students().create(
+      courseId=course_id, body=student, enrollmentCode=course_code).execute()
+  return result
+
+def get_person_information (access_token):
+  """
+  Args:
+    access_token(str): Oauth access token which contains
+    student credentials
+  Return:
+    profile: dictionary of users personal information
+  """
+  people_service = build("people", "v1",\
+     credentials=get_oauth_credentials(access_token))
+  profile = people_service.people().get(resourceName="people/me",
+  personFields="metadata,photos,names").execute()
+  return profile
+
+def get_oauth_credentials(access_token):
+  """
+  Args:
+    access_token(str): Oauth access token which contains student credentials
+  Return:
+    creds: user credential object
+  """
+  creds = Credentials(token=access_token)
+  if not creds or not creds.valid:
+    raise InvalidTokenError("Invalid access_token please provide a valid token")
+  return creds
 
 def enroll_student(headers ,access_token, course_id,student_email,course_code):
   """Add student to the classroom using student google auth token
@@ -329,22 +369,31 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   Return:
     dict: returns a dict which contains student and classroom details
   """
+  # Call search by email usermanagement API to get the student data
+  response = requests.get(f"\
+  {USER_MANAGEMENT_BASE_URL}/user/search?email={student_email}",\
+    headers=headers)
+  # If the response is success check if student is inactive i.e  raise error
+  if response.status_code == 200:
+    searched_student = response.json()["data"]
+    if searched_student != []:
+      if searched_student[0]["status"]=="inactive":
+        raise InternalServerError("Student inactive in \
+          database is trying to enroll.Please update\
+             the student status")
 
-  creds = Credentials(token=access_token)
-  if not creds or not creds.valid:
-    raise InvalidTokenError("Invalid access_token please provide a valid token")
-  service = build("classroom", "v1", credentials=creds)
-  student = {"userId": student_email}
-  service.courses().students().create(
-      courseId=course_id, body=student, enrollmentCode=course_code).execute()
-  # Get the gaia ID of the course
-  people_service = build("people", "v1", credentials=creds)
-  profile = people_service.people().get(resourceName="people/me",
-  personFields="metadata").execute()
+  # Given student is active then call create
+  # student in classroom course function
+  create_student_in_course(access_token,student_email,course_id,course_code)
+  # Get the gaia ID , first name ,last_name of the student
+  # Call_people api function
+  profile = get_person_information(access_token)
   gaia_id = profile["metadata"]["sources"][0]["id"]
+  # first_name=profile["names"][0]["givenName"]
+  # last_name =profile["names"][0]["familyName"]
   # Call user API
   data = {
-  "first_name": "",
+  "first_name":"",
   "last_name": "",
   "email":student_email,
   "user_type": "learner",
@@ -356,11 +405,17 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   "access_api_docs": False,
   "gaia_id":gaia_id
   }
-  response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
-  json=data,headers=headers)
-  if response.status_code != 200:
-    raise UserManagementServiceError(response.json()["message"])
-  return response.json()["data"]
+  # Check if searched user is [] ,i.e student is enrolling for first time
+  # then call create user usermanagement API and return user data else
+  # return searched user data
+  if searched_student == []:
+    response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
+    json=data,headers=headers)
+    if response.status_code != 200:
+      raise UserManagementServiceError(response.json()["message"])
+    return response.json()["data"]
+  else :
+    return searched_student[0]
 
 def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns

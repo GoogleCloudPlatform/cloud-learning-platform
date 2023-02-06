@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Flatten import namespace for models
-"""
-
-from .base_model import *
-from .user import *
-from .course_template import *
-from .cohort import *
-from .section import *
-from .lti import *
-from .course_enrollment_mapping import *
-from .temp_user import *
-from .lti_assignment import *
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lms-admin-ui
+spec:
+  replicas: 1
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: lms-admin-ui
+        image: lms-admin-ui
+        imagePullPolicy: Always

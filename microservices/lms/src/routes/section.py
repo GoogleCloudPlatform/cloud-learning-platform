@@ -5,6 +5,7 @@ from common.utils.errors import InvalidTokenError, ResourceNotFoundException, Va
 from common.utils.http_exceptions import (CustomHTTPException,
                                           InternalServerError, InvalidToken,
                                           ResourceNotFound, BadRequest)
+from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
@@ -19,8 +20,7 @@ from schemas.section import (
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     ClassroomCourseListResponseModel, UpdateSectionResponseModel)
 from schemas.update_section import UpdateSection
-from services import classroom_crud
-from services.classroom_crud import get_edit_url_and_view_url_mapping_of_form
+from services import student_service
 from utils.helper import convert_section_to_section_model
 
 # disabling for linting to pass
@@ -132,7 +132,7 @@ def create_section(sections_details: SectionDetails):
         # google form which returns
         # a dictionary of view_links as keys and edit
         #  likns as values of google form
-        url_mapping = get_edit_url_and_view_url_mapping_of_form()
+        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
         # Loop to check if a material in courssework has a google
         # form attached to it
         # update the  view link to edit link and attach it as a form
@@ -164,6 +164,7 @@ def create_section(sections_details: SectionDetails):
     section.classroom_code = new_course["enrollmentCode"]
     section.classroom_url = new_course["alternateLink"]
     section.teachers = sections_details.teachers
+    section.enrolled_students_count=0
     section.save()
     new_section = convert_section_to_section_model(section)
     return {"data": new_section}
@@ -236,8 +237,7 @@ def delete_section(section_id: str):
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except HttpError as ae:
-    print("In Except")
-    print(ae)
+    Logger.error(ae)
     raise CustomHTTPException(status_code=ae.resp.status,
                               success=False,
                               message=str(ae),
@@ -275,6 +275,7 @@ def section_list(skip: int = 0, limit: int = 10):
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
+    print(err)
     raise InternalServerError(str(e)) from e
 
 
@@ -328,8 +329,8 @@ def update_section(sections_details: UpdateSection):
     raise InternalServerError(str(e)) from e
 
 
-@router.post("/{sections_id}/students", response_model=AddStudentResponseModel)
-def enroll_student_section(sections_id: str,
+@router.post("/{cohort_id}/students", response_model=AddStudentResponseModel)
+def enroll_student_section(cohort_id: str,
                            input_data: AddStudentToSectionModel,
                            request: Request):
   """
@@ -347,7 +348,14 @@ def enroll_student_section(sections_id: str,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
   try:
-    section = Section.find_by_id(sections_id)
+    cohort = Cohort.find_by_id(cohort_id)
+    sections = Section.collection.filter("cohort","==",cohort.key).fetch()
+    sections = list(sections)
+    if len(sections) == 0:
+      raise ResourceNotFoundException("Given CohortId\
+         does not have any sections")
+    section = student_service.get_section_with_minimum_student(sections)
+
     headers = {"Authorization": request.headers.get("Authorization")}
     user_object = classroom_crud.enroll_student(
         headers,
@@ -355,20 +363,22 @@ def enroll_student_section(sections_id: str,
         student_email=input_data.email,
         course_id=section.classroom_id,
         course_code=section.classroom_code)
-
     cohort = section.cohort
     cohort.enrolled_students_count += 1
     cohort.update()
+    section.enrolled_students_count +=1
+    section.update()
+
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = user_object["user_id"]
     course_enrollment_mapping.status = "active"
     course_enrollment_mapping.role = "learner"
-    course_enrollment_mapping.save()
-
+    course_enrollment_id = course_enrollment_mapping.save().id
     return {
         "message":
-        f"Successfully Added the Student with email {input_data.email}"
+        f"Successfully Added the Student with email {input_data.email}",
+        "data" : course_enrollment_id
     }
   except InvalidTokenError as ive:
     raise InvalidToken(str(ive)) from ive
@@ -435,7 +445,7 @@ def copy_courses(course_details: CourseDetails):
         #  form which returns
         # a dictionary of view_links as keys and edit likns as
         # values of google form
-        url_mapping = get_edit_url_and_view_url_mapping_of_form()
+        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
         # Loop to check if a material in courssework has
         #  a google form attached to it
         # update the  view link to edit link and attach it as a form
@@ -519,3 +529,4 @@ def section_enable_notifications_pub_sub(
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
