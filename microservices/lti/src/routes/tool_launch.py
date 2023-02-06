@@ -1,7 +1,7 @@
 """ Launch endpoints for LTI as a tool """
 import json
 from copy import deepcopy
-from config import ERROR_RESPONSES, ISSUER
+from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from services.lti_token import lti_claim_field, get_unverified_token_claims
 from fastapi import APIRouter, Request, Form
 from fastapi.security import HTTPBearer
@@ -38,7 +38,7 @@ def content_selection_launch(request: Request,
       lti_claim_field("claim", "deep_linking_settings",
                       "dl")).get("deep_link_return_url")
 
-  content_return_url = ISSUER + "/lti/api/v1/content-selection-response"
+  content_return_url = LTI_ISSUER_DOMAIN + "/lti/api/v1/content-selection-response"
   # decoded_token = jwt.decode(token=id_token, algorithms="RS256")
   # decoded_token = decode_token(id_token, key)
   return templates.TemplateResponse(

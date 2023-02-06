@@ -35,7 +35,7 @@ ERROR_RESPONSES = {
 
 TOKEN_TTL = 3600
 
-ISSUER = os.getenv("ISSUER", "http://localhost")
+LTI_ISSUER_DOMAIN = os.getenv("LTI_ISSUER_DOMAIN", "http://localhost")
 
 LTI_SERVICE_PLATFORM_PUBLIC_KEY = secrets.access_secret_version(request={
     "name":

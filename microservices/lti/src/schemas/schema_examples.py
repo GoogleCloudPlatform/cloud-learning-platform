@@ -1,6 +1,6 @@
 """ Schema examples and test objects for unit test """
 # pylint: disable=line-too-long
-from config import ISSUER
+from config import LTI_ISSUER_DOMAIN
 
 BASIC_TOOL_EXAMPLE = {
     "name": "Test tool",
@@ -20,10 +20,10 @@ FULL_TOOL_EXAMPLE = {
     "id": "asd98798as7dhjgkjsdfh",
     **BASIC_TOOL_EXAMPLE, "client_id": "174875a8-9c35-4963-89f7-cae31be3d78e",
     "deployment_id": "8434c79b-ba17-443d-a561-2e3ce7d7c804",
-    "issuer": ISSUER,
-    "platform_auth_url": f"{ISSUER}/lti/api/v1/authorize",
-    "platform_token_url": f"{ISSUER}/lti/api/v1/token",
-    "platform_keyset_url": f"{ISSUER}/lti/api/v1/jwks",
+    "issuer": LTI_ISSUER_DOMAIN,
+    "platform_auth_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/authorize",
+    "platform_token_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/token",
+    "platform_keyset_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/jwks",
     "created_time": "2022-03-03 09:22:49.843674+00:00",
     "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
 }
@@ -41,9 +41,9 @@ BASIC_PLATFORM_EXAMPLE = {
 
 FULL_PLATFORM_EXAMPLE = {
     "id": "asd98798as7dhjgkjsdfh",
-    **BASIC_PLATFORM_EXAMPLE, "tool_auth_url": f"{ISSUER}/lti/api/v1/authorize",
-    "tool_token_url": f"{ISSUER}/lti/api/v1/token",
-    "tool_keyset_url": f"{ISSUER}/lti/api/v1/jwks/SoD1uf9V1nc9"
+    **BASIC_PLATFORM_EXAMPLE, "tool_auth_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/authorize",
+    "tool_token_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/token",
+    "tool_keyset_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/jwks/SoD1uf9V1nc9"
 }
 
 BASIC_LINE_ITEM_EXAMPLE = {

@@ -1,6 +1,6 @@
 """ Launch endpoints for LTI as a platform """
 from copy import deepcopy
-from config import ERROR_RESPONSES, ISSUER
+from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from fastapi import APIRouter
 from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
@@ -57,7 +57,7 @@ def resource_launch_init(lti_content_item_id: str, user_id: str):
         query_params = parse_qsl(login_url.query)
         query_params.extend([("login_hint", user_id),
                              ("lti_message_hint", lti_content_item_id),
-                             ("iss", ISSUER),
+                             ("iss", LTI_ISSUER_DOMAIN),
                              ("target_link_uri", tool_data.get("tool_url")),
                              ("client_id", tool_data.get("client_id")),
                              ("lti_deployment_id",
@@ -122,7 +122,7 @@ def content_selection_launch_init(tool_id: str, user_id: str):
 
       query_params = parse_qsl(login_url.query)
       query_params.extend([("login_hint", user_id),
-                           ("lti_message_hint", "deep_link"), ("iss", ISSUER),
+                           ("lti_message_hint", "deep_link"), ("iss", LTI_ISSUER_DOMAIN),
                            ("target_link_uri", target_link_uri),
                            ("client_id", tool_data.get("client_id")),
                            ("lti_deployment_id", tool_data.get("deployment_id"))

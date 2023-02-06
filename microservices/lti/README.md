@@ -6,7 +6,7 @@ A pair of RSA private and public keys can be generated using the `generate_rsa_k
 
 For running this service, a set of RSA public and private keys are picked with the terms `lti-service-public-key` and `lti-service-private-key` from gcp secret manager.
 
-The issuer url is the domain where the service will be hosted. This will be passed as `iss` claim in the lti_message. This should also be passed as an environment variable with the name `ISSUER`. If not passed as env variable, the default `http://localhost` will be used for `iss` claim.
+The issuer url is the domain where the LTI service will be hosted. This will be passed as `iss` claim in the lti_message. This should also be passed as an environment variable with the name `LTI_ISSUER_DOMAIN`. If not passed as env variable, the default `http://localhost` will be used for `iss` claim.
 
 
 ## Moodle setup

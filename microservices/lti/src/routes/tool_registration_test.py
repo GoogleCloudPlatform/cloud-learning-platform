@@ -6,7 +6,7 @@
 # pylint: disable=wrong-import-position
 import os
 
-os.environ["ISSUER"] = "http://localhost"
+os.environ["LTI_ISSUER_DOMAIN"] = "http://localhost"
 import copy
 import pytest
 import mock
