@@ -45,7 +45,7 @@ def firestore_emulator():
         "firebase emulators:start --only firestore --project fake-project",
         shell=True,
         preexec_fn=os.setsid)
-  time.sleep(7)
+  time.sleep(15)
 
   os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
   os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"

@@ -64,7 +64,11 @@ class BaseModel(Model):
     self.last_modified_time = date_timestamp
     return super().save(transaction, batch, merge, no_return)
 
-  def update(self, input_datetime=None, key=None, transaction=None, batch=None):
+  def update(self,
+             input_datetime=None,
+             key=None,
+             transaction=None,
+             batch=None):
     """overrides default method to update items with timestamp
     Args:
       provided_timestamp (_type_, optional): _description_. Defaults to None.
