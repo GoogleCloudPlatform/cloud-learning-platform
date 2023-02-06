@@ -21,9 +21,25 @@ import os
 
 PROJECT_ID = os.environ.get("PROJECT_ID", "")
 
-if PROJECT_ID != "":
-  os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
-
+PROJECT_ID = os.environ.get("PROJECT_ID") or \
+    os.environ.get("GOOGLE_CLOUD_PROJECT")
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
-NEO4J_URI = "bolt://neo4j-neo4j:7687"
+PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
+  PROJECT_ID
+
+API_BASE_URL = os.getenv("API_BASE_URL")
+
+
+SERVICES = {
+  "user-management": {
+    "host": "user-management",
+    "port": 80
+  }
+}
+
+USER_MANAGEMENT_BASE_URL = f"http://{SERVICES['user-management']['host']}:" \
+                  f"{SERVICES['user-management']['port']}" \
+                  f"/user-management/api/v1"
+
+CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL")
