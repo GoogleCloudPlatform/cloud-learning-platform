@@ -122,7 +122,8 @@ def content_selection_launch_init(tool_id: str, user_id: str):
 
       query_params = parse_qsl(login_url.query)
       query_params.extend([("login_hint", user_id),
-                           ("lti_message_hint", "deep_link"), ("iss", LTI_ISSUER_DOMAIN),
+                           ("lti_message_hint", "deep_link"),
+                           ("iss", LTI_ISSUER_DOMAIN),
                            ("target_link_uri", target_link_uri),
                            ("client_id", tool_data.get("client_id")),
                            ("lti_deployment_id", tool_data.get("deployment_id"))

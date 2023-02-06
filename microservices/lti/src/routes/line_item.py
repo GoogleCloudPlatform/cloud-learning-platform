@@ -89,7 +89,8 @@ def get_all_line_items(context_id: str,
     line_items_list = []
     for i in line_items:
       line_item = i.get_fields(reformat_datetime=True)
-      line_item["id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{i.id}"
+      line_item[
+          "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{i.id}"
       line_items_list.append(line_item)
     return line_items_list
 

@@ -40,10 +40,14 @@ BASIC_PLATFORM_EXAMPLE = {
 }
 
 FULL_PLATFORM_EXAMPLE = {
-    "id": "asd98798as7dhjgkjsdfh",
-    **BASIC_PLATFORM_EXAMPLE, "tool_auth_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/authorize",
-    "tool_token_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/token",
-    "tool_keyset_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/jwks/SoD1uf9V1nc9"
+    "id":
+        "asd98798as7dhjgkjsdfh",
+    **BASIC_PLATFORM_EXAMPLE, "tool_auth_url":
+        f"{LTI_ISSUER_DOMAIN}/lti/api/v1/authorize",
+    "tool_token_url":
+        f"{LTI_ISSUER_DOMAIN}/lti/api/v1/token",
+    "tool_keyset_url":
+        f"{LTI_ISSUER_DOMAIN}/lti/api/v1/jwks/SoD1uf9V1nc9"
 }
 
 BASIC_LINE_ITEM_EXAMPLE = {

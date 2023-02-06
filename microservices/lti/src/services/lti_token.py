@@ -43,11 +43,16 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
     token_claims[lti_claim_field("claim", "deep_linking_settings", "dl")] = {
         "accept_types": ["link", "file", "html", "ltiResourceLink", "image"],
         "accept_presentation_document_targets": ["iframe", "window", "embed"],
-        "accept_multiple": False,
-        "auto_create": False,
-        "title": "",
-        "text": "",
-        "deep_link_return_url": LTI_ISSUER_DOMAIN + "/lti/api/v1/content-item-return"
+        "accept_multiple":
+            False,
+        "auto_create":
+            False,
+        "title":
+            "",
+        "text":
+            "",
+        "deep_link_return_url":
+            LTI_ISSUER_DOMAIN + "/lti/api/v1/content-item-return"
     }
 
     token_claims[lti_claim_field("claim",
@@ -91,8 +96,10 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
               lti_claim_field("scope", "result.readonly", "ags"),
               lti_claim_field("scope", "score", "ags")
           ],
-          "lineitems": LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items",
-          "lineitem": LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items/" + line_item.id
+          "lineitems":
+              LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items",
+          "lineitem":
+              LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items/" + line_item.id
       }
 
     resource_link_claim_info = {

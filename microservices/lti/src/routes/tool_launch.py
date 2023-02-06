@@ -6,6 +6,7 @@ from services.lti_token import lti_claim_field, get_unverified_token_claims
 from fastapi import APIRouter, Request, Form
 from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
+# pylint: disable = line-too-long
 
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
 del ERROR_RESPONSE_DICT[401]
