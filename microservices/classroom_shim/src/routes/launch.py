@@ -5,9 +5,10 @@ from fastapi.responses import RedirectResponse
 from config import ERROR_RESPONSES
 from common.models import LTIAssignment
 from common.utils.auth_service import validate_token
-from common.utils.errors import ResourceNotFoundException, ValidationError
+from common.utils.errors import (ResourceNotFoundException, ValidationError,
+                                 UnauthorizedUserError)
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
-                                          BadRequest)
+                                          BadRequest, Unauthenticated)
 from common.utils.logging_handler import Logger
 from typing import Optional
 import requests
@@ -63,7 +64,7 @@ def launch_assignment(request: Request,
     user_email = user_details.get("email")
     headers = {"Authorization": request.headers.get("Authorization")}
     fetch_user_request = requests.get(
-        "http://user-management/user-management/api/v1/user/search",
+        "http://user-management/user-management/api/v1/user/search/email",
         params={"email": user_email},
         headers=headers,
         timeout=60)
@@ -71,9 +72,9 @@ def launch_assignment(request: Request,
     if fetch_user_request.status_code == 200:
       user_data = fetch_user_request.json().get("data")[0]
     elif fetch_user_request.status_code == 404:
-      return {"success": False, "message": "User not found"}
-    elif fetch_user_request.status_code == 500:
-      return {"success": False, "message": "Internal server error"}
+      raise UnauthorizedUserError("Unauthorized")
+    else:
+      raise Exception("Internal server error from user API")
 
     user_id = user_data.get("user_id")
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
@@ -87,6 +88,9 @@ def launch_assignment(request: Request,
   except ValidationError as e:
     Logger.error(e)
     raise BadRequest(str(e)) from e
+  except UnauthorizedUserError as e:
+    Logger.error(e)
+    raise Unauthenticated(str(e)) from e
   except ResourceNotFoundException as e:
     Logger.error(e)
     raise ResourceNotFound(str(e)) from e

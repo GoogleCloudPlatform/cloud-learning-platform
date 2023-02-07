@@ -4,3 +4,7 @@ pylint==2.15.10
 mock==4.0.3
 protobuf==3.19.5
 google-cloud-logging==3.1.2
+backports-unittest-mock==1.5
+pytest-cov==4.0.0
+pytest-custom_exit_code==0.3.0
+pytest-mock==3.10.0
