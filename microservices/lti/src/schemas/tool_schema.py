@@ -26,15 +26,14 @@ class BasicToolModel(BaseModel):
 
 
 class FullToolModel(BasicToolModel):
-  """Tool Model with uuid, created and last modified time"""
-  uuid: str
+  """Tool Model with id, created and last modified time"""
+  id: str
   client_id: str
   deployment_id: str
   issuer: str = ISSUER
   platform_auth_url: str = f"{ISSUER}/lti/api/v1/authorize"
   platform_token_url: str = f"{ISSUER}/lti/api/v1/token"
   platform_keyset_url: str = f"{ISSUER}/lti/api/v1/jwks"
-  is_archived: Optional[bool] = False
   created_time: str
   last_modified_time: str
 
@@ -60,7 +59,6 @@ class UpdateToolModel(BaseModel):
   content_selection_url: Optional[str]
   redirect_uris: Optional[list]
   enable_grade_sync: Optional[bool]
-  is_archived: Optional[bool]
 
   class Config():
     orm_mode = True
