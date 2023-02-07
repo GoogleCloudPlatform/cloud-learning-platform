@@ -1,0 +1,9 @@
+<h2 mat-dialog-title>Confirm ?</h2>
+<div mat-dialog-content style="padding-bottom: 4%;padding-top: 1%;">
+    <b>{{deleteDialogData.first_name}} {{deleteDialogData.last_name}}</b> will be removed from
+    <b>{{deleteDialogData.section}}</b>
+</div>
+<div mat-dialog-actions style="display: flex;justify-content: end;">
+    <button mat-flat-button (click)="onNoClick()">No</button>
+    <button mat-flat-button color="primary" (click)="deleteStudent()">Yes</button>
+</div>
