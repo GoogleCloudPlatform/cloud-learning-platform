@@ -7,7 +7,8 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
                                           ResourceNotFound, BadRequest)
 from common.models import CourseEnrollmentMapping,Section
-from services import classroom_crud
+# from services import classroom_crud
+from common.utils import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,

@@ -10,8 +10,8 @@ from common.utils.logging_handler import Logger
 
 from common.models import Section,CourseEnrollmentMapping
 
-from config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
-from utils import helper
+from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
+from common.utils import helper
 import requests
 
 SUCCESS_RESPONSE = {"status": "Success"}
@@ -42,6 +42,7 @@ def get_credentials():
   creds = service_account.Credentials.from_service_account_info(classroom_key,
                                                                 scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+
   return creds
 
 
