@@ -37,9 +37,9 @@ def search_content_item(tool_id: str):
   try:
     content_item = LTIContentItem.find_by_tool_id(tool_id)
     if content_item:
-      tool_data = content_item.get_fields(reformat_datetime=True)
-      tool_data["id"] = content_item.id
-      result = [tool_data]
+      content_item_data = content_item.get_fields(reformat_datetime=True)
+      content_item_data["id"] = content_item.id
+      result = [content_item_data]
     return {
         "success": True,
         "message": "Successfully fetched the content items",

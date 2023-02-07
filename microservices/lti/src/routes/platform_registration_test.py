@@ -205,49 +205,15 @@ def test_delete_platform_negative(clean_firestore):
   assert json_response == response, "Expected response not same"
 
 
-# @pytest.mark.parametrize(
-#     "create_platform", [(BASIC_PLATFORM_EXAMPLE)], indirect=True)
-# def test_get_platforms(clean_firestore, create_platform):
-#   platform = create_platform
+@pytest.mark.parametrize(
+    "create_platform", [(BASIC_PLATFORM_EXAMPLE)], indirect=True)
+def test_get_platforms(clean_firestore, create_platform):
+  platform = create_platform
 
-#   # create an archived object
-#   archived_platform_dict = copy.deepcopy(BASIC_PLATFORM_EXAMPLE)
-#   archived_platform_dict["platform_url"] = "https://testplatform.com/test-url"
-#   archived_platform_dict["client_id"] = str(uuid4())
-#   archived_platform_dict["deployment_id"] = str(uuid4())
-
-#   archived_platform = Platform.from_dict(archived_platform_dict)
-#   archived_platform.id = ""
-#   archived_platform.save()
-#   archived_platform.id = archived_platform.id
-#   archived_platform.is_archived = True
-#   archived_platform.update()
-
-#   params = {"skip": 0, "limit": "50"}
-
-#   params = {"skip": 0, "limit": "50"}
-#   url = f"{api_url}s"
-#   resp = client_with_emulator.get(url, params=params)
-#   json_response = resp.json()
-#   assert resp.status_code == 200, "Status code not 200"
-#   saved_names = [i.get("name") for i in json_response.get("data")]
-#   assert platform.name in saved_names, "all data not retrived"
-#   assert archived_platform.name in saved_names, ("all data not retrived")
-
-#   # Test archival functionality: Fetch all archived objects
-#   params = {"skip": 0, "limit": "50", "fetch_archive": True}
-#   url = f"{api_url}s"
-#   resp = client_with_emulator.get(url, params=params)
-#   json_response = resp.json()
-#   assert resp.status_code == 200, "Status code not 200"
-#   saved_uuids = [i.get("uuid") for i in json_response.get("data")]
-#   assert archived_platform.id in saved_uuids
-
-#   # Test archival functionality: Fetch all non archived objects
-#   params = {"skip": 0, "limit": "50", "fetch_archive": False}
-#   url = f"{api_url}s"
-#   resp = client_with_emulator.get(url, params=params)
-#   json_response = resp.json()
-#   assert resp.status_code == 200, "Status code not 200"
-#   saved_uuids = [i.get("uuid") for i in json_response.get("data")]
-#   assert platform.id in saved_uuids
+  params = {"skip": 0, "limit": "50"}
+  url = f"{api_url}s"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+  assert resp.status_code == 200, "Status code not 200"
+  saved_names = [i.get("name") for i in json_response.get("data")]
+  assert platform.name in saved_names, "all data not retrived"
