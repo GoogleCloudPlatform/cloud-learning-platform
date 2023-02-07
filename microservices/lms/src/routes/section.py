@@ -5,6 +5,7 @@ from common.utils.errors import InvalidTokenError, ResourceNotFoundException, Va
 from common.utils.http_exceptions import (CustomHTTPException,
                                           InternalServerError, InvalidToken,
                                           ResourceNotFound, BadRequest)
+from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
@@ -19,8 +20,7 @@ from schemas.section import (
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     ClassroomCourseListResponseModel, UpdateSectionResponseModel)
 from schemas.update_section import UpdateSection
-from services import classroom_crud,student_service
-from services.classroom_crud import get_edit_url_and_view_url_mapping_of_form
+from services import student_service
 from utils.helper import convert_section_to_section_model
 
 # disabling for linting to pass
@@ -132,7 +132,7 @@ def create_section(sections_details: SectionDetails):
         # google form which returns
         # a dictionary of view_links as keys and edit
         #  likns as values of google form
-        url_mapping = get_edit_url_and_view_url_mapping_of_form()
+        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
         # Loop to check if a material in courssework has a google
         # form attached to it
         # update the  view link to edit link and attach it as a form
@@ -275,6 +275,7 @@ def section_list(skip: int = 0, limit: int = 10):
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
+    print(err)
     raise InternalServerError(str(e)) from e
 
 
@@ -444,7 +445,7 @@ def copy_courses(course_details: CourseDetails):
         #  form which returns
         # a dictionary of view_links as keys and edit likns as
         # values of google form
-        url_mapping = get_edit_url_and_view_url_mapping_of_form()
+        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
         # Loop to check if a material in courssework has
         #  a google form attached to it
         # update the  view link to edit link and attach it as a form
@@ -528,6 +529,4 @@ def section_enable_notifications_pub_sub(
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
-
-
 
