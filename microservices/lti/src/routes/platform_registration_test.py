@@ -216,4 +216,4 @@ def test_get_platforms(clean_firestore, create_platform):
   json_response = resp.json()
   assert resp.status_code == 200, "Status code not 200"
   saved_names = [i.get("name") for i in json_response.get("data")]
-  assert platform.name in saved_names, "all data not retrived"
+  assert platform.name in saved_names, "all data not retrieved"
