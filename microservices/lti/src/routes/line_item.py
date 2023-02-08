@@ -494,6 +494,7 @@ def create_score_for_line_item(context_id: str,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
+    print("in here")
     LineItem.find_by_uuid(line_item_id)
     input_score_dict = {**input_score.dict()}
     input_score_dict["lineItemId"] = line_item_id
@@ -505,7 +506,8 @@ def create_score_for_line_item(context_id: str,
     new_score.update()
 
     line_item_url = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
-    result = Result.collection.filter("scoreOf", "==", line_item_id).get()
+    result = Result.collection.filter("scoreOf", "==", line_item_id).filter(
+        "userId", "==", input_score_dict["userId"]).get()
 
     input_result_dict = {
         "userId": input_score_dict["userId"],

@@ -75,11 +75,18 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
     if tool_info.get("enable_grade_sync"):
       token_claims[lti_claim_field("claim", "endpoint", "ags")] = {
           "scope": [
-              lti_claim_field("scope", "lineitem", "ags"),
-              lti_claim_field("scope", "result.readonly", "ags"),
-              lti_claim_field("scope", "score", "ags")
+              "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+              "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
+              "https://purl.imsglobal.org/spec/lti-ags/scope/score"
           ],
           "lineitems": ISSUER + "/lti/api/v1/1234/line_items",
+      }
+
+    if tool_info.get("enable_nrps"):
+      token_claims[lti_claim_field("claim", "namesroleservice", "nrps")] = {
+          "context_memberships_url":
+              f"{ISSUER}/lti/api/v1/2qi7b3vh83hq3vesfd/memberships",
+          "service_versions": ["2.0"]
       }
 
     if "lineItem" in content_item_info.keys():
@@ -118,6 +125,8 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
 
   if user.get("user_type") == "learner":
     token_claims[lti_claim_field("claim", "roles")] = [
+        "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Learner",
         "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
     ]
   elif user.get("user_type") == "faculty":
