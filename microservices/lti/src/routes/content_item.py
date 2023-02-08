@@ -1,5 +1,4 @@
 """LTI Content Item endpoints"""
-from typing import Optional
 from fastapi import APIRouter
 from config import ERROR_RESPONSES
 from common.models import LTIContentItem, Tool
@@ -38,7 +37,9 @@ def search_content_item(tool_id: str):
   try:
     content_item = LTIContentItem.find_by_tool_id(tool_id)
     if content_item:
-      result = [content_item.get_fields(reformat_datetime=True)]
+      content_item_data = content_item.get_fields(reformat_datetime=True)
+      content_item_data["id"] = content_item.id
+      result = [content_item_data]
     return {
         "success": True,
         "message": "Successfully fetched the content items",
@@ -56,9 +57,7 @@ def search_content_item(tool_id: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_all_content_items(skip: int = 0,
-                          limit: int = 10,
-                          fetch_archive: Optional[bool] = None):
+def get_all_content_items(skip: int = 0, limit: int = 10):
   """The get content items endpoint will return an array of content
   items from firestore
   ### Args:
@@ -76,21 +75,20 @@ def get_all_content_items(skip: int = 0,
   """
   try:
     collection_manager = LTIContentItem.collection.filter(
-        "is_deleted", "==", False)
-    if fetch_archive is not None:
-      collection_manager = collection_manager\
-                            .filter("is_archived", "==", fetch_archive)
+        "deleted_at_timestamp", "==", None)
 
     content_items = collection_manager.order("-created_time").offset(
         skip).fetch(limit)
-    content_items = [
-        i.get_fields(reformat_datetime=True) for i in content_items
-    ]
+    content_items_list = []
+    for i in content_items:
+      content_item_data = i.get_fields(reformat_datetime=True)
+      content_item_data["id"] = i.id
+      content_items_list.append(content_item_data)
 
     return {
         "success": True,
         "message": "Content items has been fetched successfully",
-        "data": content_items
+        "data": content_items_list
     }
   except ValidationError as e:
     Logger.error(e)
@@ -104,17 +102,17 @@ def get_all_content_items(skip: int = 0,
 
 
 @router.get(
-    "/content-item/{uuid}",
+    "/content-item/{content_item_id}",
     name="Get a specific content item",
     response_model=LTIContentItemResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_content_item(uuid: str):
+def get_content_item(content_item_id: str):
   """The get content item endpoint will return the content item
-  from firestore of which uuid is provided
+  from firestore of which content_item_id is provided
   ### Args:
-  uuid: `str`
+  content_item_id: `str`
     Unique identifier for content item
   ### Raises:
   ResourceNotFoundException:
@@ -125,13 +123,12 @@ def get_content_item(uuid: str):
   LTIContentItem: `LTIContentItemResponseModel`
   """
   try:
-    content_item = LTIContentItem.find_by_uuid(uuid)
+    content_item = LTIContentItem.find_by_id(content_item_id)
     content_item_fields = content_item.get_fields(reformat_datetime=True)
-    return {
-        "success": True,
-        "message": f"Content item with '{uuid}' has been fetched successfully",
-        "data": content_item_fields
-    }
+    content_item_fields["id"] = content_item.id
+
+    msg = f"Content item with '{content_item_id}' has been fetched successfully"
+    return {"success": True, "message": msg, "data": content_item_fields}
   except ResourceNotFoundException as e:
     Logger.error(e)
     raise ResourceNotFound(str(e)) from e
@@ -165,9 +162,10 @@ def create_content_item(input_content_item: LTIContentItemModel):
   """
   try:
     input_content_item_dict = {**input_content_item.dict()}
-    Tool.find_by_uuid(input_content_item_dict.get("tool_id"))
+    Tool.find_by_id(input_content_item_dict.get("tool_id"))
 
     content_item_fields = create_new_content_item(input_content_item_dict)
+
     return {
         "success": True,
         "message": "Content item has been created successfully",
@@ -187,12 +185,12 @@ def create_content_item(input_content_item: LTIContentItemModel):
 
 
 @router.put(
-    "/content-item/{uuid}",
+    "/content-item/{content_item_id}",
     response_model=LTIContentItemResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def update_content_item(uuid: str,
+def update_content_item(content_item_id: str,
                         input_content_item: UpdateLTIContentItemModel):
   """Update a content_item
   ### Args:
@@ -207,13 +205,13 @@ def update_content_item(uuid: str,
   Updated LTIContentItem: `LTIContentItemResponseModel`
   """
   try:
-    existing_content_item = LTIContentItem.find_by_uuid(uuid)
+    existing_content_item = LTIContentItem.find_by_id(content_item_id)
     content_item_fields = existing_content_item.get_fields()
 
     input_content_item_dict = {**input_content_item.dict()}
 
     if input_content_item_dict.get("tool_id"):
-      Tool.find_by_uuid(input_content_item_dict.get("tool_id"))
+      Tool.find_by_id(input_content_item_dict.get("tool_id"))
 
     for key, value in input_content_item_dict.items():
       content_item_fields[key] = value
@@ -222,6 +220,7 @@ def update_content_item(uuid: str,
     existing_content_item.update()
     content_item_fields = existing_content_item.get_fields(
         reformat_datetime=True)
+    content_item_fields["id"] = existing_content_item.id
     return {
         "success": True,
         "message": "Successfully updated the content item",
@@ -236,15 +235,15 @@ def update_content_item(uuid: str,
 
 
 @router.delete(
-    "/content-item/{uuid}",
+    "/content-item/{content_item_id}",
     response_model=DeleteLTIContentItem,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def delete_content_item(uuid: str):
+def delete_content_item(content_item_id: str):
   """Delete a content item from firestore
   ### Args:
-  uuid: `str`
+  content_item_id: `str`
     Unique ID of the content item
   ### Raises:
   ResourceNotFoundException:
@@ -255,7 +254,8 @@ def delete_content_item(uuid: str):
   Success/Fail Message: `JSON`
   """
   try:
-    LTIContentItem.delete_by_uuid(uuid)
+    LTIContentItem.find_by_id(content_item_id)
+    LTIContentItem.delete_by_id(content_item_id)
     return {}
   except ResourceNotFoundException as e:
     Logger.error(e)

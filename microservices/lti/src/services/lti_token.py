@@ -57,7 +57,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
     token_claims[lti_claim_field("claim",
                                  "message_type")] = "LtiResourceLinkRequest"
 
-    lti_content_item = LTIContentItem.find_by_uuid(lti_message_hint)
+    lti_content_item = LTIContentItem.find_by_id(lti_message_hint)
 
     content_item_info = lti_content_item.content_item_info
     if content_item_info:
@@ -83,7 +83,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       }
 
     if "lineItem" in content_item_info.keys():
-      line_item = LineItem.find_by_resource_link_id(lti_content_item.uuid)
+      line_item = LineItem.find_by_resource_link_id(lti_content_item.id)
 
       token_claims[lti_claim_field("claim", "endpoint", "ags")] = {
           "scope": [
@@ -92,7 +92,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
               lti_claim_field("scope", "score", "ags")
           ],
           "lineitems": ISSUER + "/lti/api/v1/1234/line_items",
-          "lineitem": ISSUER + "/lti/api/v1/1234/line_items/" + line_item.uuid
+          "lineitem": ISSUER + "/lti/api/v1/1234/line_items/" + line_item.id
       }
 
     resource_link_claim_info = {

@@ -63,10 +63,11 @@ def test_post_and_get_line_item(mock_unverified_token, mock_token_scopes,
   assert post_resp.status_code == 200, "Status code not 200 for POST line_item"
 
   post_json_response = post_resp.json()
-  uuid = post_json_response.get("uuid")
+  line_item_id = post_json_response.get("id")
+  line_item_id = line_item_id.split("/")[-1]
 
   # now see if GET endpoint returns same data
-  url = f"{api_url}/{uuid}"
+  url = f"{api_url}/{line_item_id}"
   get_resp = client_with_emulator.get(url, headers=headers)
   get_json_response = get_resp.json()
   assert get_json_response == post_json_response
@@ -128,11 +129,10 @@ def test_update_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
   assert post_resp.status_code == 200, "Status code not 200 for POST line_item"
 
   post_json_response = post_resp.json()
-  print(post_json_response)
-  uuid = post_json_response.get("uuid")
-
+  line_item_id = post_json_response.get("id")
+  line_item_id = line_item_id.split("/")[-1]
   # update line item here
-  url = f"{api_url}/{uuid}"
+  url = f"{api_url}/{line_item_id}"
 
   post_json_response["scoreMaximum"] = 100
   update_resp = client_with_emulator.put(
@@ -144,7 +144,6 @@ def test_update_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
   # now see if GET endpoint returns same data
   get_resp = client_with_emulator.get(url, headers=headers)
   get_json_response = get_resp.json()
-  print(get_json_response)
   assert get_json_response["scoreMaximum"] == update_json_response[
       "scoreMaximum"]
 
@@ -167,13 +166,12 @@ def test_delete_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
   assert post_resp.status_code == 200, "Status code not 200 for POST line_item"
 
   post_json_response = post_resp.json()
-  print(post_json_response)
-  uuid = post_json_response.get("uuid")
+  line_item_id = post_json_response.get("id")
+  line_item_id = line_item_id.split("/")[-1]
 
   # delete line item here
-  url = f"{api_url}/{uuid}"
+  url = f"{api_url}/{line_item_id}"
   delete_resp = client_with_emulator.delete(url, headers=headers)
-  print("delete_resp.text", delete_resp.text)
   assert delete_resp.status_code == 200, \
   "Status code not 200 for DELETE line_item"
 
@@ -191,7 +189,7 @@ def test_post_score(mock_unverified_token, mock_token_scopes, mock_keyset,
 
   headers = {"Authorization": "Bearer test_token"}
   line_item = create_line_item
-  line_item_id = line_item.uuid
+  line_item_id = line_item.id
 
   input_score = copy.deepcopy(BASIC_SCORE_EXAMPLE)
   url = f"{api_url}/{line_item_id}/scores"

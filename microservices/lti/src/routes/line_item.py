@@ -86,14 +86,12 @@ def get_all_line_items(context_id: str,
     line_items = collection_manager.order("-created_time").offset(skip).fetch(
         limit)
 
-    line_items = [i.get_fields(reformat_datetime=True) for i in line_items]
-
-    for each_line_item in line_items:
-      each_line_item[
-          "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/" + each_line_item[
-              "uuid"]
-
-    return line_items
+    line_items_list = []
+    for i in line_items:
+      line_item = i.get_fields(reformat_datetime=True)
+      line_item["id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{i.id}"
+      line_items_list.append(line_item)
+    return line_items_list
 
   except InvalidTokenError as e:
     Logger.error(e)
@@ -104,7 +102,7 @@ def get_all_line_items(context_id: str,
 
 
 @router.get(
-    "/{context_id}/line_items/{uuid}",
+    "/{context_id}/line_items/{line_item_id}",
     name="Get a specific line item",
     response_model=LineItemResponseModel,
     responses={404: {
@@ -114,11 +112,13 @@ def get_all_line_items(context_id: str,
     "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
     "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
 ])
-def get_line_item(context_id: str, uuid: str, token: auth_scheme = Depends()):
+def get_line_item(context_id: str,
+                  line_item_id: str,
+                  token: auth_scheme = Depends()):
   """The get line item endpoint will return the line item
-  from firestore of which uuid is provided
+  from firestore of which line_item_id is provided
   ### Args:
-  uuid: `str`
+  line_item_id: `str`
     Unique identifier for line item
   ### Raises:
   ResourceNotFoundException:
@@ -130,11 +130,10 @@ def get_line_item(context_id: str, uuid: str, token: auth_scheme = Depends()):
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    line_item = LineItem.find_by_uuid(uuid)
+    line_item = LineItem.find_by_id(line_item_id)
     line_item_fields = line_item.get_fields(reformat_datetime=True)
     line_item_fields[
-        "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/" + line_item_fields[
-            "uuid"]
+        "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item.id}"
 
     return line_item_fields
   except InvalidTokenError as e:
@@ -174,11 +173,10 @@ def create_line_item(context_id: str,
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
     input_line_item_dict = {**input_line_item.dict()}
-    new_line_item = create_new_line_item(input_line_item_dict)
-    line_item_fields = new_line_item.get_fields(reformat_datetime=True)
+    line_item = create_new_line_item(input_line_item_dict)
+    line_item_fields = line_item.get_fields(reformat_datetime=True)
     line_item_fields[
-        "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/" + line_item_fields[
-            "uuid"]
+        "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item.id}"
 
     return line_item_fields
   except InvalidTokenError as e:
@@ -190,7 +188,7 @@ def create_line_item(context_id: str,
 
 
 @router.put(
-    "/{context_id}/line_items/{uuid}",
+    "/{context_id}/line_items/{line_item_id}",
     response_model=LineItemResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
@@ -198,12 +196,12 @@ def create_line_item(context_id: str,
 @validate_access(
     allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
 def update_line_item(context_id: str,
-                     uuid: str,
+                     line_item_id: str,
                      input_line_item: UpdateLineItemModel,
                      token: auth_scheme = Depends()):
   """Update a line item
   ### Args:
-  uuid: `str`
+  line_item_id: `str`
     Unique identifier for line item
   input_line_item: `UpdateLineItemModel`
     Required body of the line item
@@ -217,7 +215,7 @@ def update_line_item(context_id: str,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    existing_line_item = LineItem.find_by_uuid(uuid)
+    existing_line_item = LineItem.find_by_id(line_item_id)
     line_item_fields = existing_line_item.get_fields()
 
     input_line_item_dict = {**input_line_item.dict()}
@@ -229,8 +227,7 @@ def update_line_item(context_id: str,
     existing_line_item.update()
     line_item_fields = existing_line_item.get_fields(reformat_datetime=True)
     line_item_fields[
-        "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/" + line_item_fields[
-            "uuid"]
+        "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}"
 
     return line_item_fields
 
@@ -271,12 +268,12 @@ def update_line_item_using_id(context_id: str,
   Updated line item: `LineItemResponseModel`
   """
   try:
-    # # TODO: Add API call to check if the context_id (course_id) exists
+    # TODO: Add API call to check if the context_id (course_id) exists
     input_line_item_dict = {**input_line_item.dict(exclude_unset=True)}
     line_item_id = input_line_item_dict.get("id")
     line_item_id = line_item_id.split("/")[-1]
 
-    existing_line_item = LineItem.find_by_uuid(line_item_id)
+    existing_line_item = LineItem.find_by_id(line_item_id)
     line_item_fields = existing_line_item.get_fields()
 
     for key, value in input_line_item_dict.items():
@@ -286,8 +283,7 @@ def update_line_item_using_id(context_id: str,
     existing_line_item.update()
     line_item_fields = existing_line_item.get_fields(reformat_datetime=True)
     line_item_fields[
-        "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/" + line_item_fields[
-            "uuid"]
+        "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}"
 
     return line_item_fields
 
@@ -303,18 +299,19 @@ def update_line_item_using_id(context_id: str,
 
 
 @router.delete(
-    "/{context_id}/line_items/{uuid}",
+    "/{context_id}/line_items/{line_item_id}",
     response_model=DeleteLineItem,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
 @validate_access(
     allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
-def delete_line_item(context_id: str, uuid: str,
+def delete_line_item(context_id: str,
+                     line_item_id: str,
                      token: auth_scheme = Depends()):
   """Delete a line item from firestore
   ### Args:
-  uuid: `str`
+  line_item_id: `str`
     Unique ID of the line item
   ### Raises:
   ResourceNotFoundException:
@@ -326,7 +323,7 @@ def delete_line_item(context_id: str, uuid: str,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    LineItem.delete_by_id(uuid)
+    LineItem.delete_by_id(line_item_id)
     return {}
 
   except InvalidTokenError as e:
@@ -383,19 +380,20 @@ def get_results_of_line_item(context_id: str,
                                         line_item_id).filter(
                                             "userId", "==", user_id).get()
       if result:
-        result_fields = [result.get_fields(reformat_datetime=True)]
+        result_fields = [{
+            "id": result.id,
+            **result.get_fields(reformat_datetime=True)
+        }]
     else:
       result = Result.collection.filter("lineItemId", "==",
                                         line_item_id).offset(skip).fetch(limit)
-      result_fields = [i.get_fields(reformat_datetime=True) for i in result]
-
-    for each_result in result_fields:
-      each_result[
-          "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}/results/" + each_result[
-              "uuid"]
-
-      each_result[
-          "scoreOf"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
+      for i in result:
+        result_data = i.get_fields(reformat_datetime=True)
+        result_data[
+            "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{i.id}"
+        result_data[
+            "scoreOf"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}"
+        result_fields.append(result_data)
 
     return result_fields
 
@@ -441,17 +439,16 @@ def get_result(context_id: str,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    result = Result.find_by_uuid(result_id)
+    result = Result.find_by_id(result_id)
     if result.lineItemId != line_item_id:
       raise ResourceNotFoundException(
           "Incorrect result id provided for the given line item")
     result_fields = result.get_fields(reformat_datetime=True)
     result_fields[
-        "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}/results/" + result_fields[
-            "uuid"]
+        "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{result.id}"
 
     result_fields[
-        "scoreOf"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
+        "scoreOf"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}"
 
     return result_fields
 
@@ -494,17 +491,15 @@ def create_score_for_line_item(context_id: str,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    LineItem.find_by_uuid(line_item_id)
+    LineItem.find_by_id(line_item_id)
     input_score_dict = {**input_score.dict()}
     input_score_dict["lineItemId"] = line_item_id
 
     new_score = Score()
     new_score = new_score.from_dict(input_score_dict)
     new_score.save()
-    new_score.uuid = new_score.id
-    new_score.update()
 
-    line_item_url = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}"
+    line_item_url = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}"
     result = Result.collection.filter("scoreOf", "==", line_item_id).get()
 
     input_result_dict = {
@@ -527,20 +522,15 @@ def create_score_for_line_item(context_id: str,
       result_fields = result.get_fields(reformat_datetime=True)
       result_fields["scoreOf"] = line_item_url
       result_fields[
-          "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}/results/" + result_fields[
-              "uuid"]
-
+          "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{result.id}"
     else:
       new_result = Result()
       new_result = new_result.from_dict(input_result_dict)
       new_result.save()
-      new_result.uuid = new_result.id
-      new_result.update()
       result_fields = new_result.get_fields(reformat_datetime=True)
       result_fields["scoreOf"] = line_item_url
       result_fields[
-          "id"] = ISSUER + f"/lti/api/v1/{context_id}/line_items/{line_item_id}/results/" + result_fields[
-              "uuid"]
+          "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{new_result.id}"
 
     return result_fields
 
