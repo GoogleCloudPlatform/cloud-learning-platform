@@ -13,6 +13,7 @@ from common.models import Section,CourseEnrollmentMapping
 from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
 from common.utils import helper
 import requests
+import time
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
@@ -374,6 +375,8 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   {USER_MANAGEMENT_BASE_URL}/user/search?email={student_email}",\
     headers=headers)
   # If the response is success check if student is inactive i.e  raise error
+  time.sleep(60)
+  print("USer Management Response ")
   if response.status_code == 200:
     searched_student = response.json()["data"]
     if searched_student != []:
