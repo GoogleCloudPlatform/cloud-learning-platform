@@ -46,9 +46,9 @@ def resource_launch_init(lti_content_item_id: str, user_id: str):
      Raised if something went wrong <br/>
   """
   try:
-    lti_content_item = LTIContentItem.find_by_uuid(lti_content_item_id)
+    lti_content_item = LTIContentItem.find_by_id(lti_content_item_id)
     if lti_content_item:
-      tool = Tool.find_by_uuid(lti_content_item.tool_id)
+      tool = Tool.find_by_id(lti_content_item.tool_id)
       if tool:
         tool_data = tool.get_fields(reformat_datetime=True)
         # """Redirect request to tool login endpoint"""
@@ -108,7 +108,7 @@ def content_selection_launch_init(tool_id: str, user_id: str):
   Redirect Request to the tool endpoint : `RedirectResponse`
   """
   try:
-    tool = Tool.find_by_uuid(tool_id)
+    tool = Tool.find_by_id(tool_id)
 
     if tool:
       tool_data = tool.get_fields(reformat_datetime=True)
