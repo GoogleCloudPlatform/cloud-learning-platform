@@ -5,7 +5,7 @@ ARG FIREBASE_APP_ID
 ARG PROJECT_ID
 WORKDIR /app
 COPY . .
-RUN npm install
+RUN npm install --save-exact
 RUN npm run build
 
 FROM nginx:1.17.10-alpine
