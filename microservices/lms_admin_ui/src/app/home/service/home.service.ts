@@ -49,4 +49,7 @@ export class HomeService {
   getStudentsInSection(sectionId: any) {
     return this.http.get(`${environment.apiurl}sections/${sectionId}/students`)
   }
+  deleteStudent(userId: any, sectionId: any) {
+    return this.http.delete(`${environment.apiurl}/student/${userId}/section/${sectionId}`)
+  }
 }

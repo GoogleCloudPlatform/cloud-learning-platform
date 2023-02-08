@@ -1,5 +1,4 @@
 """Platform Registration endpoints"""
-from typing import Optional
 from fastapi import APIRouter
 from config import ERROR_RESPONSES, ISSUER
 from common.models import Platform
@@ -42,7 +41,8 @@ def search_platform(client_id: str):
     platform = Platform.find_by_client_id(client_id)
     if platform:
       platform_fields = platform.get_fields(reformat_datetime=True)
-      platform_fields = add_tool_key_set(platform_fields, platform.uuid)
+      platform_fields = add_tool_key_set(platform_fields, platform.id)
+      platform_fields["id"] = platform.id
       result = [platform_fields]
     return {
         "success": True,
@@ -60,9 +60,7 @@ def search_platform(client_id: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_all_platforms(skip: int = 0,
-                      limit: int = 10,
-                      fetch_archive: Optional[bool] = None):
+def get_all_platforms(skip: int = 0, limit: int = 10):
   """The get platforms endpoint will return an array of platforms from firestore
   ### Args:
   skip: `int`
@@ -84,17 +82,16 @@ def get_all_platforms(skip: int = 0,
     if limit < 1:
       raise ValidationError("Invalid value passed to \"limit\" query parameter")
 
-    collection_manager = Platform.collection.filter("is_deleted", "==", False)
-    if fetch_archive is not None:
-      collection_manager = collection_manager\
-                            .filter("is_archived", "==", fetch_archive)
+    collection_manager = Platform.collection.filter("deleted_at_timestamp",
+                                                    "==", None)
     platforms = collection_manager.order("-created_time").offset(skip).fetch(
         limit)
 
     platforms_list = []
     for platform in platforms:
       platform_fields = platform.get_fields(reformat_datetime=True)
-      platform_fields = add_tool_key_set(platform_fields, platform.uuid)
+      platform_fields = add_tool_key_set(platform_fields, platform.id)
+      platform_fields["id"] = platform.id
       platforms_list.append(platform_fields)
     return {
         "success": True,
@@ -110,34 +107,38 @@ def get_all_platforms(skip: int = 0,
 
 
 @router.get(
-    "/platform/{uuid}",
+    "/platform/{platform_id}",
     name="Get a specific platform",
     response_model=PlatformResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_platform(uuid: str):
+def get_platform(platform_id: str):
   """The get platform endpoint will return the platform
-  from firestore of which uuid is provided
+  from firestore of which platform_id is provided
   ### Args:
-  uuid: `str`
+  platform_id: `str`
     Unique identifier for platform
   ### Raises:
   ResourceNotFoundException:
-    If the platform with given uuid does not exist. <br/>
+    If the platform with given platform_id does not exist. <br/>
   Internal Server Error:
     Raised if something went wrong.
   ### Returns:
   Platform: `PlatformResponseModel`
   """
   try:
-    platform = Platform.find_by_uuid(uuid)
+    platform = Platform.find_by_id(platform_id)
     platform_fields = platform.get_fields(reformat_datetime=True)
-    platform_fields = add_tool_key_set(platform_fields, uuid)
+    platform_fields = add_tool_key_set(platform_fields, platform_id)
+    platform_fields["id"] = platform.id
     return {
-        "success": True,
-        "message": f"Platform with '{uuid}' has been fetched successfully",
-        "data": platform_fields
+        "success":
+            True,
+        "message":
+            f"Platform with '{platform_id}' has been fetched successfully",
+        "data":
+            platform_fields
     }
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
@@ -167,8 +168,8 @@ def create_platform(input_platform: PlatformModel):
   ### Returns:
   Platform Data: `PlatformResponseModel`
   """
-  # TODO: Currently the issuer should be unique. The combination of client_id
-  # and issuer should be unique
+  # TODO: Currently the issuer should be unique. But later, the combination of
+  # client_id and issuer should be unique
   try:
     input_platform_dict = {**input_platform.dict()}
     issuer = input_platform_dict.get("issuer")
@@ -180,12 +181,10 @@ def create_platform(input_platform: PlatformModel):
 
     new_platform = Platform()
     new_platform = new_platform.from_dict(input_platform_dict)
-    new_platform.uuid = ""
     new_platform.save()
-    new_platform.uuid = new_platform.id
-    new_platform.update()
     platform_fields = new_platform.get_fields(reformat_datetime=True)
-    platform_fields = add_tool_key_set(platform_fields, new_platform.uuid)
+    platform_fields = add_tool_key_set(platform_fields, new_platform.id)
+    platform_fields["id"] = new_platform.id
     return {
         "success": True,
         "message": "Platform has been created successfully",
@@ -200,28 +199,28 @@ def create_platform(input_platform: PlatformModel):
 
 
 @router.put(
-    "/platform/{uuid}",
+    "/platform/{platform_id}",
     response_model=PlatformResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def update_platform(uuid: str, input_platform: UpdatePlatformModel):
+def update_platform(platform_id: str, input_platform: UpdatePlatformModel):
   """Update a platform
   ### Args:
-  uuid: `str`
+  platform_id: `str`
     Unique identifier for platform
   input_platform: `UpdatePlatformModel`
     Required body of the platform
   ### Raises:
   ResourceNotFoundException:
-    If the platform with given uuid does not exist <br/>
+    If the platform with given platform_id does not exist <br/>
   Internal Server Error:
     Raised if something went wrong.
   ### Returns:
   Updated Platform: `PlatformResponseModel`
   """
   try:
-    existing_platform = Platform.find_by_uuid(uuid)
+    existing_platform = Platform.find_by_id(platform_id)
     platform_fields = existing_platform.get_fields()
 
     input_platform_dict = {**input_platform.dict()}
@@ -237,7 +236,8 @@ def update_platform(uuid: str, input_platform: UpdatePlatformModel):
       setattr(existing_platform, key, value)
     existing_platform.update()
     platform_fields = existing_platform.get_fields(reformat_datetime=True)
-    platform_fields = add_tool_key_set(platform_fields, uuid)
+    platform_fields = add_tool_key_set(platform_fields, platform_id)
+    platform_fields["id"] = existing_platform.id
     return {
         "success": True,
         "message": "Successfully updated the platform",
@@ -250,26 +250,27 @@ def update_platform(uuid: str, input_platform: UpdatePlatformModel):
 
 
 @router.delete(
-    "/platform/{uuid}",
+    "/platform/{platform_id}",
     response_model=DeletePlatform,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def delete_platform(uuid: str):
+def delete_platform(platform_id: str):
   """Delete a platform from firestore
   ### Args:
-  uuid: `str`
+  platform_id: `str`
     Unique ID of the platform
   ### Raises:
   ResourceNotFoundException:
-    If the platform with given uuid does not exist. <br/>
+    If the platform with given platform_id does not exist. <br/>
   Internal Server Error:
     Raised if something went wrong.
   ### Returns:
   Success/Fail Message: `JSON`
   """
   try:
-    Platform.delete_by_uuid(uuid)
+    Platform.find_by_id(platform_id)
+    Platform.delete_by_id(platform_id)
     return {}
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e

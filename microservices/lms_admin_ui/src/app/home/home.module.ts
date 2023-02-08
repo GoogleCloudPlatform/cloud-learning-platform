@@ -18,6 +18,7 @@ import { CreateSectionComponent } from './create-section/create-section.componen
 import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips';
 import { EditSectionComponent } from './edit-section/edit-section.component';
 import { SectionListComponent } from './section-list/section-list.component';
+import { DeleteOverviewDialog } from './section/section.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { SectionListComponent } from './section-list/section-list.component';
     CreateSectionComponent,
     EditSectionComponent,
     SectionListComponent,
+    DeleteOverviewDialog
 
   ],
   // entryComponents: [CreateCohortModalComponent],

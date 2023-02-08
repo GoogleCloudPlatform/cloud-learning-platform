@@ -12,146 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module to add common helper methods to all FireO objects"""
-import os
-from datetime import datetime
-import fireo
-from fireo.models import Model
-from fireo.fields import DateTime, TextField, ListField, BooleanField, MapField, NumberField
+from fireo.fields import TextField, ListField, BooleanField, MapField, NumberField, IDField
 from common.utils.errors import ResourceNotFoundException
+from common.models import BaseModel
+# pylint: disable = invalid-name
 
 
-# pylint: disable = too-few-public-methods,pointless-string-statement,arguments-renamed,invalid-name
-class TempBaseModel(Model):
-  """BaseModel to add common helper methods to all FireO objects
-
-  An interface, intended to be subclassed.
-
-  """
-  created_time = DateTime(auto=True)
-  last_modified_time = DateTime(auto=True)
-  created_by = TextField(default="")
-  last_modified_by = TextField(default="")
-  DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
-
-  def save(self, input_datetime=None, transaction=None, batch=None, merge=None):
-    """overrides default method to save items with timestamp"""
-    if input_datetime:
-      datetime_value = input_datetime
-    else:
-      datetime_value = datetime.now()
-    self.created_time = datetime_value
-    self.last_modified_time = datetime_value
-    super().save(transaction=transaction, batch=batch, merge=merge)
-
-  def update(self, input_datetime=None, key=None, transaction=None, batch=None):
-    """overrides default method to update items with timestamp"""
-    if input_datetime:
-      datetime_value = input_datetime
-    else:
-      datetime_value = datetime.now()
-    self.last_modified_time = datetime_value
-    super().update(key=key, transaction=transaction, batch=batch)
-
-  def get_fields(self, reformat_datetime=False):
-    """overrides default method to fix data type for datetime fields"""
-    fields = super()._get_fields()
-    if reformat_datetime:
-      fields["created_time"] = str(fields["created_time"])
-      fields["last_modified_time"] = str(fields["last_modified_time"])
-    return fields
-
-  class Meta:
-    abstract = True
-
-  @classmethod
-  def find_by_id(cls, doc_id):
-    """Looks up in the Database and returns an object of this type by
-    id (not key)
-
-    An interface, intended to be subclassed.
-
-    Args:
-      doc_id (string): the document id without collection_name (i.e. not the
-      key)
-
-    Returns:
-      [any]: an instance of object returned by the database, type is the
-      subclassed Model
-    """
-    key = fireo.utils.utils.generateKeyFromId(cls, doc_id)
-    obj = cls.collection.get(key)
-    if obj:
-      return obj
-    else:
-      raise ResourceNotFoundException(f"Invalid {cls.__name__} ID: {doc_id}")
-
-  @classmethod
-  def delete_by_id(cls, doc_id):
-    """Deletes from the Database the object of this type by id (not key)
-
-    Args:
-      doc_id (string): the document id without collection_name (i.e. not the
-      key)
-
-    Returns:
-      None
-    """
-    key = fireo.utils.utils.generateKeyFromId(cls, doc_id)
-    return cls.collection.delete(key)
-
-  @classmethod
-  def fetch_all_documents(cls, limit=1000):
-    """Fetches all documents of the collection in batches
-
-    Args:
-      limit (int): the number of documents to fetch in a batch
-
-    Returns:
-      list (document objects): list of firestore document objects
-    """
-    all_docs = []
-    docs = cls.collection.fetch(limit)
-    while True:
-      batch_docs = list(docs)
-      if not batch_docs:
-        break
-      all_docs.extend(batch_docs)
-      docs.next_fetch(limit)
-    return all_docs
-
-  @classmethod
-  def delete_by_uuid(cls, uuid):
-    doc = cls.collection.filter("uuid", "==",
-                                uuid).filter("is_deleted", "==", False).get()
-    if doc is not None:
-      doc.is_deleted = True
-      doc.update()
-    else:
-      raise ResourceNotFoundException(
-          f"{cls.__name__} with uuid {uuid} not found")
-
-  @classmethod
-  def archive_by_uuid(cls, uuid, archive=True):
-    doc = cls.collection.filter("uuid", "==",
-                                uuid).filter("is_deleted", "==", False).get()
-    if doc is not None:
-      doc.is_archived = archive
-      doc.update()
-    else:
-      raise ResourceNotFoundException\
-        (f"{cls.__name__} with uuid {uuid} not found")
-
-
-"""
-  -----------------------
-  LTI Service Data Models
-  -----------------------
-"""
-
-
-class Tool(TempBaseModel):
+class Tool(BaseModel):
   """LTI Tool Data Model"""
-  uuid = TextField(required=True)
+  id = IDField()
   name = TextField(required=True)
   description = TextField()
   tool_url = TextField(required=True)
@@ -164,55 +33,30 @@ class Tool(TempBaseModel):
   redirect_uris = ListField(required=True)
   deployment_id = TextField(required=True)
   enable_grade_sync = BooleanField(default=False)
-  is_archived = BooleanField(default=False)
-  is_deleted = BooleanField(default=False)
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "tools"
+    collection_name = BaseModel.DATABASE_PREFIX + "tools"
     ignore_none_field = False
 
   @classmethod
-  def find_by_uuid(cls, uuid, is_deleted=False):
-    tool = cls.collection.filter("uuid", "==",
-                                 uuid).filter("is_deleted", "==",
-                                              is_deleted).get()
-    if tool is None:
-      raise ResourceNotFoundException(
-          f"{cls.__name__} with uuid {uuid} not found")
-    return tool
-
-  @classmethod
-  def find_by_client_id(cls, client_id, is_deleted=False):
-    tool = cls.collection.filter("client_id", "==",
-                                 client_id).filter("is_deleted", "==",
-                                                   is_deleted).get()
+  def find_by_client_id(cls, client_id):
+    tool = cls.collection.filter("client_id", "==", client_id).get()
     if tool is None:
       raise ResourceNotFoundException(
           f"{cls.__name__} with client_id {client_id} not found")
     return tool
 
   @classmethod
-  def find_by_tool_url(cls, tool_url, is_deleted=False):
+  def find_by_tool_url(cls, tool_url):
     tool = cls.collection.filter("tool_url", "==",
-                                 tool_url).filter("is_deleted", "==",
-                                                  is_deleted).get()
+                                 tool_url).filter("deleted_at_timestamp", "==",
+                                                  None).get()
     return tool
 
-  @classmethod
-  def delete_by_uuid(cls, uuid):
-    doc = cls.collection.filter("uuid", "==",
-                                uuid).filter("is_deleted", "==", False).get()
-    if doc is not None:
-      doc.is_deleted = True
-      doc.update()
-    else:
-      raise ResourceNotFoundException(
-          f"{cls.__name__} with uuid {uuid} not found")
 
-
-class Platform(TempBaseModel):
+class Platform(BaseModel):
   """LTI Platform Data Model"""
-  uuid = TextField(required=True)
+  id = IDField()
   name = TextField(required=True)
   description = TextField()
   issuer = TextField(required=True)
@@ -221,108 +65,56 @@ class Platform(TempBaseModel):
   platform_auth_url = TextField(required=True)
   platform_token_url = TextField(required=True)
   deployment_ids = ListField(required=True)
-  is_archived = BooleanField(default=False)
-  is_deleted = BooleanField(default=False)
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "platforms"
+    collection_name = BaseModel.DATABASE_PREFIX + "platforms"
     ignore_none_field = False
 
   @classmethod
-  def find_by_uuid(cls, uuid, is_deleted=False):
-    platform = cls.collection.filter("uuid", "==",
-                                     uuid).filter("is_deleted", "==",
-                                                  is_deleted).get()
-    if platform is None:
-      raise ResourceNotFoundException(
-          f"{cls.__name__} with uuid {uuid} not found")
-    return platform
-
-  @classmethod
-  def find_by_issuer(cls, issuer, is_deleted=False):
+  def find_by_issuer(cls, issuer):
     platform = cls.collection.filter("issuer", "==",
-                                     issuer).filter("is_deleted", "==",
-                                                    is_deleted).get()
+                                     issuer).filter("deleted_at_timestamp",
+                                                    "==", None).get()
     return platform
 
   @classmethod
-  def find_by_client_id(cls, client_id, is_deleted=False):
+  def find_by_client_id(cls, client_id):
     platform = cls.collection.filter("client_id", "==",
-                                     client_id).filter("is_deleted", "==",
-                                                       is_deleted).get()
+                                     client_id).filter("deleted_at_timestamp",
+                                                       "==", None).get()
     return platform
 
-  @classmethod
-  def delete_by_uuid(cls, uuid):
-    doc = cls.collection.filter("uuid", "==",
-                                uuid).filter("is_deleted", "==", False).get()
-    if doc is not None:
-      doc.is_deleted = True
-      doc.update()
-    else:
-      raise ResourceNotFoundException(
-          f"{cls.__name__} with uuid {uuid} not found")
 
-
-class LTIContentItem(TempBaseModel):
+class LTIContentItem(BaseModel):
   """LTI Content Item Data Model"""
-  uuid = TextField(required=True)
+  id = IDField()
   tool_id = TextField(required=True)
   content_item_type = TextField(required=True)
   content_item_info = MapField(required=True)
-  is_archived = BooleanField(default=False)
-  is_deleted = BooleanField(default=False)
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "lti_content_items"
+    collection_name = BaseModel.DATABASE_PREFIX + "lti_content_items"
     ignore_none_field = False
-
-  @classmethod
-  def find_by_uuid(cls, uuid, is_deleted=False):
-    lti_content_item = cls.collection.filter("uuid", "==", uuid).filter(
-        "is_deleted", "==", is_deleted).get()
-    if lti_content_item is None:
-      raise ResourceNotFoundException(
-          f"LTI Content item with uuid {uuid} not found")
-    return lti_content_item
-
-  @classmethod
-  def delete_by_uuid(cls, uuid):
-    doc = cls.collection.filter("uuid", "==",
-                                uuid).filter("is_deleted", "==", False).get()
-    if doc is not None:
-      doc.is_deleted = True
-      doc.update()
-    else:
-      raise ResourceNotFoundException(
-          f"LTI Content item with uuid {uuid} not found")
 
   @classmethod
   def find_by_tool_id(cls, tool_id):
     lti_content_item_doc = cls.collection.filter(
-        "tool_id", "==", tool_id).filter("is_deleted", "==", False).get()
+        "tool_id", "==", tool_id).filter("deleted_at_timestamp", "==",
+                                         None).get()
     return lti_content_item_doc
 
 
-class LTISession(TempBaseModel):
+class LTISession(BaseModel):
   """LTI Session Data Model"""
-  uuid = TextField(required=True)
+  id = IDField()
   state = TextField(required=True)
   nonce = TextField(required=True)
   user_id = TextField(required=True)
   client_id = TextField(required=True)
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "lti_sessions"
+    collection_name = BaseModel.DATABASE_PREFIX + "lti_sessions"
     ignore_none_field = False
-
-  @classmethod
-  def find_by_uuid(cls, uuid):
-    session = cls.collection.filter("uuid", "==", uuid).get()
-    if session is None:
-      raise ResourceNotFoundException(
-          f"{cls.__name__} with uuid {uuid} not found")
-    return session
 
   @classmethod
   def find_by_client_id(cls, client_id):
@@ -341,9 +133,9 @@ class LTISession(TempBaseModel):
     return session
 
 
-class LineItem(TempBaseModel):
+class LineItem(BaseModel):
   """LTI Line Item Data Model"""
-  uuid = TextField()
+  id = IDField()
   startDateTime = TextField()
   endDateTime = TextField()
   scoreMaximum = NumberField()
@@ -353,15 +145,8 @@ class LineItem(TempBaseModel):
   resourceLinkId = TextField()
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "line_items"
+    collection_name = BaseModel.DATABASE_PREFIX + "line_items"
     ignore_none_field = False
-
-  @classmethod
-  def find_by_uuid(cls, uuid):
-    line_item = cls.collection.filter("uuid", "==", uuid).get()
-    if line_item is None:
-      raise ResourceNotFoundException(f"Line item with uuid {uuid} not found")
-    return line_item
 
   @classmethod
   def find_by_resource_link_id(cls, resource_link_id):
@@ -370,9 +155,9 @@ class LineItem(TempBaseModel):
     return line_item
 
 
-class Result(TempBaseModel):
+class Result(BaseModel):
   """LTI Result Data Model"""
-  uuid = TextField()
+  id = IDField()
   userId = TextField()
   resultScore = NumberField()
   resultMaximum = NumberField()
@@ -381,15 +166,8 @@ class Result(TempBaseModel):
   lineItemId = TextField()
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "results"
+    collection_name = BaseModel.DATABASE_PREFIX + "results"
     ignore_none_field = False
-
-  @classmethod
-  def find_by_uuid(cls, uuid):
-    result = cls.collection.filter("uuid", "==", uuid).get()
-    if result is None:
-      raise ResourceNotFoundException(f"Result with uuid {uuid} not found")
-    return result
 
   @classmethod
   def find_by_line_item_id(cls, line_item_id):
@@ -397,9 +175,9 @@ class Result(TempBaseModel):
     return result
 
 
-class Score(TempBaseModel):
+class Score(BaseModel):
   """LTI Score Data Model"""
-  uuid = TextField()
+  id = IDField()
   userId = TextField()
   scoreGiven = NumberField()
   scoreMaximum = NumberField()
@@ -410,12 +188,5 @@ class Score(TempBaseModel):
   lineItemId = TextField()
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "scores"
+    collection_name = BaseModel.DATABASE_PREFIX + "scores"
     ignore_none_field = False
-
-  @classmethod
-  def find_by_uuid(cls, uuid):
-    score = cls.collection.filter("uuid", "==", uuid).get()
-    if score is None:
-      raise ResourceNotFoundException(f"Score with uuid {uuid} not found")
-    return score

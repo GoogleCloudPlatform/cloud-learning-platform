@@ -494,8 +494,7 @@ def create_score_for_line_item(context_id: str,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    print("in here")
-    LineItem.find_by_uuid(line_item_id)
+    LineItem.find_by_id(line_item_id)
     input_score_dict = {**input_score.dict()}
     input_score_dict["lineItemId"] = line_item_id
 

@@ -15,9 +15,8 @@ class BasicLTIContentItemModel(BaseModel):
 
 
 class FullLTIContentItemModel(BasicLTIContentItemModel):
-  """Content Item Model with uuid, created and last modified time"""
-  uuid: str
-  is_archived: Optional[bool] = False
+  """Content Item Model with id, created and last modified time"""
+  id: str
   created_time: str
   last_modified_time: str
 
