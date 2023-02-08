@@ -44,7 +44,9 @@ def get_student_email_and_token():
     "personal-test-user-3-username":"add_student_token_3", "personal-test-user-4-username":"add_student_token_4"}
   
 #   random_idex=random.choice(["personal-test-user-1-username","personal-test-user-2-username"])
-  random_index=random.choice(["personal-test-user-1-username"])
+  random_index=random.choice(["personal-test-user-1-username","personal-test-user-2-username",
+    "personal-test-user-3-username", "personal-test-user-4-username"
+  ])
   client = secretmanager.SecretManagerServiceClient()
 #   student_email_secret_id = "personal-test-user-1-username"
   # student_email_secret_id = "personal-test-user-2-username"
