@@ -1,6 +1,7 @@
 """ Helper Functions"""
 import json
 import os
+import random
 from google.cloud import secretmanager
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
@@ -38,10 +39,15 @@ def get_student_email_and_token():
     Returns:
         dict: returns a dict which contains student email and token
     """
+  student_email_token_name_mapping = {
+    "personal-test-user-1-username": "add_student_token","personal-test-user-2-username": "add_student_token_2"
+  } 
+  random_idex=random.choice(["personal-test-user-1-username","personal-test-user-2-username"])
   client = secretmanager.SecretManagerServiceClient()
-  student_email_secret_id = "personal-test-user-1-username"
+#   student_email_secret_id = "personal-test-user-1-username"
   # student_email_secret_id = "personal-test-user-2-username"
-  student_token_secret_id = "add_student_token"
+  student_email_secret_id = random_idex
+  student_token_secret_id = student_email_token_name_mapping[random_idex]
   student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
   student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
   student_email_response = client.access_secret_version(
