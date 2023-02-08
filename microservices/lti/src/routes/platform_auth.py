@@ -83,11 +83,11 @@ def authorize(request: Request,
               response_type: str = "id_token",
               response_mode: str = "form_post",
               prompt: str = "none"):
-  """
-    Generate a LTI Message (jwt token) which is encoded using a private rsa key
-    of platform and return it back to provided redirect_uri
-  """
-  try:
+  # """
+  #   Generate a LTI Message (jwt token) which is encoded using a private rsa key
+  #   of platform and return it back to provided redirect_uri
+  # """
+  # try:
     if scope != "openid":
       raise ValidationError("Invalid scope provided")
     if response_type != "id_token":
@@ -128,12 +128,12 @@ def authorize(request: Request,
           }
       }
 
-  except ResourceNotFoundException as e:
-    raise ResourceNotFound(str(e)) from e
-  except ValidationError as e:
-    raise BadRequest(str(e)) from e
-  except Exception as e:
-    raise InternalServerError(str(e)) from e
+  # except ResourceNotFoundException as e:
+  #   raise ResourceNotFound(str(e)) from e
+  # except ValidationError as e:
+  #   raise BadRequest(str(e)) from e
+  # except Exception as e:
+  #   raise InternalServerError(str(e)) from e
 
 
 @router.post("/token", name="Token Endpoint")
