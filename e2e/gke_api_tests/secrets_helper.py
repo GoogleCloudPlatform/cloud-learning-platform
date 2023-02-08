@@ -48,6 +48,7 @@ def get_student_email_and_token():
   # student_email_secret_id = "personal-test-user-2-username"
   student_email_secret_id = random_idex
   student_token_secret_id = student_email_token_name_mapping[random_idex]
+  print("________Student Email and token for E2E__________",student_email_secret_id,student_token_secret_id)
   student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
   student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
   student_email_response = client.access_secret_version(
