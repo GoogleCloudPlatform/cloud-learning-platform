@@ -8,6 +8,12 @@
   <script src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css" />
+  <style>
+    body {
+      background-color: #fffdf5;
+      font-family: Lato, sans-serif;
+    }
+  </style>
   <script type="text/javascript">
     const firebaseConfig = {
       apiKey: "AIzaSyDyr4yG7khoWYsteBcYqVy-t00YlCevtkY",
@@ -17,45 +23,61 @@
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
-    // FirebaseUI config.
-    let uiConfig = {
-      signInOptions: [
-        {
-          provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-          customParameters: {
-            // Forces account selection even when one account is available.
-            prompt: "select_account"
+    let ui = null
+    initFirebaseUI()
+    function initFirebaseUI() {// FirebaseUI config.
+      if (ui) {
+        ui.reset();
+      } else {
+        ui = new firebaseui.auth.AuthUI(firebase.auth());
+      }
+      let uiConfig = {
+        signInOptions: [
+          {
+            provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+            customParameters: {
+              // Forces account selection even when one account is available.
+              prompt: "select_account"
+            }
           }
-        }
-      ],
-      callbacks: {
-        signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-          let user = authResult.user;
-          let token = user._delegate.accessToken
-          document.getElementById("waiting-text").style.display = "block"
-          document.getElementById("waiting-text").innerText = "Redirecting..."
-          axios
-            .get('{{redirect_url}}', {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            })
-            .then((response) => {
-              response.data
-                ? response.data.url
-                  ? window.open(response.data.url, "_self").focus()
-                  : console.log("No URL found in the response")
-                : console.log("No response data");
-            })
-          return false;
+        ],
+        callbacks: {
+          signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+            let user = authResult.user;
+            let token = user._delegate.accessToken
+            displayRedirecting()
+            axios
+              .get('{{redirect_url}}', {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              })
+              .then((response) => {
+                if (response.data) {
+                  if (response.data.url) {
+                    window.open(response.data.url, "_self").focus()
+                  } else {
+                    displayError("There was a error while redirecting, Redirect url was not received in the response. Please try again.")
+                    console.log("No URL found in the response")
+                  }
+                } else {
+                  displayError("There was a error while redirecting, No response received for redirection. Please try again.")
+                  console.log("No response data");
+                }
+              }).catch((err) => {
+                displayError()
+                console.log(err)
+                initFirebaseUI()
+              })
+            return false;
+          },
         },
-      },
-    };
+      };
 
-    // Initialize the FirebaseUI Widget using Firebase.
-    let ui = new firebaseui.auth.AuthUI(firebase.auth());
-    // The start method will wait until the DOM is loaded.
-    ui.start('#firebaseui-auth-container', uiConfig);
+      // Initialize the FirebaseUI Widget using Firebase.
+      // The start method will wait until the DOM is loaded.
+      ui.start('#firebaseui-auth-container', uiConfig);
+    }
 
     function getParameterByName(name, url = window.location.href) {
       name = name.replace(/[\[\]]/g, '\\$&');
@@ -65,14 +87,35 @@
       if (!results[2]) return '';
       return decodeURIComponent(results[2].replace(/\+/g, ' '));
     }
+
+    function displayRedirecting(text) {
+      var displayText = "Redirecting..."
+      if (text) {
+        displayText = text
+      }
+      document.getElementById("status").style.display = "block"
+      document.getElementById("status").style.color = "black"
+      document.getElementById("status").innerText = displayText
+    }
+
+    function displayError(text) {
+      var displayText = "There was a error while redirecting! Please try again."
+      if (text) {
+        displayText = text
+      }
+      document.getElementById("status").style.display = "block"
+      document.getElementById("status").style.color = "red"
+      document.getElementById("status").innerText = displayText
+    }
   </script>
 </head>
 
 <body>
-  <h1 style="text-align: center; margin-bottom: 3rem">
-    You are required to sign in before we proceed further
-    <h3 id="waiting-text" style="text-align: center; display: none;"></h3>
+  <h1 style="text-align: center; margin-bottom: 2rem">
+    Welcome to Studyhall
   </h1>
+  <h3 style="text-align: center; margin-bottom: 2rem" id="instruction">You need to log in to proceed further</h3>
+  <p id="status" style="text-align: center; margin-bottom: 2rem; display: none;"></p>
 
   <div id="firebaseui-auth-container"></div>
 </body>
