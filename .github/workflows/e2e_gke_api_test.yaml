@@ -102,8 +102,9 @@ jobs:
     - name: Initialize Pub/Sub
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        cd e2e/utils
+        cd e2e
         python -m pip install -r requirements.txt
+        cd utils
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python pub_sub_setup.py
 
     - name: Build and deploy to cluster
@@ -326,8 +327,9 @@ jobs:
     - name: Cleaning up Pub/Sub
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        cd e2e/utils
+        cd e2e
         python -m pip install -r requirements.txt
+        cd utils
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python pub_sub_cleanup.py  
 
 # cookiecutter:endraw 
