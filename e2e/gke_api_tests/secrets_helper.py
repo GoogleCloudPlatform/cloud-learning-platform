@@ -40,9 +40,11 @@ def get_student_email_and_token():
         dict: returns a dict which contains student email and token
     """
   student_email_token_name_mapping = {
-    "personal-test-user-1-username": "add_student_token","personal-test-user-2-username": "add_student_token_2"
-  } 
-  random_idex=random.choice(["personal-test-user-1-username","personal-test-user-2-username"])
+    "personal-test-user-1-username": "add_student_token","personal-test-user-2-username": "add_student_token_2",
+    "personal-test-user-3-username":"add_student_token_2",}
+  
+#   random_idex=random.choice(["personal-test-user-1-username","personal-test-user-2-username"])
+  random_idex=random.choice(["personal-test-user-3-username"])
   client = secretmanager.SecretManagerServiceClient()
 #   student_email_secret_id = "personal-test-user-1-username"
   # student_email_secret_id = "personal-test-user-2-username"
