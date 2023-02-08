@@ -44,12 +44,12 @@ def get_student_email_and_token():
     "personal-test-user-3-username":"add_student_token_3", "personal-test-user-4-username":"add_student_token_4"}
   
 #   random_idex=random.choice(["personal-test-user-1-username","personal-test-user-2-username"])
-  random_idex=random.choice(["personal-test-user-3-username"])
+  random_index=random.choice(["personal-test-user-1-username"])
   client = secretmanager.SecretManagerServiceClient()
 #   student_email_secret_id = "personal-test-user-1-username"
   # student_email_secret_id = "personal-test-user-2-username"
-  student_email_secret_id = random_idex
-  student_token_secret_id = student_email_token_name_mapping[random_idex]
+  student_email_secret_id = random_index
+  student_token_secret_id = student_email_token_name_mapping[random_index]
   print("________Student Email and token for E2E__________",student_email_secret_id,student_token_secret_id)
   student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
   student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
