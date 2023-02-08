@@ -162,7 +162,8 @@
                                     Action
                                 </th>
                                 <td mat-cell *matCellDef="let element">
-                                    <span class="material-symbols-rounded">
+                                    <span class="material-symbols-rounded" style="cursor: pointer;"
+                                        (click)="openDeleteDialog(element.first_name,element.last_name,element.user_id)">
                                         delete
                                     </span>
                                 </td>
