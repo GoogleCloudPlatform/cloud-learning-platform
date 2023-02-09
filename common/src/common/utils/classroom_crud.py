@@ -394,6 +394,8 @@ def enroll_student(headers, access_token, course_id, student_email,
   {USER_MANAGEMENT_BASE_URL}/user/search?email={student_email}"                                                                                                                              ,\
     headers=headers)
   # If the response is success check if student is inactive i.e  raise error
+  print("USer Management Response " , response.status_code ,response.json())
+  searched_student = []
   if response.status_code == 200:
     searched_student = response.json()["data"]
     if searched_student != []:
