@@ -33,8 +33,7 @@ def health_check():
   }
 
 
-api = FastAPI(
-    title="LTI Service APIs", version="latest", docs_url=None, redoc_url=None)
+api = FastAPI(title="LTI Service APIs", version="latest")
 
 # LTI as a platform routes
 api.include_router(

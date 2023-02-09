@@ -54,22 +54,21 @@ def content_item_return(JWT: str = Form()):
     if isinstance(content_item_data, list):
       for received_content_item in content_item_data:
         content_item_dict = {
-            "tool_id": tool_config.uuid,
+            "tool_id": tool_config.id,
             "content_item_type": received_content_item.get("type"),
             "content_item_info": received_content_item
         }
         content_item_fields = create_new_content_item(content_item_dict)
-        received_content_item["content_item_id"] = content_item_fields.get(
-            "uuid")
+        received_content_item["content_item_id"] = content_item_fields.get("id")
 
     elif isinstance(content_item_data, dict):
       content_item_dict = {
-          "tool_id": tool_config.uuid,
+          "tool_id": tool_config.id,
           "content_item_type": content_item_data.get("type"),
           "content_item_info": content_item_data
       }
       content_item_fields = create_new_content_item(content_item_dict)
-      content_item_data["content_item_id"] = content_item_fields.get("uuid")
+      content_item_data["content_item_id"] = content_item_fields.get("id")
 
     return {
         "success": True,

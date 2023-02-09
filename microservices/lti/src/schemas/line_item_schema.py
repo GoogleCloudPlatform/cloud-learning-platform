@@ -29,7 +29,7 @@ class BasicScoreModel(BaseModel):
 
 class ScoreResponseModel(BaseModel):
   """Score Response Model"""
-  uuid: str
+  id: str
   userId: str
   scoreGiven: Optional[float]
   scoreMaximum: Optional[float]
@@ -58,7 +58,6 @@ class BasicResultModel(BaseModel):
 
 class ResultResponseModel(BaseModel):
   """Result Response Model"""
-  uuid: str
   id: str
   userId: str
   resultScore: Optional[float]
@@ -85,7 +84,6 @@ class BasicLineItemModel(BaseModel):
 class FullLineItemModel(BasicLineItemModel):
   """Full Line Item Model"""
   id: str
-  uuid: str
 
   class Config():
     orm_mode = True

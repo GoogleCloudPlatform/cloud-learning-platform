@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
@@ -192,4 +192,46 @@ export class SectionComponent implements OnInit {
     });
   }
 
+  openDeleteDialog(firstName: any, lastName: any, userId: any) {
+    let deleteDialogData: LooseObject = {}
+    deleteDialogData['first_name'] = firstName
+    deleteDialogData['last_name'] = lastName
+    deleteDialogData['section'] = this.selectedSection.section
+    deleteDialogData['user_id'] = userId
+    deleteDialogData['section_id'] = this.selectedSection.id
+    const dialogRef = this.dialog.open(DeleteOverviewDialog, {
+      width: '500px',
+      data: deleteDialogData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.data == 'success') {
+        this.getSectionStudents()
+      }
+    });
+  }
+
+}
+
+@Component({
+  selector: 'delete-overview-dialog',
+  templateUrl: 'delete-overview-dialog.html',
+})
+export class DeleteOverviewDialog {
+  constructor(
+    public dialogRef: MatDialogRef<DeleteOverviewDialog>,
+    @Inject(MAT_DIALOG_DATA) public deleteDialogData: any, public _HomeService: HomeService
+  ) { }
+
+  deleteStudent() {
+    this._HomeService.deleteStudent(this.deleteDialogData.user_id, this.deleteDialogData.section_id).subscribe((res: any) => {
+      if (res.success == true) {
+        this.dialogRef.close({ data: 'success' });
+      }
+    })
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close({ data: 'closed' });
+  }
 }
