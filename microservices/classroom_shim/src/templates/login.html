@@ -65,8 +65,10 @@
                   console.log("No response data");
                 }
               }).catch((err) => {
-                displayError()
-                console.log(err)
+                console.log("err", err)
+                if (err.response.status == 401) {
+                  displayError("Access Denied")
+                }
                 initFirebaseUI()
               })
             return false;
