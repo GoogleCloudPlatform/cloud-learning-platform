@@ -3,7 +3,7 @@ from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from config import ERROR_RESPONSES
-from common.models import LTIAssignment
+from common.models import LTIAssignment, LTIContentItem
 from common.utils.auth_service import validate_token
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  UnauthorizedUserError)
@@ -22,7 +22,7 @@ CLP_DOMAIN_URL = "https://core-learning-services-dev.cloudpssolutions.com"
 
 
 @router.get("/launch")
-def login(request: Request, lti_assignment_id: Optional[str] = ""):
+def login(request: Request, lti_assignment_id: str):
   """This login endpoint will return the user to firebase login page
   Args:
       lti_assignment_id (str): unique id of the LTI Assignment
@@ -30,14 +30,19 @@ def login(request: Request, lti_assignment_id: Optional[str] = ""):
       Template response with the login page of the user
   """
   try:
-    url = f"{CLP_DOMAIN_URL}/classroom-shim/api/v1/launch-assignment"
+    url = f"{CLP_DOMAIN_URL}/classroom-shim/api/v1/launch-assignment?lti_assignment_id={lti_assignment_id}"
 
-    if lti_assignment_id:
-      url = f"{url}?lti_assignment_id={lti_assignment_id}"
-
+    lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
+    lti_content_item_id = lti_assignment.lti_content_item_id
+    lti_content_item = LTIContentItem.find_by_id(lti_content_item_id)
+    content_item_info = lti_content_item.content_item_info
+    title = content_item_info.get("title")
+    if title is None:
+      title = "dummy text"
     return templates.TemplateResponse("login.html", {
         "request": request,
-        "redirect_url": url
+        "redirect_url": url,
+        "title": title
     })
 
   except ValidationError as e:
