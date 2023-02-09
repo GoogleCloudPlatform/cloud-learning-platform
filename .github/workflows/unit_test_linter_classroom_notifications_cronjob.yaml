@@ -15,15 +15,16 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Unit test & lint for classroom notification services
+name: Unit test & lint for all services
 on:
   pull_request:
     branches:
       - main
     paths:
-      - 'microservices/classroom_notification_service/**'
+      # TODO: Add all microservice folders below.
+      - 'microservices/classroom_notifications_cronjob'
       - 'common/**'
-      - '.github/workflows/unit_test_linter_cns.yaml'
+      - '.github/workflows/unit_test_linter_classroom_notifications_cronjob.yaml'
       - '.pylintrc'
   workflow_dispatch:
 
@@ -34,13 +35,13 @@ env:
 jobs:
   unit-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
         python-version: [3.9]
         target-folder: [
-          microservices/classroom_notification_service,
+          # TODO: Add all microservice folders below.
+          microservices/classroom_notifications_cronjob,
         ]
     steps:
     - uses: actions/checkout@v3
@@ -72,6 +73,7 @@ jobs:
         BASE_DIR=$(pwd)
         cd ${{ matrix.target-folder }}
         python -m pip install --upgrade pip
+        python -m pip install pytest pytest-custom_exit_code pytest-cov pylint pytest-mock mock
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
         if [ -f $BASE_DIR/common/requirements.txt ]; then pip install -r $BASE_DIR/common/requirements.txt; fi
@@ -84,13 +86,12 @@ jobs:
 
   linter:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
         python-version: [3.9]
         target-folder: [
-          microservices/classroom_notification_service,
+          microservices/classroom_notifications_cronjob,
         ]
     steps:
     - uses: actions/checkout@v3
@@ -103,7 +104,7 @@ jobs:
       run: |
         cd ${{ matrix.target-folder }}
         python -m pip install --upgrade pip
-        if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
+        python -m pip install pylint
 
     - name: Lint with pylint
       run: |
@@ -112,3 +113,4 @@ jobs:
         python -m pylint $(git ls-files '*.py') --rcfile=$BASE_DIR/.pylintrc
 
 # cookiecutter:endraw 
+

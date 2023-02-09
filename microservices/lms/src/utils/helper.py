@@ -5,7 +5,7 @@ import google_crc32c
 import ttl_cache
 from config import PROJECT_ID
 from fastapi import Depends
-from common.utils.auth_service import validate_user_type_and_token,auth_scheme
+from common.utils.auth_service import validate_user_type_and_token, auth_scheme
 
 
 @ttl_cache(3600)
@@ -84,6 +84,6 @@ def convert_section_to_section_model(section):
   loaded_section["cohort"] = cohort["key"]
   return loaded_section
 
-def validate_user(token: auth_scheme = Depends()):
-  return validate_user_type_and_token(['other','faculty'],token)
 
+def validate_user(token: auth_scheme = Depends()):
+  return validate_user_type_and_token(['other', 'faculty'], token)
