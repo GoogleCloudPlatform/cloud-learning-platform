@@ -31,8 +31,8 @@ try:
   # create subscriber client object using credentials
   subscriber = pubsub_v1.SubscriberClient(credentials=CREDENTIALS)
 
-  topic_name = DATABASE_PREFIX + "classroom-messeges"
-  subscription_name = DATABASE_PREFIX + "classroom-messeges-sub"
+  topic_name = DATABASE_PREFIX + "classroom-notifications"
+  subscription_name = DATABASE_PREFIX + "classroom-notifications-sub"
   #generate complete topic path using topic name and project id
   topic_path = publisher.topic_path(PUB_SUB_PROJECT_ID, topic_name)
 
