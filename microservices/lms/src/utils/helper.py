@@ -86,4 +86,4 @@ def convert_section_to_section_model(section):
 
 
 def validate_user(token: auth_scheme = Depends()):
-  return validate_user_type_and_token(['other', 'faculty'], token)
+  return validate_user_type_and_token(["other", "faculty"], token)

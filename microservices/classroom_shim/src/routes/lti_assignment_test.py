@@ -10,13 +10,22 @@ import pytest
 # pylint: disable=unused-argument,redefined-outer-name,unused-import,line-too-long
 from copy import deepcopy
 from common.models import LTIAssignment
-from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
+from common.utils.http_exceptions import add_exception_handlers
 from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE
 from testing.test_config import API_URL
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+from lti_assignment import router
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
+
+app = FastAPI()
+add_exception_handlers(app)
+app.include_router(router, prefix="/classroom-shim/api/v1")
+
+client_with_emulator = TestClient(app)
 
 api_url = f"{API_URL}/lti-assignment"
 
@@ -74,7 +83,7 @@ def test_get_lti_assignments(client_with_emulator, create_lti_assignment):
   resp_data = json_response.get("data")
 
   assert lti_assignment.id in [i["id"] for i in resp_data
-                              ], "Incorrect response received"
+                               ], "Incorrect response received"
 
 
 def test_get_lti_assignments_negative(client_with_emulator):
@@ -154,12 +163,10 @@ def test_delete_lti_assignment(client_with_emulator, create_lti_assignment):
   json_resp = resp.json()
 
   expected_data = {
-      "success":
-          True,
+      "success": True,
       "message":
-          f"Successfully deleted the LTI Assignment with id {lti_assignment.id}",
-      "data":
-          None
+      f"Successfully deleted the LTI Assignment with id {lti_assignment.id}",
+      "data": None
   }
   print("json_resp", json_resp)
   assert resp.status_code == 200, "Status code not 200"
