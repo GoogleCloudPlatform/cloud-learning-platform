@@ -92,7 +92,6 @@ jobs:
         run: |
           skaffold run \
           --profile dev \
-          --module lms,lti,lms-admin-ui,classroom-notifications-cronjob,classroom-shim  \
           --namespace $NAMESPACE \
           -l commit=$GITHUB_SHA \
           --tag latest 
