@@ -9,20 +9,21 @@ import pytest
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import,line-too-long
 from copy import deepcopy
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 from common.models import LTIAssignment
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from common.utils.http_exceptions import add_exception_handlers
 from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE
 from testing.test_config import API_URL
-from fastapi import FastAPI, APIRouter
-from fastapi.testclient import TestClient
+from routes.lti_assignment import router
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 
 app = FastAPI()
 add_exception_handlers(app)
-app.include_router(APIRouter, prefix="/classroom-shim/api/v1")
+app.include_router(router, prefix="/classroom-shim/api/v1")
 
 client_with_emulator = TestClient(app)
 
@@ -30,13 +31,13 @@ api_url = f"{API_URL}/lti-assignment"
 
 
 @pytest.fixture
-def create_lti_assignment(client_with_emulator):
+def create_lti_assignment():
   lti_assignment = LTIAssignment.from_dict(INSERT_LTI_ASSIGNMENT_EXAMPLE)
   lti_assignment.save()
   return lti_assignment
 
 
-def test_get_lti_assignment(client_with_emulator, create_lti_assignment):
+def test_get_lti_assignment(create_lti_assignment):
   lti_assignment = create_lti_assignment
   input_data = deepcopy(INSERT_LTI_ASSIGNMENT_EXAMPLE)
   url = f"{api_url}/{lti_assignment.id}"
@@ -59,7 +60,7 @@ def test_get_lti_assignment(client_with_emulator, create_lti_assignment):
   assert resp_data == input_data, "Incorrect response received"
 
 
-def test_get_lti_assignment_negative(client_with_emulator):
+def test_get_lti_assignment_negative():
   lti_assignment_id = "1v38m1v64m37cj"
   url = f"{api_url}/{lti_assignment_id}"
   resp = client_with_emulator.get(url)
@@ -70,7 +71,7 @@ def test_get_lti_assignment_negative(client_with_emulator):
   assert json_response.get("success") is False, "Response is incorrect"
 
 
-def test_get_lti_assignments(client_with_emulator, create_lti_assignment):
+def test_get_lti_assignments(create_lti_assignment):
   lti_assignment = create_lti_assignment
   url = f"{api_url}s"
   resp = client_with_emulator.get(url)
@@ -82,10 +83,10 @@ def test_get_lti_assignments(client_with_emulator, create_lti_assignment):
   resp_data = json_response.get("data")
 
   assert lti_assignment.id in [i["id"] for i in resp_data
-                               ], "Incorrect response received"
+                              ], "Incorrect response received"
 
 
-def test_get_lti_assignments_negative(client_with_emulator):
+def test_get_lti_assignments_negative():
   url = f"{api_url}s"
   resp = client_with_emulator.get(url, params={"skip": -1})
 
@@ -95,7 +96,7 @@ def test_get_lti_assignments_negative(client_with_emulator):
   assert json_response.get("success") is False, "Response is incorrect"
 
 
-def test_post_lti_assignment(client_with_emulator):
+def test_post_lti_assignment():
   input_lti_assignment = deepcopy(INSERT_LTI_ASSIGNMENT_EXAMPLE)
   url = f"{api_url}"
 
@@ -126,7 +127,7 @@ def test_post_lti_assignment(client_with_emulator):
   assert get_json_response.get("data") == post_json_response.get("data")
 
 
-def test_update_lti_assignment(client_with_emulator, create_lti_assignment):
+def test_update_lti_assignment(create_lti_assignment):
   lti_assignment = create_lti_assignment
 
   url = f"{api_url}/{lti_assignment.id}"
@@ -141,7 +142,7 @@ def test_update_lti_assignment(client_with_emulator, create_lti_assignment):
       "end_date") == input_data["end_date"], "Expected response not same"
 
 
-def test_update_lti_assignment_negative(client_with_emulator):
+def test_update_lti_assignment_negative():
 
   lti_assignment_id = "TB2vb9VP8d9YvN8W"
   input_data = {"end_date": "2023-10-14T00:00:00"}
@@ -154,7 +155,7 @@ def test_update_lti_assignment_negative(client_with_emulator):
   assert json_response.get("success") is False, "Response is incorrect"
 
 
-def test_delete_lti_assignment(client_with_emulator, create_lti_assignment):
+def test_delete_lti_assignment(create_lti_assignment):
   lti_assignment = create_lti_assignment
 
   url = f"{api_url}/{lti_assignment.id}"
@@ -162,17 +163,19 @@ def test_delete_lti_assignment(client_with_emulator, create_lti_assignment):
   json_resp = resp.json()
 
   expected_data = {
-      "success": True,
+      "success":
+          True,
       "message":
-      f"Successfully deleted the LTI Assignment with id {lti_assignment.id}",
-      "data": None
+          f"Successfully deleted the LTI Assignment with id {lti_assignment.id}",
+      "data":
+          None
   }
   print("json_resp", json_resp)
   assert resp.status_code == 200, "Status code not 200"
   assert json_resp == expected_data, "Incorrect response received"
 
 
-def test_delete_lti_assignment_negative(client_with_emulator):
+def test_delete_lti_assignment_negative():
   lti_assignment_id = "aG1Jh2sv78fAv5S7F"
   url = f"{api_url}/{lti_assignment_id}"
 
