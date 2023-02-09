@@ -114,7 +114,6 @@ jobs:
         export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
         skaffold run \
         --profile dev \
-        --module lms,lti,lms-admin-ui,classroom-notifications-cronjob,classroom-shim  \
         --namespace $NAMESPACE \
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }}
