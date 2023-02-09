@@ -12,29 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Master Skaffold
-apiVersion: skaffold/v2beta12
-kind: Config
-metadata:
-  name: backends
-requires:
-- path: ./common
-  configs: [common]
+ARG BASE_IMG
+FROM ${BASE_IMG}
 
-- path: ./microservices/lms
-  configs: [lms]
+WORKDIR /opt
+COPY requirements.txt service_requirements.txt
 
-- path: ./microservices/lms_admin_ui
-  configs: [lms-admin-ui]
+# add endline in case not there
+RUN awk 1 requirements.txt > requirements.txt
+RUN cat service_requirements.txt >> requirements.txt
 
-- path: ./microservices/lti
-  configs: [lti]
+RUN pip install -r requirements.txt
 
-- path: ./microservices/classroom_notification_service
-  configs: [classroom-notification-service]
+COPY src/ .
 
-- path: ./microservices/classroom_shim
-  configs: [classroom-shim]
-
-- path: ./microservices/classroom_notifications_cronjob
-  configs: [classroom-notifications-cronjob]
+# ENTRYPOINT [ "python", "main.py", "--prod=True" ]
+ENTRYPOINT [ "python", "main.py" ]
