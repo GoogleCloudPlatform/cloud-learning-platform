@@ -14,16 +14,15 @@ from common.testing.firestore_emulator import firestore_emulator, clean_firestor
 from common.utils.http_exceptions import add_exception_handlers
 from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE
 from testing.test_config import API_URL
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.testclient import TestClient
-from routes.platform_auth import router
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 
 app = FastAPI()
 add_exception_handlers(app)
-app.include_router(router, prefix="/classroom-shim/api/v1")
+app.include_router(APIRouter, prefix="/classroom-shim/api/v1")
 
 client_with_emulator = TestClient(app)
 
