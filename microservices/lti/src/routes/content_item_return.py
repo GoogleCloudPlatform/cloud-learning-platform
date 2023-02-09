@@ -1,6 +1,6 @@
 """Content Item  Return endpoint for LTI Service as Platform"""
 from copy import deepcopy
-from config import ERROR_RESPONSES, ISSUER
+from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from fastapi import APIRouter, Form
 from common.models import Tool
 from common.utils.errors import ResourceNotFoundException
@@ -47,7 +47,7 @@ def content_item_return(JWT: str = Form()):
     elif tool_config.public_key_type == "Public Key":
       key = tool_config.tool_public_key
 
-    decoded_data = decode_token(JWT, key, ISSUER)
+    decoded_data = decode_token(JWT, key, LTI_ISSUER_DOMAIN)
     content_item_key = lti_claim_field("claim", "content_items", "dl")
     content_item_data = decoded_data[content_item_key]
 
