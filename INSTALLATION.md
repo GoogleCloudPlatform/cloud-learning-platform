@@ -69,6 +69,37 @@ A pair of RSA private and public keys can be generated using the `generate_rsa_k
 
 For running the LTI service, a set of RSA public and private keys are picked with the terms `lti-service-public-key` and `lti-service-private-key` from Google secret manager.
 
+## Adding Initial user in the DB
+
+#TODO
+
+## Adding Backend Robot User
+
+A backend robot (service account) user is needed in the database to allow backend services to make authenticated API calls to each other when a User bearer token is not in the API flow. This is particularly neede for cronjobs and LTI callback flows.
+
+1. Hit POST method for users api in user-management microservice with new user's emain id in the api body
+
+API :
+
+``` POST https://<base url>/user-management/api/v1/user ```
+
+Authorization :
+
+``` Bearer Token = <id_token> ```
+
+Body :
+
+```
+{
+"first_name": "Backend",
+"last_name": "Bot",
+"email": "bot@core-learning-services-dev.cloudpssolutions.com",
+"user_type": "other"
+}
+```
+
+
+
 ## Steps to add new user
 
 1. Hit POST method for users api in user-management microservice with new user's emain id in the api body
