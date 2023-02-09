@@ -27,8 +27,11 @@ router = APIRouter(
 @router.get("/jwks", name="Platform JWKS Endpoint")
 def platform_jwks():
   """Get the public keys of the platform"""
-  key_set = get_platform_public_keyset()
-  return key_set.get("public_keyset")
+  try:
+    key_set = get_platform_public_keyset()
+    return key_set.get("public_keyset")
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
 
 
 @router.post(
