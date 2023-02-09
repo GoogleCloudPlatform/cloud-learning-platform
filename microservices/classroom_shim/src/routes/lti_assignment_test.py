@@ -16,7 +16,7 @@ from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE
 from testing.test_config import API_URL
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from lti_assignment import router
+from routes.platform_auth import router
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
