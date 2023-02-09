@@ -50,7 +50,8 @@ def validate_token(token: auth_scheme = Depends()):
     raise InternalServerError(str(e)) from e
 
 
-def validate_user_type_and_token(accepted_user_types:list,token: auth_scheme = Depends()):
+def validate_user_type_and_token(accepted_user_types: list,
+                                 token: auth_scheme = Depends()):
   """_summary_
 
   Args:
@@ -80,7 +81,8 @@ def validate_user_type_and_token(accepted_user_types:list,token: auth_scheme = D
           },
           timeout=60)
       data = res.json()
-      if res.status_code == 200 and data["success"] is True and data["data"]["user_type"] in accepted_user_types:
+      if res.status_code == 200 and data["success"] is True and data["data"][
+          "user_type"] in accepted_user_types:
         return data.get("data")
       else:
         raise InvalidTokenError(data["message"])
