@@ -171,8 +171,15 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
         description=course_template_dict["description"],
         owner_id=course_template_dict["admin"])
     # Adding instructional designer in the course on classroom
-    classroom_crud.add_teacher(classroom.get("id"),
+    # classroom_crud.add_teacher(classroom.get("id"),
+    #                            course_template_dict["instructional_designer"])
+    invitation_object = classroom_crud.invite_teacher(classroom.get("id"),
                                course_template_dict["instructional_designer"])
+    # Storing classroom details
+    print("This is invitation API response ")
+    print(invitation_object)
+    classroom_crud.acceept_invite(invitation_object["id"],course_template_dict["instructional_designer"])
+    print("Invite Accepted")
     # Storing classroom details
     course_template.classroom_id = classroom.get("id")
     course_template.classroom_code = classroom.get("enrollmentCode")

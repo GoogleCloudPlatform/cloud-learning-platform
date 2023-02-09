@@ -151,7 +151,22 @@ def create_section(sections_details: SectionDetails):
       classroom_crud.create_coursework(new_course["id"], coursework_list)
 
     for teacher_email in sections_details.teachers:
-      classroom_crud.add_teacher(new_course["id"], teacher_email)
+      # classroom_crud.add_teacher(new_course["id"], teacher_email)
+      invitation_object = classroom_crud.invite_teacher(new_course["id"],
+                            teacher_email)
+    # Storing classroom details
+      print("This is invitation API response ")
+      print(invitation_object)
+      classroom_crud.acceept_invite(invitation_object["id"],teacher_email)
+      print("Invite Accepted")
+      user_profile = classroom_crud.get_user_profile_information(teacher_email)
+      # classroom_crud.add_teacher(new_course["id"], teacher_email)
+      print("User profile Information ______",user_profile)
+      gaid = user_profile["id"]
+      name =  user_profile["name"]["givenName"]
+      last_name =  user_profile["name"]["givenName"]
+      photo_url =  user_profile["photoUrl"]
+      print(f"Gaid {gaid} first name {name} last name {last_name} photo url {photo_url}")
     # Save the new record of seecion in firestore
     section = Section()
     section.name = name
@@ -310,7 +325,15 @@ def update_section(sections_details: UpdateSection):
     add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
     for i in add_teacher_list:
-      classroom_crud.add_teacher(sections_details.course_id, i)
+      # classroom_crud.add_teacher(sections_details.course_id, i)
+      invitation_object = classroom_crud.invite_teacher(sections_details.course_id,
+                            i)
+      # Storing classroom details
+      print("This is invitation API response ")
+      print(invitation_object)
+      classroom_crud.acceept_invite(invitation_object["id"],i)
+      user_profile = classroom_crud.get_user_profile_information(i)
+      print("Invite Accepted userprofile is",user_profile)
     remove_teacher_list = list(
         set(section.teachers) - set(sections_details.teachers))
     for i in remove_teacher_list:
