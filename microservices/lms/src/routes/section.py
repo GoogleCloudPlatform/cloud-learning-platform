@@ -182,7 +182,7 @@ def create_section(sections_details: SectionDetails,request: Request):
     # Save the new record of seecion in firestore
       data = {
       "first_name":user_profile["name"]["givenName"],
-      "last_name": user_profile["name"]["lastnName"],
+      "last_name": user_profile["name"]["lastName"],
       "email":teacher_email,
       "user_type": "faculty",
       "user_type_ref": "",
