@@ -1,10 +1,12 @@
 '''Course Template Endpoint'''
 from fastapi import APIRouter, Request
+from googleapiclient.errors import HttpError
 from common.models import CourseTemplate, Cohort
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
-from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest
+from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest, CustomHTTPException
 from common.utils import classroom_crud
+from config import CLASSROOM_ADMIN_EMAIL
 from utils.helper import convert_cohort_to_cohort_model
 from services import common_service
 from schemas.cohort import CohortListResponseModel
@@ -172,7 +174,7 @@ request: Request):
         name=course_template_dict["name"],
         section="template",
         description=course_template_dict["description"],
-        owner_id=course_template_dict["admin"])
+        owner_id="me")
     # Adding instructional designer in the course on classroom
     # classroom_crud.add_teacher(classroom.get("id"),
     #                            course_template_dict["instructional_designer"])
@@ -209,8 +211,15 @@ request: Request):
     course_template.classroom_id = classroom.get("id")
     course_template.classroom_code = classroom.get("enrollmentCode")
     course_template.classroom_url = classroom.get("alternateLink")
+    course_template.admin=CLASSROOM_ADMIN_EMAIL
     course_template.save()
     return {"course_template": course_template}
+  except HttpError as hte:
+    Logger.error(hte)
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -242,6 +251,7 @@ def update_course_template(
   """
   try:
     course_template = CourseTemplate.find_by_id(course_template_id)
+    instructional_designer = course_template.instructional_designer
     update_course_template_dict = {**update_course_template_model.dict()}
     if not any(update_course_template_dict.values()):
       raise ValidationError(
@@ -250,6 +260,19 @@ def update_course_template(
     for key in update_course_template_dict:
       if update_course_template_dict[key] is not None:
         setattr(course_template, key, update_course_template_dict.get(key))
+    # update instructional designer
+    if course_template.instructional_designer != instructional_designer:
+      classroom_crud.delete_teacher(
+          course_template.classroom_id,
+          instructional_designer)
+      classroom_crud.add_teacher(
+          course_template.classroom_id,
+          course_template.instructional_designer)
+    # update classroom
+    classroom_crud.update_course(
+        course_id=course_template.classroom_id, section_name="template",
+        description=course_template.description,
+        course_name=course_template.name)
     course_template.update()
     return {
         "message": "Successfully Updated the " +
@@ -258,6 +281,12 @@ def update_course_template(
     }
   except ValidationError as ve:
     raise BadRequest(str(ve)) from ve
+  except HttpError as hte:
+    Logger.error(hte)
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:

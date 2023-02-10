@@ -2,7 +2,7 @@
 Pydantic Model for Course template API's
 """
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, INSERT_COURSE_TEMPLATE_EXAMPLE, UPDATE_COURSE_TEMPLATE_EXAMPLE
 
 
@@ -12,7 +12,8 @@ class CourseTemplateModel(BaseModel):
   name: str
   description: str
   admin: str
-  instructional_designer: str
+  instructional_designer: constr(min_length=7, max_length=128,
+          regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")
   classroom_id: Optional[str]
   classroom_code: Optional[str]
   classroom_url: Optional[str]
@@ -26,11 +27,8 @@ class UpdateCourseTemplateModel(BaseModel):
   """Update Course Template Pydantic Model"""
   name: Optional[str] = None
   description: Optional[str] = None
-  admin: Optional[str] = None
-  instructional_designer: Optional[str] = None
-  classroom_id: Optional[str] = None
-  classroom_code: Optional[str] = None
-  classroom_url: Optional[str] = None
+  instructional_designer: Optional[constr(min_length=7, max_length=128,
+    regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")] = None
 
   class Config():
     orm_mode = True
@@ -75,8 +73,8 @@ class InputCourseTemplateModel(BaseModel):
   """Insert Course Template Model"""
   name: str
   description: str
-  admin: str
-  instructional_designer: str
+  instructional_designer: constr(min_length=7, max_length=128,
+        regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")
 
   class Config():
     orm_mode = True

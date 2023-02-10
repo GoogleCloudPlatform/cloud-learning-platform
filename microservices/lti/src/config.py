@@ -1,7 +1,7 @@
 """
   LTI Service config file
 """
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, broad-except
 import os
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
@@ -35,26 +35,40 @@ ERROR_RESPONSES = {
 
 TOKEN_TTL = 3600
 
-ISSUER = os.getenv("ISSUER", "http://localhost")
+LTI_ISSUER_DOMAIN = os.getenv("LTI_ISSUER_DOMAIN", "http://localhost")
 
-LTI_SERVICE_PLATFORM_PUBLIC_KEY = secrets.access_secret_version(request={
-    "name":
-        f"projects/{PROJECT_ID}/secrets/lti-service-public-key/versions/latest"
-}).payload.data.decode("utf-8")
+try:
+  LTI_SERVICE_PLATFORM_PUBLIC_KEY = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/lti-service-public-key/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  LTI_SERVICE_PLATFORM_PUBLIC_KEY = None
 
-LTI_SERVICE_PLATFORM_PRIVATE_KEY = secrets.access_secret_version(
-    request={
-        "name":
-            f"projects/{PROJECT_ID}/secrets/lti-service-private-key/versions/latest"
-    }).payload.data.decode("utf-8")
+try:
+  LTI_SERVICE_PLATFORM_PRIVATE_KEY = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/lti-service-private-key/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  LTI_SERVICE_PLATFORM_PRIVATE_KEY = None
 
-LTI_SERVICE_TOOL_PUBLIC_KEY = secrets.access_secret_version(request={
-    "name":
-        f"projects/{PROJECT_ID}/secrets/lti-service-public-key/versions/latest"
-}).payload.data.decode("utf-8")
+try:
+  LTI_SERVICE_TOOL_PUBLIC_KEY = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/lti-service-public-key/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  LTI_SERVICE_TOOL_PUBLIC_KEY = None
 
-LTI_SERVICE_TOOL_PRIVATE_KEY = secrets.access_secret_version(
-    request={
-        "name":
-            f"projects/{PROJECT_ID}/secrets/lti-service-private-key/versions/latest"
-    }).payload.data.decode("utf-8")
+try:
+  LTI_SERVICE_TOOL_PRIVATE_KEY = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/lti-service-private-key/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  LTI_SERVICE_TOOL_PRIVATE_KEY = None

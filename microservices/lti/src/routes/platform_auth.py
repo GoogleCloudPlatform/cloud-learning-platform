@@ -1,7 +1,7 @@
 """LTI Platform Auth endpoints"""
 from copy import deepcopy
 from datetime import datetime
-from config import ERROR_RESPONSES, ISSUER, TOKEN_TTL
+from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN, TOKEN_TTL
 from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
 from common.utils.errors import (ResourceNotFoundException, ValidationError)
@@ -27,8 +27,11 @@ router = APIRouter(
 @router.get("/jwks", name="Platform JWKS Endpoint")
 def platform_jwks():
   """Get the public keys of the platform"""
-  key_set = get_platform_public_keyset()
-  return key_set.get("public_keyset")
+  try:
+    key_set = get_platform_public_keyset()
+    return key_set.get("public_keyset")
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
 
 
 @router.post(
@@ -186,7 +189,7 @@ def generate_token(
 
     required_scopes_str = " ".join(required_scopes)
     token_claims = {
-        "iss": ISSUER,
+        "iss": LTI_ISSUER_DOMAIN,
         "aud": claims.get("iss"),
         "iat": int(datetime.now().timestamp()),
         "exp": int(datetime.now().timestamp()) + TOKEN_TTL,

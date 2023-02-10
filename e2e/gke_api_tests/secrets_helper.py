@@ -18,17 +18,16 @@ def get_required_emails_from_secret_manager():
     """ ""
 
   client = secretmanager.SecretManagerServiceClient()
-  test_user_secret_id = "test-user-1-username"
-  # lms_user_secret_id = "lms-service-user"
-  lms_user_secret_id = "lms-admin-teacher-username"
+  test_user_secret_id = "org-test-user-1-username"
+  test_user_2_secret_id = "org-test-user-2-username"
   test_user_secret_name = f"projects/{PROJECT_ID}/secrets/{test_user_secret_id}/versions/latest"
   test_user_response = client.access_secret_version(
       request={"name": test_user_secret_name})
-  lms_user_secret_name = f"projects/{PROJECT_ID}/secrets/{lms_user_secret_id}/versions/latest"
-  lms_user_response = client.access_secret_version(
-      request={"name": lms_user_secret_name})
+  test_user_2_secret_name = f"projects/{PROJECT_ID}/secrets/{test_user_2_secret_id}/versions/latest"
+  test_user_2_response = client.access_secret_version(
+      request={"name": test_user_2_secret_name})
   data = {
-      "admin": lms_user_response.payload.data.decode("UTF-8"),
+      "teacher": test_user_2_response.payload.data.decode("UTF-8"),
       "instructional_designer": test_user_response.payload.data.decode("UTF-8")
   }
   return data

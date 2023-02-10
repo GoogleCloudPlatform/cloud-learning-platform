@@ -100,7 +100,7 @@ def test_create_section(client_with_emulator, create_fake_data):
       "description": "This is description",
       "course_template": create_fake_data["course_template"],
       "cohort": create_fake_data["cohort"],
-      "teachers": [os.environ.get("CLASSROOM_ADMIN_EMAIL")]
+      "teachers": ["teachera@gmail.com"]
   }
   mock_return_course = {
       "id": "57690009090",
@@ -141,7 +141,7 @@ def test_create_section_course_template_not_found(client_with_emulator,
       "description": "This is description",
       "course_template": "fake-classroom-id_new",
       "cohort": create_fake_data["cohort"],
-      "teachers": ["string"]
+      "teachers": ["teachera@gmail.com"]
   }
   mock_return_course = {
       "id": "57690009090",
@@ -174,7 +174,7 @@ def test_create_section_cohort_not_found(client_with_emulator,
       "description": "This is description",
       "course_template": create_fake_data["course_template"],
       "cohort": "fake-cohort-id-new",
-      "teachers": ["string"]
+      "teachers": ["teachera@gmail.com"]
   }
   mock_return_course = {
       "id": "57690009090",

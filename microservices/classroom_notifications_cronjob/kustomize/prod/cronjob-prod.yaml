@@ -16,4 +16,3 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: classroom-notifications-cronjob
-spec:
