@@ -75,7 +75,11 @@ For running the LTI service, a set of RSA public and private keys are picked wit
 
 ## Adding Initial user in the DB
 
-#TODO
+The initial user has to be entered into the database manually. Subsequent users can be added via API after that first user grabs an ID token from the UI or other method.
+
+Create a new `users` collection in Firestore and add the first user as follows:
+![](docs/static/images/first_db_user_1.png)
+![](docs/static/images/first_db_user_2.png)
 
 ## Adding Backend Robot User
 
