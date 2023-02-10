@@ -190,9 +190,6 @@ request: Request):
       course_template_dict["instructional_designer"])
     # classroom_crud.add_teacher(new_course["id"], teacher_email)
     gaia_id = user_profile["id"]
-    first_name =  user_profile["name"]["givenName"]
-    last_name =  user_profile["name"]["givenName"]
-    photo_url =  user_profile["photoUrl"]
     data = {
       "first_name":user_profile["name"]["givenName"],
       "last_name": user_profile["name"]["familyName"],
