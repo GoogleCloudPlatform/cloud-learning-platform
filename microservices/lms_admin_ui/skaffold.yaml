@@ -50,7 +50,7 @@ profiles:
       - ./kustomize/prod
   build:
     googleCloudBuild:
-      concurrency: 10
+      concurrency: 0
     artifacts:
     - image: lms-admin-ui
       sync:
@@ -95,7 +95,7 @@ profiles:
   - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
     googleCloudBuild:
-      concurrency: 10
+      concurrency: 0
     artifacts:
     - image: gcr.io/core-learning-services-dev/lms-admin-ui
       sync:
