@@ -22,7 +22,7 @@ def call_create_user_api(headers,body):
   Args:
   body (dict):  Body for create user API
   Returns:
-      response object : response from create user 
+      response object : response from create user
   """
 
   response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
@@ -34,9 +34,9 @@ def create_teacher(headers,body):
     Call create user  API to to insert a user
   Args:
   body (dict):  Body for create user API
-  headers : auth headers to call user management api 
+  headers : auth headers to call user management api
   Returns:
-      response object : response from create user 
+      response object : response from create user
   """
   response = call_search_user_api(headers,body["email"])
   searched_teacher = []

@@ -109,7 +109,7 @@ def test_create_section(client_with_emulator, create_fake_data):
       "alternateLink": "https://classroom.google.com"
   }
   mocked_value = {"id":"123456789","name":{"givenName":"user1",\
-    "lastName":"last_name","photoUrl":"http://mockurl.com"}}
+    "lastName":"last_name",},"photoUrl":"http://mockurl.com"}
   with mock.patch("routes.section.classroom_crud.get_course_by_id"):
     with mock.patch("routes.section.classroom_crud.create_course",
                     return_value=mock_return_course):
@@ -157,11 +157,11 @@ def test_create_section_course_template_not_found(client_with_emulator,
           with mock.patch("routes.section.classroom_crud.get_coursework"):
             with mock.patch(
                 "routes.section.classroom_crud.create_coursework"):
-                with mock.patch("routes.section.classroom_crud.invite_teacher"):
-                  with mock.patch("routes.section.classroom_crud.get_user_profile_information"):
-                    with mock.patch("routes.section.classroom_crud.acceept_invite"):
-                      with mock.patch("routes.section.common_service.create_teacher"):
-                        resp = client_with_emulator.post(url, json=section_details)
+              with mock.patch("routes.section.classroom_crud.invite_teacher"):
+                with mock.patch("routes.section.classroom_crud.get_user_profile_information"):
+                  with mock.patch("routes.section.classroom_crud.acceept_invite"):
+                    with mock.patch("routes.section.common_service.create_teacher"):
+                      resp = client_with_emulator.post(url, json=section_details)
   assert resp.status_code == 404
 
 
