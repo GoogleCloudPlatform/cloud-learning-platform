@@ -175,14 +175,14 @@ def create_section(sections_details: SectionDetails,request: Request):
       print("User profile Information ______",user_profile)
       gaid = user_profile["id"]
       name =  user_profile["name"]["givenName"]
-      last_name =  user_profile["name"]["givenName"]
+      last_name =  user_profile["name"]["familyName"]
       photo_url =  user_profile["photoUrl"]
       print(f"Gaid {gaid} first name {name} last name \
         {last_name} photo url {photo_url}")
     # Save the new record of seecion in firestore
       data = {
       "first_name":user_profile["name"]["givenName"],
-      "last_name": user_profile["name"]["lastName"],
+      "last_name": user_profile["name"]["familyName"],
       "email":teacher_email,
       "user_type": "faculty",
       "user_type_ref": "",
@@ -369,7 +369,7 @@ def update_section(sections_details: UpdateSection,request: Request):
       user_profile = classroom_crud.get_user_profile_information(i)
       data = {
       "first_name":user_profile["name"]["givenName"],
-      "last_name": user_profile["name"]["givenName"],
+      "last_name": user_profile["name"]["familyName"],
       "email":i,
       "user_type": "faculty",
       "user_type_ref": "",

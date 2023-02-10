@@ -195,7 +195,7 @@ request: Request):
     photo_url =  user_profile["photoUrl"]
     data = {
       "first_name":user_profile["name"]["givenName"],
-      "last_name": user_profile["name"]["givenName"],
+      "last_name": user_profile["name"]["familyName"],
       "email":course_template_dict["instructional_designer"],
       "user_type": "faculty",
       "user_type_ref": "",
