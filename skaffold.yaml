@@ -36,3 +36,5 @@ requires:
 - path: ./microservices/classroom_shim
   configs: [classroom-shim]
 
+- path: ./microservices/classroom_notifications_cronjob
+  configs: [classroom-notifications-cronjob]

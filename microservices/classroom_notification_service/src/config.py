@@ -24,12 +24,13 @@ PUB_SUB_PROJECT_ID = os.getenv("PUB_SUB_PROJECT_ID") or \
 
 BQ_DATASET = DATABASE_PREFIX + os.getenv("BQ_DATASET", "cns")
 
-BQ_LOG_CW_TABLE = os.getenv("BQ_LOG_CW_TABLE", "courseWorkLogs")
-BQ_LOG_RS_TABLE = os.getenv("BQ_LOG_RS_TABLE", "rosterLogs")
-BQ_COLL_USER_TABLE = os.getenv("BQ_COLL_USER_TABLE", "userCollection")
-BQ_COLL_CW_TABLE = os.getenv("BQ_COLL_CW_TABLE", "courseWorkCollection")
-BQ_COLL_SCW_TABLE = os.getenv(
-    "BQ_COLL_SCW_TABLE", "submittedCourseWorkCollection")
+BQ_TABLE_DICT = {
+    "BQ_LOG_CW_TABLE": "courseWorkLogs",
+    "BQ_LOG_RS_TABLE": "rosterLogs",
+    "BQ_COLL_USER_TABLE": "userCollection",
+    "BQ_COLL_CW_TABLE": "courseWorkCollection",
+    "BQ_COLL_SCW_TABLE": "submittedCourseWorkCollection"
+}
 
 CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL")
 

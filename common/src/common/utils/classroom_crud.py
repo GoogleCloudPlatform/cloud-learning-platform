@@ -374,6 +374,8 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   {USER_MANAGEMENT_BASE_URL}/user/search?email={student_email}",\
     headers=headers)
   # If the response is success check if student is inactive i.e  raise error
+  print("USer Management Response " , response.status_code ,response.json())
+  searched_student = []
   if response.status_code == 200:
     searched_student = response.json()["data"]
     if searched_student != []:
@@ -501,8 +503,8 @@ def enable_notifications(course_id, feed_type):
           }
       },
       "cloudPubsubTopic": {
-          "topicName":"projects/"+
-          f"{PUB_SUB_PROJECT_ID}/topics/{DATABASE_PREFIX}classroom-messeges"
+        "topicName":"projects/"+
+        f"{PUB_SUB_PROJECT_ID}/topics/{DATABASE_PREFIX}classroom-notifications"
       }
   }
   return service.registrations().create(body=body).execute()
