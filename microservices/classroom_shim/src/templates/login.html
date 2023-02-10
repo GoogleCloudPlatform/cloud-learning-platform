@@ -53,23 +53,35 @@
                 },
               })
               .then((response) => {
-                if (response.data) {
-                  if (response.data.url) {
-                    window.open(response.data.url, "_self").focus()
-                  } else {
-                    displayError("There was a error while redirecting, Redirect url was not received in the response. Please try again.")
-                    console.log("No URL found in the response")
-                  }
-                } else {
-                  displayError("There was a error while redirecting, No response received for redirection. Please try again.")
-                  console.log("No response data");
-                }
+                setTimeout(() => {
+                  console.log("response", response)
+
+                  axios.post(response.data.url, response.data.message_hint, {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }).then((res) => {
+                    setTimeout(() => {
+                      window.open(res.data.url, "_self").focus()
+                    }, 10)
+                  }).catch((err) => {
+                    setTimeout(() => {
+                      console.log("err", err)
+                      if (err.response.status == 401) {
+                        displayError("Access Denied")
+                      }
+                      initFirebaseUI()
+                    }, 10)
+                  })
+                }, 10)
               }).catch((err) => {
-                console.log("err", err)
-                if (err.response.status == 401) {
-                  displayError("Access Denied")
-                }
-                initFirebaseUI()
+                setTimeout(() => {
+                  console.log("err", err)
+                  if (err.response.status == 401) {
+                    displayError("Access Denied")
+                  }
+                  initFirebaseUI()
+                }, 10)
               })
             return false;
           },

@@ -14,6 +14,7 @@ from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest, Unauthenticated)
 from common.utils.logging_handler import Logger
 # pylint: disable=line-too-long
+from common.utils.classroom_crud import get_course_work
 
 templates = Jinja2Templates(directory="templates")
 
@@ -81,6 +82,9 @@ def launch_assignment(request: Request,
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
     lti_content_item_id = lti_assignment.lti_content_item_id
 
+    data = get_course_work(lti_assignment.section_id,
+                           lti_assignment.course_work_id)
+    print("\n***data", data)
     custom_params = {
         "$ResourceLink.available.startDateTime":
             datetime.now().isoformat(),
@@ -102,7 +106,8 @@ def launch_assignment(request: Request,
     url = f"{CLP_DOMAIN_URL}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}"
     # TODO: verify assignment and user relationship
     # TODO: fetch data from request for custom param substitution
-    return RedirectResponse(url=url, headers=headers, status_code=302)
+    return {"url": url, "message_hint": final_lti_message_hint_dict}
+    # RedirectResponse(url=url, headers=headers, status_code=302)
 
   except ValidationError as e:
     Logger.error(e)

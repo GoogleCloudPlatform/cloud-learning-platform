@@ -4,6 +4,7 @@ from typing import Optional
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from fastapi import APIRouter
 from fastapi.security import HTTPBearer
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from common.models import Tool, LTIContentItem
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
@@ -26,15 +27,27 @@ router = APIRouter(
     responses=ERROR_RESPONSE_DICT)
 
 
+@router.post(
+    "/resource-launch-init",
+    name="Resource launch endpoint for LTI initiation",
+    responses={404: {
+        "model": NotFoundErrorResponseModel
+    }})
+def post_resource_launch_init(lti_content_item_id: str,
+                              user_id: str,
+                              custom_params: Optional[dict] = {}):
+  return get_resource_launch_init(lti_content_item_id, user_id, custom_params)
+
+
 @router.get(
     "/resource-launch-init",
     name="Resource launch endpoint for LTI initiation",
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def resource_launch_init(lti_content_item_id: str,
-                         user_id: str,
-                         custom_params: Optional[dict] = {}):
+def get_resource_launch_init(lti_content_item_id: str,
+                             user_id: str,
+                             custom_params: Optional[dict] = {}):
   """The resource launch init endpoint will initiate the process to
   fetch a content item and then redirect the request to the tool login url.
   ### Args:
@@ -90,6 +103,7 @@ def resource_launch_init(lti_content_item_id: str,
             (login_url.scheme, login_url.netloc, login_url.path,
              login_url.params, urlencode(query_params), login_url.fragment))
         return {"url": redirect_url}
+        # RedirectResponse(url=redirect_url, status_code=302)
       else:
         raise ResourceNotFoundException(
             "Tool for the requested resource is not available")
