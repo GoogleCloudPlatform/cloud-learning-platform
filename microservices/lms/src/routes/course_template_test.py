@@ -14,7 +14,6 @@ from testing.test_config import BASE_URL, COURSE_TEMPLATE_LIST_TEST_DATA, COHORT
 API_URL = f"{BASE_URL}/course_templates"
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
-CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL")
 
 def test_get_course_template_list(client_with_emulator):
   for i in COURSE_TEMPLATE_LIST_TEST_DATA:
@@ -50,7 +49,6 @@ def test_get_course_template(client_with_emulator):
   url = API_URL + f"/{course_template.id}"
   data = COURSE_TEMPLATE_EXAMPLE
   data["id"] = course_template.id
-  data["admin"]=CLASSROOM_ADMIN_EMAIL
   with mock.patch("routes.course_template.Logger"):
     response = client_with_emulator.get(url)
   response_course_template = response.json()

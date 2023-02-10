@@ -163,7 +163,7 @@ def test_create_section_cohort_not_found(client_with_emulator,
       "description": "This is description",
       "course_template": create_fake_data["course_template"],
       "cohort": "fake-cohort-id-new",
-      "teachers": ["string"]
+      "teachers": ["teachera@gmail.com"]
   }
   mock_return_course = {
       "id": "57690009090",

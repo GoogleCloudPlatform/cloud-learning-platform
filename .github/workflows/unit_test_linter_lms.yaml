@@ -30,7 +30,6 @@ on:
 
 env:
   PROJECT_ID: core-learning-services-dev
-  CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
 
 # cookiecutter:raw 
 jobs:
