@@ -20,7 +20,7 @@ from schemas.section import (
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     ClassroomCourseListResponseModel, UpdateSectionResponseModel)
 from schemas.update_section import UpdateSection
-from services import student_service
+from services import student_service ,common_service
 from utils.helper import convert_section_to_section_model
 
 # disabling for linting to pass
@@ -75,7 +75,7 @@ def get_courses(skip: int = 0, limit: int = 10):
 
 
 @router.post("", response_model=CreateSectiontResponseModel)
-def create_section(sections_details: SectionDetails):
+def create_section(sections_details: SectionDetails,request: Request):
   """Create section API
   Args:
     name (section): Section name
@@ -91,6 +91,7 @@ def create_section(sections_details: SectionDetails):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
+    headers = {"Authorization": request.headers.get("Authorization")}
     course_template_details = CourseTemplate.find_by_id(
         sections_details.course_template)
     cohort_details = Cohort.find_by_id(sections_details.cohort)
@@ -168,6 +169,20 @@ def create_section(sections_details: SectionDetails):
       photo_url =  user_profile["photoUrl"]
       print(f"Gaid {gaid} first name {name} last name {last_name} photo url {photo_url}")
     # Save the new record of seecion in firestore
+      data = {
+      "first_name":user_profile["name"]["givenName"],
+      "last_name": user_profile["name"]["givenName"],
+      "email":teacher_email,
+      "user_type": "faculty",
+      "user_type_ref": "",
+      "user_groups": [],
+      "status": "active",
+      "is_registered": True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id":user_profile["id"]
+        }
+      common_service.create_teacher(headers,data)
     section = Section()
     section.name = name
     section.section = sections_details.name
@@ -295,7 +310,7 @@ def section_list(skip: int = 0, limit: int = 10):
 
 
 @router.patch("", response_model=UpdateSectionResponseModel)
-def update_section(sections_details: UpdateSection):
+def update_section(sections_details: UpdateSection,request: Request):
   """Update section API
 
   Args:
@@ -313,7 +328,8 @@ def update_section(sections_details: UpdateSection):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-
+    print("1")
+    headers = {"Authorization": request.headers.get("Authorization")}
     section = Section.find_by_id(sections_details.id)
     new_course = classroom_crud.update_course(sections_details.course_id,
                                               sections_details.section_name,
@@ -324,6 +340,7 @@ def update_section(sections_details: UpdateSection):
           f" {sections_details.course_id} is not found in classroom")
     add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
+    print("ADD teachers list ",add_teacher_list)
     for i in add_teacher_list:
       # classroom_crud.add_teacher(sections_details.course_id, i)
       invitation_object = classroom_crud.invite_teacher(sections_details.course_id,
@@ -333,6 +350,20 @@ def update_section(sections_details: UpdateSection):
       print(invitation_object)
       classroom_crud.acceept_invite(invitation_object["id"],i)
       user_profile = classroom_crud.get_user_profile_information(i)
+      data = {
+      "first_name":user_profile["name"]["givenName"],
+      "last_name": user_profile["name"]["givenName"],
+      "email":i,
+      "user_type": "faculty",
+      "user_type_ref": "",
+      "user_groups": [],
+      "status": "active",
+      "is_registered": True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id":user_profile["id"]
+        }
+      common_service.create_teacher(headers,data)
       print("Invite Accepted userprofile is",user_profile)
     remove_teacher_list = list(
         set(section.teachers) - set(sections_details.teachers))
@@ -348,6 +379,8 @@ def update_section(sections_details: UpdateSection):
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Exception as e:
+    err = traceback.format_exc().replace("\n", " ")
+    print(err)
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 

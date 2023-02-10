@@ -1,11 +1,12 @@
 '''Course Template Endpoint'''
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from common.models import CourseTemplate, Cohort
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest
 from common.utils import classroom_crud
 from utils.helper import convert_cohort_to_cohort_model
+from services import common_service
 from schemas.cohort import CohortListResponseModel
 from schemas.course_template import CourseTemplateModel, CourseTemplateListModel, CreateCourseTemplateResponseModel, InputCourseTemplateModel, DeleteCourseTemplateModel, UpdateCourseTemplateModel, UpdateCourseTemplateResponseModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
@@ -145,7 +146,8 @@ def get_cohort_list_by_course_template_id(course_template_id: str,
 
 
 @router.post("", response_model=CreateCourseTemplateResponseModel)
-def create_course_template(input_course_template: InputCourseTemplateModel):
+def create_course_template(input_course_template: InputCourseTemplateModel,
+request: Request):
   """Create a Course Template endpoint
 
     Args:
@@ -161,6 +163,7 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
             if the Course Template creation raises an exception
   """
   try:
+    headers = {"Authorization": request.headers.get("Authorization")}
     course_template_dict = {**input_course_template.dict()}
     course_template = CourseTemplate()
     course_template = course_template.from_dict(course_template_dict)
@@ -180,6 +183,26 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
     print(invitation_object)
     classroom_crud.acceept_invite(invitation_object["id"],course_template_dict["instructional_designer"])
     print("Invite Accepted")
+    user_profile = classroom_crud.get_user_profile_information(course_template_dict["instructional_designer"])
+    # classroom_crud.add_teacher(new_course["id"], teacher_email)
+    gaia_id = user_profile["id"]
+    first_name =  user_profile["name"]["givenName"]
+    last_name =  user_profile["name"]["givenName"]
+    photo_url =  user_profile["photoUrl"]
+    data = {
+      "first_name":user_profile["name"]["givenName"],
+      "last_name": user_profile["name"]["givenName"],
+      "email":course_template_dict["instructional_designer"],
+      "user_type": "faculty",
+      "user_type_ref": "",
+      "user_groups": [],
+      "status": "active",
+      "is_registered": True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id":gaia_id
+        }
+    common_service.create_teacher(headers,data)
     # Storing classroom details
     course_template.classroom_id = classroom.get("id")
     course_template.classroom_code = classroom.get("enrollmentCode")
