@@ -188,7 +188,10 @@ def test_update_course_template(client_with_emulator):
   }
   json_body = {"name": "update_name", "description": "updated_description"}
   with mock.patch("routes.course_template.Logger"):
-    response = client_with_emulator.patch(url, json=json_body)
+    with mock.patch("routes.course_template.classroom_crud.update_course"):
+      with mock.patch("routes.course_template.classroom_crud.add_teacher"):
+        with mock.patch("routes.course_template.classroom_crud.delete_teacher"):
+          response = client_with_emulator.patch(url, json=json_body)
   response_course_template = response.json()
   loaded_course_template = response_course_template.pop("course_template")
   assert response.status_code == 200, "Status 200"
@@ -209,6 +212,9 @@ def test_update_nonexists_course_template(client_with_emulator):
   }
   json_body = {"name": "update_name", "description": "updated_description"}
   with mock.patch("routes.course_template.Logger"):
-    response = client_with_emulator.patch(url, json=json_body)
+    with mock.patch("routes.course_template.classroom_crud.update_course"):
+      with mock.patch("routes.course_template.classroom_crud.add_teacher"):
+        with mock.patch("routes.course_template.classroom_crud.delete_teacher"):
+          response = client_with_emulator.patch(url, json=json_body)
   assert response.status_code == 404, "Status 404"
   assert response.json() == data, "Return data doesn't match."

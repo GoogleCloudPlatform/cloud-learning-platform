@@ -21,17 +21,12 @@ COURSE_TEMPLATE_EXAMPLE = {
 UPDATE_COURSE_TEMPLATE_EXAMPLE = {
     "name": "name",
     "description": "description",
-    "admin": "admin",
-    "instructional_designer": "IDesiner",
-    "classroom_id": "clID",
-    "classroom_code": "clcode",
-    "classroom_url": "https://classroom.google.com"
+    "instructional_designer": "IDesiner@gmail.com"
 }
 
 INSERT_COURSE_TEMPLATE_EXAMPLE = {
     "name": "name",
     "description": "description",
-    "admin": "admin@gmail.com",
     "instructional_designer": "IDesiner@gmail.com"
 }
 
