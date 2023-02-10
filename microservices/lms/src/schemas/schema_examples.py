@@ -12,8 +12,8 @@ COURSE_TEMPLATE_EXAMPLE = {
     "id": "id",
     "name": "name",
     "description": "description",
-    "admin": "admin",
-    "instructional_designer": "IDesiner",
+    "admin": "admin@gmail.com",
+    "instructional_designer": "idesiner@gmail.com",
     "classroom_id": "clID",
     "classroom_code": "clcode",
     "classroom_url": "https://classroom.google.com"
@@ -21,13 +21,13 @@ COURSE_TEMPLATE_EXAMPLE = {
 UPDATE_COURSE_TEMPLATE_EXAMPLE = {
     "name": "name",
     "description": "description",
-    "instructional_designer": "IDesiner@gmail.com"
+    "instructional_designer": "idesiner@gmail.com"
 }
 
 INSERT_COURSE_TEMPLATE_EXAMPLE = {
     "name": "name",
     "description": "description",
-    "instructional_designer": "IDesiner@gmail.com"
+    "instructional_designer": "idesiner@gmail.com"
 }
 
 COHORT_EXAMPLE = {

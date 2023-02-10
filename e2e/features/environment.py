@@ -14,6 +14,7 @@ from google.oauth2.credentials import Credentials
 import logging
 
 USER_EMAIL_PASSWORD_DICT = get_user_email_and_password_for_e2e()
+CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL")
 
 def create_course(name,section,description):
   """Create course Function in classroom
@@ -88,6 +89,7 @@ def create_course_templates(context):
   classroom = create_course(
       course_template.name, "master", course_template.description)
   course_template.classroom_id=classroom["id"]
+  course_template.admin=CLASSROOM_ADMIN_EMAIL
   course_template.classroom_code=classroom["enrollmentCode"]
   course_template.classroom_url = classroom["alternateLink"]
   course_template.save()
