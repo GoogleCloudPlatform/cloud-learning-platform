@@ -49,6 +49,10 @@ def delete_classroom_courses():
     if DATABASE_PREFIX + "test_course" in course["name"]:
       print("Inside IF for delete ")
       final_list.append(course["name"])
+      course = service.courses().get(id=course["id"]).execute()
+      course['courseState'] = 'ARCHIVED'
+      course = service.courses().update(id=course["id"], body=course).execute()
+      print(f" Updated Course and state  is :  {course.get('name')},{course.get('courseState')}")
       course = service.courses().delete(id=course["id"]).execute()
       print("AFter delete")
   return final_list
