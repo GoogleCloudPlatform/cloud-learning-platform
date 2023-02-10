@@ -61,6 +61,10 @@ Add an entry for front-end in addition to backend API
 - Add frontend domain as an "Authorized Domain"
 ![](docs/static/images/authorized_domain.png)
 
+## Add gke-pod-sa key
+
+Create and download a key for the `gke-pod-sa` service account and place it in the `gke-pod-sa-key` secret.
+
 ## LTI keys setup
 
 LTI Service requires a pair of rsa private and public keys for signing the jwt token (also referred as lti_message in LTI documentation) and a issuer url.
