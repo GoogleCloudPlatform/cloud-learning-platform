@@ -19,7 +19,8 @@ def get_required_emails_from_secret_manager():
 
   client = secretmanager.SecretManagerServiceClient()
   test_user_secret_id = "test-user-1-username"
-  lms_user_secret_id = "lms-service-user"
+  # lms_user_secret_id = "lms-service-user"
+  lms_user_secret_id = "lms-admin-teacher-username"
   test_user_secret_name = f"projects/{PROJECT_ID}/secrets/{test_user_secret_id}/versions/latest"
   test_user_response = client.access_secret_version(
       request={"name": test_user_secret_name})
