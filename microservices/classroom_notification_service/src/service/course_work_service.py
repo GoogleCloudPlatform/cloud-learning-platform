@@ -21,7 +21,7 @@ from common.utils.logging_handler import Logger
 from googleapiclient.errors import HttpError
 from helper.bq_helper import insert_rows_to_bq
 from helper.classroom_helper import get_course_work,get_student_submissions
-from config import BQ_LOG_CW_TABLE,BQ_COLL_CW_TABLE,BQ_COLL_SCW_TABLE
+from config import BQ_TABLE_DICT
 # disabling for linting to pass
 # pylint: disable = broad-except
 
@@ -43,17 +43,22 @@ def save_course_work(data):
     if len(data["collection"].split(".")) == 3:
       if data["collection"].split(".")[2] == "studentSubmissions":
         return insert_rows_to_bq(
-            rows=rows, table_name=BQ_LOG_CW_TABLE) & save_student_submission(
+            rows=rows,
+            table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"]
+            ) & save_student_submission(
                 course_id=data["resourceId"]["courseId"],
                 message_id=data["message_id"],
                 course_work_id=data["resourceId"]["courseWorkId"],
-                submissions_id=data["resourceId"]["id"])
+                submissions_id=data["resourceId"]["id"],
+                event_type=data["eventType"])
     else:
       return insert_rows_to_bq(rows=rows,
-        table_name=BQ_LOG_CW_TABLE) & save_course_work_collection(
+                               table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"]
+                               ) & save_course_work_collection(
             course_id=data["resourceId"]["courseId"],
             message_id=data["message_id"],
-            course_work_id=data["resourceId"]["id"])
+            course_work_id=data["resourceId"]["id"],
+          event_type=data["eventType"])
   except HttpError as ae:
     Logger.error(ae)
     return False
@@ -63,7 +68,7 @@ def save_course_work(data):
 
 
 
-def save_course_work_collection(course_id,course_work_id,message_id):
+def save_course_work_collection(course_id,course_work_id,message_id,event_type):
   """_summary_
 
   Args:
@@ -84,12 +89,14 @@ def save_course_work_collection(course_id,course_work_id,message_id):
       course_work, "individualStudentsOptions")
   course_work["gradeCategory"] = convert_to_json(course_work, "gradeCategory")
   course_work["materials"] = convert_dict_array_to_json(course_work,"materials")
+  course_work["event_type"] = event_type
   course_work["timestamp"] = datetime.datetime.utcnow()
-  return insert_rows_to_bq(rows=[course_work], table_name=BQ_COLL_CW_TABLE)
+  return insert_rows_to_bq(rows=[course_work],
+                           table_name=BQ_TABLE_DICT["BQ_COLL_CW_TABLE"])
 
 
 def save_student_submission(course_id, course_work_id,
-                            submissions_id, message_id):
+                            submissions_id, message_id,event_type):
   """_summary_
 
   Args:
@@ -113,8 +120,9 @@ def save_student_submission(course_id, course_work_id,
       submission, "shortAnswerSubmission")
   submission["multipleChoiceSubmission"] = convert_to_json(
       submission, "multipleChoiceSubmission")
+  submission["event_type"] = event_type
   submission["timestamp"] = datetime.datetime.utcnow()
-  return insert_rows_to_bq([submission],BQ_COLL_SCW_TABLE)
+  return insert_rows_to_bq([submission], BQ_TABLE_DICT["BQ_COLL_SCW_TABLE"])
 
 
 def convert_to_json(dict_object,key):

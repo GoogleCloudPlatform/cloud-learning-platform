@@ -23,5 +23,6 @@ CREATE TABLE IF NOT EXISTS courseWorkCollection (
         gradeCategory JSON,
         assignment JSON,
         multipleChoiceQuestion JSON,
+        event_type STRING,
         `timestamp` TIMESTAMP,
         message_id STRING NOT NULL);
