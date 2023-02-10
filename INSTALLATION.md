@@ -61,6 +61,10 @@ Add an entry for front-end in addition to backend API
 - Add frontend domain as an "Authorized Domain"
 ![](docs/static/images/authorized_domain.png)
 
+## Add gke-pod-sa key
+
+Create and download a key for the `gke-pod-sa` service account and place it in the `gke-pod-sa-key` secret.
+
 ## LTI keys setup
 
 LTI Service requires a pair of rsa private and public keys for signing the jwt token (also referred as lti_message in LTI documentation) and a issuer url.
@@ -71,7 +75,11 @@ For running the LTI service, a set of RSA public and private keys are picked wit
 
 ## Adding Initial user in the DB
 
-#TODO
+The initial user has to be entered into the database manually. Subsequent users can be added via API after that first user grabs an ID token from the UI or other method.
+
+Create a new `users` collection in Firestore and add the first user as follows:
+![](docs/static/images/first_db_user_1.png)
+![](docs/static/images/first_db_user_2.png)
 
 ## Adding Backend Robot User
 
