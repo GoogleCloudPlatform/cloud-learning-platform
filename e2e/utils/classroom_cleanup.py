@@ -31,6 +31,7 @@ DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
 def delete_classroom_courses():
   GKE_POD_SA_KEY=json.loads(os.environ.get("GKE_POD_SA_KEY"))
   CLASSROOM_ADMIN_EMAIL=os.environ.get("CLASSROOM_ADMIN_EMAIL")
+  print("Admin Email in cleanup")
   SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly",""]
   a_creds = service_account.Credentials.from_service_account_info(GKE_POD_SA_KEY,scopes=SCOPES)

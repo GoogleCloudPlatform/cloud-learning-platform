@@ -601,7 +601,8 @@ def acceept_invite(invitation_id,teacher_email):
   Returns:
       dict: response from create invitation method
   """
-  service = build("classroom", "v1", credentials=impersonate_teacher_creds(teacher_email))
+  service = build("classroom", "v1", \
+    credentials=impersonate_teacher_creds(teacher_email))
   try:
     print("_________Impersonated credentialsss_________________")
     course = service.invitations().accept(id=invitation_id).execute()
@@ -615,11 +616,17 @@ def acceept_invite(invitation_id,teacher_email):
     raise InternalServerError(str(e)) from e
 
 def get_user_profile_information(user_email):
-
+  """
+   Args:
+      user_email: email of user 
+  Returns:
+      profile_information: User profile information of the user 
+  """
   service = build("classroom", "v1", credentials=get_credentials())
 
   try:
-    profile_information = service.userProfiles().get(userId=user_email).execute()
+    profile_information = service.userProfiles(\
+      ).get(userId=user_email).execute()
     return profile_information
   except HttpError as ae:
     raise CustomHTTPException(status_code=ae.resp.status,
