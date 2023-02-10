@@ -20,7 +20,7 @@ from common.utils.logging_handler import Logger
 from helper.bq_helper import insert_rows_to_bq
 from helper.classroom_helper import get_user
 from googleapiclient.errors import HttpError
-from config import BQ_COLL_USER_TABLE,BQ_LOG_RS_TABLE
+from config import BQ_TABLE_DICT
 # disabling for linting to pass
 # pylint: disable = broad-except
 def save_roster(data):
@@ -39,8 +39,8 @@ def save_roster(data):
       "publish_time":data["publish_time"],"timestamp":datetime.datetime.utcnow()
     }]
     return insert_rows_to_bq(
-          rows=rows, table_name=BQ_LOG_RS_TABLE) & save_user(
-        data["resourceId"]["userId"], data["message_id"])
+        rows=rows, table_name=BQ_TABLE_DICT["BQ_LOG_RS_TABLE"]) & save_user(
+        data["resourceId"]["userId"], data["message_id"], data["eventType"])
   except HttpError as ae:
     Logger.error(ae)
     return False
@@ -48,9 +48,11 @@ def save_roster(data):
     Logger.error(e)
     return False
 
-def save_user(user_id,message_id):
+def save_user(user_id,message_id,event_type):
   user=get_user(user_id)
   user["uuid"]=str(uuid.uuid4())
   user["message_id"]=message_id
   user["timestamp"] = datetime.datetime.utcnow()
-  return insert_rows_to_bq(rows=[user],table_name=BQ_COLL_USER_TABLE)
+  user["event_type"]=event_type
+  return insert_rows_to_bq(rows=[user],
+                           table_name=BQ_TABLE_DICT["BQ_COLL_USER_TABLE"])

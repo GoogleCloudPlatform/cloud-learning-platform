@@ -1,7 +1,7 @@
 """Line item  Endpoints"""
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
-from config import ERROR_RESPONSES, ISSUER
+from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from common.models import LineItem, Result, Score
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  InvalidTokenError)
@@ -89,7 +89,8 @@ def get_all_line_items(context_id: str,
     line_items_list = []
     for i in line_items:
       line_item = i.get_fields(reformat_datetime=True)
-      line_item["id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{i.id}"
+      line_item[
+          "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{i.id}"
       line_items_list.append(line_item)
     return line_items_list
 
@@ -133,7 +134,7 @@ def get_line_item(context_id: str,
     line_item = LineItem.find_by_id(line_item_id)
     line_item_fields = line_item.get_fields(reformat_datetime=True)
     line_item_fields[
-        "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item.id}"
+        "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item.id}"
 
     return line_item_fields
   except InvalidTokenError as e:
@@ -176,7 +177,7 @@ def create_line_item(context_id: str,
     line_item = create_new_line_item(input_line_item_dict)
     line_item_fields = line_item.get_fields(reformat_datetime=True)
     line_item_fields[
-        "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item.id}"
+        "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item.id}"
 
     return line_item_fields
   except InvalidTokenError as e:
@@ -227,7 +228,7 @@ def update_line_item(context_id: str,
     existing_line_item.update()
     line_item_fields = existing_line_item.get_fields(reformat_datetime=True)
     line_item_fields[
-        "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}"
+        "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}"
 
     return line_item_fields
 
@@ -283,7 +284,7 @@ def update_line_item_using_id(context_id: str,
     existing_line_item.update()
     line_item_fields = existing_line_item.get_fields(reformat_datetime=True)
     line_item_fields[
-        "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}"
+        "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}"
 
     return line_item_fields
 
@@ -390,9 +391,9 @@ def get_results_of_line_item(context_id: str,
       for i in result:
         result_data = i.get_fields(reformat_datetime=True)
         result_data[
-            "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{i.id}"
+            "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{i.id}"
         result_data[
-            "scoreOf"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}"
+            "scoreOf"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}"
         result_fields.append(result_data)
 
     return result_fields
@@ -445,10 +446,10 @@ def get_result(context_id: str,
           "Incorrect result id provided for the given line item")
     result_fields = result.get_fields(reformat_datetime=True)
     result_fields[
-        "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{result.id}"
+        "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{result.id}"
 
     result_fields[
-        "scoreOf"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}"
+        "scoreOf"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}"
 
     return result_fields
 
@@ -499,7 +500,7 @@ def create_score_for_line_item(context_id: str,
     new_score = new_score.from_dict(input_score_dict)
     new_score.save()
 
-    line_item_url = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}"
+    line_item_url = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}"
     result = Result.collection.filter("scoreOf", "==", line_item_id).get()
 
     input_result_dict = {
@@ -522,7 +523,7 @@ def create_score_for_line_item(context_id: str,
       result_fields = result.get_fields(reformat_datetime=True)
       result_fields["scoreOf"] = line_item_url
       result_fields[
-          "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{result.id}"
+          "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{result.id}"
     else:
       new_result = Result()
       new_result = new_result.from_dict(input_result_dict)
@@ -530,7 +531,7 @@ def create_score_for_line_item(context_id: str,
       result_fields = new_result.get_fields(reformat_datetime=True)
       result_fields["scoreOf"] = line_item_url
       result_fields[
-          "id"] = f"{ISSUER}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{new_result.id}"
+          "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{new_result.id}"
 
     return result_fields
 

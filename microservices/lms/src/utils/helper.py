@@ -4,12 +4,14 @@ from google.cloud import secretmanager
 import google_crc32c
 import ttl_cache
 from config import PROJECT_ID
+from fastapi import Depends
+from common.utils.auth_service import validate_user_type_and_token, auth_scheme
 
 
 @ttl_cache(3600)
 def get_gke_pd_sa_key_from_secret_manager():
-  """Copy course  API
-
+  """Get GKE Pod service account keys from
+    Secret manager
   Args:
   Returns:
   return the POD service account keys in JSON format
@@ -81,3 +83,7 @@ def convert_section_to_section_model(section):
   cohort = loaded_section.pop("cohort").to_dict()
   loaded_section["cohort"] = cohort["key"]
   return loaded_section
+
+
+def validate_user(token: auth_scheme = Depends()):
+  return validate_user_type_and_token(["other", "faculty"], token)

@@ -5,7 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from typing_extensions import Literal
 from schemas.schema_examples import (BASIC_TOOL_EXAMPLE, FULL_TOOL_EXAMPLE)
-from config import ISSUER
+from config import LTI_ISSUER_DOMAIN
 
 # pylint: disable-next = invalid-name
 ALLOWED_PUBLIC_KEY_TYPES = Literal["JWK URL", "Public Key"]
@@ -30,10 +30,10 @@ class FullToolModel(BasicToolModel):
   id: str
   client_id: str
   deployment_id: str
-  issuer: str = ISSUER
-  platform_auth_url: str = f"{ISSUER}/lti/api/v1/authorize"
-  platform_token_url: str = f"{ISSUER}/lti/api/v1/token"
-  platform_keyset_url: str = f"{ISSUER}/lti/api/v1/jwks"
+  issuer: str = LTI_ISSUER_DOMAIN
+  platform_auth_url: str = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/authorize"
+  platform_token_url: str = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/token"
+  platform_keyset_url: str = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/jwks"
   created_time: str
   last_modified_time: str
 

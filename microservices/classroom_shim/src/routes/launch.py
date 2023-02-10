@@ -1,4 +1,7 @@
 """Tool Registration Endpoints"""
+import requests
+from typing import Optional
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
@@ -10,8 +13,6 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError,
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest, Unauthenticated)
 from common.utils.logging_handler import Logger
-from typing import Optional
-import requests
 # pylint: disable=line-too-long
 
 templates = Jinja2Templates(directory="templates")
@@ -79,6 +80,24 @@ def launch_assignment(request: Request,
     user_id = user_data.get("user_id")
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
     lti_content_item_id = lti_assignment.lti_content_item_id
+
+    custom_params = {
+        "$ResourceLink.available.startDateTime":
+            datetime.now().isoformat(),
+        "$ResourceLink.submission.endDateTime":
+            (datetime.now() - timedelta(hours=1)).isoformat(),
+        "$ResourceLink.available.endDateTime":
+            (datetime.now() - timedelta(hours=1)).isoformat(),
+    }
+    # "$Context.id.history": "",
+    # "$Person.address.timezone": ""
+    final_lti_message_hint_dict = {
+        "custom_params_for_substitution": custom_params,
+        "user_details": {
+            "picture":
+                "https://lh3.googleusercontent.com/a/AEdFTp4wIxRnw50hW7_bjiqYOMgdhpt0Gz9dw1D6LpOA=s96-c"
+        }
+    }
 
     url = f"{CLP_DOMAIN_URL}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}"
     # TODO: verify assignment and user relationship

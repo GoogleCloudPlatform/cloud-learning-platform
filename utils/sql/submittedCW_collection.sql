@@ -17,5 +17,6 @@ CREATE TABLE IF NOT EXISTS submittedCourseWorkCollection (
         submissionHistory ARRAY<JSON>,
         shortAnswerSubmission JSON,
         multipleChoiceSubmission JSON,
+        event_type STRING,
         `timestamp` TIMESTAMP,
         message_id STRING NOT NULL);

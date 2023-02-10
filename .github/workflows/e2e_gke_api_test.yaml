@@ -99,6 +99,14 @@ jobs:
         python -m pip install -r requirements.txt
         PYTHONPATH=../common/src python firestore_indexing.py
 
+    - name: Initialize Pub/Sub
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        cd e2e
+        python -m pip install -r requirements.txt
+        cd utils
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python pub_sub_setup.py
+
     - name: Build and deploy to cluster
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
@@ -106,7 +114,6 @@ jobs:
         export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
         skaffold run \
         --profile dev \
-        --module lms,lti,lms-admin-ui,classroom-notifications-cronjob,classroom-shim  \
         --namespace $NAMESPACE \
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }}
@@ -184,12 +191,6 @@ jobs:
         NAMESPACE=e2e-pr-$PR_NUMBER
         python e2e/utils/port_forward.py --namespace $NAMESPACE
 
-    - name: Cleaning up Pub/Sub
-      run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        cd e2e/utils
-        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python pub_sub_cleanup.py
-
     - name: Cleaning up database
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
@@ -211,12 +212,6 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
         PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_setup.py
-
-    - name: Initialize Pub/Sub
-      run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        cd e2e/utils
-        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python pub_sub_setup.py
 
     - name: Run pytest
       run: |
@@ -270,12 +265,6 @@ jobs:
         cd utils/
         python -m pip install -r requirements.txt
         PYTHONPATH=../common/src python firestore_indexing_cleanup.py
-
-    - name: Cleaning up Pub/Sub
-      run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        cd e2e/utils
-        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python pub_sub_cleanup.py  
 
     - name: Cleaning up database
       run: |
@@ -334,5 +323,13 @@ jobs:
         NAMESPACE=e2e-pr-$PR_NUMBER
         skaffold delete --namespace $NAMESPACE
         kubectl delete namespace $NAMESPACE
+
+    - name: Cleaning up Pub/Sub
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        cd e2e
+        python -m pip install -r requirements.txt
+        cd utils
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python pub_sub_cleanup.py  
 
 # cookiecutter:endraw 

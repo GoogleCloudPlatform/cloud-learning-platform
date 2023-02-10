@@ -523,9 +523,8 @@ def enable_notifications(course_id, feed_type):
           }
       },
       "cloudPubsubTopic": {
-          "topicName":
-              "projects/" +
-              f"{PUB_SUB_PROJECT_ID}/topics/{DATABASE_PREFIX}classroom-messeges"
+        "topicName":"projects/"+
+        f"{PUB_SUB_PROJECT_ID}/topics/{DATABASE_PREFIX}classroom-notifications"
       }
   }
   return service.registrations().create(body=body).execute()

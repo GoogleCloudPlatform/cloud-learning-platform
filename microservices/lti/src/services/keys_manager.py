@@ -59,6 +59,8 @@ def get_platform_public_keyset() -> dict:
 
 def get_platform_private_key():
   """ Returns the Platform Private key from config """
+  if LTI_SERVICE_PLATFORM_PRIVATE_KEY is None:
+    raise Exception("Platform RSA Keys missing.")
   return LTI_SERVICE_PLATFORM_PRIVATE_KEY
 
 
@@ -70,6 +72,8 @@ def get_tool_public_keyset() -> dict:
 
 def get_tool_private_key():
   """ Returns the Tool Private key from config """
+  if LTI_SERVICE_TOOL_PRIVATE_KEY is None:
+    raise Exception("Tool RSA Keys missing.")
   return LTI_SERVICE_TOOL_PRIVATE_KEY
 
 

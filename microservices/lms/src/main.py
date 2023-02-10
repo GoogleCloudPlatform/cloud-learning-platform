@@ -20,7 +20,6 @@ from concurrent.futures import ThreadPoolExecutor
 import uvicorn
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import add_exception_handlers
-from common.utils.auth_service import validate_token
 from fastapi import FastAPI, Request, Depends
 import config
 from routes import user
@@ -28,6 +27,7 @@ from routes import section
 from routes import student
 from routes import course_template
 from routes import cohort
+from utils.helper import validate_user
 
 app = FastAPI()
 
@@ -72,8 +72,9 @@ def hello():
 
 api = FastAPI(title="LMS Service APIs",
               version="latest",
-              dependencies=[Depends(validate_token)]
+              dependencies=[Depends(validate_user)]
               )
+
 
 api.include_router(user.router)
 api.include_router(section.router)
