@@ -45,7 +45,8 @@ deploy:
 profiles:
 - name: custom
   build:
-    googleCloudBuild: {}
+    googleCloudBuild:
+      concurrency: 10
     artifacts:
     - image: lms
       requires:
@@ -66,7 +67,8 @@ profiles:
       paths:
       - ./kustomize/prod
   build:
-    googleCloudBuild: {}
+    googleCloudBuild:
+      concurrency: 10
     artifacts:
     - image: lms
       docker:
@@ -80,7 +82,8 @@ profiles:
   activation:
   - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
-    googleCloudBuild: {}
+    googleCloudBuild:
+      concurrency: 10
     artifacts:
     - image: gcr.io/core-learning-services-dev/lms
       docker:

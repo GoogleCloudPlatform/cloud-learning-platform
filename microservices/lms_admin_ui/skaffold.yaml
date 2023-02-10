@@ -49,7 +49,8 @@ profiles:
       paths:
       - ./kustomize/prod
   build:
-    googleCloudBuild: {}
+    googleCloudBuild:
+      concurrency: 10
     artifacts:
     - image: lms-admin-ui
       sync:
@@ -93,7 +94,8 @@ profiles:
   activation:
   - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
-    googleCloudBuild: {}
+    googleCloudBuild:
+      concurrency: 10
     artifacts:
     - image: gcr.io/core-learning-services-dev/lms-admin-ui
       sync:
