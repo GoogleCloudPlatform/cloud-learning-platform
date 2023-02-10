@@ -108,6 +108,8 @@ def test_create_section(client_with_emulator, create_fake_data):
       "name": "Jhjiuiui",
       "alternateLink": "https://classroom.google.com"
   }
+  mocked_value = {"id":"123456789","name":{"givenName":"user1",\
+    "lastName":"last_name","photoUrl":"http://mockurl.com"}}
   with mock.patch("routes.section.classroom_crud.get_course_by_id"):
     with mock.patch("routes.section.classroom_crud.create_course",
                     return_value=mock_return_course):
@@ -121,8 +123,9 @@ def test_create_section(client_with_emulator, create_fake_data):
                     "routes.section.classroom_crud.delete_teacher"):
                   with mock.patch(
                     "routes.section.classroom_crud.enable_notifications"):
-                    with mock.patch("routes.section.classroom_crud.invite_teacher"):
-                      with mock.patch("routes.section.classroom_crud.get_user_profile_information"):
+                    with mock.patch("routes.section.classroom_crud.invite_teacher",return_value="12wewew"):
+                      with mock.patch("routes.section.classroom_crud.get_user_profile_information",return_value=mocked_value
+                      ):
                         with mock.patch("routes.section.classroom_crud.acceept_invite"):
                           with mock.patch("routes.section.common_service.create_teacher"):
                             resp = client_with_emulator.post(url, json=section_details)
