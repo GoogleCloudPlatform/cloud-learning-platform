@@ -167,11 +167,12 @@ def create_section(sections_details: SectionDetails,request: Request):
       name =  user_profile["name"]["givenName"]
       last_name =  user_profile["name"]["givenName"]
       photo_url =  user_profile["photoUrl"]
-      print(f"Gaid {gaid} first name {name} last name {last_name} photo url {photo_url}")
+      print(f"Gaid {gaid} first name {name} last name \
+        {last_name} photo url {photo_url}")
     # Save the new record of seecion in firestore
       data = {
       "first_name":user_profile["name"]["givenName"],
-      "last_name": user_profile["name"]["givenName"],
+      "last_name": user_profile["name"]["lastnName"],
       "email":teacher_email,
       "user_type": "faculty",
       "user_type_ref": "",
@@ -343,8 +344,8 @@ def update_section(sections_details: UpdateSection,request: Request):
     print("ADD teachers list ",add_teacher_list)
     for i in add_teacher_list:
       # classroom_crud.add_teacher(sections_details.course_id, i)
-      invitation_object = classroom_crud.invite_teacher(sections_details.course_id,
-                            i)
+      invitation_object = classroom_crud.invite_teacher(
+                            sections_details.course_id,i)
       # Storing classroom details
       print("This is invitation API response ")
       print(invitation_object)

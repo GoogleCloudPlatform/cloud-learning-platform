@@ -181,9 +181,11 @@ request: Request):
     # Storing classroom details
     print("This is invitation API response ")
     print(invitation_object)
-    classroom_crud.acceept_invite(invitation_object["id"],course_template_dict["instructional_designer"])
+    classroom_crud.acceept_invite(invitation_object["id"],\
+      course_template_dict["instructional_designer"])
     print("Invite Accepted")
-    user_profile = classroom_crud.get_user_profile_information(course_template_dict["instructional_designer"])
+    user_profile = classroom_crud.get_user_profile_information(\
+      course_template_dict["instructional_designer"])
     # classroom_crud.add_teacher(new_course["id"], teacher_email)
     gaia_id = user_profile["id"]
     first_name =  user_profile["name"]["givenName"]

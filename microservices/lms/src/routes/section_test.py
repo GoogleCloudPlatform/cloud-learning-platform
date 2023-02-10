@@ -123,7 +123,7 @@ def test_create_section(client_with_emulator, create_fake_data):
                     "routes.section.classroom_crud.delete_teacher"):
                   with mock.patch(
                     "routes.section.classroom_crud.enable_notifications"):
-                    with mock.patch("routes.section.classroom_crud.invite_teacher",return_value="12wewew"):
+                    with mock.patch("routes.section.classroom_crud.invite_teacher",return_value={"id":"12wewew"}):
                       with mock.patch("routes.section.classroom_crud.get_user_profile_information",return_value=mocked_value
                       ):
                         with mock.patch("routes.section.classroom_crud.acceept_invite"):

@@ -1,12 +1,11 @@
 """Common API services"""
-from  config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL
+from  config import USER_MANAGEMENT_BASE_URL
 import requests
 from common.utils.errors import  UserManagementServiceError
 
 def call_search_user_api(headers,email):
   """ Call search by email usermanagement API to get the student data
   Args:
-   
   email (str):  email id of user to search
 
   Returns:
@@ -21,7 +20,6 @@ def call_search_user_api(headers,email):
 def call_create_user_api(headers,body):
   """ Call create user  API to to insert a user
   Args:
-   
   body (dict):  Body for create user API
   Returns:
       response object : response from create user 
@@ -32,6 +30,14 @@ def call_create_user_api(headers,body):
   return response
 
 def create_teacher(headers,body):
+  """ Call create user API if user is not present in db then
+    Call create user  API to to insert a user
+  Args:
+  body (dict):  Body for create user API
+  headers : auth headers to call user management api 
+  Returns:
+      response object : response from create user 
+  """
   response = call_search_user_api(headers,body["email"])
   searched_teacher = []
   print("Search user response for ",body["email"])
