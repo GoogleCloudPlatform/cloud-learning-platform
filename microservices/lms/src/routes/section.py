@@ -67,6 +67,12 @@ def get_courses(skip: int = 0, limit: int = 10):
     return {"data": list(course_list)[skip:limit]}
   except ValidationError as ve:
     raise BadRequest(str(ve)) from ve
+  except HttpError as hte:
+    Logger.error(hte)
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
   except Exception as e:
     Logger.error(e)
     error = traceback.format_exc().replace("\n", " ")
@@ -150,6 +156,10 @@ def create_section(sections_details: SectionDetails):
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
 
+    # add Instructional designer
+    sections_details.teachers.append(
+        course_template_details.instructional_designer)
+
     for teacher_email in sections_details.teachers:
       classroom_crud.add_teacher(new_course["id"], teacher_email)
     # Save the new record of seecion in firestore
@@ -171,6 +181,12 @@ def create_section(sections_details: SectionDetails):
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
+  except HttpError as hte:
+    Logger.error(hte)
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
@@ -324,6 +340,12 @@ def update_section(sections_details: UpdateSection):
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
+  except HttpError as hte:
+    Logger.error(hte)
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -465,6 +487,12 @@ def copy_courses(course_details: CourseDetails):
     SUCCESS_RESPONSE["new_course"] = new_course
     SUCCESS_RESPONSE["coursework_list"] = coursework_list
     return SUCCESS_RESPONSE
+  except HttpError as hte:
+    Logger.error(hte)
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)

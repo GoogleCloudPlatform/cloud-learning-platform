@@ -109,8 +109,7 @@ def step_impl_13(context):
   context.url = f'{API_URL}/sections/enable_notifications'
   course=create_course(
         COURSE_TEMPLATE_INPUT_DATA["name"],"testing_section",
-        COURSE_TEMPLATE_INPUT_DATA["description"],
-        COURSE_TEMPLATE_INPUT_DATA["admin"])
+        COURSE_TEMPLATE_INPUT_DATA["description"])
   context.payload = {
       "course_id": course["id"],
       "feed_type": "COURSE_WORK_CHANGES"
