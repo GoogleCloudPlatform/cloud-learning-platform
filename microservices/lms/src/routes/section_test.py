@@ -64,7 +64,7 @@ def test_get_user(client_with_emulator):
   assert resp.status_code == 200
 
 mocked_value = {"id":"123456789","name":{"givenName":"user1",
-    "familyName":"last_name","photoUrl":"http://mockurl.com"}}
+    "familyName":"last_name"},"photoUrl":"http://mockurl.com"}
 
 def test_copy_course(client_with_emulator):
   url = BASE_URL + "/sections/copy_course/"
@@ -110,8 +110,7 @@ def test_create_section(client_with_emulator, create_fake_data):
       "name": "Jhjiuiui",
       "alternateLink": "https://classroom.google.com"
   }
-  mocked_value = {"id":"123456789","name":{"givenName":"user1",
-    "lastName":"last_name",},"photoUrl":"http://mockurl.com"}
+
   with mock.patch("routes.section.classroom_crud.get_course_by_id"):
     with mock.patch("routes.section.classroom_crud.create_course",
                     return_value=mock_return_course):
@@ -184,7 +183,7 @@ def test_create_section_cohort_not_found(client_with_emulator,
       "alternateLink": "https://classroom.google.com"
   }
   mocked_value = {"id":"123456789","name":{"givenName":"user1",
-    "familyName":"last_name","photoUrl":"http://mockurl.com"}}
+    "familyName":"last_name"},"photoUrl":"http://mockurl.com"}
   with mock.patch("routes.section.classroom_crud.get_course_by_id"):
     with mock.patch("routes.section.classroom_crud.create_course",
                     return_value=mock_return_course):
