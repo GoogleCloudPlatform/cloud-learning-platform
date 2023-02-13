@@ -4,9 +4,10 @@ from fastapi import APIRouter, HTTPException, Request
 from googleapiclient.errors import HttpError
 from services import student_service
 from common.utils.logging_handler import Logger
-from common.utils.errors import (ResourceNotFoundException, ValidationError,InvalidTokenError)
+from common.utils.errors import (ResourceNotFoundException, 
+ValidationError,InvalidTokenError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
-                                          ResourceNotFound, BadRequest,InvalidToken)
+                                      ResourceNotFound, BadRequest,InvalidToken)
 from common.models import CourseEnrollmentMapping,Section,Cohort
 from common.utils import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
@@ -117,7 +118,8 @@ cohort_student_router = APIRouter(prefix="/cohorts",
 
 
 
-@section_student_router.get("/{section_id}/students", response_model=StudentListResponseModel)
+@section_student_router.get("/{section_id}/students",
+ response_model=StudentListResponseModel)
 def list_students_in_section(section_id: str, request: Request):
   """ Get a list of students of one section from db
 
@@ -192,7 +194,8 @@ def delete_student(section_id: str,user_id:str,request: Request):
     raise InternalServerError(str(e)) from e
 
 
-@cohort_student_router.post("/{cohort_id}/students", response_model=AddStudentResponseModel)
+@cohort_student_router.post("/{cohort_id}/students", 
+response_model=AddStudentResponseModel)
 def enroll_student_section(cohort_id: str,
                            input_data: AddStudentToSectionModel,
                            request: Request):
@@ -242,7 +245,8 @@ def enroll_student_section(cohort_id: str,
         "message":
         f"Successfully Added the Student with email {input_data.email}",
         "data" : {"course_enrollment_id":course_enrollment_id,
-        "user_id":user_object["user_id"]}
+        "student_email":input_data.email,"section_id":section.id,
+        "cohort_id":cohort_id}
     }
   except InvalidTokenError as ive:
     raise InvalidToken(str(ive)) from ive
