@@ -138,6 +138,7 @@ def test_create_section_course_template_not_found(client_with_emulator,
   url = BASE_URL + "/section"
   section_details = {
       "name": "section_20",
+      
       "description": "This is description",
       "course_template": "fake-classroom-id_new",
       "cohort": create_fake_data["cohort"],
