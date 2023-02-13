@@ -241,10 +241,7 @@ def enroll_student_section(cohort_id: str,
     course_enrollment_mapping.status = "active"
     course_enrollment_mapping.role = "learner"
     course_enrollment_id = course_enrollment_mapping.save().id
-    print("Dict to be returned_________")
-    print(input_data.email)
-    print(section.id)
-    print(cohort_id)
+    response_dict = {}
     response_dict = {"course_enrollment_id":course_enrollment_id,
         "student_email":input_data.email,"section_id":section.id,
         "cohort_id":cohort_id}

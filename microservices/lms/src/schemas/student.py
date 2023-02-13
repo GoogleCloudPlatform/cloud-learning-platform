@@ -17,7 +17,9 @@ class AddStudentResponseModel(BaseModel):
             "success": True,
             "message": "Successfully Added the Student",
             "data": {"course_enrollment_id":"2xBnBjqm2X3eRgVxE6Bv",
-            "user_id":"2xBnBjqm2X3eRgVxE6Bv","section_id":"fake-section-id","cohort_id":"fake-cohort-id"}
+            "student_email":"test_user@gmail",
+            "section_id":"fake-section-id",
+            "cohort_id":"fake-cohort-id"}
         }
     }
 
