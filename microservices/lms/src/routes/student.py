@@ -240,6 +240,7 @@ def enroll_student_section(cohort_id: str,
     course_enrollment_mapping.user = user_object["user_id"]
     course_enrollment_mapping.status = "active"
     course_enrollment_mapping.role = "learner"
+    
     course_enrollment_id = course_enrollment_mapping.save().id
     response_dict = {}
     response_dict = {"course_enrollment_id":course_enrollment_id,
