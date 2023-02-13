@@ -8,7 +8,7 @@ class AddStudentResponseModel(BaseModel):
   """Add Student Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully Added the Student"
-  data: Optional[str] = None
+  data: Optional[dict] = None
 
   class Config():
     orm_mode = True
@@ -17,11 +17,11 @@ class AddStudentResponseModel(BaseModel):
             "success": True,
             "message": "Successfully Added the Student",
             "data": {"course_enrollment_id":"2xBnBjqm2X3eRgVxE6Bv",
-            "user_id":"2xBnBjqm2X3eRgVxE6Bv"}
+            "user_id":"2xBnBjqm2X3eRgVxE6Bv","section_id":"fake-section-id","cohort_id":"fake-cohort-id"}
         }
     }
 
-class AddStudentToSectionModel(BaseModel):
+class AddStudentToCohortModel(BaseModel):
   """Input Model to add student in section"""
   email: str
   access_token:str

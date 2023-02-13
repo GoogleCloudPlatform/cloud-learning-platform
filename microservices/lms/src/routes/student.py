@@ -17,7 +17,7 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
 from schemas.section import(StudentListResponseModel,\
    DeleteStudentFromSectionResponseModel)
 from schemas.student import(AddStudentResponseModel,\
-  AddStudentToSectionModel)
+  AddStudentToCohortModel)
 
 router = APIRouter(prefix="/student",
                    tags=["Students"],
@@ -197,7 +197,7 @@ def delete_student(section_id: str,user_id:str,request: Request):
 @cohort_student_router.post("/{cohort_id}/students",
 response_model=AddStudentResponseModel)
 def enroll_student_section(cohort_id: str,
-                           input_data: AddStudentToSectionModel,
+                           input_data: AddStudentToCohortModel,
                            request: Request):
   """
   Args:
@@ -241,12 +241,17 @@ def enroll_student_section(cohort_id: str,
     course_enrollment_mapping.status = "active"
     course_enrollment_mapping.role = "learner"
     course_enrollment_id = course_enrollment_mapping.save().id
+    print("Dict to be returned_________")
+    print(input_data.email)
+    print(section.id)
+    print(cohort_id)
+    response_dict = {"course_enrollment_id":course_enrollment_id,
+        "student_email":input_data.email,"section_id":section.id,
+        "cohort_id":cohort_id}
     return {
         "message":
         f"Successfully Added the Student with email {input_data.email}",
-        "data" : {"course_enrollment_id":course_enrollment_id,
-        "student_email":input_data.email,"section_id":section.id,
-        "cohort_id":cohort_id}
+        "data" : response_dict
     }
   except InvalidTokenError as ive:
     raise InvalidToken(str(ive)) from ive
@@ -262,4 +267,6 @@ def enroll_student_section(cohort_id: str,
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
+    print("Traceback-------")
+    print(err)
     raise InternalServerError(str(e)) from e
