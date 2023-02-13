@@ -29,6 +29,10 @@ $primary-color : #8c1d40;
                 text-decoration: none;
             }
 
+            .text:hover {
+                text-decoration: underline;
+            }
+
             .icon {
                 margin-left: 2%;
             }

@@ -3,7 +3,7 @@ Pydantic Model for copy course API's
 """
 from typing import Optional
 from pydantic import BaseModel, constr
-from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE
+from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE,INSERT_SECTION_EXAMPLE
 
 
 class Sections(BaseModel):
@@ -27,13 +27,15 @@ class Sections(BaseModel):
 
 class SectionDetails(BaseModel):
   """Course Detail model"""
-  id: Optional[str]
   name: str
   description: str
   course_template: str
   cohort: str
   teachers: list[constr(min_length=7, max_length=128,
     regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")]
+  class Config():
+    orm_mode=True
+    schema_extra={"example":INSERT_SECTION_EXAMPLE}
 
 
 class SectionListResponseModel(BaseModel):
@@ -151,37 +153,6 @@ class CredentialKeys(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {"example": CREDENTIAL_JSON}
-
-
-class AddStudentToSectionModel(BaseModel):
-  """Input Model to add student in section"""
-  email: str
-  access_token:str
-  class Config():
-    orm_mode = True
-    schema_extra = {
-        "example": {
-            "email": "email@gmail.com",
-            "access_token":"test_token"
-        }
-    }
-
-
-class AddStudentResponseModel(BaseModel):
-  """Add Student Model"""
-  success: Optional[bool] = True
-  message: Optional[str] = "Successfully Added the Student"
-  data: Optional[str] = None
-
-  class Config():
-    orm_mode = True
-    schema_extra = {
-        "example": {
-            "success": True,
-            "message": "Successfully Added the Student",
-            "data": None
-        }
-    }
 
 
 class DeleteSectionResponseModel(BaseModel):

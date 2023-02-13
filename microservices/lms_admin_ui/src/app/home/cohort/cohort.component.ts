@@ -41,4 +41,26 @@ export class CohortComponent implements OnInit {
       }
     });
   }
+  checkIfActive(start: string, end: string): boolean {
+    let startDate = Date.parse(start)
+    let endDate = Date.parse(end)
+    let d = Date.now()
+    if (d.valueOf() >= startDate.valueOf() && d.valueOf() <= endDate.valueOf()) {
+      return true
+    }
+    else {
+      return false
+    }
+
+  }
+  ifUpcomming(start: string): boolean {
+    let startDate = Date.parse(start)
+    let d = Date.now()
+    if (d.valueOf() < startDate.valueOf()) {
+      return true
+    }
+    else {
+      return false
+    }
+  }
 }

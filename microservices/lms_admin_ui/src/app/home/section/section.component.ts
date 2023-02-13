@@ -78,7 +78,12 @@ export class SectionComponent implements OnInit {
     this._HomeService.getSectionList(cohortid).subscribe((res: any) => {
       this.sectionDetails = res.data
       if (this.sectionDetails.length > 0) {
-        this.selectedSection = this.sectionDetails[0]
+        if (this.router.url.split('/')[3]) {
+          this.selectedSection = this.sectionDetails.find(o => o.id == this.router.url.split('/')[3])
+        }
+        else {
+          this.selectedSection = this.sectionDetails[0]
+        }
         this.createTableData()
       }
       this.loadSection = false

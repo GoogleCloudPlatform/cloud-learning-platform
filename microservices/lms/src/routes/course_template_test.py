@@ -114,8 +114,16 @@ def test_create_course_template(client_with_emulator):
                         "id": "classroom_id",
                         "enrollmentCode": "classroomcode"
                     }):
-      with mock.patch("routes.course_template.classroom_crud.add_teacher"):
-        response = client_with_emulator.post(
+      with mock.patch("routes.course_template.classroom_crud.acceept_invite"):
+        with mock.patch(
+          "routes.course_template.classroom_crud.invite_teacher"):
+          with mock.patch(
+            "routes.course_template.classroom_crud.get_user_profile_information"
+            ):
+            with mock.patch(
+            "routes.course_template.common_service.create_teacher"
+            ):
+              response = client_with_emulator.post(
             API_URL, json=INSERT_COURSE_TEMPLATE_EXAMPLE)
   response_json = response.json()
   assert response.status_code == 200, "Status 200"
