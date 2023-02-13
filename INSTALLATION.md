@@ -18,7 +18,7 @@ Get the unique id (numeric) for the gke-pod-sa Service Account in your project
 Go to the Domain Wide Delegation page of Google Admin
 ![](docs/static/images/domain_wide_delegation.png)
 
-Click __Add new__
+Click **Add new**
 
 Add this numeric value, and the following scopes:
 https://www.googleapis.com/auth/classroom.announcements,https://www.googleapis.com/auth/classroom.announcements.readonly,https://www.googleapis.com/auth/classroom.courses,https://www.googleapis.com/auth/classroom.courses.readonly,https://www.googleapis.com/auth/classroom.coursework.me,https://www.googleapis.com/auth/classroom.student-submissions.me.readonly,https://www.googleapis.com/auth/classroom.coursework.students,https://www.googleapis.com/auth/classroom.student-submissions.students.readonly,https://www.googleapis.com/auth/classroom.courseworkmaterials,https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly,https://www.googleapis.com/auth/classroom.rosters,https://www.googleapis.com/auth/classroom.rosters.readonly,https://www.googleapis.com/auth/classroom.topics,https://www.googleapis.com/auth/classroom.topics.readonly,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/forms.body.readonly,https://www.googleapis.com/auth/classroom.push-notifications,https://www.googleapis.com/auth/classroom.profile.photos,https://www.googleapis.com/auth/classroom.profile.emails
@@ -26,7 +26,6 @@ https://www.googleapis.com/auth/classroom.announcements,https://www.googleapis.c
 It should look like this when you're done:
 
 ![](docs/static/images/client_id_access.png)
-
 
 ## DNS for Front-End
 
@@ -53,13 +52,24 @@ Add an entry for front-end in addition to backend API
 - https://www.googleapis.com/auth/classroom.push-notifications
 - https://www.googleapis.com/auth/classroom.profile.emails
 - https://www.googleapis.com/auth/classroom.profile.photos
+- https://www.googleapis.com/auth/classroom.profile.emails
 
+## Scopes needed for Generating OAuth access to enroll student
+
+- https://www.googleapis.com/auth/classroom.rosters,
+- https://www.googleapis.com/auth/userinfo.email,
+- https://www.googleapis.com/auth/userinfo.profile
 
 ## Firebase Authentication Settings
+
 - Adding Google and email/passwor auth options
-![](docs/static/images/auth_providers.png)
+  ![](docs/static/images/auth_providers.png)
 - Add frontend domain as an "Authorized Domain"
-![](docs/static/images/authorized_domain.png)
+  ![](docs/static/images/authorized_domain.png)
+
+## Add gke-pod-sa key
+
+Create and download a key for the `gke-pod-sa` service account and place it in the `gke-pod-sa-key` secret.
 
 ## LTI keys setup
 
@@ -71,7 +81,11 @@ For running the LTI service, a set of RSA public and private keys are picked wit
 
 ## Adding Initial user in the DB
 
-#TODO
+The initial user has to be entered into the database manually. Subsequent users can be added via API after that first user grabs an ID token from the UI or other method.
+
+Create a new `users` collection in Firestore and add the first user as follows:
+![](docs/static/images/first_db_user_1.png)
+![](docs/static/images/first_db_user_2.png)
 
 ## Adding Backend Robot User
 
@@ -81,11 +95,11 @@ A backend robot (service account) user is needed in the database to allow backen
 
 API :
 
-``` POST https://<base url>/user-management/api/v1/user ```
+`POST https://<base url>/user-management/api/v1/user`
 
 Authorization :
 
-``` Bearer Token = <id_token> ```
+`Bearer Token = <id_token>`
 
 Body :
 
@@ -98,19 +112,17 @@ Body :
 }
 ```
 
-
-
 ## Steps to add new user
 
 1. Hit POST method for users api in user-management microservice with new user's emain id in the api body
 
 API :
 
-``` POST https://<base url>/user-management/api/v1/user ```
+`POST https://<base url>/user-management/api/v1/user`
 
 Authorization :
 
-``` Bearer Token = <id_token> ```
+`Bearer Token = <id_token>`
 
 Body :
 
@@ -133,6 +145,7 @@ Body :
 Response samples:
 
 **200**
+
 ```
 {
 "success": true,
@@ -153,7 +166,9 @@ Response samples:
 }
 }
 ```
+
 **401**
+
 ```
 {
 "success": false,
@@ -161,7 +176,9 @@ Response samples:
 "data": { }
 }
 ```
+
 **422**
+
 ```
 {
 "success": false,
@@ -171,6 +188,7 @@ Response samples:
 ```
 
 **500**
+
 ```
 {
 "success": false,

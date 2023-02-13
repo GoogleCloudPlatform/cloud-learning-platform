@@ -29,8 +29,8 @@ def step_impl_3(context):
 
 @behave.given("A section has a students enrolled and has course enrollment mapping present")
 def step_impl_4(context):
-  context.url = f'{API_URL}/student/{context.user_id}/section/{context.section_id}'
-
+  # context.url = f'{API_URL}/student/{context.user_id}/section/{context.section_id}'
+  context.url = f'{API_URL}/sections/{context.section_id}/students/{context.user_id}'
 
 @behave.when("API request with valid section Id is sent to delete student")
 def step_impl_5(context):

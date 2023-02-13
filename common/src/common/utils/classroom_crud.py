@@ -94,10 +94,9 @@ def update_course(course_id, section_name, description, course_name=None):
 
   service = build("classroom", "v1", credentials=get_credentials())
   try:
-    new_course = {}
     course = service.courses().get(id=course_id).execute()
     if course_name is not None:
-      new_course["name"] = course_name
+      course["name"] = course_name
     course["section"] = section_name
     course["description"] = description
     course = service.courses().update(id=course_id, body=course).execute()
