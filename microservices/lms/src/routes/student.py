@@ -225,7 +225,7 @@ def enroll_student_section(cohort_id: str,
 
     headers = {"Authorization": request.headers.get("Authorization")}
     user_object = classroom_crud.enroll_student(
-        headers,
+        headers=headers,
         access_token=input_data.access_token,
         student_email=input_data.email,
         course_id=section.classroom_id,
