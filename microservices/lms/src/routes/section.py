@@ -1,6 +1,6 @@
 """ Section endpoints """
 import traceback
-from common.models import Cohort, CourseTemplate, Section,
+from common.models import Cohort, CourseTemplate, Section
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (CustomHTTPException,
                                           InternalServerError,
