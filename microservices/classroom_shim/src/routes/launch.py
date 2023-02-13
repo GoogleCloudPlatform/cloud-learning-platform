@@ -4,17 +4,16 @@ from typing import Optional
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
 from config import ERROR_RESPONSES
 from common.models import LTIAssignment
 from common.utils.auth_service import validate_token
+from common.utils.secrets import get_backend_robot_id_token
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  UnauthorizedUserError)
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest, Unauthenticated)
 from common.utils.logging_handler import Logger
 # pylint: disable=line-too-long
-from common.utils.classroom_crud import get_course_work
 
 templates = Jinja2Templates(directory="templates")
 
@@ -24,7 +23,7 @@ CLP_DOMAIN_URL = "https://core-learning-services-dev.cloudpssolutions.com"
 
 
 @router.get("/launch")
-def login(request: Request, lti_assignment_id: Optional[str] = ""):
+def login(request: Request, lti_assignment_id: str):
   """This login endpoint will return the user to firebase login page
   Args:
       lti_assignment_id (str): unique id of the LTI Assignment
@@ -32,14 +31,31 @@ def login(request: Request, lti_assignment_id: Optional[str] = ""):
       Template response with the login page of the user
   """
   try:
-    url = f"{CLP_DOMAIN_URL}/classroom-shim/api/v1/launch-assignment"
+    url = f"{CLP_DOMAIN_URL}/classroom-shim/api/v1/launch-assignment?lti_assignment_id={lti_assignment_id}"
 
-    if lti_assignment_id:
-      url = f"{url}?lti_assignment_id={lti_assignment_id}"
+    lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
+    content_item_url = f"http://lti/lti/api/v1/content-item/{lti_assignment.lti_content_item_id}"
+    res = requests.get(
+        url=content_item_url,
+        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+        timeout=60)
+    data = res.json()
+    lti_content_item = data.get("data")
 
+    content_item_info = lti_content_item.get("content_item_info")
+    title = content_item_info.get("title")
+    if title is None:
+      tool_url = f"http://lti/lti/api/v1/tool/{lti_assignment.tool_id}"
+      res = requests.get(
+          url=tool_url,
+          headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+          timeout=60)
+      lti_tool = res.json().get("data")
+      title = lti_tool.get("name", "")
     return templates.TemplateResponse("login.html", {
         "request": request,
-        "redirect_url": url
+        "redirect_url": url,
+        "title": title
     })
 
   except ValidationError as e:
@@ -82,19 +98,16 @@ def launch_assignment(request: Request,
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
     lti_content_item_id = lti_assignment.lti_content_item_id
 
-    data = get_course_work(lti_assignment.section_id,
-                           lti_assignment.course_work_id)
-    print("\n***data", data)
     custom_params = {
-        "$ResourceLink.available.startDateTime":
-            datetime.now().isoformat(),
-        "$ResourceLink.submission.endDateTime":
-            (datetime.now() - timedelta(hours=1)).isoformat(),
-        "$ResourceLink.available.endDateTime":
-            (datetime.now() - timedelta(hours=1)).isoformat(),
-    }
-    # "$Context.id.history": "",
-    # "$Person.address.timezone": ""
+          "$ResourceLink.available.startDateTime":
+              lti_assignment.start_date.isoformat(),
+          "$ResourceLink.submission.endDateTime":
+              (lti_assignment.end_date - timedelta(hours=1)).isoformat(),
+          "$ResourceLink.available.endDateTime":
+              (lti_assignment.due_date - timedelta(hours=1)).isoformat(),
+      }
+    # TODO: implementation of "$Context.id.history" as a custom parameter
+    # TODO: implementation of "$Person.address.timezone" as a custom parameter
     final_lti_message_hint_dict = {
         "custom_params_for_substitution": custom_params,
         "user_details": {
