@@ -385,10 +385,9 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   """
   # Call search by email usermanagement API to get the student data
   response = requests.get(f"\
-  {USER_MANAGEMENT_BASE_URL}/user/search?email={student_email}",\
+  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",\
     headers=headers)
   # If the response is success check if student is inactive i.e  raise error
-  print("USer Management Response " , response.status_code ,response.json())
   searched_student = []
   if response.status_code == 200:
     searched_student = response.json()["data"]
@@ -585,6 +584,24 @@ def get_user_details(user_id, headers):
         ResourceNotFoundException(response_get_student.json()["message"])
   return response_get_student.json()
 
+def get_user_details_by_email(user_email, headers):
+  """Get user from user collection
+  Args:
+      user_email (str): user email id
+      headers : Auth headers
+
+  Returns:
+      dict: response from user API
+  """
+
+  response_get_student = requests.get(
+      f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={user_email}",
+      headers=headers)
+  if response_get_student.status_code == 404:
+    raise \
+        ResourceNotFoundException(response_get_student.json()["message"])
+  return response_get_student.json()
+
 def acceept_invite(invitation_id,teacher_email):
   """Invite teacher to google classroom using course id and email
 
@@ -603,7 +620,6 @@ def acceept_invite(invitation_id,teacher_email):
   service = build("classroom", "v1", \
     credentials=impersonate_teacher_creds(teacher_email))
   try:
-    print("_________Impersonated credentialsss_________________")
     course = service.invitations().accept(id=invitation_id).execute()
     return course
   except HttpError as ae:
@@ -634,3 +650,4 @@ def get_user_profile_information(user_email):
                               data=None) from ae
   except Exception as e:
     raise InternalServerError(str(e)) from e
+

@@ -3,7 +3,7 @@ Pydantic Model for copy course API's
 """
 from typing import Optional
 from pydantic import BaseModel, constr
-from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE
+from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE,INSERT_SECTION_EXAMPLE
 
 
 class Sections(BaseModel):
@@ -27,13 +27,15 @@ class Sections(BaseModel):
 
 class SectionDetails(BaseModel):
   """Course Detail model"""
-  id: Optional[str]
   name: str
   description: str
   course_template: str
   cohort: str
   teachers: list[constr(min_length=7, max_length=128,
     regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")]
+  class Config():
+    orm_mode=True
+    schema_extra={"example":INSERT_SECTION_EXAMPLE}
 
 
 class SectionListResponseModel(BaseModel):

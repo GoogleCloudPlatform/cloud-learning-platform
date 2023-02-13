@@ -148,13 +148,13 @@ def list_students_in_section(section_id: str, request: Request):
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
-@section_student_router.delete("/{section_id}/students/{user_id}",
+@section_student_router.delete("/{section_id}/students/{user}",
 response_model=DeleteStudentFromSectionResponseModel)
-def delete_student(section_id: str,user_id:str,request: Request):
-  """Get a section details from db
+def delete_student(section_id: str,user:str,request: Request):
+  """Get a section details from db\n
   Args:
-      section_id (str): section_id in firestore
-      user_id (str): user_id in firestore User collection
+      section_id (str): section_id in firestore\n
+      user (str): user_id in firestore User collection or email ID of the user
   Raises:
       HTTPException: 500 Internal Server Error if something fails
       HTTPException: 404 user with section id is not found
@@ -165,6 +165,7 @@ def delete_student(section_id: str,user_id:str,request: Request):
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
     section_details = Section.find_by_id(section_id)
+    user_id=student_service.get_user_id(user=user,headers=headers)
     result = CourseEnrollmentMapping.\
       find_course_enrollment_record(section_details.key,user_id)
     if result is None:
@@ -224,7 +225,7 @@ def enroll_student_section(cohort_id: str,
 
     headers = {"Authorization": request.headers.get("Authorization")}
     user_object = classroom_crud.enroll_student(
-        headers,
+        headers=headers,
         access_token=input_data.access_token,
         student_email=input_data.email,
         course_id=section.classroom_id,
