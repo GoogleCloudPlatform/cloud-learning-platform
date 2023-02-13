@@ -34,4 +34,9 @@ export class CourseTemplateComponent implements OnInit {
       }
     });
   }
+
+  openClassroom(link: any) {
+    window.open(link
+      , '_blank');
+  }
 }

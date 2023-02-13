@@ -11,10 +11,19 @@
                     </span>
 
                     <div class="status-chip">
-                        <mat-chip-list>
-                            <mat-chip class="active-chip">Active</mat-chip>
-                            <!-- <mat-chip class="deactive-chip">Deactive</mat-chip> -->
+                        <mat-chip-list *ngIf="ifUpcomming(cohort.start_date); else active">
+                            <mat-chip class="active-chip">Upcomming</mat-chip>
                         </mat-chip-list>
+
+                        <ng-template #active>
+                            <mat-chip-list>
+                                <mat-chip *ngIf="checkIfActive(cohort.start_date,cohort.end_date); else elseChip"
+                                    class="active-chip">Active</mat-chip>
+                                <ng-template #elseChip>
+                                    <mat-chip class="deactive-chip">Expired</mat-chip>
+                                </ng-template>
+                            </mat-chip-list>
+                        </ng-template>
                     </div>
 
                 </div>
@@ -23,7 +32,7 @@
 
                 <!-- <div>
                 <mat-chip-list>
-                    <mat-chip class="deactive-chip">Deactive</mat-chip>
+                    <mat-chip class="deactive-chip">Expired</mat-chip>
                 </mat-chip-list>
             </div> -->
 
@@ -48,8 +57,24 @@
                 <div class="metadata">
                     <div class="date-block"><span class="material-symbols-rounded">
                             date_range
-                        </span> <span class="date-body"><span>{{cohort.start_date | date: 'EEEE, MMM d, y'}}</span> -
-                            {{cohort.end_date | date: 'EEEE, MMM d, y'}}</span></div>
+                        </span> <span class="date-body">
+                            <span class="title">Cohort duration :
+                            </span>
+                            <span class="content">{{cohort.start_date | date: 'EEEE, MMM d, y'}}</span> <span
+                                class="to">to</span>
+                            <span class="content">{{cohort.end_date | date: 'EEEE, MMM d, y'}}</span>
+                        </span></div>
+
+                    <div class="date-block"><span class="material-symbols-rounded">
+                            date_range
+                        </span>
+                        <span class="date-body"><span class="title">Registration window :
+                            </span>
+                            <span class="content">{{cohort.registration_start_date
+                                | date: 'EEEE, MMM d, y'}}</span> <span class="to">to</span>
+                            <span class="content">{{cohort.registration_end_date | date: 'EEEE, MMM d, y'}}</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 
