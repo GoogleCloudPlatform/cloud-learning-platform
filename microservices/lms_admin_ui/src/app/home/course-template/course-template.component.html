@@ -3,7 +3,16 @@
         <div class="block-header">
             <div class="title">
                 <a class="text" color="primary">{{courseTemplate.name}}</a>
+                <button mat-stroked-button (click)="openClassroom(courseTemplate.classroom_url)" color="primary" style="padding: 0 20px 0 14px;
+            margin-left: 4%;
+            line-height: 30px;">
+                    <span class="material-symbols-rounded">
+                        account_box
+                    </span> <span style="margin-left:5%;">Go to classroom</span></button>
             </div>
+
+
+
             <div class="more-options" pTooltip="more options" tooltipPosition="top">
                 <span class="material-symbols-rounded" style="cursor:pointer;" [matMenuTriggerFor]="subMenu"
                     (click)="setSelected(courseTemplate)">

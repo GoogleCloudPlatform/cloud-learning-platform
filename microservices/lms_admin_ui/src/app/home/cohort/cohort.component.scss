@@ -60,15 +60,32 @@ $primary-color : #8c1d40;
             padding: 1.5%;
 
             .metadata {
+                display: flex;
+                width: 100%;
+
                 .date-block {
                     display: flex;
                     align-items: center;
                     color: mat.get-color-from-palette($my-palette, 700);
+                    width: 100%;
 
                     .date-body {
                         padding-left: 1%;
                         font-size: 0.8rem;
-                        font-weight: 600;
+
+                        .title {
+                            font-weight: 600;
+                            margin-right: 5px;
+                        }
+
+                        .content {
+                            font-size: 0.75rem;
+                        }
+
+                        .to {
+                            padding: 0 6px;
+                        }
+
                     }
                 }
             }
@@ -88,6 +105,7 @@ $primary-color : #8c1d40;
                 font-size: 2rem;
                 font-weight: 800;
                 color: $primary-color;
+                text-align: center;
             }
 
             .text {

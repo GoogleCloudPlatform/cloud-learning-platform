@@ -13,8 +13,8 @@ export class SectionListComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  reRout(cohortUrl: any) {
-    this.router.navigate(['/home/' + cohortUrl.split('/')[1]])
+  reRout(cohortUrl: any, sectionId: any) {
+    this.router.navigate(['/home/' + cohortUrl.split('/')[1] + '/' + sectionId])
   }
   openClassroom(link: any) {
     window.open(link
