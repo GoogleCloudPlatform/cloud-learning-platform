@@ -2,12 +2,13 @@
 import traceback
 from fastapi import APIRouter, HTTPException, Request
 from googleapiclient.errors import HttpError
+from services import student_service
 from common.utils.logging_handler import Logger
-from common.utils.errors import (ResourceNotFoundException, ValidationError)
+from common.utils.errors import (ResourceNotFoundException,
+ValidationError,InvalidTokenError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
-                                          ResourceNotFound, BadRequest)
-from common.models import CourseEnrollmentMapping,Section
-# from services import classroom_crud
+                                      ResourceNotFound, BadRequest,InvalidToken)
+from common.models import CourseEnrollmentMapping,Section,Cohort
 from common.utils import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
@@ -15,7 +16,8 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import(StudentListResponseModel,\
    DeleteStudentFromSectionResponseModel)
-
+from schemas.student import(AddStudentResponseModel,\
+  AddStudentToCohortModel)
 
 router = APIRouter(prefix="/student",
                    tags=["Students"],
@@ -76,7 +78,26 @@ def get_progress_percentage(course_id: int, student_email: str):
     raise HTTPException(status_code=500) from e
 
 
-section_student_router = APIRouter(prefix="/sections/{section_id}/students",
+section_student_router = APIRouter(prefix="/sections",
+                                   tags=["Students"],
+                                   responses={
+                                       500: {
+                                           "model":
+                                           InternalServerErrorResponseModel
+                                       },
+                                       404: {
+                                           "model": NotFoundErrorResponseModel
+                                       },
+                                       409: {
+                                           "model": ConflictResponseModel
+                                       },
+                                       422: {
+                                           "model":
+                                           ValidationErrorResponseModel
+                                       }
+                                   })
+
+cohort_student_router = APIRouter(prefix="/cohorts",
                                    tags=["Students"],
                                    responses={
                                        500: {
@@ -96,7 +117,9 @@ section_student_router = APIRouter(prefix="/sections/{section_id}/students",
                                    })
 
 
-@section_student_router.get("", response_model=StudentListResponseModel)
+
+@section_student_router.get("/{section_id}/students",
+ response_model=StudentListResponseModel)
 def list_students_in_section(section_id: str, request: Request):
   """ Get a list of students of one section from db
 
@@ -125,7 +148,7 @@ def list_students_in_section(section_id: str, request: Request):
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
-@router.delete("/{user_id}/section/{section_id}",
+@section_student_router.delete("/{section_id}/students/{user_id}",
 response_model=DeleteStudentFromSectionResponseModel)
 def delete_student(section_id: str,user_id:str,request: Request):
   """Get a section details from db
@@ -168,4 +191,79 @@ def delete_student(section_id: str,user_id:str,request: Request):
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+
+@cohort_student_router.post("/{cohort_id}/students",
+response_model=AddStudentResponseModel)
+def enroll_student_section(cohort_id: str,
+                           input_data: AddStudentToCohortModel,
+                           request: Request):
+  """
+  Args:
+    input_data(AddStudentToSectionModel):
+      An AddStudentToSectionModel object which contains email and credentials
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    AddStudentResponseModel: if the student successfully added,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    cohort = Cohort.find_by_id(cohort_id)
+    sections = Section.collection.filter("cohort","==",cohort.key).fetch()
+    sections = list(sections)
+    if len(sections) == 0:
+      raise ResourceNotFoundException("Given CohortId\
+         does not have any sections")
+    section = student_service.get_section_with_minimum_student(sections)
+
+    headers = {"Authorization": request.headers.get("Authorization")}
+    user_object = classroom_crud.enroll_student(
+        headers,
+        access_token=input_data.access_token,
+        student_email=input_data.email,
+        course_id=section.classroom_id,
+        course_code=section.classroom_code)
+    cohort = section.cohort
+    cohort.enrolled_students_count += 1
+    cohort.update()
+    section.enrolled_students_count +=1
+    section.update()
+
+    course_enrollment_mapping = CourseEnrollmentMapping()
+    course_enrollment_mapping.section = section
+    course_enrollment_mapping.user = user_object["user_id"]
+    course_enrollment_mapping.status = "active"
+    course_enrollment_mapping.role = "learner"
+    course_enrollment_id = course_enrollment_mapping.save().id
+    response_dict = {}
+    response_dict = {"course_enrollment_id":course_enrollment_id,
+        "student_email":input_data.email,"section_id":section.id,
+        "cohort_id":cohort_id}
+    return {
+        "message":
+        f"Successfully Added the Student with email {input_data.email}",
+        "data" : response_dict
+    }
+  except InvalidTokenError as ive:
+    raise InvalidToken(str(ive)) from ive
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    print("Traceback-------")
+    print(err)
     raise InternalServerError(str(e)) from e

@@ -106,7 +106,7 @@ def test_list_student_of_section(client_with_emulator):
 def test_delete_student_from_section(client_with_emulator,create_fake_data):
   user_id = create_fake_data["user_id"]
   section_id = create_fake_data["section"]
-  url = BASE_URL + f"/student/{user_id}/section/{section_id}"
+  url = BASE_URL + f"/sections/{section_id}/students/{user_id}"
   with mock.patch("routes.student.classroom_crud.delete_student",
                   return_value=[{}, {}]):
     with mock.patch("routes.student.classroom_crud.get_user_details",
@@ -118,7 +118,8 @@ def test_delete_student_sectionid_not_found\
 (client_with_emulator,create_fake_data):
   user_id = create_fake_data["user_id"]
   section_id = "test_section_id"
-  url = BASE_URL + f"/student/{user_id}/section/{section_id}"
+  # url = BASE_URL + f"/student/{user_id}/section/{section_id}"
+  url = BASE_URL + f"/sections/{section_id}/students/{user_id}"
   with mock.patch("routes.student.classroom_crud.delete_student",
                   return_value=[{}, {}]):
     with mock.patch("routes.student.classroom_crud.get_user_details",

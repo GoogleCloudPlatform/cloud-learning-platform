@@ -77,6 +77,7 @@ def setp_impl_7(context):
       "classroom_code"] = context.course_template.classroom_code
   COURSE_TEMPLATE_INPUT_DATA[
       "classroom_url"] = context.course_template.classroom_url
+  COURSE_TEMPLATE_INPUT_DATA["admin"] = context.course_template.admin
   context.test_data = COURSE_TEMPLATE_INPUT_DATA
   context.url = f'{API_URL}/course_templates/{context.course_template.id}'
 
