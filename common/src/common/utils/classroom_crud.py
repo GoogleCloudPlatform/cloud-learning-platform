@@ -570,3 +570,21 @@ def get_user_details(user_id, headers):
         ResourceNotFoundException(response_get_student.json()["message"])
   return response_get_student.json()
 
+
+def get_user_details_by_email(user_email, headers):
+  """Get user from user collection
+  Args:
+      user_email (str): user email id
+      headers : Auth headers
+
+  Returns:
+      dict: response from user API
+  """
+
+  response_get_student = requests.get(
+      f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={user_email}", headers=headers)
+  if response_get_student.status_code == 404:
+    raise \
+        ResourceNotFoundException(response_get_student.json()["message"])
+  return response_get_student.json()
+

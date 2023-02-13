@@ -150,8 +150,9 @@ def enroll_student_course(context):
   context.user_id = user_id
   course_enrollment_mapping.user = user_id
   course_enrollment_mapping.save()
-  context.course_enrollment_mapping= course_enrollment_mapping
-  yield context.course_enrollment_mapping
+  context.course_enrollment_mapping_data = {"course_enrollment_mapping": course_enrollment_mapping,
+                  "email": student_email_and_token["email"]}
+  yield context.course_enrollment_mapping_data
 
 
 @fixture
