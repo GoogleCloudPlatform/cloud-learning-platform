@@ -1,9 +1,9 @@
 """ Section endpoints """
 import traceback
-from common.models import Cohort, CourseTemplate, Section, CourseEnrollmentMapping
-from common.utils.errors import InvalidTokenError, ResourceNotFoundException, ValidationError
+from common.models import Cohort, CourseTemplate, Section,
+from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (CustomHTTPException,
-                                          InternalServerError, InvalidToken,
+                                          InternalServerError,
                                           ResourceNotFound, BadRequest)
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
@@ -15,12 +15,11 @@ from schemas.error_schema import (ConflictResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import (
-    AddStudentResponseModel, AddStudentToSectionModel,
     CreateSectiontResponseModel, DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     ClassroomCourseListResponseModel, UpdateSectionResponseModel)
 from schemas.update_section import UpdateSection
-from services import student_service ,common_service
+from services import common_service
 from utils.helper import convert_section_to_section_model
 
 # disabling for linting to pass

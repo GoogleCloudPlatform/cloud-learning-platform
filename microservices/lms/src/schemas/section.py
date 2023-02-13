@@ -153,37 +153,6 @@ class CredentialKeys(BaseModel):
     schema_extra = {"example": CREDENTIAL_JSON}
 
 
-class AddStudentToSectionModel(BaseModel):
-  """Input Model to add student in section"""
-  email: str
-  access_token:str
-  class Config():
-    orm_mode = True
-    schema_extra = {
-        "example": {
-            "email": "email@gmail.com",
-            "access_token":"test_token"
-        }
-    }
-
-
-class AddStudentResponseModel(BaseModel):
-  """Add Student Model"""
-  success: Optional[bool] = True
-  message: Optional[str] = "Successfully Added the Student"
-  data: Optional[str] = None
-
-  class Config():
-    orm_mode = True
-    schema_extra = {
-        "example": {
-            "success": True,
-            "message": "Successfully Added the Student",
-            "data": None
-        }
-    }
-
-
 class DeleteSectionResponseModel(BaseModel):
   """Delete section Model"""
   success: Optional[bool] = True
