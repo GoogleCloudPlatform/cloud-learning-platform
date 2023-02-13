@@ -581,7 +581,8 @@ def get_user_details_by_email(user_email, headers):
   """
 
   response_get_student = requests.get(
-      f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={user_email}", headers=headers)
+      f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={user_email}",
+      headers=headers)
   if response_get_student.status_code == 404:
     raise \
         ResourceNotFoundException(response_get_student.json()["message"])

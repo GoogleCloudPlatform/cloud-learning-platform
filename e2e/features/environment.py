@@ -130,8 +130,6 @@ def enroll_student_course(context):
   """Fixture to enroll studnet in course"""
  
   section = use_fixture(create_section,context)
-  section_id = section.id
-  context.section_id = section_id
   classroom_code = section.classroom_code
   classroom_id = section.classroom_id
   student_email_and_token = get_student_email_and_token()
@@ -146,13 +144,14 @@ def enroll_student_course(context):
   temp_user.save()
   temp_user.user_id = temp_user.id
   temp_user.update()
-  user_id = temp_user.user_id
-  context.user_id = user_id
-  course_enrollment_mapping.user = user_id
+  course_enrollment_mapping.user = temp_user.user_id
   course_enrollment_mapping.save()
-  context.course_enrollment_mapping_data = {"course_enrollment_mapping": course_enrollment_mapping,
-                  "email": student_email_and_token["email"]}
-  yield context.course_enrollment_mapping_data
+  context.enroll_student_data = {
+    "section_id": section.id,
+    "user_id":temp_user.id,
+    "email": student_email_and_token["email"]
+    }
+  yield context.enroll_student_data
 
 
 @fixture
