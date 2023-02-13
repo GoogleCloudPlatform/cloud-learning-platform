@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, Request
 from googleapiclient.errors import HttpError
 from services import student_service
 from common.utils.logging_handler import Logger
-from common.utils.errors import (ResourceNotFoundException, 
+from common.utils.errors import (ResourceNotFoundException,
 ValidationError,InvalidTokenError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
                                       ResourceNotFound, BadRequest,InvalidToken)
@@ -194,7 +194,7 @@ def delete_student(section_id: str,user_id:str,request: Request):
     raise InternalServerError(str(e)) from e
 
 
-@cohort_student_router.post("/{cohort_id}/students", 
+@cohort_student_router.post("/{cohort_id}/students",
 response_model=AddStudentResponseModel)
 def enroll_student_section(cohort_id: str,
                            input_data: AddStudentToSectionModel,
