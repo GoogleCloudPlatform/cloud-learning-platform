@@ -33,7 +33,8 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.coursework.students",
     "https://www.googleapis.com/auth/classroom.coursework.me",
     "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/forms.body.readonly"
+    "https://www.googleapis.com/auth/forms.body.readonly",
+    "https://www.googleapis.com/auth/classroom.profile.photos"
 ]
 
 
@@ -43,6 +44,20 @@ def get_credentials():
                                                                 scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
 
+  return creds
+
+
+def impersonate_teacher_creds(teacher_email):
+  """Impersonate teacher in a classroom
+  Args:
+    teacher_email(str): teacher email which needs to be impersonated
+  Return:
+    creds(dict): returns a dict which credentils
+  """
+  classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
+  creds = service_account.Credentials.from_service_account_info(classroom_key,
+                                                                scopes=SCOPES)
+  creds = creds.with_subject(teacher_email)
   return creds
 
 
@@ -329,7 +344,7 @@ def create_student_in_course(access_token,student_email,course_id,course_code):
       courseId=course_id, body=student, enrollmentCode=course_code).execute()
   return result
 
-def get_person_information (access_token):
+def get_person_information(access_token):
   """
   Args:
     access_token(str): Oauth access token which contains
@@ -570,3 +585,52 @@ def get_user_details(user_id, headers):
         ResourceNotFoundException(response_get_student.json()["message"])
   return response_get_student.json()
 
+def acceept_invite(invitation_id,teacher_email):
+  """Invite teacher to google classroom using course id and email
+
+  Args:
+      invitation_id (str): google classroom invitation Id from invite 
+      teacher response
+      teacher_email (str): teacher email id
+
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
+
+  Returns:
+      dict: response from create invitation method
+  """
+  service = build("classroom", "v1", \
+    credentials=impersonate_teacher_creds(teacher_email))
+  try:
+    print("_________Impersonated credentialsss_________________")
+    course = service.invitations().accept(id=invitation_id).execute()
+    return course
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+def get_user_profile_information(user_email):
+  """
+   Args:
+      user_email: email of user 
+  Returns:
+      profile_information: User profile information of the user 
+  """
+  service = build("classroom", "v1", credentials=get_credentials())
+
+  try:
+    profile_information = service.userProfiles(\
+      ).get(userId=user_email).execute()
+    return profile_information
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    raise InternalServerError(str(e)) from e

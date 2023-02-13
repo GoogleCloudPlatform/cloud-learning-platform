@@ -76,6 +76,7 @@ def test_create_section(get_token):
   }
   resp = requests.post(url=url, json=data, headers=get_token)
   resp_json = resp.json()
+  print("_______***********create section  response ****_________",resp_json)
   assert resp.status_code == 200, "Status 200"
 
 

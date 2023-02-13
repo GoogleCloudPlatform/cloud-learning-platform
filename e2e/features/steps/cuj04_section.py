@@ -39,11 +39,11 @@ def step_impl_3(context):
 
 @behave.given("A user has access to portal and needs to enroll a student into a section")
 def setp_impl_4(context):
-  context.url = f'{API_URL}/sections/fake_id_data/students'
+  context.url = f'{API_URL}/cohorts/fake_id_data/students'
   context.payload = get_student_email_and_token()
 
 
-@behave.when("API request is sent to enroll student to a section with correct request payload and invalid section id")
+@behave.when("API request is sent to enroll student to a section with correct request payload and invalid cohort id")
 def step_impl_5(context):
   resp = requests.post(context.url, json=context.payload,headers=context.header)
   context.status = resp.status_code
@@ -57,13 +57,13 @@ def step_impl_6(context):
 
 # ----
 
-@behave.given("A user has access to the portal and wants to enroll a student into a section")
+@behave.given("A user has access to the portal and wants to enroll a student into a cohort")
 def step_impl_7(context):
-  context.url = f'{API_URL}/sections/{context.sections.id}/students'
+  context.url = f'{API_URL}/cohorts/{context.cohort.id}/students'
   context.payload ={"email":"email@gmail.com","credentials":{"token":"token"}}
 
 
-@behave.when("API request is sent to enroll student to a section with incorrect request payload and valid section id")
+@behave.when("API request is sent to enroll student to a section with incorrect request payload and valid cohort id")
 def step_impl_8(context):
   resp = requests.post(context.url, json=context.payload,headers=context.header)
   context.status = resp.status_code
