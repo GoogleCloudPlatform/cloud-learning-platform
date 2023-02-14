@@ -47,6 +47,9 @@ def create_teacher(headers,body):
     print("Searched  teacher value ",searched_teacher)
     if searched_teacher == []:
       print("In  Iff comparison ")
+      body["first_name"] = ""
+      body["last_name"] = ""
+      print("---------create user--body-------",body)
       create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
     json=body,headers=headers)
     print("CREATE USER RESPONSE ",create_user_response.status_code,
