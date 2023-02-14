@@ -54,8 +54,8 @@ def create_teacher(headers,body):
       json=body,headers=headers)
       print("CREATE USER RESPONSE ",create_user_response.status_code,
       create_user_response.json())
-    if create_user_response.status_code != 200:
-      raise UserManagementServiceError(response.json()["message"])
-    return response.json()["data"]
+      if create_user_response.status_code != 200:
+        raise UserManagementServiceError(response.json()["message"])
+      return response.json()["data"]
   else :
     raise UserManagementServiceError(response.json()["message"])
