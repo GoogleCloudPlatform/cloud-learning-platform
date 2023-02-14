@@ -226,7 +226,8 @@ request: Request):
               response_model=UpdateCourseTemplateResponseModel)
 def update_course_template(
     course_template_id: str,
-    update_course_template_model: UpdateCourseTemplateModel):
+    update_course_template_model: UpdateCourseTemplateModel,
+    request: Request):
   """Update Course Template Api
 
   Args:
@@ -247,6 +248,7 @@ def update_course_template(
           If the update course template raises an exception
   """
   try:
+    headers = {"Authorization": request.headers.get("Authorization")}
     course_template = CourseTemplate.find_by_id(course_template_id)
     instructional_designer = course_template.instructional_designer
     update_course_template_dict = {**update_course_template_model.dict()}
@@ -262,9 +264,35 @@ def update_course_template(
       classroom_crud.delete_teacher(
           course_template.classroom_id,
           instructional_designer)
-      classroom_crud.add_teacher(
-          course_template.classroom_id,
-          course_template.instructional_designer)
+      # classroom_crud.add_teacher(
+      #     course_template.classroom_id,
+      #     course_template.instructional_designer)
+      invitation_object = classroom_crud.invite_teacher(course_template.classroom_id,
+                    course_template.instructional_designer)
+      # Storing classroom details
+      print("This is invitation API response ")
+      print(invitation_object)
+      classroom_crud.acceept_invite(invitation_object["id"],
+      course_template.instructional_designer)
+      print("Invite Accepted")
+      user_profile = classroom_crud.get_user_profile_information(
+     course_template.instructional_designer)
+      # classroom_crud.add_teacher(new_course["id"], teacher_email)
+      gaia_id = user_profile["id"]
+      data = {
+        "first_name":user_profile["name"]["givenName"],
+        "last_name": user_profile["name"]["familyName"],
+        "email":course_template.instructional_designer,
+        "user_type": "faculty",
+        "user_type_ref": "",
+        "user_groups": [],
+        "status": "active",
+        "is_registered": True,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": False,
+        "gaia_id":gaia_id
+        }
+      common_service.create_teacher(headers,data)
     # update classroom
     classroom_crud.update_course(
         course_id=course_template.classroom_id, section_name="template",
