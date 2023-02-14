@@ -85,7 +85,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
     if tool_info.get("enable_nrps"):
       token_claims[lti_claim_field("claim", "namesroleservice", "nrps")] = {
           "context_memberships_url":
-              f"{ISSUER}/lti/api/v1/2qi7b3vh83hq3vesfd/memberships",
+              f"{ISSUER}/lti/api/v1/qv9byob9ov5by7vk5js5d/memberships",
           "service_versions": ["2.0"]
       }
 
@@ -117,9 +117,9 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
 
   # TODO: Update the context claim with the actual context/course data
   token_claims[lti_claim_field("claim", "context")] = {
-      "id": "2qi7b3vh83hq3vesfd",
-      "label": "Test Course",
-      "title": "Test title of the course",
+      "id": "qv9byob9ov5by7vk5js5d",
+      "label": "Test Course 2",
+      "title": "Test title of the course 2",
       "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"]
   }
 
@@ -138,7 +138,8 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
   # Role claims for Admin -
   elif user.get("user_type") == "admin":
     token_claims[lti_claim_field("claim", "roles")] = [
-        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
+        "http://purl.imsglobal.org/vocab/lis/v2/membership#Administrator",
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator",
         "http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator",
     ]
 

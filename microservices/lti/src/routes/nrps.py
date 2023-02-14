@@ -41,44 +41,69 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
   try:
     # TODO: Add API call to check if the context_id exists and get the members
     # data for the given context
-    nrps_id = f"{ISSUER}+/lti/api/v1/{context_id}/memberships"
+    nrps_id = f"{ISSUER}/lti/api/v1/{context_id}/memberships"
 
     context_details = {
         "id": context_id,
-        "label": "Test Course",
-        "title": "Course1Title",
-        "type": [
-            "http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"
-        ]
+        "label": "Test Course 2",
+        "title": "Test title of the course 2",
+        "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"]
     }
 
     members_list = [{
-        "name": "Test Learner1",
-        "picture": "https://public_image_url1.com",
-        "given_name": "Test",
-        "family_name": "Learner1",
-        "email": "test.learner1@gmail.com",
-        "user_id": "qv2py89v21ny8p",
-        "lis_person_sourcedid": "qv2py89v21ny8p",
+        "user_id":
+            "QXUkLyVRsuJRqFBppUOo",
+        "status":
+            "Active",
+        "given_name":
+            "Ross",
+        "family_name":
+            "Geller",
+        "name":
+            "Ross Geller",
+        "email":
+            "ltitesting002@gmail.com",
+        "picture":
+            "https://lh3.googleusercontent.com/a/AEdFTp5ulzT6ClmwuiTPlpmy6UDm8FrvVoRnWotGi_vn=s100",
+        "lis_person_sourcedid":
+            "QXUkLyVRsuJRqFBppUOo",
+        "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"]
+    }, {
+        "user_id":
+            "MaHmy8jrcpxuF0938EeX",
+        "status":
+            "Active",
+        "given_name":
+            "Phoebe",
+        "family_name":
+            "Buffay",
+        "name":
+            "Phoebe Buffay",
+        "email":
+            "ltitesting001@gmail.com",
+        "picture":
+            "https://lh3.googleusercontent.com/a/AEdFTp4mMFy2EvCqOBrHOXKx_-QlLXq84aoKKo37AsZQ=s100",
+        "lis_person_sourcedid":
+            "MaHmy8jrcpxuF0938EeX",
         "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"]
     }, {
-        "name":
-            "Test Faculty1",
-        "picture":
-            "https://public_image_url2.com",
-        "given_name":
-            "Test",
-        "family_name":
-            "Faculty1",
-        "email":
-            "test.faculty1@gmail.com",
         "user_id":
-            "v23b89ptqvpvqp39y",
+            "NSJDWSgXf7nc9H59yWCx",
+        "status":
+            "Active",
+        "given_name":
+            "Chandler",
+        "family_name":
+            "Bing",
+        "name":
+            "Chandler Bing",
+        "email":
+            "ltitesting003@gmail.com",
+        "picture":
+            "https://lh3.googleusercontent.com/a/AEdFTp55udg-hg_3rzF4g7_9frDyWFFA440rs1SAzrPs=s100",
         "lis_person_sourcedid":
-            "v23b89ptqvpvqp39y",
-        "roles": [
-            "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
-        ]
+            "NSJDWSgXf7nc9H59yWCx",
+        "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"]
     }]
 
     output_data = {
@@ -93,6 +118,7 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
     Logger.error(e)
     raise Unauthenticated(str(e)) from e
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
