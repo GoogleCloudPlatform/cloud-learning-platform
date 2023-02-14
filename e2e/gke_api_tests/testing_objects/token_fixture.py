@@ -32,7 +32,6 @@ def sign_up_user():
 
 @pytest.fixture(scope="module")
 def get_token():
-  print("INside the get token Fixturee____",USER_EMAIL_PASSWORD_DICT)
   req = requests.post(f"{API_URL_AUTHENTICATION_SERVICE}/sign-in/credentials",
                       json=USER_EMAIL_PASSWORD_DICT,
                       timeout=60)

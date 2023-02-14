@@ -100,7 +100,6 @@ def create_section(sections_details: SectionDetails,request: Request):
     course_template_details = CourseTemplate.find_by_id(
         sections_details.course_template)
     cohort_details = Cohort.find_by_id(sections_details.cohort)
-    # course_name = course_template_details.name
     # Get course by course id for copying from master course
     current_course = classroom_crud.get_course_by_id(
         course_template_details.classroom_id)
@@ -168,10 +167,10 @@ def create_section(sections_details: SectionDetails,request: Request):
       classroom_crud.acceept_invite(invitation_object["id"],teacher_email)
       user_profile = classroom_crud.get_user_profile_information(teacher_email)
       # classroom_crud.add_teacher(new_course["id"], teacher_email)
-      gaid = user_profile["id"]
-      name =  user_profile["name"]["givenName"]
-      last_name =  user_profile["name"]["familyName"]
-      photo_url =  user_profile["photoUrl"]
+      # gaid = user_profile["id"]
+      # name =  user_profile["name"]["givenName"]
+      # last_name =  user_profile["name"]["familyName"]
+      # photo_url =  user_profile["photoUrl"]
     # Save the new record of seecion in firestore
       data = {
       "first_name":user_profile["name"]["givenName"],

@@ -40,6 +40,8 @@ def create_teacher(headers,body):
   """
   response = call_search_user_api(headers,body["email"])
   searched_teacher = []
+  print("IN create teacher")
+  print("SERCH USER REPSPONSE",response.status_code , response.json()["data"])
   if response.status_code == 200:
     searched_teacher = response.json()["data"]
     if searched_teacher == []:
