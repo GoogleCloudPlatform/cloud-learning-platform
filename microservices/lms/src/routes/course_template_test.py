@@ -198,7 +198,8 @@ def test_update_course_template(client_with_emulator):
     with mock.patch("routes.course_template.classroom_crud.update_course"):
       with mock.patch("routes.course_template.classroom_crud.add_teacher"):
         with mock.patch("routes.course_template.classroom_crud.delete_teacher"):
-          with mock.patch("routes.course_template.classroom_crud.acceept_invite"):
+          with mock.patch(
+          "routes.course_template.classroom_crud.acceept_invite"):
             with mock.patch(
           "routes.course_template.classroom_crud.invite_teacher"):
               with mock.patch(

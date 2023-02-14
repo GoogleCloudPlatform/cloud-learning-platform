@@ -100,7 +100,7 @@ def create_section(sections_details: SectionDetails,request: Request):
     course_template_details = CourseTemplate.find_by_id(
         sections_details.course_template)
     cohort_details = Cohort.find_by_id(sections_details.cohort)
-    name = course_template_details.name
+    # course_name = course_template_details.name
     # Get course by course id for copying from master course
     current_course = classroom_crud.get_course_by_id(
         course_template_details.classroom_id)
@@ -110,7 +110,7 @@ def create_section(sections_details: SectionDetails,request: Request):
           f" {course_template_details.classroom_id} is not found")
     # Create a new course
 
-    new_course = classroom_crud.create_course(name,
+    new_course = classroom_crud.create_course(course_template_details.name,
                                               sections_details.description,
                                               sections_details.name, "me")
     # Get topics of current course
@@ -165,19 +165,13 @@ def create_section(sections_details: SectionDetails,request: Request):
       invitation_object = classroom_crud.invite_teacher(new_course["id"],
                             teacher_email)
     # Storing classroom details
-      print("This is invitation API response ")
-      print(invitation_object)
       classroom_crud.acceept_invite(invitation_object["id"],teacher_email)
-      print("Invite Accepted")
       user_profile = classroom_crud.get_user_profile_information(teacher_email)
       # classroom_crud.add_teacher(new_course["id"], teacher_email)
-      print("User profile Information ______",user_profile)
       gaid = user_profile["id"]
       name =  user_profile["name"]["givenName"]
       last_name =  user_profile["name"]["familyName"]
       photo_url =  user_profile["photoUrl"]
-      print(f"Gaid {gaid} first name {name} last name \
-        {last_name} photo url {photo_url}")
     # Save the new record of seecion in firestore
       data = {
       "first_name":user_profile["name"]["givenName"],
@@ -194,7 +188,7 @@ def create_section(sections_details: SectionDetails,request: Request):
         }
       common_service.create_teacher(headers,data)
     section = Section()
-    section.name = name
+    section.name =course_template_details.name
     section.section = sections_details.name
     section.description = sections_details.description
     # Reference document can be get using get() method
@@ -321,7 +315,6 @@ def section_list(skip: int = 0, limit: int = 10):
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
-    print(err)
     raise InternalServerError(str(e)) from e
 
 
@@ -344,7 +337,6 @@ def update_section(sections_details: UpdateSection,request: Request):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    print("1")
     headers = {"Authorization": request.headers.get("Authorization")}
     section = Section.find_by_id(sections_details.id)
     new_course = classroom_crud.update_course(sections_details.course_id,
@@ -356,14 +348,11 @@ def update_section(sections_details: UpdateSection,request: Request):
           f" {sections_details.course_id} is not found in classroom")
     add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
-    print("ADD teachers list ",add_teacher_list)
     for i in add_teacher_list:
       # classroom_crud.add_teacher(sections_details.course_id, i)
       invitation_object = classroom_crud.invite_teacher(
                             sections_details.course_id,i)
       # Storing classroom details
-      print("This is invitation API response ")
-      print(invitation_object)
       classroom_crud.acceept_invite(invitation_object["id"],i)
       user_profile = classroom_crud.get_user_profile_information(i)
       data = {
@@ -380,7 +369,6 @@ def update_section(sections_details: UpdateSection,request: Request):
       "gaia_id":user_profile["id"]
         }
       common_service.create_teacher(headers,data)
-      print("Invite Accepted userprofile is",user_profile)
     remove_teacher_list = list(
         set(section.teachers) - set(sections_details.teachers))
     for i in remove_teacher_list:
@@ -402,7 +390,6 @@ def update_section(sections_details: UpdateSection,request: Request):
                               data=None) from hte
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
-    print(err)
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 

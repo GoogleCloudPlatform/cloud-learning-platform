@@ -40,14 +40,13 @@ def create_teacher(headers,body):
   """
   response = call_search_user_api(headers,body["email"])
   searched_teacher = []
-  print("Search user response for ",body["email"])
-  print(response.json()["data"])
   if response.status_code == 200:
     searched_teacher = response.json()["data"]
     if searched_teacher == []:
-      print("Called Create user API user management")
       response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
     json=body,headers=headers)
     if response.status_code != 200:
       raise UserManagementServiceError(response.json()["message"])
     return response.json()["data"]
+  else :
+    raise UserManagementServiceError(response.json()["message"])
