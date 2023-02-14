@@ -1,14 +1,14 @@
-<ng-container *ngIf="sectionList.length > 0; else noResult">
+<ng-container>
     <div *ngFor="let section of sectionList" class="data-obj-card">
         <div class="block-header">
             <div class="title">
                 <a class="text" color="primary" style="cursor: pointer;"
-                    (click)="reRout(section.cohort)">{{section.section}}</a>
+                    (click)="reRout(section.cohort, section.id)">{{section.section}}</a>
                 <span class="material-symbols-rounded" style="font-size: 0.9rem;">
                     open_in_new
                 </span>
 
-                <button mat-flat-button (click)="openClassroom(section.classroom_url)" color="accent" style="padding: 0 20px 0 14px;
+                <button mat-stroked-button (click)="openClassroom(section.classroom_url)" color="primary" style="padding: 0 20px 0 14px;
                 margin-left: 4%;
                 line-height: 30px;">
                     <span class="material-symbols-rounded">
@@ -50,9 +50,9 @@
     </div>
 </ng-container>
 
-<ng-template #noResult>
+<!-- <ng-template #noResult>
     <div class="no-data-inner-comp">No Data Found</div>
-</ng-template>
+</ng-template> -->
 
 <!-- <mat-menu #subMenu="matMenu" yPosition="below">
     <div class="edit-menu">

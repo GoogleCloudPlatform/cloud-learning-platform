@@ -12,7 +12,7 @@ from common.testing.firestore_emulator import firestore_emulator, clean_firestor
 from common.models import CourseTemplate, Cohort ,TempUser,CourseEnrollmentMapping,Section
 from testing.test_config import BASE_URL
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
-   COHORT_EXAMPLE, TEMP_USER
+   COHORT_EXAMPLE, TEMP_USER,CREDENTIAL_JSON
 from config import USER_MANAGEMENT_BASE_URL
 
 
@@ -126,3 +126,31 @@ def test_delete_student_sectionid_not_found\
                   return_value={"data":{"email":"clplmstestuser1@gmail.com"}}):
       resp = client_with_emulator.delete(url)
   assert resp.status_code == 404
+
+def test_enroll_student_negative(client_with_emulator):
+  url = BASE_URL + "/cohorts/fake_id_cohort/students"
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
+  with mock.patch("routes.section.classroom_crud.enroll_student"):
+    with mock.patch("routes.section.Logger"):
+      resp = client_with_emulator.post(url, json=input_data)
+
+  assert resp.status_code == 404, "Status 404"
+  assert resp.json()["success"] is False, "Check success"
+
+def test_enroll_student(client_with_emulator, create_fake_data):
+
+  url = BASE_URL + f"/cohorts/{create_fake_data['cohort']}/students"
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
+  with mock.patch("routes.section.classroom_crud.enroll_student",
+  return_value ={"user_id":"test_user_id"}):
+    with mock.patch("routes.section.Logger"):
+      resp = client_with_emulator.post(url, json=input_data)
+  assert resp.status_code == 200, "Status 200"
+  assert resp.json()["success"] is True
+

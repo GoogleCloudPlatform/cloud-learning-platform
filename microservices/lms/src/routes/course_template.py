@@ -1,5 +1,5 @@
 '''Course Template Endpoint'''
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
 from common.models import CourseTemplate, Cohort
 from common.utils.logging_handler import Logger
@@ -8,6 +8,7 @@ from common.utils.http_exceptions import ResourceNotFound, InternalServerError, 
 from common.utils import classroom_crud
 from config import CLASSROOM_ADMIN_EMAIL
 from utils.helper import convert_cohort_to_cohort_model
+from services import common_service
 from schemas.cohort import CohortListResponseModel
 from schemas.course_template import CourseTemplateModel, CourseTemplateListModel, CreateCourseTemplateResponseModel, InputCourseTemplateModel, DeleteCourseTemplateModel, UpdateCourseTemplateModel, UpdateCourseTemplateResponseModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
@@ -147,7 +148,8 @@ def get_cohort_list_by_course_template_id(course_template_id: str,
 
 
 @router.post("", response_model=CreateCourseTemplateResponseModel)
-def create_course_template(input_course_template: InputCourseTemplateModel):
+def create_course_template(input_course_template: InputCourseTemplateModel,
+request: Request):
   """Create a Course Template endpoint
 
     Args:
@@ -163,6 +165,7 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
             if the Course Template creation raises an exception
   """
   try:
+    headers = {"Authorization": request.headers.get("Authorization")}
     course_template_dict = {**input_course_template.dict()}
     course_template = CourseTemplate()
     course_template = course_template.from_dict(course_template_dict)
@@ -173,8 +176,30 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
         description=course_template_dict["description"],
         owner_id="me")
     # Adding instructional designer in the course on classroom
-    classroom_crud.add_teacher(classroom.get("id"),
+    # classroom_crud.add_teacher(classroom.get("id"),
+    #                            course_template_dict["instructional_designer"])
+    invitation_object = classroom_crud.invite_teacher(classroom.get("id"),
                                course_template_dict["instructional_designer"])
+    # Storing classroom details
+    classroom_crud.acceept_invite(invitation_object["id"],\
+      course_template_dict["instructional_designer"])
+    user_profile = classroom_crud.get_user_profile_information(\
+      course_template_dict["instructional_designer"])
+    gaia_id = user_profile["id"]
+    data = {
+      "first_name":user_profile["name"]["givenName"],
+      "last_name": user_profile["name"]["familyName"],
+      "email":course_template_dict["instructional_designer"],
+      "user_type": "faculty",
+      "user_type_ref": "",
+      "user_groups": [],
+      "status": "active",
+      "is_registered": True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id":gaia_id
+        }
+    common_service.create_teacher(headers,data)
     # Storing classroom details
     course_template.classroom_id = classroom.get("id")
     course_template.classroom_code = classroom.get("enrollmentCode")
@@ -197,7 +222,8 @@ def create_course_template(input_course_template: InputCourseTemplateModel):
               response_model=UpdateCourseTemplateResponseModel)
 def update_course_template(
     course_template_id: str,
-    update_course_template_model: UpdateCourseTemplateModel):
+    update_course_template_model: UpdateCourseTemplateModel,
+    request: Request):
   """Update Course Template Api
 
   Args:
@@ -218,6 +244,7 @@ def update_course_template(
           If the update course template raises an exception
   """
   try:
+    headers = {"Authorization": request.headers.get("Authorization")}
     course_template = CourseTemplate.find_by_id(course_template_id)
     instructional_designer = course_template.instructional_designer
     update_course_template_dict = {**update_course_template_model.dict()}
@@ -233,9 +260,32 @@ def update_course_template(
       classroom_crud.delete_teacher(
           course_template.classroom_id,
           instructional_designer)
-      classroom_crud.add_teacher(
-          course_template.classroom_id,
-          course_template.instructional_designer)
+      # classroom_crud.add_teacher(
+      #     course_template.classroom_id,
+      #     course_template.instructional_designer)
+      invitation_object = classroom_crud.invite_teacher(
+        course_template.classroom_id,
+                    course_template.instructional_designer)
+      # Storing classroom details
+      classroom_crud.acceept_invite(invitation_object["id"],
+      course_template.instructional_designer)
+      user_profile = classroom_crud.get_user_profile_information(
+     course_template.instructional_designer)
+      gaia_id = user_profile["id"]
+      data = {
+        "first_name":user_profile["name"]["givenName"],
+        "last_name": user_profile["name"]["familyName"],
+        "email":course_template.instructional_designer,
+        "user_type": "faculty",
+        "user_type_ref": "",
+        "user_groups": [],
+        "status": "active",
+        "is_registered": True,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": False,
+        "gaia_id":gaia_id
+        }
+      common_service.create_teacher(headers,data)
     # update classroom
     classroom_crud.update_course(
         course_id=course_template.classroom_id, section_name="template",

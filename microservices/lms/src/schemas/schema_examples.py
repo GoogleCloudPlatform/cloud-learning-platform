@@ -61,7 +61,7 @@ INSERT_COHORT_EXAMPLE = {
     "registration_start_date": datetime.datetime(year=2022, month=10, day=20),
     "registration_end_date": datetime.datetime(year=2022, month=11, day=14),
     "max_students": 0,
-    "course_template": "fake-id"
+    "course_template_id": "fake-id"
 }
 
 SECTION_EXAMPLE = {
@@ -76,6 +76,13 @@ SECTION_EXAMPLE = {
     "course_template": "course_templates/7d2zTApD-id",
     "cohort": "cohorts/1j-id",
     "enrolled_students_count":2
+}
+INSERT_SECTION_EXAMPLE = {
+    "name": "section c",
+    "description": "This is updated create section test",
+    "course_template": "course_template-id",
+    "cohort": "cohort-id",
+    "teachers": ["test_user@gmail.com"]
 }
 
 CREDENTIAL_JSON = {

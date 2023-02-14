@@ -36,6 +36,8 @@ def get_token():
                       json=USER_EMAIL_PASSWORD_DICT,
                       timeout=60)
   res = req.json()
+  print("Authentication response")
+  print(res)
   if res is None or res["data"] is None:
     raise Exception("User sign-in failed")
   print(f"User with {USER_EMAIL_PASSWORD_DICT['email']} was logged in with "
