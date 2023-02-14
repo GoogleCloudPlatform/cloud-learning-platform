@@ -11,7 +11,7 @@ DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
 GCP_PROJECT = os.getenv("PROJECT_ID", None)
 
-BQ_DATASET = DATABASE_PREFIX + os.getenv("BQ_DATASET", "lms-analytics")
+BQ_DATASET = DATABASE_PREFIX + os.getenv("BQ_DATASET", "lms_analytics")
 
 bq_client = bigquery.Client()
 # Print statements are being used in this file to debug in the Github actions
@@ -72,7 +72,7 @@ def parse_arguments():
       type=str,
       default="false",
       choices=["true", "false"],
-      help="Create dataset for lms-analytics? true or false")
+      help="Create dataset for lms_analytics? true or false")
 
   parser.add_argument(
       "--create-tables",
@@ -80,7 +80,7 @@ def parse_arguments():
       type=str,
       default="false",
       choices=["true", "false"],
-      help="Create table for logs in lms-analytics dataset? true or false")
+      help="Create table for logs in lms_analytics dataset? true or false")
   return parser.parse_args()
 
 
@@ -89,7 +89,7 @@ if __name__ == "__main__":
   # be logged in to the respective GCP project using google sdk
 
   # Set the following environment variables
-  # BQ_DATASET -<dataset-name> (default -> lms-analytics), GCP_PROJECT -<project_id>
+  # BQ_DATASET -<dataset-name> (default -> lms_analytics), GCP_PROJECT -<project_id>
   # Run the following command with the required arguments to trigger the script
   # cd utils
   # PYTHONPATH=../common/src python3 bq_setup.py
