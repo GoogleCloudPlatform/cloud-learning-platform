@@ -265,6 +265,4 @@ def enroll_student_section(cohort_id: str,
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
-    print("Traceback-------")
-    print(err)
     raise InternalServerError(str(e)) from e
