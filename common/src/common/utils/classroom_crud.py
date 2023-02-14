@@ -4,13 +4,13 @@ from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from common.utils.errors import InvalidTokenError, UserManagementServiceError, ResourceNotFoundException
+from common.utils.errors import InvalidTokenError,UserManagementServiceError,ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
 
-from common.models import Section, CourseEnrollmentMapping
+from common.models import Section,CourseEnrollmentMapping
 
-from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL, PUB_SUB_PROJECT_ID, DATABASE_PREFIX
+from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
 from common.utils import helper
 import requests
 
@@ -22,7 +22,7 @@ FEED_TYPE_DICT = {
 }
 REGISTER_SCOPES = [
     "https://www.googleapis.com/auth/classroom.push-notifications",
-    "https://www.googleapis.com/auth/" +
+    "https://www.googleapis.com/auth/"+
     "classroom.student-submissions.students.readonly",
     "https://www.googleapis.com/auth/classroom.rosters.readonly"
 ]
@@ -40,8 +40,8 @@ SCOPES = [
 
 def get_credentials():
   classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
-  creds = service_account.Credentials.from_service_account_info(
-      classroom_key, scopes=SCOPES)
+  creds = service_account.Credentials.from_service_account_info(classroom_key,
+                                                                scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
 
   return creds
@@ -166,8 +166,8 @@ def get_topics(course_id):
     topics = []
     page_token = None
     while True:
-      response = service.courses().topics().list(
-          pageToken=page_token, courseId=course_id).execute()
+      response = service.courses().topics().list(pageToken=page_token,
+                                                 courseId=course_id).execute()
       topics = topics.extend(response.get("topic", []))
       page_token = response.get("nextPageToken", None)
       if not page_token:
@@ -223,21 +223,6 @@ def get_coursework(course_id):
     return None
 
 
-def get_course_work(course_id, course_work_id):
-  """_summary_
-
-  Args:
-    course_id (_type_): _description_
-    course_work_id (_type_): _description_
-
-  Returns:
-    _type_: _description_
-  """
-  service = build("classroom", "v1", credentials=get_credentials())
-  return service.courses().courseWork().get(
-      courseId=course_id, id=course_work_id).execute()
-
-
 def create_coursework(course_id, coursework_list):
   """create coursework in a classroom course
 
@@ -250,8 +235,8 @@ def create_coursework(course_id, coursework_list):
 
   service = build("classroom", "v1", credentials=get_credentials())
   for coursework_item in coursework_list:
-    _ = service.courses().courseWork().create(
-        courseId=course_id, body=coursework_item).execute()
+    _ = service.courses().courseWork().create(courseId=course_id,
+                                              body=coursework_item).execute()
   Logger.info("Create coursework method worked")
   return "success"
 
@@ -306,8 +291,9 @@ def get_submitted_course_work_list(course_id, student_email):
   service = build("classroom", "v1", credentials=get_credentials())
 
   submitted_course_work_list = service.courses().courseWork(
-  ).studentSubmissions().list(
-      courseId=course_id, courseWorkId="-", userId=student_email).execute()
+  ).studentSubmissions().list(courseId=course_id,
+                              courseWorkId="-",
+                              userId=student_email).execute()
   if submitted_course_work_list:
     submitted_course_work_list = submitted_course_work_list[
         "studentSubmissions"]
@@ -325,8 +311,8 @@ def add_teacher(course_id, teacher_email):
 
   service = build("classroom", "v1", credentials=get_credentials())
   teacher = {"userId": teacher_email}
-  course = service.courses().teachers().create(
-      courseId=course_id, body=teacher).execute()
+  course = service.courses().teachers().create(courseId=course_id,
+                                               body=teacher).execute()
   return course
 
 
@@ -340,13 +326,11 @@ def delete_teacher(course_id, teacher_email):
   """
 
   service = build("classroom", "v1", credentials=get_credentials())
-  course = service.courses().teachers().delete(
-      courseId=course_id, userId=teacher_email).execute()
+  course = service.courses().teachers().delete(courseId=course_id,
+                                               userId=teacher_email).execute()
   return course
 
-
-def create_student_in_course(access_token, student_email, course_id,
-                             course_code):
+def create_student_in_course(access_token,student_email,course_id,course_code):
   """
   Args:
     access_token(str): Oauth access token which contains student credentials
@@ -370,10 +354,9 @@ def get_person_information(access_token):
   """
   people_service = build("people", "v1",\
      credentials=get_oauth_credentials(access_token))
-  profile = people_service.people().get(
-      resourceName="people/me", personFields="metadata,photos,names").execute()
+  profile = people_service.people().get(resourceName="people/me",
+  personFields="metadata,photos,names").execute()
   return profile
-
 
 def get_oauth_credentials(access_token):
   """
@@ -387,9 +370,7 @@ def get_oauth_credentials(access_token):
     raise InvalidTokenError("Invalid access_token please provide a valid token")
   return creds
 
-
-def enroll_student(headers, access_token, course_id, student_email,
-                   course_code):
+def enroll_student(headers ,access_token, course_id,student_email,course_code):
   """Add student to the classroom using student google auth token
   Args:
     headers :Bearer token
@@ -411,14 +392,14 @@ def enroll_student(headers, access_token, course_id, student_email,
   if response.status_code == 200:
     searched_student = response.json()["data"]
     if searched_student != []:
-      if searched_student[0]["status"] == "inactive":
+      if searched_student[0]["status"]=="inactive":
         raise InternalServerError("Student inactive in \
           database is trying to enroll.Please update\
              the student status")
 
   # Given student is active then call create
   # student in classroom course function
-  create_student_in_course(access_token, student_email, course_id, course_code)
+  create_student_in_course(access_token,student_email,course_id,course_code)
   # Get the gaia ID , first name ,last_name of the student
   # Call_people api function
   profile = get_person_information(access_token)
@@ -427,30 +408,29 @@ def enroll_student(headers, access_token, course_id, student_email,
   # last_name =profile["names"][0]["familyName"]
   # Call user API
   data = {
-      "first_name": "",
-      "last_name": "",
-      "email": student_email,
-      "user_type": "learner",
-      "user_type_ref": "",
-      "user_groups": [],
-      "status": "active",
-      "is_registered": True,
-      "failed_login_attempts_count": 0,
-      "access_api_docs": False,
-      "gaia_id": gaia_id
+  "first_name":"",
+  "last_name": "",
+  "email":student_email,
+  "user_type": "learner",
+  "user_type_ref": "",
+  "user_groups": [],
+  "status": "active",
+  "is_registered": True,
+  "failed_login_attempts_count": 0,
+  "access_api_docs": False,
+  "gaia_id":gaia_id
   }
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user usermanagement API and return user data else
   # return searched user data
   if searched_student == []:
-    response = requests.post(
-        f"{USER_MANAGEMENT_BASE_URL}/user", json=data, headers=headers)
+    response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
+    json=data,headers=headers)
     if response.status_code != 200:
       raise UserManagementServiceError(response.json()["message"])
     return response.json()["data"]
-  else:
+  else :
     return searched_student[0]
-
 
 def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns
@@ -503,9 +483,10 @@ def invite_teacher(course_id, teacher_email):
     course = service.invitations().create(body=body).execute()
     return course
   except HttpError as ae:
-    raise CustomHTTPException(
-        status_code=ae.resp.status, success=False, message=str(ae),
-        data=None) from ae
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
@@ -523,7 +504,7 @@ def enable_notifications(course_id, feed_type):
   Returns:
       _type_: _description_
   """
-  creds = service_account.Credentials.from_service_account_info(
+  creds =service_account.Credentials.from_service_account_info(
       helper.get_gke_pd_sa_key_from_secret_manager(), scopes=REGISTER_SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
@@ -541,8 +522,7 @@ def enable_notifications(course_id, feed_type):
   }
   return service.registrations().create(body=body).execute()
 
-
-def list_student_section(section_id, headers):
+def list_student_section(section_id,headers):
   """List  student of section given firestore section id
 
   Args:
@@ -556,12 +536,11 @@ def list_student_section(section_id, headers):
     fetch_all_by_section(section_details.key,"learner")
   users = []
   for record in result:
-    user_id = record.user
+    user_id =record.user
     response = requests.\
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     users.append(response.json()["data"])
   return users
-
 
 def delete_student(course_id, student_email):
   """Delete  student from google classroom using course id and email
@@ -578,15 +557,15 @@ def delete_student(course_id, student_email):
   student = {"userId": student_email}
   try:
     student = service.courses().students().delete(
-        courseId=course_id, userId=student_email).execute()
+                courseId=course_id,userId = student_email).execute()
     return student
   except HttpError as ae:
-    raise CustomHTTPException(
-        status_code=ae.resp.status, success=False, message=str(ae),
-        data=None) from ae
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
   except Exception as e:
     raise InternalServerError(str(e)) from e
-
 
 def get_user_details(user_id, headers):
   """Get user from user collection
