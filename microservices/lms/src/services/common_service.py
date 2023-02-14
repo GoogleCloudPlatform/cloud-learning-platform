@@ -13,7 +13,7 @@ def call_search_user_api(headers,email):
   """
 
   response = requests.get(f"\
-  {USER_MANAGEMENT_BASE_URL}/user/search?email={email}",\
+  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={email}",\
     headers=headers)
   return response
 
@@ -44,10 +44,13 @@ def create_teacher(headers,body):
   print("SERCH USER REPSPONSE",response.status_code , response.json()["data"])
   if response.status_code == 200:
     searched_teacher = response.json()["data"]
+    print("Searched  teacher value ",searched_teacher)
     if searched_teacher == []:
-      response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
+      print("In  Iff comparison ")
+      create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
     json=body,headers=headers)
-    if response.status_code != 200:
+    print("CREATE USER RESPONSE ",create_user_response.status_code,create_user_response.json())
+    if create_user_response.status_code != 200:
       raise UserManagementServiceError(response.json()["message"])
     return response.json()["data"]
   else :
