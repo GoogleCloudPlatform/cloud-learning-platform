@@ -1,9 +1,9 @@
 """ Section endpoints """
 import traceback
-from common.models import Cohort, CourseTemplate, Section, CourseEnrollmentMapping
-from common.utils.errors import InvalidTokenError, ResourceNotFoundException, ValidationError
+from common.models import Cohort, CourseTemplate, Section
+from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (CustomHTTPException,
-                                          InternalServerError, InvalidToken,
+                                          InternalServerError,
                                           ResourceNotFound, BadRequest)
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
@@ -15,12 +15,11 @@ from schemas.error_schema import (ConflictResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import (
-    AddStudentResponseModel, AddStudentToSectionModel,
     CreateSectiontResponseModel, DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     ClassroomCourseListResponseModel, UpdateSectionResponseModel)
 from schemas.update_section import UpdateSection
-from services import student_service
+from services import common_service
 from utils.helper import convert_section_to_section_model
 
 # disabling for linting to pass
@@ -67,6 +66,12 @@ def get_courses(skip: int = 0, limit: int = 10):
     return {"data": list(course_list)[skip:limit]}
   except ValidationError as ve:
     raise BadRequest(str(ve)) from ve
+  except HttpError as hte:
+    Logger.error(hte)
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
   except Exception as e:
     Logger.error(e)
     error = traceback.format_exc().replace("\n", " ")
@@ -75,7 +80,7 @@ def get_courses(skip: int = 0, limit: int = 10):
 
 
 @router.post("", response_model=CreateSectiontResponseModel)
-def create_section(sections_details: SectionDetails):
+def create_section(sections_details: SectionDetails,request: Request):
   """Create section API
   Args:
     name (section): Section name
@@ -91,6 +96,7 @@ def create_section(sections_details: SectionDetails):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
+    headers = {"Authorization": request.headers.get("Authorization")}
     course_template_details = CourseTemplate.find_by_id(
         sections_details.course_template)
     cohort_details = Cohort.find_by_id(sections_details.cohort)
@@ -150,9 +156,43 @@ def create_section(sections_details: SectionDetails):
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
 
+    # add Instructional designer
+    sections_details.teachers.append(
+        course_template_details.instructional_designer)
+
     for teacher_email in sections_details.teachers:
-      classroom_crud.add_teacher(new_course["id"], teacher_email)
+      # classroom_crud.add_teacher(new_course["id"], teacher_email)
+      invitation_object = classroom_crud.invite_teacher(new_course["id"],
+                            teacher_email)
+    # Storing classroom details
+      print("This is invitation API response ")
+      print(invitation_object)
+      classroom_crud.acceept_invite(invitation_object["id"],teacher_email)
+      print("Invite Accepted")
+      user_profile = classroom_crud.get_user_profile_information(teacher_email)
+      # classroom_crud.add_teacher(new_course["id"], teacher_email)
+      print("User profile Information ______",user_profile)
+      gaid = user_profile["id"]
+      name =  user_profile["name"]["givenName"]
+      last_name =  user_profile["name"]["familyName"]
+      photo_url =  user_profile["photoUrl"]
+      print(f"Gaid {gaid} first name {name} last name \
+        {last_name} photo url {photo_url}")
     # Save the new record of seecion in firestore
+      data = {
+      "first_name":user_profile["name"]["givenName"],
+      "last_name": user_profile["name"]["familyName"],
+      "email":teacher_email,
+      "user_type": "faculty",
+      "user_type_ref": "",
+      "user_groups": [],
+      "status": "active",
+      "is_registered": True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id":user_profile["id"]
+        }
+      common_service.create_teacher(headers,data)
     section = Section()
     section.name = name
     section.section = sections_details.name
@@ -171,6 +211,12 @@ def create_section(sections_details: SectionDetails):
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
+  except HttpError as hte:
+    Logger.error(hte)
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
@@ -280,7 +326,7 @@ def section_list(skip: int = 0, limit: int = 10):
 
 
 @router.patch("", response_model=UpdateSectionResponseModel)
-def update_section(sections_details: UpdateSection):
+def update_section(sections_details: UpdateSection,request: Request):
   """Update section API
 
   Args:
@@ -298,7 +344,8 @@ def update_section(sections_details: UpdateSection):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-
+    print("1")
+    headers = {"Authorization": request.headers.get("Authorization")}
     section = Section.find_by_id(sections_details.id)
     new_course = classroom_crud.update_course(sections_details.course_id,
                                               sections_details.section_name,
@@ -309,8 +356,31 @@ def update_section(sections_details: UpdateSection):
           f" {sections_details.course_id} is not found in classroom")
     add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
+    print("ADD teachers list ",add_teacher_list)
     for i in add_teacher_list:
-      classroom_crud.add_teacher(sections_details.course_id, i)
+      # classroom_crud.add_teacher(sections_details.course_id, i)
+      invitation_object = classroom_crud.invite_teacher(
+                            sections_details.course_id,i)
+      # Storing classroom details
+      print("This is invitation API response ")
+      print(invitation_object)
+      classroom_crud.acceept_invite(invitation_object["id"],i)
+      user_profile = classroom_crud.get_user_profile_information(i)
+      data = {
+      "first_name":user_profile["name"]["givenName"],
+      "last_name": user_profile["name"]["familyName"],
+      "email":i,
+      "user_type": "faculty",
+      "user_type_ref": "",
+      "user_groups": [],
+      "status": "active",
+      "is_registered": True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id":user_profile["id"]
+        }
+      common_service.create_teacher(headers,data)
+      print("Invite Accepted userprofile is",user_profile)
     remove_teacher_list = list(
         set(section.teachers) - set(sections_details.teachers))
     for i in remove_teacher_list:
@@ -324,78 +394,17 @@ def update_section(sections_details: UpdateSection):
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
-  except Exception as e:
-    Logger.error(e)
-    raise InternalServerError(str(e)) from e
-
-
-@router.post("/{cohort_id}/students", response_model=AddStudentResponseModel)
-def enroll_student_section(cohort_id: str,
-                           input_data: AddStudentToSectionModel,
-                           request: Request):
-  """
-  Args:
-    input_data(AddStudentToSectionModel):
-      An AddStudentToSectionModel object which contains email and credentials
-  Raises:
-    InternalServerError: 500 Internal Server Error if something fails
-    ResourceNotFound : 404 if the section or classroom does not exist
-    Conflict: 409 if the student already exists
-  Returns:
-    AddStudentResponseModel: if the student successfully added,
-    NotFoundErrorResponseModel: if the section and course not found,
-    ConflictResponseModel: if any conflict occurs,
-    InternalServerErrorResponseModel: if the add student raises an exception
-  """
-  try:
-    cohort = Cohort.find_by_id(cohort_id)
-    sections = Section.collection.filter("cohort","==",cohort.key).fetch()
-    sections = list(sections)
-    if len(sections) == 0:
-      raise ResourceNotFoundException("Given CohortId\
-         does not have any sections")
-    section = student_service.get_section_with_minimum_student(sections)
-
-    headers = {"Authorization": request.headers.get("Authorization")}
-    user_object = classroom_crud.enroll_student(
-        headers,
-        access_token=input_data.access_token,
-        student_email=input_data.email,
-        course_id=section.classroom_id,
-        course_code=section.classroom_code)
-    cohort = section.cohort
-    cohort.enrolled_students_count += 1
-    cohort.update()
-    section.enrolled_students_count +=1
-    section.update()
-
-    course_enrollment_mapping = CourseEnrollmentMapping()
-    course_enrollment_mapping.section = section
-    course_enrollment_mapping.user = user_object["user_id"]
-    course_enrollment_mapping.status = "active"
-    course_enrollment_mapping.role = "learner"
-    course_enrollment_id = course_enrollment_mapping.save().id
-    return {
-        "message":
-        f"Successfully Added the Student with email {input_data.email}",
-        "data" : course_enrollment_id
-    }
-  except InvalidTokenError as ive:
-    raise InvalidToken(str(ive)) from ive
-  except ResourceNotFoundException as err:
-    Logger.error(err)
-    raise ResourceNotFound(str(err)) from err
-  except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
+  except HttpError as hte:
+    Logger.error(hte)
+    raise CustomHTTPException(status_code=hte.resp.status,
                               success=False,
-                              message=str(ae),
-                              data=None) from ae
+                              message=str(hte),
+                              data=None) from hte
   except Exception as e:
-    Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
-    Logger.error(err)
+    print(err)
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
-
 
 @router.post("/copy_course/")
 def copy_courses(course_details: CourseDetails):
@@ -465,6 +474,12 @@ def copy_courses(course_details: CourseDetails):
     SUCCESS_RESPONSE["new_course"] = new_course
     SUCCESS_RESPONSE["coursework_list"] = coursework_list
     return SUCCESS_RESPONSE
+  except HttpError as hte:
+    Logger.error(hte)
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)

@@ -14,7 +14,7 @@ from environment import create_course
 def step_impl_1(context):
   # context.url = f'{API_URL}/sections/{context.sections.id}/students'
   print("IN ENROLL STUDNET_ chort ID",context.cohort.id)
-  context.url = f'{API_URL}/sections/{context.cohort.id}/students'
+  context.url = f'{API_URL}/cohorts/{context.cohort.id}/students'
   context.payload = get_student_email_and_token()
 
 
@@ -39,11 +39,11 @@ def step_impl_3(context):
 
 @behave.given("A user has access to portal and needs to enroll a student into a section")
 def setp_impl_4(context):
-  context.url = f'{API_URL}/sections/fake_id_data/students'
+  context.url = f'{API_URL}/cohorts/fake_id_data/students'
   context.payload = get_student_email_and_token()
 
 
-@behave.when("API request is sent to enroll student to a section with correct request payload and invalid section id")
+@behave.when("API request is sent to enroll student to a section with correct request payload and invalid cohort id")
 def step_impl_5(context):
   resp = requests.post(context.url, json=context.payload,headers=context.header)
   context.status = resp.status_code
@@ -57,13 +57,13 @@ def step_impl_6(context):
 
 # ----
 
-@behave.given("A user has access to the portal and wants to enroll a student into a section")
+@behave.given("A user has access to the portal and wants to enroll a student into a cohort")
 def step_impl_7(context):
-  context.url = f'{API_URL}/sections/{context.sections.id}/students'
+  context.url = f'{API_URL}/cohorts/{context.cohort.id}/students'
   context.payload ={"email":"email@gmail.com","credentials":{"token":"token"}}
 
 
-@behave.when("API request is sent to enroll student to a section with incorrect request payload and valid section id")
+@behave.when("API request is sent to enroll student to a section with incorrect request payload and valid cohort id")
 def step_impl_8(context):
   resp = requests.post(context.url, json=context.payload,headers=context.header)
   context.status = resp.status_code
@@ -81,7 +81,7 @@ def step_impl_9(context):
 @behave.given("A user has access privileges and wants to enroll a student using his/her workspace email into a section")
 def step_impl_10(context):
   print("FOR WORKSPACE EMAIL cohort ID")
-  context.url = f'{API_URL}/sections/{context.cohort.id}/students'
+  context.url = f'{API_URL}/cohorts/{context.cohort.id}/students'
   context.payload = get_workspace_student_email_and_token()
 
 
@@ -109,8 +109,7 @@ def step_impl_13(context):
   context.url = f'{API_URL}/sections/enable_notifications'
   course=create_course(
         COURSE_TEMPLATE_INPUT_DATA["name"],"testing_section",
-        COURSE_TEMPLATE_INPUT_DATA["description"],
-        COURSE_TEMPLATE_INPUT_DATA["admin"])
+        COURSE_TEMPLATE_INPUT_DATA["description"])
   context.payload = {
       "course_id": course["id"],
       "feed_type": "COURSE_WORK_CHANGES"

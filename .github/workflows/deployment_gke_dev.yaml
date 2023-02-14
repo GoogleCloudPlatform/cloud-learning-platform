@@ -34,12 +34,13 @@ env:
   KUSTOMIZE_VERSION: 4.1.3
   SKAFFOLD_VERSION: 1.39.2
   SKAFFOLD_CACHE_GCS: gs://core-learning-services-dev.appspot.com/skaffold/cache
-  CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
+  # CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
+  CLASSROOM_ADMIN_EMAIL : lms_admin_teacher@dhodun.altostrat.com
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
-  ISSUER: https://core-learning-services-dev.cloudpssolutions.com
+  LTI_ISSUER_DOMAIN: https://core-learning-services-dev.cloudpssolutions.com
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
 # cookiecutter:raw 
 jobs:

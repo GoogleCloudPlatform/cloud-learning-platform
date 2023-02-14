@@ -23,16 +23,17 @@
 
 import pytest
 from fastapi.testclient import TestClient
-from main import app,api
+from main import app, api
 from common.testing.firestore_emulator import clean_firestore
-from common.utils.auth_service import validate_token
+from utils.helper import validate_user
 
 
 @pytest.fixture
 def client_with_emulator(clean_firestore, scope="module"):
+
   def mock_validate_token():
     return True
 
-  api.dependency_overrides[validate_token] = mock_validate_token
+  api.dependency_overrides[validate_user] = mock_validate_token
   test_client = TestClient(app)
   yield test_client

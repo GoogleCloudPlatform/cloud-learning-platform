@@ -32,10 +32,13 @@ def sign_up_user():
 
 @pytest.fixture(scope="module")
 def get_token():
+  print("INside the get token Fixturee____",USER_EMAIL_PASSWORD_DICT)
   req = requests.post(f"{API_URL_AUTHENTICATION_SERVICE}/sign-in/credentials",
                       json=USER_EMAIL_PASSWORD_DICT,
                       timeout=60)
   res = req.json()
+  print("Authentication response")
+  print(res)
   if res is None or res["data"] is None:
     raise Exception("User sign-in failed")
   print(f"User with {USER_EMAIL_PASSWORD_DICT['email']} was logged in with "

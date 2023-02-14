@@ -2,8 +2,63 @@
     <app-breadcrum></app-breadcrum>
 
     <mat-tab-group style="margin-top: 1%;">
-        <mat-tab label="Cohort List">
 
+        <mat-tab label="Course Template List">
+
+            <!-- <div class="search-bar">
+                <div style="width: 87%;">
+                    <div class="full-width">
+
+                        <mat-form-field appearance="outline" style="width: 100%;">
+                            <mat-label>Enter Course template name, keyword</mat-label>
+                            <input matInput [(ngModel)]="searchCourseTemplate">
+                            <button *ngIf="searchCourseTemplate" matSuffix mat-icon-button aria-label="Clear"
+                                (click)="searchCourseTemplate=''">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="search-button">
+
+                    <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"><span
+                            class="material-symbols-rounded">
+                            search
+                        </span> Search</button>
+                </div>
+            </div>
+            <mat-divider></mat-divider> -->
+            <div class="add-button">
+                <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"
+                    (click)="openCourseTemplateDialog()">
+                    <span class="material-symbols-rounded">
+                        add
+                    </span>
+                    Add Course Template</button>
+            </div>
+
+
+            <ngx-skeleton-loader *ngIf="courseTemplateLoader" count="5"
+                [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
+            </ngx-skeleton-loader>
+
+            <app-course-template *ngIf="courseTemplateList.length > 0; else noResultCourseTemplate"
+                [courseTemplateList]="courseTemplateList">
+            </app-course-template>
+
+            <ng-template #noResultCourseTemplate>
+                <div *ngIf="courseTemplateLoader == false" class="no-data-inner-comp">No Data Found</div>
+            </ng-template>
+
+            <mat-paginator [length]="500" (page)="handleCourseTemplatePageEvent($event)" [pageSize]='10'
+                [pageSizeOptions]="[10,20,30]" aria-label="Select page">
+            </mat-paginator>
+
+        </mat-tab>
+
+
+        <mat-tab label="Cohort List">
+            <!-- 
             <div class="search-bar">
                 <div style="width: 87%;">
                     <div class="full-width">
@@ -26,7 +81,7 @@
                         </span> Search</button>
                 </div>
             </div>
-            <mat-divider></mat-divider>
+            <mat-divider></mat-divider> -->
             <div class="add-button">
                 <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"
                     (click)="openDialog()">
@@ -40,64 +95,21 @@
                 [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
             </ngx-skeleton-loader>
 
-            <app-cohort [cohortList]="cohortList"></app-cohort>
+            <app-cohort *ngIf="cohortList.length > 0; else noResultCohort" [cohortList]="cohortList"></app-cohort>
 
-            <mat-paginator [length]="100" (page)="handleCohortPageEvent($event)" [pageSize]='10'
+            <ng-template #noResultCohort>
+                <div *ngIf="cohortLoader == false" class="no-data-inner-comp">No Data Found</div>
+            </ng-template>
+
+            <mat-paginator [length]="500" (page)="handleCohortPageEvent($event)" [pageSize]='10'
                 [pageSizeOptions]="[10,20,30]" aria-label="Select page">
             </mat-paginator>
 
-
-        </mat-tab>
-        <mat-tab label="Course Template List">
-
-            <div class="search-bar">
-                <div style="width: 87%;">
-                    <div class="full-width">
-
-                        <mat-form-field appearance="outline" style="width: 100%;">
-                            <mat-label>Enter Course template name, keyword</mat-label>
-                            <input matInput [(ngModel)]="searchCourseTemplate">
-                            <button *ngIf="searchCourseTemplate" matSuffix mat-icon-button aria-label="Clear"
-                                (click)="searchCourseTemplate=''">
-                                <mat-icon>close</mat-icon>
-                            </button>
-                        </mat-form-field>
-                    </div>
-                </div>
-                <div class="search-button">
-
-                    <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"><span
-                            class="material-symbols-rounded">
-                            search
-                        </span> Search</button>
-                </div>
-            </div>
-            <mat-divider></mat-divider>
-            <div class="add-button">
-                <button mat-flat-button style="padding: 7px 28px;font-size: 1rem;" color="primary"
-                    (click)="openCourseTemplateDialog()">
-                    <span class="material-symbols-rounded">
-                        add
-                    </span>
-                    Add Course Template</button>
-            </div>
-
-
-            <ngx-skeleton-loader *ngIf="courseTemplateLoader" count="5"
-                [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
-            </ngx-skeleton-loader>
-
-            <app-course-template [courseTemplateList]="courseTemplateList">
-            </app-course-template>
-
-            <mat-paginator [length]="100" (page)="handleCourseTemplatePageEvent($event)" [pageSize]='10'
-                [pageSizeOptions]="[10,20,30]" aria-label="Select page">
-            </mat-paginator>
 
         </mat-tab>
 
         <mat-tab label="Section List">
-            <div class="search-bar">
+            <!-- <div class="search-bar">
                 <div style="width: 87%;">
                     <div class="full-width">
 
@@ -118,11 +130,23 @@
                             search
                         </span> Search</button>
                 </div>
-            </div>
+            </div> -->
+            <div style="width:100%;height:1px;margin-top:6%;"></div>
 
-            <app-section-list [sectionList]="sectionList"></app-section-list>
+            <ngx-skeleton-loader *ngIf="sectionLoader" count="4"
+                [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
+            </ngx-skeleton-loader>
 
+            <app-section-list *ngIf="sectionList.length > 0; else noResultSection"
+                [sectionList]="sectionList"></app-section-list>
 
+            <ng-template #noResultSection>
+                <div *ngIf="sectionLoader == false" class="no-data-inner-comp">No Data Found</div>
+            </ng-template>
+
+            <mat-paginator [length]="500" (page)="handleSectionPageEvent($event)" [pageSize]='10'
+                [pageSizeOptions]="[10,20,30]" aria-label="Select page">
+            </mat-paginator>
 
         </mat-tab>
 

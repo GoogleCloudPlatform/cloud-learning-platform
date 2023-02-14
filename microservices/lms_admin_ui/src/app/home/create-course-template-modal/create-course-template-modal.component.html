@@ -17,30 +17,19 @@
         <ng-container *ngIf="courseTemplateModalData.mode == 'Create'; else elseTemplate">
             <mat-form-field appearance="fill" style="width: 100%;">
                 <mat-label>Instructional Designer</mat-label>
-                <mat-select formControlName="instructional_designer">
+
+                <input matInput formControlName="instructional_designer">
+                <!-- <mat-select formControlName="instructional_designer">
                     <mat-option value="test_user_1@dhodun.altostrat.com">test_user_1@dhodun.altostrat.com</mat-option>
-                    <!-- <mat-option value="two">Second option</mat-option> -->
-                </mat-select>
+                </mat-select> -->
             </mat-form-field>
 
-            <mat-form-field appearance="fill" style="width: 100%;">
-                <mat-label>Course Admin</mat-label>
-                <mat-select formControlName="admin">
-                    <mat-option value="lms_service@dhodun.altostrat.com">lms_service@dhodun.altostrat.com</mat-option>
-                    <!-- <mat-option value="two">Second option</mat-option> -->
-                </mat-select>
-            </mat-form-field>
         </ng-container>
 
         <ng-template #elseTemplate>
             <mat-form-field appearance="fill" style="width: 100%;">
                 <mat-label>Instructional Designer</mat-label>
                 <input matInput formControlName="instructional_designer">
-            </mat-form-field>
-
-            <mat-form-field appearance="fill" style="width: 100%;">
-                <mat-label>Course Admin</mat-label>
-                <input matInput formControlName="admin">
             </mat-form-field>
         </ng-template>
 

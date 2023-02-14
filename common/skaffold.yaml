@@ -29,7 +29,8 @@ build:
 profiles:
 - name: custom
   build:
-    googleCloudBuild: {}
+    googleCloudBuild:
+      concurrency: 0
     artifacts:
     - image: common
       docker:
@@ -38,7 +39,8 @@ profiles:
           - common:latest
 - name: prod
   build:
-    googleCloudBuild: {}
+    googleCloudBuild:
+      concurrency: 0
     artifacts:
     - image: common
       docker:
@@ -53,7 +55,8 @@ profiles:
   activation:
   - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
-    googleCloudBuild: {}
+    googleCloudBuild:
+      concurrency: 0
     artifacts:
     - image: gcr.io/core-learning-services-dev/common
       docker:

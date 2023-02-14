@@ -9,13 +9,13 @@ Feature: Add student to section
 
   Scenario: Unable to Add student to a section using a payload
     Given A user has access to portal and needs to enroll a student into a section
-    When API request is sent to enroll student to a section with correct request payload and invalid section id
+    When API request is sent to enroll student to a section with correct request payload and invalid cohort id
     Then Student will not be enrolled and API will throw a resource not found error
 
   @fixture.create.section
   Scenario: Unable to enroll student to a section using request data
-    Given A user has access to the portal and wants to enroll a student into a section
-    When API request is sent to enroll student to a section with incorrect request payload and valid section id
+    Given A user has access to the portal and wants to enroll a student into a cohort
+    When API request is sent to enroll student to a section with incorrect request payload and valid cohort id
     Then Student will not be enrolled and API will throw a validation error
 
   @fixture.create.section

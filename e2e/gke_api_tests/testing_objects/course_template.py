@@ -9,7 +9,6 @@ COURSE_TEMPLATE_INPUT_DATA = {
     "name": DATABASE_PREFIX+"test_course"+str(uuid.uuid4),
     "description": "Study Hall Test Course for Development purpose",
     "topic": "e2e test",
-    "admin": emails["admin"],
     "instructional_designer": emails["instructional_designer"]
 }
 

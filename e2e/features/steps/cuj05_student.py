@@ -11,7 +11,7 @@ from environment import create_course
 
 @behave.given("A section has a students enrolled")
 def step_impl_1(context):
-  context.url = f'{API_URL}/sections/{context.section_id}/students'
+  context.url = f'{API_URL}/sections/{context.enroll_student_data["section_id"]}/students'
 
 
 @behave.when("API request with valid section Id is sent")
@@ -29,15 +29,36 @@ def step_impl_3(context):
 
 @behave.given("A section has a students enrolled and has course enrollment mapping present")
 def step_impl_4(context):
-  context.url = f'{API_URL}/student/{context.user_id}/section/{context.section_id}'
+  context.url = f'{API_URL}/sections/{context.enroll_student_data["section_id"]}/students/{context.enroll_student_data["user_id"]}'
 
 
-@behave.when("API request with valid section Id is sent to delete student")
+@behave.when("API request with valid section Id and user id is sent to delete student")
 def step_impl_5(context):
   resp = requests.delete(context.url,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
-@behave.then("Student is marked as inactive in course enrollment mapping and removed from google classroom")
+
+@behave.then("Student is marked as inactive in course enrollment mapping and removed from google classroom using user id")
 def step_impl_6(context):
   assert context.status == 200, "Status 200"
+
+
+#----delete using email---------
+
+@behave.given("A user wants to remove a student from a section using email id")
+def step_impl_7(context):
+  context.url = f'{API_URL}/sections/{context.enroll_student_data["section_id"]}/students/{context.enroll_student_data["email"]}'
+
+
+@behave.when("API request with valid section Id and email is sent to delete student")
+def step_impl_8(context):
+  resp = requests.delete(context.url, headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then("Student is marked as inactive in course enrollment mapping and removed from google classroom using email id")
+def step_impl_9(context):
+  assert context.status == 200, "Status 200"
+  

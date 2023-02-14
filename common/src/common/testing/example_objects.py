@@ -13,8 +13,8 @@ TEST_USER = {
 TEST_COURSE_TEMPLATE = {
     "name": "name",
     "description": "description",
-    "admin": "admin",
-    "instructional_designer": "IDesiner",
+    "admin": "admin@gmail.com",
+    "instructional_designer": "IDesiner@gmail.com",
     "classroom_id": "clID",
     "classroom_code": "clcode",
     "classroom_url": "https://classroom.google.com"

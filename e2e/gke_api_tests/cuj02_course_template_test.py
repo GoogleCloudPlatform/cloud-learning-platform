@@ -24,9 +24,14 @@ def test_create_course_template(get_token):
   Which creates a course template and master course in classroom.
   """
   url = f"{API_URL}/course_templates"
+  print("Course template api execution started")
+  print("______This is course template Body__________")
+  print(COURSE_TEMPLATE_INPUT_DATA)
   resp = requests.post(url=url, json=COURSE_TEMPLATE_INPUT_DATA,headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
+  print("___________*********Course template api response***********____________")
+  print(resp.json())
   assert resp_json["success"] is True, "Check success"
   assert resp_json["course_template"]["classroom_code"] not in [
       "", None

@@ -25,15 +25,13 @@ export class CreateCourseTemplateModalComponent implements OnInit {
         name: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
         description: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
         instructional_designer: this.fb.control('', [Validators.required]),
-        admin: this.fb.control('', [Validators.required]),
       });
     }
     else {
       this.courseTemplateForm = this.fb.group({
         name: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
         description: this.fb.control({ value: this.courseTemplateModalData.init_data.description, disabled: false }, [Validators.required]),
-        instructional_designer: this.fb.control({ value: this.courseTemplateModalData.init_data.instructional_designer, disabled: true }, [Validators.required]),
-        admin: this.fb.control({ value: this.courseTemplateModalData.init_data.admin, disabled: true }, [Validators.required]),
+        instructional_designer: this.fb.control({ value: this.courseTemplateModalData.init_data.instructional_designer, disabled: false }, [Validators.required]),
       });
     }
 

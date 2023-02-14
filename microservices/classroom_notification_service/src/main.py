@@ -30,7 +30,7 @@ subscriber = pubsub_v1.SubscriberClient()
 # The `subscription_path` method creates a fully qualified identifier
 # in the form `projects/{project_id}/subscriptions/{subscription_id}`
 subscription_path = subscriber.subscription_path(
-    PUB_SUB_PROJECT_ID, DATABASE_PREFIX+"classroom-messeges-sub")
+    PUB_SUB_PROJECT_ID, DATABASE_PREFIX+"classroom-notifications-sub")
 
 
 def callback(message: pubsub_v1.subscriber.message.Message) -> None:
@@ -61,7 +61,7 @@ with subscriber:
   try:
     # When `timeout` is not set, result() will block indefinitely,
     # unless an exception is encountered first.
-    streaming_pull_future.result(timeout=40.0)
+    streaming_pull_future.result()
   except TimeoutException:
     streaming_pull_future.cancel()  # Trigger the shutdown.
     streaming_pull_future.result()  # Block until the shutdown is complete.

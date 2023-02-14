@@ -14,8 +14,9 @@ from google.oauth2.credentials import Credentials
 import logging
 
 USER_EMAIL_PASSWORD_DICT = get_user_email_and_password_for_e2e()
+CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL")
 
-def create_course(name,section,description,ownerId):
+def create_course(name,section,description):
   """Create course Function in classroom
 
   Args: course_name ,description of course, section,owner_id of course
@@ -34,7 +35,7 @@ def create_course(name,section,description,ownerId):
   new_course["name"] = name
   new_course["section"] = section
   new_course["description"] = description
-  new_course["ownerId"] = ownerId
+  new_course["ownerId"] = "me"
   new_course["courseState"] = "ACTIVE"
   course = service.courses().create(body=new_course).execute()
   return course
@@ -86,8 +87,9 @@ def create_course_templates(context):
   """Fixture to create temporary data"""
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_INPUT_DATA)
   classroom = create_course(
-      course_template.name, "master", course_template.description,course_template.admin)
+      course_template.name, "master", course_template.description)
   course_template.classroom_id=classroom["id"]
+  course_template.admin=CLASSROOM_ADMIN_EMAIL
   course_template.classroom_code=classroom["enrollmentCode"]
   course_template.classroom_url = classroom["alternateLink"]
   course_template.save()
@@ -114,8 +116,8 @@ def create_section(context):
   context.course_name = cohort.course_template.name
   context.course_section = section.section
   context.course_description = section.description
-  context.course_ownerId = context.cohort.course_template.admin
-  classroom=create_course(cohort.course_template.name,section.section,section.description,cohort.course_template.admin)
+  classroom=create_course(cohort.course_template.name,
+                          section.section,section.description)
   section.classroom_id=classroom["id"]
   section.classroom_code = classroom["enrollmentCode"]
   section.classroom_url = classroom["alternateLink"]
@@ -128,8 +130,6 @@ def enroll_student_course(context):
   """Fixture to enroll studnet in course"""
  
   section = use_fixture(create_section,context)
-  section_id = section.id
-  context.section_id = section_id
   classroom_code = section.classroom_code
   classroom_id = section.classroom_id
   student_email_and_token = get_student_email_and_token()
@@ -144,12 +144,14 @@ def enroll_student_course(context):
   temp_user.save()
   temp_user.user_id = temp_user.id
   temp_user.update()
-  user_id = temp_user.user_id
-  context.user_id = user_id
-  course_enrollment_mapping.user = user_id
+  course_enrollment_mapping.user = temp_user.user_id
   course_enrollment_mapping.save()
-  context.course_enrollment_mapping= course_enrollment_mapping
-  yield context.course_enrollment_mapping
+  context.enroll_student_data = {
+    "section_id": section.id,
+    "user_id":temp_user.id,
+    "email": student_email_and_token["email"]
+    }
+  yield context.enroll_student_data
 
 
 @fixture

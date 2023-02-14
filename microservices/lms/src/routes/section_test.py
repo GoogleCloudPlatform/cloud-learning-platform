@@ -63,6 +63,8 @@ def test_get_user(client_with_emulator):
     resp = client_with_emulator.get(url)
   assert resp.status_code == 200
 
+mocked_value = {"id":"123456789","name":{"givenName":"user1",
+    "familyName":"last_name"},"photoUrl":"http://mockurl.com"}
 
 def test_copy_course(client_with_emulator):
   url = BASE_URL + "/sections/copy_course/"
@@ -100,7 +102,7 @@ def test_create_section(client_with_emulator, create_fake_data):
       "description": "This is description",
       "course_template": create_fake_data["course_template"],
       "cohort": create_fake_data["cohort"],
-      "teachers": [os.environ.get("CLASSROOM_ADMIN_EMAIL")]
+      "teachers": ["teachera@gmail.com"]
   }
   mock_return_course = {
       "id": "57690009090",
@@ -108,6 +110,7 @@ def test_create_section(client_with_emulator, create_fake_data):
       "name": "Jhjiuiui",
       "alternateLink": "https://classroom.google.com"
   }
+
   with mock.patch("routes.section.classroom_crud.get_course_by_id"):
     with mock.patch("routes.section.classroom_crud.create_course",
                     return_value=mock_return_course):
@@ -121,7 +124,18 @@ def test_create_section(client_with_emulator, create_fake_data):
                     "routes.section.classroom_crud.delete_teacher"):
                   with mock.patch(
                     "routes.section.classroom_crud.enable_notifications"):
-                    resp = client_with_emulator.post(url, json=section_details)
+                    with mock.patch(
+                  "routes.section.classroom_crud.invite_teacher",
+                    return_value={"id":"12wewew"}):
+                      with mock.patch(
+              "routes.section.classroom_crud.get_user_profile_information",
+                        return_value=mocked_value):
+                        with mock.patch(
+                "routes.section.classroom_crud.acceept_invite"):
+                          with mock.patch(
+                      "routes.section.common_service.create_teacher"):
+                            resp = client_with_emulator.post(url,
+                            json=section_details)
   assert resp.status_code == 200
 
 
@@ -134,7 +148,7 @@ def test_create_section_course_template_not_found(client_with_emulator,
       "description": "This is description",
       "course_template": "fake-classroom-id_new",
       "cohort": create_fake_data["cohort"],
-      "teachers": ["string"]
+      "teachers": ["teachera@gmail.com"]
   }
   mock_return_course = {
       "id": "57690009090",
@@ -150,7 +164,16 @@ def test_create_section_course_template_not_found(client_with_emulator,
           with mock.patch("routes.section.classroom_crud.get_coursework"):
             with mock.patch(
                 "routes.section.classroom_crud.create_coursework"):
-              resp = client_with_emulator.post(url, json=section_details)
+              with mock.patch("routes.section.classroom_crud.invite_teacher"):
+                with mock.patch(
+                "routes.section.classroom_crud.get_user_profile_information",
+                return_value=mocked_value):
+                  with mock.patch(
+              "routes.section.classroom_crud.acceept_invite"):
+                    with mock.patch(
+            "routes.section.common_service.create_teacher"):
+                      resp = client_with_emulator.post(url,
+                      json=section_details)
   assert resp.status_code == 404
 
 
@@ -163,7 +186,7 @@ def test_create_section_cohort_not_found(client_with_emulator,
       "description": "This is description",
       "course_template": create_fake_data["course_template"],
       "cohort": "fake-cohort-id-new",
-      "teachers": ["string"]
+      "teachers": ["teachera@gmail.com"]
   }
   mock_return_course = {
       "id": "57690009090",
@@ -171,6 +194,8 @@ def test_create_section_cohort_not_found(client_with_emulator,
       "name": "Jhjiuiui",
       "alternateLink": "https://classroom.google.com"
   }
+  mocked_value = {"id":"123456789","name":{"givenName":"user1",
+    "familyName":"last_name"},"photoUrl":"http://mockurl.com"}
   with mock.patch("routes.section.classroom_crud.get_course_by_id"):
     with mock.patch("routes.section.classroom_crud.create_course",
                     return_value=mock_return_course):
@@ -179,7 +204,16 @@ def test_create_section_cohort_not_found(client_with_emulator,
           with mock.patch("routes.section.classroom_crud.get_coursework"):
             with mock.patch(
                 "routes.section.classroom_crud.create_coursework"):
-              resp = client_with_emulator.post(url, json=section_details)
+              with mock.patch("routes.section.classroom_crud.acceept_invite"):
+                with mock.patch(
+        "routes.section.classroom_crud.get_user_profile_information",
+                return_value=mocked_value):
+                  with mock.patch(
+        "routes.section.classroom_crud.invite_teacher"):
+                    with mock.patch(
+        "routes.section.common_service.create_teacher"):
+                      resp = client_with_emulator.post(url,
+                      json=section_details)
   assert resp.status_code == 404
 
 
@@ -224,7 +258,13 @@ def test_update_section(client_with_emulator, create_fake_data):
   }
   url = BASE_URL + "/sections"
   with mock.patch("routes.section.classroom_crud.update_course"):
-    resp = client_with_emulator.patch(url, json=data)
+    with mock.patch("routes.section.classroom_crud.acceept_invite"):
+      with mock.patch(
+    "routes.section.classroom_crud.get_user_profile_information",
+      return_value=mocked_value):
+        with mock.patch("routes.section.classroom_crud.acceept_invite"):
+          with mock.patch("routes.section.common_service.create_teacher"):
+            resp = client_with_emulator.patch(url, json=data)
   assert resp.status_code == 200
 
 
@@ -240,7 +280,13 @@ def test_update_section_section_id_not_found(client_with_emulator):
   url = BASE_URL + "/sections"
 
   with mock.patch("routes.section.classroom_crud.update_course"):
-    resp = client_with_emulator.patch(url, json=data)
+    with mock.patch("routes.section.classroom_crud.acceept_invite"):
+      with mock.patch(
+        "routes.section.classroom_crud.get_user_profile_information",
+      return_value=mocked_value):
+        with mock.patch("routes.section.classroom_crud.acceept_invite"):
+          with mock.patch("routes.section.common_service.create_teacher"):
+            resp = client_with_emulator.patch(url, json=data)
   assert resp.status_code == 404
 
 
@@ -262,33 +308,6 @@ def test_update_section_course_id_not_found(client_with_emulator,
   assert resp.status_code == 404
 
 
-def test_enroll_student(client_with_emulator, create_fake_data):
-
-  url = BASE_URL + f"/sections/{create_fake_data['cohort']}/students"
-  input_data = {
-      "email": "student@gmail.com",
-      "access_token": CREDENTIAL_JSON["token"]
-  }
-  with mock.patch("routes.section.classroom_crud.enroll_student",
-  return_value ={"user_id":"test_user_id"}):
-    with mock.patch("routes.section.Logger"):
-      resp = client_with_emulator.post(url, json=input_data)
-  assert resp.status_code == 200, "Status 200"
-  assert resp.json()["success"] is True
-
-
-def test_enroll_student_negative(client_with_emulator):
-  url = BASE_URL + "/sections/fake_id_cohort/students"
-  input_data = {
-      "email": "student@gmail.com",
-      "access_token": CREDENTIAL_JSON["token"]
-  }
-  with mock.patch("routes.section.classroom_crud.enroll_student"):
-    with mock.patch("routes.section.Logger"):
-      resp = client_with_emulator.post(url, json=input_data)
-
-  assert resp.status_code == 404, "Status 404"
-  assert resp.json()["success"] is False, "Check success"
 
 
 def test_delete_section(client_with_emulator, create_fake_data):
@@ -332,8 +351,8 @@ def test_enable_notifications_using_section_id(client_with_emulator,
                                                create_fake_data):
 
   url = BASE_URL + "/sections/enable_notifications"
-  input_data = {"section_id": create_fake_data["section"], \
-    "feed_type": "COURSE_WORK_CHANGES"}
+  input_data = {"section_id": create_fake_data["section"],
+  "feed_type": "COURSE_WORK_CHANGES"}
   section=Section.find_by_id(create_fake_data["section"])
   data = {
       "success":
@@ -363,7 +382,7 @@ def test_enable_notifications_using_section_id(client_with_emulator,
 def test_enable_notifications_using_fake_section_id(client_with_emulator):
 
   url = BASE_URL + "/sections/enable_notifications"
-  input_data = {"section_id": "fake_section_id", \
+  input_data = {"section_id": "fake_section_id",
     "feed_type": "COURSE_WORK_CHANGES"}
   with mock.patch("routes.section.classroom_crud.enable_notifications"):
     with mock.patch("routes.section.Logger"):

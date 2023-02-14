@@ -1,6 +1,6 @@
 """Platform Registration endpoints"""
 from fastapi import APIRouter
-from config import ERROR_RESPONSES, ISSUER
+from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from common.models import Platform
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  ConflictError)
@@ -17,9 +17,9 @@ router = APIRouter(
 
 
 def add_tool_key_set(fields, uuid):
-  fields["tool_url"] = f"{ISSUER}/lti/api/v1"
-  fields["tool_login_url"] = f"{ISSUER}/lti/api/v1/oidc-login"
-  fields["tool_keyset_url"] = f"{ISSUER}/lti/api/v1/jwks/{uuid}"
+  fields["tool_url"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1"
+  fields["tool_login_url"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/oidc-login"
+  fields["tool_keyset_url"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/jwks/{uuid}"
   return fields
 
 
