@@ -90,7 +90,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
     if tool_info.get("enable_nrps"):
       token_claims[lti_claim_field("claim", "namesroleservice", "nrps")] = {
           "context_memberships_url":
-              f"{ISSUER}/lti/api/v1/qv9byob9ov5by7vk5js5d/memberships",
+              f"{LTI_ISSUER_DOMAIN}/lti/api/v1/qv9byob9ov5by7vk5js5d/memberships",
           "service_versions": ["2.0"]
       }
 

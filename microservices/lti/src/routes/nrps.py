@@ -1,7 +1,7 @@
 """Line item  Endpoints"""
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
-from config import ERROR_RESPONSES, ISSUER
+from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from common.utils.errors import (ResourceNotFoundException, InvalidTokenError)
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound,
@@ -41,13 +41,15 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
   try:
     # TODO: Add API call to check if the context_id exists and get the members
     # data for the given context
-    nrps_id = f"{ISSUER}/lti/api/v1/{context_id}/memberships"
+    nrps_id = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/memberships"
 
     context_details = {
         "id": context_id,
         "label": "Test Course 2",
         "title": "Test title of the course 2",
-        "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"]
+        "type": [
+            "http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"
+        ]
     }
 
     members_list = [{
@@ -67,7 +69,9 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
             "https://lh3.googleusercontent.com/a/AEdFTp5ulzT6ClmwuiTPlpmy6UDm8FrvVoRnWotGi_vn=s100",
         "lis_person_sourcedid":
             "QXUkLyVRsuJRqFBppUOo",
-        "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"]
+        "roles": [
+            "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
+        ]
     }, {
         "user_id":
             "MaHmy8jrcpxuF0938EeX",
