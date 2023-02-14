@@ -37,7 +37,7 @@
                     Select Section
                 </div>
                 <div class="body">
-                    <mat-form-field appearance="fill" style="margin-right: 2%;">
+                    <mat-form-field appearance="fill" style="margin-right: 2%;width: 250px;">
                         <mat-label>Select Section</mat-label>
                         <mat-select [(value)]="selectedSection" (selectionChange)="createTableData()">
                             <!-- <mat-option value="Section A">Section A</mat-option>
@@ -48,11 +48,11 @@
                         </mat-select>
                     </mat-form-field>
 
-                    <div style="margin-right: 1%;">
+                    <!-- <div style="margin-right: 1%;">
                         <mat-chip-list>
                             <mat-chip>Active</mat-chip>
                         </mat-chip-list>
-                    </div>
+                    </div> -->
 
                     <button mat-button (click)="openCreateSectionDialog()"><span class="material-symbols-rounded">
                             add_circle
@@ -62,13 +62,12 @@
                             account_box
                         </span> Go to classroom</button>
 
-                    <button mat-button><span class="material-symbols-rounded">
-                            insights
-                        </span> View Reports</button>
-
                     <button mat-button (click)="openEditSelectionDialog()"><span class="material-symbols-rounded">
                             edit
                         </span> View / Edit info</button>
+                    <button mat-button disabled><span class="material-symbols-rounded">
+                            insights
+                        </span> View Reports</button>
                 </div>
 
 

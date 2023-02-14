@@ -97,6 +97,31 @@ export class HomeComponent implements OnInit {
   }
 
 
+  handleSectionPageEvent(e: PageEvent) {
+    this.pageEvent = e;
+    console.log(this.pageEvent)
+
+    if (this.pageEvent.pageSize != this.sectionPageSize) {
+      this.sectionSkip = 0
+      this.sectionLimit = this.pageEvent.pageSize
+      this.sectionPageSize = this.pageEvent.pageSize
+    }
+    else {
+
+      if (this.pageEvent.pageIndex > this.pageEvent.previousPageIndex) {
+        this.sectionSkip = this.sectionLimit
+        this.sectionLimit = this.sectionLimit + this.pageEvent.pageSize
+      }
+      else if (this.pageEvent.previousPageIndex > this.pageEvent.pageIndex) {
+        this.sectionSkip = this.sectionSkip - this.pageEvent.pageSize
+        this.sectionLimit = this.sectionLimit - this.pageEvent.pageSize
+      }
+    }
+    console.log("skip ", this.sectionSkip, 'limit ', this.sectionLimit)
+    this.getAllSectionsList()
+  }
+
+
   getCourseTemplateList() {
     this.courseTemplateLoader = true
     this.courseTemplateList = []
@@ -121,7 +146,7 @@ export class HomeComponent implements OnInit {
   getAllSectionsList() {
     this.sectionLoader = true
     this.sectionList = []
-    this._HomeService.getAllSectionList(this.cohortSkip, this.cohortLimit).subscribe((res: any) => {
+    this._HomeService.getAllSectionList(this.sectionSkip, this.sectionLimit).subscribe((res: any) => {
       if (res.success == true) {
         this.sectionList = res.data
         this.sectionLoader = false

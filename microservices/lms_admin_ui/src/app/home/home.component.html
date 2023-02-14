@@ -42,8 +42,13 @@
                 [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
             </ngx-skeleton-loader>
 
-            <app-course-template [courseTemplateList]="courseTemplateList">
+            <app-course-template *ngIf="courseTemplateList.length > 0; else noResultCourseTemplate"
+                [courseTemplateList]="courseTemplateList">
             </app-course-template>
+
+            <ng-template #noResultCourseTemplate>
+                <div *ngIf="courseTemplateLoader == false" class="no-data-inner-comp">No Data Found</div>
+            </ng-template>
 
             <mat-paginator [length]="500" (page)="handleCourseTemplatePageEvent($event)" [pageSize]='10'
                 [pageSizeOptions]="[10,20,30]" aria-label="Select page">
@@ -90,7 +95,11 @@
                 [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
             </ngx-skeleton-loader>
 
-            <app-cohort [cohortList]="cohortList"></app-cohort>
+            <app-cohort *ngIf="cohortList.length > 0; else noResultCohort" [cohortList]="cohortList"></app-cohort>
+
+            <ng-template #noResultCohort>
+                <div *ngIf="cohortLoader == false" class="no-data-inner-comp">No Data Found</div>
+            </ng-template>
 
             <mat-paginator [length]="500" (page)="handleCohortPageEvent($event)" [pageSize]='10'
                 [pageSizeOptions]="[10,20,30]" aria-label="Select page">
@@ -123,9 +132,21 @@
                 </div>
             </div> -->
             <div style="width:100%;height:1px;margin-top:6%;"></div>
-            <app-section-list [sectionList]="sectionList"></app-section-list>
 
+            <ngx-skeleton-loader *ngIf="sectionLoader" count="4"
+                [theme]="{'height': '100px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
+            </ngx-skeleton-loader>
 
+            <app-section-list *ngIf="sectionList.length > 0; else noResultSection"
+                [sectionList]="sectionList"></app-section-list>
+
+            <ng-template #noResultSection>
+                <div *ngIf="sectionLoader == false" class="no-data-inner-comp">No Data Found</div>
+            </ng-template>
+
+            <mat-paginator [length]="500" (page)="handleSectionPageEvent($event)" [pageSize]='10'
+                [pageSizeOptions]="[10,20,30]" aria-label="Select page">
+            </mat-paginator>
 
         </mat-tab>
 
