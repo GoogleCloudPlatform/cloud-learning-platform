@@ -30,11 +30,11 @@ requires:
 - path: ./microservices/lti
   configs: [lti]
 
-- path: ./microservices/classroom_notification_service
-  configs: [classroom-notification-service]
+# - path: ./microservices/classroom_notification_service
+#   configs: [classroom-notification-service]
 
 - path: ./microservices/classroom_shim
   configs: [classroom-shim]
 
-- path: ./microservices/classroom_notifications_cronjob
-  configs: [classroom-notifications-cronjob]
+# - path: ./microservices/classroom_notifications_cronjob
+#   configs: [classroom-notifications-cronjob]
