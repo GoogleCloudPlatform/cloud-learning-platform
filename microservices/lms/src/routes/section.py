@@ -108,21 +108,27 @@ def create_section(sections_details: SectionDetails,request: Request):
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
     # Create a new course
-
+    print("Current Course ____",current_course)
     new_course = classroom_crud.create_course(course_template_details.name,
                                               sections_details.description,
-                                              sections_details.name, "me")
+                                              sections_details.name, "me",
+                                              current_course["gradebookSettings"])
+
     # Get topics of current course
+    # gradebook_result =  classroom_crud.create_gradebook_settings(new_course["id"],current_course["gradebookSettings"])
+    # print("gradebook setting result ",gradebook_result)
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
     # add new_course to pubsub topic for both course work and roaster changes
-    classroom_crud.enable_notifications(new_course["id"],
-                                        "COURSE_WORK_CHANGES")
-    classroom_crud.enable_notifications(new_course["id"],
-                                        "COURSE_ROSTER_CHANGES")
+    # classroom_crud.enable_notifications(new_course["id"],
+    #                                     "COURSE_WORK_CHANGES")
+    # classroom_crud.enable_notifications(new_course["id"],
+    #                                     "COURSE_ROSTER_CHANGES")
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
     if topics is not None:
       topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
+      print("__________This is topic ID__________")
+      print(topic_id_map)
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(
         course_template_details.classroom_id)
