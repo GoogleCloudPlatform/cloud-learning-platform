@@ -39,11 +39,13 @@ SCOPES = [
 
 
 def get_credentials():
+  print("____Inside get credentials_ Email____",CLASSROOM_ADMIN_EMAIL)
   classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
   creds = service_account.Credentials.from_service_account_info(classroom_key,
                                                                 scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-
+  print("creds generated using email",CLASSROOM_ADMIN_EMAIL)
+  print(creds)
   return creds
 
 
