@@ -76,7 +76,6 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       else:
         token_claims[lti_claim_field("claim",
                                      "target_link_uri")] = tool_info["tool_url"]
-    print("decoded_lti_message_hint", decoded_lti_message_hint)
     if "custom" in content_item_info.keys():
       custom_params = decoded_lti_message_hint.get("custom_params_for_substitution")
       final_custom_claims = {**content_item_info.get("custom")}
