@@ -1,4 +1,4 @@
-<ng-container *ngIf="courseTemplateList.length > 0; else noResult">
+<ng-container>
     <div *ngFor="let courseTemplate of courseTemplateList" class="data-obj-card">
         <div class="block-header">
             <div class="title">
@@ -57,9 +57,9 @@
     </div>
 </ng-container>
 
-<ng-template #noResult>
+<!-- <ng-template #noResult>
     <div class="no-data-inner-comp">No Data Found</div>
-</ng-template>
+</ng-template> -->
 
 <mat-menu #subMenu="matMenu" yPosition="below">
     <div class="edit-menu">
