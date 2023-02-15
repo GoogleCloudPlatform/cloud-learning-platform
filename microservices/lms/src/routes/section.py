@@ -115,10 +115,10 @@ def create_section(sections_details: SectionDetails,request: Request):
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
     # add new_course to pubsub topic for both course work and roaster changes
-    classroom_crud.enable_notifications(new_course["id"],
-                                        "COURSE_WORK_CHANGES")
-    classroom_crud.enable_notifications(new_course["id"],
-                                        "COURSE_ROSTER_CHANGES")
+    # classroom_crud.enable_notifications(new_course["id"],
+    #                                     "COURSE_WORK_CHANGES")
+    # classroom_crud.enable_notifications(new_course["id"],
+    #                                     "COURSE_ROSTER_CHANGES")
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
     if topics is not None:
