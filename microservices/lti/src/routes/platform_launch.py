@@ -4,7 +4,6 @@ from typing import Optional
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from fastapi import APIRouter
 from fastapi.security import HTTPBearer
-from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from common.models import Tool, LTIContentItem
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
@@ -14,7 +13,7 @@ from common.utils.http_exceptions import (InternalServerError, BadRequest,
 from urllib.parse import urlparse, urlunparse, urlencode, parse_qsl
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.lti_token import encode_token
-from datetime import datetime, timedelta
+# pylint: disable=dangerous-default-value
 
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
 del ERROR_RESPONSE_DICT[401]
@@ -67,23 +66,9 @@ def get_resource_launch_init(lti_content_item_id: str,
     lti_content_item = LTIContentItem.find_by_id(lti_content_item_id)
     if lti_content_item:
       tool = Tool.find_by_id(lti_content_item.tool_id)
-      custom_params = {
-          "$ResourceLink.available.startDateTime":
-              datetime.now().isoformat(),
-          "$ResourceLink.submission.endDateTime":
-              (datetime.now() - timedelta(hours=1)).isoformat(),
-          "$ResourceLink.available.endDateTime":
-              (datetime.now() - timedelta(hours=1)).isoformat(),
-      }
-      # "$Context.id.history": "",
-      # "$Person.address.timezone": ""
       final_lti_message_hint_dict = {
           "custom_params_for_substitution": custom_params,
           "lti_content_item_id": lti_content_item_id,
-          "user_details": {
-              "picture":
-                  "https://lh3.googleusercontent.com/a/AEdFTp4wIxRnw50hW7_bjiqYOMgdhpt0Gz9dw1D6LpOA=s96-c"
-          }
       }
       lti_message_hint = encode_token(final_lti_message_hint_dict)
       if tool:
@@ -103,7 +88,6 @@ def get_resource_launch_init(lti_content_item_id: str,
             (login_url.scheme, login_url.netloc, login_url.path,
              login_url.params, urlencode(query_params), login_url.fragment))
         return {"url": redirect_url}
-        # RedirectResponse(url=redirect_url, status_code=302)
       else:
         raise ResourceNotFoundException(
             "Tool for the requested resource is not available")

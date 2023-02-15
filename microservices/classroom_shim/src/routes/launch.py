@@ -1,7 +1,7 @@
 """Tool Registration Endpoints"""
 import requests
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import timedelta
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
 from config import ERROR_RESPONSES

@@ -47,49 +47,49 @@
             let user = authResult.user;
             let token = user._delegate.accessToken
             displayRedirecting()
-            axios
-              .get('{{redirect_url}}', {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              })
-              .then((response) => {
-                setTimeout(() => {
-                  console.log("response", response)
-
-                  axios.post(response.data.url, response.data.message_hint, {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  }).then((res) => {
-                    setTimeout(() => {
-                      window.open(res.data.url, "_self").focus()
-                    }, 10)
-                  }).catch((err) => {
-                    setTimeout(() => {
-                      console.log("err", err)
-                      if (err.response.status == 401) {
-                        displayError("Access Denied")
-                      }
-                      initFirebaseUI()
-                    }, 10)
-                  })
-                }, 10)
-              }).catch((err) => {
-                setTimeout(() => {
-                  console.log("err", err)
-                  if (err.response.status == 401) {
-                    displayError("Access Denied")
-                  }
-                  initFirebaseUI()
-                }, 10)
-              })
+            initiateRedirection(token)
+            console.log("something failed")
             return false;
           },
         },
       };
 
       ui.start('#firebaseui-auth-container', uiConfig);
+    }
+
+    function initiateRedirection(token) {
+      return axios
+        .get('{{redirect_url}}', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response1) => {
+          console.log("response1", response1)
+
+          return axios.post(response1.data.url, response1.data.message_hint, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }).then((response2) => {
+            window.open(response2.data.url, "_self").focus()
+          }).catch((err) => {
+            console.log("err", err)
+            if (err?.response?.status == 401) {
+              displayError("Access Denied")
+            }
+            displayError(err.message)
+            initFirebaseUI()
+          })
+        }).catch((err) => {
+          console.log("err", err)
+          if (err?.response?.status == 401) {
+            displayError("Access Denied")
+          }
+          displayError(err.message)
+          initFirebaseUI()
+        })
+
     }
 
     function getParameterByName(name, url = window.location.href) {
