@@ -15,7 +15,7 @@ import config
 import uvicorn
 from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
-from routes import launch, lti_assignment
+from routes import launch, lti_assignment, grade
 from common.utils.http_exceptions import add_exception_handlers
 
 templates = Jinja2Templates(directory="templates")
@@ -36,6 +36,7 @@ api = FastAPI(title="Classroom Shim Service APIs", version="latest")
 
 api.include_router(launch.router)
 api.include_router(lti_assignment.router)
+api.include_router(grade.router)
 
 add_exception_handlers(app)
 add_exception_handlers(api)

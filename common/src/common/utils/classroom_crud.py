@@ -274,7 +274,9 @@ def get_course_work_list(course_id):
   return coursework_list
 
 
-def get_submitted_course_work_list(course_id, student_email):
+def get_submitted_course_work_list(course_id,
+                                   student_email,
+                                   course_work_id="-"):
   """Returns an array of objects containing all the coursework of a course
     assigned to the student with the status if else the coursework has
     been submitted by the student or not
@@ -291,9 +293,9 @@ def get_submitted_course_work_list(course_id, student_email):
   service = build("classroom", "v1", credentials=get_credentials())
 
   submitted_course_work_list = service.courses().courseWork(
-  ).studentSubmissions().list(courseId=course_id,
-                              courseWorkId="-",
-                              userId=student_email).execute()
+  ).studentSubmissions().list(
+      courseId=course_id, courseWorkId=course_work_id,
+      userId=student_email).execute()
   if submitted_course_work_list:
     submitted_course_work_list = submitted_course_work_list[
         "studentSubmissions"]
@@ -651,3 +653,44 @@ def get_user_profile_information(user_email):
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
+def post_user_grade(course_id: str,
+                    course_work_id: str,
+                    submission_id: str,
+                    assigned_grade: float = None,
+                    draft_grade: float = None):
+  """
+   Args:
+      course_id: Google classroom course id
+      course_work_id: Google classroom course work id
+      submission_id: Google classroom submission id of a student
+      assigned_grade: Final grade assigned to the user
+      draft_grade: Draft grade given to the user
+  Returns:
+      dict: Output response from the classroom for post grade
+  """
+  service = build("classroom", "v1", credentials=get_credentials())
+
+  try:
+    student_submission = {}
+
+    if assigned_grade:
+      student_submission["assignedGrade"] = assigned_grade
+
+    if draft_grade:
+      student_submission["draftGrade"] = draft_grade
+
+    output = service.courses().courseWork().studentSubmissions().patch(
+        courseId=course_id,
+        courseWorkId=course_work_id,
+        id=submission_id,
+        updateMask="assignedGrade,draftGrade",
+        body=student_submission).execute()
+
+    return output
+
+  except HttpError as ae:
+    raise CustomHTTPException(
+        status_code=ae.resp.status, success=False, message=str(ae),
+        data=None) from ae
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
