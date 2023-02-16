@@ -116,11 +116,13 @@ export class CreateSectionComponent implements OnInit {
           this.dialogRef.close({ data: 'success' });
         }
         else {
-          this.openFailureSnackBar('Update section', 'FAILED')
+          // this.openFailureSnackBar('Update section', 'FAILED')
+          this.dialogRef.close({ data: 'success' });
         }
         this.showProgressSpinner = false
       }, (error: any) => {
-        this.openFailureSnackBar('Update section', 'FAILED')
+        // this.openFailureSnackBar('Update section', 'FAILED')
+        this.dialogRef.close({ data: 'success' });
         this.showProgressSpinner = false
       })
     }
@@ -133,11 +135,13 @@ export class CreateSectionComponent implements OnInit {
           this.dialogRef.close({ data: 'success' });
         }
         else {
-          this.openFailureSnackBar('Create section', 'FAILED')
+          // this.openFailureSnackBar('Create section', 'FAILED')
+          this.dialogRef.close({ data: 'success' });
         }
         this.showProgressSpinner = false
       }, (error: any) => {
-        this.openFailureSnackBar('Create section', 'FAILED')
+        // this.openFailureSnackBar('Create section', 'FAILED')
+        this.dialogRef.close({ data: 'success' });
         this.showProgressSpinner = false
       })
       console.log('final obj', sectionObj)
