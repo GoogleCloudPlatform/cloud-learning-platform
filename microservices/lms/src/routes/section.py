@@ -114,8 +114,6 @@ def create_section(sections_details: SectionDetails,request: Request):
                                               sections_details.name, "me")
 
     # Get topics of current course
-    # gradebook_result =  classroom_crud.create_gradebook_settings(new_course["id"],current_course["gradebookSettings"])
-    # print("gradebook setting result ",gradebook_result)
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
     # add new_course to pubsub topic for both course work and roaster changes
     # classroom_crud.enable_notifications(new_course["id"],
@@ -126,8 +124,6 @@ def create_section(sections_details: SectionDetails,request: Request):
     # with keys a current topicID and new topic id as values
     if topics is not None:
       topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
-      print("__________This is topic ID__________")
-      print(topic_id_map)
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(
         course_template_details.classroom_id)
@@ -160,14 +156,15 @@ def create_section(sections_details: SectionDetails,request: Request):
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
 
-    # Get the list of courseworkMaterial 
+    # Get the list of courseworkMaterial
     coursework_material_list = classroom_crud.get_coursework_material(
       course_template_details.classroom_id)
     for coursework_material in coursework_material_list:
       #Check if a coursework material is linked to a topic if yes then
       # replace the old topic id to new topic id using topic_id_map
       if "topicId" in coursework_material.keys():
-        coursework_material["topicId"] = topic_id_map[coursework_material["topicId"]]
+        coursework_material["topicId"] =topic_id_map[
+          coursework_material["topicId"]]
       #Check if a material is present in coursework
       if "materials" in coursework_material.keys():
         # Calling function to get edit_url and view url of
@@ -190,12 +187,11 @@ def create_section(sections_details: SectionDetails,request: Request):
             # url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
     if coursework_material_list is not None:
-      classroom_crud.create_coursework_material(new_course["id"], coursework_material_list)
-
+      classroom_crud.create_coursework_material(new_course["id"], 
+      coursework_material_list)
     # add Instructional designer
     sections_details.teachers.append(
         course_template_details.instructional_designer)
-
     for teacher_email in sections_details.teachers:
       # classroom_crud.add_teacher(new_course["id"], teacher_email)
       invitation_object = classroom_crud.invite_teacher(new_course["id"],
@@ -526,14 +522,15 @@ def copy_courses(course_details: CourseDetails):
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
     
-    # Get the list of courseworkMaterial 
+    # Get the list of courseworkMaterial
     coursework_material_list = classroom_crud.get_coursework_material(
       course_id)
     for coursework_material in coursework_material_list:
       #Check if a coursework material is linked to a topic if yes then
       # replace the old topic id to new topic id using topic_id_map
       if "topicId" in coursework_material.keys():
-        coursework_material["topicId"] = topic_id_map[coursework_material["topicId"]]
+        coursework_material["topicId"] = topic_id_map[
+          coursework_material["topicId"]]
       #Check if a material is present in coursework
       if "materials" in coursework_material.keys():
         # Calling function to get edit_url and view url of
@@ -556,7 +553,8 @@ def copy_courses(course_details: CourseDetails):
             # url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
     if coursework_material_list is not None:
-      classroom_crud.create_coursework_material(new_course["id"], coursework_material_list)
+      classroom_crud.create_coursework_material(new_course["id"],
+       coursework_material_list)
 
     SUCCESS_RESPONSE["new_course"] = new_course
     SUCCESS_RESPONSE["coursework_list"] = coursework_list
