@@ -521,7 +521,6 @@ def copy_courses(course_details: CourseDetails):
     # Create coursework in new course
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
-    
     # Get the list of courseworkMaterial
     coursework_material_list = classroom_crud.get_coursework_material(
       course_id)
