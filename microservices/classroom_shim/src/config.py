@@ -1,7 +1,6 @@
 """
   Classroom Shim Service config file
 """
-# pylint: disable=line-too-long
 import os
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
@@ -14,9 +13,11 @@ os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
-API_BASE_URL = os.getenv("API_BASE_URL")
+API_DOMAIN = f"https://{os.getenv('API_DOMAIN')}"
 
-SERVICE_NAME = os.getenv("SERVICE_NAME")
+FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
+
+FIREBASE_AUTH_DOMAIN = f"{PROJECT_ID}.firebaseapp.com"
 
 ERROR_RESPONSES = {
     500: {
