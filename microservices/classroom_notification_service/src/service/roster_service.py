@@ -39,6 +39,9 @@ def save_roster(data):
       "event_type":data["eventType"], "resource":data["resourceId"],
       "publish_time":data["publish_time"],"timestamp":datetime.datetime.utcnow()
     }]
+    if data["eventType"] == "DELETED":
+      return insert_rows_to_bq(
+          rows=rows, table_name=BQ_TABLE_DICT["BQ_LOG_RS_TABLE"])
     return insert_rows_to_bq(
         rows=rows, table_name=BQ_TABLE_DICT["BQ_LOG_RS_TABLE"]) & save_user(
         data["resourceId"]["userId"], data["message_id"], data["eventType"])

@@ -75,8 +75,12 @@ def test_copy_course(client_with_emulator):
         with mock.patch("routes.section.classroom_crud.create_topics"):
           with mock.patch("routes.section.classroom_crud.get_coursework"):
             with mock.patch(
-                "routes.section.classroom_crud.create_coursework"):
-              resp = client_with_emulator.post(url, json=course_details)
+              "routes.section.classroom_crud.create_coursework"):
+              with mock.patch(
+                "routes.section.classroom_crud.get_coursework_material"):
+                with mock.patch(
+                "routes.section.classroom_crud.create_coursework_material"):
+                  resp = client_with_emulator.post(url, json=course_details)
   assert resp.status_code == 200
 
 
@@ -90,8 +94,12 @@ def test_copy_course_not_found(client_with_emulator):
         with mock.patch("routes.section.classroom_crud.create_topics"):
           with mock.patch("routes.section.classroom_crud.get_coursework"):
             with mock.patch(
-                "routes.section.classroom_crud.create_coursework"):
-              resp = client_with_emulator.post(url, json=course_details)
+            "routes.section.classroom_crud.create_coursework"):
+              with mock.patch(
+            "routes.section.classroom_crud.create_coursework_material"):
+                with mock.patch(
+              "routes.section.classroom_crud.get_coursework_material"):
+                  resp = client_with_emulator.post(url, json=course_details)
   assert resp.status_code == 200
 
 
@@ -134,8 +142,12 @@ def test_create_section(client_with_emulator, create_fake_data):
                 "routes.section.classroom_crud.acceept_invite"):
                           with mock.patch(
                       "routes.section.common_service.create_teacher"):
-                            resp = client_with_emulator.post(url,
-                            json=section_details)
+                            with mock.patch(
+                    "routes.section.classroom_crud.get_coursework_material"):
+                              with mock.patch(
+                    "routes.section.classroom_crud.create_coursework_material"):
+                                resp = client_with_emulator.post(url,
+                              json=section_details)
   assert resp.status_code == 200
 
 
@@ -172,7 +184,11 @@ def test_create_section_course_template_not_found(client_with_emulator,
               "routes.section.classroom_crud.acceept_invite"):
                     with mock.patch(
             "routes.section.common_service.create_teacher"):
-                      resp = client_with_emulator.post(url,
+                      with mock.patch(
+            "routes.section.classroom_crud.get_coursework_material"):
+                        with mock.patch(
+            "routes.section.classroom_crud.create_coursework_material"):
+                          resp = client_with_emulator.post(url,
                       json=section_details)
   assert resp.status_code == 404
 
@@ -212,7 +228,11 @@ def test_create_section_cohort_not_found(client_with_emulator,
         "routes.section.classroom_crud.invite_teacher"):
                     with mock.patch(
         "routes.section.common_service.create_teacher"):
-                      resp = client_with_emulator.post(url,
+                      with mock.patch(
+              "routes.section.classroom_crud.get_coursework_material"):
+                        with mock.patch(
+                "routes.section.classroom_crud.create_coursework_material"):
+                          resp = client_with_emulator.post(url,
                       json=section_details)
   assert resp.status_code == 404
 

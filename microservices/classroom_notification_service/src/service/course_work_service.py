@@ -43,6 +43,11 @@ def save_course_work(data):
         }]
     if len(data["collection"].split(".")) == 3:
       if data["collection"].split(".")[2] == "studentSubmissions":
+        if data["eventType"] == "DELETED":
+          return insert_rows_to_bq(
+              rows=rows,
+              table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"]
+          )
         return insert_rows_to_bq(
             rows=rows,
             table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"]
