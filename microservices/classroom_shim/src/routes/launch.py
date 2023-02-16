@@ -3,7 +3,7 @@ import requests
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from config import ERROR_RESPONSES
+from config import ERROR_RESPONSES, API_DOMAIN, FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, PROJECT_ID
 from common.models import LTIAssignment
 from common.utils.auth_service import validate_token
 from common.utils.secrets import get_backend_robot_id_token
@@ -18,8 +18,6 @@ templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(tags=["Login Template"], responses=ERROR_RESPONSES)
 
-CLP_DOMAIN_URL = "https://core-learning-services-dev.cloudpssolutions.com"
-
 
 @router.get("/launch")
 def login(request: Request, lti_assignment_id: str):
@@ -30,7 +28,7 @@ def login(request: Request, lti_assignment_id: str):
       Template response with the login page of the user
   """
   try:
-    url = f"{CLP_DOMAIN_URL}/classroom-shim/api/v1/launch-assignment?lti_assignment_id={lti_assignment_id}"
+    url = f"{API_DOMAIN}/classroom-shim/api/v1/launch-assignment?lti_assignment_id={lti_assignment_id}"
 
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
     content_item_url = f"http://lti/lti/api/v1/content-item/{lti_assignment.lti_content_item_id}"
@@ -51,11 +49,15 @@ def login(request: Request, lti_assignment_id: str):
           timeout=60)
       lti_tool = res.json().get("data")
       title = lti_tool.get("name", "")
-    return templates.TemplateResponse("login.html", {
-        "request": request,
-        "redirect_url": url,
-        "title": title
-    })
+    return templates.TemplateResponse(
+        "login.html", {
+            "request": request,
+            "redirect_url": url,
+            "title": title,
+            "firebase_api_key": FIREBASE_API_KEY,
+            "project_id": PROJECT_ID,
+            "firebase_auth_domain": FIREBASE_AUTH_DOMAIN
+        })
 
   except ValidationError as e:
     Logger.error(e)
@@ -107,6 +109,7 @@ def launch_assignment(request: Request,
     }
     # TODO: implementation of "$Context.id.history" as a custom parameter
     # TODO: implementation of "$Person.address.timezone" as a custom parameter
+    # TODO: send the user details like profile photo inside final_lti_message_hint_dict and use it in lti service to send as token claims
     final_lti_message_hint_dict = {
         "custom_params_for_substitution": custom_params,
         "user_details": {
@@ -115,7 +118,7 @@ def launch_assignment(request: Request,
         }
     }
 
-    url = f"{CLP_DOMAIN_URL}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}"
+    url = f"{API_DOMAIN}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}"
     # TODO: verify assignment and user relationship
     return {"url": url, "message_hint": final_lti_message_hint_dict}
 
