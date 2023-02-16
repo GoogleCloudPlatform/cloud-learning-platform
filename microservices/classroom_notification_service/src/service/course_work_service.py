@@ -41,13 +41,15 @@ def save_course_work(data):
     "event_type":data["eventType"], "resource":json.dumps(data["resourceId"]),
     "publish_time":data["publish_time"],"timestamp":datetime.datetime.utcnow()
         }]
+
+    if data["eventType"] == "DELETED":
+      return insert_rows_to_bq(
+            rows=rows,
+            table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"]
+        )
+
     if len(data["collection"].split(".")) == 3:
       if data["collection"].split(".")[2] == "studentSubmissions":
-        if data["eventType"] == "DELETED":
-          return insert_rows_to_bq(
-              rows=rows,
-              table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"]
-          )
         return insert_rows_to_bq(
             rows=rows,
             table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"]
