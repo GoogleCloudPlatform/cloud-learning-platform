@@ -75,12 +75,12 @@ def test_copy_course(client_with_emulator):
         with mock.patch("routes.section.classroom_crud.create_topics"):
           with mock.patch("routes.section.classroom_crud.get_coursework"):
             with mock.patch(
-                "routes.section.classroom_crud.create_coursework"):
-                with mock.patch(
+              "routes.section.classroom_crud.create_coursework"):
+              with mock.patch(
                 "routes.section.classroom_crud.get_coursework_material"):
-                  with mock.patch(
+                with mock.patch(
                 "routes.section.classroom_crud.create_coursework_material"):
-                    resp = client_with_emulator.post(url, json=course_details)
+                  resp = client_with_emulator.post(url, json=course_details)
   assert resp.status_code == 200
 
 
@@ -94,12 +94,12 @@ def test_copy_course_not_found(client_with_emulator):
         with mock.patch("routes.section.classroom_crud.create_topics"):
           with mock.patch("routes.section.classroom_crud.get_coursework"):
             with mock.patch(
-                "routes.section.classroom_crud.create_coursework"):
-                with mock.patch(
+            "routes.section.classroom_crud.create_coursework"):
+              with mock.patch(
             "routes.section.classroom_crud.create_coursework_material"):
-                  with mock.patch(
+                with mock.patch(
               "routes.section.classroom_crud.get_coursework_material"):
-                    resp = client_with_emulator.post(url, json=course_details)
+                  resp = client_with_emulator.post(url, json=course_details)
   assert resp.status_code == 200
 
 
@@ -128,7 +128,6 @@ def test_create_section(client_with_emulator, create_fake_data):
             with mock.patch(
                 "routes.section.classroom_crud.create_coursework"):
               with mock.patch("routes.section.classroom_crud.add_teacher"):
-                
                 with mock.patch(
                     "routes.section.classroom_crud.delete_teacher"):
                   with mock.patch(

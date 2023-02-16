@@ -187,7 +187,7 @@ def create_section(sections_details: SectionDetails,request: Request):
             # url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
     if coursework_material_list is not None:
-      classroom_crud.create_coursework_material(new_course["id"], 
+      classroom_crud.create_coursework_material(new_course["id"],
       coursework_material_list)
     # add Instructional designer
     sections_details.teachers.append(
