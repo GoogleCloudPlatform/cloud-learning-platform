@@ -1,7 +1,6 @@
 """Tool Registration Endpoints"""
 import requests
 from typing import Optional
-from datetime import timedelta
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
 from config import ERROR_RESPONSES
@@ -99,13 +98,13 @@ def launch_assignment(request: Request,
     lti_content_item_id = lti_assignment.lti_content_item_id
 
     custom_params = {
-          "$ResourceLink.available.startDateTime":
-              lti_assignment.start_date.isoformat(),
-          "$ResourceLink.submission.endDateTime":
-              (lti_assignment.end_date - timedelta(hours=1)).isoformat(),
-          "$ResourceLink.available.endDateTime":
-              (lti_assignment.due_date - timedelta(hours=1)).isoformat(),
-      }
+        "$ResourceLink.available.startDateTime":
+            lti_assignment.start_date.isoformat(),
+        "$ResourceLink.submission.endDateTime":
+            (lti_assignment.end_date).isoformat(),
+        "$ResourceLink.available.endDateTime":
+            (lti_assignment.due_date).isoformat()
+    }
     # TODO: implementation of "$Context.id.history" as a custom parameter
     # TODO: implementation of "$Person.address.timezone" as a custom parameter
     final_lti_message_hint_dict = {
@@ -118,9 +117,7 @@ def launch_assignment(request: Request,
 
     url = f"{CLP_DOMAIN_URL}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}"
     # TODO: verify assignment and user relationship
-    # TODO: fetch data from request for custom param substitution
     return {"url": url, "message_hint": final_lti_message_hint_dict}
-    # RedirectResponse(url=url, headers=headers, status_code=302)
 
   except ValidationError as e:
     Logger.error(e)
