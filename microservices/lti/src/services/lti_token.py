@@ -125,19 +125,23 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
 
   if user.get("user_type") == "learner":
     token_claims[lti_claim_field("claim", "roles")] = [
+        "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Learner",
         "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
     ]
+
   elif user.get("user_type") == "faculty":
     token_claims[lti_claim_field("claim", "roles")] = [
-        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor",
+        "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
         "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Faculty",
-        "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor"
     ]
   # Role claims for Admin -
   elif user.get("user_type") == "admin":
     token_claims[lti_claim_field("claim", "roles")] = [
-        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
+        "http://purl.imsglobal.org/vocab/lis/v2/membership#Administrator",
         "http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator",
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
     ]
 
   return token_claims
