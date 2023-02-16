@@ -6,7 +6,7 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest, CustomHTTPException
 from common.utils import classroom_crud
-from config import CLASSROOM_ADMIN_EMAIL
+from config import CLASSROOM_ADMIN_EMAIL,DATABASE_PREFIX
 from utils.helper import convert_cohort_to_cohort_model
 from services import common_service
 from schemas.cohort import CohortListResponseModel
@@ -85,6 +85,7 @@ def get_course_template(course_template_id: str):
             if the get Course Template raises an exception
     """
   try:
+    print("DATABSE_PREFX",DATABASE_PREFIX)
     course_template = CourseTemplate.find_by_id(course_template_id)
     return course_template
   except ResourceNotFoundException as re:
@@ -197,7 +198,8 @@ request: Request):
       "is_registered": True,
       "failed_login_attempts_count": 0,
       "access_api_docs": False,
-      "gaia_id":gaia_id
+      "gaia_id":gaia_id,
+      "photo_url":"temp_url"
         }
     common_service.create_teacher(headers,data)
     # Storing classroom details

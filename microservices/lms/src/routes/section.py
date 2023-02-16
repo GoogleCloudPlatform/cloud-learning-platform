@@ -111,8 +111,7 @@ def create_section(sections_details: SectionDetails,request: Request):
     print("Current Course ____",current_course)
     new_course = classroom_crud.create_course(course_template_details.name,
                                               sections_details.description,
-                                              sections_details.name, "me",
-                                              current_course["gradebookSettings"])
+                                              sections_details.name, "me")
 
     # Get topics of current course
     # gradebook_result =  classroom_crud.create_gradebook_settings(new_course["id"],current_course["gradebookSettings"])
@@ -160,6 +159,38 @@ def create_section(sections_details: SectionDetails,request: Request):
     # Create coursework in new course
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
+
+    # Get the list of courseworkMaterial 
+    coursework_material_list = classroom_crud.get_coursework_material(
+      course_template_details.classroom_id)
+    for coursework_material in coursework_material_list:
+      #Check if a coursework material is linked to a topic if yes then
+      # replace the old topic id to new topic id using topic_id_map
+      if "topicId" in coursework_material.keys():
+        coursework_material["topicId"] = topic_id_map[coursework_material["topicId"]]
+      #Check if a material is present in coursework
+      if "materials" in coursework_material.keys():
+        # Calling function to get edit_url and view url of
+        # google form which returns
+        # a dictionary of view_links as keys and edit
+        #  likns as values of google form
+        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+        # Loop to check if a material in courssework has a google
+        # form attached to it
+        # update the  view link to edit link and attach it as a form
+        for material in coursework_material["materials"]:
+          if "form" in material.keys():
+            material["link"] = {
+                "title": material["form"]["title"],
+                "url": url_mapping[material["form"]["formUrl"]]
+            }
+            # remove form from  material dict
+            material.pop("form")
+            # material["form"]["formUrl"]=
+            # url_mapping[material["form"]["formUrl"]]
+    # Create coursework in new course
+    if coursework_material_list is not None:
+      classroom_crud.create_coursework_material(new_course["id"], coursework_material_list)
 
     # add Instructional designer
     sections_details.teachers.append(
@@ -220,6 +251,36 @@ def create_section(sections_details: SectionDetails,request: Request):
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
     Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.get("/get_coursewworkmaterial/{course_id}")
+def get_section_list(course_id:str,skip: int = 0, limit: int = 10):
+  """Get a all section details from db
+
+  Args:
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      HTTPException:
+        500 If refereced course_template and cohort object does not exists in db
+  Returns:
+    {"status":"Success","new_course":{}}: Returns section details from  db,
+    {'status': 'Failed'} if the user creation raises an exception
+  """
+  try:
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+    if limit < 1:
+      raise ValidationError(
+          "Invalid value passed to \"limit\" query parameter")
+
+    sections_list = classroom_crud.get_coursework_material(course_id=course_id)
+    return {"data": sections_list}
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
+  except Exception as e:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
     raise InternalServerError(str(e)) from e
 
 
@@ -423,7 +484,8 @@ def copy_courses(course_details: CourseDetails):
     new_course = classroom_crud.create_course(current_course["name"],
                                               current_course["description"],
                                               current_course["section"],
-                                              current_course["ownerId"])
+                                              current_course["ownerId"]
+                                            )
 
     # Get topics of current course
     topics = classroom_crud.get_topics(course_id)
@@ -463,6 +525,39 @@ def copy_courses(course_details: CourseDetails):
     # Create coursework in new course
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
+    
+    # Get the list of courseworkMaterial 
+    coursework_material_list = classroom_crud.get_coursework_material(
+      course_id)
+    for coursework_material in coursework_material_list:
+      #Check if a coursework material is linked to a topic if yes then
+      # replace the old topic id to new topic id using topic_id_map
+      if "topicId" in coursework_material.keys():
+        coursework_material["topicId"] = topic_id_map[coursework_material["topicId"]]
+      #Check if a material is present in coursework
+      if "materials" in coursework_material.keys():
+        # Calling function to get edit_url and view url of
+        # google form which returns
+        # a dictionary of view_links as keys and edit
+        #  likns as values of google form
+        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+        # Loop to check if a material in courssework has a google
+        # form attached to it
+        # update the  view link to edit link and attach it as a form
+        for material in coursework_material["materials"]:
+          if "form" in material.keys():
+            material["link"] = {
+                "title": material["form"]["title"],
+                "url": url_mapping[material["form"]["formUrl"]]
+            }
+            # remove form from  material dict
+            material.pop("form")
+            # material["form"]["formUrl"]=
+            # url_mapping[material["form"]["formUrl"]]
+    # Create coursework in new course
+    if coursework_material_list is not None:
+      classroom_crud.create_coursework_material(new_course["id"], coursework_material_list)
+
     SUCCESS_RESPONSE["new_course"] = new_course
     SUCCESS_RESPONSE["coursework_list"] = coursework_list
     return SUCCESS_RESPONSE
