@@ -100,7 +100,6 @@ def create_section(sections_details: SectionDetails,request: Request):
     course_template_details = CourseTemplate.find_by_id(
         sections_details.course_template)
     cohort_details = Cohort.find_by_id(sections_details.cohort)
-    name = course_template_details.name
     # Get course by course id for copying from master course
     current_course = classroom_crud.get_course_by_id(
         course_template_details.classroom_id)
@@ -109,17 +108,18 @@ def create_section(sections_details: SectionDetails,request: Request):
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
     # Create a new course
-
-    new_course = classroom_crud.create_course(name,
+    print("Current Course ____",current_course)
+    new_course = classroom_crud.create_course(course_template_details.name,
                                               sections_details.description,
                                               sections_details.name, "me")
+
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
     # add new_course to pubsub topic for both course work and roaster changes
-    classroom_crud.enable_notifications(new_course["id"],
-                                        "COURSE_WORK_CHANGES")
-    classroom_crud.enable_notifications(new_course["id"],
-                                        "COURSE_ROSTER_CHANGES")
+    # classroom_crud.enable_notifications(new_course["id"],
+    #                                     "COURSE_WORK_CHANGES")
+    # classroom_crud.enable_notifications(new_course["id"],
+    #                                     "COURSE_ROSTER_CHANGES")
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
     if topics is not None:
@@ -156,28 +156,54 @@ def create_section(sections_details: SectionDetails,request: Request):
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
 
+    # Get the list of courseworkMaterial
+    coursework_material_list = classroom_crud.get_coursework_material(
+      course_template_details.classroom_id)
+    for coursework_material in coursework_material_list:
+      #Check if a coursework material is linked to a topic if yes then
+      # replace the old topic id to new topic id using topic_id_map
+      if "topicId" in coursework_material.keys():
+        coursework_material["topicId"] =topic_id_map[
+          coursework_material["topicId"]]
+      #Check if a material is present in coursework
+      if "materials" in coursework_material.keys():
+        # Calling function to get edit_url and view url of
+        # google form which returns
+        # a dictionary of view_links as keys and edit
+        #  likns as values of google form
+        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+        # Loop to check if a material in courssework has a google
+        # form attached to it
+        # update the  view link to edit link and attach it as a form
+        for material in coursework_material["materials"]:
+          if "form" in material.keys():
+            material["link"] = {
+                "title": material["form"]["title"],
+                "url": url_mapping[material["form"]["formUrl"]]
+            }
+            # remove form from  material dict
+            material.pop("form")
+            # material["form"]["formUrl"]=
+            # url_mapping[material["form"]["formUrl"]]
+    # Create coursework in new course
+    if coursework_material_list is not None:
+      classroom_crud.create_coursework_material(new_course["id"],
+      coursework_material_list)
     # add Instructional designer
     sections_details.teachers.append(
         course_template_details.instructional_designer)
-
     for teacher_email in sections_details.teachers:
       # classroom_crud.add_teacher(new_course["id"], teacher_email)
       invitation_object = classroom_crud.invite_teacher(new_course["id"],
                             teacher_email)
     # Storing classroom details
-      print("This is invitation API response ")
-      print(invitation_object)
       classroom_crud.acceept_invite(invitation_object["id"],teacher_email)
-      print("Invite Accepted")
       user_profile = classroom_crud.get_user_profile_information(teacher_email)
       # classroom_crud.add_teacher(new_course["id"], teacher_email)
-      print("User profile Information ______",user_profile)
-      gaid = user_profile["id"]
-      name =  user_profile["name"]["givenName"]
-      last_name =  user_profile["name"]["familyName"]
-      photo_url =  user_profile["photoUrl"]
-      print(f"Gaid {gaid} first name {name} last name \
-        {last_name} photo url {photo_url}")
+      # gaid = user_profile["id"]
+      # name =  user_profile["name"]["givenName"]
+      # last_name =  user_profile["name"]["familyName"]
+      # photo_url =  user_profile["photoUrl"]
     # Save the new record of seecion in firestore
       data = {
       "first_name":user_profile["name"]["givenName"],
@@ -194,7 +220,7 @@ def create_section(sections_details: SectionDetails,request: Request):
         }
       common_service.create_teacher(headers,data)
     section = Section()
-    section.name = name
+    section.name =course_template_details.name
     section.section = sections_details.name
     section.description = sections_details.description
     # Reference document can be get using get() method
@@ -321,7 +347,6 @@ def section_list(skip: int = 0, limit: int = 10):
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
-    print(err)
     raise InternalServerError(str(e)) from e
 
 
@@ -344,7 +369,6 @@ def update_section(sections_details: UpdateSection,request: Request):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    print("1")
     headers = {"Authorization": request.headers.get("Authorization")}
     section = Section.find_by_id(sections_details.id)
     new_course = classroom_crud.update_course(sections_details.course_id,
@@ -356,14 +380,11 @@ def update_section(sections_details: UpdateSection,request: Request):
           f" {sections_details.course_id} is not found in classroom")
     add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
-    print("ADD teachers list ",add_teacher_list)
     for i in add_teacher_list:
       # classroom_crud.add_teacher(sections_details.course_id, i)
       invitation_object = classroom_crud.invite_teacher(
                             sections_details.course_id,i)
       # Storing classroom details
-      print("This is invitation API response ")
-      print(invitation_object)
       classroom_crud.acceept_invite(invitation_object["id"],i)
       user_profile = classroom_crud.get_user_profile_information(i)
       data = {
@@ -380,7 +401,6 @@ def update_section(sections_details: UpdateSection,request: Request):
       "gaia_id":user_profile["id"]
         }
       common_service.create_teacher(headers,data)
-      print("Invite Accepted userprofile is",user_profile)
     remove_teacher_list = list(
         set(section.teachers) - set(sections_details.teachers))
     for i in remove_teacher_list:
@@ -402,7 +422,6 @@ def update_section(sections_details: UpdateSection,request: Request):
                               data=None) from hte
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
-    print(err)
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
@@ -431,7 +450,8 @@ def copy_courses(course_details: CourseDetails):
     new_course = classroom_crud.create_course(current_course["name"],
                                               current_course["description"],
                                               current_course["section"],
-                                              current_course["ownerId"])
+                                              current_course["ownerId"]
+                                            )
 
     # Get topics of current course
     topics = classroom_crud.get_topics(course_id)
@@ -471,6 +491,40 @@ def copy_courses(course_details: CourseDetails):
     # Create coursework in new course
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
+    # Get the list of courseworkMaterial
+    coursework_material_list = classroom_crud.get_coursework_material(
+      course_id)
+    for coursework_material in coursework_material_list:
+      #Check if a coursework material is linked to a topic if yes then
+      # replace the old topic id to new topic id using topic_id_map
+      if "topicId" in coursework_material.keys():
+        coursework_material["topicId"] = topic_id_map[
+          coursework_material["topicId"]]
+      #Check if a material is present in coursework
+      if "materials" in coursework_material.keys():
+        # Calling function to get edit_url and view url of
+        # google form which returns
+        # a dictionary of view_links as keys and edit
+        #  likns as values of google form
+        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+        # Loop to check if a material in courssework has a google
+        # form attached to it
+        # update the  view link to edit link and attach it as a form
+        for material in coursework_material["materials"]:
+          if "form" in material.keys():
+            material["link"] = {
+                "title": material["form"]["title"],
+                "url": url_mapping[material["form"]["formUrl"]]
+            }
+            # remove form from  material dict
+            material.pop("form")
+            # material["form"]["formUrl"]=
+            # url_mapping[material["form"]["formUrl"]]
+    # Create coursework in new course
+    if coursework_material_list is not None:
+      classroom_crud.create_coursework_material(new_course["id"],
+       coursework_material_list)
+
     SUCCESS_RESPONSE["new_course"] = new_course
     SUCCESS_RESPONSE["coursework_list"] = coursework_list
     return SUCCESS_RESPONSE

@@ -34,7 +34,9 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.coursework.me",
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/forms.body.readonly",
-    "https://www.googleapis.com/auth/classroom.profile.photos"
+    "https://www.googleapis.com/auth/classroom.profile.photos",
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials",
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
 ]
 
 
@@ -43,7 +45,6 @@ def get_credentials():
   creds = service_account.Credentials.from_service_account_info(classroom_key,
                                                                 scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-
   return creds
 
 
@@ -222,6 +223,29 @@ def get_coursework(course_id):
     logger.error(error)
     return None
 
+def get_coursework_material(course_id):
+  """Get  list of coursework from classroom
+
+  Args: course_id
+  Returns:
+    returns list of coursework of given course in classroom
+    """ ""
+
+  service = build("classroom", "v1", credentials=get_credentials())
+  try:
+    print("This in coursewoek material")
+    coursework_list = service.courses().courseWorkMaterials().list(
+        courseId=course_id).execute()
+    print("This is courseworkMaterial list before Mapping ",coursework_list)
+    if coursework_list:
+      coursework_list = coursework_list["courseWorkMaterial"]
+    return coursework_list
+  except HttpError as error:
+    print(error)
+    logger.error(error)
+    return None
+
+
 
 def create_coursework(course_id, coursework_list):
   """create coursework in a classroom course
@@ -239,6 +263,24 @@ def create_coursework(course_id, coursework_list):
                                               body=coursework_item).execute()
   Logger.info("Create coursework method worked")
   return "success"
+
+def create_coursework_material(course_id, coursework_material_list):
+  """create coursework in a classroom course
+
+  Args:
+    course_id: where coursework need to be created
+    coursework : list of dictionary of coursework to be created
+  Returns:
+    returns success
+    """ ""
+  Logger.info("In Create coursework Material")
+  service = build("classroom", "v1", credentials=get_credentials())
+  for coursework_item in coursework_material_list:
+    _ = service.courses().courseWorkMaterials().create(courseId=course_id,
+                                              body=coursework_item).execute()
+  Logger.info("Create coursework Material worked")
+  return "success"
+
 
 
 def delete_course_by_id(course_id):

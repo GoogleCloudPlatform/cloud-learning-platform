@@ -22,7 +22,7 @@ DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PUB_SUB_PROJECT_ID = os.getenv("PUB_SUB_PROJECT_ID") or \
     PROJECT_ID
 
-BQ_DATASET = DATABASE_PREFIX + os.getenv("BQ_DATASET", "cns")
+BQ_DATASET = DATABASE_PREFIX + os.getenv("BQ_DATASET", "lms_analytics")
 
 BQ_TABLE_DICT = {
     "BQ_LOG_CW_TABLE": "courseWorkLogs",

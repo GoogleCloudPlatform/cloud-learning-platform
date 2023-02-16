@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS userCollection (
         `emailAddress` STRING NOT NULL,
         photoUrl STRING,
         verifiedTeacher BOOL,
-        Permissions ARRAY < STRING >,
+        permissions ARRAY <JSON>,
         event_type STRING,
         `timestamp` TIMESTAMP,
         message_id STRING NOT NULL);
