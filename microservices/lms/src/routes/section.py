@@ -250,36 +250,6 @@ def create_section(sections_details: SectionDetails,request: Request):
     raise InternalServerError(str(e)) from e
 
 
-@router.get("/get_coursewworkmaterial/{course_id}")
-def get_section_list(course_id:str,skip: int = 0, limit: int = 10):
-  """Get a all section details from db
-
-  Args:
-  Raises:
-      HTTPException: 500 Internal Server Error if something fails
-      HTTPException:
-        500 If refereced course_template and cohort object does not exists in db
-  Returns:
-    {"status":"Success","new_course":{}}: Returns section details from  db,
-    {'status': 'Failed'} if the user creation raises an exception
-  """
-  try:
-    if skip < 0:
-      raise ValidationError("Invalid value passed to \"skip\" query parameter")
-    if limit < 1:
-      raise ValidationError(
-          "Invalid value passed to \"limit\" query parameter")
-
-    sections_list = classroom_crud.get_coursework_material(course_id=course_id)
-    return {"data": sections_list}
-  except ValidationError as ve:
-    raise BadRequest(str(ve)) from ve
-  except Exception as e:
-    err = traceback.format_exc().replace("\n", " ")
-    Logger.error(err)
-    raise InternalServerError(str(e)) from e
-
-
 @router.get("/{section_id}", response_model=GetSectiontResponseModel)
 def get_section(section_id: str):
   """Get a section details from db
