@@ -18,8 +18,7 @@ from schemas.section import (
     CreateSectiontResponseModel, DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     ClassroomCourseListResponseModel, UpdateSectionResponseModel,
-    TeachersListResponseModel,GetTeacherResponseModel,AssignmentModel)
-    
+    TeachersListResponseModel,GetTeacherResponseModel,AssignmentModel)  
 from schemas.update_section import UpdateSection
 from services import common_service
 from utils.helper import convert_section_to_section_model, convert_assignment_to_assignment_model
@@ -324,7 +323,7 @@ def get_teachers_list(section_id: str, request: Request):
     raise InternalServerError(str(e)) from e
 
 
-@router.get("/sections/{section_id}/teachers/{teacher_email}", 
+@router.get("/{section_id}/teachers/{teacher_email}",
 response_model=GetTeacherResponseModel)
 def get_teacher(section_id: str,teacher_email:str,request: Request):
   """Get teacher for a section .If teacher is present in given section
@@ -345,9 +344,11 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
     section_details = Section.find_by_id(section_id)
     teachers= section_details.teachers
     if teacher_email in teachers:
-      result = common_service.call_search_user_api(headers=headers,email=teacher_email)
+      result = common_service.call_search_user_api(headers=headers,
+      email=teacher_email)
       if result.json()["data"] == []:
-        raise ResourceNotFoundException(f"{teacher_email} not found in Users data")
+        raise ResourceNotFoundException(
+          f"{teacher_email} not found in Users data")
       else :
         print("Result of search User API",result.json()["data"][0])
         return {"data": result.json()["data"][0]}

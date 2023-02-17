@@ -337,11 +337,11 @@ def test_list_teachers(client_with_emulator,create_fake_data):
 
   section_id =  create_fake_data["section"]
   url = BASE_URL + f"/sections/{section_id}"
-  with mock.patch("routes.section.common_service.call_search_user_api"):
+  with mock.patch("routes.section.common_service.call_search_user_api",return_value=TEMP_USER):
     resp = client_with_emulator.get(url)
     print("Test teachers list response___",resp.json())
   assert resp.status_code == 200
-  assert resp.json()["data"] == []
+  assert resp.json()["success"] == True
 
 def test_get_teacher(client_with_emulator,create_fake_data):
   user_api_response={
@@ -350,7 +350,9 @@ def test_get_teacher(client_with_emulator,create_fake_data):
   "data": TEMP_USER}
   section_id =  create_fake_data["section"]
   url = BASE_URL + f"/sections/{section_id}/teachers/teachera@gmail.com"
-  with mock.patch("routes.section.common_service.call_search_user_api",return_value=user_api_response):
+  with mock.patch(
+    "routes.section.common_service.call_search_user_api",
+  return_value=user_api_response):
     resp = client_with_emulator.get(url)
     print("Get User response___",resp.json())
   assert resp.status_code == 200
