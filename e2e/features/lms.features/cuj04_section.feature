@@ -44,3 +44,14 @@ Feature: Add student to section
     Given A user has access to portal and needs to enable notifications for a course using payload
     When API request is sent to enable notifications for a course with incorrect request payload
     Then Notifications will not be enabled and API will throw a validation error
+
+@fixture.create.assignment
+  Scenario: Retrieve Assignment details by giving valid section id and assignment id
+    Given A user has access to portal and needs to retrieve a assignment using section id and assignment id
+    When API request is sent to retrieve assignment details of a section with correct section id and assignment id
+    Then Assignment Record corresponding to given assignment id will be returned successfully
+
+  Scenario: Unable to retrieve Assignment details when invalid section id given
+    Given A user has access to admin portal and wants to retrieve a assignment using assignment id and section id
+    When API request is sent to retrieve assignment details by providing invalid section id
+    Then Assignment details will not be returned and API will throw a resource not found error

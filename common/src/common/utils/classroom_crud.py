@@ -693,3 +693,15 @@ def get_user_profile_information(user_email):
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
+
+def get_course_work(course_id,course_work_id):
+  """get course work by course id and course work id
+  Args:
+    course_id (str): _description_
+    course_work_id (str): _description_
+  Returns:
+    dict: _description_
+  """
+  service = service = build("classroom", "v1", credentials=get_credentials())
+  return service.courses().courseWork().get(
+    courseId=course_id,id=course_work_id).execute()
