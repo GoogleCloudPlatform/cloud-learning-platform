@@ -17,10 +17,11 @@ from schemas.error_schema import (ConflictResponseModel,
 from schemas.section import (
     CreateSectiontResponseModel, DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
-    ClassroomCourseListResponseModel, UpdateSectionResponseModel)
+    ClassroomCourseListResponseModel, UpdateSectionResponseModel,
+    AssignmentModel)
 from schemas.update_section import UpdateSection
 from services import common_service
-from utils.helper import convert_section_to_section_model
+from utils.helper import convert_section_to_section_model, convert_assignment_to_assignment_model
 
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -258,7 +259,7 @@ def get_section(section_id: str):
       section_id (str): section_id in firestore
   Raises:
       HTTPException: 500 Internal Server Error if something fails
-      HTTPException: 404 Section with section id is not found
+      ResourceNotFound: 404 Section with section id is not found
   Returns:
     {"status":"Success","new_course":{}}: Returns section details from  db,
     {'status': 'Failed'} if the user creation raises an exception
@@ -293,7 +294,7 @@ def delete_section(section_id: str):
       section_id (str): section_id in firestore
   Raises:
       HTTPException: 500 Internal Server Error if something fails
-      HTTPException: 404 Section with section id is not found
+      ResourceNotFound: 404 Section with section id is not found
   Returns:
     {"message": "Successfully deleted section"}
   """
@@ -599,3 +600,35 @@ def section_enable_notifications_pub_sub(
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
+@router.get("/{section_id}/assignments/{assignment_id}",
+            response_model=AssignmentModel)
+def get_assignment(section_id: str, assignment_id: str):
+  """Get course work details using section id and course work id
+  Args:
+      section_id (str): section unique id
+      assignment_id (str): course work/assignment unique id
+  Raises:
+      InternalServerError: 500 Internal Server Error if something fails
+      CustomHTTPException: raise error according to the HTTPError exception
+      ResourceNotFound: 404 Section with section id is not found
+  Returns:
+      AssignmentModel: AssignmentModel object which
+        contains all the course work details
+  """
+  try:
+    section = Section.find_by_id(section_id)
+    assignment = classroom_crud.get_course_work(course_id=section.classroom_id,
+                                                course_work_id=assignment_id)
+    return convert_assignment_to_assignment_model(assignment)
+  except HttpError as hte:
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
