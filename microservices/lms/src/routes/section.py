@@ -18,7 +18,7 @@ from schemas.section import (
     CreateSectiontResponseModel, DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     ClassroomCourseListResponseModel, UpdateSectionResponseModel,
-    TeachersListResponseModel,GetTeacherResponseModel,AssignmentModel)  
+    TeachersListResponseModel,GetTeacherResponseModel,AssignmentModel)
 from schemas.update_section import UpdateSection
 from services import common_service
 from utils.helper import convert_section_to_section_model, convert_assignment_to_assignment_model
