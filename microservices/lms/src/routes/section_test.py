@@ -11,7 +11,8 @@ from common.models import CourseTemplate, Cohort
 from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from testing.test_config import BASE_URL
-from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, COHORT_EXAMPLE, CREDENTIAL_JSON
+from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
+   COHORT_EXAMPLE, CREDENTIAL_JSON,TEMP_USER
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
@@ -224,6 +225,9 @@ def test_list_section(client_with_emulator, create_fake_data):
   assert resp.status_code == 200
 
 
+
+
+
 def test_list_section_validation_error(client_with_emulator, create_fake_data):
 
   url = BASE_URL + "/sections?skip=-1&limit=10"
@@ -307,8 +311,28 @@ def test_update_section_course_id_not_found(client_with_emulator,
   resp.json()
   assert resp.status_code == 404
 
+def test_list_teachers(client_with_emulator,create_fake_data):
 
 
+  section_id =  create_fake_data["section"]
+  url = BASE_URL + f"/sections/{section_id}"
+  with mock.patch("routes.section.common_service.call_search_user_api"):
+    resp = client_with_emulator.get(url)
+    print("Test teachers list response___",resp.json())
+  assert resp.status_code == 200
+  assert resp.json()["data"] == []
+
+def test_get_teacher(client_with_emulator,create_fake_data):
+  user_api_response={
+  "success": True,
+  "message": "Success",
+  "data": TEMP_USER}
+  section_id =  create_fake_data["section"]
+  url = BASE_URL + f"/sections/{section_id}/teachers/teachera@gmail.com"
+  with mock.patch("routes.section.common_service.call_search_user_api",return_value=user_api_response):
+    resp = client_with_emulator.get(url)
+    print("Get User response___",resp.json())
+  assert resp.status_code == 200
 
 def test_delete_section(client_with_emulator, create_fake_data):
 

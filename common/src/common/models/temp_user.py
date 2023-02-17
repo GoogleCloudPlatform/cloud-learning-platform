@@ -179,7 +179,8 @@ class TempUser(TempBaseModel):
   is_registered = BooleanField()
   failed_login_attempts_count = NumberField()
   access_api_docs = BooleanField(default=False)
-
+  gaia_id = TextField()
+  photo_url = TextField()
   class Meta:
     collection_name = TempBaseModel.DATABASE_PREFIX + "users"
     ignore_none_field = False
