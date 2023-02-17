@@ -116,3 +116,19 @@ UPDATE_SECTION = {
     "description": "string",
     "teachers": ["test_user_1@gmail.com"]
 }
+
+ASSIGNMENT_MODEL = {
+    "id": "1234567888",
+    "classroom_id": "1237777333",
+    "title": "Assignment name",
+    "description": "description",
+    "link": "https://link.com",
+    "state": "PUBLISHED",
+    "creation_time": "2023-02-16T10:32:25.059Z",
+    "update_time": "2023-02-16T11:01:09.375Z",
+    "due_date": "20xx-0x-1x",
+    "due_time": "hh:mm:ss",
+    "max_grade": 100,
+    "work_type": "ASSIGNMENT",
+    "assignee_mode": "ALL_STUDENTS"
+}

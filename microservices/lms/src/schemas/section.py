@@ -1,10 +1,11 @@
 """
 Pydantic Model for copy course API's
 """
+import datetime
 from typing import Optional
 from pydantic import BaseModel, constr
 from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE,\
-  INSERT_SECTION_EXAMPLE,TEMP_USER
+  INSERT_SECTION_EXAMPLE,TEMP_USER,ASSIGNMENT_MODEL
 
 
 class Sections(BaseModel):
@@ -265,4 +266,25 @@ class StudentListResponseModel(BaseModel):
       "user_type_ref": "cnkybYRTLPobwyo52JBR"}]
       }
       }
+class AssignmentModel(BaseModel):
+  """Assignment Details Model"""
+  id: str
+  classroom_id: str
+  title: Optional[str] = None
+  description: Optional[str] = None
+  link: Optional[str] = None
+  state: Optional[str] = None
+  creation_time: str
+  update_time: str
+  due_date: Optional[datetime.date] = None
+  due_time: Optional[datetime.time] = None
+  max_grade: Optional[int] = None
+  work_type: Optional[str] = None
+  assignee_mode: Optional[str] = None
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": ASSIGNMENT_MODEL
+    }
      

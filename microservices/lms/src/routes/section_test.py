@@ -4,6 +4,7 @@
 import os
 import mock
 import pytest
+import datetime
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from common.models.section import Section
@@ -76,8 +77,12 @@ def test_copy_course(client_with_emulator):
         with mock.patch("routes.section.classroom_crud.create_topics"):
           with mock.patch("routes.section.classroom_crud.get_coursework"):
             with mock.patch(
-                "routes.section.classroom_crud.create_coursework"):
-              resp = client_with_emulator.post(url, json=course_details)
+              "routes.section.classroom_crud.create_coursework"):
+              with mock.patch(
+                "routes.section.classroom_crud.get_coursework_material"):
+                with mock.patch(
+                "routes.section.classroom_crud.create_coursework_material"):
+                  resp = client_with_emulator.post(url, json=course_details)
   assert resp.status_code == 200
 
 
@@ -91,8 +96,12 @@ def test_copy_course_not_found(client_with_emulator):
         with mock.patch("routes.section.classroom_crud.create_topics"):
           with mock.patch("routes.section.classroom_crud.get_coursework"):
             with mock.patch(
-                "routes.section.classroom_crud.create_coursework"):
-              resp = client_with_emulator.post(url, json=course_details)
+            "routes.section.classroom_crud.create_coursework"):
+              with mock.patch(
+            "routes.section.classroom_crud.create_coursework_material"):
+                with mock.patch(
+              "routes.section.classroom_crud.get_coursework_material"):
+                  resp = client_with_emulator.post(url, json=course_details)
   assert resp.status_code == 200
 
 
@@ -135,8 +144,12 @@ def test_create_section(client_with_emulator, create_fake_data):
                 "routes.section.classroom_crud.acceept_invite"):
                           with mock.patch(
                       "routes.section.common_service.create_teacher"):
-                            resp = client_with_emulator.post(url,
-                            json=section_details)
+                            with mock.patch(
+                    "routes.section.classroom_crud.get_coursework_material"):
+                              with mock.patch(
+                    "routes.section.classroom_crud.create_coursework_material"):
+                                resp = client_with_emulator.post(url,
+                              json=section_details)
   assert resp.status_code == 200
 
 
@@ -173,7 +186,11 @@ def test_create_section_course_template_not_found(client_with_emulator,
               "routes.section.classroom_crud.acceept_invite"):
                     with mock.patch(
             "routes.section.common_service.create_teacher"):
-                      resp = client_with_emulator.post(url,
+                      with mock.patch(
+            "routes.section.classroom_crud.get_coursework_material"):
+                        with mock.patch(
+            "routes.section.classroom_crud.create_coursework_material"):
+                          resp = client_with_emulator.post(url,
                       json=section_details)
   assert resp.status_code == 404
 
@@ -213,7 +230,11 @@ def test_create_section_cohort_not_found(client_with_emulator,
         "routes.section.classroom_crud.invite_teacher"):
                     with mock.patch(
         "routes.section.common_service.create_teacher"):
-                      resp = client_with_emulator.post(url,
+                      with mock.patch(
+              "routes.section.classroom_crud.get_coursework_material"):
+                        with mock.patch(
+                "routes.section.classroom_crud.create_coursework_material"):
+                          resp = client_with_emulator.post(url,
                       json=section_details)
   assert resp.status_code == 404
 
@@ -422,3 +443,74 @@ def test_negative_enable_notifications(client_with_emulator):
       resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code==422,"Status 422"
   assert resp.json()["success"] is False, "Data doesn't Match"
+
+
+def test_get_assignment(client_with_emulator, create_fake_data):
+  url = BASE_URL + \
+      f"/sections/{create_fake_data['section']}/assignments/5789246"
+  course_work_data = {
+      "courseId": "555555555",
+      "id": "5789246",
+      "title": "test assignment",
+      "state": "PUBLISHED",
+      "alternateLink": "https://classroom.google.com/xyz",
+      "creationTime": "2023-02-16T10:45:49.833Z",
+      "updateTime": "2023-02-16T10:46:06.699Z",
+      "dueDate": {
+          "year": 2023,
+          "month": 2,
+          "day": 28
+      },
+      "dueTime": {
+          "hours": 18,
+          "minutes": 29
+      },
+      "maxPoints": 100,
+      "workType": "ASSIGNMENT",
+      "assigneeMode": "ALL_STUDENTS",
+  }
+  with mock.patch("routes.section.classroom_crud.get_course_work",
+                  return_value=course_work_data):
+    resp = client_with_emulator.get(url)
+  data = resp.json()
+  assert resp.status_code == 200, "Status 200"
+  assert data["id"] == course_work_data["id"], "Data id doesn't Match"
+  assert data["classroom_id"] == course_work_data[
+      "courseId"], "Data course id doesn't Match"
+  assert data["description"] is None, "Data description doesn't Match"
+  assert datetime.date.fromisoformat(data["due_date"]) == datetime.date(
+      year=course_work_data["dueDate"]["year"],
+      month=course_work_data["dueDate"]["month"],
+      day=course_work_data["dueDate"]["day"]), "Data due date doesn't Match"
+
+
+def test_negative_get_assignment(client_with_emulator, create_fake_data):
+  url = BASE_URL + \
+      "/sections/fake_id/assignments/5789246"
+  course_work_data = {
+      "courseId": "555555555",
+      "id": "5789246",
+      "title": "test assignment",
+      "state": "PUBLISHED",
+      "alternateLink": "https://classroom.google.com/xyz",
+      "creationTime": "2023-02-16T10:45:49.833Z",
+      "updateTime": "2023-02-16T10:46:06.699Z",
+      "dueDate": {
+          "year": 2023,
+          "month": 2,
+          "day": 28
+      },
+      "dueTime": {
+          "hours": 18,
+          "minutes": 29
+      },
+      "maxPoints": 100,
+      "workType": "ASSIGNMENT",
+      "assigneeMode": "ALL_STUDENTS",
+  }
+  with mock.patch("routes.section.classroom_crud.get_course_work",
+                  return_value=course_work_data):
+    resp = client_with_emulator.get(url)
+  data = resp.json()
+  assert resp.status_code == 404, "Status 404"
+  assert data["success"] is False, "Data doesn't Match"

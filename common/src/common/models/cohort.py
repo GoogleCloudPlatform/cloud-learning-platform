@@ -35,7 +35,6 @@ class Cohort(BaseModel):
   class Meta:
     ignore_none_field = False
     collection_name = BaseModel.DATABASE_PREFIX + "cohorts"
-
   @classmethod
   def fetch_all_by_course_template(cls,
                                    course_template_key,
