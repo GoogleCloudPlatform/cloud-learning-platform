@@ -71,279 +71,279 @@ def test_get_user(client_with_emulator):
 mocked_value = {"id":"123456789","name":{"givenName":"user1",
     "familyName":"last_name"},"photoUrl":"http://mockurl.com"}
 
-# def test_copy_course(client_with_emulator):
-#   url = BASE_URL + "/sections/copy_course/"
-#   course_details = {"course_id": "TEST123"}
-#   with mock.patch("routes.section.classroom_crud.get_course_by_id"):
-#     with mock.patch("routes.section.classroom_crud.create_course"):
-#       with mock.patch("routes.section.classroom_crud.get_topics"):
-#         with mock.patch("routes.section.classroom_crud.create_topics"):
-#           with mock.patch("routes.section.classroom_crud.get_coursework"):
-#             with mock.patch(
-#               "routes.section.classroom_crud.create_coursework"):
-#               with mock.patch(
-#                 "routes.section.classroom_crud.get_coursework_material"):
-#                 with mock.patch(
-#                 "routes.section.classroom_crud.create_coursework_material"):
-#                   resp = client_with_emulator.post(url, json=course_details)
-#   assert resp.status_code == 200
+def test_copy_course(client_with_emulator):
+  url = BASE_URL + "/sections/copy_course/"
+  course_details = {"course_id": "TEST123"}
+  with mock.patch("routes.section.classroom_crud.get_course_by_id"):
+    with mock.patch("routes.section.classroom_crud.create_course"):
+      with mock.patch("routes.section.classroom_crud.get_topics"):
+        with mock.patch("routes.section.classroom_crud.create_topics"):
+          with mock.patch("routes.section.classroom_crud.get_coursework"):
+            with mock.patch(
+              "routes.section.classroom_crud.create_coursework"):
+              with mock.patch(
+                "routes.section.classroom_crud.get_coursework_material"):
+                with mock.patch(
+                "routes.section.classroom_crud.create_coursework_material"):
+                  resp = client_with_emulator.post(url, json=course_details)
+  assert resp.status_code == 200
 
 
-# def test_copy_course_not_found(client_with_emulator):
-#   url = BASE_URL + "/sections/copy_course/"
-#   course_details = {"course_id": "TEST123"}
-#   with mock.patch("routes.section.classroom_crud.get_course_by_id",
-#                   return_value=None):
-#     with mock.patch("routes.section.classroom_crud.create_course"):
-#       with mock.patch("routes.section.classroom_crud.get_topics"):
-#         with mock.patch("routes.section.classroom_crud.create_topics"):
-#           with mock.patch("routes.section.classroom_crud.get_coursework"):
-#             with mock.patch(
-#             "routes.section.classroom_crud.create_coursework"):
-#               with mock.patch(
-#             "routes.section.classroom_crud.create_coursework_material"):
-#                 with mock.patch(
-#               "routes.section.classroom_crud.get_coursework_material"):
-#                   resp = client_with_emulator.post(url, json=course_details)
-#   assert resp.status_code == 200
+def test_copy_course_not_found(client_with_emulator):
+  url = BASE_URL + "/sections/copy_course/"
+  course_details = {"course_id": "TEST123"}
+  with mock.patch("routes.section.classroom_crud.get_course_by_id",
+                  return_value=None):
+    with mock.patch("routes.section.classroom_crud.create_course"):
+      with mock.patch("routes.section.classroom_crud.get_topics"):
+        with mock.patch("routes.section.classroom_crud.create_topics"):
+          with mock.patch("routes.section.classroom_crud.get_coursework"):
+            with mock.patch(
+            "routes.section.classroom_crud.create_coursework"):
+              with mock.patch(
+            "routes.section.classroom_crud.create_coursework_material"):
+                with mock.patch(
+              "routes.section.classroom_crud.get_coursework_material"):
+                  resp = client_with_emulator.post(url, json=course_details)
+  assert resp.status_code == 200
 
 
-# def test_create_section(client_with_emulator, create_fake_data):
-#   url = BASE_URL + "/sections"
-#   section_details = {
-#       "name": "section_20",
-#       "description": "This is description",
-#       "course_template": create_fake_data["course_template"],
-#       "cohort": create_fake_data["cohort"],
-#       "teachers": ["teachera@gmail.com"]
-#   }
-#   mock_return_course = {
-#       "id": "57690009090",
-#       "enrollmentCode": "as3rr",
-#       "name": "Jhjiuiui",
-#       "alternateLink": "https://classroom.google.com"
-#   }
+def test_create_section(client_with_emulator, create_fake_data):
+  url = BASE_URL + "/sections"
+  section_details = {
+      "name": "section_20",
+      "description": "This is description",
+      "course_template": create_fake_data["course_template"],
+      "cohort": create_fake_data["cohort"],
+      "teachers": ["teachera@gmail.com"]
+  }
+  mock_return_course = {
+      "id": "57690009090",
+      "enrollmentCode": "as3rr",
+      "name": "Jhjiuiui",
+      "alternateLink": "https://classroom.google.com"
+  }
 
-#   with mock.patch("routes.section.classroom_crud.get_course_by_id"):
-#     with mock.patch("routes.section.classroom_crud.create_course",
-#                     return_value=mock_return_course):
-#       with mock.patch("routes.section.classroom_crud.get_topics"):
-#         with mock.patch("routes.section.classroom_crud.create_topics"):
-#           with mock.patch("routes.section.classroom_crud.get_coursework"):
-#             with mock.patch(
-#                 "routes.section.classroom_crud.create_coursework"):
-#               with mock.patch("routes.section.classroom_crud.add_teacher"):
-#                 with mock.patch(
-#                     "routes.section.classroom_crud.delete_teacher"):
-#                   with mock.patch(
-#                     "routes.section.classroom_crud.enable_notifications"):
-#                     with mock.patch(
-#                   "routes.section.classroom_crud.invite_teacher",
-#                     return_value={"id":"12wewew"}):
-#                       with mock.patch(
-#               "routes.section.classroom_crud.get_user_profile_information",
-#                         return_value=mocked_value):
-#                         with mock.patch(
-#                 "routes.section.classroom_crud.acceept_invite"):
-#                           with mock.patch(
-#                       "routes.section.common_service.create_teacher"):
-#                             with mock.patch(
-#                     "routes.section.classroom_crud.get_coursework_material"):
-#                               with mock.patch(
-#                     "routes.section.classroom_crud.create_coursework_material"):
-#                                 resp = client_with_emulator.post(url,
-#                               json=section_details)
-#   assert resp.status_code == 200
-
-
-# def test_create_section_course_template_not_found(client_with_emulator,
-#                                                   create_fake_data):
-
-#   url = BASE_URL + "/section"
-#   section_details = {
-#       "name": "section_20",
-#       "description": "This is description",
-#       "course_template": "fake-classroom-id_new",
-#       "cohort": create_fake_data["cohort"],
-#       "teachers": ["teachera@gmail.com"]
-#   }
-#   mock_return_course = {
-#       "id": "57690009090",
-#       "enrollmentCode": "as3rr",
-#       "name": "Jhjiuiui",
-#       "alternateLink": "https://classroom.google.com"
-#   }
-#   with mock.patch("routes.section.classroom_crud.get_course_by_id"):
-#     with mock.patch("routes.section.classroom_crud.create_course",
-#                     return_value=mock_return_course):
-#       with mock.patch("routes.section.classroom_crud.get_topics"):
-#         with mock.patch("routes.section.classroom_crud.create_topics"):
-#           with mock.patch("routes.section.classroom_crud.get_coursework"):
-#             with mock.patch(
-#                 "routes.section.classroom_crud.create_coursework"):
-#               with mock.patch("routes.section.classroom_crud.invite_teacher"):
-#                 with mock.patch(
-#                 "routes.section.classroom_crud.get_user_profile_information",
-#                 return_value=mocked_value):
-#                   with mock.patch(
-#               "routes.section.classroom_crud.acceept_invite"):
-#                     with mock.patch(
-#             "routes.section.common_service.create_teacher"):
-#                       with mock.patch(
-#             "routes.section.classroom_crud.get_coursework_material"):
-#                         with mock.patch(
-#             "routes.section.classroom_crud.create_coursework_material"):
-#                           resp = client_with_emulator.post(url,
-#                       json=section_details)
-#   assert resp.status_code == 404
+  with mock.patch("routes.section.classroom_crud.get_course_by_id"):
+    with mock.patch("routes.section.classroom_crud.create_course",
+                    return_value=mock_return_course):
+      with mock.patch("routes.section.classroom_crud.get_topics"):
+        with mock.patch("routes.section.classroom_crud.create_topics"):
+          with mock.patch("routes.section.classroom_crud.get_coursework"):
+            with mock.patch(
+                "routes.section.classroom_crud.create_coursework"):
+              with mock.patch("routes.section.classroom_crud.add_teacher"):
+                with mock.patch(
+                    "routes.section.classroom_crud.delete_teacher"):
+                  with mock.patch(
+                    "routes.section.classroom_crud.enable_notifications"):
+                    with mock.patch(
+                  "routes.section.classroom_crud.invite_teacher",
+                    return_value={"id":"12wewew"}):
+                      with mock.patch(
+              "routes.section.classroom_crud.get_user_profile_information",
+                        return_value=mocked_value):
+                        with mock.patch(
+                "routes.section.classroom_crud.acceept_invite"):
+                          with mock.patch(
+                      "routes.section.common_service.create_teacher"):
+                            with mock.patch(
+                    "routes.section.classroom_crud.get_coursework_material"):
+                              with mock.patch(
+                    "routes.section.classroom_crud.create_coursework_material"):
+                                resp = client_with_emulator.post(url,
+                              json=section_details)
+  assert resp.status_code == 200
 
 
-# def test_create_section_cohort_not_found(client_with_emulator,
-#                                          create_fake_data):
+def test_create_section_course_template_not_found(client_with_emulator,
+                                                  create_fake_data):
 
-#   url = BASE_URL + "/sections"
-#   section_details = {
-#       "name": "section_20",
-#       "description": "This is description",
-#       "course_template": create_fake_data["course_template"],
-#       "cohort": "fake-cohort-id-new",
-#       "teachers": ["teachera@gmail.com"]
-#   }
-#   mock_return_course = {
-#       "id": "57690009090",
-#       "enrollmentCode": "as3rr",
-#       "name": "Jhjiuiui",
-#       "alternateLink": "https://classroom.google.com"
-#   }
-#   mocked_value = {"id":"123456789","name":{"givenName":"user1",
-#     "familyName":"last_name"},"photoUrl":"http://mockurl.com"}
-#   with mock.patch("routes.section.classroom_crud.get_course_by_id"):
-#     with mock.patch("routes.section.classroom_crud.create_course",
-#                     return_value=mock_return_course):
-#       with mock.patch("routes.section.classroom_crud.get_topics"):
-#         with mock.patch("routes.section.classroom_crud.create_topics"):
-#           with mock.patch("routes.section.classroom_crud.get_coursework"):
-#             with mock.patch(
-#                 "routes.section.classroom_crud.create_coursework"):
-#               with mock.patch("routes.section.classroom_crud.acceept_invite"):
-#                 with mock.patch(
-#         "routes.section.classroom_crud.get_user_profile_information",
-#                 return_value=mocked_value):
-#                   with mock.patch(
-#         "routes.section.classroom_crud.invite_teacher"):
-#                     with mock.patch(
-#         "routes.section.common_service.create_teacher"):
-#                       with mock.patch(
-#               "routes.section.classroom_crud.get_coursework_material"):
-#                         with mock.patch(
-#                 "routes.section.classroom_crud.create_coursework_material"):
-#                           resp = client_with_emulator.post(url,
-#                       json=section_details)
-#   assert resp.status_code == 404
+  url = BASE_URL + "/section"
+  section_details = {
+      "name": "section_20",
+      "description": "This is description",
+      "course_template": "fake-classroom-id_new",
+      "cohort": create_fake_data["cohort"],
+      "teachers": ["teachera@gmail.com"]
+  }
+  mock_return_course = {
+      "id": "57690009090",
+      "enrollmentCode": "as3rr",
+      "name": "Jhjiuiui",
+      "alternateLink": "https://classroom.google.com"
+  }
+  with mock.patch("routes.section.classroom_crud.get_course_by_id"):
+    with mock.patch("routes.section.classroom_crud.create_course",
+                    return_value=mock_return_course):
+      with mock.patch("routes.section.classroom_crud.get_topics"):
+        with mock.patch("routes.section.classroom_crud.create_topics"):
+          with mock.patch("routes.section.classroom_crud.get_coursework"):
+            with mock.patch(
+                "routes.section.classroom_crud.create_coursework"):
+              with mock.patch("routes.section.classroom_crud.invite_teacher"):
+                with mock.patch(
+                "routes.section.classroom_crud.get_user_profile_information",
+                return_value=mocked_value):
+                  with mock.patch(
+              "routes.section.classroom_crud.acceept_invite"):
+                    with mock.patch(
+            "routes.section.common_service.create_teacher"):
+                      with mock.patch(
+            "routes.section.classroom_crud.get_coursework_material"):
+                        with mock.patch(
+            "routes.section.classroom_crud.create_coursework_material"):
+                          resp = client_with_emulator.post(url,
+                      json=section_details)
+  assert resp.status_code == 404
 
 
-# def test_list_section(client_with_emulator, create_fake_data):
+def test_create_section_cohort_not_found(client_with_emulator,
+                                         create_fake_data):
 
-#   url = BASE_URL + "/sections"
-#   resp = client_with_emulator.get(url)
-#   assert resp.status_code == 200
-
-
-
-# def test_list_section_validation_error(client_with_emulator, create_fake_data):
-
-#   url = BASE_URL + "/sections?skip=-1&limit=10"
-#   resp = client_with_emulator.get(url)
-#   assert resp.status_code == 422
-
-
-# def test_get_section(client_with_emulator, create_fake_data):
-
-#   url = BASE_URL + f"/sections/{create_fake_data['section']}"
-
-#   resp = client_with_emulator.get(url)
-#   assert resp.status_code == 200
-
-
-# def test_get_section_not_found(client_with_emulator):
-
-#   url = BASE_URL + "/sections/test_case_id_does_not_exists"
-#   resp = client_with_emulator.get(url)
-#   assert resp.status_code == 404
-
-
-# def test_update_section(client_with_emulator, create_fake_data):
-
-#   section = Section.find_by_id(create_fake_data["section"])
-#   data = {
-#       "id": create_fake_data["section"],
-#       "course_id": "561822649300",
-#       "section_name": "tsection",
-#       "description": "tdescription",
-#       "teachers": section.teachers
-#   }
-#   url = BASE_URL + "/sections"
-#   with mock.patch("routes.section.classroom_crud.update_course"):
-#     with mock.patch("routes.section.classroom_crud.acceept_invite"):
-#       with mock.patch(
-#     "routes.section.classroom_crud.get_user_profile_information",
-#       return_value=mocked_value):
-#         with mock.patch("routes.section.classroom_crud.acceept_invite"):
-#           with mock.patch("routes.section.common_service.create_teacher"):
-#             resp = client_with_emulator.patch(url, json=data)
-#   assert resp.status_code == 200
+  url = BASE_URL + "/sections"
+  section_details = {
+      "name": "section_20",
+      "description": "This is description",
+      "course_template": create_fake_data["course_template"],
+      "cohort": "fake-cohort-id-new",
+      "teachers": ["teachera@gmail.com"]
+  }
+  mock_return_course = {
+      "id": "57690009090",
+      "enrollmentCode": "as3rr",
+      "name": "Jhjiuiui",
+      "alternateLink": "https://classroom.google.com"
+  }
+  mocked_value = {"id":"123456789","name":{"givenName":"user1",
+    "familyName":"last_name"},"photoUrl":"http://mockurl.com"}
+  with mock.patch("routes.section.classroom_crud.get_course_by_id"):
+    with mock.patch("routes.section.classroom_crud.create_course",
+                    return_value=mock_return_course):
+      with mock.patch("routes.section.classroom_crud.get_topics"):
+        with mock.patch("routes.section.classroom_crud.create_topics"):
+          with mock.patch("routes.section.classroom_crud.get_coursework"):
+            with mock.patch(
+                "routes.section.classroom_crud.create_coursework"):
+              with mock.patch("routes.section.classroom_crud.acceept_invite"):
+                with mock.patch(
+        "routes.section.classroom_crud.get_user_profile_information",
+                return_value=mocked_value):
+                  with mock.patch(
+        "routes.section.classroom_crud.invite_teacher"):
+                    with mock.patch(
+        "routes.section.common_service.create_teacher"):
+                      with mock.patch(
+              "routes.section.classroom_crud.get_coursework_material"):
+                        with mock.patch(
+                "routes.section.classroom_crud.create_coursework_material"):
+                          resp = client_with_emulator.post(url,
+                      json=section_details)
+  assert resp.status_code == 404
 
 
-# def test_update_section_section_id_not_found(client_with_emulator):
+def test_list_section(client_with_emulator, create_fake_data):
 
-#   data = {
-#       "id": "fake-section-id_new",
-#       "course_id": "561822649300",
-#       "section_name": "tsection",
-#       "description": "tdescription",
-#       "teachers": ["teachera@gmail.com", "teacherb@gmail.com"]
-#   }
-#   url = BASE_URL + "/sections"
-
-#   with mock.patch("routes.section.classroom_crud.update_course"):
-#     with mock.patch("routes.section.classroom_crud.acceept_invite"):
-#       with mock.patch(
-#         "routes.section.classroom_crud.get_user_profile_information",
-#       return_value=mocked_value):
-#         with mock.patch("routes.section.classroom_crud.acceept_invite"):
-#           with mock.patch("routes.section.common_service.create_teacher"):
-#             resp = client_with_emulator.patch(url, json=data)
-#   assert resp.status_code == 404
+  url = BASE_URL + "/sections"
+  resp = client_with_emulator.get(url)
+  assert resp.status_code == 200
 
 
-# def test_update_section_course_id_not_found(client_with_emulator,
-#                                             create_fake_data):
 
-#   data = {
-#       "id": create_fake_data["section"],
-#       "course_id": "561822649300",
-#       "section_name": "tsection",
-#       "description": "tdescription",
-#       "teachers": ["teachera@gmail.com", "teacherb@gmail.com"]
-#   }
-#   url = BASE_URL + "/sections"
-#   with mock.patch("routes.section.classroom_crud.update_course",
-#                   return_value=None):
-#     resp = client_with_emulator.patch(url, json=data)
-#   resp.json()
-#   assert resp.status_code == 404
+def test_list_section_validation_error(client_with_emulator, create_fake_data):
 
-# def test_list_teachers(client_with_emulator,create_fake_data):
+  url = BASE_URL + "/sections?skip=-1&limit=10"
+  resp = client_with_emulator.get(url)
+  assert resp.status_code == 422
 
 
-#   section_id =  create_fake_data["section"]
-#   url = BASE_URL + f"/sections/{section_id}"
-#   with mock.patch("routes.section.common_service.call_search_user_api",
-#   return_value=TEMP_USER):
-#     resp = client_with_emulator.get(url)
-#     print("Test teachers list response___",resp.json())
-#   assert resp.status_code == 200
-#   assert resp.json()["success"] is True
+def test_get_section(client_with_emulator, create_fake_data):
+
+  url = BASE_URL + f"/sections/{create_fake_data['section']}"
+
+  resp = client_with_emulator.get(url)
+  assert resp.status_code == 200
+
+
+def test_get_section_not_found(client_with_emulator):
+
+  url = BASE_URL + "/sections/test_case_id_does_not_exists"
+  resp = client_with_emulator.get(url)
+  assert resp.status_code == 404
+
+
+def test_update_section(client_with_emulator, create_fake_data):
+
+  section = Section.find_by_id(create_fake_data["section"])
+  data = {
+      "id": create_fake_data["section"],
+      "course_id": "561822649300",
+      "section_name": "tsection",
+      "description": "tdescription",
+      "teachers": section.teachers
+  }
+  url = BASE_URL + "/sections"
+  with mock.patch("routes.section.classroom_crud.update_course"):
+    with mock.patch("routes.section.classroom_crud.acceept_invite"):
+      with mock.patch(
+    "routes.section.classroom_crud.get_user_profile_information",
+      return_value=mocked_value):
+        with mock.patch("routes.section.classroom_crud.acceept_invite"):
+          with mock.patch("routes.section.common_service.create_teacher"):
+            resp = client_with_emulator.patch(url, json=data)
+  assert resp.status_code == 200
+
+
+def test_update_section_section_id_not_found(client_with_emulator):
+
+  data = {
+      "id": "fake-section-id_new",
+      "course_id": "561822649300",
+      "section_name": "tsection",
+      "description": "tdescription",
+      "teachers": ["teachera@gmail.com", "teacherb@gmail.com"]
+  }
+  url = BASE_URL + "/sections"
+
+  with mock.patch("routes.section.classroom_crud.update_course"):
+    with mock.patch("routes.section.classroom_crud.acceept_invite"):
+      with mock.patch(
+        "routes.section.classroom_crud.get_user_profile_information",
+      return_value=mocked_value):
+        with mock.patch("routes.section.classroom_crud.acceept_invite"):
+          with mock.patch("routes.section.common_service.create_teacher"):
+            resp = client_with_emulator.patch(url, json=data)
+  assert resp.status_code == 404
+
+
+def test_update_section_course_id_not_found(client_with_emulator,
+                                            create_fake_data):
+
+  data = {
+      "id": create_fake_data["section"],
+      "course_id": "561822649300",
+      "section_name": "tsection",
+      "description": "tdescription",
+      "teachers": ["teachera@gmail.com", "teacherb@gmail.com"]
+  }
+  url = BASE_URL + "/sections"
+  with mock.patch("routes.section.classroom_crud.update_course",
+                  return_value=None):
+    resp = client_with_emulator.patch(url, json=data)
+  resp.json()
+  assert resp.status_code == 404
+
+def test_list_teachers(client_with_emulator,create_fake_data):
+
+
+  section_id =  create_fake_data["section"]
+  url = BASE_URL + f"/sections/{section_id}"
+  with mock.patch("routes.section.common_service.call_search_user_api",
+  return_value=TEMP_USER):
+    resp = client_with_emulator.get(url)
+    print("Test teachers list response___",resp.json())
+  assert resp.status_code == 200
+  assert resp.json()["success"] is True
 
 def test_get_teacher(client_with_emulator,create_fake_data):
   user_api_response={

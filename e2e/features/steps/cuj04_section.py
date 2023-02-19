@@ -2,7 +2,8 @@ import uuid
 import behave
 import requests
 from testing_objects.test_config import API_URL
-from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
+from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA 
+from testing_objects.user import TEST_USER
 from e2e.gke_api_tests.secrets_helper import get_student_email_and_token,get_workspace_student_email_and_token
 from environment import create_course
 
@@ -311,3 +312,57 @@ def step_impl_33(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] == True, "Success status doesn't match"
   assert context.response["data"][0]["user_type"] == "faculty", "User type faculty doesn't match"
+
+# -------------------------------List teachers in section negative -------------------------------------
+# ----Positive Scenario-----
+
+@behave.given(
+    "A user has access to admin portal and needs to retrieve the list of teachers with invailid section id"
+)
+def step_impl_34(context):
+  context.url = f'{API_URL}/sections/invalid_id/teachers'
+
+
+@behave.when(
+    "API request is sent which contains invalid section id"
+)
+def step_impl_35(context):
+  resp = requests.get(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("List teachers API response in E2E invaalid section id",resp.status_code,resp.json())
+
+
+@behave.then(
+    "Section not found error is sent in response"
+)
+def step_impl_36(context):
+  assert context.status == 404, "Status 404"
+
+# -------------------------------Get teachers in section Positive-------------------------------------
+# ----Positive Scenario-----
+
+@behave.given(
+    "A user has access to admin portal and needs to retrieve the details teacher with vailid section id and teacher_email"
+)
+def step_impl_37(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/teachers/teachera@gmail.com'
+
+
+@behave.when(
+    "API request is sent which contains valid section id and teacher email"
+)
+def step_impl_38(context):
+  resp = requests.get(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("Get teacher API response in E2E  section id",resp.status_code,resp.json())
+
+@behave.then(
+    "Get the details of teacher from user collection"
+)
+def step_impl_39(context):
+  assert context.status == 200, "Status 200"
+
