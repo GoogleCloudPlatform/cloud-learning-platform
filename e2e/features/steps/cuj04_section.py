@@ -282,3 +282,32 @@ def step_impl_29(context):
 def step_impl_30(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
+
+# -------------------------------List teachers in section-------------------------------------
+# ----Positive Scenario-----
+
+@behave.given(
+    "A user has access to admin portal and needs to retrieve the list of teachers with vailid section id"
+)
+def step_impl_31(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/teachers'
+
+
+@behave.when(
+    "API request is sent which contains valid section id"
+)
+def step_impl_32(context):
+  resp = requests.get(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("List teachers API response in E2E",resp.status_code,resp.json())
+
+
+@behave.then(
+    "List of teachers will be given with there details"
+)
+def step_impl_33(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] == True, "Success status doesn't match"
+  assert context.response["data"][0]["user_type"] == "faculty", "User type faculty doesn't match"
