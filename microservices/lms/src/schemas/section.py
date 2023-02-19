@@ -28,19 +28,17 @@ class Sections(BaseModel):
 
 class TempUsers(BaseModel):
   "User Details"
-  user_id :str
-  first_name :str
-  last_name : str
-  email :str
-  user_type :str
-  user_type_ref :str
-  user_groups : list
-  status :str
-  is_registered : bool
-  failed_login_attempts_count :int
-  access_api_docs :bool
-  gaia_id:str
-  photo_url : str
+  first_name: str
+  last_name: str
+  email: str
+  user_type: str
+  user_groups: Optional[list]
+  status: str
+  is_registered: Optional[bool] = True
+  failed_login_attempts_count: Optional[int] = 0
+  access_api_docs: Optional[bool] = False
+  gaia_id: Optional[str] = ""
+  photo_url: Optional[str] = ""
 
 
 class SectionDetails(BaseModel):
@@ -88,11 +86,12 @@ class TeachersListResponseModel(BaseModel):
         }
     }
 
+
 class GetTeacherResponseModel(BaseModel):
-  """Get a list of Teachers"""
+  """Get a Teacher """
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[TempUsers] = []
+  data: Optional[TempUsers] = None
 
   class Config():
     orm_mode = True
@@ -103,6 +102,7 @@ class GetTeacherResponseModel(BaseModel):
             "data": TEMP_USER
         }
     }
+
 
 
 

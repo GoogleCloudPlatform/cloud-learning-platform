@@ -306,6 +306,7 @@ def get_teachers_list(section_id: str, request: Request):
     for teacher in teachers:
       result = common_service.call_search_user_api(headers=headers,
       email=teacher)
+      print("Search user function response",result.status_code)
       if result.json()["data"] !=[]:
         teacher_details.append(result.json()["data"][0])
     return {"data": teacher_details}
@@ -346,15 +347,14 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
     if teacher_email in teachers:
       result = common_service.call_search_user_api(headers=headers,
       email=teacher_email)
-      if result.json()["data"] == []:
-        raise ResourceNotFoundException(
-          f"{teacher_email} not found in Users data")
+      if result.json()["data"] == [] or result.json()["data"] == None :
+        raise ResourceNotFoundException(f"{teacher_email} not found in Users data")
       else :
-        print("Result of search User API",result.json()["data"][0])
+        print("Result of search User API",result.status_code,result.json()["data"])
         return {"data": result.json()["data"][0]}
     else:
-      raise ResourceNotFoundException(f"{teacher_email} not\
-         found in teachers list of the section")
+      raise ResourceNotFoundException(f"{teacher_email}\
+        not found in teachers list of the section")
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
