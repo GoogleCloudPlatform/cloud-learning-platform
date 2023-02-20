@@ -665,7 +665,7 @@ def acceept_invite(invitation_id,teacher_email):
   """Invite teacher to google classroom using course id and email
 
   Args:
-      invitation_id (str): google classroom invitation Id from invite 
+      invitation_id (str): google classroom invitation Id from invite
       teacher response
       teacher_email (str): teacher email id
 
@@ -692,9 +692,9 @@ def acceept_invite(invitation_id,teacher_email):
 def get_user_profile_information(user_email):
   """
    Args:
-      user_email: email of user 
-  Returns:
-      profile_information: User profile information of the user 
+      user_email: email of user
+    Returns:
+      profile_information: User profile information of the user
   """
   service = build("classroom", "v1", credentials=get_credentials())
 

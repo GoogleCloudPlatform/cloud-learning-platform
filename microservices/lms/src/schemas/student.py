@@ -9,12 +9,6 @@ class AddStudentResponseModel(BaseModel):
   success: Optional[bool] = True
   message: Optional[str] = "Successfully Added the Student"
   data: Optional[dict] = None
-
-class GetStudentDetailsResponseModel(BaseModel):
-  """Add Student Model"""
-  success: Optional[bool] = True
-  data: Optional[dict] = None
-  
   class Config():
     orm_mode = True
     schema_extra = {
@@ -41,3 +35,8 @@ class AddStudentToCohortModel(BaseModel):
         }
     }
 
+class GetStudentDetailsResponseModel(BaseModel):
+  """Add Student Model"""
+  success: Optional[bool] = True
+  data: Optional[dict] = None
+  
