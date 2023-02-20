@@ -16,6 +16,7 @@
     }
   </style>
   <script type="text/javascript">
+    let counter = 5
     const firebaseConfig = {
       apiKey: '{{ firebase_api_key }}',
       projectId: '{{ project_id }}',
@@ -24,6 +25,18 @@
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
+
+    let user = null
+    setTimeout(() => {
+      user = firebase.auth().currentUser;
+      console.log("user", user)
+
+      if (user) {
+        let email = user._delegate.email
+        displayCounterWithText(email)
+      }
+    }, 1000);
+
     let ui = null
     initFirebaseUI()
     function initFirebaseUI() {// FirebaseUI config.
@@ -46,32 +59,8 @@
           signInSuccessWithAuthResult: function (authResult, redirectUrl) {
             let user = authResult.user;
             let token = user._delegate.accessToken
-            displayRedirecting()
-            axios
-              .get('{{redirect_url}}', {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              })
-              .then((response) => {
-                if (response.data) {
-                  if (response.data.url) {
-                    window.open(response.data.url, "_self").focus()
-                  } else {
-                    displayError("There was a error while redirecting, Redirect url was not received in the response. Please try again.")
-                    console.log("No URL found in the response")
-                  }
-                } else {
-                  displayError("There was a error while redirecting, No response received for redirection. Please try again.")
-                  console.log("No response data");
-                }
-              }).catch((err) => {
-                console.log("err", err)
-                if (err.response.status == 401) {
-                  displayError("Access Denied")
-                }
-                initFirebaseUI()
-              })
+            initiateRedirection(token)
+            console.log("something failed")
             return false;
           },
         },
@@ -80,9 +69,53 @@
       ui.start('#firebaseui-auth-container', uiConfig);
     }
 
+
+    function continueLaunch() {
+      user.getIdToken().then((idToken) => {
+        initiateRedirection(idToken)
+      }).catch(function (error) {
+        console.error("Error getting ID token:", error);
+      });
+    }
+
+    function initiateRedirection(token) {
+      displayRedirecting()
+      return axios
+        .get('{{redirect_url}}', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response1) => {
+          console.log("response1", response1)
+          return axios.post(response1.data.url, response1.data.message_hint, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }).then((response2) => {
+            window.open(response2.data.url, "_self").focus()
+          }).catch((err) => {
+            console.log("err", err)
+            if (err?.response?.status == 401) {
+              displayError("Access Denied")
+            }
+            displayError(err.message)
+            initFirebaseUI()
+          })
+        }).catch((err) => {
+          console.log("err", err)
+          if (err?.response?.status == 401) {
+            displayError("Access Denied")
+          }
+          displayError(err.message)
+          initFirebaseUI()
+        })
+
+    }
+
     function getParameterByName(name, url = window.location.href) {
       name = name.replace(/[\[\]]/g, '\\$&');
-      var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+      let regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
         results = regex.exec(url);
       if (!results) return null;
       if (!results[2]) return '';
@@ -90,7 +123,7 @@
     }
 
     function displayRedirecting(text) {
-      var displayText = "Redirecting..."
+      let displayText = "Redirecting..."
       if (text) {
         displayText = text
       }
@@ -100,13 +133,30 @@
     }
 
     function displayError(text) {
-      var displayText = "There was a error while redirecting! Please try again."
+      let displayText = "There was a error while redirecting! Please try again."
       if (text) {
         displayText = text
       }
       document.getElementById("status").style.display = "block"
       document.getElementById("status").style.color = "red"
       document.getElementById("status").innerText = displayText
+    }
+
+    function displayCounterWithText(email) {
+      let interval = setInterval(() => {
+        if (counter == 0) {
+          console.log("cleared interval")
+          document.getElementById("existing-acc").style.display = "none"
+          clearInterval(interval)
+          continueLaunch()
+        } else {
+          let displayText = `Continuing with ${email} in ${counter} seconds`
+          document.getElementById("existing-acc").style.display = "block"
+          document.getElementById("existing-acc").style.color = "red"
+          document.getElementById("existing-acc").innerText = displayText
+          counter--
+        }
+      }, 1000);
     }
   </script>
 </head>
@@ -117,6 +167,8 @@
   </h1>
   <h3 style="text-align: center; margin-bottom: 2rem" id="instruction">Log in to proceed further</h3>
   <p id="status" style="text-align: center; margin-bottom: 2rem; display: none;"></p>
+
+  <p id="existing-acc" style="text-align: center; margin-bottom: 2rem; display: none;"></p>
 
   <div id="firebaseui-auth-container"></div>
 </body>
