@@ -461,7 +461,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   "failed_login_attempts_count": 0,
   "access_api_docs": False,
   "gaia_id":gaia_id,
-  "photo_url":""
+  "photo_url":profile["photos"][0]["url"]
   }
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user usermanagement API and return user data else

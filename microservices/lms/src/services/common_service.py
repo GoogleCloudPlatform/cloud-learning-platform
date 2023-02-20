@@ -46,10 +46,13 @@ def create_teacher(headers,body):
     searched_teacher = response.json()["data"]
     print("Searched  teacher value ",searched_teacher)
     if searched_teacher == []:
+      print("cerate teacher body")
+      body["first_name"] = "firstname"
+      body["last_name"] = "lastname"
       create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
       json=body,headers=headers)
-      # Logger.info("CREATE USER RESPONSE ",create_user_response.status_code,
-      # create_user_response.json())
+      print("CREATE USER RESPONSE ",create_user_response.status_code,
+      create_user_response.json())
       if create_user_response.status_code != 200:
         raise UserManagementServiceError(response.json()["message"])
       return response.json()["data"]

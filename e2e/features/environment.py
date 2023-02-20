@@ -15,20 +15,7 @@ import logging
 
 USER_EMAIL_PASSWORD_DICT = get_user_email_and_password_for_e2e()
 
-CLASSROOM_KEY = {
-  "type": "service_account",
-  "project_id": "core-learning-services-dev",
-  "private_key_id": "3ad36ab0c4ceba2824251e549f8398165396d144",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDNRMpkJhIS9ur1\nYah1aWA8/RqAv4meV/E9E6R38Ey4EdYgNTBiAmbOHqYAWKABP1gk3hqzw4iHAUPr\nI8LWqxREdEdgUAgsFji3cdH6cugyaRDBSbcO38v1dP3VOUTAEXLNwm/ZfamW6F5b\nTr7saB/GfF6oQjwoCW8f7o+Z47S4fE9JMyB0QkCj/mUnITZCXOWJ8aOpQU3Ew1Q4\nTytZxC4bfyBSMgFSN9+AIgnyNmzefbOlII/tzJfi+u0Dwl5bQjQQ6oA+ax+Wln+S\npIWk1nHCBi2FcrgLPHflVGZZPL8/+38RVlswdTMSRRlYKrkyGSbEGWI+6idwn4OO\nl+Nr6RuJAgMBAAECggEADn2/bA05VBgVGPhT/uCkPVSrp6Xd/qJmvXvC2Kog6xMX\nSB7Ofkd9H9VkvWbZpOeRPskPSYbm/zZE/TdWbKFB77M7IWmE/4JyGUFHzvkzEJv/\nkCW2xANjUBN6TVtFpz7pbpfoyDSUNxB12NcDqNzmTApBBHqTP0sAiq3k0BBrPxAn\nNB+Sf4KZF/c8MgkOsljEyqx9sZlU+msZ1Ca3IZ9UNeTI7AD4+oLKSflXQO06r5xo\nCLIvN2p3PqQXcMz5mg99zT5khbV1XnG2BqU4r7mz8SsSTjZKmsjIJ8FuHciD9SVR\ndld1HGhP9UqgUtUpiIDw/bNzQW4eWz0bRQ2PEQN0IQKBgQDphL0z4ViLG1LWt47P\nqwm/YOWd3EVnqrSmbNT6r3bYhWEQfd1dD5rjfXf0dMOam9chgeG4jGuD5acCnisV\noF4/BPjr4UceRlilwKDFPH/NrzUKG0fiqxVzBFc19f4/DAMxSsKjHFVEB7zvtFJZ\nch3h2XxjGdB8xHgRhjaNM1qeHwKBgQDhB8+2B+78znF8gw2QmihoOFI8gAQ9igsy\nobC/6wOt0+LP5X08yDuhcijDCAuhmJNC6naex6+mJprYkVEQkRK9ArYE3YwnKl8+\nuaL+18Ed8Fg/9+4lJA8/kv6ifNiYPE9JvKPn91jxF4VX9sKXEByuMe3y7F1ndkEN\n38IMrBjBVwKBgQDM+HNut20V5SzoRYR4KgRLVM0XrEHLhd49eqfTRvLFiQWzCRel\n2M22wunozBjpe8LwqWWsrKyuwITA2n6s4+/11vJ7cWkQXOTw0M0Nc1Ym/5RJw7ps\nbolMRNIcDklVo8Clop6Ht5XsOfKQYLIryuwJ0vHItt72tSlDEJCPjjULNwKBgDxL\nc4Q6q/Zg+ld6ZfAQ3jLOpHpBcuFqU4XFfS5vMhUpaOR7gQsAO7oOdI2NYlByKUMM\nv6vbpVzHi0Xr6eSeen7acxrqodr8p3iPFPVjqgLzmzHIpK6e8tb98+xlt0NTJYuE\nWAaXZ+Vxf/EJ1SnUz1p9Vlx4qK5IKTYmdkAe/KMRAoGBAL+6g46ZasKYD7hXs/FW\nobtf3rC9DGwodV+EsUb+9xmGSvNLuFr9MB7gfxjdLM4J2LsO69uW5RVzRHs98axz\n73zrkdqMq9m6g8b23sU3PkJ8EbNdca8z9JpQdCP3AfkvrbRTVgu651fHNQtLjaGG\nv07ie+HINdOqgVNF1VBt+8Fi\n-----END PRIVATE KEY-----\n",
-  "client_email": "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
-  "client_id": "104636564660654922211",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gke-pod-sa%40core-learning-services-dev.iam.gserviceaccount.com"
-}
-
-# CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
+CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
 SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
           "https://www.googleapis.com/auth/classroom.courses.readonly",
