@@ -560,6 +560,27 @@ def enable_notifications(course_id, feed_type):
   }
   return service.registrations().create(body=body).execute()
 
+def if_user_exists_in_section(section_id, user_id, headers):
+  """Check if student exists in a given section
+  Args:
+      section_id (str): firestore section id
+      user_id (str): firestore user id
+  Returns:
+      dict: user details
+  """
+  section_details = []
+  section_details = Section.find_by_id(section_id)
+  result = CourseEnrollmentMapping.\
+    find_course_enrollment_record(section_details.key,user_id)
+  if result is not None:
+    response = requests.\
+      get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+    user = response.json()["data"]
+    return user
+  else:
+    raise ResourceNotFoundException("User not found")
+
+
 def list_student_section(section_id,headers):
   """List  student of section given firestore section id
 
