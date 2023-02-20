@@ -55,3 +55,20 @@ Feature: Add student to section
     Given A user has access to admin portal and wants to retrieve a assignment using assignment id and section id
     When API request is sent to retrieve assignment details by providing invalid section id
     Then Assignment details will not be returned and API will throw a resource not found error
+
+  @fixture.create.section
+  Scenario: List teachers in section with given section id
+    Given A user has access to admin portal and needs to retrieve the list of teachers with vailid section id
+    When API request is sent which contains valid section id
+    Then List of teachers will be given with there details
+  
+  Scenario: List teachers in section with wrong section id
+    Given A user has access to admin portal and needs to retrieve the list of teachers with invailid section id
+    When API request is sent which contains invalid section id
+    Then Section not found error is sent in response
+
+  @fixture.create.section
+  Scenario:Get teacher details in section with given section id and teacher email
+    Given A user has access to admin portal and needs to retrieve the details teacher with vailid section id and teacher_email
+    When API request is sent which contains valid section id and teacher email
+    Then Get the details of teacher from user collection

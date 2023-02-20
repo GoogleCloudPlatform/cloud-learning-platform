@@ -4,7 +4,8 @@ Pydantic Model for copy course API's
 import datetime
 from typing import Optional
 from pydantic import BaseModel, constr
-from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE,INSERT_SECTION_EXAMPLE,ASSIGNMENT_MODEL
+from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE,\
+  INSERT_SECTION_EXAMPLE,TEMP_USER,ASSIGNMENT_MODEL
 
 
 class Sections(BaseModel):
@@ -24,6 +25,20 @@ class Sections(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {"example": SECTION_EXAMPLE}
+
+class TempUsers(BaseModel):
+  "User Details"
+  first_name: str
+  last_name: str
+  email: str
+  user_type: str
+  user_groups: Optional[list]
+  status: str
+  is_registered: Optional[bool] = True
+  failed_login_attempts_count: Optional[int] = 0
+  access_api_docs: Optional[bool] = False
+  gaia_id: Optional[str] = ""
+  photo_url: Optional[str] = ""
 
 
 class SectionDetails(BaseModel):
@@ -54,6 +69,41 @@ class SectionListResponseModel(BaseModel):
             "data": [SECTION_EXAMPLE]
         }
     }
+
+class TeachersListResponseModel(BaseModel):
+  """Get a list of Teachers"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success"
+  data: Optional[list[TempUsers]] = []
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data": [TEMP_USER]
+        }
+    }
+
+
+class GetTeacherResponseModel(BaseModel):
+  """Get a Teacher """
+  success: Optional[bool] = True
+  message: Optional[str] = "Success"
+  data: Optional[TempUsers] = None
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data": TEMP_USER
+        }
+    }
+
+
 
 
 class ClassroomCourseListResponseModel(BaseModel):

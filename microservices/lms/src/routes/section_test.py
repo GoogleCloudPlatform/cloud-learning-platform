@@ -5,6 +5,8 @@ import os
 import mock
 import pytest
 import datetime
+from unittest.mock import Mock
+from requests.models import Response
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from common.models.section import Section
@@ -12,7 +14,8 @@ from common.models import CourseTemplate, Cohort
 from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from testing.test_config import BASE_URL
-from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, COHORT_EXAMPLE, CREDENTIAL_JSON
+from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
+   COHORT_EXAMPLE, CREDENTIAL_JSON,TEMP_USER
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
@@ -245,6 +248,7 @@ def test_list_section(client_with_emulator, create_fake_data):
   assert resp.status_code == 200
 
 
+
 def test_list_section_validation_error(client_with_emulator, create_fake_data):
 
   url = BASE_URL + "/sections?skip=-1&limit=10"
@@ -328,8 +332,36 @@ def test_update_section_course_id_not_found(client_with_emulator,
   resp.json()
   assert resp.status_code == 404
 
+def test_list_teachers(client_with_emulator,create_fake_data):
 
 
+  section_id =  create_fake_data["section"]
+  url = BASE_URL + f"/sections/{section_id}"
+  with mock.patch("routes.section.common_service.call_search_user_api",
+  return_value=TEMP_USER):
+    resp = client_with_emulator.get(url)
+    print("Test teachers list response___",resp.json())
+  assert resp.status_code == 200
+  assert resp.json()["success"] is True
+
+def test_get_teacher(client_with_emulator,create_fake_data):
+  user_api_response={
+  "success": True,
+  "message": "Success",
+  "data": [TEMP_USER]}
+  section_id =  create_fake_data["section"]
+  url = BASE_URL + f"/sections/{section_id}/teachers/teachera@gmail.com"
+  the_response = Mock(spec=Response)
+  the_response.json.return_value = user_api_response
+  the_response.status_code = 200
+  with mock.patch(
+    "routes.section.common_service.call_search_user_api",
+    return_value=the_response)  :
+    # mock_request.return_value.status_code = 200
+    # mock_request.return_value = str(user_api_response)
+    resp = client_with_emulator.get(url)
+    print("Get User response___",resp)
+  assert resp.status_code == 200
 
 def test_delete_section(client_with_emulator, create_fake_data):
 

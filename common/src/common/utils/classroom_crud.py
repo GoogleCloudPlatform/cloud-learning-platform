@@ -233,15 +233,12 @@ def get_coursework_material(course_id):
 
   service = build("classroom", "v1", credentials=get_credentials())
   try:
-    print("This in coursewoek material")
     coursework_list = service.courses().courseWorkMaterials().list(
         courseId=course_id).execute()
-    print("This is courseworkMaterial list before Mapping ",coursework_list)
     if coursework_list:
       coursework_list = coursework_list["courseWorkMaterial"]
     return coursework_list
   except HttpError as error:
-    print(error)
     logger.error(error)
     return None
 
@@ -446,12 +443,10 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   # Call_people api function
   profile = get_person_information(access_token)
   gaia_id = profile["metadata"]["sources"][0]["id"]
-  # first_name=profile["names"][0]["givenName"]
-  # last_name =profile["names"][0]["familyName"]
   # Call user API
   data = {
-  "first_name":"",
-  "last_name": "",
+  "first_name":profile["names"][0]["givenName"],
+  "last_name": profile["names"][0]["familyName"],
   "email":student_email,
   "user_type": "learner",
   "user_type_ref": "",
@@ -460,7 +455,8 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   "is_registered": True,
   "failed_login_attempts_count": 0,
   "access_api_docs": False,
-  "gaia_id":gaia_id
+  "gaia_id":gaia_id,
+  "photo_url":profile["photos"][0]["url"]
   }
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user usermanagement API and return user data else
