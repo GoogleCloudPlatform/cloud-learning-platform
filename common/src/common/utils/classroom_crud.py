@@ -446,8 +446,6 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   # Call_people api function
   profile = get_person_information(access_token)
   gaia_id = profile["metadata"]["sources"][0]["id"]
-  # first_name=profile["names"][0]["givenName"]
-  # last_name =profile["names"][0]["familyName"]
   # Call user API
   data = {
   "first_name":profile["names"][0]["givenName"],

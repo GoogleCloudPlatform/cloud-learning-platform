@@ -19,7 +19,7 @@ user_name = email.split("@")[0]
 
 TEST_USER = {
     "first_name": user_name,
-    "last_name": "last_name",
+    "last_name": "lastname",
     "email": email,
     "status": "active",
     "user_type": "other",
@@ -27,6 +27,6 @@ TEST_USER = {
     "user_groups": [],
     "is_registered": True,
     "failed_login_attempts_count": 0,
-    "gaia_id":"test_gaia_id",
-    "photo_url":"temp_url"
+    "gaia_id":"test1233",
+    "photo_url":"tempurl"
 }
