@@ -17,10 +17,11 @@ from schemas.error_schema import (ConflictResponseModel,
 from schemas.section import (
     CreateSectiontResponseModel, DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
-    ClassroomCourseListResponseModel, UpdateSectionResponseModel)
+    ClassroomCourseListResponseModel, UpdateSectionResponseModel,
+    TeachersListResponseModel,GetTeacherResponseModel,AssignmentModel)
 from schemas.update_section import UpdateSection
 from services import common_service
-from utils.helper import convert_section_to_section_model
+from utils.helper import convert_section_to_section_model, convert_assignment_to_assignment_model
 
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -108,7 +109,6 @@ def create_section(sections_details: SectionDetails,request: Request):
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
     # Create a new course
-    print("Current Course ____",current_course)
     new_course = classroom_crud.create_course(course_template_details.name,
                                               sections_details.description,
                                               sections_details.name, "me")
@@ -216,7 +216,8 @@ def create_section(sections_details: SectionDetails,request: Request):
       "is_registered": True,
       "failed_login_attempts_count": 0,
       "access_api_docs": False,
-      "gaia_id":user_profile["id"]
+      "gaia_id":user_profile["id"],
+      "photo_url" :  user_profile["photoUrl"]
         }
       common_service.create_teacher(headers,data)
     section = Section()
@@ -258,7 +259,7 @@ def get_section(section_id: str):
       section_id (str): section_id in firestore
   Raises:
       HTTPException: 500 Internal Server Error if something fails
-      HTTPException: 404 Section with section id is not found
+      ResourceNotFound: 404 Section with section id is not found
   Returns:
     {"status":"Success","new_course":{}}: Returns section details from  db,
     {'status': 'Failed'} if the user creation raises an exception
@@ -269,6 +270,90 @@ def get_section(section_id: str):
     # Get course by course id
     new_section = convert_section_to_section_model(section_details)
     return {"data": new_section}
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except HttpError as ae:
+    Logger.error(ae)
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+@router.get("/{section_id}/teachers",response_model=TeachersListResponseModel)
+def get_teachers_list(section_id: str, request: Request):
+  """Get a list of teachers for a section details from db
+
+  Args:
+      section_id (str): section_id in firestore
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      HTTPException: 404 Section with section id is not found
+  Returns:
+    {"status":"Success","new_course":{}}: Returns section details from  db,
+    {'status': 'Failed'} if the user creation raises an exception
+  """
+  try:
+    teacher_details = []
+    headers = {"Authorization": request.headers.get("Authorization")}
+    section_details = Section.find_by_id(section_id)
+    teachers= section_details.teachers
+    if teachers == []:
+      return{"data":teacher_details}
+    for teacher in teachers:
+      result = common_service.call_search_user_api(headers=headers,
+      email=teacher)
+      if result.json()["data"] !=[]:
+        teacher_details.append(result.json()["data"][0])
+    return {"data": teacher_details}
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except HttpError as ae:
+    Logger.error(ae)
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.get("/{section_id}/teachers/{teacher_email}",
+response_model=GetTeacherResponseModel)
+def get_teacher(section_id: str,teacher_email:str,request: Request):
+  """Get teacher for a section .If teacher is present in given section
+  get teacher details else throw
+  Args:
+      section_id (str): section_id in firestore
+      teacher_email(str): teachers email Id
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      HTTPException: 404 Section with section id is not found
+      HTTPException: 404 Teacher with teacher email is not found
+  Returns:
+    {"status":"Success","data":}: Returns section details from  db,
+    {'status': 'False'} if raises an exception
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    section_details = Section.find_by_id(section_id)
+    teachers= section_details.teachers
+    if teacher_email in teachers:
+      result = common_service.call_search_user_api(headers=headers,
+      email=teacher_email)
+      if result.json()["data"] == [] or result.json()["data"] is None :
+        raise ResourceNotFoundException(
+          f"{teacher_email} not found in Users data")
+      else :
+        return {"data": result.json()["data"][0]}
+    else:
+      raise ResourceNotFoundException(f"{teacher_email}\
+        not found in teachers list of the section")
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -293,7 +378,7 @@ def delete_section(section_id: str):
       section_id (str): section_id in firestore
   Raises:
       HTTPException: 500 Internal Server Error if something fails
-      HTTPException: 404 Section with section id is not found
+      ResourceNotFound: 404 Section with section id is not found
   Returns:
     {"message": "Successfully deleted section"}
   """
@@ -398,7 +483,8 @@ def update_section(sections_details: UpdateSection,request: Request):
       "is_registered": True,
       "failed_login_attempts_count": 0,
       "access_api_docs": False,
-      "gaia_id":user_profile["id"]
+      "gaia_id":user_profile["id"],
+      "photo_url" :  user_profile["photoUrl"]
         }
       common_service.create_teacher(headers,data)
     remove_teacher_list = list(
@@ -599,3 +685,35 @@ def section_enable_notifications_pub_sub(
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
+@router.get("/{section_id}/assignments/{assignment_id}",
+            response_model=AssignmentModel)
+def get_assignment(section_id: str, assignment_id: str):
+  """Get course work details using section id and course work id
+  Args:
+      section_id (str): section unique id
+      assignment_id (str): course work/assignment unique id
+  Raises:
+      InternalServerError: 500 Internal Server Error if something fails
+      CustomHTTPException: raise error according to the HTTPError exception
+      ResourceNotFound: 404 Section with section id is not found
+  Returns:
+      AssignmentModel: AssignmentModel object which
+        contains all the course work details
+  """
+  try:
+    section = Section.find_by_id(section_id)
+    assignment = classroom_crud.get_course_work(course_id=section.classroom_id,
+                                                course_work_id=assignment_id)
+    return convert_assignment_to_assignment_model(assignment)
+  except HttpError as hte:
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e

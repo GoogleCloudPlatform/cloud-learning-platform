@@ -62,8 +62,12 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
     token_claims[lti_claim_field("claim",
                                  "message_type")] = "LtiResourceLinkRequest"
 
-    lti_content_item = LTIContentItem.find_by_id(lti_message_hint)
+    # do a signature verification for decoding lti_message_hint token
+    decoded_lti_message_hint = get_unverified_token_claims(lti_message_hint)
+    lti_content_item_id = decoded_lti_message_hint.get("lti_content_item_id")
+    lti_content_item = LTIContentItem.find_by_id(lti_content_item_id)
 
+    # process content item info claims required for launch
     content_item_info = lti_content_item.content_item_info
     if content_item_info:
       if content_item_info.get("url"):
@@ -72,11 +76,19 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       else:
         token_claims[lti_claim_field("claim",
                                      "target_link_uri")] = tool_info["tool_url"]
-
     if "custom" in content_item_info.keys():
-      token_claims[lti_claim_field("claim",
-                                   "custom")] = content_item_info.get("custom")
+      custom_params = decoded_lti_message_hint.get("custom_params_for_substitution")
+      final_custom_claims = {**content_item_info.get("custom")}
 
+      # process custom parameter substitution
+      for key, value in content_item_info.get("custom").items():
+        if isinstance(value, str) and value.startswith(
+            "$") and custom_params.get(value) is not None:
+          final_custom_claims[key] = custom_params.get(value)
+
+      token_claims[lti_claim_field("claim", "custom")] = final_custom_claims
+
+    # process grade sync functionality
     if tool_info.get("enable_grade_sync"):
       token_claims[lti_claim_field("claim", "endpoint", "ags")] = {
           "scope": [
@@ -87,6 +99,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
           "lineitems": LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items",
       }
 
+    # process line_item claims
     if "lineItem" in content_item_info.keys():
       line_item = LineItem.find_by_resource_link_id(lti_content_item.id)
 
@@ -103,7 +116,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       }
 
     resource_link_claim_info = {
-        "id": lti_message_hint,
+        "id": lti_content_item.id,
         "title": content_item_info.get("title"),
         "description": content_item_info.get("text")
     }
@@ -125,20 +138,23 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
 
   if user.get("user_type") == "learner":
     token_claims[lti_claim_field("claim", "roles")] = [
-        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student",
-        "http://purl.imsglobal.org/vocab/lis/v2/membership#Student"
+        "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Learner",
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
     ]
+
   elif user.get("user_type") == "faculty":
     token_claims[lti_claim_field("claim", "roles")] = [
-        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor",
+        "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
         "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Faculty",
-        "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor"
     ]
   # Role claims for Admin -
   elif user.get("user_type") == "admin":
     token_claims[lti_claim_field("claim", "roles")] = [
-        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
+        "http://purl.imsglobal.org/vocab/lis/v2/membership#Administrator",
         "http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator",
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
     ]
 
   return token_claims

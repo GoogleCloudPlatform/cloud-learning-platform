@@ -4,6 +4,9 @@
 import os
 import mock
 import pytest
+import datetime
+from unittest.mock import Mock
+from requests.models import Response
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from common.models.section import Section
@@ -11,7 +14,8 @@ from common.models import CourseTemplate, Cohort
 from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from testing.test_config import BASE_URL
-from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, COHORT_EXAMPLE, CREDENTIAL_JSON
+from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
+   COHORT_EXAMPLE, CREDENTIAL_JSON,TEMP_USER
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
@@ -244,6 +248,7 @@ def test_list_section(client_with_emulator, create_fake_data):
   assert resp.status_code == 200
 
 
+
 def test_list_section_validation_error(client_with_emulator, create_fake_data):
 
   url = BASE_URL + "/sections?skip=-1&limit=10"
@@ -327,8 +332,36 @@ def test_update_section_course_id_not_found(client_with_emulator,
   resp.json()
   assert resp.status_code == 404
 
+def test_list_teachers(client_with_emulator,create_fake_data):
 
 
+  section_id =  create_fake_data["section"]
+  url = BASE_URL + f"/sections/{section_id}"
+  with mock.patch("routes.section.common_service.call_search_user_api",
+  return_value=TEMP_USER):
+    resp = client_with_emulator.get(url)
+    print("Test teachers list response___",resp.json())
+  assert resp.status_code == 200
+  assert resp.json()["success"] is True
+
+def test_get_teacher(client_with_emulator,create_fake_data):
+  user_api_response={
+  "success": True,
+  "message": "Success",
+  "data": [TEMP_USER]}
+  section_id =  create_fake_data["section"]
+  url = BASE_URL + f"/sections/{section_id}/teachers/teachera@gmail.com"
+  the_response = Mock(spec=Response)
+  the_response.json.return_value = user_api_response
+  the_response.status_code = 200
+  with mock.patch(
+    "routes.section.common_service.call_search_user_api",
+    return_value=the_response)  :
+    # mock_request.return_value.status_code = 200
+    # mock_request.return_value = str(user_api_response)
+    resp = client_with_emulator.get(url)
+    print("Get User response___",resp)
+  assert resp.status_code == 200
 
 def test_delete_section(client_with_emulator, create_fake_data):
 
@@ -418,3 +451,74 @@ def test_negative_enable_notifications(client_with_emulator):
       resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code==422,"Status 422"
   assert resp.json()["success"] is False, "Data doesn't Match"
+
+
+def test_get_assignment(client_with_emulator, create_fake_data):
+  url = BASE_URL + \
+      f"/sections/{create_fake_data['section']}/assignments/5789246"
+  course_work_data = {
+      "courseId": "555555555",
+      "id": "5789246",
+      "title": "test assignment",
+      "state": "PUBLISHED",
+      "alternateLink": "https://classroom.google.com/xyz",
+      "creationTime": "2023-02-16T10:45:49.833Z",
+      "updateTime": "2023-02-16T10:46:06.699Z",
+      "dueDate": {
+          "year": 2023,
+          "month": 2,
+          "day": 28
+      },
+      "dueTime": {
+          "hours": 18,
+          "minutes": 29
+      },
+      "maxPoints": 100,
+      "workType": "ASSIGNMENT",
+      "assigneeMode": "ALL_STUDENTS",
+  }
+  with mock.patch("routes.section.classroom_crud.get_course_work",
+                  return_value=course_work_data):
+    resp = client_with_emulator.get(url)
+  data = resp.json()
+  assert resp.status_code == 200, "Status 200"
+  assert data["id"] == course_work_data["id"], "Data id doesn't Match"
+  assert data["classroom_id"] == course_work_data[
+      "courseId"], "Data course id doesn't Match"
+  assert data["description"] is None, "Data description doesn't Match"
+  assert datetime.date.fromisoformat(data["due_date"]) == datetime.date(
+      year=course_work_data["dueDate"]["year"],
+      month=course_work_data["dueDate"]["month"],
+      day=course_work_data["dueDate"]["day"]), "Data due date doesn't Match"
+
+
+def test_negative_get_assignment(client_with_emulator, create_fake_data):
+  url = BASE_URL + \
+      "/sections/fake_id/assignments/5789246"
+  course_work_data = {
+      "courseId": "555555555",
+      "id": "5789246",
+      "title": "test assignment",
+      "state": "PUBLISHED",
+      "alternateLink": "https://classroom.google.com/xyz",
+      "creationTime": "2023-02-16T10:45:49.833Z",
+      "updateTime": "2023-02-16T10:46:06.699Z",
+      "dueDate": {
+          "year": 2023,
+          "month": 2,
+          "day": 28
+      },
+      "dueTime": {
+          "hours": 18,
+          "minutes": 29
+      },
+      "maxPoints": 100,
+      "workType": "ASSIGNMENT",
+      "assigneeMode": "ALL_STUDENTS",
+  }
+  with mock.patch("routes.section.classroom_crud.get_course_work",
+                  return_value=course_work_data):
+    resp = client_with_emulator.get(url)
+  data = resp.json()
+  assert resp.status_code == 404, "Status 404"
+  assert data["success"] is False, "Data doesn't Match"
