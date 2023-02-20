@@ -46,8 +46,6 @@ def create_teacher(headers,body):
     searched_teacher = response.json()["data"]
     print("Searched  teacher value ",searched_teacher)
     if searched_teacher == []:
-      body["first_name"] = ""
-      body["last_name"] = ""
       create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
       json=body,headers=headers)
       # Logger.info("CREATE USER RESPONSE ",create_user_response.status_code,

@@ -26,5 +26,7 @@ TEST_USER = {
     "user_type_ref": "",
     "user_groups": [],
     "is_registered": True,
-    "failed_login_attempts_count": 0
+    "failed_login_attempts_count": 0,
+    "gaia_id":"test_gaia_id",
+    "photo_url":"temp_url"
 }

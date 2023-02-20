@@ -198,7 +198,7 @@ request: Request):
       "failed_login_attempts_count": 0,
       "access_api_docs": False,
       "gaia_id":gaia_id,
-      "photo_url":"temp_url"
+      "photo_url" :  user_profile["photoUrl"]
         }
     common_service.create_teacher(headers,data)
     # Storing classroom details

@@ -217,7 +217,8 @@ def create_section(sections_details: SectionDetails,request: Request):
       "is_registered": True,
       "failed_login_attempts_count": 0,
       "access_api_docs": False,
-      "gaia_id":user_profile["id"]
+      "gaia_id":user_profile["id"],
+      "photo_url" :  user_profile["photoUrl"]
         }
       common_service.create_teacher(headers,data)
     section = Section()
@@ -350,7 +351,8 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
       if result.json()["data"] == [] or result.json()["data"] is None :
         raise ResourceNotFoundException(f"{teacher_email} not found in Users data")
       else :
-        print("Result of search User API",result.status_code,result.json()["data"])
+        print("Result of search User API",
+        result.status_code,result.json()["data"])
         return {"data": result.json()["data"][0]}
     else:
       raise ResourceNotFoundException(f"{teacher_email}\
@@ -484,7 +486,8 @@ def update_section(sections_details: UpdateSection,request: Request):
       "is_registered": True,
       "failed_login_attempts_count": 0,
       "access_api_docs": False,
-      "gaia_id":user_profile["id"]
+      "gaia_id":user_profile["id"],
+      "photo_url" :  user_profile["photoUrl"]
         }
       common_service.create_teacher(headers,data)
     remove_teacher_list = list(

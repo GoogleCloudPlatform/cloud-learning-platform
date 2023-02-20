@@ -450,8 +450,8 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   # last_name =profile["names"][0]["familyName"]
   # Call user API
   data = {
-  "first_name":"",
-  "last_name": "",
+  "first_name":profile["names"][0]["givenName"],
+  "last_name": profile["names"][0]["familyName"],
   "email":student_email,
   "user_type": "learner",
   "user_type_ref": "",
@@ -460,7 +460,8 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   "is_registered": True,
   "failed_login_attempts_count": 0,
   "access_api_docs": False,
-  "gaia_id":gaia_id
+  "gaia_id":gaia_id,
+  "photo_url":""
   }
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user usermanagement API and return user data else
