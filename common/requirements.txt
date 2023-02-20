@@ -4,7 +4,7 @@ google-cloud-secret-manager==2.15.0
 jsonschema==4.17.3
 fastapi==0.85.1
 google-auth==2.15.0
-google-api-python-client==2.69.0
+google-api-python-client==2.78.0
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.4.6
 oauth2client==4.1.3
