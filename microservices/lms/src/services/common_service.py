@@ -44,15 +44,14 @@ def create_teacher(headers,body):
   searched_teacher = []
   if response.status_code == 200:
     searched_teacher = response.json()["data"]
-    print("Searched  teacher value ",searched_teacher)
+    Logger.info(f"Searched  teacher value {searched_teacher}")
     if searched_teacher == []:
-      print("cerate teacher body")
       body["first_name"] = "firstname"
       body["last_name"] = "lastname"
       create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
       json=body,headers=headers)
-      print("CREATE USER RESPONSE ",create_user_response.status_code,
-      create_user_response.json())
+      Logger.info(
+        f"User created with email{body},{create_user_response.status_code}")
       if create_user_response.status_code != 200:
         raise UserManagementServiceError(response.json()["message"])
       return response.json()["data"]

@@ -233,15 +233,12 @@ def get_coursework_material(course_id):
 
   service = build("classroom", "v1", credentials=get_credentials())
   try:
-    print("This in coursewoek material")
     coursework_list = service.courses().courseWorkMaterials().list(
         courseId=course_id).execute()
-    print("This is courseworkMaterial list before Mapping ",coursework_list)
     if coursework_list:
       coursework_list = coursework_list["courseWorkMaterial"]
     return coursework_list
   except HttpError as error:
-    print(error)
     logger.error(error)
     return None
 

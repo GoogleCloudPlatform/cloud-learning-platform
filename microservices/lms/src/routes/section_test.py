@@ -3,7 +3,6 @@
 """
 import os
 import mock
-from mock import patch
 import pytest
 import datetime
 from unittest.mock import Mock

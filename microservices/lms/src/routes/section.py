@@ -109,7 +109,6 @@ def create_section(sections_details: SectionDetails,request: Request):
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
     # Create a new course
-    print("Current Course ____",current_course)
     new_course = classroom_crud.create_course(course_template_details.name,
                                               sections_details.description,
                                               sections_details.name, "me")
@@ -307,7 +306,6 @@ def get_teachers_list(section_id: str, request: Request):
     for teacher in teachers:
       result = common_service.call_search_user_api(headers=headers,
       email=teacher)
-      print("Search user function response",result.status_code)
       if result.json()["data"] !=[]:
         teacher_details.append(result.json()["data"][0])
     return {"data": teacher_details}
@@ -349,10 +347,9 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
       result = common_service.call_search_user_api(headers=headers,
       email=teacher_email)
       if result.json()["data"] == [] or result.json()["data"] is None :
-        raise ResourceNotFoundException(f"{teacher_email} not found in Users data")
+        raise ResourceNotFoundException(
+          f"{teacher_email} not found in Users data")
       else :
-        print("Result of search User API",
-        result.status_code,result.json()["data"])
         return {"data": result.json()["data"][0]}
     else:
       raise ResourceNotFoundException(f"{teacher_email}\
