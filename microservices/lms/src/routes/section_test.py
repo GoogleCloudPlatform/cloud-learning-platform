@@ -355,9 +355,9 @@ def test_get_teacher(client_with_emulator,create_fake_data):
   the_response = Mock(spec=Response)
   the_response.json.return_value = user_api_response
   the_response.status_code = 200
-  # with patch("routes.section.common_service.call_search_user_api") as mock_request:
   with mock.patch(
-    "routes.section.common_service.call_search_user_api",return_value=the_response)  :
+    "routes.section.common_service.call_search_user_api",
+    return_value=the_response)  :
     # mock_request.return_value.status_code = 200
     # mock_request.return_value = str(user_api_response)
     resp = client_with_emulator.get(url)

@@ -347,7 +347,7 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
     if teacher_email in teachers:
       result = common_service.call_search_user_api(headers=headers,
       email=teacher_email)
-      if result.json()["data"] == [] or result.json()["data"] == None :
+      if result.json()["data"] == [] or result.json()["data"] is None :
         raise ResourceNotFoundException(f"{teacher_email} not found in Users data")
       else :
         print("Result of search User API",result.status_code,result.json()["data"])

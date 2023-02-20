@@ -50,8 +50,8 @@ def create_teacher(headers,body):
       body["last_name"] = ""
       create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
       json=body,headers=headers)
-      Logger.info("CREATE USER RESPONSE ",create_user_response.status_code,
-      create_user_response.json())
+      # Logger.info("CREATE USER RESPONSE ",create_user_response.status_code,
+      # create_user_response.json())
       if create_user_response.status_code != 200:
         raise UserManagementServiceError(response.json()["message"])
       return response.json()["data"]
