@@ -125,7 +125,8 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
 
   if user.get("user_type") == "learner":
     token_claims[lti_claim_field("claim", "roles")] = [
-        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
+        "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student",
+        "http://purl.imsglobal.org/vocab/lis/v2/membership#Student"
     ]
   elif user.get("user_type") == "faculty":
     token_claims[lti_claim_field("claim", "roles")] = [

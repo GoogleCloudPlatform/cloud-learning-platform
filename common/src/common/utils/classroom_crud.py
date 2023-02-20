@@ -695,7 +695,7 @@ def get_user_profile_information(user_email):
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
-def post_user_grade(course_id: str,
+def post_grade_of_the_user(course_id: str,
                     course_work_id: str,
                     submission_id: str,
                     assigned_grade: float = None,
