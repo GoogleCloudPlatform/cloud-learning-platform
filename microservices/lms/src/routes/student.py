@@ -218,6 +218,7 @@ def enroll_student_section(cohort_id: str,
     cohort = Cohort.find_by_id(cohort_id)
     sections = Section.collection.filter("cohort","==",cohort.key).fetch()
     sections = list(sections)
+    
     if len(sections) == 0:
       raise ResourceNotFoundException("Given CohortId\
          does not have any sections")

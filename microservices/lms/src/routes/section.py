@@ -193,6 +193,7 @@ def create_section(sections_details: SectionDetails,request: Request):
     sections_details.teachers.append(
         course_template_details.instructional_designer)
     for teacher_email in set(sections_details.teachers):
+      print("TEACHER NAME",teacher_email)
       # classroom_crud.add_teacher(new_course["id"], teacher_email)
       invitation_object = classroom_crud.invite_teacher(new_course["id"],
                             teacher_email)
