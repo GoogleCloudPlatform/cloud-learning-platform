@@ -13,7 +13,8 @@ BASIC_TOOL_EXAMPLE = {
     "redirect_uris": [
         "https://example-tool.com/admin/api/ltilaunch/ltitoollaunch"
     ],
-    "enable_grade_sync": False
+    "enable_grade_sync": False,
+    "enable_nrps": False
 }
 
 FULL_TOOL_EXAMPLE = {

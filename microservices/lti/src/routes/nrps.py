@@ -1,4 +1,5 @@
 """Line item  Endpoints"""
+import requests
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
@@ -6,6 +7,7 @@ from common.utils.errors import (ResourceNotFoundException, InvalidTokenError)
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound,
                                           Unauthenticated)
+from common.utils.secrets import get_backend_robot_id_token
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.validate_service import validate_access
 # pylint: disable=unused-argument, use-maxsplit-arg, line-too-long
@@ -43,72 +45,93 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
     # data for the given context
     nrps_id = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/memberships"
 
+    get_section_url = f"http://lms/lms/api/v1/sections/{context_id}"
+
+    section_res = requests.get(
+        url=get_section_url,
+        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+        timeout=60)
+
+    if section_res.status_code == 200:
+      section_data = section_res.json().get("data")
+    else:
+      raise Exception(
+          f"Internal error from LMS get section API with status code - {section_res.status_code}"
+      )
+
+    members_list = []
+    members_data = []
+    get_teachers_members_url = f"http://lms/lms/api/v1/sections/{context_id}/teachers"
+
+    teachers_res = requests.get(
+        url=get_teachers_members_url,
+        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+        timeout=60)
+
+    if teachers_res.status_code == 200:
+      teachers_data = teachers_res.json().get("data")
+      members_list.append(teachers_data)
+    else:
+      raise Exception(
+          f"Internal error from LMS get teachers API with status code - {teachers_res.status_code}"
+      )
+
     context_details = {
-        "id": context_id,
-        "label": "Test Course 2",
-        "title": "Test title of the course 2",
-        "type": [
-            "http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"
-        ]
+        "id": section_data.get("id"),
+        "label": section_data.get("section"),
+        "title": section_data.get("description")
     }
 
-    members_list = [{
-        "user_id":
-            "QXUkLyVRsuJRqFBppUOo",
-        "status":
-            "Active",
-        "given_name":
-            "Ross",
-        "family_name":
-            "Geller",
-        "name":
-            "Ross Geller",
-        "email":
-            "ltitesting002@gmail.com",
-        "picture":
-            "https://lh3.googleusercontent.com/a/AEdFTp5ulzT6ClmwuiTPlpmy6UDm8FrvVoRnWotGi_vn=s100",
-        "lis_person_sourcedid":
-            "QXUkLyVRsuJRqFBppUOo",
-        "roles": [
-            "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
+    members_data.append(teachers_data)
+
+    get_student_members_url = f"http://lms/lms/api/v1/sections/{context_id}/students"
+
+    student_res = requests.get(
+        url=get_student_members_url,
+        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+        timeout=60)
+
+    if student_res.status_code == 200:
+      student_data = student_res.json().get("data")
+    else:
+      raise Exception(
+          f"Internal error from LMS get students API with status code - {student_res.status_code}"
+      )
+
+    members_data.append(student_data)
+    for member in members_data:
+      members_info = {
+          "user_id": member.get("user_id"),
+          "status": "Active",
+          "given_name": member.get("first_name"),
+          "family_name": member.get("last_name"),
+          "name": member.get("first_name", "") + member.get("last_name", ""),
+          "email": member.get("email"),
+          "picture": member.get("photo_url"),
+          "lis_person_sourcedid": member.get("user_id")
+      }
+
+      if member.get("user_type") == "learner":
+        members_info["roles"] = [
+            "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
+            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Learner",
+            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
         ]
-    }, {
-        "user_id":
-            "MaHmy8jrcpxuF0938EeX",
-        "status":
-            "Active",
-        "given_name":
-            "Phoebe",
-        "family_name":
-            "Buffay",
-        "name":
-            "Phoebe Buffay",
-        "email":
-            "ltitesting001@gmail.com",
-        "picture":
-            "https://lh3.googleusercontent.com/a/AEdFTp4mMFy2EvCqOBrHOXKx_-QlLXq84aoKKo37AsZQ=s100",
-        "lis_person_sourcedid":
-            "MaHmy8jrcpxuF0938EeX",
-        "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"]
-    }, {
-        "user_id":
-            "NSJDWSgXf7nc9H59yWCx",
-        "status":
-            "Active",
-        "given_name":
-            "Chandler",
-        "family_name":
-            "Bing",
-        "name":
-            "Chandler Bing",
-        "email":
-            "ltitesting003@gmail.com",
-        "picture":
-            "https://lh3.googleusercontent.com/a/AEdFTp55udg-hg_3rzF4g7_9frDyWFFA440rs1SAzrPs=s100",
-        "lis_person_sourcedid":
-            "NSJDWSgXf7nc9H59yWCx",
-        "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"]
-    }]
+
+      elif member.get("user_type") == "faculty":
+        members_info["roles"] = [
+            "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
+            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Faculty",
+            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor"
+        ]
+      elif member.get("user_type") == "admin":
+        members_info["roles"] = [
+            "http://purl.imsglobal.org/vocab/lis/v2/membership#Administrator",
+            "http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator",
+            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
+        ]
+
+      members_list.append(members_info)
 
     output_data = {
         "id": nrps_id,
