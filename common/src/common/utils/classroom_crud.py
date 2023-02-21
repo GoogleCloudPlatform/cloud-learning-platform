@@ -560,6 +560,27 @@ def enable_notifications(course_id, feed_type):
   }
   return service.registrations().create(body=body).execute()
 
+def if_user_exists_in_section(section_id, user_id, headers):
+  """Check if student exists in a given section
+  Args:
+      section_id (str): firestore section id
+      user_id (str): firestore user id
+  Returns:
+      dict: user details
+  """
+  section_details = []
+  section_details = Section.find_by_id(section_id)
+  result = CourseEnrollmentMapping.\
+    find_course_enrollment_record(section_details.key,user_id)
+  if result is not None:
+    response = requests.\
+      get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+    user = response.json()["data"]
+    return user
+  else:
+    raise ResourceNotFoundException("User not found")
+
+
 def list_student_section(section_id,headers):
   """List  student of section given firestore section id
 
@@ -644,7 +665,7 @@ def acceept_invite(invitation_id,teacher_email):
   """Invite teacher to google classroom using course id and email
 
   Args:
-      invitation_id (str): google classroom invitation Id from invite 
+      invitation_id (str): google classroom invitation Id from invite
       teacher response
       teacher_email (str): teacher email id
 
@@ -671,9 +692,9 @@ def acceept_invite(invitation_id,teacher_email):
 def get_user_profile_information(user_email):
   """
    Args:
-      user_email: email of user 
-  Returns:
-      profile_information: User profile information of the user 
+      user_email: email of user
+    Returns:
+      profile_information: User profile information of the user
   """
   service = build("classroom", "v1", credentials=get_credentials())
 
