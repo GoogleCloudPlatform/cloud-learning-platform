@@ -17,10 +17,11 @@ from schemas.error_schema import (ConflictResponseModel,
 from schemas.section import (
     CreateSectiontResponseModel, DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
-    ClassroomCourseListResponseModel, UpdateSectionResponseModel)
+    ClassroomCourseListResponseModel, UpdateSectionResponseModel,
+    TeachersListResponseModel,GetTeacherResponseModel,AssignmentModel)
 from schemas.update_section import UpdateSection
 from services import common_service
-from utils.helper import convert_section_to_section_model
+from utils.helper import convert_section_to_section_model, convert_assignment_to_assignment_model
 
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -100,7 +101,6 @@ def create_section(sections_details: SectionDetails,request: Request):
     course_template_details = CourseTemplate.find_by_id(
         sections_details.course_template)
     cohort_details = Cohort.find_by_id(sections_details.cohort)
-    name = course_template_details.name
     # Get course by course id for copying from master course
     current_course = classroom_crud.get_course_by_id(
         course_template_details.classroom_id)
@@ -109,17 +109,17 @@ def create_section(sections_details: SectionDetails,request: Request):
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
     # Create a new course
-
-    new_course = classroom_crud.create_course(name,
+    new_course = classroom_crud.create_course(course_template_details.name,
                                               sections_details.description,
                                               sections_details.name, "me")
+
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
     # add new_course to pubsub topic for both course work and roaster changes
-    classroom_crud.enable_notifications(new_course["id"],
-                                        "COURSE_WORK_CHANGES")
-    classroom_crud.enable_notifications(new_course["id"],
-                                        "COURSE_ROSTER_CHANGES")
+    # classroom_crud.enable_notifications(new_course["id"],
+    #                                     "COURSE_WORK_CHANGES")
+    # classroom_crud.enable_notifications(new_course["id"],
+    #                                     "COURSE_ROSTER_CHANGES")
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
     if topics is not None:
@@ -156,28 +156,54 @@ def create_section(sections_details: SectionDetails,request: Request):
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
 
+    # Get the list of courseworkMaterial
+    coursework_material_list = classroom_crud.get_coursework_material(
+      course_template_details.classroom_id)
+    for coursework_material in coursework_material_list:
+      #Check if a coursework material is linked to a topic if yes then
+      # replace the old topic id to new topic id using topic_id_map
+      if "topicId" in coursework_material.keys():
+        coursework_material["topicId"] =topic_id_map[
+          coursework_material["topicId"]]
+      #Check if a material is present in coursework
+      if "materials" in coursework_material.keys():
+        # Calling function to get edit_url and view url of
+        # google form which returns
+        # a dictionary of view_links as keys and edit
+        #  likns as values of google form
+        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+        # Loop to check if a material in courssework has a google
+        # form attached to it
+        # update the  view link to edit link and attach it as a form
+        for material in coursework_material["materials"]:
+          if "form" in material.keys():
+            material["link"] = {
+                "title": material["form"]["title"],
+                "url": url_mapping[material["form"]["formUrl"]]
+            }
+            # remove form from  material dict
+            material.pop("form")
+            # material["form"]["formUrl"]=
+            # url_mapping[material["form"]["formUrl"]]
+    # Create coursework in new course
+    if coursework_material_list is not None:
+      classroom_crud.create_coursework_material(new_course["id"],
+      coursework_material_list)
     # add Instructional designer
     sections_details.teachers.append(
         course_template_details.instructional_designer)
-
     for teacher_email in sections_details.teachers:
       # classroom_crud.add_teacher(new_course["id"], teacher_email)
       invitation_object = classroom_crud.invite_teacher(new_course["id"],
                             teacher_email)
     # Storing classroom details
-      print("This is invitation API response ")
-      print(invitation_object)
       classroom_crud.acceept_invite(invitation_object["id"],teacher_email)
-      print("Invite Accepted")
       user_profile = classroom_crud.get_user_profile_information(teacher_email)
       # classroom_crud.add_teacher(new_course["id"], teacher_email)
-      print("User profile Information ______",user_profile)
-      gaid = user_profile["id"]
-      name =  user_profile["name"]["givenName"]
-      last_name =  user_profile["name"]["familyName"]
-      photo_url =  user_profile["photoUrl"]
-      print(f"Gaid {gaid} first name {name} last name \
-        {last_name} photo url {photo_url}")
+      # gaid = user_profile["id"]
+      # name =  user_profile["name"]["givenName"]
+      # last_name =  user_profile["name"]["familyName"]
+      # photo_url =  user_profile["photoUrl"]
     # Save the new record of seecion in firestore
       data = {
       "first_name":user_profile["name"]["givenName"],
@@ -190,11 +216,12 @@ def create_section(sections_details: SectionDetails,request: Request):
       "is_registered": True,
       "failed_login_attempts_count": 0,
       "access_api_docs": False,
-      "gaia_id":user_profile["id"]
+      "gaia_id":user_profile["id"],
+      "photo_url" :  user_profile["photoUrl"]
         }
       common_service.create_teacher(headers,data)
     section = Section()
-    section.name = name
+    section.name =course_template_details.name
     section.section = sections_details.name
     section.description = sections_details.description
     # Reference document can be get using get() method
@@ -232,7 +259,7 @@ def get_section(section_id: str):
       section_id (str): section_id in firestore
   Raises:
       HTTPException: 500 Internal Server Error if something fails
-      HTTPException: 404 Section with section id is not found
+      ResourceNotFound: 404 Section with section id is not found
   Returns:
     {"status":"Success","new_course":{}}: Returns section details from  db,
     {'status': 'Failed'} if the user creation raises an exception
@@ -243,6 +270,90 @@ def get_section(section_id: str):
     # Get course by course id
     new_section = convert_section_to_section_model(section_details)
     return {"data": new_section}
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except HttpError as ae:
+    Logger.error(ae)
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+@router.get("/{section_id}/teachers",response_model=TeachersListResponseModel)
+def get_teachers_list(section_id: str, request: Request):
+  """Get a list of teachers for a section details from db
+
+  Args:
+      section_id (str): section_id in firestore
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      HTTPException: 404 Section with section id is not found
+  Returns:
+    {"status":"Success","new_course":{}}: Returns section details from  db,
+    {'status': 'Failed'} if the user creation raises an exception
+  """
+  try:
+    teacher_details = []
+    headers = {"Authorization": request.headers.get("Authorization")}
+    section_details = Section.find_by_id(section_id)
+    teachers= section_details.teachers
+    if teachers == []:
+      return{"data":teacher_details}
+    for teacher in teachers:
+      result = common_service.call_search_user_api(headers=headers,
+      email=teacher)
+      if result.json()["data"] !=[]:
+        teacher_details.append(result.json()["data"][0])
+    return {"data": teacher_details}
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except HttpError as ae:
+    Logger.error(ae)
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.get("/{section_id}/teachers/{teacher_email}",
+response_model=GetTeacherResponseModel)
+def get_teacher(section_id: str,teacher_email:str,request: Request):
+  """Get teacher for a section .If teacher is present in given section
+  get teacher details else throw
+  Args:
+      section_id (str): section_id in firestore
+      teacher_email(str): teachers email Id
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      HTTPException: 404 Section with section id is not found
+      HTTPException: 404 Teacher with teacher email is not found
+  Returns:
+    {"status":"Success","data":}: Returns section details from  db,
+    {'status': 'False'} if raises an exception
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    section_details = Section.find_by_id(section_id)
+    teachers= section_details.teachers
+    if teacher_email in teachers:
+      result = common_service.call_search_user_api(headers=headers,
+      email=teacher_email)
+      if result.json()["data"] == [] or result.json()["data"] is None :
+        raise ResourceNotFoundException(
+          f"{teacher_email} not found in Users data")
+      else :
+        return {"data": result.json()["data"][0]}
+    else:
+      raise ResourceNotFoundException(f"{teacher_email}\
+        not found in teachers list of the section")
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -267,7 +378,7 @@ def delete_section(section_id: str):
       section_id (str): section_id in firestore
   Raises:
       HTTPException: 500 Internal Server Error if something fails
-      HTTPException: 404 Section with section id is not found
+      ResourceNotFound: 404 Section with section id is not found
   Returns:
     {"message": "Successfully deleted section"}
   """
@@ -321,7 +432,6 @@ def section_list(skip: int = 0, limit: int = 10):
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
-    print(err)
     raise InternalServerError(str(e)) from e
 
 
@@ -344,7 +454,6 @@ def update_section(sections_details: UpdateSection,request: Request):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    print("1")
     headers = {"Authorization": request.headers.get("Authorization")}
     section = Section.find_by_id(sections_details.id)
     new_course = classroom_crud.update_course(sections_details.course_id,
@@ -356,14 +465,11 @@ def update_section(sections_details: UpdateSection,request: Request):
           f" {sections_details.course_id} is not found in classroom")
     add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
-    print("ADD teachers list ",add_teacher_list)
     for i in add_teacher_list:
       # classroom_crud.add_teacher(sections_details.course_id, i)
       invitation_object = classroom_crud.invite_teacher(
                             sections_details.course_id,i)
       # Storing classroom details
-      print("This is invitation API response ")
-      print(invitation_object)
       classroom_crud.acceept_invite(invitation_object["id"],i)
       user_profile = classroom_crud.get_user_profile_information(i)
       data = {
@@ -377,10 +483,10 @@ def update_section(sections_details: UpdateSection,request: Request):
       "is_registered": True,
       "failed_login_attempts_count": 0,
       "access_api_docs": False,
-      "gaia_id":user_profile["id"]
+      "gaia_id":user_profile["id"],
+      "photo_url" :  user_profile["photoUrl"]
         }
       common_service.create_teacher(headers,data)
-      print("Invite Accepted userprofile is",user_profile)
     remove_teacher_list = list(
         set(section.teachers) - set(sections_details.teachers))
     for i in remove_teacher_list:
@@ -402,7 +508,6 @@ def update_section(sections_details: UpdateSection,request: Request):
                               data=None) from hte
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
-    print(err)
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
@@ -431,7 +536,8 @@ def copy_courses(course_details: CourseDetails):
     new_course = classroom_crud.create_course(current_course["name"],
                                               current_course["description"],
                                               current_course["section"],
-                                              current_course["ownerId"])
+                                              current_course["ownerId"]
+                                            )
 
     # Get topics of current course
     topics = classroom_crud.get_topics(course_id)
@@ -471,6 +577,40 @@ def copy_courses(course_details: CourseDetails):
     # Create coursework in new course
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
+    # Get the list of courseworkMaterial
+    coursework_material_list = classroom_crud.get_coursework_material(
+      course_id)
+    for coursework_material in coursework_material_list:
+      #Check if a coursework material is linked to a topic if yes then
+      # replace the old topic id to new topic id using topic_id_map
+      if "topicId" in coursework_material.keys():
+        coursework_material["topicId"] = topic_id_map[
+          coursework_material["topicId"]]
+      #Check if a material is present in coursework
+      if "materials" in coursework_material.keys():
+        # Calling function to get edit_url and view url of
+        # google form which returns
+        # a dictionary of view_links as keys and edit
+        #  likns as values of google form
+        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+        # Loop to check if a material in courssework has a google
+        # form attached to it
+        # update the  view link to edit link and attach it as a form
+        for material in coursework_material["materials"]:
+          if "form" in material.keys():
+            material["link"] = {
+                "title": material["form"]["title"],
+                "url": url_mapping[material["form"]["formUrl"]]
+            }
+            # remove form from  material dict
+            material.pop("form")
+            # material["form"]["formUrl"]=
+            # url_mapping[material["form"]["formUrl"]]
+    # Create coursework in new course
+    if coursework_material_list is not None:
+      classroom_crud.create_coursework_material(new_course["id"],
+       coursework_material_list)
+
     SUCCESS_RESPONSE["new_course"] = new_course
     SUCCESS_RESPONSE["coursework_list"] = coursework_list
     return SUCCESS_RESPONSE
@@ -545,3 +685,35 @@ def section_enable_notifications_pub_sub(
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
+@router.get("/{section_id}/assignments/{assignment_id}",
+            response_model=AssignmentModel)
+def get_assignment(section_id: str, assignment_id: str):
+  """Get course work details using section id and course work id
+  Args:
+      section_id (str): section unique id
+      assignment_id (str): course work/assignment unique id
+  Raises:
+      InternalServerError: 500 Internal Server Error if something fails
+      CustomHTTPException: raise error according to the HTTPError exception
+      ResourceNotFound: 404 Section with section id is not found
+  Returns:
+      AssignmentModel: AssignmentModel object which
+        contains all the course work details
+  """
+  try:
+    section = Section.find_by_id(section_id)
+    assignment = classroom_crud.get_course_work(course_id=section.classroom_id,
+                                                course_work_id=assignment_id)
+    return convert_assignment_to_assignment_model(assignment)
+  except HttpError as hte:
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=str(hte),
+                              data=None) from hte
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e

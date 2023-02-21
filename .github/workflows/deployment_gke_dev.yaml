@@ -42,6 +42,10 @@ env:
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   LTI_ISSUER_DOMAIN: https://core-learning-services-dev.cloudpssolutions.com
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+  
+  # For Scalability in Dev env using Prod config
+  BQ_DATASET: lms_analytics
+  
 # cookiecutter:raw 
 jobs:
   deploy_backends:
@@ -92,7 +96,7 @@ jobs:
       - name: Build and deploy to cluster
         run: |
           skaffold run \
-          --profile dev \
+          --profile custom \
           --namespace $NAMESPACE \
           -l commit=$GITHUB_SHA \
           --tag latest 

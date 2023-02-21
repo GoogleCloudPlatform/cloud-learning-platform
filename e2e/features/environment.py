@@ -14,7 +14,12 @@ from google.oauth2.credentials import Credentials
 import logging
 
 USER_EMAIL_PASSWORD_DICT = get_user_email_and_password_for_e2e()
-CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL")
+
+CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
+CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
+SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
+          "https://www.googleapis.com/auth/classroom.courses.readonly",
+          "https://www.googleapis.com/auth/classroom.coursework.students"]
 
 def create_course(name,section,description):
   """Create course Function in classroom
@@ -23,10 +28,6 @@ def create_course(name,section,description):
   Returns:
     new created course details
     """""
-  SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
-            "https://www.googleapis.com/auth/classroom.courses.readonly"]
-  CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
-  CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
@@ -122,6 +123,23 @@ def create_section(context):
   section.classroom_code = classroom["enrollmentCode"]
   section.classroom_url = classroom["alternateLink"]
   section.save()
+  # Create teachers in the DB 
+  temp_user = TempUser.from_dict(TEST_USER)
+  temp_user.email = TEST_SECTION["teachers"][0]
+  temp_user.user_type = "faculty"
+  temp_user.first_name = TEST_SECTION["teachers"][0].split("@")[0]
+  temp_user.user_id = ""
+  temp_user.save()
+  temp_user.user_id = temp_user.id
+  temp_user.update()
+  temp_user1 = TempUser.from_dict(TEST_USER)
+  temp_user1.email = TEST_SECTION["teachers"][1].split("@")[0]
+  temp_user1.user_type = "faculty"
+  temp_user1.user_id = ""
+  temp_user1.save()
+  temp_user1.user_id = temp_user.id
+  temp_user1.update()
+  print("TEST TEACHERS CREATED",TEST_SECTION["teachers"][1].split("@")[0],TEST_SECTION["teachers"][0].split("@")[0])
   context.sections=section
   yield context.sections
 
@@ -155,6 +173,24 @@ def enroll_student_course(context):
 
 
 @fixture
+def create_assignment(context):
+  """Create assignment fixture"""
+  section = use_fixture(create_section, context)
+  a_creds = service_account.Credentials.from_service_account_info(
+      CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("classroom", "v1", credentials=creds)
+  result = service.courses().courseWork().create(courseId=section.classroom_id,
+                                                 body={
+                                                     "title": "test course work",
+                                                     "description": "test desc",
+                                                     "workType": "ASSIGNMENT"
+                                                 }).execute()
+  result["section_id"] = section.id
+  context.assignment = result
+  yield context.assignment
+
+@fixture
 def get_header(context):
   req = requests.post(f"{API_URL_AUTHENTICATION_SERVICE}/sign-in/credentials",
                       json=USER_EMAIL_PASSWORD_DICT,
@@ -174,7 +210,8 @@ fixture_registry = {
     "fixture.create.cohort": create_cohort,
     "fixture.create.section":create_section,
     "fixture.create.enroll_student_course":enroll_student_course,
-    "fixture.get.header":get_header
+    "fixture.get.header": get_header,
+    "fixture.create.assignment": create_assignment
 }
 
 def before_tag(context, tag):

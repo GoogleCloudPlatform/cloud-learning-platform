@@ -34,7 +34,9 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.coursework.me",
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/forms.body.readonly",
-    "https://www.googleapis.com/auth/classroom.profile.photos"
+    "https://www.googleapis.com/auth/classroom.profile.photos",
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials",
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
 ]
 
 
@@ -43,7 +45,6 @@ def get_credentials():
   creds = service_account.Credentials.from_service_account_info(classroom_key,
                                                                 scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-
   return creds
 
 
@@ -222,6 +223,26 @@ def get_coursework(course_id):
     logger.error(error)
     return None
 
+def get_coursework_material(course_id):
+  """Get  list of coursework from classroom
+
+  Args: course_id
+  Returns:
+    returns list of coursework of given course in classroom
+    """ ""
+
+  service = build("classroom", "v1", credentials=get_credentials())
+  try:
+    coursework_list = service.courses().courseWorkMaterials().list(
+        courseId=course_id).execute()
+    if coursework_list:
+      coursework_list = coursework_list["courseWorkMaterial"]
+    return coursework_list
+  except HttpError as error:
+    logger.error(error)
+    return None
+
+
 
 def create_coursework(course_id, coursework_list):
   """create coursework in a classroom course
@@ -239,6 +260,24 @@ def create_coursework(course_id, coursework_list):
                                               body=coursework_item).execute()
   Logger.info("Create coursework method worked")
   return "success"
+
+def create_coursework_material(course_id, coursework_material_list):
+  """create coursework in a classroom course
+
+  Args:
+    course_id: where coursework need to be created
+    coursework : list of dictionary of coursework to be created
+  Returns:
+    returns success
+    """ ""
+  Logger.info("In Create coursework Material")
+  service = build("classroom", "v1", credentials=get_credentials())
+  for coursework_item in coursework_material_list:
+    _ = service.courses().courseWorkMaterials().create(courseId=course_id,
+                                              body=coursework_item).execute()
+  Logger.info("Create coursework Material worked")
+  return "success"
+
 
 
 def delete_course_by_id(course_id):
@@ -404,12 +443,10 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   # Call_people api function
   profile = get_person_information(access_token)
   gaia_id = profile["metadata"]["sources"][0]["id"]
-  # first_name=profile["names"][0]["givenName"]
-  # last_name =profile["names"][0]["familyName"]
   # Call user API
   data = {
-  "first_name":"",
-  "last_name": "",
+  "first_name":profile["names"][0]["givenName"],
+  "last_name": profile["names"][0]["familyName"],
   "email":student_email,
   "user_type": "learner",
   "user_type_ref": "",
@@ -418,7 +455,8 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   "is_registered": True,
   "failed_login_attempts_count": 0,
   "access_api_docs": False,
-  "gaia_id":gaia_id
+  "gaia_id":gaia_id,
+  "photo_url":profile["photos"][0]["url"]
   }
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user usermanagement API and return user data else
@@ -522,6 +560,27 @@ def enable_notifications(course_id, feed_type):
   }
   return service.registrations().create(body=body).execute()
 
+def if_user_exists_in_section(section_id, user_id, headers):
+  """Check if student exists in a given section
+  Args:
+      section_id (str): firestore section id
+      user_id (str): firestore user id
+  Returns:
+      dict: user details
+  """
+  section_details = []
+  section_details = Section.find_by_id(section_id)
+  result = CourseEnrollmentMapping.\
+    find_course_enrollment_record(section_details.key,user_id)
+  if result is not None:
+    response = requests.\
+      get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+    user = response.json()["data"]
+    return user
+  else:
+    raise ResourceNotFoundException("User not found")
+
+
 def list_student_section(section_id,headers):
   """List  student of section given firestore section id
 
@@ -606,7 +665,7 @@ def acceept_invite(invitation_id,teacher_email):
   """Invite teacher to google classroom using course id and email
 
   Args:
-      invitation_id (str): google classroom invitation Id from invite 
+      invitation_id (str): google classroom invitation Id from invite
       teacher response
       teacher_email (str): teacher email id
 
@@ -633,9 +692,9 @@ def acceept_invite(invitation_id,teacher_email):
 def get_user_profile_information(user_email):
   """
    Args:
-      user_email: email of user 
-  Returns:
-      profile_information: User profile information of the user 
+      user_email: email of user
+    Returns:
+      profile_information: User profile information of the user
   """
   service = build("classroom", "v1", credentials=get_credentials())
 
@@ -651,3 +710,15 @@ def get_user_profile_information(user_email):
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
+
+def get_course_work(course_id,course_work_id):
+  """get course work by course id and course work id
+  Args:
+    course_id (str): _description_
+    course_work_id (str): _description_
+  Returns:
+    dict: _description_
+  """
+  service = service = build("classroom", "v1", credentials=get_credentials())
+  return service.courses().courseWork().get(
+    courseId=course_id,id=course_work_id).execute()

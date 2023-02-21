@@ -1,57 +1,7 @@
 """ Helper Functions"""
-import json
-from google.cloud import secretmanager
-import google_crc32c
-import ttl_cache
-from config import PROJECT_ID
+import datetime
 from fastapi import Depends
 from common.utils.auth_service import validate_user_type_and_token, auth_scheme
-
-
-@ttl_cache(3600)
-def get_gke_pd_sa_key_from_secret_manager():
-  """Get GKE Pod service account keys from
-    Secret manager
-  Args:
-  Returns:
-  return the POD service account keys in JSON format
-  """ ""
-
-  client = secretmanager.SecretManagerServiceClient()
-  secret_id = "gke-pod-sa-key"
-  secret_name = f"projects/{PROJECT_ID}/secrets/{secret_id}/versions/latest"
-
-  response = client.access_secret_version(request={"name": secret_name})
-  crc32c = google_crc32c.Checksum()
-  crc32c.update(response.payload.data)
-  if response.payload.data_crc32c != int(crc32c.hexdigest(), 16):
-    print("Data corruption detected.")
-    return response
-  payload = response.payload.data.decode("UTF-8")
-  response = json.loads(payload)
-  return response
-
-
-@ttl_cache(3600)
-def get_offline_access_token_from_secret_manager():
-  """_summary_
-
-  Returns:
-      dict: offline access token
-  """
-  client = secretmanager.SecretManagerServiceClient()
-  secret_id = "registration_access_token"
-  secret_name = f"projects/{PROJECT_ID}/secrets/{secret_id}/versions/latest"
-
-  response = client.access_secret_version(request={"name": secret_name})
-  crc32c = google_crc32c.Checksum()
-  crc32c.update(response.payload.data)
-  if response.payload.data_crc32c != int(crc32c.hexdigest(), 16):
-    print("Data corruption detected.")
-    return response
-  payload = response.payload.data.decode("UTF-8")
-  response = json.loads(payload)
-  return response
 
 
 def convert_cohort_to_cohort_model(cohort):
@@ -87,3 +37,44 @@ def convert_section_to_section_model(section):
 
 def validate_user(token: auth_scheme = Depends()):
   return validate_user_type_and_token(["other", "faculty"], token)
+
+
+def convert_assignment_to_assignment_model(assignment):
+  """Convert assignment dict to assignment object
+  Args:
+      assignment (dict): dict which contains all the assignment details
+  Returns:
+      dict: dict which contains assignment details
+       according to assignment object
+  """
+  keys = assignment.keys()
+  assignment["classroom_id"] = assignment["courseId"]
+  assignment["creation_time"] = assignment["creationTime"]
+  assignment["update_time"] = assignment["updateTime"]
+  if "dueDate" in keys:
+    assignment["due_date"] = datetime.date(
+        year=assignment["dueDate"]["year"],
+        month=assignment["dueDate"]["month"],
+        day=assignment["dueDate"]["day"])
+  if "dueTime" in keys:
+    assignment["due_time"] = datetime.time(
+        hour=assignment["dueTime"]["hours"],
+        minute=assignment["dueTime"]["minutes"])
+  assignment["link"] = get_json_value(assignment, "alternateLink")
+  assignment["max_grade"] = get_json_value(assignment, "maxPoints")
+  assignment["work_type"] = get_json_value(assignment, "workType")
+  assignment["assignee_mode"] = get_json_value(assignment, "assigneeMode")
+  return assignment
+
+
+def get_json_value(dict_object, key):
+  """check key in the dict and return value according it
+  Args:
+    dict_object (dict): dict
+    key (str): _description_
+  Returns:
+    _type_: _description_
+  """
+  if key in dict_object.keys():
+    return dict_object[key]
+  return None

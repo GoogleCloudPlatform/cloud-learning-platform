@@ -2,6 +2,8 @@
 from  config import USER_MANAGEMENT_BASE_URL
 import requests
 from common.utils.errors import  UserManagementServiceError
+from common.utils.logging_handler import Logger
+
 
 def call_search_user_api(headers,email):
   """ Call search by email usermanagement API to get the student data
@@ -13,7 +15,7 @@ def call_search_user_api(headers,email):
   """
 
   response = requests.get(f"\
-  {USER_MANAGEMENT_BASE_URL}/user/search?email={email}",\
+  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={email}",\
     headers=headers)
   return response
 
@@ -40,14 +42,18 @@ def create_teacher(headers,body):
   """
   response = call_search_user_api(headers,body["email"])
   searched_teacher = []
-  print("Search user response for ",body["email"])
-  print(response.json()["data"])
   if response.status_code == 200:
     searched_teacher = response.json()["data"]
+    Logger.info(f"Searched  teacher value {searched_teacher}")
     if searched_teacher == []:
-      print("Called Create user API user management")
-      response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
-    json=body,headers=headers)
-    if response.status_code != 200:
-      raise UserManagementServiceError(response.json()["message"])
-    return response.json()["data"]
+      body["first_name"] = "firstname"
+      body["last_name"] = "lastname"
+      create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
+      json=body,headers=headers)
+      Logger.info(
+        f"User created with email{body},{create_user_response.status_code}")
+      if create_user_response.status_code != 200:
+        raise UserManagementServiceError(response.json()["message"])
+      return response.json()["data"]
+  else :
+    raise UserManagementServiceError(response.json()["message"])

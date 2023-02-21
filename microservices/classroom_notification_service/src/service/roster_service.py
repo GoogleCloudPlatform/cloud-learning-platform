@@ -19,6 +19,7 @@ import uuid
 from common.utils.logging_handler import Logger
 from helper.bq_helper import insert_rows_to_bq
 from helper.classroom_helper import get_user
+from helper.json_helper import convert_dict_array_to_json
 from googleapiclient.errors import HttpError
 from config import BQ_TABLE_DICT
 # disabling for linting to pass
@@ -38,6 +39,9 @@ def save_roster(data):
       "event_type":data["eventType"], "resource":data["resourceId"],
       "publish_time":data["publish_time"],"timestamp":datetime.datetime.utcnow()
     }]
+    if data["eventType"] == "DELETED":
+      return insert_rows_to_bq(
+          rows=rows, table_name=BQ_TABLE_DICT["BQ_LOG_RS_TABLE"])
     return insert_rows_to_bq(
         rows=rows, table_name=BQ_TABLE_DICT["BQ_LOG_RS_TABLE"]) & save_user(
         data["resourceId"]["userId"], data["message_id"], data["eventType"])
@@ -54,5 +58,6 @@ def save_user(user_id,message_id,event_type):
   user["message_id"]=message_id
   user["timestamp"] = datetime.datetime.utcnow()
   user["event_type"]=event_type
+  user["permissions"] = convert_dict_array_to_json(user, "permissions")
   return insert_rows_to_bq(rows=[user],
                            table_name=BQ_TABLE_DICT["BQ_COLL_USER_TABLE"])

@@ -21,6 +21,7 @@ from common.utils.logging_handler import Logger
 from googleapiclient.errors import HttpError
 from helper.bq_helper import insert_rows_to_bq
 from helper.classroom_helper import get_course_work,get_student_submissions
+from helper.json_helper import convert_dict_array_to_json,convert_to_json
 from config import BQ_TABLE_DICT
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -40,6 +41,13 @@ def save_course_work(data):
     "event_type":data["eventType"], "resource":json.dumps(data["resourceId"]),
     "publish_time":data["publish_time"],"timestamp":datetime.datetime.utcnow()
         }]
+
+    if data["eventType"] == "DELETED":
+      return insert_rows_to_bq(
+            rows=rows,
+            table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"]
+        )
+
     if len(data["collection"].split(".")) == 3:
       if data["collection"].split(".")[2] == "studentSubmissions":
         return insert_rows_to_bq(
@@ -125,32 +133,4 @@ def save_student_submission(course_id, course_work_id,
   return insert_rows_to_bq([submission], BQ_TABLE_DICT["BQ_COLL_SCW_TABLE"])
 
 
-def convert_to_json(dict_object,key):
-  """_summary_
 
-  Args:
-    dict_object (_type_): _description_
-    key (_type_): _description_
-
-  Returns:
-    _type_: _description_
-  """
-  if key in dict_object.keys():
-    return json.dumps(dict_object[key])
-  return None
-
-
-def convert_dict_array_to_json(dict_object, key):
-  """_summary_
-
-  Args:
-    dict_object (_type_): _description_
-    key (_type_): _description_
-
-  Returns:
-    _type_: _description_
-  """
-  if key in dict_object.keys():
-    return [json.dumps(i) for i in dict_object[key]]
-  else:
-    return None
