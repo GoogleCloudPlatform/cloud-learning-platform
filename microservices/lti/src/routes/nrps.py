@@ -41,8 +41,6 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
   LineItem: `LineItemResponseModel`
   """
   try:
-    # TODO: Add API call to check if the context_id exists and get the members
-    # data for the given context
     nrps_id = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/memberships"
 
     get_section_url = f"http://lms/lms/api/v1/sections/{context_id}"
@@ -70,7 +68,6 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
 
     if teachers_res.status_code == 200:
       teachers_data = teachers_res.json().get("data")
-      members_list.append(teachers_data)
     else:
       raise Exception(
           f"Internal error from LMS get teachers API with status code - {teachers_res.status_code}"
@@ -82,7 +79,7 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
         "title": section_data.get("description")
     }
 
-    members_data.append(teachers_data)
+    members_data.extend(teachers_data)
 
     get_student_members_url = f"http://lms/lms/api/v1/sections/{context_id}/students"
 
@@ -98,7 +95,8 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
           f"Internal error from LMS get students API with status code - {student_res.status_code}"
       )
 
-    members_data.append(student_data)
+    members_data.extend(student_data)
+
     for member in members_data:
       members_info = {
           "user_id": member.get("user_id"),
@@ -124,6 +122,7 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
             "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Faculty",
             "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor"
         ]
+
       elif member.get("user_type") == "admin":
         members_info["roles"] = [
             "http://purl.imsglobal.org/vocab/lis/v2/membership#Administrator",
