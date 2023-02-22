@@ -78,23 +78,23 @@ def create_fake_data():
   }
 
 
-# def test_get_student_course_progress_percent(client_with_emulator):
-#   url = BASE_URL + "/sections/9xieFlma8bcWYyLPOg0c/" + \
-#     "/get_progress_percentage/clplmstestuser1@gmail.com"
+def test_get_progress_percentage(client_with_emulator):
+  url = BASE_URL + "/sections/9xieFlma8bcWYyLPOg0c/" + \
+    "/get_progress_percentage/clplmstestuser1@gmail.com"
 
-#   with mock.patch("routes.student.classroom_crud.get_course_work_list",
-#                   return_value=[{}, {}]):
-#     with mock.patch(
-#         "routes.student.classroom_crud.get_submitted_course_work_list",
-#         return_value=[{
-#             "state": "TURNED_IN"
-#         }, {
-#             "state": "TURNED_IN"
-#         }]):
-#       resp = client_with_emulator.get(url)
-#   assert resp.status_code == 200
+  with mock.patch("routes.student.classroom_crud.get_course_work_list",
+                  return_value=[{}, {}]):
+    with mock.patch(
+        "routes.student.classroom_crud.get_submitted_course_work_list",
+        return_value=[{
+            "state": "TURNED_IN"
+        }, {
+            "state": "TURNED_IN"
+        }]):
+      resp = client_with_emulator.get(url)
+  assert resp.status_code == 200
 
-def get_student_in_section(client_with_emulator):
+def test_get_student_in_section(client_with_emulator):
   url = BASE_URL + "/sections/5/students/clplmstestuser1@gmail.com"
 
   with mock.patch("routes.student.classroom_crud.if_user_exists_in_section",
