@@ -332,7 +332,7 @@ def test_delete_section(client_with_emulator, create_fake_data):
 
 def test_enable_notifications_using_section_id(client_with_emulator,
                                                create_fake_data):
-  section_id = create_fake_data['section']
+  section_id = create_fake_data["section"]
   url=f"{BASE_URL}/sections/{section_id}/enable_notifications"
   section=Section.find_by_id(section_id)
   data = {
