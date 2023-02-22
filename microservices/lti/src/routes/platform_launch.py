@@ -1,5 +1,6 @@
 """ Launch endpoints for LTI as a platform """
 from copy import deepcopy
+from typing import Optional
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from fastapi import APIRouter
 from fastapi.security import HTTPBearer
@@ -11,6 +12,8 @@ from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound)
 from urllib.parse import urlparse, urlunparse, urlencode, parse_qsl
 from schemas.error_schema import NotFoundErrorResponseModel
+from services.lti_token import encode_token
+# pylint: disable=dangerous-default-value
 
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
 del ERROR_RESPONSE_DICT[401]
@@ -23,13 +26,27 @@ router = APIRouter(
     responses=ERROR_RESPONSE_DICT)
 
 
+@router.post(
+    "/resource-launch-init",
+    name="Resource launch endpoint for LTI initiation",
+    responses={404: {
+        "model": NotFoundErrorResponseModel
+    }})
+def post_resource_launch_init(lti_content_item_id: str,
+                              user_id: str,
+                              custom_params: Optional[dict] = {}):
+  return get_resource_launch_init(lti_content_item_id, user_id, custom_params)
+
+
 @router.get(
     "/resource-launch-init",
     name="Resource launch endpoint for LTI initiation",
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def resource_launch_init(lti_content_item_id: str, user_id: str):
+def get_resource_launch_init(lti_content_item_id: str,
+                             user_id: str,
+                             custom_params: Optional[dict] = {}):
   """The resource launch init endpoint will initiate the process to
   fetch a content item and then redirect the request to the tool login url.
   ### Args:
@@ -49,14 +66,18 @@ def resource_launch_init(lti_content_item_id: str, user_id: str):
     lti_content_item = LTIContentItem.find_by_id(lti_content_item_id)
     if lti_content_item:
       tool = Tool.find_by_id(lti_content_item.tool_id)
+      final_lti_message_hint_dict = {
+          "custom_params_for_substitution": custom_params,
+          "lti_content_item_id": lti_content_item_id,
+      }
+      lti_message_hint = encode_token(final_lti_message_hint_dict)
       if tool:
         tool_data = tool.get_fields(reformat_datetime=True)
-        # """Redirect request to tool login endpoint"""
-        # using client_id and deployment_id, fetch tool_login_url
+        # build a url for tool login endpoint
         login_url = urlparse(tool_data.get("tool_login_url"))
         query_params = parse_qsl(login_url.query)
         query_params.extend([("login_hint", user_id),
-                             ("lti_message_hint", lti_content_item_id),
+                             ("lti_message_hint", lti_message_hint),
                              ("iss", LTI_ISSUER_DOMAIN),
                              ("target_link_uri", tool_data.get("tool_url")),
                              ("client_id", tool_data.get("client_id")),

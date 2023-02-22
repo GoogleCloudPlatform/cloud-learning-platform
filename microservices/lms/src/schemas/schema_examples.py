@@ -105,7 +105,8 @@ TEMP_USER = {
   "is_registered": True,
   "failed_login_attempts_count": 0,
   "access_api_docs": False,
-  "gaia_id":"1234577657333"
+  "gaia_id":"1234577657333",
+  "photo_url":"https://lh3.googleusercontent.com/a/AEd"
   }
 
 UPDATE_SECTION = {

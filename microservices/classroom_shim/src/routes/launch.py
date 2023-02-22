@@ -3,7 +3,6 @@ import requests
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
 from config import ERROR_RESPONSES, API_DOMAIN, FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, PROJECT_ID
 from common.models import LTIAssignment
 from common.utils.auth_service import validate_token
@@ -100,10 +99,28 @@ def launch_assignment(request: Request,
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
     lti_content_item_id = lti_assignment.lti_content_item_id
 
+    custom_params = {
+        "$ResourceLink.available.startDateTime":
+            lti_assignment.start_date.isoformat(),
+        "$ResourceLink.submission.endDateTime":
+            (lti_assignment.end_date).isoformat(),
+        "$ResourceLink.available.endDateTime":
+            (lti_assignment.due_date).isoformat()
+    }
+    # TODO: implementation of "$Context.id.history" as a custom parameter
+    # TODO: implementation of "$Person.address.timezone" as a custom parameter
+    # TODO: send the user details like profile photo inside final_lti_message_hint_dict and use it in lti service to send as token claims
+    final_lti_message_hint_dict = {
+        "custom_params_for_substitution": custom_params,
+        "user_details": {
+            "picture":
+                "https://lh3.googleusercontent.com/a/AEdFTp4wIxRnw50hW7_bjiqYOMgdhpt0Gz9dw1D6LpOA=s96-c"
+        }
+    }
+
     url = f"{API_DOMAIN}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}"
     # TODO: verify assignment and user relationship
-    # TODO: fetch data from request for custom param substitution
-    return RedirectResponse(url=url, headers=headers, status_code=302)
+    return {"url": url, "message_hint": final_lti_message_hint_dict}
 
   except ValidationError as e:
     Logger.error(e)

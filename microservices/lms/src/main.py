@@ -56,7 +56,10 @@ async def add_process_time_header(request: Request, call_next):
   if path != "/ping":
     process_time = time.time() - start_time
     time_elapsed = round(process_time * 1000)
-    Logger.info(f"{method} {path} Time elapsed: {str(time_elapsed)} ms")
+    status = response.status_code
+    Logger.info(
+      f"{method} {path} Time elapsed: {str(time_elapsed)} ms Status: {status}"
+      )
   return response
 
 

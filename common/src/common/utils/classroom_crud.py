@@ -233,15 +233,12 @@ def get_coursework_material(course_id):
 
   service = build("classroom", "v1", credentials=get_credentials())
   try:
-    print("This in coursewoek material")
     coursework_list = service.courses().courseWorkMaterials().list(
         courseId=course_id).execute()
-    print("This is courseworkMaterial list before Mapping ",coursework_list)
     if coursework_list:
       coursework_list = coursework_list["courseWorkMaterial"]
     return coursework_list
   except HttpError as error:
-    print(error)
     logger.error(error)
     return None
 
@@ -446,12 +443,10 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   # Call_people api function
   profile = get_person_information(access_token)
   gaia_id = profile["metadata"]["sources"][0]["id"]
-  # first_name=profile["names"][0]["givenName"]
-  # last_name =profile["names"][0]["familyName"]
   # Call user API
   data = {
-  "first_name":"",
-  "last_name": "",
+  "first_name":profile["names"][0]["givenName"],
+  "last_name": profile["names"][0]["familyName"],
   "email":student_email,
   "user_type": "learner",
   "user_type_ref": "",
@@ -460,7 +455,8 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   "is_registered": True,
   "failed_login_attempts_count": 0,
   "access_api_docs": False,
-  "gaia_id":gaia_id
+  "gaia_id":gaia_id,
+  "photo_url":profile["photos"][0]["url"]
   }
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user usermanagement API and return user data else
@@ -564,6 +560,27 @@ def enable_notifications(course_id, feed_type):
   }
   return service.registrations().create(body=body).execute()
 
+def if_user_exists_in_section(section_id, user_id, headers):
+  """Check if student exists in a given section
+  Args:
+      section_id (str): firestore section id
+      user_id (str): firestore user id
+  Returns:
+      dict: user details
+  """
+  section_details = []
+  section_details = Section.find_by_id(section_id)
+  result = CourseEnrollmentMapping.\
+    find_course_enrollment_record(section_details.key,user_id)
+  if result is not None:
+    response = requests.\
+      get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+    user = response.json()["data"]
+    return user
+  else:
+    raise ResourceNotFoundException("User not found")
+
+
 def list_student_section(section_id,headers):
   """List  student of section given firestore section id
 
@@ -648,7 +665,7 @@ def acceept_invite(invitation_id,teacher_email):
   """Invite teacher to google classroom using course id and email
 
   Args:
-      invitation_id (str): google classroom invitation Id from invite 
+      invitation_id (str): google classroom invitation Id from invite
       teacher response
       teacher_email (str): teacher email id
 
@@ -675,9 +692,9 @@ def acceept_invite(invitation_id,teacher_email):
 def get_user_profile_information(user_email):
   """
    Args:
-      user_email: email of user 
-  Returns:
-      profile_information: User profile information of the user 
+      user_email: email of user
+    Returns:
+      profile_information: User profile information of the user
   """
   service = build("classroom", "v1", credentials=get_credentials())
 

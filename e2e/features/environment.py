@@ -14,6 +14,7 @@ from google.oauth2.credentials import Credentials
 import logging
 
 USER_EMAIL_PASSWORD_DICT = get_user_email_and_password_for_e2e()
+
 CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
 SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
@@ -122,6 +123,23 @@ def create_section(context):
   section.classroom_code = classroom["enrollmentCode"]
   section.classroom_url = classroom["alternateLink"]
   section.save()
+  # Create teachers in the DB 
+  temp_user = TempUser.from_dict(TEST_USER)
+  temp_user.email = TEST_SECTION["teachers"][0]
+  temp_user.user_type = "faculty"
+  temp_user.first_name = TEST_SECTION["teachers"][0].split("@")[0]
+  temp_user.user_id = ""
+  temp_user.save()
+  temp_user.user_id = temp_user.id
+  temp_user.update()
+  temp_user1 = TempUser.from_dict(TEST_USER)
+  temp_user1.email = TEST_SECTION["teachers"][1].split("@")[0]
+  temp_user1.user_type = "faculty"
+  temp_user1.user_id = ""
+  temp_user1.save()
+  temp_user1.user_id = temp_user.id
+  temp_user1.update()
+  print("TEST TEACHERS CREATED",TEST_SECTION["teachers"][1].split("@")[0],TEST_SECTION["teachers"][0].split("@")[0])
   context.sections=section
   yield context.sections
 
