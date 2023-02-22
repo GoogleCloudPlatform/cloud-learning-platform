@@ -79,8 +79,8 @@ def create_fake_data():
 
 
 def test_get_student_course_progress_percent(client_with_emulator):
-  url = BASE_URL + "/student/get_progress_percentage/" + \
-    "?course_id=504551481098&student_email=test_user_1@dhodun.altostrat.com"
+  url = BASE_URL + "/sections/9xieFlma8bcWYyLPOg0c/" + \
+    "/get_progress_percentage/clplmstestuser1@gmail.com"
 
   with mock.patch("routes.student.classroom_crud.get_course_work_list",
                   return_value=[{}, {}]):
@@ -94,6 +94,13 @@ def test_get_student_course_progress_percent(client_with_emulator):
       resp = client_with_emulator.get(url)
   assert resp.status_code == 200
 
+def get_student_in_section(client_with_emulator):
+  url = BASE_URL + "/sections/5/students/clplmstestuser1@gmail.com"
+
+  with mock.patch("routes.student.classroom_crud.if_user_exists_in_section",
+                  return_value=[{}, {}]):
+    resp = client_with_emulator.get(url)
+  assert resp.status_code == 200
 
 def test_list_student_of_section(client_with_emulator):
   url = BASE_URL + "/sections/5/students"
