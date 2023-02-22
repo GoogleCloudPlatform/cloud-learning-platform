@@ -11,7 +11,6 @@
   <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css" />
   <style>
     body {
-      background-color: #fffdf5;
       font-family: Lato, sans-serif;
     }
   </style>
@@ -38,8 +37,10 @@
     }, 1000);
 
     let ui = null
+    let disableTransfer = null
+
     initFirebaseUI()
-    function initFirebaseUI() {// FirebaseUI config.
+    function initFirebaseUI() {
       if (ui) {
         ui.reset();
       } else {
@@ -50,7 +51,6 @@
           {
             provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
             customParameters: {
-              // Forces account selection even when one account is available.
               prompt: "select_account"
             }
           }
@@ -59,16 +59,27 @@
           signInSuccessWithAuthResult: function (authResult, redirectUrl) {
             let user = authResult.user;
             let token = user._delegate.accessToken
-            initiateRedirection(token)
+            disableTransfer = true
+            // initiateRedirection(token)
             console.log("something failed")
             return false;
           },
+          uiShown: function () {
+            let googleButton = document.querySelector('[data-provider-id="google.com"]')
+            if (googleButton) {
+              disableTransfer = false
+              googleButton.addEventListener("click", () => {
+                disableTransfer = true
+              })
+            } else {
+              disableTransfer = true
+            }
+          }
         },
       };
 
       ui.start('#firebaseui-auth-container', uiConfig);
     }
-
 
     function continueLaunch() {
       user.getIdToken().then((idToken) => {
@@ -110,7 +121,6 @@
           displayError(err.message)
           initFirebaseUI()
         })
-
     }
 
     function getParameterByName(name, url = window.location.href) {
@@ -144,15 +154,18 @@
 
     function displayCounterWithText(email) {
       let interval = setInterval(() => {
+        if (disableTransfer) {
+          setTimeout(() => { document.getElementById("existing-acc").style.display = "none" }, 0);
+          clearInterval(interval)
+          continueLaunch()
+        }
         if (counter == 0) {
-          console.log("cleared interval")
           document.getElementById("existing-acc").style.display = "none"
           clearInterval(interval)
           continueLaunch()
         } else {
           let displayText = `Continuing with ${email} in ${counter} seconds`
           document.getElementById("existing-acc").style.display = "block"
-          document.getElementById("existing-acc").style.color = "red"
           document.getElementById("existing-acc").innerText = displayText
           counter--
         }
