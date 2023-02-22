@@ -22,11 +22,11 @@ from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import add_exception_handlers
 from fastapi import FastAPI, Request, Depends
 import config
-from routes import user
-from routes import section
-from routes import student
-from routes import course_template
-from routes import cohort
+from routes import (
+  section,student,
+  course_template,cohort,classroom_courses
+  # ,user
+        )
 from utils.helper import validate_user
 
 app = FastAPI()
@@ -75,12 +75,13 @@ api = FastAPI(title="LMS Service APIs",
               )
 
 
-api.include_router(user.router)
+# api.include_router(user.router)
 api.include_router(section.router)
 api.include_router(student.router)
 api.include_router(student.section_student_router)
 api.include_router(student.cohort_student_router)
 api.include_router(course_template.router)
+api.include_router(classroom_courses.router)
 api.include_router(cohort.router)
 
 add_exception_handlers(app)
