@@ -60,7 +60,7 @@
             let user = authResult.user;
             let token = user._delegate.accessToken
             disableTransfer = true
-            // initiateRedirection(token)
+            initiateRedirection(token)
             console.log("something failed")
             return false;
           },
