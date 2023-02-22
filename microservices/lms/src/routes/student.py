@@ -1,6 +1,6 @@
 """ Student endpoints """
 import traceback
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
 from services import student_service
 from common.utils.logging_handler import Logger
@@ -105,7 +105,8 @@ def get_progress_percentage(section_id: str, user: str, request: Request):
     for x in submitted_course_work:
       if x["state"] == "TURNED_IN":
         submitted_course_work_list = submitted_course_work_list + 1
-    return {"data": round((submitted_course_work_list / course_work_list) * 100, 2)}
+    return {"data":\
+    round((submitted_course_work_list / course_work_list) * 100, 2)}
 
   except ResourceNotFoundException as err:
     Logger.error(err)

@@ -8,7 +8,7 @@ from common.utils.errors import InvalidTokenError,UserManagementServiceError,Res
 from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
 
-from common.models import Section,CourseEnrollmentMapping,User
+from common.models import Section,CourseEnrollmentMapping
 
 from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
 from common.utils import helper
