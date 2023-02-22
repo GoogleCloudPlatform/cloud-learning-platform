@@ -20,7 +20,7 @@ def test_get_courses(client_with_emulator):
   assert resp.status_code == 200
 
 def test_copy_course(client_with_emulator):
-  url = BASE_URL + "/classroom_courses/copy_course/"
+  url = BASE_URL + "/classroom_courses/copy_course"
   course_details = {"course_id": "TEST123"}
   with mock.patch("routes.classroom_courses.classroom_crud.get_course_by_id"):
     with mock.patch("routes.classroom_courses.classroom_crud.create_course"):
@@ -42,7 +42,7 @@ def test_copy_course(client_with_emulator):
 
 
 def test_copy_course_not_found(client_with_emulator):
-  url = BASE_URL + "/classroom_courses/copy_course/"
+  url = BASE_URL + "/classroom_courses/copy_course"
   course_details = {"course_id": "TEST123"}
   with mock.patch("routes.classroom_courses.classroom_crud.get_course_by_id",
                   return_value=None):
@@ -90,4 +90,4 @@ def test_enable_notifications_using_course_id(client_with_emulator):
       resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True, "Data doesn't Match"
-  assert resp.json()["data"][0] == data, "Data doesn't Match"
+  assert resp.json()["data"][0] == data["data"], "Data doesn't Match"

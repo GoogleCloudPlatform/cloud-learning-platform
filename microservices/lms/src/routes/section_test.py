@@ -332,9 +332,9 @@ def test_delete_section(client_with_emulator, create_fake_data):
 
 def test_enable_notifications_using_section_id(client_with_emulator,
                                                create_fake_data):
-
-  url=f"{BASE_URL}/sections/{create_fake_data['section']}/enable_notifications"
-  section=Section.find_by_id(create_fake_data["section"])
+  section_id = create_fake_data['section']
+  url=f"{BASE_URL}/sections/{section_id}/enable_notifications"
+  section=Section.find_by_id(section_id)
   data = {
       "success":
       True,
@@ -358,27 +358,17 @@ def test_enable_notifications_using_section_id(client_with_emulator,
       resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True, "Data doesn't Match"
-  assert resp.json()["data"][0] ==data, "Data doesn't Match"
+  assert resp.json()["data"][0] ==data["data"], "Data doesn't Match"
 
 
 def test_enable_notifications_using_fake_section_id(client_with_emulator):
 
-  url = BASE_URL + "/sections/enable_notifications"
-  input_data = {"section_id": "fake_section_id",
-    "feed_type": "COURSE_WORK_CHANGES"}
+  url = BASE_URL + "/sections/fake_section_id/enable_notifications"
   with mock.patch("routes.section.classroom_crud.enable_notifications"):
     with mock.patch("routes.section.Logger"):
-      resp = client_with_emulator.post(url, json=input_data)
+      resp = client_with_emulator.get(url)
+  print(resp.json())
   assert resp.status_code == 404, "Status 404"
-  assert resp.json()["success"] is False, "Data doesn't Match"
-
-def test_negative_enable_notifications(client_with_emulator):
-  url = BASE_URL + "/sections/enable_notifications"
-  input_data = {"section_id": "", "feed_type": "COURSE_WORK_CHANGES"}
-  with mock.patch("routes.section.classroom_crud.enable_notifications"):
-    with mock.patch("routes.section.Logger"):
-      resp = client_with_emulator.post(url, json=input_data)
-  assert resp.status_code==422,"Status 422"
   assert resp.json()["success"] is False, "Data doesn't Match"
 
 

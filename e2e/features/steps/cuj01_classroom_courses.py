@@ -41,7 +41,7 @@ def step_impl_4(context):
   course = create_course(
       COURSE_TEMPLATE_INPUT_DATA["name"], "testing_section",
       COURSE_TEMPLATE_INPUT_DATA["description"])
-  context.url = f'{API_URL}/classroom_courses//copy_course'
+  context.url = f'{API_URL}/classroom_courses/copy_course'
   context.payload = {
       "course_id": course["id"]
   }

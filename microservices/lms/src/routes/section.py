@@ -480,7 +480,7 @@ def update_section(sections_details: UpdateSection,request: Request):
     raise InternalServerError(str(e)) from e
 
 
-@router.get("{section_id}/enable_notifications",
+@router.get("/{section_id}/enable_notifications",
              response_model=EnableNotificationsResponse)
 def section_enable_notifications_pub_sub(section_id:str):
   """Resgister section with a pub/sub topic
