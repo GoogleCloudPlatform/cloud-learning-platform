@@ -12,8 +12,12 @@ from schemas.error_schema import (ConflictResponseModel,
                                   InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
-from schemas.classroom_courses import CourseDetails,EnableNotificationsResponse,CopyCourseResponse
-from schemas.section import ClassroomCourseListResponseModel
+from schemas.classroom_courses import (
+                          CourseDetails,
+                          EnableNotificationsResponse,
+                          CopyCourseResponse,
+                          ClassroomCourseListResponseModel
+                          )
 from utils.helper import FEED_TYPES
 
 router = APIRouter(prefix="/classroom_courses",
