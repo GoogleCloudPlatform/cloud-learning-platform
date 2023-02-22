@@ -20,7 +20,8 @@
 # import mock
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
-# from common.testing.firestore_emulator import firestore_emulator, clean_firestore
+# from common.testing.firestore_emulator import firestore_emulator,
+# clean_firestore
 # from common.testing.client_with_emulator import client_with_emulator
 # from common.models import User
 # from schemas.schema_examples import USER_EXAMPLE

@@ -102,10 +102,7 @@ def step_impl_9(context):
     "A user has access to portal and needs to enable notifications for a course"
 )
 def step_impl_10(context):
-  course = create_course(
-      COURSE_TEMPLATE_INPUT_DATA["name"], "testing_section",
-      COURSE_TEMPLATE_INPUT_DATA["description"])
-  context.url = f'{API_URL}/classroom_courses/{course["id"]}/enable_notifications'
+  context.url = f'{API_URL}/classroom_courses/fake_id/enable_notifications'
 
 
 @behave.when(
@@ -119,7 +116,7 @@ def step_impl_11(context):
 
 
 @behave.then(
-    "Notifications will not be enabled and API will throw a resource not found error"
+    "Course Notifications will not be enabled and API will throw a resource not found error"
 )
 def step_impl_12(context):
   assert context.status == 404, "Status 404"

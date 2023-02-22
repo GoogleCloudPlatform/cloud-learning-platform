@@ -19,4 +19,4 @@ Feature: Retive all courses, Copy course and enable notification APIs of classro
   Scenario: Unable to enable notifications for a course
     Given A user has access to portal and needs to enable notifications for a course
     When API request is sent to enable notifications for a section using invalid course id
-    Then Notifications will not be enabled and API will throw a resource not found error
+    Then Course Notifications will not be enabled and API will throw a resource not found error
