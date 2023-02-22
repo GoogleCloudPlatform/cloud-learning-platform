@@ -67,8 +67,10 @@ def get_resource_launch_init(lti_content_item_id: str,
     if lti_content_item:
       tool = Tool.find_by_id(lti_content_item.tool_id)
       final_lti_message_hint_dict = {
-          "custom_params_for_substitution": custom_params,
-          "lti_content_item_id": lti_content_item_id,
+          "custom_params_for_substitution":
+              custom_params.get("custom_params_for_substitution"),
+          "lti_content_item_id":
+              lti_content_item_id,
       }
       lti_message_hint = encode_token(final_lti_message_hint_dict)
       if tool:
