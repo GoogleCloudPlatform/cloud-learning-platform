@@ -95,6 +95,7 @@ CREDENTIAL_JSON = {
     "expiry": "2022-11-23T12:01:17Z"
 }
 TEMP_USER = {
+  "user_id":"kh5FoIBOx5qDsfh4ZRuv",
   "first_name": "",
   "last_name": "",
   "email":"clplmstestuser1@gmail.com",
