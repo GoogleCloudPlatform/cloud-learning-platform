@@ -179,13 +179,15 @@ def test_delete_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
 @mock.patch("services.validate_service.get_platform_public_keyset")
 @mock.patch("services.validate_service.decode_token")
 @mock.patch("services.validate_service.get_unverified_token_claims")
+@mock.patch("routes.line_item.grade_pass_back")
 @pytest.mark.parametrize(
     "create_line_item", [BASIC_LINE_ITEM_EXAMPLE], indirect=True)
-def test_post_score(mock_unverified_token, mock_token_scopes, mock_keyset,
-                    clean_firestore, create_line_item):
+def test_post_score(mock_pass_back, mock_unverified_token, mock_token_scopes,
+                    mock_keyset, clean_firestore, create_line_item):
   mock_unverified_token.return_value = test_scope
   mock_token_scopes.return_value = test_scope
   mock_keyset.return_value = test_keyset
+  mock_pass_back.return_value = True
 
   headers = {"Authorization": "Bearer test_token"}
   line_item = create_line_item

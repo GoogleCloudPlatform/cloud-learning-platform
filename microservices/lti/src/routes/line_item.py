@@ -1,5 +1,4 @@
 """Line item  Endpoints"""
-import requests
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
@@ -9,7 +8,6 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError,
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound,
                                           Unauthenticated)
-from common.utils.secrets import get_backend_robot_id_token
 from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
                                       UpdateLineItemModel,
                                       UpdateLineItemUsingIdModel,
@@ -17,6 +15,7 @@ from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
                                       BasicScoreModel, ResultResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
+from services.grade_service import grade_pass_back
 from typing import List, Optional
 from services.validate_service import validate_access
 # pylint: disable=unused-argument, use-maxsplit-arg, line-too-long
@@ -557,22 +556,8 @@ def create_score_for_line_item(context_id: str,
     if input_score_dict["gradingProgress"] == "FullyGraded":
       input_grade_dict["assigned_grade"] = input_result_dict["resultScore"]
 
-    post_grade_url = f"http://classroom-shim/classroom-shim/api/v1/grade"
+    grade_pass_back(input_grade_dict, user_id, line_item_id)
 
-    grade_res = requests.post(
-        url=post_grade_url,
-        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
-        json=input_grade_dict,
-        timeout=60)
-
-    if grade_res.status_code == 200:
-      Logger.info(
-          f"Success: Grade pass back for user id - {user_id} for line item {line_item_id}"
-      )
-    else:
-      Logger.error(
-          f"Failed: Grade pass back for user id - {user_id} for line item {line_item_id}"
-      )
     return result_fields
 
   except InvalidTokenError as e:
