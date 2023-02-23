@@ -314,7 +314,8 @@ def get_course_work_list(section_id):
   return coursework_list
 
 
-def get_submitted_course_work_list(section_id, user_id,headers,course_work_id="-"):
+def get_submitted_course_work_list(section_id, user_id, headers,
+                                    course_work_id="-"):
   """Returns an array of objects containing all the coursework of a course
     assigned to the student with the status if else the coursework has
     been submitted by the student or not
@@ -727,14 +728,14 @@ def get_course_work(course_id,course_work_id):
   return service.courses().courseWork().get(
     courseId=course_id,id=course_work_id).execute()
 
-def post_grade_of_the_user(course_id: str,
+def post_grade_of_the_user(section_id: str,
                     course_work_id: str,
                     submission_id: str,
                     assigned_grade: float = None,
                     draft_grade: float = None):
   """
    Args:
-      course_id: Google classroom course id
+      section_id: Unique ID of the section
       course_work_id: Google classroom course work id
       submission_id: Google classroom submission id of a student
       assigned_grade: Final grade assigned to the user
@@ -745,6 +746,9 @@ def post_grade_of_the_user(course_id: str,
   service = build("classroom", "v1", credentials=get_credentials())
 
   try:
+    section_details = Section.find_by_id(section_id)
+    course_id = section_details.classroom_id
+
     student_submission = {}
 
     if assigned_grade:
