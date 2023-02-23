@@ -66,7 +66,7 @@ def update_classroom_grade(input_grade: PostGradeModel):
     course_work_id = lti_assignment.course_work_id
 
     assigned_grade = input_grade_dict["assigned_grade"]
-    draft_grade = input_grade_dict["assigned_grade"]
+    draft_grade = input_grade_dict["draft_grade"]
 
     if assigned_grade:
       assigned_grade = (assigned_grade / input_grade_dict["maximum_grade"]
