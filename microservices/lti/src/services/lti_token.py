@@ -77,7 +77,8 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
         token_claims[lti_claim_field("claim",
                                      "target_link_uri")] = tool_info["tool_url"]
     if "custom" in content_item_info.keys():
-      custom_params = decoded_lti_message_hint.get("custom_params_for_substitution")
+      custom_params = decoded_lti_message_hint.get(
+          "custom_params_for_substitution")
       final_custom_claims = {**content_item_info.get("custom")}
 
       # process custom parameter substitution
@@ -137,9 +138,9 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
 
   # TODO: Update the context claim with the actual context/course data
   token_claims[lti_claim_field("claim", "context")] = {
-      "id": "qv9byob9ov5by7vk5js5d",
-      "label": "Test Course 2",
-      "title": "Test title of the course 2",
+      "id": "2qi7b3vh83hq3vesfd",
+      "label": "Test Course",
+      "title": "Test title of the course",
       "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"]
   }
 

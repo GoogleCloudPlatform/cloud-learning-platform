@@ -1,4 +1,4 @@
-"""Line item  Endpoints"""
+"""NRPS  Endpoints"""
 import requests
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
@@ -8,6 +8,7 @@ from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound,
                                           Unauthenticated)
 from common.utils.secrets import get_backend_robot_id_token
+from schemas.nrps_schema import GetNRPSModel
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.validate_service import validate_access
 # pylint: disable=unused-argument, use-maxsplit-arg, line-too-long
@@ -20,6 +21,7 @@ router = APIRouter(tags=["NRPS Endpoints"], responses=ERROR_RESPONSES)
 @router.get(
     "/{context_id}/memberships",
     name="Get the members of a given context",
+    response_model=GetNRPSModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
@@ -57,6 +59,12 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
           f"Internal error from LMS get section API with status code - {section_res.status_code}"
       )
 
+    context_details = {
+        "id": section_data.get("id"),
+        "label": section_data.get("section"),
+        "title": section_data.get("description")
+    }
+
     members_list = []
     members_data = []
     get_teachers_members_url = f"http://lms/lms/api/v1/sections/{context_id}/teachers"
@@ -72,12 +80,6 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
       raise Exception(
           f"Internal error from LMS get teachers API with status code - {teachers_res.status_code}"
       )
-
-    context_details = {
-        "id": section_data.get("id"),
-        "label": section_data.get("section"),
-        "title": section_data.get("description")
-    }
 
     members_data.extend(teachers_data)
 
