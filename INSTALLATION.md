@@ -33,7 +33,7 @@ Add an entry for front-end in addition to backend API
 
 ## Scopes needed for Service Account
 
-- https://www.googleapis.com/auth/classroom.announcements
+- https://www.googleapis.com/auth/classroom.announcements -
 - https://www.googleapis.com/auth/classroom.announcements.readonly
 - https://www.googleapis.com/auth/classroom.courses
 - https://www.googleapis.com/auth/classroom.courses.readonly

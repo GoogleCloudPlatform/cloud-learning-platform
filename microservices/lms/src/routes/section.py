@@ -226,7 +226,7 @@ def create_section(sections_details: SectionDetails,request: Request):
     section.classroom_id = new_course["id"]
     section.classroom_code = new_course["enrollmentCode"]
     section.classroom_url = new_course["alternateLink"]
-    section.teachers = sections_details.teachers
+    section.teachers = list(set(sections_details.teachers))
     section.enrolled_students_count=0
     section.save()
     new_section = convert_section_to_section_model(section)

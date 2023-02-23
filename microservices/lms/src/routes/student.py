@@ -5,7 +5,7 @@ from googleapiclient.errors import HttpError
 from services import student_service
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
-ValidationError,InvalidTokenError)
+ValidationError,InvalidTokenError,CohortFullError )
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
                                       ResourceNotFound, BadRequest,InvalidToken)
 from common.models import CourseEnrollmentMapping,Section,Cohort
@@ -218,7 +218,8 @@ def enroll_student_section(cohort_id: str,
     cohort = Cohort.find_by_id(cohort_id)
     sections = Section.collection.filter("cohort","==",cohort.key).fetch()
     sections = list(sections)
-    
+    if cohort.enrolled_students_count == cohort.max_students:
+      raise  CohortFullError("Cohort Max count reached so student cannot be erolled in this cohort")
     if len(sections) == 0:
       raise ResourceNotFoundException("Given CohortId\
          does not have any sections")
