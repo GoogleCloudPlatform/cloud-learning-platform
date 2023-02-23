@@ -100,6 +100,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
           "lineitems": LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items",
       }
 
+    # TODO: Update the dummy context ids to the actual one
     if tool_info.get("enable_nrps"):
       token_claims[lti_claim_field("claim", "namesroleservice", "nrps")] = {
           "context_memberships_url":
