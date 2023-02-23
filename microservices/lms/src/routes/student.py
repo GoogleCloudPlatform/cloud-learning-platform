@@ -219,7 +219,7 @@ def enroll_student_section(cohort_id: str,
     sections = Section.collection.filter("cohort","==",cohort.key).fetch()
     sections = list(sections)
     if cohort.enrolled_students_count == cohort.max_students:
-      raise  CohortFullError("Cohort Max count reached so student cannot be erolled in this cohort")
+      raise  CohortFullError("Cohort Max count reached hence student cannot be erolled in this cohort")
     if len(sections) == 0:
       raise ResourceNotFoundException("Given CohortId\
          does not have any sections")

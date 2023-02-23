@@ -18,6 +18,15 @@ from fireo.fields import TextField, DateTime, NumberField, ReferenceField, IDFie
 from common.models import BaseModel, CourseTemplate
 
 
+def check_non_zero_number(field_val):
+  """validator method for status field"""
+  if field_val == 0:
+    return (False,"Max student value in cohort cannot be zero")
+  else:
+    return True
+  
+
+
 class Cohort(BaseModel):
   """Cohort ORM class
   """
@@ -28,7 +37,7 @@ class Cohort(BaseModel):
   end_date = DateTime(required=True)
   registration_start_date = DateTime(required=True)
   registration_end_date = DateTime(required=True)
-  max_students = NumberField(default=0, required=True)
+  max_students = NumberField(required=True,validator=check_non_zero_number)
   enrolled_students_count = NumberField(default=0)
   course_template = ReferenceField(CourseTemplate, required=True)
 

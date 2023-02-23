@@ -20,7 +20,7 @@ class CohortModel(BaseModel):
   end_date: datetime.datetime
   registration_start_date: datetime.datetime
   registration_end_date: datetime.datetime
-  max_students: Optional[int] = 0
+  max_students: Optional[int] = 100
   enrolled_students_count: Optional[int] = 0
   course_template: str
   course_template_name: str
