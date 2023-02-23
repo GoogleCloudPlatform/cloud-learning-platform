@@ -87,7 +87,7 @@ def test_enable_notifications_using_course_id(client_with_emulator):
     "routes.classroom_courses.classroom_crud.enable_notifications",
               return_value=data["data"]):
     with mock.patch("routes.classroom_courses.Logger"):
-      resp = client_with_emulator.get(url)
+      resp = client_with_emulator.post(url)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True, "Data doesn't Match"
   assert resp.json()["data"][0] == data["data"], "Data doesn't Match"

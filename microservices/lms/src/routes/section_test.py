@@ -355,7 +355,7 @@ def test_enable_notifications_using_section_id(client_with_emulator,
   with mock.patch("routes.section.classroom_crud.enable_notifications",
                   return_value=data["data"]):
     with mock.patch("routes.section.Logger"):
-      resp = client_with_emulator.get(url)
+      resp = client_with_emulator.post(url)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True, "Data doesn't Match"
   assert resp.json()["data"][0] ==data["data"], "Data doesn't Match"
@@ -366,7 +366,7 @@ def test_enable_notifications_using_fake_section_id(client_with_emulator):
   url = BASE_URL + "/sections/fake_section_id/enable_notifications"
   with mock.patch("routes.section.classroom_crud.enable_notifications"):
     with mock.patch("routes.section.Logger"):
-      resp = client_with_emulator.get(url)
+      resp = client_with_emulator.post(url)
   print(resp.json())
   assert resp.status_code == 404, "Status 404"
   assert resp.json()["success"] is False, "Data doesn't Match"

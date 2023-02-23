@@ -82,7 +82,7 @@ def step_impl_7(context):
     "API request is sent to enable notifications for a course using valid course id"
 )
 def step_impl_8(context):
-  resp = requests.get(context.url,
+  resp = requests.post(context.url,
                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
@@ -109,7 +109,7 @@ def step_impl_10(context):
     "API request is sent to enable notifications for a section using invalid course id"
 )
 def step_impl_11(context):
-  resp = requests.get(context.url,
+  resp = requests.post(context.url,
                       headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()

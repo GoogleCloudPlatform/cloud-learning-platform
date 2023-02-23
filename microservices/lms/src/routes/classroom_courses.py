@@ -185,7 +185,7 @@ def copy_courses(course_details: CourseDetails):
     raise InternalServerError(str(e)) from e
 
 
-@router.get("/{course_id}/enable_notifications",
+@router.post("/{course_id}/enable_notifications",
              response_model=EnableNotificationsResponse)
 def classroom_enable_notifications_pub_sub(course_id:str):
   """Resgister course with a pub/sub topic

@@ -113,7 +113,7 @@ def step_impl_13(context):
     "API request is sent to enable notifications for a section using valid section id"
 )
 def step_impl_14(context):
-  resp = requests.get(context.url,
+  resp = requests.post(context.url,
                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
@@ -138,7 +138,7 @@ def step_impl_16(context):
     "API request is sent to enable notifications for a section using invalid section id"
 )
 def step_impl_17(context):
-  resp = requests.get(context.url,
+  resp = requests.post(context.url,
                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
