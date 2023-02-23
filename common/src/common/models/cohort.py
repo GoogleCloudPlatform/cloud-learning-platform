@@ -19,12 +19,11 @@ from common.models import BaseModel, CourseTemplate
 
 
 def check_non_zero_number(field_val):
-  """validator method for status field"""
+  """validator method for max_student field"""
   if field_val == 0:
     return (False,"Max student value in cohort cannot be zero")
   else:
     return True
-  
 
 
 class Cohort(BaseModel):
