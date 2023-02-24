@@ -120,7 +120,7 @@ def launch_assignment(request: Request,
     user_type = user_details.get("user_type")
 
     if user_type == "learner":
-      api_url = f"http://lms/lms/api/v1//sections/{lti_assignment.get('section_id')}/teachers/{user_email}"
+      api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.get('section_id')}/students/{user_email}"
       fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
 
       if fetch_user_mapping.status_code == 200:
@@ -131,8 +131,8 @@ def launch_assignment(request: Request,
         raise Exception(
             "Internal server error from user mapping validation API")
 
-    elif user_type == "faculty":
-      api_url = f"http://lms/lms/api/v1//sections/{lti_assignment.get('section_id')}/teachers/{user_email}"
+    elif user_type == "faculty" or user_type == "admin":
+      api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.get('section_id')}/teachers/{user_email}"
       fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
 
       if fetch_user_mapping.status_code == 200:
@@ -143,8 +143,9 @@ def launch_assignment(request: Request,
         raise Exception(
             "Internal server error from user mapping validation API")
 
-    elif user_type == "admin":
-      pass
+    else:
+      raise UnauthorizedUserError("Unauthorized")
+
     return {"url": url, "message_hint": final_lti_message_hint_dict}
 
   except ValidationError as e:
