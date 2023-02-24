@@ -65,11 +65,4 @@ class CronJobException(Exception):
     self.message = message
     super().__init__(self.message)
 
-class CohortFullError(Exception):
-  """Error class to be raised when issue in executin gCronjob"""
-
-  def __init__(self, message=
-  "Cohort Max count reached so student cannot be erolled in this cohort"):
-    self.message = message
-    super().__init__(self.message)
   
