@@ -34,8 +34,10 @@ router = APIRouter(
     }})
 def post_resource_launch_init(lti_content_item_id: str,
                               user_id: str,
+                              context_id: str,
                               custom_params: Optional[dict] = {}):
-  return get_resource_launch_init(lti_content_item_id, user_id, custom_params)
+  return get_resource_launch_init(lti_content_item_id, user_id, context_id,
+                                  custom_params)
 
 
 @router.get(

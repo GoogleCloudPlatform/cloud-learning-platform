@@ -102,7 +102,7 @@ def launch_assignment(request: Request,
 
     custom_params = {
         "$ResourceLink.available.startDateTime":
-            lti_assignment.start_date.isoformat(),
+            (lti_assignment.start_date).isoformat(),
         "$ResourceLink.submission.endDateTime":
             (lti_assignment.end_date).isoformat(),
         "$ResourceLink.available.endDateTime":

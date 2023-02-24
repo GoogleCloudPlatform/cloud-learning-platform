@@ -51,12 +51,12 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
         f"Internal error from get user API with status code - {context_res.status_code}"
     )
 
-  # TODO: Update the context claim with the actual context/course data
+  lti_context_id = context_data.get("id")
   token_claims[lti_claim_field("claim", "context")] = {
-      "id": context_data.id,
-      "label": context_data.name,
-      "title": context_data.description,
-      "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"]
+      "id": lti_context_id,
+      "label": context_data.get("name"),
+      "title": context_data.get("description"),
+      "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseSection"]
   }
 
   if lti_request_type == "deep_link":
@@ -72,7 +72,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
         "text":
             "",
         "deep_link_return_url":
-            LTI_ISSUER_DOMAIN + "/lti/api/v1/content-item-return"
+            f"{LTI_ISSUER_DOMAIN}/lti/api/v1/content-item-return?context_id={lti_context_id}"
     }
 
     token_claims[lti_claim_field("claim",
@@ -94,6 +94,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       else:
         token_claims[lti_claim_field("claim",
                                      "target_link_uri")] = tool_info["tool_url"]
+
     if "custom" in content_item_info.keys():
       custom_params = lti_message_hint.get("custom_params_for_substitution")
       final_custom_claims = {**content_item_info.get("custom")}
@@ -114,15 +115,8 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
               "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
               "https://purl.imsglobal.org/spec/lti-ags/scope/score"
           ],
-          "lineitems": LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items",
-      }
-
-    # TODO: Update the dummy context ids to the actual one
-    if tool_info.get("enable_nrps"):
-      token_claims[lti_claim_field("claim", "namesroleservice", "nrps")] = {
-          "context_memberships_url":
-              f"{LTI_ISSUER_DOMAIN}/lti/api/v1/qv9byob9ov5by7vk5js5d/memberships",
-          "service_versions": ["2.0"]
+          "lineitems":
+              f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/line_items",
       }
 
     # process line_item claims
@@ -136,9 +130,16 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
               lti_claim_field("scope", "score", "ags")
           ],
           "lineitems":
-              LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items",
+              f"f{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/line_items",
           "lineitem":
-              LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items/" + line_item.id
+              f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/line_items/{line_item.id}"
+      }
+
+    if tool_info.get("enable_nrps"):
+      token_claims[lti_claim_field("claim", "namesroleservice", "nrps")] = {
+          "context_memberships_url":
+              f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/memberships",
+          "service_versions": ["2.0"]
       }
 
     resource_link_claim_info = {
