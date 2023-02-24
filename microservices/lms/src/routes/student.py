@@ -1,13 +1,13 @@
 """ Student endpoints """
 import traceback
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
 from services import student_service
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
 ValidationError,InvalidTokenError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
-                                      ResourceNotFound, BadRequest,InvalidToken)
+                             ResourceNotFound, BadRequest,InvalidToken,Conflict)
 from common.models import CourseEnrollmentMapping,Section,Cohort
 from common.utils import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
@@ -17,7 +17,8 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
 from schemas.section import(StudentListResponseModel,\
    DeleteStudentFromSectionResponseModel)
 from schemas.student import(AddStudentResponseModel,\
-  AddStudentToCohortModel,GetStudentDetailsResponseModel)
+  AddStudentToCohortModel,GetStudentDetailsResponseModel,\
+    GetProgressPercentageResponseModel)
 
 router = APIRouter(prefix="/student",
                    tags=["Students"],
@@ -38,45 +39,6 @@ router = APIRouter(prefix="/student",
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
-
-
-@router.get("/get_progress_percentage/")
-def get_progress_percentage(course_id: int, student_email: str):
-  """Get progress percentage
-
-  Args:
-    course_id :
-      course_id of the course for which progress needs to be determined
-    student_email : student_email of the student
-
-  Raises:
-    HTTPException: 500 Internal Server Error if something fails
-
-  Returns:
-    A number indicative of the percentage of the course completed
-    by the student,
-    {'status': 'Failed'} if any exception is raised
-  """
-  try:
-    submitted_course_work_list = 0
-    course_work_list = len(classroom_crud.get_course_work_list(course_id))
-    submitted_course_work = classroom_crud.get_submitted_course_work_list(
-        course_id, student_email)
-    for x in submitted_course_work:
-      if x["state"] == "TURNED_IN":
-        submitted_course_work_list = submitted_course_work_list + 1
-
-    SUCCESS_RESPONSE["result"] = {
-        "progress_percentage":
-        round((submitted_course_work_list / course_work_list) * 100, 2)
-    }
-    return SUCCESS_RESPONSE
-
-  except Exception as e:
-    Logger.error(e)
-    traceback.format_exc().replace("\n", " ")
-    raise HTTPException(status_code=500) from e
-
 
 section_student_router = APIRouter(prefix="/sections",
                                    tags=["Students"],
@@ -115,6 +77,47 @@ cohort_student_router = APIRouter(prefix="/cohorts",
                                            ValidationErrorResponseModel
                                        }
                                    })
+
+@section_student_router.get("/{section_id}/get_progress_percentage/{user}",
+                            response_model=GetProgressPercentageResponseModel)
+def get_progress_percentage(section_id: str, user: str, request: Request):
+  """Get progress percentage
+
+  Args:
+    section_id : section id for which progess is required
+    user : email id or user id for whol progress is required
+
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+
+  Returns:
+    A number indicative of the percentage of the course completed
+    by the student,
+    {'status': 'Failed'} if any exception is raised
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    user_id = student_service.get_user_id(user=user, headers=headers)
+    submitted_course_work_list = 0
+    course_work_list = len(classroom_crud.get_course_work_list(section_id))
+    submitted_course_work = classroom_crud.get_submitted_course_work_list(
+        section_id, user_id,headers)
+    for x in submitted_course_work:
+      if x["state"] == "TURNED_IN":
+        submitted_course_work_list = submitted_course_work_list + 1
+    return {"data":\
+    round((submitted_course_work_list / course_work_list) * 100, 2)}
+
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
 
 
 @section_student_router.get("/{section_id}/students/{user}",
@@ -251,6 +254,10 @@ def enroll_student_section(cohort_id: str,
     cohort = Cohort.find_by_id(cohort_id)
     sections = Section.collection.filter("cohort","==",cohort.key).fetch()
     sections = list(sections)
+    if cohort.enrolled_students_count >= cohort.max_students:
+      raise Conflict(
+    "Cohort Max count reached hence student cannot be erolled in this cohort"
+    )
     if len(sections) == 0:
       raise ResourceNotFoundException("Given CohortId\
          does not have any sections")
@@ -284,11 +291,15 @@ def enroll_student_section(cohort_id: str,
         f"Successfully Added the Student with email {input_data.email}",
         "data" : response_dict
     }
+
   except InvalidTokenError as ive:
     raise InvalidToken(str(ive)) from ive
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    Logger.error(conflict)
+    raise Conflict(str(conflict)) from conflict
   except HttpError as ae:
     raise CustomHTTPException(status_code=ae.resp.status,
                               success=False,

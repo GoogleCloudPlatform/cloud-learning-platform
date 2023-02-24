@@ -112,10 +112,7 @@ def launch_assignment(request: Request,
     # TODO: send the user details like profile photo inside final_lti_message_hint_dict and use it in lti service to send as token claims
     final_lti_message_hint_dict = {
         "custom_params_for_substitution": custom_params,
-        "user_details": {
-            "picture":
-                "https://lh3.googleusercontent.com/a/AEdFTp4wIxRnw50hW7_bjiqYOMgdhpt0Gz9dw1D6LpOA=s96-c"
-        }
+        "user_details": {}
     }
 
     url = f"{API_DOMAIN}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}"

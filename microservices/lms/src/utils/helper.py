@@ -3,7 +3,7 @@ import datetime
 from fastapi import Depends
 from common.utils.auth_service import validate_user_type_and_token, auth_scheme
 
-
+FEED_TYPES = ("COURSE_WORK_CHANGES", "COURSE_ROSTER_CHANGES")
 def convert_cohort_to_cohort_model(cohort):
   """Convert Cohort Object to Cohort Model Object
 

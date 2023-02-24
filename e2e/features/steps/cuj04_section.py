@@ -104,87 +104,41 @@ def step_impl_12(context):
 # ----Positive Scenario-----
 
 @behave.given(
-    "A user has access privileges and wants to enable notifications for a course"
+    "A user has access privileges and wants to enable notifications for a section"
 )
 def step_impl_13(context):
-  context.url = f'{API_URL}/sections/enable_notifications'
-  course=create_course(
-        COURSE_TEMPLATE_INPUT_DATA["name"],"testing_section",
-        COURSE_TEMPLATE_INPUT_DATA["description"])
-  context.payload = {
-      "course_id": course["id"],
-      "feed_type": "COURSE_WORK_CHANGES"
-  }
-
+  context.url = f'{API_URL}/sections/{context.sections.id}/enable_notifications'
 
 @behave.when(
-    "API request is sent to enable notifications for a course with correct request payload which contains valid course id"
+    "API request is sent to enable notifications for a section using valid section id"
 )
 def step_impl_14(context):
   resp = requests.post(context.url,
-                       json=context.payload,
                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
 
 @behave.then(
-    "Notifications will be enabled using unique course id and feed type and a response model object will be return"
+    "Notifications will be enabled using unique section id and a response model object will be return"
 )
 def step_impl_15(context):
-  assert context.status == 200, "Status 200"
-  assert context.response["success"] is True, "Check success"
-
-# ----
-
-@behave.given(
-    "A user has access privileges and wants to enable notifications for a course using section id"
-)
-def step_impl_16(context):
-  context.url = f'{API_URL}/sections/enable_notifications'
-  context.payload = {
-      "section_id": context.sections.id,
-      "feed_type": "COURSE_WORK_CHANGES"
-  }
-
-
-@behave.when(
-    "API request is sent to enable notifications for a course with correct request payload which contains valid section id"
-)
-def step_impl_17(context):
-  resp = requests.post(context.url,
-                       json=context.payload,
-                       headers=context.header)
-  context.status = resp.status_code
-  context.response = resp.json()
-
-
-@behave.then(
-    "Notifications will be enabled using unique section id and feed type and a response model object will be return"
-)
-def step_impl_18(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 
 # -----Negative Scenario-----
 
 @behave.given(
-    "A user has access to portal and needs to enable notifications for a course using section id"
+    "A user has access to portal and needs to enable notifications for a section"
 )
-def step_impl_19(context):
-  context.url = f'{API_URL}/sections/enable_notifications'
-  context.payload = {
-      "section_id": "fake_section_id",
-      "feed_type": "COURSE_WORK_CHANGES"
-  }
-
+def step_impl_16(context):
+  context.url = f'{API_URL}/sections/fake_section_id/enable_notifications'
 
 @behave.when(
-    "API request is sent to enable notifications for a course with correct request payload which contains invalid section id"
+    "API request is sent to enable notifications for a section using invalid section id"
 )
-def step_impl_20(context):
+def step_impl_17(context):
   resp = requests.post(context.url,
-                       json=context.payload,
                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
@@ -193,41 +147,10 @@ def step_impl_20(context):
 @behave.then(
     "Notifications will not be enabled and API will throw a resource not found error"
 )
-def step_impl_21(context):
+def step_impl_18(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
 
-# ----
-
-@behave.given(
-    "A user has access to portal and needs to enable notifications for a course using payload"
-)
-def step_impl_22(context):
-  context.url = f'{API_URL}/sections/enable_notifications'
-  context.payload = {
-      "section_id": "",
-      "course_id": "",
-      "feed_type": "COURSE_WORK_CHANGES"
-  }
-
-
-@behave.when(
-    "API request is sent to enable notifications for a course with incorrect request payload"
-)
-def step_impl_23(context):
-  resp = requests.post(context.url,
-                       json=context.payload,
-                       headers=context.header)
-  context.status = resp.status_code
-  context.response = resp.json()
-
-
-@behave.then(
-    "Notifications will not be enabled and API will throw a validation error"
-)
-def step_impl_24(context):
-  assert context.status == 422, "Status 422"
-  assert context.response["success"] is False, "Check success"
 
 # -------------------------------Retrieve assignment-------------------------------------
 # ----Positive Scenario-----
@@ -235,14 +158,14 @@ def step_impl_24(context):
 @behave.given(
     "A user has access to portal and needs to retrieve a assignment using section id and assignment id"
 )
-def step_impl_25(context):
+def step_impl_19(context):
   context.url = f'{API_URL}/sections/{context.assignment["section_id"]}/assignments/{context.assignment["id"]}'
 
 
 @behave.when(
     "API request is sent to retrieve assignment details of a section with correct section id and assignment id"
 )
-def step_impl_26(context):
+def step_impl_20(context):
   resp = requests.get(context.url,
                        headers=context.header)
   context.status = resp.status_code
@@ -252,7 +175,7 @@ def step_impl_26(context):
 @behave.then(
     "Assignment Record corresponding to given assignment id will be returned successfully"
 )
-def step_impl_27(context):
+def step_impl_21(context):
   assert context.status == 200, "Status 200"
   assert context.response["id"] == context.assignment["id"], "Data id doesn't Match"
   assert context.response["classroom_id"] == context.assignment["courseId"], "Data classroom id doesn't Match"
@@ -264,14 +187,14 @@ def step_impl_27(context):
 @behave.given(
     "A user has access to admin portal and wants to retrieve a assignment using assignment id and section id"
 )
-def setp_impl_28(context):
+def setp_impl_22(context):
   context.url = f'{API_URL}/sections/fake_section_id/assignments/fake_assignment_id'
 
 
 @behave.when(
     "API request is sent to retrieve assignment details by providing invalid section id"
 )
-def step_impl_29(context):
+def step_impl_23(context):
   resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
@@ -280,8 +203,8 @@ def step_impl_29(context):
 @behave.then(
     "Assignment details will not be returned and API will throw a resource not found error"
 )
-def step_impl_30(context):
-#   assert context.status == 404, "Status 404"
+def step_impl_24(context):
+  assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
 
 # -------------------------------List teachers in section-------------------------------------

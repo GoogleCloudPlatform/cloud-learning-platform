@@ -28,6 +28,7 @@ class Sections(BaseModel):
 
 class TempUsers(BaseModel):
   "User Details"
+  user_id:str
   first_name: str
   last_name: str
   email: str
@@ -105,22 +106,6 @@ class GetTeacherResponseModel(BaseModel):
 
 
 
-
-class ClassroomCourseListResponseModel(BaseModel):
-  """Get a list of Classroom Courses"""
-  success: Optional[bool] = True
-  message: Optional[str] = "Success list"
-  data: Optional[list] = []
-
-  class Config():
-    orm_mode = True
-    schema_extra = {
-        "example": {
-            "success": True,
-            "message": "Success",
-            "data": []
-        }
-    }
 
 
 class CreateSectiontResponseModel(BaseModel):
