@@ -91,8 +91,18 @@
 
     function initiateRedirection(token) {
       displayRedirecting()
+      let timezone = null
+      if (Intl?.DateTimeFormat().resolvedOptions().timeZone) {
+        timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      }
+      let redirectUrl = null
+      if (timezone) {
+        redirectUrl = `${'{{redirect_url}}'}&timezone=${timezone}`
+      } else {
+        redirectUrl = '{{redirect_url}}'
+      }
       return axios
-        .get('{{redirect_url}}', {
+        .get(redirectUrl, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
