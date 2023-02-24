@@ -43,5 +43,5 @@ class GetStudentDetailsResponseModel(BaseModel):
 class GetProgressPercentageResponseModel(BaseModel):
   """Get Progress Percentage"""
   success: Optional[bool] = True
-  data: int = None
+  data: list = None
   
