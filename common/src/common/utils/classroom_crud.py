@@ -293,7 +293,7 @@ def delete_course_by_id(course_id):
   return course
 
 
-def get_course_work_list(course_id):
+def get_course_work_list(section_id):
   """Returns an array of objects containing all the coursework details of a
     course
 
@@ -304,16 +304,17 @@ def get_course_work_list(course_id):
       returns success
       """ ""
 
+  section_details = Section.find_by_id(section_id)
   service = build("classroom", "v1", credentials=get_credentials())
 
   coursework_list = service.courses().courseWork().list(
-      courseId=course_id).execute()
+      courseId=section_details.classroom_id).execute()
   if coursework_list:
     coursework_list = coursework_list["courseWork"]
   return coursework_list
 
 
-def get_submitted_course_work_list(course_id, student_email):
+def get_submitted_course_work_list(section_id, user_id,headers):
   """Returns an array of objects containing all the coursework of a course
     assigned to the student with the status if else the coursework has
     been submitted by the student or not
@@ -327,12 +328,16 @@ def get_submitted_course_work_list(course_id, student_email):
       returns success
       """ ""
 
+  section_details = Section.find_by_id(section_id)
+  response = requests.\
+      get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+  user_email = response.json()["data"]["email"]
   service = build("classroom", "v1", credentials=get_credentials())
 
   submitted_course_work_list = service.courses().courseWork(
-  ).studentSubmissions().list(courseId=course_id,
+  ).studentSubmissions().list(courseId=section_details.classroom_id,
                               courseWorkId="-",
-                              userId=student_email).execute()
+                              userId=user_email).execute()
   if submitted_course_work_list:
     submitted_course_work_list = submitted_course_work_list[
         "studentSubmissions"]
