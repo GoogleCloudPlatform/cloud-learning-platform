@@ -248,7 +248,7 @@ def list_section(cohort_id: str, skip: int = 0, limit: int = 10):
     raise InternalServerError(str(e)) from e
 
 @router.get("/{cohort_id}/get_progress_percentage/{user}",
-                            response_model=GetProgressPercentageCohortResponseModel)
+      response_model=GetProgressPercentageCohortResponseModel)
 def get_progress_percentage(cohort_id: str, user: str, request: Request):
   """Get progress percentage
 
