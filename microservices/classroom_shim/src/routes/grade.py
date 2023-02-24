@@ -1,14 +1,12 @@
 ''' Grade APIs '''
-import requests
 from fastapi import APIRouter
 from common.models import LTIAssignment
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import InternalServerError
-from common.utils.classroom_crud import (get_credentials,
-                                         post_grade_of_the_user,
+from common.utils.classroom_crud import (post_grade_of_the_user,
                                          get_submitted_course_work_list)
 from common.utils.secrets import get_backend_robot_id_token
-from schemas.grade_schema import PostGradeModel
+from schemas.grade_schema import PostGradeModel, PostGradeResponseModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
@@ -29,10 +27,8 @@ router = APIRouter(
         }
     })
 
-creds = get_credentials()
 
-
-@router.post("/grade")
+@router.post("/grade", response_model=PostGradeResponseModel)
 def update_classroom_grade(input_grade: PostGradeModel):
   """Post/Updates the student grade in the classroom for a given course
    work in a course"""

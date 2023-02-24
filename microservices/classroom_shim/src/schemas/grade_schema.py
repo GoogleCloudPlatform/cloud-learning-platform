@@ -7,7 +7,7 @@ from schemas.schema_examples import LTI_POST_GRADE_MODEL
 
 
 class PostGradeModel(BaseModel):
-  """LTI Post Grade Pydantic Model
+  """Post Grade Pydantic Model
 
   Args:
       BaseModel (_type_): _description_
@@ -23,3 +23,20 @@ class PostGradeModel(BaseModel):
     "Pydantic Config Class"
     orm_mode = True
     schema_extra = {"example": LTI_POST_GRADE_MODEL}
+
+
+class PostGradeResponseModel(BaseModel):
+  """Post Grade List Response model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully updated the user grade in classroom"
+  data: Optional[str] = None
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully updated the user grade in classroom",
+            "data": None
+        }
+    }
