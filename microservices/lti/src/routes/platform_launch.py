@@ -36,6 +36,7 @@ def post_resource_launch_init(lti_content_item_id: str,
                               user_id: str,
                               context_id: str,
                               custom_params: Optional[dict] = {}):
+  """Post method for the resource launch init endpoint"""
   return get_resource_launch_init(lti_content_item_id, user_id, context_id,
                                   custom_params)
 

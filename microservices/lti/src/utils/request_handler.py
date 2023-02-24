@@ -47,7 +47,7 @@ def post_method(url: str,
   if resp.status_code == 200:
     resp_data = resp.json().get("data")
   else:
-    raise Exception(f"Internal error from the API")
+    raise Exception("Internal error from the API")
 
   return resp_data
 
