@@ -1,4 +1,5 @@
 ''' Grade APIs '''
+import traceback
 from fastapi import APIRouter
 from common.models import LTIAssignment
 from common.utils.logging_handler import Logger
@@ -83,4 +84,5 @@ def update_classroom_grade(input_grade: PostGradeModel):
 
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e

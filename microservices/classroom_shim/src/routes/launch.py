@@ -70,6 +70,7 @@ def login(request: Request, lti_assignment_id: str):
 @router.get("/launch-assignment")
 def launch_assignment(request: Request,
                       lti_assignment_id: Optional[str] = "",
+                      timezone: Optional[str] = "",
                       user_details: dict = Depends(validate_token)):
   """This launch assignment will take the input assignment id and
   redirect the user to the appropriate LTI tool content item
@@ -106,10 +107,16 @@ def launch_assignment(request: Request,
         "$ResourceLink.submission.endDateTime":
             (lti_assignment.end_date).isoformat(),
         "$ResourceLink.available.endDateTime":
-            (lti_assignment.due_date).isoformat()
+            (lti_assignment.due_date).isoformat(),
     }
+
+    if lti_assignment.max_points:
+      custom_params["$LineItem.resultValue.max"] = lti_assignment.max_points
+
+    if timezone:
+      custom_params["$Person.address.timezone"] = timezone
+
     # TODO: implementation of "$Context.id.history" as a custom parameter
-    # TODO: implementation of "$Person.address.timezone" as a custom parameter
     # TODO: send the user details like profile photo inside final_lti_message_hint_dict and use it in lti service to send as token claims
     final_lti_message_hint_dict = {
         "custom_params_for_substitution": custom_params,

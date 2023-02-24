@@ -1,11 +1,13 @@
 '''Cohort Endpoint'''
 import traceback
-from fastapi import APIRouter
-from common.models import Cohort, CourseTemplate
+from fastapi import APIRouter, Request
+from services import student_service
+from common.models import Cohort, CourseTemplate,CourseEnrollmentMapping
 from common.models.section import Section
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest
+from common.utils import classroom_crud
 from schemas.cohort import (CohortListResponseModel, CohortModel,
                             CreateCohortResponseModel, InputCohortModel,
                             DeleteCohortResponseModel,
@@ -15,8 +17,10 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import SectionListResponseModel
+from schemas.student import GetProgressPercentageCohortResponseModel
 from utils.helper import (convert_cohort_to_cohort_model,
                           convert_section_to_section_model)
+
 
 router = APIRouter(prefix="/cohorts",
                    tags=["Cohorts"],
@@ -241,4 +245,57 @@ def list_section(cohort_id: str, skip: int = 0, limit: int = 10):
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
+    raise InternalServerError(str(e)) from e
+
+@router.get("/{cohort_id}/get_progress_percentage/{user}",
+      response_model=GetProgressPercentageCohortResponseModel)
+def get_progress_percentage(cohort_id: str, user: str, request: Request):
+  """Get progress percentage
+
+  Args:
+    cohort_id : cohort_id for which progess is required
+    user : email id or user id for whol progress is required
+
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+
+  Returns:
+    A number indicative of the percentage of the course completed
+    by the student,
+    {'status': 'Failed'} if any exception is raised
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    user_id = student_service.get_user_id(user=user, headers=headers)
+    section_with_progress_percentage = []
+    cohort = Cohort.find_by_id(cohort_id)
+    # Using the cohort object reference key query sections model to get a list
+    # of section of a perticular cohort
+    result = Section.fetch_all_by_cohort(cohort_key=cohort.key)
+    for y in result:
+      submitted_course_work_list = 0
+      record = CourseEnrollmentMapping.\
+        find_course_enrollment_record(y.key,user_id)
+      if record is not None:
+        course_work_list = len\
+          (classroom_crud.get_course_work_list(y.key.split("/")[1]))
+        submitted_course_work = classroom_crud.get_submitted_course_work_list(
+        y.key.split("/")[1], user_id,headers)
+        for x in submitted_course_work:
+          if x["state"] == "TURNED_IN":
+            submitted_course_work_list = submitted_course_work_list + 1
+        data = {"section_id":y.key.split("/")[1],"progress_percentage":round\
+        ((submitted_course_work_list / course_work_list) * 100, 2)}
+        section_with_progress_percentage.append(data)
+    return {"data":section_with_progress_percentage}
+
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
     raise InternalServerError(str(e)) from e
