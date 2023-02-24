@@ -7,7 +7,7 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
 ValidationError,InvalidTokenError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
-                                      ResourceNotFound, BadRequest,InvalidToken,Conflict)
+                             ResourceNotFound, BadRequest,InvalidToken,Conflict)
 from common.models import CourseEnrollmentMapping,Section,Cohort
 from common.utils import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
