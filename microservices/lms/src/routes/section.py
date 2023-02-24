@@ -160,18 +160,14 @@ def create_section(sections_details: SectionDetails,request: Request):
     # add Instructional designer
     sections_details.teachers.append(
         course_template_details.instructional_designer)
-    for teacher_email in sections_details.teachers:
+    for teacher_email in set(sections_details.teachers):
+      print("TEACHER NAME",teacher_email)
       # classroom_crud.add_teacher(new_course["id"], teacher_email)
       invitation_object = classroom_crud.invite_teacher(new_course["id"],
                             teacher_email)
     # Storing classroom details
       classroom_crud.acceept_invite(invitation_object["id"],teacher_email)
       user_profile = classroom_crud.get_user_profile_information(teacher_email)
-      # classroom_crud.add_teacher(new_course["id"], teacher_email)
-      # gaid = user_profile["id"]
-      # name =  user_profile["name"]["givenName"]
-      # last_name =  user_profile["name"]["familyName"]
-      # photo_url =  user_profile["photoUrl"]
     # Save the new record of seecion in firestore
       data = {
       "first_name":user_profile["name"]["givenName"],
@@ -198,7 +194,7 @@ def create_section(sections_details: SectionDetails,request: Request):
     section.classroom_id = new_course["id"]
     section.classroom_code = new_course["enrollmentCode"]
     section.classroom_url = new_course["alternateLink"]
-    section.teachers = sections_details.teachers
+    section.teachers = list(set(sections_details.teachers))
     section.enrolled_students_count=0
     section.save()
     new_section = convert_section_to_section_model(section)
@@ -295,7 +291,7 @@ def get_teachers_list(section_id: str, request: Request):
 response_model=GetTeacherResponseModel)
 def get_teacher(section_id: str,teacher_email:str,request: Request):
   """Get teacher for a section .If teacher is present in given section
-  get teacher details else throw
+    get teacher details else throw
   Args:
       section_id (str): section_id in firestore
       teacher_email(str): teachers email Id
@@ -434,7 +430,6 @@ def update_section(sections_details: UpdateSection,request: Request):
     add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
     for i in add_teacher_list:
-      # classroom_crud.add_teacher(sections_details.course_id, i)
       invitation_object = classroom_crud.invite_teacher(
                             sections_details.course_id,i)
       # Storing classroom details
