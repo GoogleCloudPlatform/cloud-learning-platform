@@ -7,7 +7,7 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
 ValidationError,InvalidTokenError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
-                                      ResourceNotFound, BadRequest,InvalidToken)
+                             ResourceNotFound, BadRequest,InvalidToken,Conflict)
 from common.models import CourseEnrollmentMapping,Section,Cohort
 from common.utils import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
@@ -254,6 +254,10 @@ def enroll_student_section(cohort_id: str,
     cohort = Cohort.find_by_id(cohort_id)
     sections = Section.collection.filter("cohort","==",cohort.key).fetch()
     sections = list(sections)
+    if cohort.enrolled_students_count >= cohort.max_students:
+      raise Conflict(
+    "Cohort Max count reached hence student cannot be erolled in this cohort"
+    )
     if len(sections) == 0:
       raise ResourceNotFoundException("Given CohortId\
          does not have any sections")
@@ -287,11 +291,15 @@ def enroll_student_section(cohort_id: str,
         f"Successfully Added the Student with email {input_data.email}",
         "data" : response_dict
     }
+
   except InvalidTokenError as ive:
     raise InvalidToken(str(ive)) from ive
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    Logger.error(conflict)
+    raise Conflict(str(conflict)) from conflict
   except HttpError as ae:
     raise CustomHTTPException(status_code=ae.resp.status,
                               success=False,

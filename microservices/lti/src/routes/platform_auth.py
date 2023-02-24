@@ -155,10 +155,11 @@ def generate_token(
   """The generate token endpoint will be used to generate the id token"""
   try:
     valid_scopes = [
-        lti_claim_field("scope", "lineitem", "ags"),
-        lti_claim_field("scope", "lineitem.readonly", "ags"),
-        lti_claim_field("scope", "result.readonly", "ags"),
-        lti_claim_field("scope", "score", "ags")
+        "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly",
+        "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+        "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
+        "https://purl.imsglobal.org/spec/lti-ags/scope/score",
+        "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"
     ]
     scopes = scope.split(" ")
     required_scopes = []

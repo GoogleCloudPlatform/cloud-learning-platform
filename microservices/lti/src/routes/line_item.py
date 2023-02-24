@@ -15,6 +15,7 @@ from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
                                       BasicScoreModel, ResultResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
+from services.grade_service import grade_pass_back
 from typing import List, Optional
 from services.validate_service import validate_access
 # pylint: disable=unused-argument, use-maxsplit-arg, line-too-long
@@ -492,16 +493,19 @@ def create_score_for_line_item(context_id: str,
   """
   try:
     # TODO: Add API call to check if the context_id (course_id) exists
-    LineItem.find_by_id(line_item_id)
+    line_item = LineItem.find_by_id(line_item_id)
     input_score_dict = {**input_score.dict()}
+
+    if input_score_dict["scoreGiven"] > input_score_dict["scoreMaximum"]:
+      raise ValidationError(
+          "Score maximum should not be greater than the given score")
+
     input_score_dict["lineItemId"] = line_item_id
 
     new_score = Score()
     new_score = new_score.from_dict(input_score_dict)
     new_score.save()
-
     line_item_url = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}"
-    result = Result.collection.filter("scoreOf", "==", line_item_id).get()
 
     input_result_dict = {
         "userId": input_score_dict["userId"],
@@ -511,6 +515,10 @@ def create_score_for_line_item(context_id: str,
         "scoreOf": line_item_id,
         "lineItemId": line_item_id
     }
+
+    user_id = input_result_dict["userId"]
+    result = Result.collection.filter("scoreOf", "==", line_item_id).filter(
+        "userId", "==", input_score_dict["userId"]).get()
 
     if result:
       result_fields = result.get_fields()
@@ -532,6 +540,24 @@ def create_score_for_line_item(context_id: str,
       result_fields["scoreOf"] = line_item_url
       result_fields[
           "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{new_result.id}"
+
+    # Passing grades back to the LMS using shim service API
+    input_grade_dict = {
+        "user_id": user_id,
+        "comment": input_result_dict["comment"],
+        "lti_content_item_id": line_item.resourceLinkId,
+        "maximum_grade": input_result_dict["resultMaximum"],
+        "assigned_grade": None,
+        "draft_grade": None,
+    }
+
+    if input_score_dict["gradingProgress"] in ["Pending", "PendingManual"]:
+      input_grade_dict["draft_grade"] = input_result_dict["resultScore"]
+
+    if input_score_dict["gradingProgress"] == "FullyGraded":
+      input_grade_dict["assigned_grade"] = input_result_dict["resultScore"]
+
+    grade_pass_back(input_grade_dict, user_id, line_item_id)
 
     return result_fields
 
