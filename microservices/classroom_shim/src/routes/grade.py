@@ -52,7 +52,11 @@ def update_classroom_grade(input_grade: PostGradeModel):
     course_work_id = lti_assignment.course_work_id
 
     assigned_grade = input_grade_dict["assigned_grade"]
-    draft_grade = input_grade_dict["draft_grade"]
+
+    if input_grade_dict["draft_grade"]:
+      draft_grade = input_grade_dict["draft_grade"]
+    else:
+      draft_grade = assigned_grade
 
     if assigned_grade:
       assigned_grade = (assigned_grade / input_grade_dict["maximum_grade"]
@@ -63,21 +67,14 @@ def update_classroom_grade(input_grade: PostGradeModel):
                     ) * lti_assignment_max_points
 
     user_id = input_grade_dict["user_id"]
-    get_user_url = f"http://user-management/user-management/api/v1/user/{user_id}"
 
-    user_res = requests.get(
-        url=get_user_url,
-        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
-        timeout=60)
+    headers = {"Authorization": f"Bearer {get_backend_robot_id_token()}"}
 
-    if user_res.status_code == 200:
-      user_data = user_res.json().get("data")
-    else:
-      raise Exception("Internal server error from lms API")
-
-    user_email = user_data.get("email")
-    submissions = get_submitted_course_work_list(lti_assignment.section_id,
-                                                 user_email, course_work_id)
+    submissions = get_submitted_course_work_list(
+        section_id=lti_assignment.section_id,
+        user_id=user_id,
+        headers=headers,
+        course_work_id=course_work_id)
 
     if submissions:
       submission_id = submissions[0].get("id")
