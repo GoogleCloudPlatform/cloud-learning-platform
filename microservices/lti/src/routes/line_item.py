@@ -517,7 +517,8 @@ def create_score_for_line_item(context_id: str,
     }
 
     user_id = input_result_dict["userId"]
-    result = Result.collection.filter("scoreOf", "==", line_item_id).get()
+    result = Result.collection.filter("scoreOf", "==", line_item_id).filter(
+        "userId", "==", input_score_dict["userId"]).get()
 
     if result:
       result_fields = result.get_fields()

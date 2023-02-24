@@ -77,7 +77,8 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
         token_claims[lti_claim_field("claim",
                                      "target_link_uri")] = tool_info["tool_url"]
     if "custom" in content_item_info.keys():
-      custom_params = decoded_lti_message_hint.get("custom_params_for_substitution")
+      custom_params = decoded_lti_message_hint.get(
+          "custom_params_for_substitution")
       final_custom_claims = {**content_item_info.get("custom")}
 
       # process custom parameter substitution
@@ -92,11 +93,19 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
     if tool_info.get("enable_grade_sync"):
       token_claims[lti_claim_field("claim", "endpoint", "ags")] = {
           "scope": [
-              lti_claim_field("scope", "lineitem", "ags"),
-              lti_claim_field("scope", "result.readonly", "ags"),
-              lti_claim_field("scope", "score", "ags")
+              "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+              "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
+              "https://purl.imsglobal.org/spec/lti-ags/scope/score"
           ],
           "lineitems": LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items",
+      }
+
+    # TODO: Update the dummy context ids to the actual one
+    if tool_info.get("enable_nrps"):
+      token_claims[lti_claim_field("claim", "namesroleservice", "nrps")] = {
+          "context_memberships_url":
+              f"{LTI_ISSUER_DOMAIN}/lti/api/v1/qv9byob9ov5by7vk5js5d/memberships",
+          "service_versions": ["2.0"]
       }
 
     # process line_item claims

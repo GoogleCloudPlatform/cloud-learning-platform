@@ -13,7 +13,8 @@ BASIC_TOOL_EXAMPLE = {
     "redirect_uris": [
         "https://example-tool.com/admin/api/ltilaunch/ltitoollaunch"
     ],
-    "enable_grade_sync": False
+    "enable_grade_sync": False,
+    "enable_nrps": False
 }
 
 FULL_TOOL_EXAMPLE = {
@@ -121,4 +122,73 @@ FULL_CONTENT_ITEM_EXAMPLE = {
     **BASIC_CONTENT_ITEM_EXAMPLE, "id": "aC72Vos31iFQt09c",
     "created_time": "2022-03-03 09:22:49.843674+00:00",
     "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
+}
+
+CONTEXT_EXAMPLE = {
+    "id": "V5o7n42Ec453R",
+    "label": "Test Course 2",
+    "title": "Test title of the course 2",
+    "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"]
+}
+
+MEMBERS_EXAMPLE = [{
+    "user_id":
+        "n93b2a3Va5v0kz3TkB",
+    "status":
+        "Active",
+    "given_name":
+        "Test",
+    "family_name":
+        "User1",
+    "name":
+        "Test User1",
+    "email":
+        "testuse1@gmail.com",
+    "picture":
+        "https://lh3.googleusercontent.com/a/AEdFTp5ulw5yy57GlmaduiTPlpmy6UDm8FrvVoRnWotGi_vn=s100",
+    "lis_person_sourcedid":
+        "n93b2a3Va5v0kz3TkB",
+    "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"]
+}, {
+    "user_id":
+        "Vb2sr3bt83b4BT4WO",
+    "status":
+        "Active",
+    "given_name":
+        "Test",
+    "family_name":
+        "User2",
+    "name":
+        "Test User2",
+    "email":
+        "testuse2@gmail.com",
+    "picture":
+        "https://lh3.googleusercontent.com/a/AEdFTv83ny9Vc8Bivn30y84Kx_-QlLXq84aoKKo37AsZQ=s100",
+    "lis_person_sourcedid":
+        "Vb2sr3bt83b4BT4WO",
+    "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"]
+}, {
+    "user_id":
+        "Vv3wb92Bqv8sx7t037",
+    "status":
+        "Active",
+    "given_name":
+        "Test",
+    "family_name":
+        "User3",
+    "name":
+        "Test User3",
+    "email":
+        "testuser3@gmail.com",
+    "picture":
+        "https://lh3.googleusercontent.com/a/AEdFTp55udAV2vBv2bOT9frDyWFFA440rs1SAzrPs=s100",
+    "lis_person_sourcedid":
+        "Vv3wb92Bqv8sx7t037",
+    "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"]
+}]
+
+NRPS_EXAMPLE = {
+    "id": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/Vvb2q87A3w6tn90BO9/memberships",
+    "context": CONTEXT_EXAMPLE,
+    "members": MEMBERS_EXAMPLE
 }
