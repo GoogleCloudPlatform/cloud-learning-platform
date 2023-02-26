@@ -53,7 +53,7 @@ export class CohortComponent implements OnInit {
     }
 
   }
-  ifUpcomming(start: string): boolean {
+  ifUpcoming(start: string): boolean {
     let startDate = Date.parse(start)
     let d = Date.now()
     if (d.valueOf() < startDate.valueOf()) {
