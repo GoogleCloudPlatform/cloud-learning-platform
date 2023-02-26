@@ -87,6 +87,8 @@ Create a new `users` collection in Firestore and add the first user as follows:
 ![](docs/static/images/first_db_user_1.png)
 ![](docs/static/images/first_db_user_2.png)
 
+## Setting up OAuth for Registrations API
+
 ## Adding Backend Robot User
 
 A backend robot (service account) user is needed in the database to allow backend services to make authenticated API calls to each other when a User bearer token is not in the API flow. This is particularly neede for cronjobs and LTI callback flows.
@@ -112,6 +114,14 @@ Body :
 }
 ```
 
+Then add this account manually into firebase. You will need to generate a secure password:
+
+![](docs/static/images/add_robot_firebase.png)
+
+Lastly, store both the full email and the pass into Secret Manager in the following two values:
+
+![](docs/static/images/robot_secret_manager.png)
+
 ## Steps to add new user
 
 1. Hit POST method for users api in user-management microservice with new user's emain id in the api body
@@ -130,14 +140,14 @@ Body :
 {
 "first_name": "",
 "last_name": "",
-"email": "abc@def.com",  | Required
-"user_type": "other",    | Required  // should always be 'other'
+"email": "abc@def.com",
+"user_type": "other",
 "user_type_ref": "",
 "user_groups": [],
-"status": "active",      | Required  // should always be true
-"is_registered": true,   | Required  // should always be true
+"status": "active",
+"is_registered": true,
 "failed_login_attempts_count": 0,
-"access_api_docs": false, | Required  // should always be false
+"access_api_docs": false,
 "gaia_id": ""
 }
 ```
