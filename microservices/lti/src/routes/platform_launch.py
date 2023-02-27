@@ -58,6 +58,8 @@ def get_resource_launch_init(lti_content_item_id: str,
     UUID of the content item <br/>
   user_id: `str`
     UUID of the User <br/>
+  context_id: `str`
+    ID of the context of the given resource <br/>
   ### Raises:
   ResourceNotFoundException:
     If the LTI content item or tool does not exist. <br/>
