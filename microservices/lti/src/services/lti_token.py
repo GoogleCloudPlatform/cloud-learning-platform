@@ -130,7 +130,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
               lti_claim_field("scope", "score", "ags")
           ],
           "lineitems":
-              f"f{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/line_items",
+              f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/line_items",
           "lineitem":
               f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/line_items/{line_item.id}"
       }
