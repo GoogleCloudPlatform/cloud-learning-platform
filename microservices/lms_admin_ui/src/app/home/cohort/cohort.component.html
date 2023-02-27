@@ -11,8 +11,8 @@
                     </span>
 
                     <div class="status-chip">
-                        <mat-chip-list *ngIf="ifUpcomming(cohort.start_date); else active">
-                            <mat-chip class="active-chip">Upcomming</mat-chip>
+                        <mat-chip-list *ngIf="ifUpcoming(cohort.start_date); else active">
+                            <mat-chip class="active-chip">Upcoming</mat-chip>
                         </mat-chip-list>
 
                         <ng-template #active>
