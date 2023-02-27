@@ -42,7 +42,7 @@ def get_all_line_items(context_id: str,
                        resource_link_id: str = None,
                        tag: str = None,
                        skip: int = 0,
-                       limit: int = 10,
+                       limit: int = 1000,
                        token: auth_scheme = Depends()):
   """The get line items endpoint will return an array of line items
   from firestore
@@ -66,14 +66,15 @@ def get_all_line_items(context_id: str,
   Array of line items: `FullLineItemModel`
   """
   try:
-    # TODO: Add API call to check if the context_id (course_id) exists
+
     if skip < 0:
       raise ValidationError("Invalid value passed to \"skip\" query parameter")
 
     if limit < 1:
       raise ValidationError("Invalid value passed to \"limit\" query parameter")
 
-    collection_manager = LineItem.collection
+    collection_manager = LineItem.collection.filter("contextId", "==",
+                                                    context_id)
 
     if resource_id:
       collection_manager = collection_manager.filter("resourceId", "==",
@@ -131,8 +132,12 @@ def get_line_item(context_id: str,
   LineItem: `LineItemResponseModel`
   """
   try:
-    # TODO: Add API call to check if the context_id (course_id) exists
     line_item = LineItem.find_by_id(line_item_id)
+
+    if line_item.contextId != context_id:
+      raise ResourceNotFoundException(
+          f"Line item with id {line_item_id} in {context_id} not found")
+
     line_item_fields = line_item.get_fields(reformat_datetime=True)
     line_item_fields[
         "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item.id}"
@@ -173,7 +178,6 @@ def create_line_item(context_id: str,
   Line item Data: `LineItemResponseModel`
   """
   try:
-    # TODO: Add API call to check if the context_id (course_id) exists
     input_line_item_dict = {**input_line_item.dict()}
     line_item = create_new_line_item(input_line_item_dict)
     line_item_fields = line_item.get_fields(reformat_datetime=True)
@@ -216,8 +220,12 @@ def update_line_item(context_id: str,
   Updated line item: `LineItemResponseModel`
   """
   try:
-    # TODO: Add API call to check if the context_id (course_id) exists
     existing_line_item = LineItem.find_by_id(line_item_id)
+
+    if existing_line_item.contextId != context_id:
+      raise ResourceNotFoundException(
+          f"Line item with id {line_item_id} in {context_id} not found")
+
     line_item_fields = existing_line_item.get_fields()
 
     input_line_item_dict = {**input_line_item.dict()}
@@ -270,12 +278,16 @@ def update_line_item_using_id(context_id: str,
   Updated line item: `LineItemResponseModel`
   """
   try:
-    # TODO: Add API call to check if the context_id (course_id) exists
     input_line_item_dict = {**input_line_item.dict(exclude_unset=True)}
     line_item_id = input_line_item_dict.get("id")
     line_item_id = line_item_id.split("/")[-1]
 
     existing_line_item = LineItem.find_by_id(line_item_id)
+
+    if existing_line_item.contextId != context_id:
+      raise ResourceNotFoundException(
+          f"Line item with id {line_item_id} in {context_id} not found")
+
     line_item_fields = existing_line_item.get_fields()
 
     for key, value in input_line_item_dict.items():
@@ -324,7 +336,12 @@ def delete_line_item(context_id: str,
   Success/Fail Message: `JSON`
   """
   try:
-    # TODO: Add API call to check if the context_id (course_id) exists
+    line_item = LineItem.find_by_id(line_item_id)
+
+    if line_item.contextId != context_id:
+      raise ResourceNotFoundException(
+          f"Line item with id {line_item_id} in {context_id} not found")
+
     LineItem.delete_by_id(line_item_id)
     return {}
 
@@ -375,7 +392,12 @@ def get_results_of_line_item(context_id: str,
   Result: `ResultResponseModel`
   """
   try:
-    # TODO: Add API call to check if the context_id (course_id) exists
+    line_item = LineItem.find_by_id(line_item_id)
+
+    if line_item.contextId != context_id:
+      raise ResourceNotFoundException(
+          f"Line item with id {line_item_id} in {context_id} not found")
+
     result_fields = []
     if user_id:
       result = Result.collection.filter("lineItemId", "==",
@@ -440,7 +462,12 @@ def get_result(context_id: str,
   Result: `ResultResponseModel`
   """
   try:
-    # TODO: Add API call to check if the context_id (course_id) exists
+    line_item = LineItem.find_by_id(line_item_id)
+
+    if line_item.contextId != context_id:
+      raise ResourceNotFoundException(
+          f"Line item with id {line_item_id} in {context_id} not found")
+
     result = Result.find_by_id(result_id)
     if result.lineItemId != line_item_id:
       raise ResourceNotFoundException(
@@ -492,8 +519,12 @@ def create_score_for_line_item(context_id: str,
   Result Data: `ResultResponseModel`
   """
   try:
-    # TODO: Add API call to check if the context_id (course_id) exists
     line_item = LineItem.find_by_id(line_item_id)
+
+    if line_item.contextId != context_id:
+      raise ResourceNotFoundException(
+          f"Line item with id {line_item_id} in {context_id} not found")
+
     input_score_dict = {**input_score.dict()}
 
     if input_score_dict["scoreGiven"] > input_score_dict["scoreMaximum"]:

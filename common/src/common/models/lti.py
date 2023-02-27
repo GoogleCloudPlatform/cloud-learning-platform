@@ -144,6 +144,7 @@ class LineItem(BaseModel):
   tag = TextField()
   resourceId = TextField()
   resourceLinkId = TextField()
+  contextId = TextField()
 
   class Meta:
     collection_name = BaseModel.DATABASE_PREFIX + "line_items"

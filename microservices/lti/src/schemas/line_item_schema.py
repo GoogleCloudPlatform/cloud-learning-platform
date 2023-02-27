@@ -3,7 +3,7 @@ Pydantic Model for Line item API's
 """
 from pydantic import BaseModel
 from typing import Optional
-from schemas.schema_examples import (BASIC_LINE_ITEM_EXAMPLE,
+from schemas.schema_examples import (POST_LINE_ITEM_EXAMPLE,
                                      UPDATE_LINE_ITEM_EXAMPLE,
                                      UPDATE_LINE_ITEM_USING_ID_EXAMPLE,
                                      FULL_LINE_ITEM_EXAMPLE,
@@ -92,10 +92,11 @@ class FullLineItemModel(BasicLineItemModel):
 
 class LineItemModel(BasicLineItemModel):
   """Line Item Input Pydantic Model"""
+  contextId: Optional[str]
 
   class Config():
     orm_mode = True
-    schema_extra = {"example": BASIC_LINE_ITEM_EXAMPLE}
+    schema_extra = {"example": POST_LINE_ITEM_EXAMPLE}
 
 
 class UpdateLineItemModel(BaseModel):

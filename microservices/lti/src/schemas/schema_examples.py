@@ -61,6 +61,10 @@ BASIC_LINE_ITEM_EXAMPLE = {
     "endDateTime": "2022-02-07T22:23:11+0000"
 }
 
+POST_LINE_ITEM_EXAMPLE = {
+    **BASIC_LINE_ITEM_EXAMPLE, "contextId": "b28KU9p34B26"
+}
+
 UPDATE_LINE_ITEM_EXAMPLE = {
     "scoreMaximum": 50,
     "label": "50",

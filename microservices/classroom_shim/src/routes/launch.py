@@ -99,10 +99,11 @@ def launch_assignment(request: Request,
     user_id = user_data.get("user_id")
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
     lti_content_item_id = lti_assignment.lti_content_item_id
+    context_id = lti_assignment.section_id
 
     custom_params = {
         "$ResourceLink.available.startDateTime":
-            lti_assignment.start_date.isoformat(),
+            (lti_assignment.start_date).isoformat(),
         "$ResourceLink.submission.endDateTime":
             (lti_assignment.end_date).isoformat(),
         "$ResourceLink.available.endDateTime":
@@ -122,7 +123,7 @@ def launch_assignment(request: Request,
         "user_details": {}
     }
 
-    url = f"{API_DOMAIN}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}"
+    url = f"{API_DOMAIN}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}&context_id={context_id}"
     # TODO: verify assignment and user relationship
     return {"url": url, "message_hint": final_lti_message_hint_dict}
 
