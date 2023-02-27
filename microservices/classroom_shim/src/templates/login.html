@@ -1,93 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <title>{{title}}</title>
-  <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css" />
   <style>
     body {
       font-family: Lato, sans-serif;
     }
   </style>
-  <script type="text/javascript">
-    let counter = 5
+</head>
+
+<body>
+  <h1 style="text-align: center; margin-bottom: 2rem">
+    Welcome to ASU Study Hall
+  </h1>
+  <h3 style="text-align: center; margin-bottom: 2rem" id="instruction">Log in to proceed further</h3>
+  <p id="status" style="text-align: center; margin-bottom: 2rem; display: none;"></p>
+
+  <p id="existing-acc" style="text-align: center; margin-bottom: 2rem; display: none;"></p>
+
+  <div style="text-align: center; margin-bottom: 2rem" id="google-sign-in-btn-container">
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-auth-compat.js"></script>
+
+  <script>
     const firebaseConfig = {
-      apiKey: '{{ firebase_api_key }}',
-      projectId: '{{ project_id }}',
-      authDomain: '{{ firebase_auth_domain }}'
+      apiKey: "AIzaSyDyr4yG7khoWYsteBcYqVy-t00YlCevtkY",
+      authDomain: "core-learning-services-dev.firebaseapp.com",
+      projectId: "core-learning-services-dev",
+      storageBucket: "core-learning-services-dev.appspot.com",
+      messagingSenderId: "142865211726",
+      appId: "1:142865211726:web:4431236f5ed1bf7902be1f"
     };
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
-    let user = null
-    setTimeout(() => {
-      user = firebase.auth().currentUser;
-      console.log("user", user)
-
-      if (user) {
-        let email = user._delegate.email
-        displayCounterWithText(email)
+    async function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        wasSignedOut = false
+        const result = await firebase.auth().signInWithPopup(provider);
+        console.log(result.user);
+      } catch (error) {
+        console.error(error);
       }
-    }, 1000);
+    }
+    let wasSignedOut = false
+    const googleSignInBtnContainer = document.getElementById('google-sign-in-btn-container');
+    googleSignInBtnContainer.innerHTML = `loading...`;
+    firebase.auth().onAuthStateChanged(user => {
+      if (!wasSignedOut) {
 
-    let ui = null
-    let disableTransfer = null
+        if (user) {
+          googleSignInBtnContainer.innerHTML = `
+          <p><button id="continue-with-same-account-btn">Continue with ${user.email}</button></p>
+          <p>OR</p>
+          <p><button id="use-different-account-btn">Use a different account</button></p>
+          `;
 
-    initFirebaseUI()
-    function initFirebaseUI() {
-      if (ui) {
-        ui.reset();
-      } else {
-        ui = new firebaseui.auth.AuthUI(firebase.auth());
+          let countdown = 5;
+          const countdownInterval = setInterval(() => {
+            document.getElementById('continue-with-same-account-btn').textContent = `Continue with ${user.email} (${countdown--})`;
+            if (countdown < 0) {
+              clearInterval(countdownInterval);
+              document.getElementById('continue-with-same-account-btn').textContent = `Continue with ${user.email}`;
+              console.log(user.getIdToken());
+            }
+          }, 1000);
+
+          document.getElementById('use-different-account-btn').addEventListener('click', () => {
+            clearInterval(countdownInterval)
+            wasSignedOut = true
+            firebase.auth().signOut();
+            signInWithGoogle()
+          });
+        } else {
+          googleSignInBtnContainer.innerHTML = `
+        <button id="sign-in-with-google-btn">Sign in with Google</button>
+        `;
+
+          document.getElementById('sign-in-with-google-btn').addEventListener('click', () => {
+            signInWithGoogle();
+          });
+        }
       }
-      let uiConfig = {
-        signInOptions: [
-          {
-            provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-            customParameters: {
-              prompt: "select_account"
-            }
-          }
-        ],
-        callbacks: {
-          signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-            let user = authResult.user;
-            let token = user._delegate.accessToken
-            disableTransfer = true
-            initiateRedirection(token)
-            console.log("something failed")
-            return false;
-          },
-          uiShown: function () {
-            let googleButton = document.querySelector('[data-provider-id="google.com"]')
-            if (googleButton) {
-              disableTransfer = false
-              googleButton.addEventListener("click", () => {
-                disableTransfer = true
-              })
-            } else {
-              disableTransfer = true
-            }
-          }
-        },
-      };
+    });
 
-      ui.start('#firebaseui-auth-container', uiConfig);
-    }
-
-    function continueLaunch() {
-      user.getIdToken().then((idToken) => {
-        initiateRedirection(idToken)
-      }).catch(function (error) {
-        console.error("Error getting ID token:", error);
-      });
-    }
 
     function initiateRedirection(token) {
       displayRedirecting()
@@ -133,25 +135,6 @@
         })
     }
 
-    function getParameterByName(name, url = window.location.href) {
-      name = name.replace(/[\[\]]/g, '\\$&');
-      let regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-        results = regex.exec(url);
-      if (!results) return null;
-      if (!results[2]) return '';
-      return decodeURIComponent(results[2].replace(/\+/g, ' '));
-    }
-
-    function displayRedirecting(text) {
-      let displayText = "Redirecting..."
-      if (text) {
-        displayText = text
-      }
-      document.getElementById("status").style.display = "block"
-      document.getElementById("status").style.color = "black"
-      document.getElementById("status").innerText = displayText
-    }
-
     function displayError(text) {
       let displayText = "There was a error while redirecting! Please try again."
       if (text) {
@@ -161,39 +144,7 @@
       document.getElementById("status").style.color = "red"
       document.getElementById("status").innerText = displayText
     }
-
-    function displayCounterWithText(email) {
-      let interval = setInterval(() => {
-        if (disableTransfer) {
-          setTimeout(() => { document.getElementById("existing-acc").style.display = "none" }, 0);
-          clearInterval(interval)
-          continueLaunch()
-        }
-        if (counter == 0) {
-          document.getElementById("existing-acc").style.display = "none"
-          clearInterval(interval)
-          continueLaunch()
-        } else {
-          let displayText = `Continuing with ${email} in ${counter} seconds`
-          document.getElementById("existing-acc").style.display = "block"
-          document.getElementById("existing-acc").innerText = displayText
-          counter--
-        }
-      }, 1000);
-    }
   </script>
-</head>
-
-<body>
-  <h1 style="text-align: center; margin-bottom: 2rem">
-    Welcome to ASU Study Hall
-  </h1>
-  <h3 style="text-align: center; margin-bottom: 2rem" id="instruction">Log in to proceed further</h3>
-  <p id="status" style="text-align: center; margin-bottom: 2rem; display: none;"></p>
-
-  <p id="existing-acc" style="text-align: center; margin-bottom: 2rem; display: none;"></p>
-
-  <div id="firebaseui-auth-container"></div>
 </body>
 
 </html>
