@@ -42,7 +42,7 @@ def get_all_line_items(context_id: str,
                        resource_link_id: str = None,
                        tag: str = None,
                        skip: int = 0,
-                       limit: int = 10,
+                       limit: int = 1000,
                        token: auth_scheme = Depends()):
   """The get line items endpoint will return an array of line items
   from firestore
