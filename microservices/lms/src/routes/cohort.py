@@ -8,6 +8,7 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest
 from common.utils import classroom_crud
+from common.utils.cache_service import set_key, get_key
 from schemas.cohort import (CohortListResponseModel, CohortModel,
                             CreateCohortResponseModel, InputCohortModel,
                             DeleteCohortResponseModel,
@@ -268,25 +269,34 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
     headers = {"Authorization": request.headers.get("Authorization")}
     user_id = student_service.get_user_id(user=user, headers=headers)
     section_with_progress_percentage = []
-    cohort = Cohort.find_by_id(cohort_id)
-    # Using the cohort object reference key query sections model to get a list
-    # of section of a perticular cohort
-    result = Section.fetch_all_by_cohort(cohort_key=cohort.key)
-    for y in result:
-      submitted_course_work_list = 0
-      record = CourseEnrollmentMapping.\
-        find_course_enrollment_record(y.key,user_id)
-      if record is not None:
-        course_work_list = len\
-          (classroom_crud.get_course_work_list(y.key.split("/")[1]))
-        submitted_course_work = classroom_crud.get_submitted_course_work_list(
-        y.key.split("/")[1], user_id,headers)
-        for x in submitted_course_work:
-          if x["state"] == "TURNED_IN":
-            submitted_course_work_list = submitted_course_work_list + 1
-        data = {"section_id":y.key.split("/")[1],"progress_percentage":round\
-        ((submitted_course_work_list / course_work_list) * 100, 2)}
-        section_with_progress_percentage.append(data)
+    cached_progress_percentage = get_key(f"{cohort_id}::{user_id}")
+    if cached_progress_percentage is not None:
+      section_with_progress_percentage = cached_progress_percentage
+    else:
+      cohort = Cohort.find_by_id(cohort_id)
+      # Using the cohort object reference key query sections model to get a list
+      # of section of a perticular cohort
+      result = Section.fetch_all_by_cohort(cohort_key=cohort.key)
+      for y in result:
+        submitted_course_work_list = 0
+        record = CourseEnrollmentMapping.\
+          find_course_enrollment_record(y.key,user_id)
+        if record is not None:
+          course_work_list = len\
+            (classroom_crud.get_course_work_list(y.key.split("/")[1]))
+          submitted_course_work = classroom_crud.get_submitted_course_work_list(
+          y.key.split("/")[1], user_id,headers)
+          for x in submitted_course_work:
+            if x["state"] == "TURNED_IN":
+              submitted_course_work_list = submitted_course_work_list + 1
+          data = {"section_id":y.key.split("/")[1],"progress_percentage":round\
+          ((submitted_course_work_list / course_work_list) * 100, 2)}
+          section_with_progress_percentage.append(data)
+      cached_value = set_key(f"{cohort_id}::{user_id}",\
+      section_with_progress_percentage, 180)
+      Logger.info\
+      (f"progress percentage caching status for cohort_id \
+      {cohort_id}, user_id {user_id} : {cached_value}")
     return {"data":section_with_progress_percentage}
 
   except ResourceNotFoundException as err:
