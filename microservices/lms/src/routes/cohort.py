@@ -277,23 +277,24 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
       # Using the cohort object reference key query sections model to get a list
       # of section of a perticular cohort
       result = Section.fetch_all_by_cohort(cohort_key=cohort.key)
-      for y in result:
+      for section in result:
         submitted_course_work_list = 0
         record = CourseEnrollmentMapping.\
-          find_course_enrollment_record(y.key,user_id)
+          find_course_enrollment_record(section.key,user_id)
         if record is not None:
           course_work_list = len\
-            (classroom_crud.get_course_work_list(y.key.split("/")[1]))
+            (classroom_crud.get_course_work_list(section.key.split("/")[1]))
           submitted_course_work = classroom_crud.get_submitted_course_work_list(
-          y.key.split("/")[1], user_id,headers)
-          for x in submitted_course_work:
-            if x["state"] == "TURNED_IN":
+          section.key.split("/")[1], user_id,headers)
+          for submission_obj in submitted_course_work:
+            if submission_obj["state"] == "TURNED_IN":
               submitted_course_work_list = submitted_course_work_list + 1
-          data = {"section_id":y.key.split("/")[1],"progress_percentage":round\
+          data = {"section_id":\
+          section.key.split("/")[1],"progress_percentage":round\
           ((submitted_course_work_list / course_work_list) * 100, 2)}
           section_with_progress_percentage.append(data)
       cached_value = set_key(f"{cohort_id}::{user_id}",\
-      section_with_progress_percentage, 180)
+      section_with_progress_percentage, 3600)
       Logger.info\
       (f"progress percentage caching status for cohort_id \
       {cohort_id}, user_id {user_id} : {cached_value}")
