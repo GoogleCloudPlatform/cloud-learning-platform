@@ -150,7 +150,11 @@ def test_create_section(client_with_emulator, create_fake_data):
                     "routes.section.classroom_crud.get_coursework_material"):
                               with mock.patch(
                     "routes.section.classroom_crud.create_coursework_material"):
-                                resp = client_with_emulator.post(url,
+                                with mock.patch(
+                      "routes.section.classroom_crud.drive_copy"):
+                                  with mock.patch(
+                      "routes.section.classroom_crud.copy_material"):
+                                    resp = client_with_emulator.post(url,
                               json=section_details)
   assert resp.status_code == 200
 
@@ -192,7 +196,11 @@ def test_create_section_course_template_not_found(client_with_emulator,
             "routes.section.classroom_crud.get_coursework_material"):
                         with mock.patch(
             "routes.section.classroom_crud.create_coursework_material"):
-                          resp = client_with_emulator.post(url,
+                          with mock.patch(
+                      "routes.section.classroom_crud.drive_copy"):
+                            with mock.patch(
+                      "routes.section.classroom_crud.copy_material"):
+                              resp = client_with_emulator.post(url,
                       json=section_details)
   assert resp.status_code == 404
 
@@ -236,7 +244,11 @@ def test_create_section_cohort_not_found(client_with_emulator,
               "routes.section.classroom_crud.get_coursework_material"):
                         with mock.patch(
                 "routes.section.classroom_crud.create_coursework_material"):
-                          resp = client_with_emulator.post(url,
+                          with mock.patch(
+                      "routes.section.classroom_crud.drive_copy"):
+                            with mock.patch(
+                      "routes.section.classroom_crud.copy_material"):
+                              resp = client_with_emulator.post(url,
                       json=section_details)
   assert resp.status_code == 404
 

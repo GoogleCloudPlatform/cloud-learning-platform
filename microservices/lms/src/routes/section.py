@@ -113,13 +113,15 @@ def create_section(sections_details: SectionDetails,request: Request):
                                               sections_details.description,
                                               sections_details.name, "me")
 
+    target_folder_id = new_course["teacherFolder"]["id"]
+    Logger.info(f"ID of target drive folder for section {target_folder_id}")
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
     # add new_course to pubsub topic for both course work and roaster changes
-    # classroom_crud.enable_notifications(new_course["id"],
-    #                                     "COURSE_WORK_CHANGES")
-    # classroom_crud.enable_notifications(new_course["id"],
-    #                                     "COURSE_ROSTER_CHANGES")
+    classroom_crud.enable_notifications(new_course["id"],
+                                        "COURSE_WORK_CHANGES")
+    classroom_crud.enable_notifications(new_course["id"],
+                                        "COURSE_ROSTER_CHANGES")
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
     if topics is not None:
@@ -143,15 +145,20 @@ def create_section(sections_details: SectionDetails,request: Request):
         # form attached to it
         # update the  view link to edit link and attach it as a form
         for material in coursework["materials"]:
+          if "driveFile" in  material.keys():
+            material = classroom_crud.copy_material(material,target_folder_id)
+          print("_____________NEW MATERIAL__________________")
+          print(material)
           if "form" in material.keys():
+            print("In form Loop ",url_mapping[material["form"]["formUrl"]])
+            result1 = classroom_crud.drive_copy(url_mapping[material["form"]["formUrl"]]["file_id"],
+                                          target_folder_id,material["form"]["title"])
             material["link"] = {
                 "title": material["form"]["title"],
-                "url": url_mapping[material["form"]["formUrl"]]
+                "url": result1["webViewLink"]
             }
             # remove form from  material dict
             material.pop("form")
-            # material["form"]["formUrl"]=
-            # url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
@@ -170,21 +177,25 @@ def create_section(sections_details: SectionDetails,request: Request):
         # Calling function to get edit_url and view url of
         # google form which returns
         # a dictionary of view_links as keys and edit
-        #  likns as values of google form
+        #  links as values of google form
         url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
         # Loop to check if a material in courssework has a google
         # form attached to it
         # update the  view link to edit link and attach it as a form
         for material in coursework_material["materials"]:
+          if "driveFile" in  material.keys():
+            material = classroom_crud.copy_material(material,target_folder_id)
+          print(material)
           if "form" in material.keys():
+            print("In form Loop ",url_mapping[material["form"]["formUrl"]])
+            new_copied_file_details = classroom_crud.drive_copy(url_mapping[material["form"]["formUrl"]]["file_id"],
+                                          target_folder_id,material["form"]["title"])
             material["link"] = {
                 "title": material["form"]["title"],
-                "url": url_mapping[material["form"]["formUrl"]]
+                "url": new_copied_file_details["webViewLink"]
             }
             # remove form from  material dict
-            material.pop("form")
-            # material["form"]["formUrl"]=
-            # url_mapping[material["form"]["formUrl"]]
+            material.pop("form")  
     # Create coursework in new course
     if coursework_material_list is not None:
       classroom_crud.create_coursework_material(new_course["id"],
@@ -192,18 +203,12 @@ def create_section(sections_details: SectionDetails,request: Request):
     # add Instructional designer
     sections_details.teachers.append(
         course_template_details.instructional_designer)
-    for teacher_email in sections_details.teachers:
-      # classroom_crud.add_teacher(new_course["id"], teacher_email)
+    for teacher_email in set(sections_details.teachers):
       invitation_object = classroom_crud.invite_teacher(new_course["id"],
                             teacher_email)
     # Storing classroom details
       classroom_crud.acceept_invite(invitation_object["id"],teacher_email)
       user_profile = classroom_crud.get_user_profile_information(teacher_email)
-      # classroom_crud.add_teacher(new_course["id"], teacher_email)
-      # gaid = user_profile["id"]
-      # name =  user_profile["name"]["givenName"]
-      # last_name =  user_profile["name"]["familyName"]
-      # photo_url =  user_profile["photoUrl"]
     # Save the new record of seecion in firestore
       data = {
       "first_name":user_profile["name"]["givenName"],
@@ -539,6 +544,7 @@ def copy_courses(course_details: CourseDetails):
                                               current_course["ownerId"]
                                             )
 
+    target_folder_id = new_course["teacherFolder"]["id"]
     # Get topics of current course
     topics = classroom_crud.get_topics(course_id)
     #If topics are present in course create topics returns a dict
@@ -565,15 +571,20 @@ def copy_courses(course_details: CourseDetails):
         #  a google form attached to it
         # update the  view link to edit link and attach it as a form
         for material in coursework["materials"]:
+          if "driveFile" in  material.keys():
+            material = classroom_crud.copy_material(material,target_folder_id)
+          print("_____________NEW MATERIAL__________________")
+          print(material)
           if "form" in material.keys():
+            print("In form Loop ",url_mapping[material["form"]["formUrl"]])
+            result1 = classroom_crud.drive_copy(url_mapping[material["form"]["formUrl"]]["file_id"],
+                                          target_folder_id,material["form"]["title"])
             material["link"] = {
                 "title": material["form"]["title"],
-                "url": url_mapping[material["form"]["formUrl"]]
+                "url": result1["webViewLink"]
             }
             # remove form from  material dict
             material.pop("form")
-            # material["form"]["formUrl"]=
-            # url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
@@ -597,15 +608,20 @@ def copy_courses(course_details: CourseDetails):
         # form attached to it
         # update the  view link to edit link and attach it as a form
         for material in coursework_material["materials"]:
+          if "driveFile" in  material.keys():
+            material = classroom_crud.copy_material(material,target_folder_id)
+            print(material)
           if "form" in material.keys():
+            print("In form Loop ",url_mapping[material["form"]["formUrl"]])
+            new_copied_file_details = classroom_crud.drive_copy(url_mapping[material["form"]["formUrl"]]["file_id"],
+                                          target_folder_id,material["form"]["title"])
             material["link"] = {
                 "title": material["form"]["title"],
-                "url": url_mapping[material["form"]["formUrl"]]
+                "url": new_copied_file_details["webViewLink"]
             }
             # remove form from  material dict
-            material.pop("form")
-            # material["form"]["formUrl"]=
-            # url_mapping[material["form"]["formUrl"]]
+            material.pop("form")  
+
     # Create coursework in new course
     if coursework_material_list is not None:
       classroom_crud.create_coursework_material(new_course["id"],
