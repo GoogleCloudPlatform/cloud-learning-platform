@@ -101,14 +101,18 @@ def launch_assignment(request: Request,
     lti_content_item_id = lti_assignment.lti_content_item_id
     context_id = lti_assignment.section_id
 
-    custom_params = {
-        "$ResourceLink.available.startDateTime":
-            (lti_assignment.start_date).isoformat(),
-        "$ResourceLink.submission.endDateTime":
-            (lti_assignment.end_date).isoformat(),
-        "$ResourceLink.available.endDateTime":
-            (lti_assignment.due_date).isoformat(),
-    }
+    custom_params = {}
+    if lti_assignment.start_date:
+      custom_params["$ResourceLink.available.startDateTime"] = (
+          lti_assignment.start_date).isoformat()
+
+    if lti_assignment.start_date:
+      custom_params["$ResourceLink.available.endDateTime"] = (
+          lti_assignment.endDate).isoformat()
+
+    if lti_assignment.start_date:
+      custom_params["$ResourceLink.submission.endDateTime"] = (
+          lti_assignment.due_date).isoformat()
 
     if lti_assignment.max_points:
       custom_params["$LineItem.resultValue.max"] = lti_assignment.max_points

@@ -48,7 +48,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
     context_data = context_res.json().get("data")
   else:
     raise Exception(
-        f"Internal error from get user API with status code - {context_res.status_code}"
+        f"Internal error from get section API with status code - {context_res.status_code}"
     )
 
   lti_context_id = context_data.get("id")
