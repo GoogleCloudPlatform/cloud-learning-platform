@@ -109,10 +109,11 @@ def drive_copy(file_id,target_folder_id,name):
     id of file 
     """ ""
 
-  copied_file = {'name': name,"parents": [target_folder_id]}
-  service= build('drive', 'v3', credentials=get_credentials())
+  copied_file = {"name": name,"parents": [target_folder_id]}
+  service= build("drive", "v3", credentials=get_credentials())
   return service.files().copy(
-  fileId=file_id,fields="webViewLink,name,mimeType,id", body=copied_file).execute()
+  fileId=file_id,fields="webViewLink,name,mimeType,id", 
+  body=copied_file).execute()
 
 
 def copy_material(drive_file_dict,target_folder_id):
@@ -125,9 +126,9 @@ def copy_material(drive_file_dict,target_folder_id):
     new created drive_file_dict with new copied file id in target folder 
   """ ""
 
-  id = drive_file_dict["driveFile"]["driveFile"]["id"]
+  file_id = drive_file_dict["driveFile"]["driveFile"]["id"]
   name = drive_file_dict["driveFile"]["driveFile"]["title"]
-  result = drive_copy(file_id=id,target_folder_id=target_folder_id,name=name)
+  result = drive_copy(file_id=file_id,target_folder_id=target_folder_id,name=name)
   new_id = result["id"]
   drive_file_dict["driveFile"]["driveFile"]["id"]=new_id
   drive_file_dict["driveFile"]["driveFile"].pop("alternateLink")

@@ -37,7 +37,11 @@ def test_copy_course(client_with_emulator):
                 with mock.patch(
             "routes.classroom_courses.classroom_crud.create_coursework_material"
                 ):
-                  resp = client_with_emulator.post(url, json=course_details)
+                  with mock.patch(
+              "routes.classroom_courses.classroom_crud.drive_copy"):
+                    with mock.patch(
+              "routes.classroom_courses.classroom_crud.copy_material"):
+                      resp = client_with_emulator.post(url, json=course_details)
   assert resp.status_code == 200
 
 
@@ -60,7 +64,11 @@ def test_copy_course_not_found(client_with_emulator):
                 with mock.patch(
               "routes.classroom_courses.classroom_crud.get_coursework_material"
                   ):
-                  resp = client_with_emulator.post(url, json=course_details)
+                  with mock.patch(
+              "routes.classroom_courses.classroom_crud.drive_copy"):
+                    with mock.patch(
+              "routes.classroom_courses.classroom_crud.copy_material"):
+                      resp = client_with_emulator.post(url, json=course_details)
   assert resp.status_code == 200
 
 
