@@ -18,11 +18,9 @@
   <h3 style="text-align: center; margin-bottom: 2rem" id="instruction">Log in to proceed further</h3>
   <p id="status" style="text-align: center; margin-bottom: 2rem; display: none;"></p>
 
-  <p id="existing-acc" style="text-align: center; margin-bottom: 2rem; display: none;"></p>
-
   <div style="text-align: center; margin-bottom: 2rem" id="google-sign-in-btn-container">
   </div>
-
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-auth-compat.js"></script>
 
@@ -38,58 +36,73 @@
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
+    let isSigningInNow = false
+    let wasSignedOut = false
 
     async function signInWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       try {
         wasSignedOut = false
+        isSigningInNow = true
         const result = await firebase.auth().signInWithPopup(provider);
         console.log(result.user);
+
       } catch (error) {
+        isSigningInNow = false
         console.error(error);
       }
     }
-    let wasSignedOut = false
     const googleSignInBtnContainer = document.getElementById('google-sign-in-btn-container');
     googleSignInBtnContainer.innerHTML = `loading...`;
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged(async (user) => {
       if (!wasSignedOut) {
 
         if (user) {
-          googleSignInBtnContainer.innerHTML = `
-          <p><button id="continue-with-same-account-btn">Continue with ${user.email}</button></p>
-          <p>OR</p>
-          <p><button id="use-different-account-btn">Use a different account</button></p>
-          `;
-
-          let countdown = 5;
-          const countdownInterval = setInterval(() => {
-            document.getElementById('continue-with-same-account-btn').textContent = `Continue with ${user.email} (${countdown--})`;
-            if (countdown < 0) {
-              clearInterval(countdownInterval);
-              document.getElementById('continue-with-same-account-btn').textContent = `Continue with ${user.email}`;
-              console.log(user.getIdToken());
-            }
-          }, 1000);
-
-          document.getElementById('use-different-account-btn').addEventListener('click', () => {
-            clearInterval(countdownInterval)
-            wasSignedOut = true
-            firebase.auth().signOut();
-            signInWithGoogle()
-          });
+          if (isSigningInNow) {
+            // hit logic
+            let token = await user.getIdToken()
+            initiateRedirection(token)
+          } else {
+            showContinueBtn(user)
+          }
         } else {
-          googleSignInBtnContainer.innerHTML = `
-        <button id="sign-in-with-google-btn">Sign in with Google</button>
-        `;
-
-          document.getElementById('sign-in-with-google-btn').addEventListener('click', () => {
-            signInWithGoogle();
-          });
+          showSignInBtn()
         }
       }
     });
 
+    function showContinueBtn(user) {
+      googleSignInBtnContainer.innerHTML = `
+        <p><button id="continue-with-same-account-btn">Continue with ${user.email}</button></p>
+        <p>OR</p>
+        <p><button id="use-different-account-btn">Use a different account</button></p>
+      `;
+
+      let countdown = 5;
+      const countdownInterval = setInterval(async () => {
+        document.getElementById('continue-with-same-account-btn').textContent = `Continue with ${user.email} (${countdown--})`;
+        if (countdown < 0) {
+          clearInterval(countdownInterval);
+          document.getElementById('continue-with-same-account-btn').textContent = `Continue with ${user.email}`;
+          let token = await user.getIdToken()
+          console.log(token);
+        }
+      }, 1000);
+
+      document.getElementById('use-different-account-btn').addEventListener('click', () => {
+        clearInterval(countdownInterval)
+        wasSignedOut = true
+        firebase.auth().signOut();
+        signInWithGoogle()
+      });
+    }
+    function showSignInBtn() {
+      googleSignInBtnContainer.innerHTML = `<button id="sign-in-with-google-btn">Sign in with Google</button>`;
+
+      document.getElementById('sign-in-with-google-btn').addEventListener('click', () => {
+        signInWithGoogle();
+      });
+    }
 
     function initiateRedirection(token) {
       displayRedirecting()
@@ -123,7 +136,7 @@
               displayError("Access Denied")
             }
             displayError(err.message)
-            initFirebaseUI()
+            showSignInBtn()
           })
         }).catch((err) => {
           console.log("err", err)
@@ -131,8 +144,18 @@
             displayError("Access Denied")
           }
           displayError(err.message)
-          initFirebaseUI()
+          showSignInBtn()
         })
+    }
+
+    function displayRedirecting(text) {
+      let displayText = "Redirecting..."
+      if (text) {
+        displayText = text
+      }
+      document.getElementById("status").style.display = "block"
+      document.getElementById("status").style.color = "black"
+      document.getElementById("status").innerText = displayText
     }
 
     function displayError(text) {
