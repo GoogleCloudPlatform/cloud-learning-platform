@@ -4,10 +4,56 @@
 <head>
   <meta charset="UTF-8">
   <title>{{title}}</title>
+  <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-auth-compat.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <style>
     body {
       font-family: Lato, sans-serif;
+      text-align: center;
     }
+
+    .login-with-google-btn {
+      transition: 0.3s;
+      padding: 12px 16px 12px 42px;
+      border: none;
+      border-radius: 3px;
+      box-shadow: #00000047 0px 1px 4px 0px;
+      color: #494949;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+      background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
+      background-color: white;
+      background-repeat: no-repeat;
+      background-position: 12px 11px;
+      cursor: pointer;
+    }
+
+    .continue-btn {
+      transition: 0.3s;
+      padding: 12px 16px 12px 16px;
+      border: none;
+      border-radius: 3px;
+      box-shadow: #00000047 0px 1px 4px 0px;
+      color: #494949;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+      background-color: white;
+      cursor: pointer;
+    }
+
+    .login-with-google-btn:hover,
+    .continue-btn:hover {
+      box-shadow: #00000075 0px 1px 4px 0px;
+    }
+
+    .login-with-google-btn:active,
+    .continue-btn:active {
+      background-color: #eee;
+    }
+
   </style>
 </head>
 
@@ -20,46 +66,39 @@
 
   <div style="text-align: center; margin-bottom: 2rem" id="google-sign-in-btn-container">
   </div>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.13.0/firebase-auth-compat.js"></script>
 
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyDyr4yG7khoWYsteBcYqVy-t00YlCevtkY",
-      authDomain: "core-learning-services-dev.firebaseapp.com",
-      projectId: "core-learning-services-dev",
-      storageBucket: "core-learning-services-dev.appspot.com",
-      messagingSenderId: "142865211726",
-      appId: "1:142865211726:web:4431236f5ed1bf7902be1f"
+      apiKey: '{{ firebase_api_key }}',
+      projectId: '{{ project_id }}',
+      authDomain: '{{ firebase_auth_domain }}'
     };
 
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig)
     let isSigningInNow = false
     let wasSignedOut = false
 
     async function signInWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
+      const provider = new firebase.auth.GoogleAuthProvider()
       try {
         wasSignedOut = false
         isSigningInNow = true
-        const result = await firebase.auth().signInWithPopup(provider);
-        console.log(result.user);
+        const result = await firebase.auth().signInWithPopup(provider)
+        console.log(result.user)
 
       } catch (error) {
         isSigningInNow = false
-        console.error(error);
+        console.error(error)
       }
     }
-    const googleSignInBtnContainer = document.getElementById('google-sign-in-btn-container');
-    googleSignInBtnContainer.innerHTML = `loading...`;
+    const googleSignInBtnContainer = document.getElementById("google-sign-in-btn-container")
+    googleSignInBtnContainer.innerHTML = `loading...`
+
     firebase.auth().onAuthStateChanged(async (user) => {
       if (!wasSignedOut) {
-
         if (user) {
           if (isSigningInNow) {
-            // hit logic
             let token = await user.getIdToken()
             initiateRedirection(token)
           } else {
@@ -69,39 +108,59 @@
           showSignInBtn()
         }
       }
-    });
+    })
+
+    function showBtnContainer() {
+      let btn = document.getElementById("continue-with-same-account-btn")
+      if (btn) {
+        document.getElementById("continue-with-same-account-btn").style.display = "block";
+      }
+    }
+
+    function hideBtnContainer() {
+      let btn = document.getElementById("continue-with-same-account-btn")
+      if (btn) {
+        document.getElementById("continue-with-same-account-btn").style.display = "none";
+      }
+    }
 
     function showContinueBtn(user) {
       googleSignInBtnContainer.innerHTML = `
-        <p><button id="continue-with-same-account-btn">Continue with ${user.email}</button></p>
+        <p><button class="continue-btn" id="continue-with-same-account-btn">Continue with ${user.email}</button></p>
         <p>OR</p>
-        <p><button id="use-different-account-btn">Use a different account</button></p>
-      `;
+        <p><button class="login-with-google-btn" id="use-different-account-btn">Use a different account</button></p>
+      `
 
-      let countdown = 5;
+      let countdown = 3
       const countdownInterval = setInterval(async () => {
-        document.getElementById('continue-with-same-account-btn').textContent = `Continue with ${user.email} (${countdown--})`;
+        document.getElementById("continue-with-same-account-btn").textContent = `Continue with ${user.email} (${countdown--})`
         if (countdown < 0) {
-          clearInterval(countdownInterval);
-          document.getElementById('continue-with-same-account-btn').textContent = `Continue with ${user.email}`;
+          clearInterval(countdownInterval)
+          document.getElementById("continue-with-same-account-btn").textContent = `Continue with ${user.email}`
           let token = await user.getIdToken()
-          console.log(token);
+          console.log(token)
+          initiateRedirection(token)
         }
-      }, 1000);
+      }, 1000)
 
-      document.getElementById('use-different-account-btn').addEventListener('click', () => {
+      document.getElementById("continue-with-same-account-btn").addEventListener("click", async () => {
+        clearInterval(countdownInterval)
+        let token = await user.getIdToken()
+        initiateRedirection(token)
+      })
+      document.getElementById("use-different-account-btn").addEventListener("click", () => {
         clearInterval(countdownInterval)
         wasSignedOut = true
-        firebase.auth().signOut();
+        firebase.auth().signOut()
         signInWithGoogle()
-      });
+      })
     }
     function showSignInBtn() {
-      googleSignInBtnContainer.innerHTML = `<button id="sign-in-with-google-btn">Sign in with Google</button>`;
+      googleSignInBtnContainer.innerHTML = `<button class="login-with-google-btn" id="sign-in-with-google-btn">Sign in with Google</button>`
 
-      document.getElementById('sign-in-with-google-btn').addEventListener('click', () => {
-        signInWithGoogle();
-      });
+      document.getElementById("sign-in-with-google-btn").addEventListener("click", () => {
+        signInWithGoogle()
+      })
     }
 
     function initiateRedirection(token) {
@@ -132,40 +191,36 @@
             window.open(response2.data.url, "_self").focus()
           }).catch((err) => {
             console.log("err", err)
-            if (err?.response?.status == 401) {
-              displayError("Access Denied")
-            }
-            displayError(err.message)
+            err?.response?.status == 401 ? displayError("Access Denied") : displayError(err.message)
             showSignInBtn()
           })
         }).catch((err) => {
           console.log("err", err)
-          if (err?.response?.status == 401) {
-            displayError("Access Denied")
-          }
-          displayError(err.message)
+          err?.response?.status == 401 ? displayError("Access Denied") : displayError(err.message)
           showSignInBtn()
         })
     }
 
     function displayRedirecting(text) {
+      hideBtnContainer()
       let displayText = "Redirecting..."
       if (text) {
         displayText = text
       }
-      document.getElementById("status").style.display = "block"
-      document.getElementById("status").style.color = "black"
-      document.getElementById("status").innerText = displayText
+      document.getElementById("status").style.display = "block";
+      document.getElementById("status").style.color = "black";
+      document.getElementById("status").innerText = displayText;
     }
 
     function displayError(text) {
+      showBtnContainer()
       let displayText = "There was a error while redirecting! Please try again."
       if (text) {
         displayText = text
       }
-      document.getElementById("status").style.display = "block"
-      document.getElementById("status").style.color = "red"
-      document.getElementById("status").innerText = displayText
+      document.getElementById("status").style.display = "block";
+      document.getElementById("status").style.color = "red";
+      document.getElementById("status").innerText = displayText;
     }
   </script>
 </body>
