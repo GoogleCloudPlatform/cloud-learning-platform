@@ -98,6 +98,7 @@ def copy_courses(course_details: CourseDetails):
                                               current_course["ownerId"]
                                               )
 
+    target_folder_id = new_course["teacherFolder"]["id"]
     # Get topics of current course
     topics = classroom_crud.get_topics(course_id)
     # If topics are present in course create topics returns a dict
@@ -124,15 +125,19 @@ def copy_courses(course_details: CourseDetails):
         #  a google form attached to it
         # update the  view link to edit link and attach it as a form
         for material in coursework["materials"]:
+          if "driveFile" in  material.keys():
+            material = classroom_crud.copy_material(material,target_folder_id)
           if "form" in material.keys():
+            result1 = classroom_crud.drive_copy(
+              url_mapping[material["form"]["formUrl"]]["file_id"],
+                    target_folder_id,material["form"]["title"])
             material["link"] = {
                 "title": material["form"]["title"],
-                "url": url_mapping[material["form"]["formUrl"]]
+                "url": result1["webViewLink"]
             }
             # remove form from  material dict
             material.pop("form")
-            # material["form"]["formUrl"]=
-            # url_mapping[material["form"]["formUrl"]]
+
     # Create coursework in new course
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
@@ -156,15 +161,18 @@ def copy_courses(course_details: CourseDetails):
         # form attached to it
         # update the  view link to edit link and attach it as a form
         for material in coursework_material["materials"]:
+          if "driveFile" in  material.keys():
+            material = classroom_crud.copy_material(material,target_folder_id)
           if "form" in material.keys():
+            new_copied_file_details = classroom_crud.drive_copy(
+              url_mapping[material["form"]["formUrl"]]["file_id"],
+                    target_folder_id,material["form"]["title"])
             material["link"] = {
                 "title": material["form"]["title"],
-                "url": url_mapping[material["form"]["formUrl"]]
+                "url": new_copied_file_details["webViewLink"]
             }
             # remove form from  material dict
             material.pop("form")
-            # material["form"]["formUrl"]=
-            # url_mapping[material["form"]["formUrl"]]
     # Create coursework in new course
     if coursework_material_list is not None:
       classroom_crud.create_coursework_material(new_course["id"],
