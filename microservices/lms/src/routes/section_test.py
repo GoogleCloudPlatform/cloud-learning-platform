@@ -77,8 +77,12 @@ def test_create_section(client_with_emulator, create_fake_data):
   mock_return_course = {
       "id": "57690009090",
       "enrollmentCode": "as3rr",
-      "name": "Jhjiuiui",
-      "alternateLink": "https://classroom.google.com"
+      "name": "test_section",
+      "alternateLink": "https://classroom.google.com",
+      "teacherFolder": {
+    "id": "18iPGzsRSp2LcQqHEvMaEZoraV37UaVkE-L0MhnDnKKyIaGKtK4-Wuz07l-tIOJGnuUMV4nf5",
+    "title": "test_section",
+    "alternateLink": "https://drive.google.com/drive/folders/18iPGzsRSp2LcQqH" }
   }
 
   with mock.patch("routes.section.classroom_crud.get_course_by_id"):

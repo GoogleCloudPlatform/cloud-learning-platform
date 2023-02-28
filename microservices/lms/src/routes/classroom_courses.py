@@ -127,12 +127,10 @@ def copy_courses(course_details: CourseDetails):
         for material in coursework["materials"]:
           if "driveFile" in  material.keys():
             material = classroom_crud.copy_material(material,target_folder_id)
-          print("_____________NEW MATERIAL__________________")
-          print(material)
           if "form" in material.keys():
-            print("In form Loop ",url_mapping[material["form"]["formUrl"]])
-            result1 = classroom_crud.drive_copy(url_mapping[material["form"]["formUrl"]]["file_id"],
-                                          target_folder_id,material["form"]["title"])
+            result1 = classroom_crud.drive_copy(
+              url_mapping[material["form"]["formUrl"]]["file_id"],
+                    target_folder_id,material["form"]["title"])
             material["link"] = {
                 "title": material["form"]["title"],
                 "url": result1["webViewLink"]
@@ -165,11 +163,10 @@ def copy_courses(course_details: CourseDetails):
         for material in coursework_material["materials"]:
           if "driveFile" in  material.keys():
             material = classroom_crud.copy_material(material,target_folder_id)
-            print(material)
           if "form" in material.keys():
-            print("In form Loop ",url_mapping[material["form"]["formUrl"]])
-            new_copied_file_details = classroom_crud.drive_copy(url_mapping[material["form"]["formUrl"]]["file_id"],
-                                          target_folder_id,material["form"]["title"])
+            new_copied_file_details = classroom_crud.drive_copy(
+              url_mapping[material["form"]["formUrl"]]["file_id"],
+                    target_folder_id,material["form"]["title"])
             material["link"] = {
                 "title": material["form"]["title"],
                 "url": new_copied_file_details["webViewLink"]
