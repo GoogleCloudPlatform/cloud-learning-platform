@@ -26,6 +26,7 @@ on:
       - 'e2e/**'
       - 'utils/**'
       - '.github/workflows/e2e_gke_api_test.yaml'
+      - 'skaffold.yaml'
   workflow_dispatch:
 env:
   PROJECT_ID: core-learning-services-dev
