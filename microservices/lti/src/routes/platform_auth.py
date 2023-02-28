@@ -98,14 +98,20 @@ def authorize(request: Request,
     if prompt != "none":
       raise ValidationError("Invalid prompt provided")
 
-    if lti_message_hint == "deep_link":  # this is DeepLinkingRequest
+    # do a signature verification for decoding lti message hint token
+    decoded_lti_message_hint = get_unverified_token_claims(lti_message_hint)
+
+    lti_request_type = decoded_lti_message_hint.get("lti_request_type")
+
+    if lti_request_type == "deep_link":  # this is DeepLinkingRequest
       token_claims = generate_token_claims("deep_link", client_id, login_hint,
-                                           lti_message_hint, nonce,
+                                           decoded_lti_message_hint, nonce,
                                            redirect_uri)
-    else:  # this is ResourceLinkRequest
+    elif lti_request_type == "resource_link":  # this is ResourceLinkRequest
       token_claims = generate_token_claims("resource_link", client_id,
-                                           login_hint, lti_message_hint, nonce,
-                                           redirect_uri)
+                                           login_hint, decoded_lti_message_hint,
+                                           nonce, redirect_uri)
+
       if token_claims.get(lti_claim_field("claim", "target_link_uri")):
         redirect_uri = token_claims.get(
             lti_claim_field("claim", "target_link_uri"))
@@ -149,10 +155,11 @@ def generate_token(
   """The generate token endpoint will be used to generate the id token"""
   try:
     valid_scopes = [
-        lti_claim_field("scope", "lineitem", "ags"),
-        lti_claim_field("scope", "lineitem.readonly", "ags"),
-        lti_claim_field("scope", "result.readonly", "ags"),
-        lti_claim_field("scope", "score", "ags")
+        "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly",
+        "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+        "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
+        "https://purl.imsglobal.org/spec/lti-ags/scope/score",
+        "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"
     ]
     scopes = scope.split(" ")
     required_scopes = []

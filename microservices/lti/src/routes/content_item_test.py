@@ -100,7 +100,8 @@ def test_post_content_item(clean_firestore, create_tool):
   input_content_item = copy.deepcopy(BASIC_CONTENT_ITEM_EXAMPLE)
   input_content_item["tool_id"] = tool.id
 
-  url = api_url
+  context_id = "Vb35woBo3cWp8nc13"
+  url = f"{api_url}?context_id={context_id}"
   for key in DEL_KEYS:
     if key in input_content_item:
       del input_content_item[key]

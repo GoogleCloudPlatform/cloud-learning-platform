@@ -70,6 +70,7 @@ def login(request: Request, lti_assignment_id: str):
 @router.get("/launch-assignment")
 def launch_assignment(request: Request,
                       lti_assignment_id: Optional[str] = "",
+                      timezone: Optional[str] = "",
                       user_details: dict = Depends(validate_token)):
   """This launch assignment will take the input assignment id and
   redirect the user to the appropriate LTI tool content item
@@ -98,27 +99,31 @@ def launch_assignment(request: Request,
     user_id = user_data.get("user_id")
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
     lti_content_item_id = lti_assignment.lti_content_item_id
+    context_id = lti_assignment.section_id
 
     custom_params = {
         "$ResourceLink.available.startDateTime":
-            lti_assignment.start_date.isoformat(),
+            (lti_assignment.start_date).isoformat(),
         "$ResourceLink.submission.endDateTime":
             (lti_assignment.end_date).isoformat(),
         "$ResourceLink.available.endDateTime":
-            (lti_assignment.due_date).isoformat()
+            (lti_assignment.due_date).isoformat(),
     }
+
+    if lti_assignment.max_points:
+      custom_params["$LineItem.resultValue.max"] = lti_assignment.max_points
+
+    if timezone:
+      custom_params["$Person.address.timezone"] = timezone
+
     # TODO: implementation of "$Context.id.history" as a custom parameter
-    # TODO: implementation of "$Person.address.timezone" as a custom parameter
     # TODO: send the user details like profile photo inside final_lti_message_hint_dict and use it in lti service to send as token claims
     final_lti_message_hint_dict = {
         "custom_params_for_substitution": custom_params,
-        "user_details": {
-            "picture":
-                "https://lh3.googleusercontent.com/a/AEdFTp4wIxRnw50hW7_bjiqYOMgdhpt0Gz9dw1D6LpOA=s96-c"
-        }
+        "user_details": {}
     }
 
-    url = f"{API_DOMAIN}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}"
+    url = f"{API_DOMAIN}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}&context_id={context_id}"
     # TODO: verify assignment and user relationship
     return {"url": url, "message_hint": final_lti_message_hint_dict}
 

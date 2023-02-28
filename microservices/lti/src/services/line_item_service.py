@@ -10,7 +10,7 @@ def create_new_line_item(input_line_item_dict):
   return new_line_item
 
 
-def create_new_content_item(input_content_item_dict):
+def create_new_content_item(input_content_item_dict, context_id):
   """Creates a new content item"""
   new_content_item = LTIContentItem()
   new_content_item = new_content_item.from_dict(input_content_item_dict)
@@ -38,7 +38,8 @@ def create_new_content_item(input_content_item_dict):
         "label": line_item_data.get("label"),
         "tag": line_item_data.get("tag", ""),
         "resourceId": line_item_data.get("resourceId", ""),
-        "resourceLinkId": new_content_item.id
+        "resourceLinkId": new_content_item.id,
+        "contextId": context_id
     }
     create_new_line_item(input_line_item)
 

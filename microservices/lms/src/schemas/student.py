@@ -36,7 +36,16 @@ class AddStudentToCohortModel(BaseModel):
     }
 
 class GetStudentDetailsResponseModel(BaseModel):
-  """Add Student Model"""
+  """Get Student Details Model"""
   success: Optional[bool] = True
   data: Optional[dict] = None
+
+class GetProgressPercentageResponseModel(BaseModel):
+  """Get Progress Percentage"""
+  success: Optional[bool] = True
+  data: int = None
+class GetProgressPercentageCohortResponseModel(BaseModel):
+  """Get Progress Percentage"""
+  success: Optional[bool] = True
+  data: list = None
   

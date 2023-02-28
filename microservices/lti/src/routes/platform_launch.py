@@ -34,8 +34,11 @@ router = APIRouter(
     }})
 def post_resource_launch_init(lti_content_item_id: str,
                               user_id: str,
+                              context_id: str,
                               custom_params: Optional[dict] = {}):
-  return get_resource_launch_init(lti_content_item_id, user_id, custom_params)
+  """Post method for the resource launch init endpoint"""
+  return get_resource_launch_init(lti_content_item_id, user_id, context_id,
+                                  custom_params)
 
 
 @router.get(
@@ -46,6 +49,7 @@ def post_resource_launch_init(lti_content_item_id: str,
     }})
 def get_resource_launch_init(lti_content_item_id: str,
                              user_id: str,
+                             context_id: str,
                              custom_params: Optional[dict] = {}):
   """The resource launch init endpoint will initiate the process to
   fetch a content item and then redirect the request to the tool login url.
@@ -54,6 +58,8 @@ def get_resource_launch_init(lti_content_item_id: str,
     UUID of the content item <br/>
   user_id: `str`
     UUID of the User <br/>
+  context_id: `str`
+    ID of the context of the given resource <br/>
   ### Raises:
   ResourceNotFoundException:
     If the LTI content item or tool does not exist. <br/>
@@ -64,13 +70,21 @@ def get_resource_launch_init(lti_content_item_id: str,
   """
   try:
     lti_content_item = LTIContentItem.find_by_id(lti_content_item_id)
+
     if lti_content_item:
       tool = Tool.find_by_id(lti_content_item.tool_id)
       final_lti_message_hint_dict = {
-          "custom_params_for_substitution": custom_params,
-          "lti_content_item_id": lti_content_item_id,
+          "lti_request_type":
+              "resource_link",
+          "custom_params_for_substitution":
+              custom_params.get("custom_params_for_substitution"),
+          "lti_content_item_id":
+              lti_content_item_id,
+          "context_id":
+              context_id
       }
       lti_message_hint = encode_token(final_lti_message_hint_dict)
+
       if tool:
         tool_data = tool.get_fields(reformat_datetime=True)
         # build a url for tool login endpoint
@@ -87,12 +101,15 @@ def get_resource_launch_init(lti_content_item_id: str,
         redirect_url = urlunparse(
             (login_url.scheme, login_url.netloc, login_url.path,
              login_url.params, urlencode(query_params), login_url.fragment))
+
         return {"url": redirect_url}
       else:
         raise ResourceNotFoundException(
             "Tool for the requested resource is not available")
+
     else:
       raise ResourceNotFoundException("Requested resource is not available")
+
   except ValidationError as e:
     raise BadRequest(str(e), data=e.data) from e
   except ResourceNotFoundException as e:
@@ -109,7 +126,7 @@ def get_resource_launch_init(lti_content_item_id: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def content_selection_launch_init(tool_id: str, user_id: str):
+def content_selection_launch_init(tool_id: str, user_id: str, context_id: str):
   """The content selection launch init endpoint is used to initiate
   the process to choose the content from the selected external tool
   and then redirect the request to the tool login url.
@@ -141,9 +158,16 @@ def content_selection_launch_init(tool_id: str, user_id: str):
       else:
         target_link_uri = tool_data.get("tool_url")
 
+      lti_message_hint_dict = {
+          "lti_request_type": "deep_link",
+          "context_id": context_id
+      }
+
+      lti_message_hint = encode_token(lti_message_hint_dict)
+
       query_params = parse_qsl(login_url.query)
       query_params.extend([("login_hint", user_id),
-                           ("lti_message_hint", "deep_link"),
+                           ("lti_message_hint", lti_message_hint),
                            ("iss", LTI_ISSUER_DOMAIN),
                            ("target_link_uri", target_link_uri),
                            ("client_id", tool_data.get("client_id")),
@@ -153,6 +177,7 @@ def content_selection_launch_init(tool_id: str, user_id: str):
       redirect_url = urlunparse(
           (login_url.scheme, login_url.netloc, login_url.path, login_url.params,
            urlencode(query_params), login_url.fragment))
+
       return {"url": redirect_url}
 
   except ValidationError as e:

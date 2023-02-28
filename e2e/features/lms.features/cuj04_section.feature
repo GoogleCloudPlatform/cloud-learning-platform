@@ -24,26 +24,16 @@ Feature: Add student to section
     When API request is sent to enroll workspace email as a student to a section with correct request payload and valid section id
     Then Section will be fetch using the given id and student is enrolled using student access token and his workspace email and a response model object will be return
 
-  Scenario: Enable notifications for a course using a payload
-    Given A user has access privileges and wants to enable notifications for a course
-    When API request is sent to enable notifications for a course with correct request payload which contains valid course id
-    Then Notifications will be enabled using unique course id and feed type and a response model object will be return
-
   @fixture.create.section
   Scenario: Enable notifications for a course using a section id
-    Given A user has access privileges and wants to enable notifications for a course using section id
-    When API request is sent to enable notifications for a course with correct request payload which contains valid section id
-    Then Notifications will be enabled using unique section id and feed type and a response model object will be return
+    Given A user has access privileges and wants to enable notifications for a section
+    When API request is sent to enable notifications for a section using valid section id
+    Then Notifications will be enabled using unique section id and a response model object will be return
 
-  Scenario: Unable to enable notifications for a course using a section id
-    Given A user has access to portal and needs to enable notifications for a course using section id
-    When API request is sent to enable notifications for a course with correct request payload which contains invalid section id
+  Scenario: Unable to enable notifications for a section
+    Given A user has access to portal and needs to enable notifications for a section
+    When API request is sent to enable notifications for a section using invalid section id
     Then Notifications will not be enabled and API will throw a resource not found error
-
-  Scenario: Unable to enable notifications for a course using a payload
-    Given A user has access to portal and needs to enable notifications for a course using payload
-    When API request is sent to enable notifications for a course with incorrect request payload
-    Then Notifications will not be enabled and API will throw a validation error
 
 @fixture.create.assignment
   Scenario: Retrieve Assignment details by giving valid section id and assignment id

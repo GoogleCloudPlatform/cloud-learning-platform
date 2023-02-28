@@ -64,9 +64,12 @@ def test_jwks(mock_key_set, clean_firestore):
 
 @mock.patch("routes.platform_auth.generate_token_claims")
 @mock.patch("routes.platform_auth.encode_token")
-def test_post_authorize(mock_token, mock_key_set, clean_firestore):
+@mock.patch("routes.platform_auth.get_unverified_token_claims")
+def test_post_authorize(mock_claims, mock_token, mock_key_set, clean_firestore):
   test_token = "ey7abos8f.8astvd9q.87cb"
   mock_token.return_value = test_token
+  mock_claims.return_value = {"lti_request_type": "deep_link"}
+
   form_data = {
       "client_id": "test_client_id",
       "login_hint": "test_user_id",
@@ -90,9 +93,12 @@ def test_post_authorize(mock_token, mock_key_set, clean_firestore):
 
 @mock.patch("routes.platform_auth.generate_token_claims")
 @mock.patch("routes.platform_auth.encode_token")
-def test_get_authorize(mock_token, mock_key_set, clean_firestore):
+@mock.patch("routes.platform_auth.get_unverified_token_claims")
+def test_get_authorize(mock_claims, mock_token, mock_key_set, clean_firestore):
   test_token = "ey7abos8f.8astvd9q.87cb"
   mock_token.return_value = test_token
+  mock_claims.return_value = {"lti_request_type": "deep_link"}
+
   req_params = {
       "client_id": "test_client_id",
       "login_hint": "test_user_id",
@@ -105,6 +111,7 @@ def test_get_authorize(mock_token, mock_key_set, clean_firestore):
       "response_mode": "form_post",
       "prompt": "none"
   }
+
   mock_key_set.return_value = test_key_set
   url = f"{API_URL}/authorize"
   resp = client_with_emulator.get(url, params=req_params)

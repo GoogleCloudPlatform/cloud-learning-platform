@@ -4,6 +4,7 @@ from datetime import datetime
 from jose import jwt, jws
 from common.models import Tool, TempUser, LTIContentItem, LineItem
 from services.keys_manager import get_platform_public_keyset
+from utils.request_handler import get_method
 from config import TOKEN_TTL, LTI_ISSUER_DOMAIN
 # pylint: disable=line-too-long
 
@@ -39,6 +40,25 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       "email": user.get("email")
   }
 
+  context_id = lti_message_hint.get("context_id")
+  get_context_url = f"http://lms/lms/api/v1/sections/{context_id}"
+  context_res = get_method(url=get_context_url, use_bot_account=True)
+
+  if context_res.status_code == 200:
+    context_data = context_res.json().get("data")
+  else:
+    raise Exception(
+        f"Internal error from get user API with status code - {context_res.status_code}"
+    )
+
+  lti_context_id = context_data.get("id")
+  token_claims[lti_claim_field("claim", "context")] = {
+      "id": lti_context_id,
+      "label": context_data.get("name"),
+      "title": context_data.get("description"),
+      "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseSection"]
+  }
+
   if lti_request_type == "deep_link":
     token_claims[lti_claim_field("claim", "deep_linking_settings", "dl")] = {
         "accept_types": ["link", "file", "html", "ltiResourceLink", "image"],
@@ -52,7 +72,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
         "text":
             "",
         "deep_link_return_url":
-            LTI_ISSUER_DOMAIN + "/lti/api/v1/content-item-return"
+            f"{LTI_ISSUER_DOMAIN}/lti/api/v1/content-item-return?context_id={lti_context_id}"
     }
 
     token_claims[lti_claim_field("claim",
@@ -62,9 +82,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
     token_claims[lti_claim_field("claim",
                                  "message_type")] = "LtiResourceLinkRequest"
 
-    # do a signature verification for decoding lti_message_hint token
-    decoded_lti_message_hint = get_unverified_token_claims(lti_message_hint)
-    lti_content_item_id = decoded_lti_message_hint.get("lti_content_item_id")
+    lti_content_item_id = lti_message_hint.get("lti_content_item_id")
     lti_content_item = LTIContentItem.find_by_id(lti_content_item_id)
 
     # process content item info claims required for launch
@@ -76,8 +94,9 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       else:
         token_claims[lti_claim_field("claim",
                                      "target_link_uri")] = tool_info["tool_url"]
+
     if "custom" in content_item_info.keys():
-      custom_params = decoded_lti_message_hint.get("custom_params_for_substitution")
+      custom_params = lti_message_hint.get("custom_params_for_substitution")
       final_custom_claims = {**content_item_info.get("custom")}
 
       # process custom parameter substitution
@@ -92,11 +111,12 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
     if tool_info.get("enable_grade_sync"):
       token_claims[lti_claim_field("claim", "endpoint", "ags")] = {
           "scope": [
-              lti_claim_field("scope", "lineitem", "ags"),
-              lti_claim_field("scope", "result.readonly", "ags"),
-              lti_claim_field("scope", "score", "ags")
+              "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+              "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
+              "https://purl.imsglobal.org/spec/lti-ags/scope/score"
           ],
-          "lineitems": LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items",
+          "lineitems":
+              f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/line_items",
       }
 
     # process line_item claims
@@ -110,9 +130,16 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
               lti_claim_field("scope", "score", "ags")
           ],
           "lineitems":
-              LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items",
+              f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/line_items",
           "lineitem":
-              LTI_ISSUER_DOMAIN + "/lti/api/v1/1234/line_items/" + line_item.id
+              f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/line_items/{line_item.id}"
+      }
+
+    if tool_info.get("enable_nrps"):
+      token_claims[lti_claim_field("claim", "namesroleservice", "nrps")] = {
+          "context_memberships_url":
+              f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/memberships",
+          "service_versions": ["2.0"]
       }
 
     resource_link_claim_info = {
@@ -127,14 +154,6 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
   token_claims[lti_claim_field("claim", "version")] = "1.3.0"
   token_claims[lti_claim_field("claim",
                                "deployment_id")] = tool_info["deployment_id"]
-
-  # TODO: Update the context claim with the actual context/course data
-  token_claims[lti_claim_field("claim", "context")] = {
-      "id": "2qi7b3vh83hq3vesfd",
-      "label": "Test Course",
-      "title": "Test title of the course",
-      "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"]
-  }
 
   if user.get("user_type") == "learner":
     token_claims[lti_claim_field("claim", "roles")] = [

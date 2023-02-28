@@ -33,6 +33,7 @@ class Tool(BaseModel):
   redirect_uris = ListField(required=True)
   deployment_id = TextField(required=True)
   enable_grade_sync = BooleanField(default=False)
+  enable_nrps = BooleanField(default=False)
 
   class Meta:
     collection_name = BaseModel.DATABASE_PREFIX + "tools"
@@ -143,6 +144,7 @@ class LineItem(BaseModel):
   tag = TextField()
   resourceId = TextField()
   resourceLinkId = TextField()
+  contextId = TextField()
 
   class Meta:
     collection_name = BaseModel.DATABASE_PREFIX + "line_items"
