@@ -96,10 +96,12 @@ def main():
   limit=10
 
   while True:
+    # get list of sections according to skip & limit value
     sections = get_sections(id_token,limit=limit,skip=skip)
     if not sections:
       break
     for section in sections:
+      # enable notification for each section
       enable_notifications(section["id"], id_token)
 
     if len(sections) < (limit-skip):

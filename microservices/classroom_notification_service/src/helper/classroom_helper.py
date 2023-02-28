@@ -35,7 +35,7 @@ def get_service():
   return build("classroom", "v1", credentials=creds)
 
 def get_user(user_id):
-  """
+  """ get user details from classroom
   Args:
     user_id (String): Guy id of a user
 
@@ -46,11 +46,11 @@ def get_user(user_id):
   return service.userProfiles().get(userId=user_id).execute()
 
 def get_course_work(course_id,course_work_id):
-  """_summary_
+  """get course work details
 
   Args:
-    course_id (_type_): _description_
-    course_work_id (_type_): _description_
+    course_id (str): _description_
+    course_work_id (str): _description_
 
   Returns:
     _type_: _description_
