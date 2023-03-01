@@ -3,13 +3,30 @@ import traceback
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.models import  Section
-from services import common_service
 from common.utils.http_exceptions import (
                       InternalServerError)
+from services import common_service
+
 
 def copy_course_background_task(course_template_details,
                                 sections_details,
                                 cohort_details,headers,message=""):
+  
+  """Create section  Background Task to copy course and updated database
+  for newly created section
+  Args:
+    course_template_details (template object): course template object which
+    will referenced in section
+    sections_details (str):Input section details provided by user in API
+    cohort_details(str):course template object which will
+    referenced in section
+    headers(str):Authentications headers
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+
+  Returns:
+    True : (bool) on success 
+  """
   try:
     # Create a new course
     Logger.info(f"Background Task started for the cohort id {cohort_details.id}\
@@ -145,10 +162,11 @@ def copy_course_background_task(course_template_details,
     section.enrolled_students_count=0
     section_id =section.save().id
     classroom_id = new_course["id"]
-
+    Logger.info(message)
     Logger.info(f"Background Task Completed for section Creation for cohort\
                 {cohort_details.id}")
-    Logger.info(f"Section Details are section id{section_id},classroom id {classroom_id}")
+    Logger.info(f"Section Details are section id{section_id},\
+                classroom id {classroom_id}")
     return True
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")

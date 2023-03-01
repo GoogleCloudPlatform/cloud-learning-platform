@@ -15,12 +15,12 @@ from schemas.error_schema import (ConflictResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import (
-    CreateSectiontResponseModel, DeleteSectionResponseModel,
+    DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     UpdateSectionResponseModel,TeachersListResponseModel,
     GetTeacherResponseModel,AssignmentModel)
 from schemas.update_section import UpdateSection
-from services import common_service,section_service
+from services import common_service
 from services.section_service import copy_course_background_task
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model,FEED_TYPES)
@@ -50,7 +50,7 @@ FAILED_RESPONSE = {"status": "Failed"}
 
 @router.post("",
              status_code=status.HTTP_202_ACCEPTED)
-def create_section(sections_details: SectionDetails, 
+def create_section(sections_details: SectionDetails,
                   request: Request,
                    background_tasks: BackgroundTasks
                    ):
@@ -80,13 +80,16 @@ def create_section(sections_details: SectionDetails,
       raise ResourceNotFoundException(
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
-    
-    background_tasks.add_task(copy_course_background_task,course_template_details,
-                             sections_details,cohort_details,headers,message = "started process")
+    background_tasks.add_task(copy_course_background_task,
+                              course_template_details,
+                             sections_details,
+                             cohort_details,
+                             headers,message = "started process")
     Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
-                course template {course_template_details.id} with section name{sections_details.name}")
+                course template {course_template_details.id} with\
+                 section name{sections_details.name}")
     return { "success": True,
-            "message": "Your section will be created shortly",
+            "message": "Section will be created shortly",
             "data": None}
   except ResourceNotFoundException as err:
     Logger.error(err)
