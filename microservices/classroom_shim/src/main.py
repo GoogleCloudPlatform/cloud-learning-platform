@@ -13,10 +13,11 @@ os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 """
 import config
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.templating import Jinja2Templates
 from routes import launch, lti_assignment, grade
 from common.utils.http_exceptions import add_exception_handlers
+from common.utils.auth_service import validate_token
 
 templates = Jinja2Templates(directory="templates")
 
@@ -35,8 +36,9 @@ def health_check():
 api = FastAPI(title="Classroom Shim Service APIs", version="latest")
 
 api.include_router(launch.router)
-api.include_router(lti_assignment.router)
-api.include_router(grade.router)
+api.include_router(
+    lti_assignment.router, dependencies=[Depends(validate_token)])
+api.include_router(grade.router, dependencies=[Depends(validate_token)])
 
 add_exception_handlers(app)
 add_exception_handlers(api)
