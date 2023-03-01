@@ -24,8 +24,8 @@ spec:
       metricName:  pubsub.googleapis.com|subscription|num_undelivered_messages
       metricSelector:
         matchLabels:
-          resource.labels.subscription_id: echo-read
-      targetAverageValue: 2
+          resource.labels.subscription_id: classroom-notifications-sub
+      targetAverageValue: "2"
     type: External
   scaleTargetRef:
     apiVersion: apps/v1
