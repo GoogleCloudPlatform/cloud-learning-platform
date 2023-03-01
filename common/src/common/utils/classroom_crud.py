@@ -44,8 +44,6 @@ def get_credentials():
   classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
   creds = service_account.Credentials.from_service_account_info(classroom_key,
                                                                 scopes=SCOPES)
-  print("______***___THIS IS CLASSROOM KEYS ____",classroom_key)
-  print("ADMIN EMAIL_______________",CLASSROOM_ADMIN_EMAIL)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   return creds
 
