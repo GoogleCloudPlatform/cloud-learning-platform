@@ -1,5 +1,5 @@
 import { CreateCourseTemplateModalComponent } from './create-course-template-modal/create-course-template-modal.component';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,Inject } from '@angular/core';
 import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { CreateCohortModalComponent } from './create-cohort-modal/create-cohort-modal.component';
 import { HomeService } from './service/home.service';
@@ -186,9 +186,37 @@ export class HomeComponent implements OnInit {
       console.log(result)
       if (result.data == 'success') {
         this.getCourseTemplateList()
+
+        
+
+
       }
     });
   }
 
+}
 
+
+
+@Component({
+  selector: 'success-overview-dialog',
+  templateUrl: 'success-overview-dialog.html',
+})
+export class SuccessOverviewDialog {
+  constructor(
+    public dialogRef: MatDialogRef<SuccessOverviewDialog>,
+    @Inject(MAT_DIALOG_DATA) public successDialogData: any
+  ) { }
+
+  // deleteStudent() {
+  //   this._HomeService.deleteStudent(this.deleteDialogData.user_id, this.deleteDialogData.section_id).subscribe((res: any) => {
+  //     if (res.success == true) {
+  //       this.dialogRef.close({ data: 'success' });
+  //     }
+  //   })
+  // }
+
+  close(): void {
+    this.dialogRef.close({ data: 'closed' });
+  }
 }

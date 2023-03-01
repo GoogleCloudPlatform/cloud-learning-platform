@@ -1,0 +1,12 @@
+<div mat-dialog-title>
+    <div style="display: flex;align-items: center;">
+        <img src="assets/img/green-check2.png" style="width: 35px;margin-right: 10px;">
+        <span style="font-weight: 800;font-size: 1.2rem;">Success</span>
+</div>
+</div>
+<div mat-dialog-content style="line-height: 1.5rem;font-size: 0.9rem;">
+    {{successDialogData}}
+</div>
+<div mat-dialog-actions style="display: flex;justify-content: end;">
+    <button mat-flat-button color="primary" (click)="close()">Got it!</button>
+</div>

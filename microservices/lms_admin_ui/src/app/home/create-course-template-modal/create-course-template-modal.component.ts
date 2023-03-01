@@ -3,7 +3,7 @@ import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA
 import { FormControl, UntypedFormGroup, UntypedFormBuilder, Validators, Form } from '@angular/forms';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { HomeService } from '../service/home.service';
-
+import { SuccessOverviewDialog } from '../home.component';
 interface LooseObject {
   [key: string]: any
 }
@@ -15,7 +15,7 @@ interface LooseObject {
 export class CreateCourseTemplateModalComponent implements OnInit {
   courseTemplateForm: UntypedFormGroup
   showProgressSpinner: boolean = false
-  constructor(public dialogRef: MatDialogRef<CreateCourseTemplateModalComponent>, private fb: UntypedFormBuilder,
+  constructor(public dialog: MatDialog,public dialogRef: MatDialogRef<CreateCourseTemplateModalComponent>, private fb: UntypedFormBuilder,
     private _snackBar: MatSnackBar, private _HomeService: HomeService, @Inject(MAT_DIALOG_DATA) public courseTemplateModalData: any) { }
 
   ngOnInit(): void {
@@ -24,14 +24,14 @@ export class CreateCourseTemplateModalComponent implements OnInit {
       this.courseTemplateForm = this.fb.group({
         name: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
         description: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
-        instructional_designer: this.fb.control('', [Validators.required]),
+        instructional_designer: this.fb.control('', [Validators.required, Validators.email]),
       });
     }
     else {
       this.courseTemplateForm = this.fb.group({
         name: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
         description: this.fb.control({ value: this.courseTemplateModalData.init_data.description, disabled: false }, [Validators.required]),
-        instructional_designer: this.fb.control({ value: this.courseTemplateModalData.init_data.instructional_designer, disabled: false }, [Validators.required]),
+        instructional_designer: this.fb.control({ value: this.courseTemplateModalData.init_data.instructional_designer, disabled: false }, [Validators.required, Validators.email]),
       });
     }
 
@@ -78,6 +78,13 @@ export class CreateCourseTemplateModalComponent implements OnInit {
         if (res.success == true) {
           this.openSuccessSnackBar('Create course template', 'SUCCESS')
           this.dialogRef.close({ data: 'success' });
+
+          const successOverviewDialogRef = this.dialog.open(SuccessOverviewDialog, {
+            width: '500px',
+            data: "Instructional Designer might get an email promting to accept the class in classroom, please ignore that !"
+          });
+
+
         }
         else {
           this.openFailureSnackBar('Create course template', 'FAILED')
@@ -86,6 +93,7 @@ export class CreateCourseTemplateModalComponent implements OnInit {
       }, (error: any) => {
         this.openFailureSnackBar('Create course template', 'FAILED')
         this.showProgressSpinner = false
+        this.dialogRef.close({ data: 'success' });
       })
     }
 
