@@ -17,7 +17,7 @@
 """
 from google.cloud import bigquery
 
-client = bigquery.Client()
+client = bigquery.Client(location="US")
 
 
 def bq_client():

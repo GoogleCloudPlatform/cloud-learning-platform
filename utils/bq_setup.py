@@ -13,7 +13,7 @@ GCP_PROJECT = os.getenv("PROJECT_ID", None)
 
 BQ_DATASET = DATABASE_PREFIX + os.getenv("BQ_DATASET", "lms_analytics")
 
-bq_client = bigquery.Client()
+bq_client = bigquery.Client(location="US")
 # Print statements are being used in this file to debug in the Github actions
 
 

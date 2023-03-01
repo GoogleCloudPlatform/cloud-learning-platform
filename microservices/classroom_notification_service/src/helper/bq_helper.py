@@ -20,7 +20,7 @@ from google.cloud import bigquery
 from common.utils.logging_handler import Logger
 from config import PROJECT_ID,BQ_DATASET
 
-bq_client = bigquery.Client()
+bq_client = bigquery.Client(location="US")
 
 def insert_rows_to_bq(rows,table_name):
   """Insert rows to BQ

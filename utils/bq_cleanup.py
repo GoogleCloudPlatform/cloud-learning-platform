@@ -11,7 +11,7 @@ GCP_PROJECT = os.getenv("PROJECT_ID", None)
 BQ_DATASET = DATABASE_PREFIX + os.getenv("BQ_DATASET", "lms_analytics")
 # Print statements are being used in this file to debug in the Github actions
 
-bq_client = bigquery.Client()
+bq_client = bigquery.Client(location="US")
 
 def delete_bigquery_dataset(dataset):
   dataset_id = f"{GCP_PROJECT}.{dataset}"
