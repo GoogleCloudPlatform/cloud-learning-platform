@@ -86,39 +86,39 @@ def test_create_section(client_with_emulator, create_fake_data):
   }
 
   with mock.patch("routes.section.classroom_crud.get_course_by_id"):
-    with mock.patch("routes.section.classroom_crud.create_course",
+    with mock.patch("services.section_service.classroom_crud.create_course",
                     return_value=mock_return_course):
-      with mock.patch("routes.section.classroom_crud.get_topics"):
-        with mock.patch("routes.section.classroom_crud.create_topics"):
-          with mock.patch("routes.section.classroom_crud.get_coursework"):
+      with mock.patch("services.section_service.classroom_crud.get_topics"):
+        with mock.patch("services.section_service.classroom_crud.create_topics"):
+          with mock.patch("services.section_service.classroom_crud.get_coursework"):
             with mock.patch(
-                "routes.section.classroom_crud.create_coursework"):
-              with mock.patch("routes.section.classroom_crud.add_teacher"):
+                "services.section_service.classroom_crud.create_coursework"):
+              with mock.patch("services.section_service.classroom_crud.add_teacher"):
                 with mock.patch(
-                    "routes.section.classroom_crud.delete_teacher"):
+                    "services.section_service.classroom_crud.delete_teacher"):
                   with mock.patch(
-                    "routes.section.classroom_crud.enable_notifications"):
+                    "services.section_service.classroom_crud.enable_notifications"):
                     with mock.patch(
-                  "routes.section.classroom_crud.invite_teacher",
+                  "services.section_service.classroom_crud.invite_teacher",
                     return_value={"id":"12wewew"}):
                       with mock.patch(
-              "routes.section.classroom_crud.get_user_profile_information",
+              "services.section_service.classroom_crud.get_user_profile_information",
                         return_value=mocked_value):
                         with mock.patch(
-                "routes.section.classroom_crud.acceept_invite"):
+                "services.section_service.classroom_crud.acceept_invite"):
                           with mock.patch(
-                      "routes.section.common_service.create_teacher"):
+                      "services.section_service.common_service.create_teacher"):
                             with mock.patch(
-                    "routes.section.classroom_crud.get_coursework_material"):
+                    "services.section_service.classroom_crud.get_coursework_material"):
                               with mock.patch(
-                    "routes.section.classroom_crud.create_coursework_material"):
+                    "services.section_service.classroom_crud.create_coursework_material"):
                                 with mock.patch(
-                      "routes.section.classroom_crud.drive_copy"):
+                      "services.section_service.classroom_crud.drive_copy"):
                                   with mock.patch(
-                      "routes.section.classroom_crud.copy_material"):
+                      "services.section_service.classroom_crud.copy_material"):
                                     resp = client_with_emulator.post(url,
                               json=section_details)
-  assert resp.status_code == 200
+  assert resp.status_code == 202
 
 
 def test_create_section_course_template_not_found(client_with_emulator,

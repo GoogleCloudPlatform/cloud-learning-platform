@@ -20,7 +20,7 @@
 	numbering=true
 	autoSave=true
 	/vscode-markdown-toc-config -->
-	
+
 <!-- /vscode-markdown-toc -->
 
 > This solution skeleton is created from https://github.com/GoogleCloudPlatform/solutions-template
@@ -48,7 +48,7 @@ This guide will detail how to set up your new solutions template project. See th
 # Set up environmental variables
 export PROJECT_ID=core-learning-services-dev
 export ADMIN_EMAIL=dhodun@google.com
-export CLASSROOM_ADMIN_EMAIL=lms_service@dhodun.altostrat.com
+export CLASSROOM_ADMIN_EMAIL=lms_admin_teacher@dhodun.altostrat.com
 export REGION=us-central1
 export API_DOMAIN=cloudpssolutions.com
 export BASE_DIR=$(pwd)
