@@ -6,6 +6,7 @@ import { HomeService } from '../service/home.service';
 
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
+import { SuccessOverviewDialog } from '../home.component';
 
 interface LooseObject {
   [key: string]: any
@@ -23,7 +24,7 @@ export class CreateSectionComponent implements OnInit {
   addOnBlur = true;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   teachingStaff: any[] = [];
-  constructor(public dialogRef: MatDialogRef<CreateSectionComponent>, @Inject(MAT_DIALOG_DATA) public requiredDetails: any, private fb: UntypedFormBuilder,
+  constructor(public dialog: MatDialog,public dialogRef: MatDialogRef<CreateSectionComponent>, @Inject(MAT_DIALOG_DATA) public requiredDetails: any, private fb: UntypedFormBuilder,
     private _snackBar: MatSnackBar, private _HomeService: HomeService) { }
 
   ngOnInit(): void {
@@ -116,13 +117,13 @@ export class CreateSectionComponent implements OnInit {
           this.dialogRef.close({ data: 'success' });
         }
         else {
-          // this.openFailureSnackBar('Update section', 'FAILED')
-          this.dialogRef.close({ data: 'success' });
+          this.openFailureSnackBar('Update section', 'FAILED')
+          // this.dialogRef.close({ data: 'success' });
         }
         this.showProgressSpinner = false
       }, (error: any) => {
-        // this.openFailureSnackBar('Update section', 'FAILED')
-        this.dialogRef.close({ data: 'success' });
+        this.openFailureSnackBar('Update section', 'FAILED')
+        // this.dialogRef.close({ data: 'success' });
         this.showProgressSpinner = false
       })
     }
@@ -133,16 +134,22 @@ export class CreateSectionComponent implements OnInit {
         if (res.success == true) {
           this.openSuccessSnackBar('Create section', 'SUCCESS')
           this.dialogRef.close({ data: 'success' });
+          const successOverviewDialogRef = this.dialog.open(SuccessOverviewDialog, {
+            width: '500px',
+            data: "Section creation is under progress, please refresh the page or return to this page after some time"
+          });
         }
         else {
-          // this.openFailureSnackBar('Create section', 'FAILED')
-          this.dialogRef.close({ data: 'success' });
+          this.openFailureSnackBar('Create section', 'FAILED')
+          this.showProgressSpinner = false
+          // this.dialogRef.close({ data: 'success' });
         }
         this.showProgressSpinner = false
       }, (error: any) => {
-        // this.openFailureSnackBar('Create section', 'FAILED')
-        this.dialogRef.close({ data: 'success' });
+        this.openFailureSnackBar('Create section', 'FAILED')
+        // this.dialogRef.close({ data: 'success' });
         this.showProgressSpinner = false
+        
       })
       console.log('final obj', sectionObj)
     }
