@@ -6,7 +6,7 @@
   ![](docs/static/images/classroom_personal_accounts.png)
 
 ## Create an Account in Google Admin to be the designated Admin Account for CLP-LMS
-
+#TODO: remove / update
 - User Account with SuperAdmin Priveleges
 - Place this email in the `lms-service-user` secret in Google Secret Manager
 
@@ -62,7 +62,7 @@ Add an entry for front-end in addition to backend API
 
 ## Firebase Authentication Settings
 
-- Adding Google and email/passwor auth options
+- Adding Google and email/password auth options
   ![](docs/static/images/auth_providers.png)
 - Add frontend domain as an "Authorized Domain"
   ![](docs/static/images/authorized_domain.png)
@@ -87,7 +87,26 @@ Create a new `users` collection in Firestore and add the first user as follows:
 ![](docs/static/images/first_db_user_1.png)
 ![](docs/static/images/first_db_user_2.png)
 
+## Generate Bearer Token
+
+Using this new user in the database, you can generate an ID Token through the frontend for use in other APIs.
+
+- Using user account already in the databse log into the Admin UI
+- Open __Developer Tools__ in Chrome
+![](docs/static/images/chrome_developer_tools.png)
+-Grab your ID Token (Bearer Token) Check the __Application__ top tab, follow by __Local Storage__ section. Grab the idToken
+![](docs/static/images/bearer_token.png)
+- Alternatively, grab the Bearer token in the __Network__ tab from some of the backend API calls
+![](docs/static/images/network_bearer_token.png)
+- [Option 1]: In Open API, provide this as the Bearer Token. https://FRONTEND-DOMAIN.com/lms/api/v1/docs#
+![](docs/static/images/open_api_authorize.png)
+- You can now make API calls:
+![](docs/static/images/open_api_calls.png)
+- [Option 2]: Use POSTMan or similar, set your ID token as the Bearer token:
+![](docs/static/images/postman_bearer_token.png)
+
 ## Setting up OAuth for Registrations API
+
 
 ## Adding Backend Robot User
 
