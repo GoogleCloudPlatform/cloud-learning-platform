@@ -11,7 +11,6 @@ from services import common_service
 def copy_course_background_task(course_template_details,
                                 sections_details,
                                 cohort_details,headers,message=""):
-  
   """Create section  Background Task to copy course and updated database
   for newly created section
   Args:
@@ -25,7 +24,7 @@ def copy_course_background_task(course_template_details,
     HTTPException: 500 Internal Server Error if something fails
 
   Returns:
-    True : (bool) on success 
+    True : (bool) on success
   """
   try:
     # Create a new course
