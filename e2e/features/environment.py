@@ -28,6 +28,8 @@ def create_course(name,section,description):
   Returns:
     new created course details
     """""
+  print("-------------*******INside envrionment.py Classroom github key********--------------")
+  print(CLASSROOM_KEY)
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
