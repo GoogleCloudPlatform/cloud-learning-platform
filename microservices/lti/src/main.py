@@ -42,12 +42,13 @@ api.include_router(
     platform_launch.router, dependencies=[Depends(validate_token)])
 api.include_router(platform_auth.router)
 api.include_router(content_item_return.router)
-api.include_router(content_item.router)
+api.include_router(content_item.router, dependencies=[Depends(validate_token)])
 api.include_router(line_item.router)
 api.include_router(nrps.router)
 
 # LTI as a tool routes
-api.include_router(platform_registration.router, dependencies=[Depends(validate_token)])
+api.include_router(
+    platform_registration.router, dependencies=[Depends(validate_token)])
 api.include_router(tool_auth.router)
 api.include_router(tool_launch.router)
 
