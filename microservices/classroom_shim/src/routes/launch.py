@@ -105,11 +105,11 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
       custom_params["$ResourceLink.available.startDateTime"] = (
           lti_assignment.start_date).isoformat()
 
-    if lti_assignment.start_date:
+    if lti_assignment.end_date:
       custom_params["$ResourceLink.available.endDateTime"] = (
           lti_assignment.end_date).isoformat()
 
-    if lti_assignment.start_date:
+    if lti_assignment.due_date:
       custom_params["$ResourceLink.submission.endDateTime"] = (
           lti_assignment.due_date).isoformat()
 
