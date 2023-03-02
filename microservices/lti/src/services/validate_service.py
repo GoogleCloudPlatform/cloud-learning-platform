@@ -2,7 +2,7 @@
 from functools import wraps
 from fastapi.security import HTTPBearer
 from common.utils.errors import InvalidTokenError
-from common.utils.http_exceptions import (InternalServerError, Unauthenticated)
+from common.utils.http_exceptions import Unauthenticated
 from services.keys_manager import get_platform_public_keyset
 from services.lti_token import decode_token, get_unverified_token_claims
 from jose.exceptions import JWSError, ExpiredSignatureError, JWTError
@@ -37,11 +37,9 @@ def validate_access(allowed_scopes):
               return func(*args, **kwargs)
         raise InvalidTokenError("Unauthorized due to invalid scope")
 
-      except (JWSError, InvalidTokenError, ExpiredSignatureError,
+      except (InvalidTokenError, JWSError, ExpiredSignatureError,
               JWTError) as e:
         raise Unauthenticated(str(e)) from e
-      except Exception as e:
-        raise InternalServerError(str(e)) from e
 
     return wrapper
 
