@@ -12,6 +12,7 @@ class BasicLTIContentItemModel(BaseModel):
   tool_id: str
   content_item_type: str
   content_item_info: dict
+  context_id: Optional[str] = None
 
 
 class FullLTIContentItemModel(BasicLTIContentItemModel):
@@ -35,6 +36,7 @@ class UpdateLTIContentItemModel(BaseModel):
   tool_id: Optional[str]
   content_item_type: Optional[str]
   content_item_info: Optional[dict]
+  context_id: Optional[str]
 
   class Config():
     orm_mode = True
