@@ -2,3 +2,22 @@
 .mat-spinner circle {
     stroke: #FFFFFF;
 }
+
+.hint-style{
+    display: flex;
+    align-items: center;
+    .info-icon{
+        font-size: 1rem;
+        font-weight: 800;
+        margin-right: 5px;
+    }
+}
+
+:host ::ng-deep .mat-form-field-hint-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+:host ::ng-deep .mat-hint {
+    padding: 4px 0px;
+}

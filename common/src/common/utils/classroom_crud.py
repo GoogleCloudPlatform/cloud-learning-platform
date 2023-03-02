@@ -98,6 +98,45 @@ def get_course_by_id(course_id):
   except HttpError as error:
     logger.error(error)
     return None
+def drive_copy(file_id,target_folder_id,name):
+  """copy the file in the target_folder 
+  Args: 
+  file_id : (str)  google drive file _id
+  target_folder_id:(str) folder_id of destination folder
+  name:(str) file name of the copied file
+  Returns:
+    new created file details dictionary with name,mimeType,WebViewLink
+    id of file 
+    """ ""
+
+  copied_file = {"name": name,"parents": [target_folder_id]}
+  service= build("drive", "v3", credentials=get_credentials())
+  return service.files().copy(
+  fileId=file_id,fields="webViewLink,name,mimeType,id",
+  body=copied_file).execute()
+
+
+def copy_material(drive_file_dict,target_folder_id):
+  """copy the file in the target_folder 
+  Args: 
+  drive_file_dict : (str)  drive file details dictionary given by get
+      coursework API 
+  target_folder_id:(str) folder_id of destination folder 
+  Returns:
+    new created drive_file_dict with new copied file id in target folder 
+  """ ""
+
+  file_id = drive_file_dict["driveFile"]["driveFile"]["id"]
+  name = drive_file_dict["driveFile"]["driveFile"]["title"]
+  result = drive_copy(file_id=file_id,
+                      target_folder_id=target_folder_id,
+                      name=name)
+  new_id = result["id"]
+  drive_file_dict["driveFile"]["driveFile"]["id"]=new_id
+  drive_file_dict["driveFile"]["driveFile"].pop("alternateLink")
+  drive_file_dict["driveFile"]["driveFile"].pop("thumbnailUrl")
+  return drive_file_dict
+
 
 
 def update_course(course_id, section_name, description, course_name=None):
@@ -492,8 +531,10 @@ def get_edit_url_and_view_url_mapping_of_form():
     view_link_and_edit_link_matching = {}
     for file in response.get("files", []):
       result = get_view_link_from_id(file.get("id"))
+      # view_link_and_edit_link_matching[result["responderUri"]] = \
+      #   file.get("webViewLink")
       view_link_and_edit_link_matching[result["responderUri"]] = \
-        file.get("webViewLink")
+      {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
     if page_token is None:
       break
   return view_link_and_edit_link_matching

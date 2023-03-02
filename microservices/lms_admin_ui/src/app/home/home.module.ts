@@ -19,7 +19,7 @@ import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy
 import { EditSectionComponent } from './edit-section/edit-section.component';
 import { SectionListComponent } from './section-list/section-list.component';
 import { DeleteOverviewDialog } from './section/section.component';
-
+import { SuccessOverviewDialog } from './home.component';
 @NgModule({
   declarations: [
     HomeComponent,
@@ -32,7 +32,8 @@ import { DeleteOverviewDialog } from './section/section.component';
     CreateSectionComponent,
     EditSectionComponent,
     SectionListComponent,
-    DeleteOverviewDialog
+    DeleteOverviewDialog,
+    SuccessOverviewDialog
 
   ],
   // entryComponents: [CreateCohortModalComponent],

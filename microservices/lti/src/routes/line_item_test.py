@@ -19,7 +19,7 @@ with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
     side_effect=mock.MagicMock()) as mok:
   from routes.line_item import router
-  from schemas.schema_examples import (BASIC_LINE_ITEM_EXAMPLE,
+  from schemas.schema_examples import (POST_LINE_ITEM_EXAMPLE,
                                        BASIC_SCORE_EXAMPLE)
 
 app = FastAPI()
@@ -27,9 +27,6 @@ add_exception_handlers(app)
 app.include_router(router, prefix="/lti/api/v1")
 
 client_with_emulator = TestClient(app)
-
-# assigning url
-api_url = f"{API_URL}/dummy_context_id/line_items"
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
@@ -44,6 +41,10 @@ test_scope = {
 
 test_keyset = {"public_keyset": "gGet21v2brb"}
 
+# assigning url
+context_id = POST_LINE_ITEM_EXAMPLE["contextId"]
+api_url = f"{API_URL}/{context_id}/line_items"
+
 
 @mock.patch("services.validate_service.get_platform_public_keyset")
 @mock.patch("services.validate_service.decode_token")
@@ -53,7 +54,7 @@ def test_post_and_get_line_item(mock_unverified_token, mock_token_scopes,
   mock_unverified_token.return_value = test_scope
   mock_token_scopes.return_value = test_scope
   mock_keyset.return_value = test_keyset
-  input_line_item = copy.deepcopy(BASIC_LINE_ITEM_EXAMPLE)
+  input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
 
   url = api_url
   headers = {"Authorization": "Bearer test_token"}
@@ -70,6 +71,8 @@ def test_post_and_get_line_item(mock_unverified_token, mock_token_scopes,
   url = f"{api_url}/{line_item_id}"
   get_resp = client_with_emulator.get(url, headers=headers)
   get_json_response = get_resp.json()
+  print("get_json_response", get_json_response)
+  print("post_json_response", post_json_response)
   assert get_json_response == post_json_response
 
 
@@ -97,7 +100,7 @@ def test_get_all_line_items(mock_unverified_token, mock_token_scopes,
   mock_token_scopes.return_value = test_scope
   mock_keyset.return_value = test_keyset
 
-  input_line_item = copy.deepcopy(BASIC_LINE_ITEM_EXAMPLE)
+  input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
 
   url = api_url
   headers = {"Authorization": "Bearer test_token"}
@@ -120,7 +123,7 @@ def test_update_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
   mock_token_scopes.return_value = test_scope
   mock_keyset.return_value = test_keyset
 
-  input_line_item = copy.deepcopy(BASIC_LINE_ITEM_EXAMPLE)
+  input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
 
   headers = {"Authorization": "Bearer test_token"}
   url = api_url
@@ -157,7 +160,7 @@ def test_delete_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
   mock_token_scopes.return_value = test_scope
   mock_keyset.return_value = test_keyset
 
-  input_line_item = copy.deepcopy(BASIC_LINE_ITEM_EXAMPLE)
+  input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
 
   headers = {"Authorization": "Bearer test_token"}
   url = api_url
@@ -181,7 +184,7 @@ def test_delete_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
 @mock.patch("services.validate_service.get_unverified_token_claims")
 @mock.patch("routes.line_item.grade_pass_back")
 @pytest.mark.parametrize(
-    "create_line_item", [BASIC_LINE_ITEM_EXAMPLE], indirect=True)
+    "create_line_item", [POST_LINE_ITEM_EXAMPLE], indirect=True)
 def test_post_score(mock_pass_back, mock_unverified_token, mock_token_scopes,
                     mock_keyset, clean_firestore, create_line_item):
   mock_unverified_token.return_value = test_scope

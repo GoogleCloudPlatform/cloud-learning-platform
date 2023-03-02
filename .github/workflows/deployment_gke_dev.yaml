@@ -23,6 +23,7 @@ on:
       - 'e2e/**'
       - 'utils/**'
       - '.github/workflows/deployment_gke_dev.yaml'
+      - 'skaffold.yaml'
   workflow_dispatch:
 
 env:

@@ -77,7 +77,7 @@ def test_create_section(get_token):
   resp = requests.post(url=url, json=data, headers=get_token)
   resp_json = resp.json()
   print("_______***********create section  response ****_________",resp_json)
-  assert resp.status_code == 200, "Status 200"
+  assert resp.status_code == 202, "Status 202"
 
 
 def test_create_section_course_template_not_found(get_token):

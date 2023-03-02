@@ -111,16 +111,16 @@ class GetTeacherResponseModel(BaseModel):
 class CreateSectiontResponseModel(BaseModel):
   """Create Section Response Model"""
   success: Optional[bool] = True
-  message: Optional[str] = "Successfully created the section"
-  data: Optional[Sections]
+  message: Optional[str] = "Your section will be created shortly"
+  data: None
 
   class Config():
     orm_mode = True
     schema_extra = {
         "example": {
             "success": True,
-            "message": "Successfully created the section",
-            "section": SECTION_EXAMPLE
+            "message": "Your section will be created shortly",
+            "data": None
         }
     }
 

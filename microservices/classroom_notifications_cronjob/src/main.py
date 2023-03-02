@@ -27,7 +27,7 @@ from common.utils.logging_handler import Logger as logger
 from common.utils.errors import CronJobException
 
 
-def enable_notifications(section, id_token):
+def enable_notifications(section_id, id_token):
   """Enable notifications for a given section
 
   Args:
@@ -37,31 +37,26 @@ def enable_notifications(section, id_token):
   Raises:
       CronJobException: If any issue hitting the internal APIs
   """
-  api_endpoint = "http://lms/lms/api/v1/sections/enable_notifications"
+  api_endpoint = "http://lms/lms/api/v1/sections"+\
+    f"/{section_id}/enable_notifications"
 
-  for feed_type in ["COURSE_WORK_CHANGES", "COURSE_ROSTER_CHANGES"]:
-    res = requests.post(url=api_endpoint,
+  res = requests.post(url=api_endpoint,
                         headers={
                             "Content-Type": "application/json",
                             "Authorization": f"Bearer {id_token}"
                         },
-                        json={
-                            "feed_type": feed_type,
-                            "section_id": section["id"]
-                        },
                         timeout=60)
-    res.raise_for_status()
+  res.raise_for_status()
 
-    res_json = res.json()
-    if res_json["success"]:
-      logger.info(res_json)
-      continue
-
+  res_json = res.json()
+  if res_json["success"]:
+    logger.info(res_json)
+  else:
     raise CronJobException("Could not enable Classroom notifications" +
                            f"with error: {res_json['message']}")
 
 
-def get_sections(id_token):
+def get_sections(id_token,limit,skip):
   """Get list of sections from LMS API
 
   Args:
@@ -73,7 +68,8 @@ def get_sections(id_token):
   Returns:
       list(section): list of section API JSON output
   """
-  api_endpoint = "http://lms/lms/api/v1/sections"
+  api_endpoint = "http://lms/lms/api/v1/sections?" +\
+      f"skip={skip}&limit={limit}"
 
   res = requests.get(url=api_endpoint,
                      headers={
@@ -96,11 +92,22 @@ def main():
       "Classroom Pubsub Registration / Notifications API Cronjob STARTING")
 
   id_token = get_backend_robot_id_token()
+  skip=0
+  limit=10
 
-  sections = get_sections(id_token)
-  for section in sections:
-    enable_notifications(section, id_token)
+  while True:
+    # get list of sections according to skip & limit value
+    sections = get_sections(id_token,limit=limit,skip=skip)
+    if not sections:
+      break
+    for section in sections:
+      # enable notification for each section
+      enable_notifications(section["id"], id_token)
 
+    if len(sections) < (limit-skip):
+      break
+    skip = limit
+    limit += 10
   logger.info(
       "Classroom Pubsub Registration / Notifications API Cronjob FINISHED")
 
