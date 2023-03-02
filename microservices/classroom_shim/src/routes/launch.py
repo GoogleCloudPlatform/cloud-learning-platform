@@ -82,7 +82,7 @@ def launch_assignment(request: Request,
   try:
     # verify user if it exists
     user_email = user_details.get("email")
-    headers = {"Authorization": request.headers.get("Authorization")}
+    headers = {"Authorization": f"Bearer {get_backend_robot_id_token()}"}
     fetch_user_request = requests.get(
         "http://user-management/user-management/api/v1/user/search/email",
         params={"email": user_email},
@@ -128,11 +128,9 @@ def launch_assignment(request: Request,
     }
 
     url = f"{API_DOMAIN}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}&context_id={context_id}"
-    # TODO: verify assignment and user relationship
     user_type = user_details.get("user_type")
-
     if user_type == "learner":
-      api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.get('section_id')}/students/{user_email}"
+      api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.section_id}/students/{user_email}"
       fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
 
       if fetch_user_mapping.status_code == 200:
@@ -144,9 +142,8 @@ def launch_assignment(request: Request,
             "Internal server error from user mapping validation API")
 
     elif user_type == "faculty" or user_type == "admin":
-      api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.get('section_id')}/teachers/{user_email}"
+      api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.section_id}/teachers/{user_email}"
       fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
-
       if fetch_user_mapping.status_code == 200:
         faculty_data = fetch_user_mapping.json().get("data")
       elif fetch_user_mapping.status_code == 404:
