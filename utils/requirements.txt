@@ -1,4 +1,4 @@
 pyyaml==6.0
 fireo==1.6.2
-firebase_admin==4.5.2
+firebase_admin==6.1.0
 google-cloud-bigquery==3.4.1
