@@ -21,7 +21,8 @@ from common.models import BaseModel
 class LTIAssignment(BaseModel):
   """LTI Assignment Data Model"""
   id = IDField()
-  section_id = TextField()
+  section_id = TextField(required=True)
+  lti_assignment_title = TextField()
   lti_content_item_id = TextField()
   tool_id = TextField()
   course_work_id = TextField()

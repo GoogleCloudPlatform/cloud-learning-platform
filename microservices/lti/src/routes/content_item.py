@@ -144,8 +144,7 @@ def get_content_item(content_item_id: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def create_content_item(context_id: str,
-                        input_content_item: LTIContentItemModel):
+def create_content_item(input_content_item: LTIContentItemModel):
   """The create content item endpoint will add the content_item to the
   firestore if it does not exist.If the content item exist then it will
   update the content item
@@ -165,8 +164,8 @@ def create_content_item(context_id: str,
     input_content_item_dict = {**input_content_item.dict()}
     Tool.find_by_id(input_content_item_dict.get("tool_id"))
 
-    content_item_fields = create_new_content_item(input_content_item_dict,
-                                                  context_id)
+    content_item_fields = create_new_content_item(
+        input_content_item_dict, input_content_item_dict.get("context_id"))
 
     return {
         "success": True,
