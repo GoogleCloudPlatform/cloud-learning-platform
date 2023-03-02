@@ -23,5 +23,4 @@ from .cohort import *
 from .section import *
 from .lti import *
 from .course_enrollment_mapping import *
-from .temp_user import *
 from .lti_assignment import *
