@@ -37,7 +37,8 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       "given_name": user.get("first_name"),
       "family_name": user.get("last_name"),
       "name": user.get("first_name") + " " + user.get("last_name"),
-      "email": user.get("email")
+      "email": user.get("email"),
+      "picture": user.get("photo_url")
   }
 
   context_id = lti_message_hint.get("context_id")
