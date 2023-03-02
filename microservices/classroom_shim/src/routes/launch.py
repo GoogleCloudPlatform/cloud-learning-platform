@@ -12,7 +12,7 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError,
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest, Unauthenticated)
 from common.utils.logging_handler import Logger
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, unused-variable
 
 templates = Jinja2Templates(directory="templates")
 
@@ -68,8 +68,7 @@ def login(request: Request, lti_assignment_id: str):
 
 
 @router.get("/launch-assignment")
-def launch_assignment(request: Request,
-                      lti_assignment_id: Optional[str] = "",
+def launch_assignment(lti_assignment_id: Optional[str] = "",
                       timezone: Optional[str] = "",
                       user_details: dict = Depends(validate_token)):
   """This launch assignment will take the input assignment id and
@@ -121,10 +120,8 @@ def launch_assignment(request: Request,
       custom_params["$Person.address.timezone"] = timezone
 
     # TODO: implementation of "$Context.id.history" as a custom parameter
-    # TODO: send the user details like profile photo inside final_lti_message_hint_dict and use it in lti service to send as token claims
     final_lti_message_hint_dict = {
-        "custom_params_for_substitution": custom_params,
-        "user_details": {}
+        "custom_params_for_substitution": custom_params
     }
 
     url = f"{API_DOMAIN}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}&context_id={context_id}"
@@ -141,7 +138,7 @@ def launch_assignment(request: Request,
         raise Exception(
             "Internal server error from user mapping validation API")
 
-    elif user_type == "faculty" or user_type == "admin":
+    elif user_type in ("faculty", "admin"):
       api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.section_id}/teachers/{user_email}"
       fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
       if fetch_user_mapping.status_code == 200:
