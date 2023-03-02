@@ -42,6 +42,8 @@ env:
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   LTI_ISSUER_DOMAIN: https://core-learning-services-dev.cloudpssolutions.com
+  LTI_PLATFORM_UNIQUE_ID: e0fc690f-7fb9-4fb2-a5a6-68466f0181a4
+  LTI_PLATFORM_NAME: CLP LTI Service
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
   
   # For Scalability in Dev env using Prod config

@@ -5,7 +5,7 @@ from jose import jwt, jws
 from common.models import Tool, TempUser, LTIContentItem, LineItem
 from services.keys_manager import get_platform_public_keyset
 from utils.request_handler import get_method
-from config import TOKEN_TTL, LTI_ISSUER_DOMAIN
+from config import TOKEN_TTL, LTI_ISSUER_DOMAIN, LTI_PLATFORM_UNIQUE_ID, LTI_PLATFORM_NAME
 # pylint: disable=line-too-long
 
 
@@ -37,7 +37,11 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       "given_name": user.get("first_name"),
       "family_name": user.get("last_name"),
       "name": user.get("first_name") + " " + user.get("last_name"),
-      "email": user.get("email")
+      "email": user.get("email"),
+      lti_claim_field("claim", "tool_platform"): {
+          "guid": LTI_PLATFORM_UNIQUE_ID,
+          "name": LTI_PLATFORM_NAME
+      }
   }
 
   context_id = lti_message_hint.get("context_id")
