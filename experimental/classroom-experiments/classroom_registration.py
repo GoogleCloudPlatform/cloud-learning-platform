@@ -58,4 +58,4 @@ def registration_func(creds):
 
 if __name__ == "__main__":
   creds = get_creds()
-  registration_func(creds)
+#   registration_func(creds)

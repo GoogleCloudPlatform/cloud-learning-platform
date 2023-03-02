@@ -6,8 +6,8 @@
   ![](docs/static/images/classroom_personal_accounts.png)
 
 ## Create an Account in Google Admin to be the designated Admin Account for CLP-LMS
-
-- User Account with SuperAdmin Priveleges
+- Normal workspace User account to be the "Admin Teacher" and own all Classroom class
+#TODO: validate if following can be removed?
 - Place this email in the `lms-service-user` secret in Google Secret Manager
 
 ## Domain Wide Delegation
@@ -62,7 +62,7 @@ Add an entry for front-end in addition to backend API
 
 ## Firebase Authentication Settings
 
-- Adding Google and email/passwor auth options
+- Adding Google and email/password auth options
   ![](docs/static/images/auth_providers.png)
 - Add frontend domain as an "Authorized Domain"
   ![](docs/static/images/authorized_domain.png)
@@ -87,7 +87,55 @@ Create a new `users` collection in Firestore and add the first user as follows:
 ![](docs/static/images/first_db_user_1.png)
 ![](docs/static/images/first_db_user_2.png)
 
+## Generate Bearer Token
+
+Using this new user in the database, you can generate an ID Token through the frontend for use in other APIs.
+
+- Using user account already in the databse log into the Admin UI
+- Open __Developer Tools__ in Chrome
+![](docs/static/images/chrome_developer_tools.png)
+-Grab your ID Token (Bearer Token) Check the __Application__ top tab, follow by __Local Storage__ section. Grab the idToken
+![](docs/static/images/bearer_token.png)
+- Alternatively, grab the Bearer token in the __Network__ tab from some of the backend API calls
+![](docs/static/images/network_bearer_token.png)
+- [Option 1]: In Open API, provide this as the Bearer Token. https://FRONTEND-DOMAIN.com/lms/api/v1/docs#
+![](docs/static/images/open_api_authorize.png)
+- You can now make API calls:
+![](docs/static/images/open_api_calls.png)
+- [Option 2]: Use POSTMan or similar, set your ID token as the Bearer token:
+![](docs/static/images/postman_bearer_token.png)
+
 ## Setting up OAuth for Registrations API
+
+In order to enable PubSub Notifications from Classroom, the backend SA must call the [Classroom Registrations API](https://developers.google.com/classroom/reference/rest/v1/registrations). This API has a particular restriction that __the user must have an existing OAuth grant on these scopes before domain-wide delegation can be used to call the API__.
+
+The scopes must be allowed once via an OAuth flow and remain accepted. The `access_token` from the OAuth flow is not used.
+
+To setup:
+- Open the OAuth Credentials screen in your project, setup the app and click __Edit__
+![](docs/static/images/oauth_consent.png)
+- Add appropriate emails and click __Next__ to the SCOPES page
+- Add the following scopes:
+![](docs/static/images/oauth_scopes.png)
+- Finish the flow
+
+Then click on the __Credentials__ menu:
+- __+ Create Credentials__
+- OAuth Client ID
+- application type: Web Application
+- make sure to include the following redirect URL
+![](docs/static/images/redirect_uri.png)
+- Click Save and download the credentials file.
+
+Rename this file `credentials.json` and place it alongside the following script:
+`./experimental/classroom-experiments/classroom_registration.py`
+Run this script and accept the permissions using your Admin Teacher account.
+
+You can verify the permissions have been given in the Google settings page: https://myaccount.google.com/data-and-privacy in the __Data from apps and services you use__.
+
+You can also test the `/enable_notifications` API in the `lms` microservice to verify.
+
+
 
 ## Adding Backend Robot User
 
