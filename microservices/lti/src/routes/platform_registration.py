@@ -228,7 +228,7 @@ def update_platform(platform_id: str, input_platform: UpdatePlatformModel):
     if not input_platform_dict.get(
         "platform_public_key") and not input_platform_dict.get(
             "platform_keyset_url"):
-      return {"success": False, "message": "Public key is missing", "data": []}
+      return ValidationError("Public key is missing")
 
     for key, value in input_platform_dict.items():
       platform_fields[key] = value
@@ -243,6 +243,8 @@ def update_platform(platform_id: str, input_platform: UpdatePlatformModel):
         "message": "Successfully updated the platform",
         "data": platform_fields
     }
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
