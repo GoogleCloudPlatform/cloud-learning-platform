@@ -46,6 +46,7 @@ env:
   
   # For Scalability in Dev env using Prod config
   BQ_DATASET: lms_analytics
+  BQ_REGION: US
   
 # cookiecutter:raw 
 jobs:
