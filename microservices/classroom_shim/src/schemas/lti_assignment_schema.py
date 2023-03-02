@@ -17,6 +17,7 @@ class LTIAssignmentModel(BaseModel):
   """
   id: str
   section_id: str
+  lti_assignment_title: Optional[str]
   lti_content_item_id: Optional[str]
   tool_id: Optional[str]
   course_work_id: Optional[str]
@@ -38,6 +39,7 @@ class UpdateLTIAssignmentModel(BaseModel):
       BaseModel (_type_): _description_
   """
   section_id: Optional[str]
+  lti_assignment_title: Optional[str]
   lti_content_item_id: Optional[str]
   tool_id: Optional[str]
   course_work_id: Optional[str]
@@ -110,6 +112,7 @@ class InputLTIAssignmentModel(BaseModel):
   """
   section_id: str
   lti_content_item_id: Optional[str]
+  lti_assignment_title: Optional[str]
   tool_id: Optional[str]
   course_work_id: Optional[str]
   max_points: Optional[float]

@@ -19,9 +19,9 @@ Bigquery helper Service
 from google.cloud import bigquery
 from google.cloud.exceptions import NotFound
 from common.utils.logging_handler import Logger
-from config import PROJECT_ID,BQ_DATASET,BQ_TABLE_DICT
+from config import PROJECT_ID,BQ_DATASET,BQ_TABLE_DICT,BQ_REGION
 
-bq_client = bigquery.Client()
+bq_client = bigquery.Client(location=BQ_REGION)
 
 def insert_rows_to_bq(rows,table_name):
   """Insert rows to BQ

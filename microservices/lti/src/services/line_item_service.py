@@ -10,7 +10,7 @@ def create_new_line_item(input_line_item_dict):
   return new_line_item
 
 
-def create_new_content_item(input_content_item_dict, context_id):
+def create_new_content_item(input_content_item_dict, context_id=None):
   """Creates a new content item"""
   new_content_item = LTIContentItem()
   new_content_item = new_content_item.from_dict(input_content_item_dict)
