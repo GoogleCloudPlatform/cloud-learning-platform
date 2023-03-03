@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
-from common.models import LineItem, Result, Score
+from common.models import LineItem, Result, Score, LTIContentItem
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  InvalidTokenError)
 from common.utils.logging_handler import Logger
@@ -179,6 +179,15 @@ def create_line_item(context_id: str,
   """
   try:
     input_line_item_dict = {**input_line_item.dict()}
+    input_line_item_dict["contextId"] = context_id
+
+    lti_content_item = LTIContentItem.filter("context_id", "==", context_id)
+    lti_content_item_id = lti_content_item.id
+
+    # This condition holds true when the line item is not created using content item return
+    if not input_line_item_dict.get("resourceLinkId"):
+      input_line_item_dict["resourceLinkId"] = lti_content_item_id
+
     line_item = create_new_line_item(input_line_item_dict)
     line_item_fields = line_item.get_fields(reformat_datetime=True)
     line_item_fields[
