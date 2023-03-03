@@ -1,6 +1,6 @@
-'''
+"""
 Test script to generate 429s against Google Classroom API and test `num_retries` for backoff
-'''
+"""
 import json
 import os
 import time
@@ -9,14 +9,14 @@ from concurrent.futures import ThreadPoolExecutor
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly']
+SCOPES = ["https://www.googleapis.com/auth/classroom.courses.readonly"]
 
 CLASSROOM_ADMIN_EMAIL = os.environ["CLASSROOM_ADMIN_EMAIL"]
 COURSE_ID = os.environ["COURSE_ID"]
 
 
 def list_courses(creds):
-  service = build('classroom', 'v1', credentials=creds)
+  service = build("classroom", "v1", credentials=creds)
 
   start = time.time()
   for i in range(100):
@@ -26,7 +26,7 @@ def list_courses(creds):
 
       print(results)
     except Exception as e:
-      print(json.loads(e.content)['error']['code'])
+      print(json.loads(e.content)["error"]["code"])
 
     print(time.time() - start)
     start = time.time()
