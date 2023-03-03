@@ -17,8 +17,9 @@ Bigquery helper Service
 """
 
 from google.cloud import bigquery
+from google.cloud.exceptions import NotFound
 from common.utils.logging_handler import Logger
-from config import PROJECT_ID,BQ_DATASET,BQ_REGION
+from config import PROJECT_ID,BQ_DATASET,BQ_TABLE_DICT,BQ_REGION
 
 bq_client = bigquery.Client(location=BQ_REGION)
 
@@ -53,3 +54,13 @@ def run_query(query):
   query_job = bq_client.query(query)
   results = query_job.result()
   return results
+
+def check_bq_tables():
+  try:
+    for table in BQ_TABLE_DICT.values():
+      bq_client.get_table(f"{PROJECT_ID}.{BQ_DATASET}.{table}")
+    return True
+  except NotFound as ne:
+    Logger.info(str(ne))
+    Logger.info(f"BQ Table {PROJECT_ID}.{BQ_DATASET}.{table} not found")
+    return False
