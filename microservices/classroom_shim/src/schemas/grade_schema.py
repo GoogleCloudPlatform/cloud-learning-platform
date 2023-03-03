@@ -18,6 +18,8 @@ class PostGradeModel(BaseModel):
   maximum_grade: Optional[float] = None
   assigned_grade: Optional[float] = None
   draft_grade: Optional[float] = None
+  validate_title: Optional[bool] = False
+  line_item_title: Optional[str] = None
 
   class Config():
     "Pydantic Config Class"

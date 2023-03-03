@@ -589,6 +589,8 @@ def create_score_for_line_item(context_id: str,
         "maximum_grade": input_result_dict["resultMaximum"],
         "assigned_grade": None,
         "draft_grade": None,
+        "validate_title": False,
+        "line_item_title": line_item.label
     }
 
     if input_score_dict["gradingProgress"] in ["Pending", "PendingManual"]:
