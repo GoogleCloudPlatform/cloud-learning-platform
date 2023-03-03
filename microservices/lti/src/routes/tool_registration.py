@@ -155,7 +155,6 @@ def create_tool(input_tool: ToolModel):
   Tool Data: `ToolResponseModel`
   """
   try:
-    print("testtt 1")
     input_tool_dict = {**input_tool.dict()}
 
     client_id = str(uuid4())
@@ -178,7 +177,6 @@ def create_tool(input_tool: ToolModel):
     new_tool.save()
     tool_fields = new_tool.get_fields(reformat_datetime=True)
     tool_fields["id"] = new_tool.id
-    print("testtt 2")
     return {
         "success": True,
         "message": "Tool has been created successfully",
