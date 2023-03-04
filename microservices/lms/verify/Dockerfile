@@ -12,21 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# changed from slim for FireO
-FROM python:3.9.14-slim
+ARG BASE_IMG
+FROM ${BASE_IMG}
 
 WORKDIR /opt
+COPY requirements.txt service_requirements.txt
 
-
-# needed for backports-datetime-fromisoformat in fireo
-RUN apt-get update
-RUN apt-get -y install gcc
-
-COPY requirements.txt .
+# add endline in case not there
+RUN awk 1 requirements.txt > requirements.txt
+RUN cat service_requirements.txt >> requirements.txt
 
 RUN pip install -r requirements.txt
 
-COPY src/ .
+COPY . .
 
-
-
+ENTRYPOINT [ "python", "main.py" ]

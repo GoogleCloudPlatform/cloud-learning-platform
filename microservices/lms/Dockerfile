@@ -30,3 +30,7 @@ EXPOSE 8888
 
 # ENTRYPOINT [ "python", "main.py", "--prod=True" ]
 ENTRYPOINT [ "python", "main.py" ]
+
+
+
+
