@@ -285,7 +285,9 @@ def enroll_student_section(cohort_id: str,
     response_dict = {}
     response_dict = {"course_enrollment_id":course_enrollment_id,
         "student_email":input_data.email,"section_id":section.id,
-        "cohort_id":cohort_id}
+        "cohort_id":cohort_id,
+        "classroom_id":section.classroom_id,
+        "classroom_url":section.classroom_url}
     return {
         "message":
         f"Successfully Added the Student with email {input_data.email}",

@@ -163,3 +163,5 @@ def test_enroll_student(client_with_emulator, create_fake_data):
       resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True
+  assert resp.json()["data"]["classroom_url"] == "https://classroom.google.com"
+  assert resp.json()["data"]["classroom_id"] == "cl_id"
