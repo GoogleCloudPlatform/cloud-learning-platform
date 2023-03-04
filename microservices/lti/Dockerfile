@@ -14,7 +14,3 @@ COPY src/ .
 EXPOSE 8888
 
 ENTRYPOINT [ "python", "main.py" ]
-
-
-
-
