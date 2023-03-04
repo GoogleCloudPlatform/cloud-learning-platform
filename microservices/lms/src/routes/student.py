@@ -215,12 +215,13 @@ def delete_student(section_id: str,user:str,request: Request):
     result.status = "inactive"
     result.update()
     # Update enrolled student count in section
-    section_details.enrolled_students_count = section_details.enrolled_students_count-1
+    section_details.enrolled_students_count = section_details.\
+      enrolled_students_count-1
     section_details.update()
     # Update enrolled student count in cohort
-    cohort_key = section_details.cohort
     cohort_details = Cohort.find_by_id(section_details.cohort.key)
-    cohort_details.enrolled_students_count = cohort_details.enrolled_students_count -1
+    cohort_details.enrolled_students_count = cohort_details.\
+      enrolled_students_count -1
     cohort_details.update()
     return{"data":result.id}
   except ResourceNotFoundException as err:
