@@ -2,6 +2,7 @@
 import re
 from common.utils import classroom_crud
 
+
 def get_section_with_minimum_student(sections):
   """Get section with minimum count of students
   Args:
@@ -27,4 +28,3 @@ def get_user_id(user,headers):
     return classroom_crud.get_user_details_by_email(
         user_email=user, headers=headers)["data"][0]["user_id"]
   return user
-  
