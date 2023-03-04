@@ -40,8 +40,7 @@ deploy:
 profiles:
 - name: custom
   build:
-    googleCloudBuild:
-      concurrency: 0
+    googleCloudBuild: {}
     artifacts:
     - image: classroom-notification-service
       requires:
@@ -62,8 +61,7 @@ profiles:
       paths:
       - ./kustomize/prod
   build:
-    googleCloudBuild:
-      concurrency: 0
+    googleCloudBuild: {}
     artifacts:
     - image: classroom-notification-service
       docker:
@@ -77,8 +75,7 @@ profiles:
   activation:
   - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
-    googleCloudBuild:
-      concurrency: 0
+    googleCloudBuild: {}
     artifacts:
     - image: gcr.io/core-learning-services-dev/classroom-notification-service
       docker:
