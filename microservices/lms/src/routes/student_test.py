@@ -184,4 +184,4 @@ def test_enroll_student_already_present(client_with_emulator, create_fake_data):
       with mock.patch("routes.student.Logger"):
         resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 409, "Status 409"
-  assert resp.json()["success"] is True
+  assert resp.json()["success"] is False
