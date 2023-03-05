@@ -52,8 +52,9 @@ def check_student_can_enroll_in_cohort(email,headers,sections):
   if student_details["data"] != []:
     user_id = student_details["data"][0]["user_id"]
     for section in sections:
-      result = CourseEnrollmentMapping.find_course_enrollment_record(section_key=section.key,
-                                                                     user_id=user_id)
+      result = CourseEnrollmentMapping.find_course_enrollment_record(
+                            section_key=section.key,
+                            user_id=user_id)
       if result is not None:
         Logger.error("Student {email} is present in section_id {section.id}")
         return False
