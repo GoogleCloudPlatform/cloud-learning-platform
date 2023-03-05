@@ -4,8 +4,6 @@ from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.models import CourseEnrollmentMapping
 from common.utils.errors import (ResourceNotFoundException)
-from common.utils.http_exceptions import (
-                             ResourceNotFound,Conflict)
 
 def get_section_with_minimum_student(sections):
   """Get section with minimum count of students
@@ -39,14 +37,15 @@ def check_student_can_enroll_in_cohort(email,headers,sections):
     sections :list of section objects with from same cohort
     email : student email
     headers : Authentication headers
-    Returns: boolean value 
+    Returns: boolean value
     True : Student can be enroll
 
   """
   try:
     student_details = classroom_crud.get_user_details_by_email(user_email=email,
                                                                headers=headers)
-  except ResourceNotFoundException as re:
+  except ResourceNotFoundException as rte:
+    Logger.info(rte)
     Logger.info("Student is not present in database")
     return True
   Logger.info("student data {email} {student_details}")

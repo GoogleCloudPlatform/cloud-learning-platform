@@ -271,11 +271,12 @@ def enroll_student_section(cohort_id: str,
     if len(sections) == 0:
       raise ResourceNotFoundException("Given CohortId\
          does not have any sections")
-    if not student_service.check_student_can_enroll_in_cohort(email=input_data.email,
+    if not student_service.check_student_can_enroll_in_cohort(
+                                              email=input_data.email,
                                                      headers=headers,
                                                      sections=sections):
       raise Conflict(f"User {input_data.email} is already\
-                      registered for cohort {cohort_id}")      
+                      registered for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
 
     user_object = classroom_crud.enroll_student(
