@@ -157,11 +157,31 @@ def test_enroll_student(client_with_emulator, create_fake_data):
       "email": "student@gmail.com",
       "access_token": CREDENTIAL_JSON["token"]
   }
-  with mock.patch("routes.section.classroom_crud.enroll_student",
+  with mock.patch("routes.student.classroom_crud.enroll_student",
   return_value ={"user_id":"test_user_id"}):
-    with mock.patch("routes.section.Logger"):
-      resp = client_with_emulator.post(url, json=input_data)
+    with mock.patch(
+      "services.student_service.check_student_can_enroll_in_cohort",
+    return_value =True):
+      with mock.patch("routes.student.Logger"):
+        resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True
   assert resp.json()["data"]["classroom_url"] == "https://classroom.google.com"
   assert resp.json()["data"]["classroom_id"] == "cl_id"
+
+def test_enroll_student_already_present(client_with_emulator, create_fake_data):
+
+  url = BASE_URL + f"/cohorts/{create_fake_data['cohort']}/students"
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
+  with mock.patch("routes.student.classroom_crud.enroll_student",
+  return_value ={"user_id":"test_user_id"}):
+    with mock.patch(
+      "services.student_service.check_student_can_enroll_in_cohort",
+    return_value =False):
+      with mock.patch("routes.student.Logger"):
+        resp = client_with_emulator.post(url, json=input_data)
+  assert resp.status_code == 409, "Status 409"
+  assert resp.json()["success"] is False
