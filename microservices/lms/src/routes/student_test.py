@@ -161,7 +161,7 @@ def test_enroll_student(client_with_emulator, create_fake_data):
   return_value ={"user_id":"test_user_id"}):
     with mock.patch(
       "services.student_service.check_student_can_enroll_in_cohort",
-    return_value =False):
+    return_value =True):
       with mock.patch("routes.student.Logger"):
         resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 200, "Status 200"
@@ -180,7 +180,7 @@ def test_enroll_student_already_present(client_with_emulator, create_fake_data):
   return_value ={"user_id":"test_user_id"}):
     with mock.patch(
       "services.student_service.check_student_can_enroll_in_cohort",
-    return_value =True):
+    return_value =False):
       with mock.patch("routes.student.Logger"):
         resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 409, "Status 409"
