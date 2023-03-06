@@ -38,6 +38,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       "family_name": user.get("last_name"),
       "name": user.get("first_name") + " " + user.get("last_name"),
       "email": user.get("email"),
+      "picture": user.get("photo_url"),
       lti_claim_field("claim", "tool_platform"): {
           "guid": LTI_PLATFORM_UNIQUE_ID,
           "name": LTI_PLATFORM_NAME
@@ -58,8 +59,8 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
   lti_context_id = context_data.get("id")
   token_claims[lti_claim_field("claim", "context")] = {
       "id": lti_context_id,
-      "label": context_data.get("name"),
-      "title": context_data.get("description"),
+      "label": context_data.get("description"),
+      "title": context_data.get("name"),
       "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseSection"]
   }
 

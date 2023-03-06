@@ -168,7 +168,7 @@ def create_tool(input_tool: ToolModel):
 
     if not input_tool_dict.get("tool_public_key") and not input_tool_dict.get(
         "tool_keyset_url"):
-      return {"success": False, "message": "Public key is missing", "data": []}
+      raise ValidationError("Public key is missing")
 
     input_tool_dict["client_id"] = client_id
     input_tool_dict["deployment_id"] = deployment_id
@@ -184,6 +184,8 @@ def create_tool(input_tool: ToolModel):
             **tool_fields
         }
     }
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
   except ConflictError as e:
     raise Conflict(str(e)) from e
   except Exception as e:
@@ -219,7 +221,7 @@ def update_tool(tool_id: str, input_tool: UpdateToolModel):
 
     if not input_tool_dict.get("tool_public_key") and not input_tool_dict.get(
         "tool_keyset_url"):
-      return {"success": False, "message": "Public key is missing", "data": []}
+      return ValidationError("Public key is missing")
 
     for key, value in input_tool_dict.items():
       tool_fields[key] = value
@@ -233,6 +235,8 @@ def update_tool(tool_id: str, input_tool: UpdateToolModel):
         "message": "Successfully updated the tool",
         "data": tool_fields
     }
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
   except Exception as e:

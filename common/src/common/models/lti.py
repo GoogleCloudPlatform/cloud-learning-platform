@@ -92,6 +92,7 @@ class LTIContentItem(BaseModel):
   tool_id = TextField(required=True)
   content_item_type = TextField(required=True)
   content_item_info = MapField(required=True)
+  context_id = TextField()
 
   class Meta:
     collection_name = BaseModel.DATABASE_PREFIX + "lti_content_items"

@@ -38,3 +38,6 @@ requires:
 
 - path: ./microservices/classroom_notifications_cronjob
   configs: [classroom-notifications-cronjob]
+
+build:
+  googleCloudBuild: {}

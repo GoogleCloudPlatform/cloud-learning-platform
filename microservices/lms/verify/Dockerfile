@@ -12,22 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: autoscaling/v2beta1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: classroom-notification-service
-spec:
-  minReplicas: 3
-  maxReplicas: 5
-  metrics:
-  - external:
-      metricName:  pubsub.googleapis.com|subscription|num_undelivered_messages
-      metricSelector:
-        matchLabels:
-          resource.labels.subscription_id: classroom-notifications-sub
-      targetAverageValue: "2"
-    type: External
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: classroom-notification-service
+ARG BASE_IMG
+FROM ${BASE_IMG}
+
+WORKDIR /opt
+COPY requirements.txt service_requirements.txt
+
+# add endline in case not there
+RUN awk 1 requirements.txt > requirements.txt
+RUN cat service_requirements.txt >> requirements.txt
+
+RUN pip install -r requirements.txt
+
+COPY . .
+
+ENTRYPOINT [ "python", "main.py" ]
