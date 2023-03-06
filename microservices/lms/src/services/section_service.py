@@ -123,7 +123,7 @@ def copy_course_background_task(course_template_details,
       coursework_material_list)
     # add Instructional designer
     sections_details.teachers.append(
-        course_template_details.instructional_designer)
+        course_template_details.instructional_designer.lower())
     for teacher_email in set(sections_details.teachers):
       print("TEACHER NAME",teacher_email)
       invitation_object = classroom_crud.invite_teacher(new_course["id"],

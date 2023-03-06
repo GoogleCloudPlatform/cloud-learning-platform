@@ -28,7 +28,7 @@ def get_user_id(user,headers):
   regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
   if re.fullmatch(regex, user):
     return classroom_crud.get_user_details_by_email(
-        user_email=user, headers=headers)["data"][0]["user_id"]
+        user_email=user.lower(), headers=headers)["data"][0]["user_id"]
   return user
 
 def check_student_can_enroll_in_cohort(email,headers,sections):
