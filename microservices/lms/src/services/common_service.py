@@ -15,7 +15,7 @@ def call_search_user_api(headers,email):
   """
 
   response = requests.get(f"\
-  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={email}",\
+  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={email.lower()}",\
     headers=headers)
   return response
 

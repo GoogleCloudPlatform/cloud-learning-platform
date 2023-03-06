@@ -18,7 +18,8 @@ class Sections(BaseModel):
   classroom_code: str
   classroom_url: str
   teachers: list[constr(min_length=7, max_length=128,
-      regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")]
+      regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+      to_lower=True)]
   course_template: str
   cohort: str
   enrolled_students_count:int
@@ -32,7 +33,9 @@ class TempUsers(BaseModel):
   user_id:str
   first_name: str
   last_name: str
-  email: str
+  email: constr(min_length=7, max_length=128,
+                regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+                to_lower=True)
   user_type: str
   user_groups: Optional[list]
   status: str
@@ -50,7 +53,8 @@ class SectionDetails(BaseModel):
   course_template: str
   cohort: str
   teachers: list[constr(min_length=7, max_length=128,
-    regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")]
+    regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+    to_lower=True)]
   class Config():
     orm_mode=True
     schema_extra={"example":INSERT_SECTION_EXAMPLE}
