@@ -22,6 +22,7 @@ class Sections(BaseModel):
       to_lower=True)]
   course_template: str
   cohort: str
+  enrolled_students_count:int
 
   class Config():
     orm_mode = True
