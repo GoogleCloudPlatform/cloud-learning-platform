@@ -26,3 +26,7 @@ ui-debug.log
 # tf lock files
 .terraform
 .terraform.lock.hcl
+
+# local credentials
+credentials.json
+sa_key.json

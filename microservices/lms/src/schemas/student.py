@@ -18,7 +18,9 @@ class AddStudentResponseModel(BaseModel):
             "data": {"course_enrollment_id":"2xBnBjqm2X3eRgVxE6Bv",
             "student_email":"test_user@gmail",
             "section_id":"fake-section-id",
-            "cohort_id":"fake-cohort-id"}
+            "cohort_id":"fake-cohort-id",
+            "classroom_id":"123453333",
+            "classroom_url":"https://classroom.google.com/c/NTYzMhjhjrx"}
         }
     }
 

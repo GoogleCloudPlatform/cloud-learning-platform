@@ -27,8 +27,8 @@ def check_status(field_val):
 
 def check_role(field_val):
   """validator method for status field"""
-  role = ["learner", "faculty","other"]
-  if field_val.lower() in ["learner", "faculty","other"]:
+  role = ["learner", "faculty","other","admin"]
+  if field_val.lower() in ["learner", "faculty","other","admin"]:
     return True
   return (False,
           "role must be one of " + ",".join("'" + i + "'" for i in role))
