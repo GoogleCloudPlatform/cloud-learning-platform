@@ -294,7 +294,7 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
           ((submitted_course_work_list / course_work_list) * 100, 2)}
           section_with_progress_percentage.append(data)
       cached_value = set_key(f"{cohort_id}::{user_id}",\
-      section_with_progress_percentage, 3600)
+      section_with_progress_percentage, 86400)
       Logger.info\
       (f"progress percentage caching status for cohort_id \
       {cohort_id}, user_id {user_id} : {cached_value}")

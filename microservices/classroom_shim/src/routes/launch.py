@@ -12,7 +12,7 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError,
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest, Unauthenticated)
 from common.utils.logging_handler import Logger
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, unused-variable
 
 templates = Jinja2Templates(directory="templates")
 
@@ -68,8 +68,7 @@ def login(request: Request, lti_assignment_id: str):
 
 
 @router.get("/launch-assignment")
-def launch_assignment(request: Request,
-                      lti_assignment_id: Optional[str] = "",
+def launch_assignment(lti_assignment_id: Optional[str] = "",
                       timezone: Optional[str] = "",
                       user_details: dict = Depends(validate_token)):
   """This launch assignment will take the input assignment id and
@@ -82,7 +81,7 @@ def launch_assignment(request: Request,
   try:
     # verify user if it exists
     user_email = user_details.get("email")
-    headers = {"Authorization": request.headers.get("Authorization")}
+    headers = {"Authorization": f"Bearer {get_backend_robot_id_token()}"}
     fetch_user_request = requests.get(
         "http://user-management/user-management/api/v1/user/search/email",
         params={"email": user_email},
@@ -106,11 +105,11 @@ def launch_assignment(request: Request,
       custom_params["$ResourceLink.available.startDateTime"] = (
           lti_assignment.start_date).isoformat()
 
-    if lti_assignment.start_date:
+    if lti_assignment.end_date:
       custom_params["$ResourceLink.available.endDateTime"] = (
           lti_assignment.end_date).isoformat()
 
-    if lti_assignment.start_date:
+    if lti_assignment.due_date:
       custom_params["$ResourceLink.submission.endDateTime"] = (
           lti_assignment.due_date).isoformat()
 
@@ -121,14 +120,38 @@ def launch_assignment(request: Request,
       custom_params["$Person.address.timezone"] = timezone
 
     # TODO: implementation of "$Context.id.history" as a custom parameter
-    # TODO: send the user details like profile photo inside final_lti_message_hint_dict and use it in lti service to send as token claims
     final_lti_message_hint_dict = {
-        "custom_params_for_substitution": custom_params,
-        "user_details": {}
+        "custom_params_for_substitution": custom_params
     }
 
     url = f"{API_DOMAIN}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}&context_id={context_id}"
-    # TODO: verify assignment and user relationship
+    user_type = user_details.get("user_type")
+    if user_type == "learner":
+      api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.section_id}/students/{user_email}"
+      fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
+
+      if fetch_user_mapping.status_code == 200:
+        learner_data = fetch_user_mapping.json().get("data")
+      elif fetch_user_mapping.status_code == 404:
+        raise UnauthorizedUserError("Unauthorized")
+      else:
+        raise Exception(
+            "Internal server error from user mapping validation API")
+
+    elif user_type in ("faculty", "admin"):
+      api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.section_id}/teachers/{user_email}"
+      fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
+      if fetch_user_mapping.status_code == 200:
+        faculty_data = fetch_user_mapping.json().get("data")
+      elif fetch_user_mapping.status_code == 404:
+        raise UnauthorizedUserError("Unauthorized")
+      else:
+        raise Exception(
+            "Internal server error from user mapping validation API")
+
+    else:
+      raise UnauthorizedUserError("Unauthorized")
+
     return {"url": url, "message_hint": final_lti_message_hint_dict}
 
   except ValidationError as e:

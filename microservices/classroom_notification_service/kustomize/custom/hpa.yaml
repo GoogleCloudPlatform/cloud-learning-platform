@@ -17,7 +17,7 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: classroom-notification-service
 spec:
-  minReplicas: 1
+  minReplicas: 3
   maxReplicas: 5
   metrics:
   - external:

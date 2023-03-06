@@ -119,7 +119,8 @@ BASIC_CONTENT_ITEM_EXAMPLE = {
         "title": "test-image.jpg",
         "type": "ltiResourceLink",
         "url": "https://testtool.com/api/ltilaunch/ltitoollaunch"
-    }
+    },
+    "context_id": "F2j4v5b3Vk96b2B"
 }
 
 FULL_CONTENT_ITEM_EXAMPLE = {
