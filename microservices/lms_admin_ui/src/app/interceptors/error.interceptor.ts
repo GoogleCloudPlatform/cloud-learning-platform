@@ -30,7 +30,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           this.authService.signOut()
         }
         else {
-          // this.openFailureSnackBar('Internal Server Error', 'Close')
+          this.openFailureSnackBar('Internal Server Error', 'Close')
           console.log("error")
         }
       }
