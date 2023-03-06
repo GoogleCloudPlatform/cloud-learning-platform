@@ -63,12 +63,12 @@ def enroll_student_classroom(access_token,course_id,student_email,course_code):
   # Get the gaia ID of the course
   people_service = build("people", "v1", credentials=creds)
   profile = people_service.people().get(resourceName="people/me",
-  personFields="metadata").execute()
+  personFields="metadata,photos,names").execute()
   gaia_id = profile["metadata"]["sources"][0]["id"]
   # Call user API
   data = {
-  "first_name": "",
-  "last_name": "",
+  "first_name": profile["names"][0]["givenName"],
+  "last_name": profile["names"][0]["familyName"],
   "email":student_email,
   "user_type": "learner",
   "user_type_ref": "",
@@ -77,7 +77,8 @@ def enroll_student_classroom(access_token,course_id,student_email,course_code):
   "is_registered": True,
   "failed_login_attempts_count": 0,
   "access_api_docs": False,
-  "gaia_id":gaia_id
+  "gaia_id":gaia_id,
+  "photo_url":profile["photos"][0]["url"]
   }
   return data
 
