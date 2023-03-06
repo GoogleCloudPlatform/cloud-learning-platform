@@ -15,7 +15,7 @@ def call_search_user_api(headers,email):
   """
 
   response = requests.get(f"\
-  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={email}",\
+  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={email.lower()}",\
     headers=headers)
   return response
 
@@ -46,8 +46,6 @@ def create_teacher(headers,body):
     searched_teacher = response.json()["data"]
     Logger.info(f"Searched  teacher value {searched_teacher}")
     if searched_teacher == []:
-      body["first_name"] = "firstname"
-      body["last_name"] = "lastname"
       create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
       json=body,headers=headers)
       Logger.info(

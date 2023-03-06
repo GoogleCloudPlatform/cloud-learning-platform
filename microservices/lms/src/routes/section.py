@@ -196,6 +196,7 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
     {'status': 'False'} if raises an exception
   """
   try:
+    teacher_email=teacher_email.lower()
     headers = {"Authorization": request.headers.get("Authorization")}
     section_details = Section.find_by_id(section_id)
     teachers= section_details.teachers

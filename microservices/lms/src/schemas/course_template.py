@@ -13,7 +13,8 @@ class CourseTemplateModel(BaseModel):
   description: str
   admin: str
   instructional_designer: constr(min_length=7, max_length=128,
-          regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")
+          regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+          to_lower=True)
   classroom_id: Optional[str]
   classroom_code: Optional[str]
   classroom_url: Optional[str]
@@ -28,7 +29,8 @@ class UpdateCourseTemplateModel(BaseModel):
   name: Optional[str] = None
   description: Optional[str] = None
   instructional_designer: Optional[constr(min_length=7, max_length=128,
-    regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")] = None
+    regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+    to_lower=True)] = None
 
   class Config():
     orm_mode = True
@@ -74,7 +76,8 @@ class InputCourseTemplateModel(BaseModel):
   name: str
   description: str
   instructional_designer: constr(min_length=7, max_length=128,
-        regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")
+        regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+        to_lower=True)
 
   class Config():
     orm_mode = True

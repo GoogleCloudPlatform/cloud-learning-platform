@@ -14,7 +14,7 @@ TEST_COURSE_TEMPLATE = {
     "name": "name",
     "description": "description",
     "admin": "admin@gmail.com",
-    "instructional_designer": "IDesiner@gmail.com",
+    "instructional_designer": "idesiner@gmail.com",
     "classroom_id": "clID",
     "classroom_code": "clcode",
     "classroom_url": "https://classroom.google.com"
