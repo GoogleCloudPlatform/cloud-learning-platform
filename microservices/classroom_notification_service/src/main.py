@@ -52,6 +52,8 @@ def callback(message: pubsub_v1.subscriber.message.Message) -> None:
     message.nack()
 
 def main():
+  if not check_bq_tables():
+    return 0
   subscriber = pubsub_v1.SubscriberClient()
   # The `subscription_path` method creates a fully qualified identifier
   # in the form `projects/{project_id}/subscriptions/{subscription_id}`
@@ -75,5 +77,5 @@ def main():
       Logger.error(f"Some error occured.\nError:{e}")
 
 # check if BQ table exist or not
-if __name__ == "__main__" and check_bq_tables():
+if __name__ == "__main__" :
   main()
