@@ -31,7 +31,7 @@ export interface student {
 })
 export class SectionComponent implements OnInit {
   selectedSection: any
-  displayedColumns: string[] = ['name', 'email', 'role'];
+  displayedColumns: string[] = ['email', 'role'];
   studentDisplayedColumns: string[] = ['first name', 'last name', 'email', 'created time', 'action'];
 
   tableData: staff[] = []
