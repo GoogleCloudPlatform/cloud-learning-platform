@@ -21,6 +21,7 @@ class Sections(BaseModel):
       regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")]
   course_template: str
   cohort: str
+  enrolled_students_count:int
 
   class Config():
     orm_mode = True
