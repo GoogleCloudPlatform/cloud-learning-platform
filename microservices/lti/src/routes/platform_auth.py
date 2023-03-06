@@ -1,4 +1,5 @@
 """LTI Platform Auth endpoints"""
+import traceback
 from copy import deepcopy
 from datetime import datetime
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN, TOKEN_TTL
@@ -7,12 +8,15 @@ from fastapi.templating import Jinja2Templates
 from common.utils.errors import (ResourceNotFoundException, ValidationError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound)
+from common.utils.logging_handler import Logger
 from common.models import Tool
 from services.keys_manager import get_platform_public_keyset, get_remote_keyset
 from services.lti_token import (lti_claim_field, generate_token_claims,
                                 encode_token, decode_token,
                                 get_unverified_token_claims)
 from schemas.error_schema import NotFoundErrorResponseModel
+
+
 # pylint: disable=too-many-function-args
 # pylint: disable=line-too-long
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
@@ -31,6 +35,8 @@ def platform_jwks():
     key_set = get_platform_public_keyset()
     return key_set.get("public_keyset")
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -142,6 +148,8 @@ def authorize(request: Request,
   except ValidationError as e:
     raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -215,4 +223,6 @@ def generate_token(
   except ValidationError as e:
     raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e

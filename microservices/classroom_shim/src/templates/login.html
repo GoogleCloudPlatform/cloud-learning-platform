@@ -85,7 +85,6 @@
         wasSignedOut = false
         isSigningInNow = true
         const result = await firebase.auth().signInWithPopup(provider)
-        console.log(result.user)
 
       } catch (error) {
         isSigningInNow = false
@@ -182,7 +181,6 @@
           },
         })
         .then((response1) => {
-          console.log("response1", response1)
           return axios.post(response1.data.url, response1.data.message_hint, {
             headers: {
               Authorization: `Bearer ${token}`,

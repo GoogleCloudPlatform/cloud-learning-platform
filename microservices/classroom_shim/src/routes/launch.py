@@ -1,4 +1,5 @@
 """Tool Registration Endpoints"""
+import traceback
 import requests
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
@@ -64,6 +65,7 @@ def login(request: Request, lti_assignment_id: str):
     raise BadRequest(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -165,4 +167,5 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
