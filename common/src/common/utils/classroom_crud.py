@@ -642,14 +642,9 @@ def list_student_section(section_id,headers):
     fetch_all_by_section(section_details.key,"learner")
   users = []
   for record in result:
-    print(record.section)
-    print((record.id))
-    print(record.status)
     user_id =record.user
-    print(user_id)
     response = requests.\
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-    print("Inlist student of section ",response.status_code,response.json())
     users.append(response.json()["data"])
   return users
 
@@ -690,9 +685,6 @@ def get_user_details(user_id, headers):
 
   response_get_student = requests.get\
       (f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-  print("This is get_user_details function get userid response")
-  print(response_get_student.status_code)
-  print(response_get_student.json())
   if response_get_student.status_code == 404:
     raise \
         ResourceNotFoundException(response_get_student.json()["message"])
