@@ -748,6 +748,8 @@ def get_user_profile_information(user_email):
   try:
     profile_information = service.userProfiles(\
       ).get(userId=user_email).execute()
+    if not profile_information["photoUrl"].startswith("https:"):
+      profile_information["photoUrl"] = "https:"+profile_information["photoUrl"]
     return profile_information
   except HttpError as ae:
     raise CustomHTTPException(status_code=ae.resp.status,
