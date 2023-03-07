@@ -100,10 +100,15 @@ def main():
     sections = get_sections(id_token,limit=limit,skip=skip)
     if not sections:
       break
-    for section in sections:
-      # enable notification for each section
-      enable_notifications(section["id"], id_token)
 
+    # enable notification for each section
+    for section in sections:
+      # added try except so that if any section enable notification
+      # get failed it will get continue
+      try:
+        enable_notifications(section["id"], id_token)
+      except requests.HTTPError as rte:
+        logger.info(str(rte))
     if len(sections) < (limit-skip):
       break
     skip = limit
