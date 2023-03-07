@@ -50,6 +50,7 @@ def get_student_email_and_token():
   client = secretmanager.SecretManagerServiceClient()
 #   student_email_secret_id = "personal-test-user-1-username"
   # student_email_secret_id = "personal-test-user-2-username"
+  random_index = "personal-test-user-4-username"
   student_email_secret_id = random_index
   student_token_secret_id = student_email_token_name_mapping[random_index]
   print("________Student Email and token for E2E__________",student_email_secret_id,student_token_secret_id)
