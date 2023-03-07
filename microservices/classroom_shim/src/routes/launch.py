@@ -13,7 +13,7 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError,
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest, Unauthenticated)
 from common.utils.logging_handler import Logger
-# pylint: disable=line-too-long, unused-variable
+# pylint: disable=line-too-long, unused-variable, broad-exception-raised
 
 templates = Jinja2Templates(directory="templates")
 
@@ -93,9 +93,11 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
     if fetch_user_request.status_code == 200:
       user_data = fetch_user_request.json().get("data")[0]
     elif fetch_user_request.status_code == 404:
-      raise UnauthorizedUserError("Unauthorized")
+      raise UnauthorizedUserError(
+          "Access Denied with code 1001, Please contact administrator")
     else:
-      raise Exception("Internal server error from user API")
+      raise Exception(
+          "Request Denied with code 1002, Please contact administrator")
 
     user_id = user_data.get("user_id")
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
@@ -135,10 +137,11 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
       if fetch_user_mapping.status_code == 200:
         learner_data = fetch_user_mapping.json().get("data")
       elif fetch_user_mapping.status_code == 404:
-        raise UnauthorizedUserError("Unauthorized")
+        raise UnauthorizedUserError(
+            "Access Denied with code 1003, Please contact administrator")
       else:
         raise Exception(
-            "Internal server error from user mapping validation API")
+            "Request failed with code 1004, Please contact administrator")
 
     elif user_type in ("faculty", "admin"):
       api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.section_id}/teachers/{user_email}"
@@ -146,13 +149,15 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
       if fetch_user_mapping.status_code == 200:
         faculty_data = fetch_user_mapping.json().get("data")
       elif fetch_user_mapping.status_code == 404:
-        raise UnauthorizedUserError("Unauthorized")
+        raise UnauthorizedUserError(
+            "Access Denied with code 1005, Please contact administrator")
       else:
         raise Exception(
-            "Internal server error from user mapping validation API")
+            "Request failed with code 1006, Please contact administrator")
 
     else:
-      raise UnauthorizedUserError("Unauthorized")
+      raise UnauthorizedUserError(
+          "Access Denied with code 1007, Please contact administrator")
 
     return {"url": url, "message_hint": final_lti_message_hint_dict}
 

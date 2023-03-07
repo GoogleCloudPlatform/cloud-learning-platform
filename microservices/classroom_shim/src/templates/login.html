@@ -53,7 +53,6 @@
     .continue-btn:active {
       background-color: #eee;
     }
-
   </style>
 </head>
 
@@ -189,12 +188,20 @@
             window.open(response2.data.url, "_self").focus()
           }).catch((err) => {
             console.log("err", err)
-            err?.response?.status == 401 ? displayError("Access Denied") : displayError(err.message)
+            if (err?.response?.data) {
+              displayError(err.response.data.message)
+            } else {
+              err?.response?.status == 401 ? displayError("Access Denied") : displayError(err.message)
+            }
             showSignInBtn()
           })
         }).catch((err) => {
           console.log("err", err)
-          err?.response?.status == 401 ? displayError("Access Denied") : displayError(err.message)
+          if (err?.response?.data) {
+            displayError(err.response.data.message)
+          } else {
+            err?.response?.status == 401 ? displayError("Access Denied") : displayError(err.message)
+          }
           showSignInBtn()
         })
     }
