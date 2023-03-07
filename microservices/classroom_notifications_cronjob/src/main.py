@@ -93,26 +93,30 @@ def main():
 
   id_token = get_backend_robot_id_token()
   skip=0
-  limit=10
-
+  limit=20
+  count=0
+  total=0
   while True:
     # get list of sections according to skip & limit value
     sections = get_sections(id_token,limit=limit,skip=skip)
     if not sections:
       break
 
+    total+=len(sections)
     # enable notification for each section
     for section in sections:
       # added try except so that if any section enable notification
       # get failed it will get continue
       try:
         enable_notifications(section["id"], id_token)
+        count+=1
       except requests.HTTPError as rte:
         logger.info(str(rte))
-    if len(sections) < (limit-skip):
+    if len(sections) < limit:
       break
-    skip = limit
-    limit += 10
+    skip +=20
+  logger.info(
+    f"Successfully enable notifications for {count} out of {total} sections")
   logger.info(
       "Classroom Pubsub Registration / Notifications API Cronjob FINISHED")
 
