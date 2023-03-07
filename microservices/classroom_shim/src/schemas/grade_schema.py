@@ -13,8 +13,8 @@ class PostGradeModel(BaseModel):
       BaseModel (_type_): _description_
   """
   user_id: str
-  comment: str
   lti_content_item_id: str
+  comment: Optional[str]
   maximum_grade: Optional[float] = None
   assigned_grade: Optional[float] = None
   draft_grade: Optional[float] = None

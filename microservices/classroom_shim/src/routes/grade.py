@@ -36,25 +36,35 @@ def update_classroom_grade(input_grade: PostGradeModel):
 
   try:
     input_grade_dict = {**input_grade.dict()}
+    print("input_grade_dict", input_grade_dict)
 
     # TODO: Need to check where the comment can be added in the classroom
     if input_grade_dict["comment"]:
       pass
 
-    if input_grade["validate_title"]:
-      lti_assignment_obj = LTIAssignment.collection.filter(
+    if input_grade_dict["validate_title"]:
+      print("in if")
+      lti_assignment_list = LTIAssignment.collection.filter(
           "lti_content_item_id", "==",
           input_grade_dict["lti_content_item_id"]).fetch()
+      print("lti_assignment_list", lti_assignment_list)
 
-      for i in lti_assignment_obj:
-        if i.lti_assignment_title == input_grade["line_item_title"]:
+      for i in lti_assignment_list:
+        print("i", i)
+        print("input_grade_dict['line_item_title']",
+              input_grade_dict["line_item_title"])
+        print("i", i.lti_assignment_title)
+
+        if i.lti_assignment_title == input_grade_dict["line_item_title"]:
           lti_assignment = i
 
     else:
-      lti_assignment_obj = LTIAssignment.collection.filter(
+      print("in else")
+      lti_assignment = LTIAssignment.collection.filter(
           "lti_content_item_id", "==",
           input_grade_dict["lti_content_item_id"]).get()
 
+    print("lti_assignment", lti_assignment)
     lti_assignment_max_points = lti_assignment.max_points
     course_work_id = lti_assignment.course_work_id
 

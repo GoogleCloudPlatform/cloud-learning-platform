@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
-from common.models import LineItem, Result, Score, LTIContentItem
+from common.models import LineItem, Result, Score, Tool, LTIContentItem
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  InvalidTokenError)
 from common.utils.logging_handler import Logger
@@ -181,7 +181,9 @@ def create_line_item(context_id: str,
     input_line_item_dict = {**input_line_item.dict()}
     input_line_item_dict["contextId"] = context_id
 
-    lti_content_item = LTIContentItem.filter("context_id", "==", context_id)
+    # TODO: Add a condition for tool_id as well, as the same context can be used for multiple tools
+    lti_content_item = LTIContentItem.collection.filter("context_id", "==",
+                                                        context_id).get()
     lti_content_item_id = lti_content_item.id
 
     # This condition holds true when the line item is not created using content item return
@@ -582,6 +584,9 @@ def create_score_for_line_item(context_id: str,
           "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{new_result.id}"
 
     # Passing grades back to the LMS using shim service API
+    lti_content_item = LTIContentItem.find_by_id(line_item.resourceLinkId)
+    tool = Tool.find_by_id(lti_content_item.tool_id)
+
     input_grade_dict = {
         "user_id": user_id,
         "comment": input_result_dict["comment"],
@@ -589,7 +594,7 @@ def create_score_for_line_item(context_id: str,
         "maximum_grade": input_result_dict["resultMaximum"],
         "assigned_grade": None,
         "draft_grade": None,
-        "validate_title": False,
+        "validate_title": tool.validate_title_for_grade_sync,
         "line_item_title": line_item.label
     }
 
