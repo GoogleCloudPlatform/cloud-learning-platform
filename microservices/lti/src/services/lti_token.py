@@ -3,10 +3,11 @@ import json
 from datetime import datetime
 from jose import jwt, jws
 from common.models import Tool, LTIContentItem, LineItem
+from common.utils.logging_handler import Logger
 from services.keys_manager import get_platform_public_keyset
 from utils.request_handler import get_method
 from config import TOKEN_TTL, LTI_ISSUER_DOMAIN
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, broad-exception-raised
 
 
 def lti_claim_field(field_type, claim_type, suffix=None):
@@ -55,9 +56,10 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
   if context_res.status_code == 200:
     context_data = context_res.json().get("data")
   else:
-    raise Exception(
-        f"Internal error from get section API with status code - {context_res.status_code}"
+    Logger.error(
+        f"Error 1009 response: Status code: {context_res.status_code}; Response: {context_res.text}"
     )
+    raise Exception("Request failed with error code 1009")
 
   lti_context_id = context_data.get("id")
   token_claims[lti_claim_field("claim", "context")] = {
