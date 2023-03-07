@@ -115,6 +115,9 @@ def main():
     if len(sections) < limit:
       break
     skip +=20
+  if count<total:
+    logger.error(
+      f"Enable notification service get failed only {count} these get enabled")
   logger.info(
     f"Successfully enable notifications for {count} out of {total} sections")
   logger.info(
