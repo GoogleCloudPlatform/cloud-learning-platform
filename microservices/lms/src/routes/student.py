@@ -1,5 +1,6 @@
 """ Student endpoints """
 import traceback
+import requests
 from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
 from services import student_service
@@ -19,6 +20,7 @@ from schemas.section import(StudentListResponseModel,\
 from schemas.student import(AddStudentResponseModel,\
   AddStudentToCohortModel,GetStudentDetailsResponseModel,\
     GetProgressPercentageResponseModel)
+from config import USER_MANAGEMENT_BASE_URL
 
 router = APIRouter(prefix="/student",
                    tags=["Students"],
@@ -307,6 +309,110 @@ def enroll_student_section(cohort_id: str,
         "message":
         f"Successfully Added the Student with email {input_data.email}",
         "data" : response_dict
+    }
+
+  except InvalidTokenError as ive:
+    raise InvalidToken(str(ive)) from ive
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    Logger.error(conflict)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+
+@cohort_student_router.post("/invite/{section_id}/{student_email}")
+def invite_student(section_id: str,student_email:str,
+                           request: Request):
+  """
+  Args:
+    input_data(AddStudentToSectionModel):
+      An AddStudentToSectionModel object which contains email and credentials
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    AddStudentResponseModel: if the student successfully added,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    section = Section.find_by_id(section_id)
+    headers = {"Authorization": request.headers.get("Authorization")}
+    invitation = classroom_crud.invite_user(course_id=section.classroom_id,
+                                            email=student_email,
+                                            role="STUDENT")
+    print(invitation)
+    response = requests.get(f"\
+    {USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",\
+    headers=headers)
+    print("RESPONSE OF SEARCH USER",response.json())
+
+  # If the response is success check if student is inactive i.e  raise error
+    if response.status_code == 200:
+      print("11")
+      searched_student = response.json()["data"]
+      print("22")
+      if searched_student == []:
+        print("Increate user 5")
+        # User does not exist in db call create User API
+        body = {
+            "first_name":"first name",
+            "last_name": "last name",
+            "email":student_email,
+            "user_type": "learner",
+            "user_type_ref": "",
+            "user_groups": [],
+            "status": "active",
+            "is_registered": True,
+            "failed_login_attempts_count": 0,
+            "access_api_docs": False,
+            "gaia_id":"",
+            "photo_url":""
+          }
+        create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
+        json=body,headers=headers)
+        print("Create user ",create_user_response.status_code)
+        print(create_user_response.json())
+        user_id = create_user_response.json()["data"]["user_id"]
+      else:
+        if searched_student[0]["status"] =="inactive":
+          print("33")
+          raise InternalServerError("Student inactive in \
+              database. Please update\
+              the student status")    
+        else:
+          user_id = searched_student[0]["user_id"]
+      print("6")
+      Logger.info("User with Email {student_email} present with user_id {user_id}")
+      course_enrollment_mapping = CourseEnrollmentMapping()
+      course_enrollment_mapping.section = section
+      course_enrollment_mapping.user = user_id
+      course_enrollment_mapping.status = "active"
+      course_enrollment_mapping.role = "learner"
+      course_enrollment_mapping.invitation_id = invitation["id"]
+      course_enrollment_mapping.is_invitation_accepted = False
+      course_enrollment_id = course_enrollment_mapping.save().id
+    else:
+      print("User Management service error_____",response.status_code)
+      raise InternalServerError("User management Search User API Error")
+    return {
+        "message":
+        f"Successfully Added the Student with email {student_email}",
+        "data" : {"invitation_id": invitation["id"],"course_enrollment_id":course_enrollment_id,
+                  "user_id":user_id}
     }
 
   except InvalidTokenError as ive:

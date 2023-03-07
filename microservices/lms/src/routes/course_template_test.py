@@ -116,7 +116,7 @@ def test_create_course_template(client_with_emulator):
                     }):
       with mock.patch("routes.course_template.classroom_crud.acceept_invite"):
         with mock.patch(
-          "routes.course_template.classroom_crud.invite_teacher"):
+          "routes.course_template.classroom_crud.invite_user"):
           with mock.patch(
             "routes.course_template.classroom_crud.get_user_profile_information"
             ):
@@ -201,7 +201,7 @@ def test_update_course_template(client_with_emulator):
           with mock.patch(
           "routes.course_template.classroom_crud.acceept_invite"):
             with mock.patch(
-          "routes.course_template.classroom_crud.invite_teacher"):
+          "routes.course_template.classroom_crud.invite_user"):
               with mock.patch(
             "routes.course_template.classroom_crud.get_user_profile_information"
             ):

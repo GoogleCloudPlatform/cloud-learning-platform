@@ -322,8 +322,8 @@ def update_section(sections_details: UpdateSection,request: Request):
     add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
     for i in add_teacher_list:
-      invitation_object = classroom_crud.invite_teacher(
-                            sections_details.course_id,i)
+      invitation_object = classroom_crud.invite_user(
+                            sections_details.course_id,i,"TEACHER")
       # Storing classroom details
       classroom_crud.acceept_invite(invitation_object["id"],i)
       user_profile = classroom_crud.get_user_profile_information(i)
