@@ -85,7 +85,7 @@ def parse_arguments():
       "--create-dataset",
       dest="create_dataset",
       type=str,
-      default="true",
+      default="false",
       choices=["true", "false"],
       help="Create dataset for lms_analytics? true or false")
 
