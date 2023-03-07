@@ -2,7 +2,7 @@
 import json
 from datetime import datetime
 from jose import jwt, jws
-from common.models import Tool, TempUser, LTIContentItem, LineItem
+from common.models import Tool, LTIContentItem, LineItem
 from services.keys_manager import get_platform_public_keyset
 from utils.request_handler import get_method
 from config import TOKEN_TTL, LTI_ISSUER_DOMAIN
@@ -24,8 +24,15 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
   if redirect_uri not in tool_info.get("redirect_uris"):
     raise Exception(f"Unknown redirect_uri {redirect_uri}")
 
-  user = TempUser.find_by_user_id(login_hint)
-  user = user.get_fields(reformat_datetime=True)
+  get_user_url = f"http://user-management/user-management/api/v1/user/{login_hint}"
+  user_res = get_method(url=get_user_url, use_bot_account=True)
+
+  if user_res.status_code == 200:
+    user = user_res.json().get("data")
+  else:
+    raise Exception(
+        f"Internal error from get user API with status code - {user_res.status_code}"
+    )
 
   token_claims = {
       "iss": LTI_ISSUER_DOMAIN,
