@@ -3,6 +3,7 @@ Pydantic Model for copy course API's
 """
 from typing import Optional
 from pydantic import BaseModel
+from schemas.schema_examples import STUDENT,INVITE_STUDENT
 
 class AddStudentResponseModel(BaseModel):
   """Add Student Model"""
@@ -41,6 +42,30 @@ class GetStudentDetailsResponseModel(BaseModel):
   """Get Student Details Model"""
   success: Optional[bool] = True
   data: Optional[dict] = None
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data":STUDENT
+      }
+      }
+  
+class InviteStudentToSectionResponseModel(BaseModel):
+  """Invite Student Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully Invited the Student"
+  data: Optional[dict] = None
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully Invited the Student",
+            "data": INVITE_STUDENT
+        }}
+    
 
 class GetProgressPercentageResponseModel(BaseModel):
   """Get Progress Percentage"""

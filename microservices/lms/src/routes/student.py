@@ -9,7 +9,7 @@ from common.utils.errors import (ResourceNotFoundException,
 ValidationError,InvalidTokenError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
                              ResourceNotFound, BadRequest,InvalidToken,Conflict)
-from common.models import CourseEnrollmentMapping,Section,Cohort
+from common.models import CourseEnrollmentMapping,Section,Cohort,TempUser
 from common.utils import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
@@ -19,7 +19,7 @@ from schemas.section import(StudentListResponseModel,\
    DeleteStudentFromSectionResponseModel)
 from schemas.student import(AddStudentResponseModel,\
   AddStudentToCohortModel,GetStudentDetailsResponseModel,\
-    GetProgressPercentageResponseModel)
+    GetProgressPercentageResponseModel,InviteStudentToSectionResponseModel)
 from config import USER_MANAGEMENT_BASE_URL
 
 router = APIRouter(prefix="/student",
@@ -174,6 +174,7 @@ def list_students_in_section(section_id: str, request: Request):
     headers = {"Authorization": request.headers.get("Authorization")}
     users = classroom_crud.\
       list_student_section(section_id=section_id,headers=headers)
+    # print(users)
     return {"data": users}
   except ResourceNotFoundException as err:
     Logger.error(err)
@@ -331,7 +332,8 @@ def enroll_student_section(cohort_id: str,
     raise InternalServerError(str(e)) from e
 
 
-@cohort_student_router.post("/invite/{section_id}/{student_email}")
+@section_student_router.post("/{section_id}/invite/{student_email}",
+                             response_model=InviteStudentToSectionResponseModel)
 def invite_student(section_id: str,student_email:str,
                            request: Request):
   """
@@ -351,10 +353,10 @@ def invite_student(section_id: str,student_email:str,
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
-    invitation = classroom_crud.invite_user(course_id=section.classroom_id,
-                                            email=student_email,
-                                            role="STUDENT")
-    print(invitation)
+    # invitation = classroom_crud.invite_user(course_id=section.classroom_id,
+    #                                         email=student_email,
+    #                                         role="STUDENT")
+    # print(invitation)
     response = requests.get(f"\
     {USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",\
     headers=headers)
@@ -369,8 +371,8 @@ def invite_student(section_id: str,student_email:str,
         print("Increate user 5")
         # User does not exist in db call create User API
         body = {
-            "first_name":"first name",
-            "last_name": "last name",
+            "first_name":"first_name",
+            "last_name": "last_name",
             "email":student_email,
             "user_type": "learner",
             "user_type_ref": "",
@@ -395,6 +397,13 @@ def invite_student(section_id: str,student_email:str,
               the student status")    
         else:
           user_id = searched_student[0]["user_id"]
+          check_already_invited = CourseEnrollmentMapping.find_course_enrollment_record(section_key=section.key,user_id=user_id)
+          if check_already_invited:
+            raise Conflict("STudent already Invited to this section")
+      invitation = classroom_crud.invite_user(course_id=section.classroom_id,
+                                            email=student_email,
+                                            role="STUDENT")
+      print(invitation)
       print("6")
       Logger.info("User with Email {student_email} present with user_id {user_id}")
       course_enrollment_mapping = CourseEnrollmentMapping()
@@ -405,15 +414,110 @@ def invite_student(section_id: str,student_email:str,
       course_enrollment_mapping.invitation_id = invitation["id"]
       course_enrollment_mapping.is_invitation_accepted = False
       course_enrollment_id = course_enrollment_mapping.save().id
+
+
     else:
       print("User Management service error_____",response.status_code)
       raise InternalServerError("User management Search User API Error")
     return {
         "message":
         f"Successfully Added the Student with email {student_email}",
-        "data" : {"invitation_id": invitation["id"],"course_enrollment_id":course_enrollment_id,
-                  "user_id":user_id}
+        "data" : {"invitation_id": invitation["id"],
+                  "course_enrollment_id":course_enrollment_id,
+                  "user_id":user_id,
+                  "section_id":section_id,
+                  "cohort_id":section.cohort.key,
+            "classroom_id":section.classroom_id,
+            "classroom_url":section.classroom_url}
     }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    Logger.error(conflict)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+@section_student_router.post("/update_invites")
+def update_invites(request: Request):
+  """
+  Args:
+    input_data(AddStudentToSectionModel):
+      An AddStudentToSectionModel object which contains email and credentials
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    AddStudentResponseModel: if the student successfully added,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    course_records = CourseEnrollmentMapping.collection.filter("is_invitation_accepted","==",False).fetch()
+    # course_records = list(course_records)
+    updated_list_inviations =[]
+    for course_record in course_records:
+      print("--------------------------------------")
+      print("In for Loop for invited  students")
+      print(course_record.user)
+      print(course_record.section.id) 
+      print(course_record.invitation_id)
+      print(course_record.is_invitation_accepted)
+      if course_record.is_invitation_accepted == False and course_record.invitation_id is not None:
+        print("If checking loop",course_record.section.id)
+        print("-----------------------------------------")
+        try:
+          print("Get invite called for",course_record.section.id)
+          result = classroom_crud.get_invite(course_record.invitation_id)
+          print("Result of get invite___",result)
+          Logger.info("In Invitation exi")
+        except Exception as e:
+          print("in except for ",course_record.section.id,course_record.invitation_id)
+          Logger.error(f"Could not get the invite for user_id {course_record.user} \
+                       section_id {course_record.section.id}")
+          # continue
+          user_details = classroom_crud.get_user_details(user_id=course_record.user,headers=headers)
+          print("User Details _____",user_details)
+          user_profile =classroom_crud.get_user_profile_information(user_details["data"]["email"])
+          user_rec = TempUser.collection.filter("user_id","==",course_record.user).get()
+          print("USer_record found Temp User ")
+          # if user_rec.first_name == "first name":
+          print("above gaid if")
+          if user_rec.gaia_id == "":
+            print("Gaid id",user_rec.gaia_id)
+            print(user_profile["name"]["givenName"])
+            user_rec.firstname =  user_profile["name"]["givenName"]
+            user_rec.lastname = user_profile["name"]["familyName"]
+            user_rec.gaia_id = user_profile["id"]
+            user_rec.photo_url = user_profile["photoUrl"]
+            user_rec.update()
+          course_record.is_invitation_accepted = True
+          course_record.update()
+          # Update section enrolled student count
+          section = Section.find_by_id(course_record.section.key)
+          section.enrolled_students_count +=1
+          section.update()
+          cohort = Cohort.find_by_id(section.cohort.key)
+          cohort.enrolled_students_count +=1
+          cohort.update()
+          # Update COhort enrolled student count
+          updated_list_inviations.append(course_record.key)
+          # continue
+    return {
+        "message":f"Successfully Added the Student with email",
+        "data" : {"list_coursenrolment":updated_list_inviations}}
 
   except InvalidTokenError as ive:
     raise InvalidToken(str(ive)) from ive

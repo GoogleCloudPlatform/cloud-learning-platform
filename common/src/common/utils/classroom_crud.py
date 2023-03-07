@@ -568,12 +568,39 @@ def invite_user(course_id, email,role):
     invitation = service.invitations().create(body=body).execute()
     return invitation
   except HttpError as ae:
+    print("HTTTPpp Errrr")
+    print(ae.resp.status)
     raise CustomHTTPException(status_code=ae.resp.status,
                               success=False,
                               message=str(ae),
                               data=None) from ae
-  except Exception as e:
-    raise InternalServerError(str(e)) from e
+
+def get_invite(invitation_id):
+  """Invite teacher to google classroom using course id and email
+
+  Args:
+      course_id (str): google classroom unique id
+      teacher_email (str): teacher email id
+
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
+
+  Returns:
+      dict: response from create invitation method
+  """
+  service = build("classroom", "v1", credentials=get_credentials())
+  # body = {"courseId": course_id, "role": role, "userId": email}
+  try:
+    invitation = service.invitations().get(id=invitation_id).execute()
+    return invitation
+  except HttpError as ae:
+    print("In http errorr")
+    print(ae.resp.status)
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
 
 
 def enable_notifications(course_id, feed_type):
@@ -623,6 +650,8 @@ def if_user_exists_in_section(section_id, user_id, headers):
     response = requests.\
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     user = response.json()["data"]
+    user["invitation_id"]=result.invitation_id
+    user["is_invitation_accepted"] = result.is_invitation_accepted
     return user
   else:
     raise ResourceNotFoundException("User not found")
@@ -645,7 +674,13 @@ def list_student_section(section_id,headers):
     user_id =record.user
     response = requests.\
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-    users.append(response.json()["data"])
+    print("invitation flag and status",record.invitation_id ,record.is_invitation_accepted)
+    user_record = response.json()["data"]
+    user_record["invitation_id"]=record.invitation_id
+    user_record["is_invitation_accepted"] = record.is_invitation_accepted
+    print("--------------------------------------------")
+    print(user_record)
+    users.append(user_record)
   return users
 
 def delete_student(course_id, student_email):

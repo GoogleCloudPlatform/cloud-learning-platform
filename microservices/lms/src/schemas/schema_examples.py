@@ -133,3 +133,30 @@ ASSIGNMENT_MODEL = {
     "work_type": "ASSIGNMENT",
     "assignee_mode": "ALL_STUDENTS"
 }
+
+STUDENT = {
+      "first_name": "steve4",
+      "last_name": "jobs",
+      "email": "clplmstestuser1@gmail.com",
+      "user_type": "other",
+      "user_groups": [],
+      "status": "active",
+      "is_registered":True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id": "F2GGRg5etyty",
+      "user_id": "vtETClM9JdWBSUBB4ZEr",
+      "created_time": "2023-01-24 17:38:32.689496+00:00",
+      "last_modified_time": "2023-01-24 17:38:32.823430+00:00",
+      "user_type_ref": "cnkybYRTLPobwyo52JBR",
+      "invitation_id":"NTk2NTY1NzYyMjE5KjU5NzAwNTkxMjgzNFpa",
+      "is_invitation_accepted":False}
+
+INVITE_STUDENT = {"course_enrollment_id":"2xBnBjqm2X3eRgVxE6Bv",
+            "student_email":"test_user@gmail",
+            "section_id":"fake-section-id",
+            "cohort_id":"fake-cohort-id",
+            "classroom_id":"123453333",
+            "classroom_url":"https://classroom.google.com/c/NTYzMhjhjrx",
+            "invitation_id":"NTk2NTY1NzYyMjE5KjU5NzAwNTkwODM2NVpa",
+            "user_id":"En4SSjm3ttfTT8Cq4nog"}
