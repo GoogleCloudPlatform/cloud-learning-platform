@@ -85,7 +85,7 @@ def parse_arguments():
       "--create-dataset",
       dest="create_dataset",
       type=str,
-      default="false",
+      default="true",
       choices=["true", "false"],
       help="Create dataset for lms_analytics? true or false")
 
@@ -93,14 +93,14 @@ def parse_arguments():
       "--create-tables",
       dest="create_tables",
       type=str,
-      default="false",
+      default="true",
       choices=["true", "false"],
       help="Create table for logs in lms_analytics dataset? true or false")
   parser.add_argument(
       "--create-views",
       dest="create_views",
       type=str,
-      default="false",
+      default="true",
       choices=["true", "false"],
       help="Create Views for logs in lms_analytics dataset? true or false")
   return parser.parse_args()

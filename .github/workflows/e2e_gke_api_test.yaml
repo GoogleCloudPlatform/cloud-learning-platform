@@ -114,7 +114,7 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd utils/
         python -m pip install -r requirements.txt
-        BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true --create-tables=true --create-views=true
+        BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py
 
     - name: Build and deploy to cluster
       run: |
