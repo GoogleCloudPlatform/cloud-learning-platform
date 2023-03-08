@@ -1,4 +1,5 @@
 """Line item  Endpoints"""
+import traceback
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
@@ -101,6 +102,7 @@ def get_all_line_items(context_id: str,
     raise Unauthenticated(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -150,6 +152,7 @@ def get_line_item(context_id: str,
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -209,6 +212,7 @@ def create_line_item(context_id: str,
     raise Unauthenticated(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -268,6 +272,7 @@ def update_line_item(context_id: str,
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -328,6 +333,7 @@ def update_line_item_using_id(context_id: str,
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -372,6 +378,7 @@ def delete_line_item(context_id: str,
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -448,6 +455,7 @@ def get_results_of_line_item(context_id: str,
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -508,6 +516,7 @@ def get_result(context_id: str,
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -624,4 +633,5 @@ def create_score_for_line_item(context_id: str,
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e

@@ -1,4 +1,5 @@
 """Content Item  Return endpoint for LTI Service as Platform"""
+import traceback
 from copy import deepcopy
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from fastapi import APIRouter, Form
@@ -85,4 +86,5 @@ def content_item_return(JWT: str = Form(), context_id: str = None):
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
