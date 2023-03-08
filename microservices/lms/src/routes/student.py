@@ -19,7 +19,8 @@ from schemas.section import(StudentListResponseModel,\
    DeleteStudentFromSectionResponseModel)
 from schemas.student import(AddStudentResponseModel,\
   AddStudentToCohortModel,GetStudentDetailsResponseModel,\
-    GetProgressPercentageResponseModel,InviteStudentToSectionResponseModel)
+    GetProgressPercentageResponseModel,InviteStudentToSectionResponseModel,
+    UpdateInviteResponseModel)
 from config import USER_MANAGEMENT_BASE_URL
 
 router = APIRouter(prefix="/student",
@@ -175,7 +176,6 @@ def list_students_in_section(section_id: str, request: Request):
     headers = {"Authorization": request.headers.get("Authorization")}
     users = classroom_crud.\
       list_student_section(section_id=section_id,headers=headers)
-    # print(users)
     return {"data": users}
   except ResourceNotFoundException as err:
     Logger.error(err)
@@ -456,57 +456,43 @@ def invite_student(section_id: str,student_email:str,
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
-@section_student_router.post("/update_invites")
+@section_student_router.post("/update_invites",response_model=UpdateInviteResponseModel)
 def update_invites(request: Request):
   """
   Args:
-    input_data(AddStudentToSectionModel):
-      An AddStudentToSectionModel object which contains email and credentials
+   
   Raises:
     InternalServerError: 500 Internal Server Error if something fails
     ResourceNotFound : 404 if the section or classroom does not exist
     Conflict: 409 if the student already exists
   Returns:
-    AddStudentResponseModel: if the student successfully added,
+    : if the student successfully added,
     NotFoundErrorResponseModel: if the section and course not found,
     ConflictResponseModel: if any conflict occurs,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
-    course_records = CourseEnrollmentMapping.collection.filter("is_invitation_accepted","==",False).fetch()
-    # course_records = list(course_records)
+    course_records = CourseEnrollmentMapping.collection.filter(
+      "is_invitation_accepted","==",False).fetch()
     updated_list_inviations =[]
     for course_record in course_records:
-      print("--------------------------------------")
-      print("In for Loop for invited  students")
-      print(course_record.user)
-      print(course_record.section.id) 
-      print(course_record.invitation_id)
-      print(course_record.is_invitation_accepted)
-      if course_record.is_invitation_accepted == False and course_record.invitation_id is not None:
-        print("If checking loop",course_record.section.id)
-        print("-----------------------------------------")
+       if course_record.is_invitation_accepted == False and\
+          course_record.invitation_id is not None:
         try:
-          print("Get invite called for",course_record.section.id)
           result = classroom_crud.get_invite(course_record.invitation_id)
-          print("Result of get invite___",result)
-          Logger.info("In Invitation exi")
+          Logger.info(f"Invitation {result} found for \
+        User id {course_record.user},database will be updated once invite is accepted.")
         except Exception as e:
-          print("in except for ",course_record.section.id,course_record.invitation_id)
-          Logger.error(f"Could not get the invite for user_id {course_record.user} \
-                       section_id {course_record.section.id}")
+          Logger.error(f"Could not get the invite for user_id {course_record.user}section_id{course_record.section.id}")
           # continue
           user_details = classroom_crud.get_user_details(user_id=course_record.user,headers=headers)
-          print("User Details _____",user_details)
+          Logger.info("User record found for User",user_details)
           user_profile =classroom_crud.get_user_profile_information(user_details["data"]["email"])
           user_rec = TempUser.collection.filter("user_id","==",course_record.user).get()
-          print("USer_record found Temp User ")
-          # if user_rec.first_name == "first name":
-          print("above gaid if")
+
+          # Check if gaia_id is "" if yes so update personal deatils
           if user_rec.gaia_id == "":
-            print("Gaid id",user_rec.gaia_id)
-            print(user_profile["name"]["givenName"])
             user_rec.firstname =  user_profile["name"]["givenName"]
             user_rec.lastname = user_profile["name"]["familyName"]
             user_rec.gaia_id = user_profile["id"]
@@ -518,17 +504,14 @@ def update_invites(request: Request):
           section = Section.find_by_id(course_record.section.key)
           section.enrolled_students_count +=1
           section.update()
+          # Update COhort enrolled student count
           cohort = Cohort.find_by_id(section.cohort.key)
           cohort.enrolled_students_count +=1
           cohort.update()
-          # Update COhort enrolled student count
           updated_list_inviations.append(course_record.key)
-          # continue
     return {
         "message":f"Successfully Added the Student with email",
         "data" : {"list_coursenrolment":updated_list_inviations}}
-
-
   except ResourceNotFoundException as err:
     Logger.error(err)
     error = traceback.format_exc().replace("\n", " ")
