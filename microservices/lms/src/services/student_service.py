@@ -48,6 +48,7 @@ def check_student_can_enroll_in_cohort(email,headers,sections):
   except ResourceNotFoundException as rte:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
+    Logger.error(rte)
     Logger.info("Student is not present in database")
     return True
   if student_details["data"] != []:

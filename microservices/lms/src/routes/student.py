@@ -209,7 +209,8 @@ def delete_student(section_id: str,user:str,request: Request):
     if result is None:
       raise ResourceNotFoundException\
       (
-      f"User {user_id} not found in course Enrollment Collection for section{section_id}"
+      f"User {user_id} not found in course Enrollment\
+        Collection for section{section_id}"
       )
     course_id = section_details.classroom_id
     response_get_student = classroom_crud.get_user_details(user_id,headers)
@@ -282,7 +283,6 @@ def enroll_student_section(cohort_id: str,
                                               email=input_data.email,
                                                      headers=headers,
                                                      sections=sections):
-      
       raise Conflict(f"User {input_data.email} is already\
                       registered for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
