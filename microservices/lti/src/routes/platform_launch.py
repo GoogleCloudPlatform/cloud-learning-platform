@@ -1,4 +1,5 @@
 """ Launch endpoints for LTI as a platform """
+import traceback
 from copy import deepcopy
 from typing import Optional
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
@@ -10,9 +11,12 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  TokenNotFoundError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound)
+from common.utils.logging_handler import Logger
 from urllib.parse import urlparse, urlunparse, urlencode, parse_qsl
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.lti_token import encode_token
+
+
 # pylint: disable=dangerous-default-value
 
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
@@ -117,6 +121,8 @@ def get_resource_launch_init(lti_content_item_id: str,
   except TokenNotFoundError as e:
     raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -187,4 +193,6 @@ def content_selection_launch_init(tool_id: str, user_id: str, context_id: str):
   except TokenNotFoundError as e:
     raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e

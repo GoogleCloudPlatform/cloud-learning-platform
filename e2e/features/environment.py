@@ -152,7 +152,7 @@ def enroll_student_course(context):
   classroom_code = section.classroom_code
   classroom_id = section.classroom_id
   student_email_and_token = get_student_email_and_token()
-  student_data = enroll_student_classroom(student_email_and_token["access_token"],classroom_id,student_email_and_token["email"],classroom_code)  
+  student_data = enroll_student_classroom(student_email_and_token["access_token"],classroom_id,student_email_and_token["email"].lower(),classroom_code)  
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.role = "learner"
   course_enrollment_mapping.section = section
@@ -168,7 +168,7 @@ def enroll_student_course(context):
   context.enroll_student_data = {
     "section_id": section.id,
     "user_id":temp_user.id,
-    "email": student_email_and_token["email"]
+    "email": student_email_and_token["email"].lower()
     }
   yield context.enroll_student_data
 
