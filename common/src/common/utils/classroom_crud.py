@@ -670,8 +670,6 @@ def delete_student(course_id, student_email):
                               success=False,
                               message=str(ae),
                               data=None) from ae
-  except Exception as e:
-    raise InternalServerError(str(e)) from e
 
 def get_user_details(user_id, headers):
   """Get user from user collection
