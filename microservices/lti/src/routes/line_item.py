@@ -18,7 +18,7 @@ from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
 from services.grade_service import grade_pass_back
 from typing import List, Optional
-from services.validate_service import validate_access, get_tool_info
+from services.validate_service import validate_access, get_tool_info_using_token
 # pylint: disable=unused-argument, use-maxsplit-arg, line-too-long
 
 auth_scheme = HTTPBearer(auto_error=False)
@@ -168,7 +168,7 @@ def get_line_item(context_id: str,
 def create_line_item(context_id: str,
                      input_line_item: LineItemModel,
                      token: auth_scheme = Depends(),
-                     tool_details: dict = Depends(get_tool_info)):
+                     tool_details: dict = Depends(get_tool_info_using_token)):
   """The create line item endpoint will add a new line item to the firestore.
   ### Args:
   input_line_item: `LineItemModel`
@@ -185,9 +185,6 @@ def create_line_item(context_id: str,
     input_line_item_dict = {**input_line_item.dict()}
     input_line_item_dict["contextId"] = context_id
 
-    print("in li tool details", tool_details)
-    print("in li tool details", tool_details)
-    # TODO: Add a condition for tool_id as well, as the same context can be used for multiple tools
     lti_content_item = LTIContentItem.collection.filter(
         "context_id", "==", context_id).filter("tool_id", "==",
                                                tool_details.id).get()
@@ -601,27 +598,33 @@ def create_score_for_line_item(context_id: str,
           "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{new_result.id}"
 
     # Passing grades back to the LMS using shim service API
-    lti_content_item = LTIContentItem.find_by_id(line_item.resourceLinkId)
-    tool = Tool.find_by_id(lti_content_item.tool_id)
+    if line_item.resourceLinkId:
+      lti_content_item = LTIContentItem.find_by_id(line_item.resourceLinkId)
+      tool = Tool.find_by_id(lti_content_item.tool_id)
 
-    input_grade_dict = {
-        "user_id": user_id,
-        "comment": input_result_dict["comment"],
-        "lti_content_item_id": line_item.resourceLinkId,
-        "maximum_grade": input_result_dict["resultMaximum"],
-        "assigned_grade": None,
-        "draft_grade": None,
-        "validate_title": tool.validate_title_for_grade_sync,
-        "line_item_title": line_item.label
-    }
+      input_grade_dict = {
+          "user_id": user_id,
+          "comment": input_result_dict["comment"],
+          "lti_content_item_id": line_item.resourceLinkId,
+          "maximum_grade": input_result_dict["resultMaximum"],
+          "assigned_grade": None,
+          "draft_grade": None,
+          "validate_title": tool.validate_title_for_grade_sync,
+          "line_item_title": line_item.label
+      }
 
-    if input_score_dict["gradingProgress"] in ["Pending", "PendingManual"]:
-      input_grade_dict["draft_grade"] = input_result_dict["resultScore"]
+      if input_score_dict["gradingProgress"] in ["Pending", "PendingManual"]:
+        input_grade_dict["draft_grade"] = input_result_dict["resultScore"]
 
-    if input_score_dict["gradingProgress"] == "FullyGraded":
-      input_grade_dict["assigned_grade"] = input_result_dict["resultScore"]
+      if input_score_dict["gradingProgress"] == "FullyGraded":
+        input_grade_dict["assigned_grade"] = input_result_dict["resultScore"]
 
-    grade_pass_back(input_grade_dict, user_id, line_item_id)
+      grade_pass_back(input_grade_dict, user_id, line_item_id)
+
+    else:
+      Logger.error(
+          f"Content item id not found for given line item {line_item_id} to trigger grade passback"
+      )
 
     return result_fields
 

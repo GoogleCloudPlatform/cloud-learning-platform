@@ -13,6 +13,7 @@ auth_scheme = HTTPBearer(auto_error=False)
 
 
 def validate_and_decode_token(token):
+  """Validates and decodes the token"""
   if token is None:
     raise InvalidTokenError("Token is missing")
   token_dict = dict(token)
@@ -38,17 +39,6 @@ def validate_access(allowed_scopes):
     def wrapper(*args, **kwargs):
       try:
         token = kwargs.get("token")
-        # if token is None:
-        #   raise InvalidTokenError("Token is missing")
-        # token_dict = dict(token)
-
-        # access_token = token_dict.get("credentials")
-        # if access_token:
-        #   unverified_claims = get_unverified_token_claims(token=access_token)
-        #   decoded_token = decode_token(
-        #       access_token,
-        #       get_platform_public_keyset().get("public_keyset"),
-        #       unverified_claims.get("aud"))
         decoded_token = validate_and_decode_token(token)
 
         user_scopes = decoded_token["scope"].split(" ")
@@ -66,9 +56,8 @@ def validate_access(allowed_scopes):
   return decorator
 
 
-def get_tool_info(token: auth_scheme = Depends()):
+def get_tool_info_using_token(token: auth_scheme = Depends()):
+  """Gets the tool info based on the given token"""
   decoded_token = validate_and_decode_token(token)
-  print("dec tok sub", decoded_token.get("sub"))
   tool_config = Tool.find_by_client_id(decoded_token.get("sub"))
-  print("tool_config", tool_config)
   return tool_config
