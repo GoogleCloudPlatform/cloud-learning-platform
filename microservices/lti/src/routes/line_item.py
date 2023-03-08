@@ -17,7 +17,7 @@ from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import create_new_line_item
 from services.grade_service import grade_pass_back
 from typing import List, Optional
-from services.validate_service import validate_access
+from services.validate_service import validate_access, get_tool_info
 # pylint: disable=unused-argument, use-maxsplit-arg, line-too-long
 
 auth_scheme = HTTPBearer(auto_error=False)
@@ -164,7 +164,8 @@ def get_line_item(context_id: str,
     allowed_scopes=["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
 def create_line_item(context_id: str,
                      input_line_item: LineItemModel,
-                     token: auth_scheme = Depends()):
+                     token: auth_scheme = Depends(),
+                     tool_details: dict = Depends(get_tool_info)):
   """The create line item endpoint will add a new line item to the firestore.
   ### Args:
   input_line_item: `LineItemModel`
@@ -181,9 +182,16 @@ def create_line_item(context_id: str,
     input_line_item_dict = {**input_line_item.dict()}
     input_line_item_dict["contextId"] = context_id
 
+    print("in li tool details", tool_details)
+    print("in li tool details", tool_details)
     # TODO: Add a condition for tool_id as well, as the same context can be used for multiple tools
-    lti_content_item = LTIContentItem.collection.filter("context_id", "==",
-                                                        context_id).get()
+    lti_content_item = LTIContentItem.collection.filter(
+        "context_id", "==", context_id).filter("tool_id", "==",
+                                               tool_details.id).get()
+
+    if not lti_content_item:
+      raise Exception("No content item object found")
+
     lti_content_item_id = lti_content_item.id
 
     # This condition holds true when the line item is not created using content item return

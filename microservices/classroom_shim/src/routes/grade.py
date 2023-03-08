@@ -54,6 +54,8 @@ def update_classroom_grade(input_grade: PostGradeModel):
         print("input_grade_dict['line_item_title']",
               input_grade_dict["line_item_title"])
         print("i", i.lti_assignment_title)
+        print("Condition",
+              input_grade_dict["line_item_title"] == i.lti_assignment_title)
 
         if i.lti_assignment_title == input_grade_dict["line_item_title"]:
           lti_assignment = i
