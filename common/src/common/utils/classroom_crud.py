@@ -568,8 +568,6 @@ def invite_user(course_id, email,role):
     invitation = service.invitations().create(body=body).execute()
     return invitation
   except HttpError as ae:
-    print("HTTTPpp Errrr")
-    print(ae.resp.status)
     raise CustomHTTPException(status_code=ae.resp.status,
                               success=False,
                               message=str(ae),
@@ -595,8 +593,6 @@ def get_invite(invitation_id):
     invitation = service.invitations().get(id=invitation_id).execute()
     return invitation
   except HttpError as ae:
-    print("In http errorr")
-    print(ae.resp.status)
     raise CustomHTTPException(status_code=ae.resp.status,
                               success=False,
                               message=str(ae),
@@ -674,12 +670,9 @@ def list_student_section(section_id,headers):
     user_id =record.user
     response = requests.\
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-    print("invitation flag and status",record.invitation_id ,record.is_invitation_accepted)
     user_record = response.json()["data"]
     user_record["invitation_id"]=record.invitation_id
     user_record["is_invitation_accepted"] = record.is_invitation_accepted
-    print("--------------------------------------------")
-    print(user_record)
     users.append(user_record)
   return users
 
