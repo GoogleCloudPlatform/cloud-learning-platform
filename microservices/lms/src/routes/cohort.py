@@ -289,9 +289,15 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
           for submission_obj in submitted_course_work:
             if submission_obj["state"] == "TURNED_IN":
               submitted_course_work_list = submitted_course_work_list + 1
+          progress_percent=0
+          if course_work_list !=0:
+            progress_percent = round\
+          ((submitted_course_work_list / course_work_list) * 100, 2)
+          else:
+            progress_percent = 0
           data = {"section_id":\
-          section.key.split("/")[1],"progress_percentage":round\
-          ((submitted_course_work_list / course_work_list) * 100, 2)}
+          section.key.split("/")[1],"progress_percentage":\
+            progress_percent}
           section_with_progress_percentage.append(data)
       cached_value = set_key(f"{cohort_id}::{user_id}",\
       section_with_progress_percentage, 86400)
