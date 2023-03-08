@@ -6,7 +6,7 @@ from googleapiclient.errors import HttpError
 from services import student_service
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
-ValidationError,InvalidTokenError)
+ValidationError,InvalidTokenError,UserManagementServiceError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
                              ResourceNotFound, BadRequest,InvalidToken,Conflict)
 from common.models import CourseEnrollmentMapping,Section,Cohort,TempUser
@@ -353,22 +353,14 @@ def invite_student(section_id: str,student_email:str,
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
-    # invitation = classroom_crud.invite_user(course_id=section.classroom_id,
-    #                                         email=student_email,
-    #                                         role="STUDENT")
-    # print(invitation)
     response = requests.get(f"\
     {USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",\
     headers=headers)
-    print("RESPONSE OF SEARCH USER",response.json())
-
   # If the response is success check if student is inactive i.e  raise error
     if response.status_code == 200:
-      print("11")
       searched_student = response.json()["data"]
-      print("22")
       if searched_student == []:
-        print("Increate user 5")
+        Logger.info(f"User {student_email} is not present in database")
         # User does not exist in db call create User API
         body = {
             "first_name":"first_name",
@@ -384,10 +376,11 @@ def invite_student(section_id: str,student_email:str,
             "gaia_id":"",
             "photo_url":""
           }
+        
         create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
         json=body,headers=headers)
-        print("Create user ",create_user_response.status_code)
-        print(create_user_response.json())
+        if create_user_response.status_code !=200:
+          raise UserManagementServiceError("Create User API Error",create_user_response.status_code)
         user_id = create_user_response.json()["data"]["user_id"]
       else:
         if searched_student[0]["status"] =="inactive":
@@ -397,14 +390,14 @@ def invite_student(section_id: str,student_email:str,
               the student status")    
         else:
           user_id = searched_student[0]["user_id"]
-          check_already_invited = CourseEnrollmentMapping.find_course_enrollment_record(section_key=section.key,user_id=user_id)
+          check_already_invited = CourseEnrollmentMapping.find_course_enrollment_record(
+                  section_key=section.key,user_id=user_id)
           if check_already_invited:
-            raise Conflict("STudent already Invited to this section")
+            Logger.error(f"Student {student_email} is invide or enrolled in this section")
+            raise Conflict("Student already invide or enrolled in this section")
       invitation = classroom_crud.invite_user(course_id=section.classroom_id,
                                             email=student_email,
                                             role="STUDENT")
-      print(invitation)
-      print("6")
       Logger.info("User with Email {student_email} present with user_id {user_id}")
       course_enrollment_mapping = CourseEnrollmentMapping()
       course_enrollment_mapping.section = section
@@ -417,7 +410,7 @@ def invite_student(section_id: str,student_email:str,
 
 
     else:
-      print("User Management service error_____",response.status_code)
+      Logger.error("Search by email api error",response.status_code)
       raise InternalServerError("User management Search User API Error")
     return {
         "message":
