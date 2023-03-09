@@ -456,7 +456,7 @@ def invite_student(section_id: str,student_email:str,
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
-@section_student_router.post("/update_invites",response_model=UpdateInviteResponseModel)
+@section_student_router.patch("/update_invites",response_model=UpdateInviteResponseModel)
 def update_invites(request: Request):
   """
   Args:
@@ -477,17 +477,18 @@ def update_invites(request: Request):
       "is_invitation_accepted","==",False).fetch()
     updated_list_inviations =[]
     for course_record in course_records:
+       Logger.info(f"course_record {course_record.section.id}, user_id {course_record.user}")
        if course_record.is_invitation_accepted == False and\
           course_record.invitation_id is not None:
         try:
           result = classroom_crud.get_invite(course_record.invitation_id)
           Logger.info(f"Invitation {result} found for \
-        User id {course_record.user},database will be updated once invite is accepted.")
+           User id {course_record.user},database will be updated once invite is accepted.")
         except Exception as e:
           Logger.error(f"Could not get the invite for user_id {course_record.user}section_id{course_record.section.id}")
           # continue
           user_details = classroom_crud.get_user_details(user_id=course_record.user,headers=headers)
-          Logger.info("User record found for User",user_details)
+          Logger.info(f"User record found for User {user_details}")
           user_profile =classroom_crud.get_user_profile_information(user_details["data"]["email"])
           user_rec = TempUser.collection.filter("user_id","==",course_record.user).get()
 
@@ -509,26 +510,26 @@ def update_invites(request: Request):
           cohort.enrolled_students_count +=1
           cohort.update()
           updated_list_inviations.append(course_record.key)
+    print("Herree")
     return {
         "message":f"Successfully Added the Student with email",
         "data" : {"list_coursenrolment":updated_list_inviations}}
   except ResourceNotFoundException as err:
-    Logger.error(err)
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
     raise ResourceNotFound(str(err)) from err
   except Conflict as conflict:
-    Logger.error(conflict)
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise Conflict(str(conflict)) from conflict
   except HttpError as ae:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
     raise CustomHTTPException(status_code=ae.resp.status,
                               success=False,
                               message=str(ae),
                               data=None) from ae
   except Exception as e:
-    Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
