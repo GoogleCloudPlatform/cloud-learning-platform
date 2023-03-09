@@ -483,12 +483,13 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
 
   # Given student is active then call create
   # student in classroom course function
-  Logger.info(
-  f"Enrolling {student_email} classroom_id {course_id} classroom_code {course_code}"
-  )
+
   access_token_details = requests.get(
     f"https://oauth2.googleapis.com/tokeninfo?access_token={access_token}")
-  Logger.info(access_token_details.json())
+  Logger.info(
+f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
+  {access_token_details.json()}"
+  )
   create_student_in_course(access_token,student_email,course_id,course_code)
   # Get the gaia ID , first name ,last_name of the student
   # Call_people api function

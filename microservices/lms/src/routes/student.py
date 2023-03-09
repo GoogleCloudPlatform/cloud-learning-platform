@@ -1,6 +1,5 @@
 """ Student endpoints """
 import traceback
-import requests
 from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
 from services import student_service
@@ -251,7 +250,7 @@ def delete_student(section_id: str,user:str,request: Request):
 
 @cohort_student_router.post("/{cohort_id}/{section_id}/students",
 response_model=AddStudentResponseModel)
-def enroll_student_section(cohort_id: str,section_id:str,
+def enroll_student_section(cohort_id: str,
                            input_data: AddStudentToCohortModel,
                            request: Request):
   """
@@ -287,7 +286,6 @@ def enroll_student_section(cohort_id: str,section_id:str,
       raise Conflict(f"User {input_data.email} is already\
                       registered for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
-    section = Section.find_by_id(section_id)
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {input_data.email}")   
     user_object = classroom_crud.enroll_student(
