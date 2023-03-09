@@ -136,6 +136,11 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
 
       if fetch_user_mapping.status_code == 200:
         learner_data = fetch_user_mapping.json().get("data")
+
+        if learner_data.get("is_invitation_accepted") is False:
+          raise Exception(
+              "Enrollment in progress, please retry again after 15 minutes")
+
       elif fetch_user_mapping.status_code == 404:
         raise UnauthorizedUserError(
             "Access Denied with code 1003, Please contact administrator")
