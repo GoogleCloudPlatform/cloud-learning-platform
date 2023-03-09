@@ -28,8 +28,12 @@ def get_section_with_minimum_student(sections):
 def get_user_id(user,headers):
   regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
   if re.fullmatch(regex, user):
-    return classroom_crud.get_user_details_by_email(
-        user_email=user.lower(), headers=headers)["data"][0]["user_id"]
+    if classroom_crud.get_user_details_by_email(
+        user_email=user.lower(), headers=headers)["data"] != []:
+      return classroom_crud.get_user_details_by_email(
+          user_email=user.lower(), headers=headers)["data"][0]["user_id"]
+    else:
+      raise ResourceNotFoundException(f"user {user} not found")
   return user
 
 def check_student_can_enroll_in_cohort(email,headers,sections):
