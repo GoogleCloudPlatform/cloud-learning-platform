@@ -1,4 +1,5 @@
 """NRPS  Endpoints"""
+import traceback
 import requests
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
@@ -150,4 +151,5 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e

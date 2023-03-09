@@ -64,6 +64,19 @@ def create_tables(dataset):
     create_table_using_sql_file(dataset, each_file)
 
 
+def create_views(dataset):
+  print("dataset", dataset)
+  sql_file_list = []
+
+  file_path = "views_sql/"
+  sql_files = listdir(file_path)
+  sql_file_list = [file_path + i for i in sql_files]
+
+  for each_file in sql_file_list:
+    print(f"Running ddl_file: {each_file}")
+    create_table_using_sql_file(dataset,
+                          each_file)
+
 def parse_arguments():
   """Parse the given arguments"""
   parser = argparse.ArgumentParser()
@@ -80,9 +93,16 @@ def parse_arguments():
       "--create-tables",
       dest="create_tables",
       type=str,
-      default="false",
+      default="true",
       choices=["true", "false"],
       help="Create table for logs in lms_analytics dataset? true or false")
+  parser.add_argument(
+      "--create-views",
+      dest="create_views",
+      type=str,
+      default="true",
+      choices=["true", "false"],
+      help="Create Views for logs in lms_analytics dataset? true or false")
   return parser.parse_args()
 
 
@@ -105,3 +125,5 @@ if __name__ == "__main__":
     create_bigquery_dataset(BQ_DATASET)
   if args.create_tables == "true":
     create_tables(BQ_DATASET)
+  if args.create_views == "true":
+    create_views(BQ_DATASET)

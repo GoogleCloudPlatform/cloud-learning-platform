@@ -483,6 +483,13 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
 
   # Given student is active then call create
   # student in classroom course function
+
+  access_token_details = requests.get(
+    f"https://oauth2.googleapis.com/tokeninfo?access_token={access_token}")
+  Logger.info(
+f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
+  {access_token_details.json()}"
+  )
   create_student_in_course(access_token,student_email,course_id,course_code)
   # Get the gaia ID , first name ,last_name of the student
   # Call_people api function
@@ -670,8 +677,6 @@ def delete_student(course_id, student_email):
                               success=False,
                               message=str(ae),
                               data=None) from ae
-  except Exception as e:
-    raise InternalServerError(str(e)) from e
 
 def get_user_details(user_id, headers):
   """Get user from user collection

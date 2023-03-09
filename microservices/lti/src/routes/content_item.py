@@ -1,4 +1,5 @@
 """LTI Content Item endpoints"""
+import traceback
 from fastapi import APIRouter
 from config import ERROR_RESPONSES
 from common.models import LTIContentItem, Tool
@@ -47,6 +48,7 @@ def search_content_item(tool_id: str):
     }
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -98,6 +100,7 @@ def get_all_content_items(skip: int = 0, limit: int = 10):
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -134,6 +137,7 @@ def get_content_item(content_item_id: str):
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -182,6 +186,7 @@ def create_content_item(input_content_item: LTIContentItemModel):
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -232,6 +237,7 @@ def update_content_item(content_item_id: str,
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -263,4 +269,5 @@ def delete_content_item(content_item_id: str):
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
