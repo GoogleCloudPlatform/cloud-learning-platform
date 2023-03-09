@@ -3,7 +3,7 @@ CREATE OR REPLACE VIEW
 SELECT * FROM
 (
 SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY timestamp DESC) AS row_num
-FROM `courseWorkCollection`
+FROM `lms_analytics.courseWorkCollection`
 ) a
     WHERE
       a.row_num = 1
