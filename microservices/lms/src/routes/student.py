@@ -287,7 +287,7 @@ def enroll_student_section(cohort_id: str,
                       registered for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
     Logger.info(f"Section with minimum student is {section.id},\
-                enroll student intiated for {input_data.email}")   
+                enroll student intiated for {input_data.email}")
     user_object = classroom_crud.enroll_student(
         headers=headers,
         access_token=input_data.access_token,
