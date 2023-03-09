@@ -248,7 +248,7 @@ def delete_student(section_id: str,user:str,request: Request):
     raise InternalServerError(str(e)) from e
 
 
-@cohort_student_router.post("/{cohort_id}/{section_id}/students",
+@cohort_student_router.post("/{cohort_id}/students",
 response_model=AddStudentResponseModel)
 def enroll_student_section(cohort_id: str,
                            input_data: AddStudentToCohortModel,
