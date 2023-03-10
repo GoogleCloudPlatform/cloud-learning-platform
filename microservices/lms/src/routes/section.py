@@ -322,7 +322,10 @@ def update_section(sections_details: UpdateSection,request: Request):
           f" {sections_details.course_id} is not found in classroom")
     add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
+    print("Add teachers List")
+    print(add_teacher_list)
     for i in add_teacher_list:
+      print("loop1",i)
       invitation_object = classroom_crud.invite_user(
                             sections_details.course_id,i,"TEACHER")
       # Storing classroom details
@@ -345,7 +348,9 @@ def update_section(sections_details: UpdateSection,request: Request):
       common_service.create_teacher(headers,data)
     remove_teacher_list = list(
         set(section.teachers) - set(sections_details.teachers))
+    print("Remove teachers list",remove_teacher_list)
     for i in remove_teacher_list:
+      print("remove loop",i)
       classroom_crud.delete_teacher(sections_details.course_id, i)
     section.section = sections_details.section_name
     section.description = sections_details.description
