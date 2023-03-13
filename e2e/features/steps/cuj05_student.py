@@ -24,6 +24,24 @@ def step_impl_2(context):
 def step_impl_3(context):
     assert context.status == 200, "Status 200"
 
+#-------------------------------Get student in cohort--------------------------------------
+@behave.given("A section has a students enrolled in cohort")
+def step_impl_1(context):
+  context.url = f'{API_URL}/cohorts/{context.enroll_student_data["cohort_id"]}/students/{context.enroll_student_data["email"]}'
+
+@behave.when("API request with valid cohort Id  user_id is sent")
+def step_impl_2(context):
+  resp = requests.get(context.url,headers=context.header)
+  print("GET student cohort response",resp.status_code)
+  print(resp.json())
+  context.status = resp.status_code
+  context.response = resp.json()
+
+@behave.then("student details will be fetch using the given id for cohort")
+def step_impl_3(context):
+    assert context.status == 200, "Status 200"
+    assert context.response["cohort_id"] == context.enroll_student_data["cohort_id"]
+
 # ------------------------------Delete student to Section-------------------------------------
 
 
