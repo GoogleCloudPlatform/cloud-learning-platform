@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW
-  rosterLogsView AS
+  lms_analytics.rosterLogsView AS
 WITH user as (SELECT id,
         name,		
         emailAddress,
