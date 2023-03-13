@@ -190,8 +190,12 @@ def test_get_student_in_cohort_email(client_with_emulator,create_fake_data):
   cohort_id = create_fake_data["cohort"]
   url = BASE_URL + f"/cohorts/{cohort_id}/students/clplmstestuser1@gmail.com"
   with mock.patch\
-  ("routes.student.classroom_crud.get_user_details",return_value={"data":TEMP_USER}):
-    resp = client_with_emulator.get(url)
+  ("routes.student.classroom_crud.get_user_details",
+   return_value={"data":TEMP_USER}):
+    with mock.patch\
+  ("routes.student.student_service.get_user_id",
+   return_value=create_fake_data["user_id"]):
+      resp = client_with_emulator.get(url)
   assert resp.status_code == 200
   assert resp.json()["data"]["cohort_id"] == cohort_id
 
@@ -200,7 +204,8 @@ def test_get_student_in_cohort_user_id(client_with_emulator,create_fake_data):
   user_id = create_fake_data["user_id"]
   url = BASE_URL + f"/cohorts/{cohort_id}/students/{user_id}"
   with mock.patch\
-  ("routes.student.classroom_crud.get_user_details",return_value={"data":TEMP_USER}):
+  ("routes.student.classroom_crud.get_user_details",
+   return_value={"data":TEMP_USER}):
     resp = client_with_emulator.get(url)
   assert resp.status_code == 200
   assert resp.json()["data"]["cohort_id"] == cohort_id
@@ -209,7 +214,8 @@ def test_get_student_in_invalid_cohort(client_with_emulator,create_fake_data):
   user_id = create_fake_data["user_id"]
   url = BASE_URL + f"/cohorts/invalid_id/students/{user_id}"
   with mock.patch\
-  ("routes.student.classroom_crud.get_user_details",return_value={"data":TEMP_USER}):
+  ("routes.student.classroom_crud.get_user_details",
+   return_value={"data":TEMP_USER}):
     resp = client_with_emulator.get(url)
   assert resp.status_code == 404
   
