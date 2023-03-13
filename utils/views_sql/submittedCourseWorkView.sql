@@ -12,7 +12,7 @@ event_type	as userColl_event_type,
 timestamp	as userColl_timestamp,			
 message_id as userColl_message_id FROM(
 SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY timestamp DESC) AS row_num
-FROM `userCollection`
+FROM `lms_analytics.userCollection`
 ) a
     WHERE
       a.row_num = 1
@@ -38,7 +38,7 @@ FROM `userCollection`
         `timestamp` as submittedColl_timestamp,
         message_id as submittedColl_message_id FROM(
 SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY timestamp DESC) AS row_num
-FROM `submittedCourseWorkCollection`
+FROM `lms_analytics.submittedCourseWorkCollection`
 ) b
     WHERE
       b.row_num = 1
