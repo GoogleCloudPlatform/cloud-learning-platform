@@ -3,18 +3,29 @@
 from config import LTI_ISSUER_DOMAIN
 
 BASIC_TOOL_EXAMPLE = {
-    "name": "Test tool",
-    "description": "Test tool integration",
-    "tool_url": "https://example-tool.com",
-    "tool_login_url": "https://example-tool.com/admin/api/ltilaunch/oidclogin",
-    "public_key_type": "JWK URL",
-    "tool_keyset_url": "https://example-tool.com/admin/ui/jwks",
-    "content_selection_url": "https://example-tool.com/admin/ui/deep_link",
+    "name":
+        "Test tool",
+    "description":
+        "Test tool integration",
+    "tool_url":
+        "https://example-tool.com",
+    "tool_login_url":
+        "https://example-tool.com/admin/api/ltilaunch/oidclogin",
+    "public_key_type":
+        "JWK URL",
+    "tool_keyset_url":
+        "https://example-tool.com/admin/ui/jwks",
+    "content_selection_url":
+        "https://example-tool.com/admin/ui/deep_link",
     "redirect_uris": [
         "https://example-tool.com/admin/api/ltilaunch/ltitoollaunch"
     ],
-    "enable_grade_sync": False,
-    "enable_nrps": False
+    "enable_grade_sync":
+        False,
+    "enable_nrps":
+        False,
+    "custom_params":
+        "deepLinkLaunchEndpoint=$ResourceLink.LaunchUrl;timeZone=$Person.address.timezone"
 }
 
 FULL_TOOL_EXAMPLE = {
