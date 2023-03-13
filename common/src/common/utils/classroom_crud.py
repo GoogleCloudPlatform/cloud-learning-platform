@@ -777,10 +777,10 @@ def get_course_work(course_id,course_work_id):
     courseId=course_id,id=course_work_id).execute()
 
 def post_grade_of_the_user(section_id: str,
-                    course_work_id: str,
-                    submission_id: str,
-                    assigned_grade: float = None,
-                    draft_grade: float = None):
+                           course_work_id: str,
+                           submission_id: str,
+                           assigned_grade: float = None,
+                           draft_grade: float = None):
   """
    Args:
       section_id: Unique ID of the section
@@ -799,10 +799,10 @@ def post_grade_of_the_user(section_id: str,
 
     student_submission = {}
 
-    if assigned_grade:
+    if assigned_grade is not None:
       student_submission["assignedGrade"] = assigned_grade
 
-    if draft_grade:
+    if draft_grade is not None:
       student_submission["draftGrade"] = draft_grade
 
     output = service.courses().courseWork().studentSubmissions().patch(

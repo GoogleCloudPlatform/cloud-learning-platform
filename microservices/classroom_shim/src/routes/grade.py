@@ -36,7 +36,6 @@ def update_classroom_grade(input_grade: PostGradeModel):
 
   try:
     input_grade_dict = {**input_grade.dict()}
-    print("input_grade_dict", input_grade_dict)
 
     # TODO: Need to check where the comment can be added in the classroom
     if input_grade_dict["comment"]:
