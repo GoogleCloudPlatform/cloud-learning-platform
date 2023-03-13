@@ -175,8 +175,9 @@ def get_student_in_cohort(cohort_id: str, user: str, request: Request):
     course_mapping = None
     list_section = Section.collection.filter("cohort","==",cohort.key).fetch()
     for section in list_section:
-      course_mapping = CourseEnrollmentMapping.collection.filter("user","==",user_id).\
-      filter("status", "==","active").filter("section","==",section.key).get()
+      course_mapping = CourseEnrollmentMapping.collection.\
+        filter("user","==",user_id).filter("status", "==","active").\
+          filter("section","==",section.key).get()
       if course_mapping:
         result = classroom_crud.get_user_details(user_id=user_id,
                                                  headers=headers)
