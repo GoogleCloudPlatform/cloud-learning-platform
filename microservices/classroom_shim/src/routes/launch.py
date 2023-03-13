@@ -17,7 +17,8 @@ from common.utils.logging_handler import Logger
 
 templates = Jinja2Templates(directory="templates")
 
-router = APIRouter(tags=["Login Template"], responses=ERROR_RESPONSES)
+router = APIRouter(
+    tags=["Assignment Launch Endpoints"], responses=ERROR_RESPONSES)
 
 
 @router.get("/launch")
@@ -122,6 +123,9 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
 
     if timezone:
       custom_params["$Person.address.timezone"] = timezone
+
+    url = f"{API_DOMAIN}/classroom-shim/api/v1/launch-assignment?lti_assignment_id={lti_assignment_id}"
+    custom_params["$ResourceLink.LaunchUrl"] = url
 
     # TODO: implementation of "$Context.id.history" as a custom parameter
     final_lti_message_hint_dict = {

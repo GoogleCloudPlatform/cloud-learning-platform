@@ -34,6 +34,7 @@ class Tool(BaseModel):
   deployment_id = TextField(required=True)
   enable_grade_sync = BooleanField(default=False)
   enable_nrps = BooleanField(default=False)
+  custom_params = TextField(default=None)
 
   class Meta:
     collection_name = BaseModel.DATABASE_PREFIX + "tools"

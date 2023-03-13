@@ -1,4 +1,5 @@
 """ LTI Token utils """
+import re
 import json
 from datetime import datetime
 from jose import jwt, jws
@@ -105,11 +106,30 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
         token_claims[lti_claim_field("claim",
                                      "target_link_uri")] = tool_info["tool_url"]
 
-    if "custom" in content_item_info.keys():
-      custom_params = lti_message_hint.get("custom_params_for_substitution")
-      final_custom_claims = {**content_item_info.get("custom")}
+    # process custom parameters
+    final_custom_claims = {**content_item_info.get("custom")}
+    custom_params = lti_message_hint.get("custom_params_for_substitution")
 
-      # process custom parameter substitution
+    if tool_info.get("custom_params", None) is not None:
+      cpm = tool_info.get("custom_params")
+      # process custom parameter from tool registration
+
+      # separate params string using ";"
+      cpm = re.split(";", cpm)
+      final_cpm = {}
+      for i in cpm:
+        # separate params string using "="
+        single_cpm = re.split("=", i)
+        key = single_cpm[0].replace(" ", "")
+        value = single_cpm[1].replace(" ", "")
+        final_cpm[key] = value
+
+      for key, value in final_cpm.items():
+        if custom_params.get(value) is not None:
+          final_custom_claims[key] = custom_params.get(value)
+
+    if "custom" in content_item_info.keys():
+      # process custom parameters from content_item
       for key, value in content_item_info.get("custom").items():
         if isinstance(value, str) and value.startswith(
             "$") and custom_params.get(value) is not None:
