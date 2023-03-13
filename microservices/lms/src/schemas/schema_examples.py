@@ -115,7 +115,7 @@ GET_STUDENT_EXAMPLE["student_email"]="test_user@gmail"
 GET_STUDENT_EXAMPLE["section_id"]="fake-section-id"
 GET_STUDENT_EXAMPLE["cohort_id"]="fake-cohort-id"
 GET_STUDENT_EXAMPLE["classroom_id"]="123453333"
-GET_STUDENT_EXAMPLE["classroom_url"]="https://classroom.google.com/c/NTYzMhjhjrx"
+GET_STUDENT_EXAMPLE["classroom_url"]="https://classroom.google.com/c/NTYzMhjhjr"
 
 UPDATE_SECTION = {
     "id": "string",

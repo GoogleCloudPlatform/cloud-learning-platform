@@ -7,15 +7,10 @@ Feature:Delete, List students in section
     When API request with valid section Id is sent
     Then Section will be fetch using the given id and list of studnets enrolled
   
-  @fixture.create.enroll_student_course
-  Scenario: Get students in section
-    Given A section has a students enrolled
-    When API request with valid section Id and user_id is sent
-    Then student details will be fetch using the given id
 
   @fixture.create.enroll_student_course
   Scenario:  Get students in cohort
-    Given A section has a students enrolled
+    Given A section has a students enrolled in cohort
     When API request with valid cohort Id  user_id is sent
     Then student details will be fetch using the given id for cohort
 

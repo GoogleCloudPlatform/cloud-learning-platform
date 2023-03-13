@@ -40,7 +40,7 @@ def step_impl_2(context):
 @behave.then("student details will be fetch using the given id for cohort")
 def step_impl_3(context):
     assert context.status == 200, "Status 200"
-    assert context.response["cohort_id"] == context.enroll_student_data["cohort_id"]
+    assert context.response["data"]["cohort_id"] == context.enroll_student_data["cohort_id"]
 
 # ------------------------------Delete student to Section-------------------------------------
 

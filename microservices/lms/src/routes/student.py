@@ -8,7 +8,7 @@ from common.utils.errors import (ResourceNotFoundException,
 ValidationError,InvalidTokenError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
                              ResourceNotFound, BadRequest,InvalidToken,Conflict)
-from common.models import CourseEnrollmentMapping,Section,Cohort,TempUser
+from common.models import CourseEnrollmentMapping,Section,Cohort
 from common.utils import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
@@ -165,14 +165,14 @@ def get_student_in_cohort(cohort_id: str, user: str, request: Request):
     HTTPException: 500 Internal Server Error if something fails
     ResourceNotFound: 404 Resource not found exception
   Returns:
-    {"status":"Success","data":{}}: 
+    {"status":"Success","data":{}}
     {'status': 'Failed',"data":null}
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
     user_id = student_service.get_user_id(user=user, headers=headers)
     cohort = Cohort.find_by_id(cohort_id)
-    csr = None
+    course_mapping = None
     list_section = Section.collection.filter("cohort","==",cohort.key).fetch()
     for section in list_section:
       course_mapping = CourseEnrollmentMapping.collection.filter("user","==",user_id).\
