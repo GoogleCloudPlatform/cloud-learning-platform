@@ -35,7 +35,6 @@ COLLECTION = os.getenv("COLLECTION")
 
 API_BASE_URL = os.getenv("API_BASE_URL")
 
-CLASSROOM_ADMIN_EMAIL="lms_admin_teacher@dhodun.altostrat.com"
 CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL").lower()
 
 SERVICES = {
