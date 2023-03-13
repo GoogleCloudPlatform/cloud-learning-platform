@@ -40,5 +40,4 @@ SERVICES = {
 USER_MANAGEMENT_BASE_URL = f"http://{SERVICES['user-management']['host']}:" \
                   f"{SERVICES['user-management']['port']}" \
                   f"/user-management/api/v1"
-CLASSROOM_ADMIN_EMAIL="lms_admin_teacher@dhodun.altostrat.com"
-# CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL")
+CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL")
