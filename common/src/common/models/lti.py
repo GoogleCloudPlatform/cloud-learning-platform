@@ -168,6 +168,7 @@ class Result(BaseModel):
   comment = TextField()
   scoreOf = TextField()
   lineItemId = TextField()
+  isGradeSyncCompleted = BooleanField(default=False)
 
   class Meta:
     collection_name = BaseModel.DATABASE_PREFIX + "results"

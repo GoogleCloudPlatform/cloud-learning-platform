@@ -569,7 +569,8 @@ def create_score_for_line_item(context_id: str,
         "resultMaximum": input_score_dict["scoreMaximum"],
         "comment": input_score_dict["comment"],
         "scoreOf": line_item_id,
-        "lineItemId": line_item_id
+        "lineItemId": line_item_id,
+        "isGradeSyncCompleted": False
     }
 
     user_id = input_result_dict["userId"]
@@ -619,7 +620,12 @@ def create_score_for_line_item(context_id: str,
       if input_score_dict["gradingProgress"] == "FullyGraded":
         input_grade_dict["assigned_grade"] = input_result_dict["resultScore"]
 
-      grade_pass_back(input_grade_dict, user_id, line_item_id)
+      gpb_resp = grade_pass_back(input_grade_dict, user_id, line_item_id)
+      if gpb_resp:
+        result = Result.collection.filter("scoreOf", "==", line_item_id).filter(
+            "userId", "==", input_score_dict["userId"]).get()
+        result.isGradeSyncCompleted = True
+        result.update()
 
     else:
       Logger.error(
