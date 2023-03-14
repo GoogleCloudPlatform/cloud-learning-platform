@@ -190,6 +190,7 @@ def get_student_in_cohort(cohort_id: str, user: str, request: Request):
         result["section_id"] = section.id
         result["classroom_url"] = section.classroom_url
         result["cohort_id"] = cohort_id
+        result["invitation_id"] = course_mapping.invitation_id
         return {"data": result}
     if not course_mapping:
       raise ResourceNotFoundException(
@@ -258,7 +259,7 @@ def delete_student(section_id: str,user:str,request: Request):
     section_details = Section.find_by_id(section_id)
     user_id=student_service.get_user_id(user=user,headers=headers)
     result = CourseEnrollmentMapping.\
-      find_course_enrollment_record(section_details.key,user_id)
+      find_enrolled_student_record(section_details.key,user_id)
     if result is None:
       raise ResourceNotFoundException\
       (
@@ -419,74 +420,13 @@ def invite_student(section_id: str,student_email:str,
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
-    response = requests.get(f"\
-    {USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",\
+    invitation_details = student_service.invite_student(section=section,
+    student_email=student_email,
     headers=headers)
-  # If the response is success check if student is inactive i.e  raise error
-    if response.status_code == 200:
-      searched_student = response.json()["data"]
-      if searched_student == []:
-        Logger.info(f"User {student_email} is not present in database")
-        # User does not exist in db call create User API
-        body = {
-            "first_name":"first_name",
-            "last_name": "last_name",
-            "email":student_email,
-            "user_type": "learner",
-            "user_type_ref": "",
-            "user_groups": [],
-            "status": "active",
-            "is_registered": True,
-            "failed_login_attempts_count": 0,
-            "access_api_docs": False,
-            "gaia_id":"",
-            "photo_url":""
-          }
-        
-        create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
-        json=body,headers=headers)
-        if create_user_response.status_code !=200:
-          raise UserManagementServiceError("Create User API Error",create_user_response.status_code)
-        user_id = create_user_response.json()["data"]["user_id"]
-      else:
-        if searched_student[0]["status"] =="inactive":
-          print("33")
-          raise InternalServerError("Student inactive in \
-              database. Please update\
-              the student status")    
-        else:
-          user_id = searched_student[0]["user_id"]
-          check_already_invited = CourseEnrollmentMapping.find_course_enrollment_record(
-                  section_key=section.key,user_id=user_id)
-          if check_already_invited:
-            Logger.error(f"Student {student_email} is invide or enrolled in this section")
-            raise Conflict("Student already invide or enrolled in this section")
-      invitation = classroom_crud.invite_user(course_id=section.classroom_id,
-                                            email=student_email,
-                                            role="STUDENT")
-      Logger.info("User with Email {student_email} present with user_id {user_id}")
-      course_enrollment_mapping = CourseEnrollmentMapping()
-      course_enrollment_mapping.section = section
-      course_enrollment_mapping.user = user_id
-      course_enrollment_mapping.status = "invited"
-      course_enrollment_mapping.role = "learner"
-      course_enrollment_mapping.invitation_id = invitation["id"]
-      course_enrollment_id = course_enrollment_mapping.save().id
-
-
-    else:
-      Logger.error("Search by email api error",response.status_code)
-      raise InternalServerError("User management Search User API Error")
     return {
         "message":
         f"Successfully Added the Student with email {student_email}",
-        "data" : {"invitation_id": invitation["id"],
-                  "course_enrollment_id":course_enrollment_id,
-                  "user_id":user_id,
-                  "section_id":section_id,
-                  "cohort_id":section.cohort.key,
-            "classroom_id":section.classroom_id,
-            "classroom_url":section.classroom_url}
+        "data":invitation_details
     }
   except ResourceNotFoundException as err:
     Logger.error(err)
@@ -533,8 +473,8 @@ def update_invites(request: Request):
           Logger.info(f"Invitation {result} found for \
            User id {course_record.user},database will be updated once invite is accepted.")
         except Exception as e:
-          Logger.error(f"Could not get the invite for user_id {course_record.user}section_id{course_record.section.id}")
-          # continue
+          Logger.error(f"Could not get the invite for user_id {course_record.user} \
+          section_id{course_record.section.id}")
           user_details = classroom_crud.get_user_details(user_id=course_record.user,headers=headers)
           Logger.info(f"User record found for User {user_details}")
           user_profile =classroom_crud.get_user_profile_information(user_details["data"]["email"])
@@ -547,7 +487,7 @@ def update_invites(request: Request):
             user_rec.gaia_id = user_profile["id"]
             user_rec.photo_url = user_profile["photoUrl"]
             user_rec.update()
-          course_record.is_invitation_accepted = True
+          course_record.status = "active"
           course_record.update()
           # Update section enrolled student count
           section = Section.find_by_id(course_record.section.key)
@@ -558,7 +498,7 @@ def update_invites(request: Request):
           cohort.enrolled_students_count +=1
           cohort.update()
           updated_list_inviations.append(course_record.key)
-          Logger.info("Successfully  updated the invitations",updated_list_inviations)
+          Logger.info(f"Successfully  updated the invitations {updated_list_inviations}")
     return {
         "message":f"Successfully  updated the invitations",
         "data" : {"list_coursenrolment":updated_list_inviations}}

@@ -14,7 +14,7 @@
 """
 Module to add course enrollment in Fireo
 """
-from fireo.fields import TextField, ReferenceField, IDField,BooleanField
+from fireo.fields import TextField, ReferenceField, IDField
 from common.models import BaseModel,Section
 
 def check_status(field_val):
@@ -77,7 +77,7 @@ class CourseEnrollmentMapping(BaseModel):
     """
     objects = CourseEnrollmentMapping.collection.\
       filter("section", "==", section_key).filter(
-        "status", 'in',["active","invited"]).filter("role", "==",role).fetch()
+        "status", "in",["active","invited"]).filter("role", "==",role).fetch()
     return list(objects)
 
   @classmethod

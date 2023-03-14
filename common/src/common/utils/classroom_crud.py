@@ -682,7 +682,6 @@ def list_student_section(section_id,headers):
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     user_record = response.json()["data"]
     user_record["invitation_id"]=record.invitation_id
-    user_record["is_invitation_accepted"] = record.is_invitation_accepted
     users.append(user_record)
   return users
 
