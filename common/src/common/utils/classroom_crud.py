@@ -653,7 +653,6 @@ def if_user_exists_in_section(section_id, user_id, headers):
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     user = response.json()["data"]
     user["invitation_id"]=result.invitation_id
-    user["is_invitation_accepted"] = result.is_invitation_accepted
     user["section_id"]=section_details.id
     user["cohort_id"]=section_details.cohort.id
     user["classroom_url"]=section_details.classroom_url

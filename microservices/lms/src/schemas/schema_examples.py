@@ -111,6 +111,7 @@ TEMP_USER = {
   }
 GET_STUDENT_EXAMPLE = TEMP_USER
 GET_STUDENT_EXAMPLE["course_enrollment_id"]="2xBnBjqm2X3eRgVxE6Bv"
+GET_STUDENT_EXAMPLE["invitation_id"]="2xBnBjqm2X3eRgVxE6Bv"
 GET_STUDENT_EXAMPLE["student_email"]="test_user@gmail"
 GET_STUDENT_EXAMPLE["section_id"]="fake-section-id"
 GET_STUDENT_EXAMPLE["cohort_id"]="fake-cohort-id"

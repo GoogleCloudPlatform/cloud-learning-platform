@@ -19,7 +19,7 @@ from common.models import BaseModel,Section
 
 def check_status(field_val):
   """validator method for status field"""
-  status = ["active", "inactive"]
+  status = ["active", "inactive","invited"]
   if field_val.lower() in ["active", "inactive","invited"]:
     return True
   return (False,
@@ -77,11 +77,28 @@ class CourseEnrollmentMapping(BaseModel):
     """
     objects = CourseEnrollmentMapping.collection.\
       filter("section", "==", section_key).filter(
-        "status", "==","active").filter("role", "==",role).fetch()
+        "status", 'in',["active","invited"]).filter("role", "==",role).fetch()
     return list(objects)
 
   @classmethod
   def find_course_enrollment_record(cls,
+                          section_key,
+                          user_id,
+                        ):
+    """_summary_
+
+    Args:
+        section_key (str): section unique key to filter data
+        user_id(str, optional): user_id from user collection
+
+    Returns:
+        course_enrollment object
+    """
+    return CourseEnrollmentMapping.collection.filter("user","==",user_id).\
+    filter("status", "in",["active","invited"]).filter("section","==",section_key).get()
+
+  @classmethod
+  def find_enrolled_student_record(cls,
                           section_key,
                           user_id,
                         ):
