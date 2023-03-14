@@ -131,7 +131,7 @@ def get_student_in_section(section_id: str, user: str, request: Request):
     HTTPException: 500 Internal Server Error if something fails
     ResourceNotFound: 404 Resource not found exception
   Returns:
-    {"status":"Success","data":{}}: Returns list of students in section
+    {"status":"Success","data":{}}:
     {'status': 'Failed',"data":null}
   """
   try:
@@ -141,6 +141,56 @@ def get_student_in_section(section_id: str, user: str, request: Request):
       if_user_exists_in_section\
         (section_id=section_id,user_id=user_id,headers=headers)
     return {"data": users}
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+
+@cohort_student_router.get("/{cohort_id}/students/{user}",
+                          response_model=GetStudentDetailsResponseModel )
+def get_student_in_cohort(cohort_id: str, user: str, request: Request):
+  """ Get student details of one cohort from db
+  Args:
+    cohort_id(str):cohort id from firestore db
+    user(str):user email or user id from firestore db
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+    ResourceNotFound: 404 Resource not found exception
+  Returns:
+    {"status":"Success","data":{}}
+    {'status': 'Failed',"data":null}
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    user_id = student_service.get_user_id(user=user, headers=headers)
+    cohort = Cohort.find_by_id(cohort_id)
+    course_mapping = None
+    list_section = Section.collection.filter("cohort","==",cohort.key).fetch()
+    for section in list_section:
+      course_mapping = CourseEnrollmentMapping.find_course_enrollment_record(
+        section_key=section.key,user_id=user_id
+      )
+      if course_mapping:
+        result = classroom_crud.get_user_details(user_id=user_id,
+                                                 headers=headers)
+        result = result["data"]
+        result["classroom_id"] = section.classroom_id
+        result["course_enrollment_id"] = course_mapping.id
+        result["section_id"] = section.id
+        result["classroom_url"] = section.classroom_url
+        result["cohort_id"] = cohort_id
+        return {"data": result}
+    if not course_mapping:
+      raise ResourceNotFoundException(
+        f"User {user} not found for cohort {cohort_id}")
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
