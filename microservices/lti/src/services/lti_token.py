@@ -119,10 +119,10 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       final_cpm = {}
       for i in cpm:
         # separate params string using "="
-        single_cpm = re.split("=", i)
-        key = single_cpm[0].replace(" ", "")
-        value = single_cpm[1].replace(" ", "")
-        final_cpm[key] = value
+        if i:
+          i = i.replace(" ", "")
+          single_cpm = re.split("=", i)
+          final_cpm[single_cpm[0]] = single_cpm[1]
 
       for key, value in final_cpm.items():
         if custom_params.get(value) is not None:
