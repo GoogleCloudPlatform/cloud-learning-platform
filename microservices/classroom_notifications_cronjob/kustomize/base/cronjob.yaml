@@ -20,6 +20,7 @@ spec:
   schedule: "25 3 * * *"
   jobTemplate:
     spec:
+      backoffLimit: 0
       template:
         spec:
           serviceAccountName: ksa
@@ -29,5 +30,5 @@ spec:
             envFrom:
             - configMapRef:
                 name: env-vars
-          restartPolicy: OnFailure
+          restartPolicy: Never
           

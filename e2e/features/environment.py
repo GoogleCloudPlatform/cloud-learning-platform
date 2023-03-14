@@ -168,8 +168,10 @@ def enroll_student_course(context):
   context.enroll_student_data = {
     "section_id": section.id,
     "user_id":temp_user.id,
-    "email": student_email_and_token["email"].lower()
+    "email": student_email_and_token["email"].lower(),
+    "cohort_id":section.cohort.id
     }
+  print("Enroll student fixture cohort id",section.cohort.id)
   yield context.enroll_student_data
 
 

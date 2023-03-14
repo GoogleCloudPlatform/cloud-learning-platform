@@ -630,6 +630,11 @@ def if_user_exists_in_section(section_id, user_id, headers):
     response = requests.\
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     user = response.json()["data"]
+    user["section_id"]=section_details.id
+    user["cohort_id"]=section_details.cohort.id
+    user["classroom_url"]=section_details.classroom_url
+    user["course_enrollment_id"]=result.id
+    user["classroom_id"] = section_details.classroom_id
     return user
   else:
     raise ResourceNotFoundException("User not found")
