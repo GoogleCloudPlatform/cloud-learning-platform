@@ -477,8 +477,7 @@ def update_invites(request: Request):
     updated_list_inviations =[]
     for course_record in course_records:
       Logger.info(f"course_record {course_record.section.id}, user_id {course_record.user}")
-      if course_record.is_invitation_accepted == False and\
-        course_record.invitation_id is not None:
+      if course_record.invitation_id is not None:
         try:
           result = classroom_crud.get_invite(course_record.invitation_id)
           Logger.info(f"Invitation {result} found for \
