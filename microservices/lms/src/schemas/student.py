@@ -5,6 +5,7 @@ from typing import Optional
 from pydantic import BaseModel
 from schemas.schema_examples import STUDENT,INVITE_STUDENT
 from pydantic import BaseModel, constr
+from schemas.schema_examples import GET_STUDENT_EXAMPLE
 
 class AddStudentResponseModel(BaseModel):
   """Add Student Model"""
@@ -84,6 +85,11 @@ class UpdateInviteResponseModel(BaseModel):
                      ,"courseenrollment_id2","courseenrollment_id3"]}
         }}
 
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example":GET_STUDENT_EXAMPLE
+    }
 
 class GetProgressPercentageResponseModel(BaseModel):
   """Get Progress Percentage"""

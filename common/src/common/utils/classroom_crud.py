@@ -483,6 +483,13 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
 
   # Given student is active then call create
   # student in classroom course function
+
+  access_token_details = requests.get(
+    f"https://oauth2.googleapis.com/tokeninfo?access_token={access_token}")
+  Logger.info(
+f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
+  {access_token_details.json()}"
+  )
   create_student_in_course(access_token,student_email,course_id,course_code)
   # Get the gaia ID , first name ,last_name of the student
   # Call_people api function
@@ -647,6 +654,11 @@ def if_user_exists_in_section(section_id, user_id, headers):
     user = response.json()["data"]
     user["invitation_id"]=result.invitation_id
     user["is_invitation_accepted"] = result.is_invitation_accepted
+    user["section_id"]=section_details.id
+    user["cohort_id"]=section_details.cohort.id
+    user["classroom_url"]=section_details.classroom_url
+    user["course_enrollment_id"]=result.id
+    user["classroom_id"] = section_details.classroom_id
     return user
   else:
     raise ResourceNotFoundException("User not found")

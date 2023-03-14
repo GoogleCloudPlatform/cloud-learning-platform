@@ -109,6 +109,13 @@ TEMP_USER = {
   "gaia_id":"1234577657333",
   "photo_url":"https://lh3.googleusercontent.com/a/AEd"
   }
+GET_STUDENT_EXAMPLE = TEMP_USER
+GET_STUDENT_EXAMPLE["course_enrollment_id"]="2xBnBjqm2X3eRgVxE6Bv"
+GET_STUDENT_EXAMPLE["student_email"]="test_user@gmail"
+GET_STUDENT_EXAMPLE["section_id"]="fake-section-id"
+GET_STUDENT_EXAMPLE["cohort_id"]="fake-cohort-id"
+GET_STUDENT_EXAMPLE["classroom_id"]="123453333"
+GET_STUDENT_EXAMPLE["classroom_url"]="https://classroom.google.com/c/NTYzMhjhjr"
 
 UPDATE_SECTION = {
     "id": "string",
