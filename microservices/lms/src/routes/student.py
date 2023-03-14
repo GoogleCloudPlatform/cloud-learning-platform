@@ -418,10 +418,9 @@ def invite_student(section_id: str,student_email:str,
       course_enrollment_mapping = CourseEnrollmentMapping()
       course_enrollment_mapping.section = section
       course_enrollment_mapping.user = user_id
-      course_enrollment_mapping.status = "active"
+      course_enrollment_mapping.status = "invited"
       course_enrollment_mapping.role = "learner"
       course_enrollment_mapping.invitation_id = invitation["id"]
-      course_enrollment_mapping.is_invitation_accepted = False
       course_enrollment_id = course_enrollment_mapping.save().id
 
 
@@ -474,12 +473,12 @@ def update_invites(request: Request):
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
     course_records = CourseEnrollmentMapping.collection.filter(
-      "is_invitation_accepted","==",False).fetch()
+      "status","==","invited").fetch()
     updated_list_inviations =[]
     for course_record in course_records:
-       Logger.info(f"course_record {course_record.section.id}, user_id {course_record.user}")
-       if course_record.is_invitation_accepted == False and\
-          course_record.invitation_id is not None:
+      Logger.info(f"course_record {course_record.section.id}, user_id {course_record.user}")
+      if course_record.is_invitation_accepted == False and\
+        course_record.invitation_id is not None:
         try:
           result = classroom_crud.get_invite(course_record.invitation_id)
           Logger.info(f"Invitation {result} found for \
@@ -510,9 +509,9 @@ def update_invites(request: Request):
           cohort.enrolled_students_count +=1
           cohort.update()
           updated_list_inviations.append(course_record.key)
-    print("Herree")
+          Logger.info("Successfully  updated the invitations",updated_list_inviations)
     return {
-        "message":f"Successfully Added the Student with email",
+        "message":f"Successfully  updated the invitations",
         "data" : {"list_coursenrolment":updated_list_inviations}}
   except ResourceNotFoundException as err:
     error = traceback.format_exc().replace("\n", " ")

@@ -588,7 +588,6 @@ def get_invite(invitation_id):
       dict: response from create invitation method
   """
   service = build("classroom", "v1", credentials=get_credentials())
-  # body = {"courseId": course_id, "role": role, "userId": email}
   try:
     invitation = service.invitations().get(id=invitation_id).execute()
     return invitation

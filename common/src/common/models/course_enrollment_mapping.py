@@ -20,7 +20,7 @@ from common.models import BaseModel,Section
 def check_status(field_val):
   """validator method for status field"""
   status = ["active", "inactive"]
-  if field_val.lower() in ["active", "inactive"]:
+  if field_val.lower() in ["active", "inactive","invited"]:
     return True
   return (False,
           "Status must be one of " + ",".join("'" + i + "'" for i in status))
@@ -42,7 +42,6 @@ class CourseEnrollmentMapping(BaseModel):
   status = TextField(validator=check_status)
   role = TextField(validator=check_role)
   invitation_id = TextField()
-  is_invitation_accepted = BooleanField()
 
   class Meta:
     ignore_none_field = False
