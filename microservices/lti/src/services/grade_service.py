@@ -2,7 +2,7 @@
 import requests
 from common.utils.logging_handler import Logger
 from common.utils.secrets import get_backend_robot_id_token
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, broad-except
 
 
 def grade_pass_back(input_grade: dict, user_id: str, line_item_id: str):
