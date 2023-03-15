@@ -653,6 +653,7 @@ def if_user_exists_in_section(section_id, user_id, headers):
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     user = response.json()["data"]
     user["invitation_id"]=result.invitation_id
+    user["enrollment_status"] = result.status
     user["section_id"]=section_details.id
     user["cohort_id"]=section_details.cohort.id
     user["classroom_url"]=section_details.classroom_url
@@ -682,6 +683,7 @@ def list_student_section(section_id,headers):
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     user_record = response.json()["data"]
     user_record["invitation_id"]=record.invitation_id
+    user_record["enrollment_status"]=record.status
     users.append(user_record)
   return users
 
@@ -852,29 +854,3 @@ def post_grade_of_the_user(section_id: str,
     raise InternalServerError(str(e)) from e
 
 
-def invite_student(course_id, email):
-  """Invite teacher to google classroom using course id and email
-
-  Args:
-      course_id (str): google classroom unique id
-      teacher_email (str): teacher email id
-
-  Raises:
-      CustomHTTPException: custom exception for HTTP exceptions
-      InternalServerError: 500 Internal Server Error if something fails
-
-  Returns:
-      dict: response from create invitation method
-  """
-  service = build("classroom", "v1", credentials=get_credentials())
-  body = {"courseId": course_id, "role": "STUDENT", "userId": email}
-  try:
-    course = service.invitations().create(body=body).execute()
-    return course
-  except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
-  except Exception as e:
-    raise InternalServerError(str(e)) from e

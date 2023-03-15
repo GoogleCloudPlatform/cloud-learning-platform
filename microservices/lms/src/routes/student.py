@@ -187,6 +187,7 @@ def get_student_in_cohort(cohort_id: str, user: str, request: Request):
         result = result["data"]
         result["classroom_id"] = section.classroom_id
         result["course_enrollment_id"] = course_mapping.id
+        result["enrollment_status"] = course_mapping.status
         result["section_id"] = section.id
         result["classroom_url"] = section.classroom_url
         result["cohort_id"] = cohort_id

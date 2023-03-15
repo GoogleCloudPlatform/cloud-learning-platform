@@ -82,6 +82,34 @@ def enroll_student_classroom(access_token,course_id,student_email,course_code):
   }
   return data
 
+def invite_user(course_id, email,role):
+  """Invite teacher to google classroom using course id and email
+
+  Args:
+      course_id (str): google classroom unique id
+      teacher_email (str): teacher email id
+
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
+
+  Returns:
+      dict: response from create invitation method
+  """
+  a_creds = service_account.Credentials.from_service_account_info(
+      CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("classroom", "v1", credentials=creds)
+  body = {"courseId": course_id, "role": role, "userId": email}
+  try:
+    invitation = service.invitations().create(body=body).execute()
+    return invitation
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+
 
 
 @fixture
@@ -152,7 +180,8 @@ def enroll_student_course(context):
   classroom_code = section.classroom_code
   classroom_id = section.classroom_id
   student_email_and_token = get_student_email_and_token()
-  student_data = enroll_student_classroom(student_email_and_token["access_token"],classroom_id,student_email_and_token["email"].lower(),classroom_code)  
+  student_data = enroll_student_classroom(student_email_and_token["access_token"],
+  classroom_id,student_email_and_token["email"].lower(),classroom_code)  
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.role = "learner"
   course_enrollment_mapping.section = section
@@ -194,6 +223,41 @@ def create_assignment(context):
   yield context.assignment
 
 @fixture
+def invite_student(context):
+  """Invite student fixture"""
+  section = use_fixture(create_section, context)
+  student_email = get_student_email_and_token()
+  invitation_dict=invite_user(section.classroom_id ,
+  student_email["invite_student_email"].lower(),
+  "STUDENT")
+  course_enrollment_mapping = CourseEnrollmentMapping()
+  course_enrollment_mapping.role = "learner"
+  course_enrollment_mapping.section = section
+  course_enrollment_mapping.status ="invited"
+  course_enrollment_mapping.invitation_id=invitation_dict["id"]
+  temp_user = TempUser.from_dict(TEST_USER)
+
+  temp_user.user_id = ""
+  temp_user.email=student_email["invite_student_email"]
+  temp_user.gaia_id = ""
+  temp_user.photo_url = ""
+  temp_user.save()
+  temp_user.user_id = temp_user.id
+  temp_user.update()
+  course_enrollment_mapping.user = temp_user.user_id
+  course_enrollment_id=course_enrollment_mapping.save().id
+  context.invitation_data = {
+    "section_id": section.id,
+    "user_id":temp_user.id,
+    "email": student_email["invite_student_email"].lower(),
+    "cohort_id":section.cohort.id,
+    "course_enrollment_id":course_enrollment_id,
+    "invitation_id":invitation_dict["id"]
+    }
+  print("Invite student fixture running for section ",section.cohort.id)
+  yield context.
+
+@fixture
 def get_header(context):
   req = requests.post(f"{API_URL_AUTHENTICATION_SERVICE}/sign-in/credentials",
                       json=USER_EMAIL_PASSWORD_DICT,
@@ -214,7 +278,8 @@ fixture_registry = {
     "fixture.create.section":create_section,
     "fixture.create.enroll_student_course":enroll_student_course,
     "fixture.get.header": get_header,
-    "fixture.create.assignment": create_assignment
+    "fixture.create.assignment": create_assignment,
+    "fixture.invite.student": invite_student
 }
 
 def before_tag(context, tag):
