@@ -125,7 +125,7 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
       custom_params["$Person.address.timezone"] = timezone
 
     url = f"{API_DOMAIN}/classroom-shim/api/v1/launch-assignment?lti_assignment_id={lti_assignment_id}"
-    custom_params["$ResourceLink.LaunchUrl"] = url
+    custom_params["$ResourceLink.RelaunchURL"] = url
 
     # TODO: implementation of "$Context.id.history" as a custom parameter
     final_lti_message_hint_dict = {

@@ -25,7 +25,7 @@ BASIC_TOOL_EXAMPLE = {
     "enable_nrps":
         False,
     "custom_params":
-        "deepLinkLaunchEndpoint=$ResourceLink.LaunchUrl;timeZone=$Person.address.timezone"
+        "deepLinkLaunchEndpoint=$ResourceLink.RelaunchURL;timeZone=$Person.address.timezone"
 }
 
 FULL_TOOL_EXAMPLE = {
