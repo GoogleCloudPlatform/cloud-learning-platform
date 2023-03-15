@@ -255,7 +255,7 @@ def invite_student(context):
     "invitation_id":invitation_dict["id"]
     }
   print("Invite student fixture running for section ",section.cohort.id)
-  yield context.
+  yield context.invitation_data
 
 @fixture
 def get_header(context):
@@ -269,7 +269,6 @@ def get_header(context):
   print(f"User with {USER_EMAIL_PASSWORD_DICT['email']} was logged in with "
         f"token {token}")
   context.header={"Authorization": f"Bearer {token}"}
-  #   session=httpx.Client(headers={"Authorization": f"Bearer {token}"})
   yield context.header
 
 fixture_registry = {
