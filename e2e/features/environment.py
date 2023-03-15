@@ -19,7 +19,8 @@ CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
 SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
           "https://www.googleapis.com/auth/classroom.courses.readonly",
-          "https://www.googleapis.com/auth/classroom.coursework.students"]
+          "https://www.googleapis.com/auth/classroom.coursework.students",
+          "https://www.googleapis.com/auth/classroom.rosters"]
 
 def create_course(name,section,description):
   """Create course Function in classroom
