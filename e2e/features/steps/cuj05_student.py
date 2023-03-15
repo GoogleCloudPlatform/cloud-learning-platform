@@ -87,9 +87,9 @@ def step_impl_12(context):
 #------------------------------Invite student to section------------------------------
 @behave.given("A user is invited to a section using email")
 def step_impl_13(context):
-  print("IN ENROLL STUDNET_ chort ID",context.cohort.id)
+  print("IN Invite student ID",context.sections.id)
   student_email =get_student_email_and_token()
-  context.url = f'{API_URL}/sections/{context.section.id}/invite/{student_email["invite_student_email"]}'
+  context.url = f'{API_URL}/sections/{context.sections.id}/invite/{student_email["invite_student_email"]}'
 
 
 
@@ -115,7 +115,7 @@ def step_impl_16(context):
 
 @behave.when("cron job is triggered and calls update_invites endpoint")
 def step_impl_17(context):
-  resp = requests.get(context.url,headers=context.header)
+  resp = requests.patch(context.url,headers=context.header)
   print("Invites students response code ",resp.status_code)
   print(resp.json())
   context.status = resp.status_code

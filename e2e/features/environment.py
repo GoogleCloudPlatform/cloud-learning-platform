@@ -225,11 +225,13 @@ def create_assignment(context):
 @fixture
 def invite_student(context):
   """Invite student fixture"""
+  print("INVITE FIXTUREE STARTED")
   section = use_fixture(create_section, context)
   student_email = get_student_email_and_token()
   invitation_dict=invite_user(section.classroom_id ,
   student_email["invite_student_email"].lower(),
   "STUDENT")
+  print("INVITATION SENT TO USER")
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.role = "learner"
   course_enrollment_mapping.section = section
@@ -246,6 +248,7 @@ def invite_student(context):
   temp_user.update()
   course_enrollment_mapping.user = temp_user.user_id
   course_enrollment_id=course_enrollment_mapping.save().id
+  print("COURSE ENROLLMENT created____",course_enrollment_id)
   context.invitation_data = {
     "section_id": section.id,
     "user_id":temp_user.id,
@@ -254,7 +257,7 @@ def invite_student(context):
     "course_enrollment_id":course_enrollment_id,
     "invitation_id":invitation_dict["id"]
     }
-  print("Invite student fixture running for section ",section.cohort.id)
+  print("Invite student fixture running completed",context.invitation_data)
   yield context.invitation_data
 
 @fixture
