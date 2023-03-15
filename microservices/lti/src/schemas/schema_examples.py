@@ -15,6 +15,7 @@ BASIC_TOOL_EXAMPLE = {
     ],
     "enable_grade_sync": False,
     "enable_nrps": False,
+    "custom_params": "deepLinkLaunchEndpoint=$ResourceLink.RelaunchURL;timeZone=$Person.address.timezone",
     "validate_title_for_grade_sync": False
 }
 
@@ -42,14 +43,11 @@ BASIC_PLATFORM_EXAMPLE = {
 }
 
 FULL_PLATFORM_EXAMPLE = {
-    "id":
-        "asd98798as7dhjgkjsdfh",
-    **BASIC_PLATFORM_EXAMPLE, "tool_auth_url":
-        f"{LTI_ISSUER_DOMAIN}/lti/api/v1/authorize",
-    "tool_token_url":
-        f"{LTI_ISSUER_DOMAIN}/lti/api/v1/token",
-    "tool_keyset_url":
-        f"{LTI_ISSUER_DOMAIN}/lti/api/v1/jwks/SoD1uf9V1nc9"
+    "id": "asd98798as7dhjgkjsdfh",
+    **BASIC_PLATFORM_EXAMPLE,
+    "tool_auth_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/authorize",
+    "tool_token_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/token",
+    "tool_keyset_url": f"{LTI_ISSUER_DOMAIN}/lti/api/v1/jwks/SoD1uf9V1nc9"
 }
 
 BASIC_LINE_ITEM_EXAMPLE = {
@@ -74,8 +72,8 @@ UPDATE_LINE_ITEM_EXAMPLE = {
 }
 
 UPDATE_LINE_ITEM_USING_ID_EXAMPLE = {
-    **UPDATE_LINE_ITEM_EXAMPLE, "id":
-        "https://platformurl.com/context_id/line_items/bv9oyqvq9no"
+    **UPDATE_LINE_ITEM_EXAMPLE,
+    "id": "https://platformurl.com/context_id/line_items/bv9oyqvq9no"
 }
 
 FULL_LINE_ITEM_EXAMPLE = {
@@ -104,8 +102,7 @@ BASIC_RESULT_EXAMPLE = {
 }
 
 FULL_RESULT_EXAMPLE = {
-    "id":
-        "https://platformurl.com/x1b62/line_items/1c82be/results/DVad8vs5boSN",
+    "id": "https://platformurl.com/x1b62/line_items/1c82be/results/DVad8vs5boSN",
     **BASIC_RESULT_EXAMPLE
 }
 
@@ -138,58 +135,34 @@ CONTEXT_EXAMPLE = {
 }
 
 MEMBERS_EXAMPLE = [{
-    "user_id":
-        "n93b2a3Va5v0kz3TkB",
-    "status":
-        "Active",
-    "given_name":
-        "Test",
-    "family_name":
-        "User1",
-    "name":
-        "Test User1",
-    "email":
-        "testuse1@gmail.com",
-    "picture":
-        "https://lh3.googleusercontent.com/a/AEdFTp5ulw5yy57GlmaduiTPlpmy6UDm8FrvVoRnWotGi_vn=s100",
-    "lis_person_sourcedid":
-        "n93b2a3Va5v0kz3TkB",
+    "user_id": "n93b2a3Va5v0kz3TkB",
+    "status": "Active",
+    "given_name": "Test",
+    "family_name": "User1",
+    "name": "Test User1",
+    "email": "testuse1@gmail.com",
+    "picture": "https://lh3.googleusercontent.com/a/AEdFTp5ulw5yy57GlmaduiTPlpmy6UDm8FrvVoRnWotGi_vn=s100",
+    "lis_person_sourcedid": "n93b2a3Va5v0kz3TkB",
     "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"]
 }, {
-    "user_id":
-        "Vb2sr3bt83b4BT4WO",
-    "status":
-        "Active",
-    "given_name":
-        "Test",
-    "family_name":
-        "User2",
-    "name":
-        "Test User2",
-    "email":
-        "testuse2@gmail.com",
-    "picture":
-        "https://lh3.googleusercontent.com/a/AEdFTv83ny9Vc8Bivn30y84Kx_-QlLXq84aoKKo37AsZQ=s100",
-    "lis_person_sourcedid":
-        "Vb2sr3bt83b4BT4WO",
+    "user_id": "Vb2sr3bt83b4BT4WO",
+    "status": "Active",
+    "given_name": "Test",
+    "family_name": "User2",
+    "name": "Test User2",
+    "email": "testuse2@gmail.com",
+    "picture": "https://lh3.googleusercontent.com/a/AEdFTv83ny9Vc8Bivn30y84Kx_-QlLXq84aoKKo37AsZQ=s100",
+    "lis_person_sourcedid": "Vb2sr3bt83b4BT4WO",
     "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"]
 }, {
-    "user_id":
-        "Vv3wb92Bqv8sx7t037",
-    "status":
-        "Active",
-    "given_name":
-        "Test",
-    "family_name":
-        "User3",
-    "name":
-        "Test User3",
-    "email":
-        "testuser3@gmail.com",
-    "picture":
-        "https://lh3.googleusercontent.com/a/AEdFTp55udAV2vBv2bOT9frDyWFFA440rs1SAzrPs=s100",
-    "lis_person_sourcedid":
-        "Vv3wb92Bqv8sx7t037",
+    "user_id": "Vv3wb92Bqv8sx7t037",
+    "status": "Active",
+    "given_name": "Test",
+    "family_name": "User3",
+    "name": "Test User3",
+    "email": "testuser3@gmail.com",
+    "picture": "https://lh3.googleusercontent.com/a/AEdFTp55udAV2vBv2bOT9frDyWFFA440rs1SAzrPs=s100",
+    "lis_person_sourcedid": "Vv3wb92Bqv8sx7t037",
     "roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"]
 }]
 
