@@ -14,7 +14,8 @@ BASIC_TOOL_EXAMPLE = {
         "https://example-tool.com/admin/api/ltilaunch/ltitoollaunch"
     ],
     "enable_grade_sync": False,
-    "enable_nrps": False
+    "enable_nrps": False,
+    "validate_title_for_grade_sync": False
 }
 
 FULL_TOOL_EXAMPLE = {

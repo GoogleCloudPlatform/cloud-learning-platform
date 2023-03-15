@@ -24,6 +24,7 @@ class BasicToolModel(BaseModel):
   redirect_uris: list
   enable_grade_sync: Optional[bool] = False
   enable_nrps: Optional[bool] = False
+  validate_title_for_grade_sync: Optional[bool] = False
 
 
 class FullToolModel(BasicToolModel):
@@ -61,6 +62,7 @@ class UpdateToolModel(BaseModel):
   redirect_uris: Optional[list]
   enable_grade_sync: Optional[bool]
   enable_nrps: Optional[bool]
+  validate_title_for_grade_sync: Optional[bool]
 
   class Config():
     orm_mode = True
