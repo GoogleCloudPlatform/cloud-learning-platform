@@ -37,6 +37,10 @@ TOKEN_TTL = 3600
 
 LTI_ISSUER_DOMAIN = os.getenv("LTI_ISSUER_DOMAIN", "http://localhost")
 
+LTI_PLATFORM_UNIQUE_ID = os.getenv("LTI_PLATFORM_UNIQUE_ID")
+
+LTI_PLATFORM_NAME = os.getenv("LTI_PLATFORM_NAME")
+
 try:
   LTI_SERVICE_PLATFORM_PUBLIC_KEY = secrets.access_secret_version(
       request={

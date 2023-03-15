@@ -25,6 +25,7 @@ class BasicToolModel(BaseModel):
   enable_grade_sync: Optional[bool] = False
   enable_nrps: Optional[bool] = False
   custom_params: Optional[str]
+  validate_title_for_grade_sync: Optional[bool] = False
 
 
 class FullToolModel(BasicToolModel):
@@ -63,6 +64,7 @@ class UpdateToolModel(BaseModel):
   enable_grade_sync: Optional[bool]
   enable_nrps: Optional[bool]
   custom_params: Optional[str]
+  validate_title_for_grade_sync: Optional[bool]
 
   class Config():
     orm_mode = True

@@ -35,6 +35,7 @@ class Tool(BaseModel):
   enable_grade_sync = BooleanField(default=False)
   enable_nrps = BooleanField(default=False)
   custom_params = TextField(default=None)
+  validate_title_for_grade_sync = BooleanField(default=False)
 
   class Meta:
     collection_name = BaseModel.DATABASE_PREFIX + "tools"
@@ -168,6 +169,7 @@ class Result(BaseModel):
   comment = TextField()
   scoreOf = TextField()
   lineItemId = TextField()
+  isGradeSyncCompleted = BooleanField(default=False)
 
   class Meta:
     collection_name = BaseModel.DATABASE_PREFIX + "results"

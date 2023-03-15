@@ -41,9 +41,20 @@ def update_classroom_grade(input_grade: PostGradeModel):
     if input_grade_dict["comment"]:
       pass
 
-    lti_assignment = LTIAssignment.collection.filter(
-        "lti_content_item_id", "==",
-        input_grade_dict["lti_content_item_id"]).get()
+    if input_grade_dict["validate_title"]:
+      lti_assignment_list = LTIAssignment.collection.filter(
+          "lti_content_item_id", "==",
+          input_grade_dict["lti_content_item_id"]).fetch()
+
+      for i in lti_assignment_list:
+
+        if i.lti_assignment_title == input_grade_dict["line_item_title"]:
+          lti_assignment = i
+
+    else:
+      lti_assignment = LTIAssignment.collection.filter(
+          "lti_content_item_id", "==",
+          input_grade_dict["lti_content_item_id"]).get()
 
     lti_assignment_max_points = lti_assignment.max_points
     course_work_id = lti_assignment.course_work_id
