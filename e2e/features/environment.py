@@ -101,14 +101,10 @@ def invite_user(course_id, email,role):
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
   body = {"courseId": course_id, "role": role, "userId": email}
-  try:
-    invitation = service.invitations().create(body=body).execute()
-    return invitation
-  except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+
+  invitation = service.invitations().create(body=body).execute()
+  return invitation
+
 
 
 

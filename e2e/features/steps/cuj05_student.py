@@ -95,7 +95,7 @@ def step_impl_13(context):
 
 @behave.when("API request is sent with valid section id and email")
 def step_impl_14(context):
-  resp = requests.post(context.url, json=context.payload,headers=context.header)
+  resp = requests.post(context.url,headers=context.header)
   print("THIS IS RESPONSE FROM INVITE STUDNET ")
   print(resp.json())
   context.status = resp.status_code
