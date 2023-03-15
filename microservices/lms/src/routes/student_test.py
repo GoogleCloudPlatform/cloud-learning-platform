@@ -231,6 +231,6 @@ def test_invite_student_to_section_api(client_with_emulator,create_fake_data):
                   "cohort_id":"section.cohort.key",
             "classroom_id":"section.classroom_id",
             "classroom_url":"section.classroom_url"}):
-    resp = client_with_emulator.get(url)
+    resp = client_with_emulator.post(url)
   assert resp.status_code == 200
 

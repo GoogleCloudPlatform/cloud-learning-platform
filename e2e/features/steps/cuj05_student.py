@@ -4,6 +4,7 @@ import requests
 from testing_objects.test_config import API_URL
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from environment import create_course
+from e2e.gke_api_tests.secrets_helper import get_student_email_and_token
 
 # ------------------------------list student to Section-------------------------------------
 
@@ -86,7 +87,6 @@ def step_impl_12(context):
 #------------------------------Invite student to section------------------------------
 @behave.given("A user is invited to a section using email")
 def step_impl_13(context):
-  # context.url = f'{API_URL}/sections/{context.sections.id}/students'
   print("IN ENROLL STUDNET_ chort ID",context.cohort.id)
   student_email =get_student_email_and_token()
   context.url = f'{API_URL}/sections/{context.section.id}/invite/{student_email["invite_student_email"]}'
