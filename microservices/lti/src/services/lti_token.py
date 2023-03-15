@@ -107,7 +107,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
                                      "target_link_uri")] = tool_info["tool_url"]
 
     # process custom parameters
-    final_custom_claims = {**content_item_info.get("custom")}
+    final_custom_claims = {**content_item_info.get("custom", {})}
     custom_params = lti_message_hint.get("custom_params_for_substitution")
 
     if tool_info.get("custom_params", None) is not None:
