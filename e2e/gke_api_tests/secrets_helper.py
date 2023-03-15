@@ -48,8 +48,8 @@ def get_student_email_and_token():
   client = secretmanager.SecretManagerServiceClient()
   student_email_secret_id = random_index
   student_token_secret_id = student_email_token_name_mapping[random_index]
-  invite_student_email = random.choice([ele for ele in test_list if ele != random_index])
-
+  invite_student_email = random.choice([ele for ele in keys if ele != random_index])
+  print("New invites student key",invite_student_email)
   print("________Student Email and token for E2E__________",student_email_secret_id,student_token_secret_id)
   student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
   student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"

@@ -33,7 +33,7 @@ Feature:Delete, List students in section
     Then Invitation is sent to student via email and course enrollmet object with status invited is created
 
 
-  @fixture.create.invite_student
+  @fixture.invite.student
   Scenario:  A student is invited to section and has accepted the invite
     Given A student is invited and has accepted the invite via email
     When cron job is triggered and calls update_invites endpoint
