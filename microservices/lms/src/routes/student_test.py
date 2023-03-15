@@ -220,7 +220,8 @@ def test_get_student_in_invalid_cohort(client_with_emulator,create_fake_data):
   assert resp.status_code == 404
   
 def test_invite_student_to_section_api(client_with_emulator,create_fake_data):
-  url = BASE_URL + f"/sections/{create_fake_data["section"]}/students/clplmstest_user4@gmail.com"
+  section_id=create_fake_data["section"]
+  url = BASE_URL + f"/sections/{section_id}/invite/clplmstest_user4@gmail.com"
   with mock.patch\
   ("routes.student.student_service.invite_student",
    return_value={"invitation_id":"abcde",

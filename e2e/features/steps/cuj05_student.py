@@ -109,11 +109,11 @@ def step_impl_15(context):
   assert "invitation_id" in context.response["data"].keys()
 
 #-------------------------------Update invites patch api--------------------------------------
-@behave.given("A student is invited to section and has accepted the invite")
+@behave.given("A student is invited and has accepted the invite via email")
 def step_impl_16(context):
   context.url = f'{API_URL}/sections/update_invites'
 
-@behave.when("API request with valid cohort Id  user_id is sent")
+@behave.when("cron job is triggered and calls update_invites endpoint")
 def step_impl_17(context):
   resp = requests.get(context.url,headers=context.header)
   print("Invites students response code ",resp.status_code)
@@ -121,7 +121,7 @@ def step_impl_17(context):
   context.status = resp.status_code
   context.response = resp.json()
 
-@behave.then("student details will be fetch using the given id for cohort")
+@behave.then("student details will be updated in user collection and course enrollment mapping status is updated to active")
 def step_impl_18(context):
     assert context.status == 200, "Status 200"
     assert context.invitation_data["course_enrollment_id"] in context.response["data"]["list_coursenrolment"]
