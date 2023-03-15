@@ -48,9 +48,8 @@ def get_student_email_and_token():
   client = secretmanager.SecretManagerServiceClient()
   student_email_secret_id = random_index
   student_token_secret_id = student_email_token_name_mapping[random_index]
-  invite_student_email = random.choice([ele for ele in keys if ele != random_index])
-  print("New invites student key",invite_student_email)
-  print("New invites student key",student_email_token_name_mapping["invite_student_email"])
+  invite_student_email_secret_id = random.choice([ele for ele in keys if ele != random_index])
+  print("New invites student key",student_email_token_name_mapping[invite_student_email_secret_id])
   print("________Student Email and token for E2E__________",student_email_secret_id,student_token_secret_id)
   student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
   student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
@@ -58,6 +57,9 @@ def get_student_email_and_token():
       request={"name": student_email_name})
   student_token_response = client.access_secret_version(
       request={"name": student_token_name})
+  invite_student_email_name =  f"projects/{PROJECT_ID}/secrets/{invite_student_email_secret_id}/versions/latest"
+  invite_student_response = client.access_secret_version(
+      request={"name":invite_student_email_name})
   credentials_dict = json.loads(
       student_token_response.payload.data.decode("UTF-8"))
   creds = Credentials.from_authorized_user_info(
@@ -69,8 +71,10 @@ def get_student_email_and_token():
   data = {
       "email": student_email_response.payload.data.decode("UTF-8"),
       "access_token":credentials_dict["token"],
-      "invite_student_email":student_email_token_name_mapping["invite_student_email"]
+      "invite_student_email":invite_student_response.payload.data.decode("UTF-8")
   }
+  print("DATA______")
+  print(data)
   return data
 
 
@@ -112,3 +116,4 @@ def get_user_email_and_password_for_e2e():
   return json.loads(user_email_password_response.payload.data.decode(
       "UTF-8"))
 
+get_student_email_and_token()

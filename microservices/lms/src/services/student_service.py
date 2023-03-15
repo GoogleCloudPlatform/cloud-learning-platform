@@ -84,7 +84,6 @@ def invite_student(section,student_email,headers):
         "last_name": "last_name",
         "email":student_email,
         "user_type": "learner",
-        "user_type_ref": "",
         "user_groups": [],
         "status": "active",
         "is_registered": True,
