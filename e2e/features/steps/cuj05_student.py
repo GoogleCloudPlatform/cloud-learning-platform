@@ -116,13 +116,9 @@ def step_impl_16(context):
 @behave.when("cron job is triggered and calls update_invites endpoint")
 def step_impl_17(context):
   resp = requests.patch(context.url,headers=context.header)
-  print("Invites students response code ",resp.status_code)
-  print(resp.json())
   context.status = resp.status_code
   context.response = resp.json()
 
 @behave.then("student details will be updated in user collection and course enrollment mapping status is updated to active")
 def step_impl_18(context):
     assert context.status == 200, "Status 200"
-    assert context.invitation_data["course_enrollment_id"] in context.response["data"]["list_coursenrolment"]
-

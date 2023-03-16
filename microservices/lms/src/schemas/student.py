@@ -3,7 +3,7 @@ Pydantic Model for copy course API's
 """
 from typing import Optional
 from pydantic import BaseModel,constr
-from schemas.schema_examples import STUDENT,INVITE_STUDENT,GET_STUDENT_EXAMPLE
+from schemas.schema_examples import INVITE_STUDENT,GET_STUDENT_EXAMPLE
 
 
 class AddStudentResponseModel(BaseModel):

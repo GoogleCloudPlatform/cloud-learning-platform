@@ -404,14 +404,14 @@ def invite_student(section_id: str,student_email:str,
                            request: Request):
   """
   Args:
-    input_data(AddStudentToSectionModel):
-      An AddStudentToSectionModel object which contains email and credentials
+    section_id:firestore id of section where student is invited
+    student email:student email
   Raises:
     InternalServerError: 500 Internal Server Error if something fails
     ResourceNotFound : 404 if the section or classroom does not exist
     Conflict: 409 if the student already exists
   Returns:
-    AddStudentResponseModel: if the student successfully added,
+    InviteStudentToSectionResponseModel: if the student successfully invited,
     NotFoundErrorResponseModel: if the section and course not found,
     ConflictResponseModel: if any conflict occurs,
     InternalServerErrorResponseModel: if the add student raises an exception
@@ -444,6 +444,72 @@ def invite_student(section_id: str,student_email:str,
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
+@cohort_student_router.post("/{cohort_id}/invite/{student_email}",
+                             response_model=InviteStudentToSectionResponseModel)
+def invite_student_cohort(cohort_id: str,student_email:str,
+                           request: Request):
+  """
+  Args:
+    cohort_id: firestore id of chort where student invited
+    student_email : student email
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    InviteStudentToSectionResponseModel:if the student successfully invited,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    cohort = Cohort.find_by_id(cohort_id)
+    sections = Section.collection.filter("cohort","==",cohort.key).fetch()
+    sections = list(sections)
+    headers = {"Authorization": request.headers.get("Authorization")}
+    if cohort.enrolled_students_count >= cohort.max_students:
+      raise Conflict(
+    "Cohort Max count reached hence student cannot be erolled in this cohort"
+    )
+    if len(sections) == 0:
+      raise ResourceNotFoundException("Given CohortId\
+         does not have any sections")
+    if not student_service.check_student_can_enroll_in_cohort(
+                                              email=student_email,
+                                                     headers=headers,
+                                                     sections=sections):
+      raise Conflict(f"User {student_email} is already\
+                      registered for cohort {cohort_id}")
+    section = student_service.get_section_with_minimum_student(sections)
+    Logger.info(f"Section with minimum student is {section.id},\
+                enroll student intiated for {student_email}")
+    headers = {"Authorization": request.headers.get("Authorization")}
+    invitation_details = student_service.invite_student(section=section,
+    student_email=student_email,
+    headers=headers)
+    return {
+        "message":
+        f"Successfully Added the Student with email {student_email}",
+        "data":invitation_details
+    }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    Logger.error(conflict)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+
 @section_student_router.patch("/update_invites",
 response_model=UpdateInviteResponseModel)
 def update_invites(request: Request):
@@ -473,11 +539,13 @@ def update_invites(request: Request):
           result = classroom_crud.get_invite(course_record.invitation_id)
           Logger.info(
           f"Invitation {result} found for User id {course_record.user},\
-          database will be updated once invite is accepted.")
-        except Exception as e:
+          course_enrollment_id {course_record.id} database will be updated\
+          once invite is accepted.")
+        except HttpError as ae:
           Logger.error(
             f"Could not get the invite for user_id {course_record.user}\
-          section_id{course_record.section.id}")
+          section_id{course_record.section.id} course_enrollment id {course_record.id}")
+          Logger.error(ae)
           user_details = classroom_crud.get_user_details(
             user_id=course_record.user,headers=headers)
           Logger.info(f"User record found for User {user_details}")

@@ -595,14 +595,9 @@ def get_invite(invitation_id):
       dict: response from create invitation method
   """
   service = build("classroom", "v1", credentials=get_credentials())
-  try:
-    invitation = service.invitations().get(id=invitation_id).execute()
-    return invitation
-  except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+  invitation = service.invitations().get(id=invitation_id).execute()
+  return invitation
+
 
 
 def enable_notifications(course_id, feed_type):
@@ -740,6 +735,8 @@ def get_user_details_by_email(user_email, headers):
   response_get_student = requests.get(
       f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={user_email}",
       headers=headers)
+  print("In classroom crud search email",response_get_student.status_code)
+  print("response_get_student",response_get_student)
   if response_get_student.status_code == 404:
     raise \
         ResourceNotFoundException(response_get_student.json()["message"])

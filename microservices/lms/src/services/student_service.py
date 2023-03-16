@@ -73,7 +73,7 @@ def check_student_can_enroll_in_cohort(email,headers,sections):
 def invite_student(section,student_email,headers):
   """
     Args:
-    section :section 
+    section :section
     student_email : student email to be invited
     headers : Authentication headers
     Returns: dictionary with course_enrollment_id,user_id,invitation_id,
@@ -81,7 +81,7 @@ def invite_student(section,student_email,headers):
 
   """
   searched_student = classroom_crud.\
-  get_user_details_by_email(user_email=student_email,headers=headers)                                                     
+  get_user_details_by_email(user_email=student_email,headers=headers)                                               
   # If the response is success check if student is inactive i.e  raise error
   searched_student = searched_student["data"]
   if searched_student == []:
