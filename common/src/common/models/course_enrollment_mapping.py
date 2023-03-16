@@ -95,7 +95,8 @@ class CourseEnrollmentMapping(BaseModel):
         course_enrollment object
     """
     return CourseEnrollmentMapping.collection.filter("user","==",user_id).\
-    filter("status", "in",["active","invited"]).filter("section","==",section_key).get()
+    filter("status", "in",["active","invited"]).\
+    filter("section","==",section_key).get()
 
   @classmethod
   def find_enrolled_student_record(cls,

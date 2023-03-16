@@ -1,12 +1,11 @@
 """ Student endpoints """
 import traceback
-import requests
 from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
 from services import student_service
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
-ValidationError,InvalidTokenError,UserManagementServiceError)
+ValidationError,InvalidTokenError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
                              ResourceNotFound, BadRequest,InvalidToken,Conflict)
 from common.models import CourseEnrollmentMapping,Section,Cohort,TempUser
@@ -21,7 +20,6 @@ from schemas.student import(AddStudentResponseModel,\
   AddStudentToCohortModel,GetStudentDetailsResponseModel,\
     GetProgressPercentageResponseModel,InviteStudentToSectionResponseModel,
     UpdateInviteResponseModel)
-from config import USER_MANAGEMENT_BASE_URL
 
 router = APIRouter(prefix="/student",
                    tags=["Students"],
@@ -467,19 +465,25 @@ def update_invites(request: Request):
       "status","==","invited").fetch()
     updated_list_inviations =[]
     for course_record in course_records:
-      Logger.info(f"course_record {course_record.section.id}, user_id {course_record.user}")
+      Logger.info(
+  f"course_record {course_record.section.id}, user_id {course_record.user}"
+      )
       if course_record.invitation_id is not None:
         try:
           result = classroom_crud.get_invite(course_record.invitation_id)
-          Logger.info(f"Invitation {result} found for \
-           User id {course_record.user},database will be updated once invite is accepted.")
+          Logger.info(
+          f"Invitation {result} found for User id {course_record.user},\
+          database will be updated once invite is accepted.")
         except Exception as e:
-          Logger.error(f"Could not get the invite for user_id {course_record.user} \
+          Logger.error(f"Could not get the invite for user_id {course_record.user}\
           section_id{course_record.section.id}")
-          user_details = classroom_crud.get_user_details(user_id=course_record.user,headers=headers)
+          user_details = classroom_crud.get_user_details(
+            user_id=course_record.user,headers=headers)
           Logger.info(f"User record found for User {user_details}")
-          user_profile =classroom_crud.get_user_profile_information(user_details["data"]["email"])
-          user_rec = TempUser.collection.filter("user_id","==",course_record.user).get()
+          user_profile =classroom_crud.get_user_profile_information(
+            user_details["data"]["email"])
+          user_rec = TempUser.collection.filter(
+            "user_id","==",course_record.user).get()
 
           # Check if gaia_id is "" if yes so update personal deatils
           if user_rec.gaia_id == "":
@@ -499,9 +503,11 @@ def update_invites(request: Request):
           cohort.enrolled_students_count +=1
           cohort.update()
           updated_list_inviations.append(course_record.key)
-          Logger.info(f"Successfully  updated the invitations {updated_list_inviations}")
+          Logger.info(
+          f"Successfully  updated the invitations {updated_list_inviations}"
+          )
     return {
-        "message":f"Successfully  updated the invitations",
+        "message":"Successfully  updated the invitations",
         "data" : {"list_coursenrolment":updated_list_inviations}}
   except ResourceNotFoundException as err:
     error = traceback.format_exc().replace("\n", " ")

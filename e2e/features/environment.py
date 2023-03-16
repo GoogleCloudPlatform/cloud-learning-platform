@@ -332,5 +332,3 @@ def sign_up_user():
     print("firestore: user email already exists")
 def before_all(context):
   sign_up_user()
-
-invite_student()

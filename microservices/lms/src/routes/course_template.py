@@ -177,7 +177,7 @@ request: Request):
         owner_id="me")
     # Adding instructional designer in the course on classroom
     invitation_object = classroom_crud.invite_user(classroom.get("id"),
-                               course_template_dict["instructional_designer"],"TEACHER")
+                  course_template_dict["instructional_designer"],"TEACHER")
     # Storing classroom details
     classroom_crud.acceept_invite(invitation_object["id"],\
       course_template_dict["instructional_designer"])

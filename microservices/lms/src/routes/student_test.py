@@ -218,7 +218,7 @@ def test_get_student_in_invalid_cohort(client_with_emulator,create_fake_data):
    return_value={"data":TEMP_USER}):
     resp = client_with_emulator.get(url)
   assert resp.status_code == 404
-  
+
 def test_invite_student_to_section_api(client_with_emulator,create_fake_data):
   section_id=create_fake_data["section"]
   url = BASE_URL + f"/sections/{section_id}/invite/clplmstest_user4@gmail.com"
