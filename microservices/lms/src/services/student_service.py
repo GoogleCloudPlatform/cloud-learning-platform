@@ -81,7 +81,7 @@ def invite_student(section,student_email,headers):
 
   """
   searched_student = classroom_crud.\
-  get_user_details_by_email(user_email=student_email,headers=headers)                                               
+  get_user_details_by_email(user_email=student_email,headers=headers)                                              
   # If the response is success check if student is inactive i.e  raise error
   searched_student = searched_student["data"]
   if searched_student == []:

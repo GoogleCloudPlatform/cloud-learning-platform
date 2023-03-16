@@ -253,7 +253,7 @@ def test_invite_student_to_cohort_api(client_with_emulator,create_fake_data):
   assert resp.status_code == 200
 
 def test_update_invites(client_with_emulator,create_fake_data):
-  url = BASE_URL + f"/sections/update_invites"
+  url = BASE_URL + "/sections/update_invites"
   with mock.patch\
   ("routes.student.classroom_crud.get_invite",
    return_value={

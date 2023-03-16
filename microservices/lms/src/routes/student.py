@@ -542,10 +542,11 @@ def update_invites(request: Request):
           course_enrollment_id {course_record.id} database will be updated\
           once invite is accepted.")
         except HttpError as ae:
-          Logger.error(
+          Logger.info(f"Get invite response status code {ae.resp.status}")
+          Logger.info(
             f"Could not get the invite for user_id {course_record.user}\
-          section_id{course_record.section.id} course_enrollment id {course_record.id}")
-          Logger.error(ae)
+          section_id{course_record.section.id}\
+           course_enrollment id {course_record.id}")
           user_details = classroom_crud.get_user_details(
             user_id=course_record.user,headers=headers)
           Logger.info(f"User record found for User {user_details}")
