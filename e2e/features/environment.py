@@ -17,7 +17,6 @@ USER_EMAIL_PASSWORD_DICT = get_user_email_and_password_for_e2e()
 
 CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
-CLASSROOM_ADMIN_EMAIL = "lms_admin_teacher@dhodun.altostrat.com"
 SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
           "https://www.googleapis.com/auth/classroom.courses.readonly",
           "https://www.googleapis.com/auth/classroom.coursework.students",
