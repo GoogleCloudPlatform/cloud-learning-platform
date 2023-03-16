@@ -83,6 +83,21 @@ def enroll_student_classroom(access_token,course_id,student_email,course_code):
   }
   return data
 
+def accept_invite(access_token,email,invitation_id):
+  """Add student to the classroom using student google auth token
+  Args:
+    access_token(str): Oauth access token which contains student credentials
+    invitation_id(str): unique classroom id which is required to get the classroom
+    email(str): student email id
+  Return:
+    dict: returns a dict which contains student and classroom details
+  """
+
+  creds = Credentials(token=access_token)
+  service = build("classroom", "v1", credentials=creds)
+  data = service.invitations().accept(id=invitation_id).execute()
+  return data
+
 def invite_user(course_id, email,role):
   """Invite teacher to google classroom using course id and email
 
@@ -97,13 +112,14 @@ def invite_user(course_id, email,role):
   Returns:
       dict: response from create invitation method
   """
+  print("IN ACCEPT INVITE FUNCTION FOR FIXTURE")
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
   body = {"courseId": course_id, "role": role, "userId": email}
-
   invitation = service.invitations().create(body=body).execute()
+  print("Accepted invite")
   return invitation
 
 
@@ -224,9 +240,9 @@ def invite_student(context):
   """Invite student fixture"""
   print("INVITE FIXTUREE STARTED")
   section = use_fixture(create_section, context)
-  student_email = get_student_email_and_token()
+  student_data = get_student_email_and_token()
   invitation_dict=invite_user(section.classroom_id ,
-  student_email["invite_student_email"].lower(),
+  student_data["invite_student_email"].lower(),
   "STUDENT")
   print("INVITATION SENT TO USER")
   course_enrollment_mapping = CourseEnrollmentMapping()
@@ -237,7 +253,7 @@ def invite_student(context):
   temp_user = TempUser.from_dict(TEST_USER)
 
   temp_user.user_id = ""
-  temp_user.email=student_email["invite_student_email"]
+  temp_user.email=student_data["invite_student_email"]
   temp_user.gaia_id = ""
   temp_user.photo_url = ""
   temp_user.save()
@@ -249,12 +265,15 @@ def invite_student(context):
   context.invitation_data = {
     "section_id": section.id,
     "user_id":temp_user.id,
-    "email": student_email["invite_student_email"].lower(),
+    "email": student_data["invite_student_email"].lower(),
     "cohort_id":section.cohort.id,
     "course_enrollment_id":course_enrollment_id,
     "invitation_id":invitation_dict["id"]
     }
-  print("Invite student fixture running completed",context.invitation_data)
+  # ACcepting invite using student access token
+  print("Invite student fixture running completed and accept invite started",context.invitation_data)
+  accept_invite(student_data["invite_student_token"],
+  student_data["invite_student_email"].lower(),invitation_dict["id"])
   yield context.invitation_data
 
 @fixture
@@ -313,3 +332,5 @@ def sign_up_user():
     print("firestore: user email already exists")
 def before_all(context):
   sign_up_user()
+
+invite_student()
