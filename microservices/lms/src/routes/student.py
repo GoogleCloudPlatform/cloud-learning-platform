@@ -444,11 +444,11 @@ def invite_student(section_id: str,student_email:str,
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
-@section_student_router.patch("/update_invites",response_model=UpdateInviteResponseModel)
+@section_student_router.patch("/update_invites",
+response_model=UpdateInviteResponseModel)
 def update_invites(request: Request):
   """
   Args:
-   
   Raises:
     InternalServerError: 500 Internal Server Error if something fails
     ResourceNotFound : 404 if the section or classroom does not exist
@@ -475,7 +475,8 @@ def update_invites(request: Request):
           f"Invitation {result} found for User id {course_record.user},\
           database will be updated once invite is accepted.")
         except Exception as e:
-          Logger.error(f"Could not get the invite for user_id {course_record.user}\
+          Logger.error(
+            f"Could not get the invite for user_id {course_record.user}\
           section_id{course_record.section.id}")
           user_details = classroom_crud.get_user_details(
             user_id=course_record.user,headers=headers)

@@ -6,7 +6,8 @@ from config import USER_MANAGEMENT_BASE_URL
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.models import CourseEnrollmentMapping
-from common.utils.errors import (ResourceNotFoundException)
+from common.utils.errors import (ResourceNotFoundException,
+UserManagementServiceError)
 from common.utils.http_exceptions import (Conflict,InternalServerError)
 
 def get_section_with_minimum_student(sections):
@@ -79,8 +80,8 @@ def invite_student(section,student_email,headers):
     cohort_id,section_id,classroom_id,classroom_url
 
   """
-  searched_student = classroom_crud.get_user_details_by_email(user_email=student_email,
-                                                               headers=headers)
+  searched_student = classroom_crud.\
+  get_user_details_by_email(user_email=student_email,headers=headers)                                                     
   # If the response is success check if student is inactive i.e  raise error
   searched_student = searched_student["data"]
   if searched_student == []:
@@ -99,7 +100,6 @@ def invite_student(section,student_email,headers):
         "gaia_id":"",
         "photo_url":""
       }
-    
     create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
     json=body,headers=headers)
     if create_user_response.status_code !=200:
