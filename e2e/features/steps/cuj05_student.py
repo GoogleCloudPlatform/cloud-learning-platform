@@ -87,7 +87,6 @@ def step_impl_12(context):
 #------------------------------Invite student to section------------------------------
 @behave.given("A user is invited to a section using email")
 def step_impl_13(context):
-  print("IN Invite student ID",context.sections.id)
   student_email =get_student_email_and_token()
   context.url = f'{API_URL}/sections/{context.sections.id}/invite/{student_email["invite_student_email"]}'
 
@@ -124,9 +123,9 @@ def step_impl_18(context):
 #------------------------------Invite student to cohort------------------------------
 @behave.given("A user is invited to a cohort_id using email")
 def step_impl_19(context):
-  print("IN Invite student ID",context.cohort.id)
+  print("IN Invite student ID",context.sections.cohort.id)
   student_email =get_student_email_and_token()
-  context.url = f'{API_URL}/cohorts/{context.cohort.id}/invite/{student_email["invite_student_email"]}'
+  context.url = f'{API_URL}/cohorts/{context.sections.cohort.id}/invite/{student_email["invite_student_email"]}'
 
 
 

@@ -38,7 +38,7 @@ Feature:Delete, List students in section
     When cron job is triggered and calls update_invites endpoint
     Then student details will be updated in user collection and course enrollment mapping once invite is accepted
 
-    @fixture.create.section
+  @fixture.create.section
   Scenario: Invite student to cohort by admin
     Given A user is invited to a cohort_id using email
     When API request is sent with valid cohort id and email
