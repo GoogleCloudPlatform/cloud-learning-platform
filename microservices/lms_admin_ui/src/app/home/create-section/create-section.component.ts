@@ -100,7 +100,6 @@ export class CreateSectionComponent implements OnInit {
     let sectionObj: LooseObject = {}
     sectionObj['description'] = this.addSectionForm.value.section_description.trim()
     sectionObj['cohort'] = this.requiredDetails.extra_data.cohort_id ? this.requiredDetails.extra_data.cohort_id : this.requiredDetails.init_data.cohort_id
-    // this.requiredDetails.extra_data.instructional_desiner ? tempTeacherList.push(this.requiredDetails.extra_data.instructional_desiner) : tempTeacherList.push(this.requiredDetails.init_data.instructional_desiner)
     for (let x of this.teachingStaff) {
       tempTeacherList.push(x)
     }
@@ -108,6 +107,7 @@ export class CreateSectionComponent implements OnInit {
 
     if (this.requiredDetails.mode == 'Edit') {
       console.log('sec obj', sectionObj)
+      this.requiredDetails.extra_data.instructional_desiner ? tempTeacherList.push(this.requiredDetails.extra_data.instructional_desiner) : tempTeacherList.push(this.requiredDetails.init_data.instructional_desiner)
       sectionObj['section_name'] = this.addSectionForm.value.section_name.trim()
       sectionObj['id'] = this.requiredDetails.init_data.section_id
       sectionObj['course_id'] = this.requiredDetails.init_data.classroom_id
@@ -136,7 +136,7 @@ export class CreateSectionComponent implements OnInit {
           this.dialogRef.close({ data: 'success' });
           const successOverviewDialogRef = this.dialog.open(SuccessOverviewDialog, {
             width: '500px',
-            data: "Section creation is under progress, please refresh the page or return to this page after some time"
+            data: "Section creation in progress"
           });
         }
         else {

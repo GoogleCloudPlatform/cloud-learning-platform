@@ -2,7 +2,8 @@
 Pydantic Model for copy course API's
 """
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
+from schemas.schema_examples import GET_STUDENT_EXAMPLE
 
 class AddStudentResponseModel(BaseModel):
   """Add Student Model"""
@@ -26,7 +27,9 @@ class AddStudentResponseModel(BaseModel):
 
 class AddStudentToCohortModel(BaseModel):
   """Input Model to add student in section"""
-  email: str
+  email: constr(min_length=7, max_length=128,
+                regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+                to_lower=True)
   access_token:str
   class Config():
     orm_mode = True
@@ -41,6 +44,11 @@ class GetStudentDetailsResponseModel(BaseModel):
   """Get Student Details Model"""
   success: Optional[bool] = True
   data: Optional[dict] = None
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example":GET_STUDENT_EXAMPLE
+    }
 
 class GetProgressPercentageResponseModel(BaseModel):
   """Get Progress Percentage"""

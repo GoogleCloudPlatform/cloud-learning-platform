@@ -483,6 +483,13 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
 
   # Given student is active then call create
   # student in classroom course function
+
+  access_token_details = requests.get(
+    f"https://oauth2.googleapis.com/tokeninfo?access_token={access_token}")
+  Logger.info(
+f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
+  {access_token_details.json()}"
+  )
   create_student_in_course(access_token,student_email,course_id,course_code)
   # Get the gaia ID , first name ,last_name of the student
   # Call_people api function
@@ -623,6 +630,11 @@ def if_user_exists_in_section(section_id, user_id, headers):
     response = requests.\
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     user = response.json()["data"]
+    user["section_id"]=section_details.id
+    user["cohort_id"]=section_details.cohort.id
+    user["classroom_url"]=section_details.classroom_url
+    user["course_enrollment_id"]=result.id
+    user["classroom_id"] = section_details.classroom_id
     return user
   else:
     raise ResourceNotFoundException("User not found")
@@ -670,8 +682,6 @@ def delete_student(course_id, student_email):
                               success=False,
                               message=str(ae),
                               data=None) from ae
-  except Exception as e:
-    raise InternalServerError(str(e)) from e
 
 def get_user_details(user_id, headers):
   """Get user from user collection
@@ -772,10 +782,10 @@ def get_course_work(course_id,course_work_id):
     courseId=course_id,id=course_work_id).execute()
 
 def post_grade_of_the_user(section_id: str,
-                    course_work_id: str,
-                    submission_id: str,
-                    assigned_grade: float = None,
-                    draft_grade: float = None):
+                           course_work_id: str,
+                           submission_id: str,
+                           assigned_grade: float = None,
+                           draft_grade: float = None):
   """
    Args:
       section_id: Unique ID of the section
@@ -794,10 +804,10 @@ def post_grade_of_the_user(section_id: str,
 
     student_submission = {}
 
-    if assigned_grade:
+    if assigned_grade is not None:
       student_submission["assignedGrade"] = assigned_grade
 
-    if draft_grade:
+    if draft_grade is not None:
       student_submission["draftGrade"] = draft_grade
 
     output = service.courses().courseWork().studentSubmissions().patch(

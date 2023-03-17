@@ -1,4 +1,5 @@
 '''LTI Assignment Endpoints'''
+import traceback
 from fastapi import APIRouter
 from common.models import LTIAssignment
 from common.utils.logging_handler import Logger
@@ -62,6 +63,7 @@ def get_lti_assignments_list(skip: int = 0, limit: int = 10):
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -95,6 +97,7 @@ def get_lti_assignment(lti_assignment_id: str):
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -129,6 +132,7 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -181,6 +185,7 @@ def update_lti_assignment(
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -213,4 +218,5 @@ def delete_lti_assignment(lti_assignment_id: str):
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e

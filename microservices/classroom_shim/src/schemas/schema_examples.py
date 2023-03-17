@@ -46,4 +46,5 @@ LTI_POST_GRADE_MODEL = {
     "maximum_grade": "50",
     "assigned_grade": "30",
     "draft_grade": "20",
+    "validate_title": False
 }

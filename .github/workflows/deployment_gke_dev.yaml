@@ -42,6 +42,8 @@ env:
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   LTI_ISSUER_DOMAIN: https://core-learning-services-dev.cloudpssolutions.com
+  LTI_PLATFORM_UNIQUE_ID: e0fc690f-7fb9-4fb2-a5a6-68466f0181a4
+  LTI_PLATFORM_NAME: CLP LTI Service
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
   
   # For Scalability in Dev env using Prod config
@@ -108,7 +110,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: GPS-Solutions/ailearning-backend
-          ref: fd43cc036c93c18bdb87633036ef39f7bc88e92e
+          ref: 9317c5e71bccd9cc1c52d6036f7b1f8695dedca5
           # adding run_id so we can fold in the repo without collision
           path: ${{ format('ailearning-backend_{0}', github.run_id) }}
           token: ${{ secrets.GH_PAT }}

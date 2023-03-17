@@ -32,6 +32,8 @@ def test_new_course(clean_firestore):
   course_template=CourseTemplate.find_by_id(new_course_template.id)
   assert course_template.name==TEST_COURSE_TEMPLATE["name"]
   assert course_template.description == TEST_COURSE_TEMPLATE["description"]
+  assert course_template.instructional_designer == TEST_COURSE_TEMPLATE[
+      "instructional_designer"].lower()
 
 def test_delete_course_template(clean_firestore):
   '''test for soft delete method'''
