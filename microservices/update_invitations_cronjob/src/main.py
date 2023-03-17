@@ -41,7 +41,9 @@ def main():
                         })
   Logger.info(f"Response of patch api {res.status_code}")
   if res.status_code!=200:
-    Logger.error(f"Update Invites status API failed with status code {res.status_code}")
+    Logger.error(
+f"Update Invites status API failed with status code {res.status_code}"
+    )
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     return False

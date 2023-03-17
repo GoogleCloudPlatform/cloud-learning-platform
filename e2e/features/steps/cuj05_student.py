@@ -96,11 +96,9 @@ def step_impl_13(context):
 @behave.when("API request is sent with valid section id and email")
 def step_impl_14(context):
   resp = requests.post(context.url,headers=context.header)
-  print("THIS IS RESPONSE FROM INVITE STUDNET ")
   print(resp.json())
   context.status = resp.status_code
   context.response = resp.json()
-  print("ADD_STUDENT RESPONSE _________",resp.json())
 
 
 @behave.then("Invitation is sent to student via email and course enrollmet object with status invited is created")
@@ -122,3 +120,27 @@ def step_impl_17(context):
 @behave.then("student details will be updated in user collection and course enrollment mapping status is updated to active")
 def step_impl_18(context):
     assert context.status == 200, "Status 200"
+
+#------------------------------Invite student to cohort------------------------------
+@behave.given("A user is invited to a cohort_id using email")
+def step_impl_19(context):
+  print("IN Invite student ID",context.cohort.id)
+  student_email =get_student_email_and_token()
+  context.url = f'{API_URL}/cohorts/{context.cohort.id}/invite/{student_email["invite_student_email"]}'
+
+
+
+@behave.when("API request is sent with valid cohort id and email")
+def step_impl_20(context):
+  resp = requests.post(context.url,headers=context.header)
+  print("THIS IS RESPONSE FROM INVITE STUDNET cohort ")
+  print(resp.json())
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("ADD_STUDENT RESPONSE _________",resp.json())
+
+
+@behave.then("Invitation is sent to student via email and course enrollmet object with status invited is created")
+def step_impl_21(context):
+  assert context.status == 200, "Status 200"
+  assert "invitation_id" in context.response["data"].keys()

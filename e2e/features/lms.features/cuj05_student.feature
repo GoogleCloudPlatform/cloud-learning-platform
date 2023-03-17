@@ -32,9 +32,14 @@ Feature:Delete, List students in section
     When API request is sent with valid section id and email
     Then Invitation is sent to student via email and course enrollmet object with status invited is created
 
-
   @fixture.invite.student
-  Scenario:  A student is invited to section and has accepted the invite
-    Given A student is invited and has accepted the invite via email
+  Scenario:  A student is invited to section and has not accepted the invite
+    Given A student is invited and has not accepted the invite via email
     When cron job is triggered and calls update_invites endpoint
     Then student details will be updated in user collection and course enrollment mapping status is updated to active
+
+    @fixture.create.section
+  Scenario: Invite student to cohort by admin
+    Given A user is invited to a cohort_id using email
+    When API request is sent with valid cohort id and email
+    Then Invitation is sent to student via email and course enrollmet object with status invited is created
