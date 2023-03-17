@@ -1,7 +1,7 @@
 """Grade service"""
 import requests
 from common.utils.logging_handler import Logger
-from common.utils.secrets import get_backend_robot_id_token
+from config import auth_client
 # pylint: disable=line-too-long, broad-except
 
 
@@ -12,7 +12,7 @@ def grade_pass_back(input_grade: dict, user_id: str, line_item_id: str):
 
     grade_res = requests.post(
         url=post_grade_url,
-        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+        headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
         json=input_grade,
         timeout=60)
 

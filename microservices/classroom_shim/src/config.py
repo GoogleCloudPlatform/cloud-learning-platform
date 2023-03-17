@@ -5,6 +5,10 @@ import os
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
+from google.cloud import secretmanager
+from services.robot_auth import Authentication
+
+secrets = secretmanager.SecretManagerServiceClient()
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
 
@@ -30,3 +34,24 @@ ERROR_RESPONSES = {
         "model": ValidationErrorResponseModel
     }
 }
+
+try:
+  LMS_BACKEND_ROBOT_USERNAME = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/lms-backend-robot-username/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  LMS_BACKEND_ROBOT_USERNAME = None
+
+try:
+  LMS_BACKEND_ROBOT_PASSWORD = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/lms-backend-robot-password/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  LMS_BACKEND_ROBOT_PASSWORD = None
+
+auth_client = Authentication(LMS_BACKEND_ROBOT_USERNAME,
+                             LMS_BACKEND_ROBOT_PASSWORD)

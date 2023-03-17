@@ -8,7 +8,7 @@ from common.utils.errors import (ResourceNotFoundException, InvalidTokenError)
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound,
                                           Unauthenticated)
-from common.utils.secrets import get_backend_robot_id_token
+from config import auth_client
 from schemas.nrps_schema import GetNRPSModel
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.validate_service import validate_access
@@ -50,7 +50,7 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
 
     section_res = requests.get(
         url=get_section_url,
-        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+        headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
         timeout=60)
 
     if section_res.status_code == 200:
@@ -72,7 +72,7 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
 
     teachers_res = requests.get(
         url=get_teachers_members_url,
-        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+        headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
         timeout=60)
 
     if teachers_res.status_code == 200:
@@ -88,7 +88,7 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
 
     student_res = requests.get(
         url=get_student_members_url,
-        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+        headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
         timeout=60)
 
     if student_res.status_code == 200:
