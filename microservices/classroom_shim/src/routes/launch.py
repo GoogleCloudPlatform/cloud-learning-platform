@@ -28,45 +28,45 @@ def login(request: Request, lti_assignment_id: str):
   Returns:
       Template response with the login page of the user
   """
-  # try:
-  url = f"{API_DOMAIN}/classroom-shim/api/v1/launch-assignment?lti_assignment_id={lti_assignment_id}"
+  try:
+    url = f"{API_DOMAIN}/classroom-shim/api/v1/launch-assignment?lti_assignment_id={lti_assignment_id}"
 
-  lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
-  content_item_url = f"http://lti/lti/api/v1/content-item/{lti_assignment.lti_content_item_id}"
-  res = requests.get(
-      url=content_item_url,
-      headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
-      timeout=60)
-  data = res.json()
-  lti_content_item = data.get("data")
-
-  content_item_info = lti_content_item.get("content_item_info")
-  title = content_item_info.get("title")
-  if title is None:
-    tool_url = f"http://lti/lti/api/v1/tool/{lti_assignment.tool_id}"
+    lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
+    content_item_url = f"http://lti/lti/api/v1/content-item/{lti_assignment.lti_content_item_id}"
     res = requests.get(
-        url=tool_url,
+        url=content_item_url,
         headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
         timeout=60)
-    lti_tool = res.json().get("data")
-    title = lti_tool.get("name", "")
-  return templates.TemplateResponse(
-      "login.html", {
-          "request": request,
-          "redirect_url": url,
-          "title": title,
-          "firebase_api_key": FIREBASE_API_KEY,
-          "project_id": PROJECT_ID,
-          "firebase_auth_domain": FIREBASE_AUTH_DOMAIN
-      })
+    data = res.json()
+    lti_content_item = data.get("data")
 
-  # except ValidationError as e:
-  #   Logger.error(e)
-  #   raise BadRequest(str(e)) from e
-  # except Exception as e:
-  #   Logger.error(e)
-  #   Logger.error(traceback.print_exc())
-  #   raise InternalServerError(str(e)) from e
+    content_item_info = lti_content_item.get("content_item_info")
+    title = content_item_info.get("title")
+    if title is None:
+      tool_url = f"http://lti/lti/api/v1/tool/{lti_assignment.tool_id}"
+      res = requests.get(
+          url=tool_url,
+          headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
+          timeout=60)
+      lti_tool = res.json().get("data")
+      title = lti_tool.get("name", "")
+    return templates.TemplateResponse(
+        "login.html", {
+            "request": request,
+            "redirect_url": url,
+            "title": title,
+            "firebase_api_key": FIREBASE_API_KEY,
+            "project_id": PROJECT_ID,
+            "firebase_auth_domain": FIREBASE_AUTH_DOMAIN
+        })
+
+  except ValidationError as e:
+    Logger.error(e)
+    raise BadRequest(str(e)) from e
+  except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise InternalServerError(str(e)) from e
 
 
 @router.get("/launch-assignment")
