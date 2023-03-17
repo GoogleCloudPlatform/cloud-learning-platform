@@ -107,7 +107,7 @@ def step_impl_15(context):
   assert "invitation_id" in context.response["data"].keys()
 
 #-------------------------------Update invites patch api--------------------------------------
-@behave.given("A student is invited and has accepted the invite via email")
+@behave.given("A student is invited and has not accepted the invite via email")
 def step_impl_16(context):
   context.url = f'{API_URL}/sections/update_invites'
 
@@ -117,7 +117,7 @@ def step_impl_17(context):
   context.status = resp.status_code
   context.response = resp.json()
 
-@behave.then("student details will be updated in user collection and course enrollment mapping status is updated to active")
+@behave.then("student details will be updated in user collection and course enrollment mapping once invite is accepted")
 def step_impl_18(context):
     assert context.status == 200, "Status 200"
 
@@ -140,7 +140,7 @@ def step_impl_20(context):
   print("ADD_STUDENT RESPONSE _________",resp.json())
 
 
-@behave.then("Invitation is sent to student via email and student invited to section with min count in cohort")
+@behave.then("Invitation is sent to student via email and student invited to section with min enrolled student count")
 def step_impl_21(context):
   assert context.status == 200, "Status 200"
   assert "invitation_id" in context.response["data"].keys()

@@ -41,7 +41,7 @@ jobs:
         python-version: [3.9]
         target-folder: [
           # TODO: Add all microservice folders below.
-          microservices/update_invitations_cronjob
+          microservices/update_invitations_cronjob,
         ]
     steps:
     - uses: actions/checkout@v3
