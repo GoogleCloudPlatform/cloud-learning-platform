@@ -12,7 +12,7 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
 
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, broad-exception-raised
 
 router = APIRouter(
     tags=["Grade"],

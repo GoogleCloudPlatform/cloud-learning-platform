@@ -1,13 +1,23 @@
+"""
+  Class to fetch and cache id token using robot account.
+"""
 import time
 import requests
 
 
 class Authentication:
+  """
+    Class to fetch and cache id token using robot account.
+    params:
+      email: robot email
+      password: robot password
+  """
 
   def __init__(self, email, password):
     self.email = email
     self.password = password
-    self.signin_url = "http://authentication/authentication/api/v1/sign-in/credentials"
+    self.signin_url = \
+      "http://authentication/authentication/api/v1/sign-in/credentials"
     self.refresh_url = "http://authentication/authentication/api/v1/generate"
     self.token = None
     self.refresh_token = None
@@ -15,6 +25,7 @@ class Authentication:
     self.get_token()
 
   def get_token(self):
+    """This function will hit the sign-in api"""
     payload = {"email": self.email, "password": self.password}
     response = requests.post(self.signin_url, json=payload, timeout=30)
     if response.status_code == 200:
@@ -24,11 +35,13 @@ class Authentication:
       self.token_expiry = time.time() + int(data.get("expiresIn"))
 
   def get_id_token(self):
+    """This function will fetch id_token"""
     if not self.token or time.time() > self.token_expiry:
       self.refresh_token_fetch()
     return self.token
 
   def refresh_token_fetch(self):
+    """This function will hit the refresh token api"""
     if not self.refresh_token:
       self.get_token()
       return
@@ -43,6 +56,7 @@ class Authentication:
       return self.token
 
   def get_refresh_token(self):
+    """This function will fetch refresh token"""
     if not self.refresh_token:
       self.refresh_token_fetch()
     return self.refresh_token
