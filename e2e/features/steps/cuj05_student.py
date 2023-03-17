@@ -140,7 +140,7 @@ def step_impl_20(context):
   print("ADD_STUDENT RESPONSE _________",resp.json())
 
 
-@behave.then("Invitation is sent to student via email and course enrollmet object with status invited is created")
+@behave.then("Invitation is sent to student via email and student invited to section with min count in cohort")
 def step_impl_21(context):
   assert context.status == 200, "Status 200"
   assert "invitation_id" in context.response["data"].keys()
