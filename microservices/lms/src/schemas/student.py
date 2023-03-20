@@ -2,8 +2,9 @@
 Pydantic Model for copy course API's
 """
 from typing import Optional
-from pydantic import BaseModel, constr
-from schemas.schema_examples import GET_STUDENT_EXAMPLE
+from pydantic import BaseModel,constr
+from schemas.schema_examples import INVITE_STUDENT,GET_STUDENT_EXAMPLE
+
 
 class AddStudentResponseModel(BaseModel):
   """Add Student Model"""
@@ -47,8 +48,41 @@ class GetStudentDetailsResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-        "example":GET_STUDENT_EXAMPLE
-    }
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data":GET_STUDENT_EXAMPLE
+      }
+      }
+
+class InviteStudentToSectionResponseModel(BaseModel):
+  """Invite Student Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully Invited the Student"
+  data: Optional[dict] = None
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully Invited the Student",
+            "data": INVITE_STUDENT
+        }}
+
+class UpdateInviteResponseModel(BaseModel):
+  """Invite Student Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully Updated the invitation status"
+  data: Optional[dict]= None
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully Invited the Student",
+            "data":{"list_coursenrolment":["courseenrollment_id1"
+                     ,"courseenrollment_id2","courseenrollment_id3"]}
+        }}
 
 class GetProgressPercentageResponseModel(BaseModel):
   """Get Progress Percentage"""

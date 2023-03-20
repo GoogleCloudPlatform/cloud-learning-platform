@@ -555,7 +555,7 @@ def get_view_link_from_id(form_id):
   return result
 
 
-def invite_teacher(course_id, teacher_email):
+def invite_user(course_id, email,role):
   """Invite teacher to google classroom using course id and email
 
   Args:
@@ -570,17 +570,34 @@ def invite_teacher(course_id, teacher_email):
       dict: response from create invitation method
   """
   service = build("classroom", "v1", credentials=get_credentials())
-  body = {"courseId": course_id, "role": "TEACHER", "userId": teacher_email}
+  body = {"courseId": course_id, "role": role, "userId": email}
   try:
-    course = service.invitations().create(body=body).execute()
-    return course
+    invitation = service.invitations().create(body=body).execute()
+    return invitation
   except HttpError as ae:
     raise CustomHTTPException(status_code=ae.resp.status,
                               success=False,
                               message=str(ae),
                               data=None) from ae
-  except Exception as e:
-    raise InternalServerError(str(e)) from e
+
+def get_invite(invitation_id):
+  """Invite teacher to google classroom using course id and email
+
+  Args:
+      course_id (str): google classroom unique id
+      teacher_email (str): teacher email id
+
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
+
+  Returns:
+      dict: response from create invitation method
+  """
+  service = build("classroom", "v1", credentials=get_credentials())
+  invitation = service.invitations().get(id=invitation_id).execute()
+  return invitation
+
 
 
 def enable_notifications(course_id, feed_type):
@@ -630,6 +647,8 @@ def if_user_exists_in_section(section_id, user_id, headers):
     response = requests.\
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     user = response.json()["data"]
+    user["invitation_id"]=result.invitation_id
+    user["enrollment_status"] = result.status
     user["section_id"]=section_details.id
     user["cohort_id"]=section_details.cohort.id
     user["classroom_url"]=section_details.classroom_url
@@ -657,7 +676,10 @@ def list_student_section(section_id,headers):
     user_id =record.user
     response = requests.\
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-    users.append(response.json()["data"])
+    user_record = response.json()["data"]
+    user_record["invitation_id"]=record.invitation_id
+    user_record["enrollment_status"]=record.status
+    users.append(user_record)
   return users
 
 def delete_student(course_id, student_email):
@@ -718,13 +740,13 @@ def get_user_details_by_email(user_email, headers):
         ResourceNotFoundException(response_get_student.json()["message"])
   return response_get_student.json()
 
-def acceept_invite(invitation_id,teacher_email):
-  """Invite teacher to google classroom using course id and email
+def acceept_invite(invitation_id,email):
+  """Accept invite sent to user
 
   Args:
       invitation_id (str): google classroom invitation Id from invite
-      teacher response
-      teacher_email (str): teacher email id
+      user response
+      email (str): user email id
 
   Raises:
       CustomHTTPException: custom exception for HTTP exceptions
@@ -734,7 +756,7 @@ def acceept_invite(invitation_id,teacher_email):
       dict: response from create invitation method
   """
   service = build("classroom", "v1", \
-    credentials=impersonate_teacher_creds(teacher_email))
+    credentials=impersonate_teacher_creds(email))
   try:
     course = service.invitations().accept(id=invitation_id).execute()
     return course
@@ -825,3 +847,5 @@ def post_grade_of_the_user(section_id: str,
         data=None) from ae
   except Exception as e:
     raise InternalServerError(str(e)) from e
+
+

@@ -4,6 +4,7 @@ import requests
 from testing_objects.test_config import API_URL
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from environment import create_course
+from e2e.gke_api_tests.secrets_helper import get_student_email_and_token
 
 # ------------------------------list student to Section-------------------------------------
 
@@ -68,7 +69,7 @@ def step_impl_9(context):
 #-------------------------------Get student in cohort--------------------------------------
 @behave.given("A section has a students enrolled in cohort")
 def step_impl_10(context):
-  context.url = f'{API_URL}/cohorts/{context.enroll_student_data["cohort_id"]}/students/{context.enroll_student_data["email"]}'
+  context.url = f'{API_URL}/cohorts/{context.enroll_student_data["cohort_id"]}/students/{context.enroll_student_data["user_id"]}'
 
 @behave.when("API request with valid cohort Id  user_id is sent")
 def step_impl_11(context):
@@ -82,4 +83,63 @@ def step_impl_11(context):
 def step_impl_12(context):
     assert context.status == 200, "Status 200"
     assert context.response["data"]["cohort_id"] == context.enroll_student_data["cohort_id"]
-  
+
+#------------------------------Invite student to section------------------------------
+@behave.given("A user is invited to a section using email")
+def step_impl_13(context):
+  student_email =get_student_email_and_token()
+  context.url = f'{API_URL}/sections/{context.sections.id}/invite/{student_email["invite_student_email"]}'
+
+
+
+@behave.when("API request is sent with valid section id and email")
+def step_impl_14(context):
+  resp = requests.post(context.url,headers=context.header)
+  print(resp.json())
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then("Invitation is sent to student via email and course enrollmet object with status invited is created")
+def step_impl_15(context):
+  assert context.status == 200, "Status 200"
+  assert "invitation_id" in context.response["data"].keys()
+
+#-------------------------------Update invites patch api--------------------------------------
+@behave.given("A student is invited and has not accepted the invite via email")
+def step_impl_16(context):
+  context.url = f'{API_URL}/sections/update_invites'
+
+@behave.when("cron job is triggered and calls update_invites endpoint")
+def step_impl_17(context):
+  resp = requests.patch(context.url,headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+@behave.then("student details will be updated in user collection and course enrollment mapping once invite is accepted")
+def step_impl_18(context):
+    assert context.status == 200, "Status 200"
+
+#------------------------------Invite student to cohort------------------------------
+@behave.given("A user is invited to a cohort_id using email")
+def step_impl_19(context):
+  print("IN Invite student ID",context.sections.cohort.id)
+  student_email =get_student_email_and_token()
+  context.url = f'{API_URL}/cohorts/{context.sections.cohort.id}/invite/{student_email["invite_student_email"]}'
+
+
+
+@behave.when("API request is sent with valid cohort id and email")
+def step_impl_20(context):
+  resp = requests.post(context.url,headers=context.header)
+  print("THIS IS RESPONSE FROM INVITE STUDNET cohort ")
+  print(resp.json())
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("ADD_STUDENT RESPONSE _________",resp.json())
+
+
+@behave.then("Invitation is sent to student via email and student invited to section with min enrolled student count")
+def step_impl_21(context):
+  assert context.status == 200, "Status 200"
+  assert "invitation_id" in context.response["data"].keys()
