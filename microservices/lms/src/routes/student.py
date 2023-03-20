@@ -557,8 +557,8 @@ def update_invites(request: Request):
 
           # Check if gaia_id is "" if yes so update personal deatils
           if user_rec.gaia_id == "":
-            user_rec.firstname =  user_profile["name"]["givenName"]
-            user_rec.lastname = user_profile["name"]["familyName"]
+            user_rec.first_name =  user_profile["name"]["givenName"]
+            user_rec.last_name = user_profile["name"]["familyName"]
             user_rec.gaia_id = user_profile["id"]
             user_rec.photo_url = user_profile["photoUrl"]
             user_rec.update()
