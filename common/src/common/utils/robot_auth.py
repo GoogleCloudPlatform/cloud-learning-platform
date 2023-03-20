@@ -1,5 +1,7 @@
+import traceback
 import time
 import requests
+from common.utils.logging_handler import Logger
 
 
 class Authentication:
@@ -15,13 +17,18 @@ class Authentication:
     self.get_token()
 
   def get_token(self):
-    payload = {"email": self.email, "password": self.password}
-    response = requests.post(self.signin_url, json=payload, timeout=30)
-    if response.status_code == 200:
-      data = response.json().get("data")
-      self.token = data.get("idToken")
-      self.refresh_token = data.get("refreshToken")
-      self.token_expiry = time.time() + int(data.get("expiresIn"))
+    try:
+      payload = {"email": self.email, "password": self.password}
+      response = requests.post(self.signin_url, json=payload, timeout=30)
+      if response.status_code == 200:
+        data = response.json().get("data")
+        self.token = data.get("idToken")
+        self.refresh_token = data.get("refreshToken")
+        self.token_expiry = time.time() + int(data.get("expiresIn"))
+    except Exception as e:
+      Logger.error(e)
+      Logger.error(traceback.print_exc())
+      Logger.error("Something went wrong while fetching the robot token")
 
   def get_id_token(self):
     if not self.token or time.time() > self.token_expiry:
