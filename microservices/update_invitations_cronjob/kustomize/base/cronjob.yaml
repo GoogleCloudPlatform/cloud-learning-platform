@@ -29,5 +29,5 @@ spec:
             envFrom:
             - configMapRef:
                 name: env-vars
-          restartPolicy: never
+          restartPolicy: Never
           
