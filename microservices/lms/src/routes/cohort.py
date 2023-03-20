@@ -280,7 +280,7 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
       for section in result:
         submitted_course_work_list = 0
         record = CourseEnrollmentMapping.\
-          find_course_enrollment_record(section.key,user_id)
+          find_enrolled_student_record(section.key,user_id)
         if record is not None:
           course_work_list = len\
             (classroom_crud.get_course_work_list(section.key.split("/")[1]))

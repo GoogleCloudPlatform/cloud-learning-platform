@@ -126,8 +126,8 @@ def copy_course_background_task(course_template_details,
         course_template_details.instructional_designer)
     for teacher_email in set(sections_details.teachers):
       print("TEACHER NAME",teacher_email)
-      invitation_object = classroom_crud.invite_teacher(new_course["id"],
-                            teacher_email)
+      invitation_object = classroom_crud.invite_user(new_course["id"],
+                            teacher_email,"TEACHER")
       # Storing classroom details
       classroom_crud.acceept_invite(invitation_object["id"],teacher_email)
       user_profile = classroom_crud.get_user_profile_information(teacher_email)
