@@ -15,8 +15,18 @@
 """class and methods for logs handling."""
 
 import logging
+from common.config import CLOUD_LOGGING_ENABLED
+import google.cloud.logging
 
-logging.basicConfig(level=logging.INFO)
+if CLOUD_LOGGING_ENABLED:
+  client = google.cloud.logging.Client()
+  client.setup_logging()
+
+  logging.basicConfig(
+        format='%(asctime)s:%(levelname)s:%(message)s',level=logging.INFO)
+else:
+  logging.basicConfig(level=logging.INFO)
+
 
 
 class Logger():
