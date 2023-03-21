@@ -39,5 +39,8 @@ requires:
 - path: ./microservices/classroom_notifications_cronjob
   configs: [classroom-notifications-cronjob]
 
+- path: ./microservices/update_invitations_cronjob
+  configs: [update-invitations-cronjob]
+
 build:
   googleCloudBuild: {}

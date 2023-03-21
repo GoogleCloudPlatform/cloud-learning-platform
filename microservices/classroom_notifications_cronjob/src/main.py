@@ -20,6 +20,7 @@
 
 """
 
+import sys
 import requests
 from common.utils.secrets import get_backend_robot_id_token
 
@@ -93,21 +94,38 @@ def main():
 
   id_token = get_backend_robot_id_token()
   skip=0
-  limit=10
-
+  page_size=20
+  num_enabled=0
+  num_sections=0
+  skip_increment=20
   while True:
     # get list of sections according to skip & limit value
-    sections = get_sections(id_token,limit=limit,skip=skip)
+    sections = get_sections(id_token,limit=page_size,skip=skip)
     if not sections:
       break
-    for section in sections:
-      # enable notification for each section
-      enable_notifications(section["id"], id_token)
 
-    if len(sections) < (limit-skip):
+    num_sections+=len(sections)
+    # enable notification for each section
+    for section in sections:
+      # added try except so that if any section enable notification
+      # get failed it will get continue
+      try:
+        enable_notifications(section["id"], id_token)
+        num_enabled+=1
+      except requests.HTTPError as rte:
+        logger.info(str(rte))
+    if len(sections) < page_size:
       break
-    skip = limit
-    limit += 10
+    skip +=skip_increment
+  if num_enabled<num_sections:
+    logger.error(f"Cron Job failed only {num_enabled}" +
+                 " these number of sections get enabled out of " +
+                 f"{num_sections} sections")
+    sys.exit(1)
+
+  logger.info(
+    "Cron Job Successfully enabled notifications for "+
+    f"{num_enabled} out of {num_sections} number of sections")
   logger.info(
       "Classroom Pubsub Registration / Notifications API Cronjob FINISHED")
 

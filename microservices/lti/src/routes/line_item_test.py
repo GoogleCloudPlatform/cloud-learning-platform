@@ -11,16 +11,19 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from testing.test_config import API_URL
-from common.models import LineItem
+from common.models import LineItem, LTIContentItem
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
 from common.utils.http_exceptions import add_exception_handlers
+from schemas.schema_examples import (BASIC_TOOL_EXAMPLE,
+                                     BASIC_CONTENT_ITEM_EXAMPLE,
+                                     POST_LINE_ITEM_EXAMPLE,
+                                     BASIC_SCORE_EXAMPLE)
+from uuid import uuid4
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
     side_effect=mock.MagicMock()) as mok:
   from routes.line_item import router
-  from schemas.schema_examples import (POST_LINE_ITEM_EXAMPLE,
-                                       BASIC_SCORE_EXAMPLE)
 
 app = FastAPI()
 add_exception_handlers(app)
@@ -46,14 +49,22 @@ context_id = POST_LINE_ITEM_EXAMPLE["contextId"]
 api_url = f"{API_URL}/{context_id}/line_items"
 
 
-@mock.patch("services.validate_service.get_platform_public_keyset")
-@mock.patch("services.validate_service.decode_token")
-@mock.patch("services.validate_service.get_unverified_token_claims")
-def test_post_and_get_line_item(mock_unverified_token, mock_token_scopes,
-                                mock_keyset, clean_firestore):
-  mock_unverified_token.return_value = test_scope
-  mock_token_scopes.return_value = test_scope
-  mock_keyset.return_value = test_keyset
+@pytest.mark.parametrize("create_tool", [BASIC_TOOL_EXAMPLE], indirect=True)
+@mock.patch("services.validate_service.validate_and_decode_token")
+def test_post_and_get_line_item(mock_token, clean_firestore, create_tool):
+  test_tool = create_tool
+
+  content_item_example = {
+      **BASIC_CONTENT_ITEM_EXAMPLE, "context_id": context_id,
+      "tool_id": test_tool.id
+  }
+
+  content_item = LTIContentItem.from_dict(content_item_example)
+  content_item.save()
+
+  test_scope_data = {**test_scope, "sub": test_tool.client_id}
+  mock_token.return_value = test_scope_data
+
   input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
 
   url = api_url
@@ -91,14 +102,21 @@ def test_negative_get_line_item(mock_unverified_token, mock_token_scopes,
   assert get_resp.status_code == 404
 
 
-@mock.patch("services.validate_service.get_platform_public_keyset")
-@mock.patch("services.validate_service.decode_token")
-@mock.patch("services.validate_service.get_unverified_token_claims")
-def test_get_all_line_items(mock_unverified_token, mock_token_scopes,
-                            mock_keyset, clean_firestore):
-  mock_unverified_token.return_value = test_scope
-  mock_token_scopes.return_value = test_scope
-  mock_keyset.return_value = test_keyset
+@pytest.mark.parametrize("create_tool", [BASIC_TOOL_EXAMPLE], indirect=True)
+@mock.patch("services.validate_service.validate_and_decode_token")
+def test_get_all_line_items(mock_token, clean_firestore, create_tool):
+  test_tool = create_tool
+
+  content_item_example = {
+      **BASIC_CONTENT_ITEM_EXAMPLE, "context_id": context_id,
+      "tool_id": test_tool.id
+  }
+
+  content_item = LTIContentItem.from_dict(content_item_example)
+  content_item.save()
+
+  test_scope_data = {**test_scope, "sub": test_tool.client_id}
+  mock_token.return_value = test_scope_data
 
   input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
 
@@ -114,14 +132,21 @@ def test_get_all_line_items(mock_unverified_token, mock_token_scopes,
   assert len(get_json_response) > 0
 
 
-@mock.patch("services.validate_service.get_platform_public_keyset")
-@mock.patch("services.validate_service.decode_token")
-@mock.patch("services.validate_service.get_unverified_token_claims")
-def test_update_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
-                          clean_firestore):
-  mock_unverified_token.return_value = test_scope
-  mock_token_scopes.return_value = test_scope
-  mock_keyset.return_value = test_keyset
+@pytest.mark.parametrize("create_tool", [BASIC_TOOL_EXAMPLE], indirect=True)
+@mock.patch("services.validate_service.validate_and_decode_token")
+def test_update_line_item(mock_token, clean_firestore, create_tool):
+  test_tool = create_tool
+
+  content_item_example = {
+      **BASIC_CONTENT_ITEM_EXAMPLE, "context_id": context_id,
+      "tool_id": test_tool.id
+  }
+
+  content_item = LTIContentItem.from_dict(content_item_example)
+  content_item.save()
+
+  test_scope_data = {**test_scope, "sub": test_tool.client_id}
+  mock_token.return_value = test_scope_data
 
   input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
 
@@ -151,14 +176,21 @@ def test_update_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
       "scoreMaximum"]
 
 
-@mock.patch("services.validate_service.get_platform_public_keyset")
-@mock.patch("services.validate_service.decode_token")
-@mock.patch("services.validate_service.get_unverified_token_claims")
-def test_delete_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
-                          clean_firestore):
-  mock_unverified_token.return_value = test_scope
-  mock_token_scopes.return_value = test_scope
-  mock_keyset.return_value = test_keyset
+@pytest.mark.parametrize("create_tool", [BASIC_TOOL_EXAMPLE], indirect=True)
+@mock.patch("services.validate_service.validate_and_decode_token")
+def test_delete_line_item(mock_token, clean_firestore, create_tool):
+  test_tool = create_tool
+
+  content_item_example = {
+      **BASIC_CONTENT_ITEM_EXAMPLE, "context_id": context_id,
+      "tool_id": test_tool.id
+  }
+
+  content_item = LTIContentItem.from_dict(content_item_example)
+  content_item.save()
+
+  test_scope_data = {**test_scope, "sub": test_tool.client_id}
+  mock_token.return_value = test_scope_data
 
   input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
 
@@ -183,19 +215,33 @@ def test_delete_line_item(mock_unverified_token, mock_token_scopes, mock_keyset,
 @mock.patch("services.validate_service.decode_token")
 @mock.patch("services.validate_service.get_unverified_token_claims")
 @mock.patch("routes.line_item.grade_pass_back")
-@pytest.mark.parametrize(
-    "create_line_item", [POST_LINE_ITEM_EXAMPLE], indirect=True)
+@pytest.mark.parametrize("create_tool", [BASIC_TOOL_EXAMPLE], indirect=True)
 def test_post_score(mock_pass_back, mock_unverified_token, mock_token_scopes,
-                    mock_keyset, clean_firestore, create_line_item):
+                    mock_keyset, clean_firestore, create_tool):
   mock_unverified_token.return_value = test_scope
   mock_token_scopes.return_value = test_scope
   mock_keyset.return_value = test_keyset
   mock_pass_back.return_value = True
 
-  headers = {"Authorization": "Bearer test_token"}
-  line_item = create_line_item
+  test_tool = create_tool
+
+  content_item_example = {
+      **BASIC_CONTENT_ITEM_EXAMPLE, "context_id": context_id,
+      "tool_id": test_tool.id
+  }
+
+  content_item = LTIContentItem.from_dict(content_item_example)
+  content_item.save()
+  content_item_id = content_item.id
+
+  input_line_item = {
+      **POST_LINE_ITEM_EXAMPLE, "resourceLinkId": content_item_id
+  }
+  line_item = LineItem.from_dict(input_line_item)
+  line_item.save()
   line_item_id = line_item.id
 
+  headers = {"Authorization": "Bearer test_token"}
   input_score = copy.deepcopy(BASIC_SCORE_EXAMPLE)
   url = f"{api_url}/{line_item_id}/scores"
   post_resp = client_with_emulator.post(url, json=input_score, headers=headers)

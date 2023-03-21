@@ -176,8 +176,8 @@ request: Request):
         description=course_template_dict["description"],
         owner_id="me")
     # Adding instructional designer in the course on classroom
-    invitation_object = classroom_crud.invite_teacher(classroom.get("id"),
-                               course_template_dict["instructional_designer"])
+    invitation_object = classroom_crud.invite_user(classroom.get("id"),
+                  course_template_dict["instructional_designer"],"TEACHER")
     # Storing classroom details
     classroom_crud.acceept_invite(invitation_object["id"],\
       course_template_dict["instructional_designer"])
@@ -259,9 +259,9 @@ def update_course_template(
       classroom_crud.delete_teacher(
           course_template.classroom_id,
           instructional_designer)
-      invitation_object = classroom_crud.invite_teacher(
+      invitation_object = classroom_crud.invite_user(
         course_template.classroom_id,
-                    course_template.instructional_designer)
+                    course_template.instructional_designer,"TEACHER")
       # Storing classroom details
       classroom_crud.acceept_invite(invitation_object["id"],
       course_template.instructional_designer)

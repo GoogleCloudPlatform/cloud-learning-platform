@@ -1,4 +1,5 @@
 """ LTI Token utils """
+import re
 import json
 from datetime import datetime
 from jose import jwt, jws
@@ -6,7 +7,7 @@ from common.models import Tool, LTIContentItem, LineItem
 from common.utils.logging_handler import Logger
 from services.keys_manager import get_platform_public_keyset
 from utils.request_handler import get_method
-from config import TOKEN_TTL, LTI_ISSUER_DOMAIN
+from config import TOKEN_TTL, LTI_ISSUER_DOMAIN, LTI_PLATFORM_UNIQUE_ID, LTI_PLATFORM_NAME
 # pylint: disable=line-too-long, broad-exception-raised
 
 
@@ -46,7 +47,11 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
       "family_name": user.get("last_name"),
       "name": user.get("first_name") + " " + user.get("last_name"),
       "email": user.get("email"),
-      "picture": user.get("photo_url")
+      "picture": user.get("photo_url"),
+      lti_claim_field("claim", "tool_platform"): {
+          "guid": LTI_PLATFORM_UNIQUE_ID,
+          "name": LTI_PLATFORM_NAME
+      }
   }
 
   context_id = lti_message_hint.get("context_id")
@@ -105,11 +110,30 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
         token_claims[lti_claim_field("claim",
                                      "target_link_uri")] = tool_info["tool_url"]
 
-    if "custom" in content_item_info.keys():
-      custom_params = lti_message_hint.get("custom_params_for_substitution")
-      final_custom_claims = {**content_item_info.get("custom")}
+    # process custom parameters
+    final_custom_claims = {**content_item_info.get("custom", {})}
+    custom_params = lti_message_hint.get("custom_params_for_substitution")
 
-      # process custom parameter substitution
+    if tool_info.get("custom_params", None) is not None:
+      cpm = tool_info.get("custom_params")
+      # process custom parameter from tool registration
+
+      # separate params string using ";"
+      cpm = re.split(";", cpm)
+      final_cpm = {}
+      for i in cpm:
+        # separate params string using "="
+        if i:
+          i = i.replace(" ", "")
+          single_cpm = re.split("=", i)
+          final_cpm[single_cpm[0]] = single_cpm[1]
+
+      for key, value in final_cpm.items():
+        if custom_params.get(value) is not None:
+          final_custom_claims[key] = custom_params.get(value)
+
+    if "custom" in content_item_info.keys():
+      # process custom parameters from content_item
       for key, value in content_item_info.get("custom").items():
         if isinstance(value, str) and value.startswith(
             "$") and custom_params.get(value) is not None:

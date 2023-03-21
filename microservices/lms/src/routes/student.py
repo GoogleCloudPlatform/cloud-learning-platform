@@ -8,7 +8,7 @@ from common.utils.errors import (ResourceNotFoundException,
 ValidationError,InvalidTokenError)
 from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
                              ResourceNotFound, BadRequest,InvalidToken,Conflict)
-from common.models import CourseEnrollmentMapping,Section,Cohort
+from common.models import CourseEnrollmentMapping,Section,Cohort,TempUser
 from common.utils import classroom_crud
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
@@ -18,7 +18,8 @@ from schemas.section import(StudentListResponseModel,\
    DeleteStudentFromSectionResponseModel)
 from schemas.student import(AddStudentResponseModel,\
   AddStudentToCohortModel,GetStudentDetailsResponseModel,\
-    GetProgressPercentageResponseModel)
+    GetProgressPercentageResponseModel,InviteStudentToSectionResponseModel,
+    UpdateInviteResponseModel)
 
 router = APIRouter(prefix="/student",
                    tags=["Students"],
@@ -131,7 +132,7 @@ def get_student_in_section(section_id: str, user: str, request: Request):
     HTTPException: 500 Internal Server Error if something fails
     ResourceNotFound: 404 Resource not found exception
   Returns:
-    {"status":"Success","data":{}}: Returns list of students in section
+    {"status":"Success","data":{}}:
     {'status': 'Failed',"data":null}
   """
   try:
@@ -141,6 +142,58 @@ def get_student_in_section(section_id: str, user: str, request: Request):
       if_user_exists_in_section\
         (section_id=section_id,user_id=user_id,headers=headers)
     return {"data": users}
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+
+@cohort_student_router.get("/{cohort_id}/students/{user}",
+                          response_model=GetStudentDetailsResponseModel )
+def get_student_in_cohort(cohort_id: str, user: str, request: Request):
+  """ Get student details of one cohort from db
+  Args:
+    cohort_id(str):cohort id from firestore db
+    user(str):user email or user id from firestore db
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+    ResourceNotFound: 404 Resource not found exception
+  Returns:
+    {"status":"Success","data":{}}
+    {'status': 'Failed',"data":null}
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    user_id = student_service.get_user_id(user=user, headers=headers)
+    cohort = Cohort.find_by_id(cohort_id)
+    course_mapping = None
+    list_section = Section.collection.filter("cohort","==",cohort.key).fetch()
+    for section in list_section:
+      course_mapping = CourseEnrollmentMapping.find_course_enrollment_record(
+        section_key=section.key,user_id=user_id
+      )
+      if course_mapping:
+        result = classroom_crud.get_user_details(user_id=user_id,
+                                                 headers=headers)
+        result = result["data"]
+        result["classroom_id"] = section.classroom_id
+        result["course_enrollment_id"] = course_mapping.id
+        result["enrollment_status"] = course_mapping.status
+        result["section_id"] = section.id
+        result["classroom_url"] = section.classroom_url
+        result["cohort_id"] = cohort_id
+        result["invitation_id"] = course_mapping.invitation_id
+        return {"data": result}
+    if not course_mapping:
+      raise ResourceNotFoundException(
+        f"User {user} not found for cohort {cohort_id}")
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -205,7 +258,7 @@ def delete_student(section_id: str,user:str,request: Request):
     section_details = Section.find_by_id(section_id)
     user_id=student_service.get_user_id(user=user,headers=headers)
     result = CourseEnrollmentMapping.\
-      find_course_enrollment_record(section_details.key,user_id)
+      find_enrolled_student_record(section_details.key,user_id)
     if result is None:
       raise ResourceNotFoundException\
       (
@@ -340,6 +393,208 @@ Please check organizations policy or authentication scopes",
                               data=None) from ae
   except Exception as e:
     Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+
+@section_student_router.post("/{section_id}/invite/{student_email}",
+                             response_model=InviteStudentToSectionResponseModel)
+def invite_student(section_id: str,student_email:str,
+                           request: Request):
+  """
+  Args:
+    section_id:firestore id of section where student is invited
+    student email:student email
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    InviteStudentToSectionResponseModel: if the student successfully invited,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    section = Section.find_by_id(section_id)
+    headers = {"Authorization": request.headers.get("Authorization")}
+    invitation_details = student_service.invite_student(section=section,
+    student_email=student_email,
+    headers=headers)
+    return {
+        "message":
+        f"Successfully Added the Student with email {student_email}",
+        "data":invitation_details
+    }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    Logger.error(conflict)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+@cohort_student_router.post("/{cohort_id}/invite/{student_email}",
+                             response_model=InviteStudentToSectionResponseModel)
+def invite_student_cohort(cohort_id: str,student_email:str,
+                           request: Request):
+  """
+  Args:
+    cohort_id: firestore id of chort where student invited
+    student_email : student email
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    InviteStudentToSectionResponseModel:if the student successfully invited,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    cohort = Cohort.find_by_id(cohort_id)
+    sections = Section.collection.filter("cohort","==",cohort.key).fetch()
+    sections = list(sections)
+    headers = {"Authorization": request.headers.get("Authorization")}
+    if cohort.enrolled_students_count >= cohort.max_students:
+      raise Conflict(
+    "Cohort Max count reached hence student cannot be erolled in this cohort"
+    )
+    if len(sections) == 0:
+      raise ResourceNotFoundException("Given CohortId\
+         does not have any sections")
+    if not student_service.check_student_can_enroll_in_cohort(
+                                              email=student_email,
+                                                     headers=headers,
+                                                     sections=sections):
+      raise Conflict(f"User {student_email} is already\
+                      registered for cohort {cohort_id}")
+    section = student_service.get_section_with_minimum_student(sections)
+    Logger.info(f"Section with minimum student is {section.id},\
+                enroll student intiated for {student_email}")
+    headers = {"Authorization": request.headers.get("Authorization")}
+    invitation_details = student_service.invite_student(section=section,
+    student_email=student_email,
+    headers=headers)
+    return {
+        "message":
+        f"Successfully Added the Student with email {student_email}",
+        "data":invitation_details
+    }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    Logger.error(conflict)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+
+@section_student_router.patch("/update_invites",
+response_model=UpdateInviteResponseModel)
+def update_invites(request: Request):
+  """
+  Args:
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    : if the student successfully added,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    course_records = CourseEnrollmentMapping.collection.filter(
+      "status","==","invited").fetch()
+    updated_list_inviations =[]
+    for course_record in course_records:
+      Logger.info(
+  f"course_record {course_record.section.id}, user_id {course_record.user}"
+      )
+      if course_record.invitation_id is not None:
+        try:
+          result = classroom_crud.get_invite(course_record.invitation_id)
+          Logger.info(
+          f"Invitation {result} found for User id {course_record.user},\
+          course_enrollment_id {course_record.id} database will be updated\
+          once invite is accepted.")
+        except HttpError as ae:
+          Logger.info(f"Get invite response status code {ae.resp.status}")
+          Logger.info(
+            f"Could not get the invite for user_id {course_record.user}\
+          section_id{course_record.section.id}\
+           course_enrollment id {course_record.id}")
+          user_details = classroom_crud.get_user_details(
+            user_id=course_record.user,headers=headers)
+          Logger.info(f"User record found for User {user_details}")
+          user_profile =classroom_crud.get_user_profile_information(
+            user_details["data"]["email"])
+          user_rec = TempUser.collection.filter(
+            "user_id","==",course_record.user).get()
+
+          # Check if gaia_id is "" if yes so update personal deatils
+          if user_rec.gaia_id == "":
+            user_rec.first_name =  user_profile["name"]["givenName"]
+            user_rec.last_name = user_profile["name"]["familyName"]
+            user_rec.gaia_id = user_profile["id"]
+            user_rec.photo_url = user_profile["photoUrl"]
+            user_rec.update()
+          course_record.status = "active"
+          course_record.update()
+          # Update section enrolled student count
+          section = Section.find_by_id(course_record.section.key)
+          section.enrolled_students_count +=1
+          section.update()
+          # Update COhort enrolled student count
+          cohort = Cohort.find_by_id(section.cohort.key)
+          cohort.enrolled_students_count +=1
+          cohort.update()
+          updated_list_inviations.append(course_record.key)
+          Logger.info(
+          f"Successfully  updated the invitations {updated_list_inviations}"
+          )
+    return {
+        "message":"Successfully  updated the invitations",
+        "data" : {"list_coursenrolment":updated_list_inviations}}
+  except ResourceNotFoundException as err:
+    error = traceback.format_exc().replace("\n", " ")
+    Logger.error(error)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise CustomHTTPException(status_code=ae.resp.status,
+                              success=False,
+                              message=str(ae),
+                              data=None) from ae
+  except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
