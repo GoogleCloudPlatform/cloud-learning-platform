@@ -20,17 +20,43 @@
 
 """
 
-import requests
+import os
 import sys
+import requests
 import traceback
 from common.utils.robot_auth import Authentication
 from common.utils.logging_handler import Logger
+from google.cloud import secretmanager
+
+secrets = secretmanager.SecretManagerServiceClient()
+PROJECT_ID = os.environ.get("PROJECT_ID", "")
 
 
 def main():
   Logger.info("Update Invites cronjob started")
 
-  auth_client = Authentication()
+  try:
+    LMS_BACKEND_ROBOT_USERNAME = secrets.access_secret_version(
+        request={
+            "name":
+                f"projects/{PROJECT_ID}/secrets/lms-backend-robot-username/versions/latest"
+        }).payload.data.decode("utf-8")
+  except Exception as e:
+    Logger.error("Failed to fetch robot username")
+    LMS_BACKEND_ROBOT_USERNAME = None
+
+  try:
+    LMS_BACKEND_ROBOT_PASSWORD = secrets.access_secret_version(
+        request={
+            "name":
+                f"projects/{PROJECT_ID}/secrets/lms-backend-robot-password/versions/latest"
+        }).payload.data.decode("utf-8")
+  except Exception as e:
+    Logger.error("Failed to fetch robot password")
+    LMS_BACKEND_ROBOT_PASSWORD = None
+
+  auth_client = Authentication(LMS_BACKEND_ROBOT_USERNAME,
+                               LMS_BACKEND_ROBOT_PASSWORD)
   id_token = auth_client.get_id_token()
   api_endpoint = "http://lms/lms/api/v1/sections/update_invites"
 
