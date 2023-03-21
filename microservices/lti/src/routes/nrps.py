@@ -3,12 +3,11 @@ import traceback
 import requests
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
-from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
+from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN, auth_client
 from common.utils.errors import (ResourceNotFoundException, InvalidTokenError)
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound,
                                           Unauthenticated)
-from config import auth_client
 from schemas.nrps_schema import GetNRPSModel
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.validate_service import validate_access
