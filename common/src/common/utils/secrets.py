@@ -1,7 +1,6 @@
 """ Secrets Helper Functions"""
 import requests
 import google_crc32c
-import requests
 from config import PROJECT_ID
 from google.cloud import secretmanager
 
@@ -37,7 +36,8 @@ def get_backend_robot_id_token():
   Returns:
       str: the new id_token
   """
-  api_endpoint = "http://authentication/authentication/api/v1/sign-in/credentials"
+  api_endpoint = \
+    "http://authentication/authentication/api/v1/sign-in/credentials"
   res = requests.post(
       url=api_endpoint,
       headers={"Content-Type": "application/json"},

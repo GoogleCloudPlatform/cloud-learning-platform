@@ -1,10 +1,12 @@
+"""Class to fetch token from robot account"""
 import traceback
 import time
 import requests
 from common.utils.logging_handler import Logger
-
+# pylint: disable=line-too-long,broad-exception-caught
 
 class Authentication:
+  """Class to fetch token from robot account"""
 
   def __init__(self, email, password):
     self.email = email
@@ -17,6 +19,9 @@ class Authentication:
     self.get_token()
 
   def get_token(self):
+    """
+      This function fetches toe id token using sign-in api from auth service 
+    """
     try:
       payload = {"email": self.email, "password": self.password}
       response = requests.post(self.signin_url, json=payload, timeout=30)
@@ -36,6 +41,10 @@ class Authentication:
     return self.token
 
   def refresh_token_fetch(self):
+    """
+      This function fetches the refresh token using refresh token api from
+       auth service 
+    """
     if not self.refresh_token:
       self.get_token()
       return

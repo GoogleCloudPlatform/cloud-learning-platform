@@ -7,7 +7,7 @@ from schemas.error_schema import (UnauthorizedResponseModel,
                                   ValidationErrorResponseModel)
 from google.cloud import secretmanager
 from services.robot_auth import Authentication
-# pylint: disable=line-too-long,broad-exception-caught
+# pylint: disable=line-too-long,broad-except
 
 secrets = secretmanager.SecretManagerServiceClient()
 

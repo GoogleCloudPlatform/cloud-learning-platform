@@ -3,11 +3,11 @@
 """
 # pylint: disable=line-too-long, broad-except
 import os
+from common.utils.robot_auth import Authentication
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 from google.cloud import secretmanager
-from common.utils.robot_auth import Authentication
 
 secrets = secretmanager.SecretManagerServiceClient()
 
