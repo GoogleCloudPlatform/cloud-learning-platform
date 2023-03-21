@@ -116,17 +116,6 @@ jobs:
         python -m pip install -r requirements.txt
         BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
 
-    - name: Build and deploy to cluster
-      run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE=e2e-pr-$PR_NUMBER
-        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
-        skaffold run \
-        --profile dev \
-        --namespace $NAMESPACE \
-        -l commit=$GITHUB_SHA \
-        --tag PR${{ github.event.pull_request.number }}
-        
     - name: Checkout external repo
       id: checkout_external_repo
       uses: actions/checkout@v3
@@ -151,6 +140,17 @@ jobs:
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }} 
         popd
+
+    - name: Build and deploy to cluster
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        NAMESPACE=e2e-pr-$PR_NUMBER
+        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+        skaffold run \
+        --profile dev \
+        --namespace $NAMESPACE \
+        -l commit=$GITHUB_SHA \
+        --tag PR${{ github.event.pull_request.number }}
 
     - name: Upload Skaffold cache
       if: always()
