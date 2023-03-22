@@ -166,7 +166,7 @@ def copy_course_background_task(course_template_details,
     classroom_id = new_course["id"]
     rows=[{
       "sectionId":section_id,\
-      "courseId":new_course['id'],\
+      "courseId":new_course["id"],\
       "classroomUrl":new_course["alternateLink"],\
         "name":new_course["section"],\
         "description":new_course["description"],\
