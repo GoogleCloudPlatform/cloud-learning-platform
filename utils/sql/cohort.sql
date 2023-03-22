@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS cohort (
-        cohortId STRING NULLABLE OPTIONS(description = "firestore uuid from cohort table"),
-        name STRING NULLABLE OPTIONS(description = "cohort name"),
-        description STRING NULLABLE,
-        startDate TIMESTAMP NULLABLE,
-        endDate TIMESTAMP NULLABLE,
-        registrationStartDate TIMESTAMP NULLABLE,
-        registrationEndDate TIMESTAMP NULLABLE,
-        maxStudents INTEGER NULLABLE,
-        timestamp TIMESTAMP NULLABLE);
+        cohortId STRING OPTIONS(description = "firestore uuid from cohort table"),
+        name STRING  OPTIONS(description = "cohort name"),
+        description STRING,
+        startDate TIMESTAMP ,
+        endDate TIMESTAMP ,
+        registrationStartDate TIMESTAMP ,
+        registrationEndDate TIMESTAMP ,
+        maxStudents INTEGER ,
+        timestamp TIMESTAMP);
