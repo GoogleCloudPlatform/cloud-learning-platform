@@ -7,7 +7,7 @@ FROM `lms_analytics.section`
 
 SELECT
 section.sectionId AS sectionId,
-section.courseId AS course_id,
+section.courseId AS courseId,
 section.name AS sectionName,
 section.description AS description,
 courseTemplate.name AS courseTemplateName,
