@@ -140,9 +140,8 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
 
       if fetch_user_mapping.status_code == 200:
         learner_data = fetch_user_mapping.json().get("data")
-
         if learner_data.get("enrollment_status") == "invited":
-          raise Exception(
+          raise UnauthorizedUserError(
               "Enrollment in progress, please retry again after 20 minutes")
 
       elif fetch_user_mapping.status_code == 404:
