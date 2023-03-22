@@ -14,6 +14,7 @@
 """
   LMS Service Microservice
 """
+from http.client import responses
 import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -56,9 +57,14 @@ async def add_process_time_header(request: Request, call_next):
   if path != "/ping":
     process_time = time.time() - start_time
     time_elapsed = round(process_time * 1000)
-    status = response.status_code
+    status = f"{response.status_code} {responses[response.status_code]}"
+    try:
+      client_ip = request.headers.getlist("X-Forwarded-For")[0]
+    except IndexError:
+      client_ip=f"{request.client.host}:{request.client.port}"
     Logger.info(
-      f"{method} {path} Time elapsed: {str(time_elapsed)} ms Status: {status}"
+      f"{client_ip} - {method} {path}" +
+      f" Time elapsed: {str(time_elapsed)} ms Status: {status}"
       )
   return response
 
@@ -96,4 +102,5 @@ if __name__ == "__main__":
               host="0.0.0.0",
               port=int(config.PORT),
               log_level="debug",
-              reload=True)
+              reload=True,
+              access_log=config.ENABLE_UVICORN_LOGS)
