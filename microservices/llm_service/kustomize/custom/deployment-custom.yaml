@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: llm-service
+        image: llm-service
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "500Mi"
+        env:
+          - name: DATABASE_PREFIX
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: DATABASE_PREFIX
+          - name: USE_STATIC_LEARNOSITY_DATA
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: USE_STATIC_LEARNOSITY_DATA

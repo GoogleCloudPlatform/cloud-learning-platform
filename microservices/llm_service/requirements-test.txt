@@ -1,0 +1,6 @@
+pytest
+mock
+faker
+backports-unittest-mock
+google-cloud-logging
+protobuf==3.19.4
