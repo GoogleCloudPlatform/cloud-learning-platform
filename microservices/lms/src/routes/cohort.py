@@ -344,3 +344,4 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
+  

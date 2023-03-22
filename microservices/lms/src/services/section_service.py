@@ -168,12 +168,14 @@ def copy_course_background_task(course_template_details,
       "sectionId":section_id,\
       "courseId":new_course['id'],\
       "classroomUrl":new_course["alternateLink"],\
-        "name":new_course['section'],\
-        "description":new_course['description'],\
-          "cohortId":cohort_details.id,"courseTemplateId":course_template_details.id,\
+        "name":new_course["section"],\
+        "description":new_course["description"],\
+          "cohortId":cohort_details.id,\
+        "courseTemplateId":course_template_details.id,\
           "timestamp":datetime.datetime.utcnow()
     }]
-    insert_rows_to_bq(rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
+    insert_rows_to_bq\
+    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
     Logger.info(message)
     Logger.info(f"Background Task Completed for section Creation for cohort\
                 {cohort_details.id}")

@@ -213,7 +213,8 @@ request: Request):
         "timestamp":datetime.datetime.utcnow(),\
         "instructionalDesigner":course_template.instructional_designer
     }]
-    insert_rows_to_bq(rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
+    insert_rows_to_bq\
+    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
     return {"course_template": course_template}
   except HttpError as hte:
     Logger.error(hte)
@@ -305,7 +306,8 @@ def update_course_template(
         "timestamp":datetime.datetime.utcnow(),\
         "instructionalDesigner":course_template.instructional_designer
     }]
-    insert_rows_to_bq(rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
+    insert_rows_to_bq\
+    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
     return {
         "message": "Successfully Updated the " +
         f"Course Template with id {course_template_id}",
