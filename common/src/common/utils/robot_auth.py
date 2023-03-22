@@ -5,6 +5,7 @@ import requests
 from common.utils.logging_handler import Logger
 # pylint: disable=line-too-long,broad-exception-caught
 
+
 class Authentication:
   """Class to fetch token from robot account"""
 
@@ -16,7 +17,6 @@ class Authentication:
     self.token = None
     self.refresh_token = None
     self.token_expiry = None
-    self.get_token()
 
   def get_token(self):
     """
@@ -36,14 +36,19 @@ class Authentication:
       Logger.error("Something went wrong while fetching the robot token")
 
   def get_id_token(self):
-    if not self.token or time.time() > self.token_expiry:
-      self.refresh_token_fetch()
+    """This function returns the id token"""
+    if self.token is None:
+      self.get_token()
+
+    if time.time() > self.token_expiry:
+      self._fetch_refresh_token()
+
     return self.token
 
-  def refresh_token_fetch(self):
+  def _fetch_refresh_token(self):
     """
       This function fetches the refresh token using refresh token api from
-       auth service 
+      auth service 
     """
     if not self.refresh_token:
       self.get_token()
@@ -57,8 +62,3 @@ class Authentication:
       self.refresh_token = data.get("refresh_token")
       self.token_expiry = int(data.get("expires_in"))
       return self.token
-
-  def get_refresh_token(self):
-    if not self.refresh_token:
-      self.refresh_token_fetch()
-    return self.refresh_token
