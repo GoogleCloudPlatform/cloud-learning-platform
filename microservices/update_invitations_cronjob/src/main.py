@@ -24,7 +24,7 @@ import os
 import sys
 import requests
 import traceback
-from common.utils.robot_auth import Authentication
+from common.utils.token_handler import Authentication
 from common.utils.logging_handler import Logger
 from google.cloud import secretmanager
 # pylint: disable=line-too-long,broad-except,missing-timeout

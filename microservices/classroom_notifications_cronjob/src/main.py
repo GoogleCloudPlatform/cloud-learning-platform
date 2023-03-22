@@ -23,7 +23,7 @@
 import os
 import sys
 import requests
-from common.utils.robot_auth import Authentication
+from common.utils.token_handler import Authentication
 from common.utils.logging_handler import Logger as logger
 from common.utils.errors import CronJobException
 from google.cloud import secretmanager

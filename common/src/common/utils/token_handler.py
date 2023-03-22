@@ -1,4 +1,4 @@
-"""Class to fetch token from robot account"""
+"""Class to fetch token for user account"""
 import traceback
 import time
 import requests
@@ -7,7 +7,7 @@ from common.utils.logging_handler import Logger
 
 
 class Authentication:
-  """Class to fetch token from robot account"""
+  """Class to fetch token for user account"""
 
   def __init__(self, email, password):
     self.email = email
@@ -33,7 +33,7 @@ class Authentication:
     except Exception as e:
       Logger.error(e)
       Logger.error(traceback.print_exc())
-      Logger.error("Something went wrong while fetching the robot token")
+      Logger.error("Something went wrong while fetching the id token")
 
   def get_id_token(self):
     """This function returns the id token"""

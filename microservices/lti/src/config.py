@@ -3,7 +3,7 @@
 """
 # pylint: disable=line-too-long, broad-except
 import os
-from common.utils.robot_auth import Authentication
+from common.utils.token_handler import Authentication
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
