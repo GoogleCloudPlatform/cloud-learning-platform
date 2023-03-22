@@ -135,16 +135,17 @@ def create_cohort(input_cohort: InputCohortModel):
     cohort_id = cohort.save().id
     rows=[{
       "cohortId":cohort_id,\
-        "name":cohort_dict['name'],\
-        "description":cohort_dict['description'],\
-        "startDate":cohort_dict['start_date'],\
-        "endDate":cohort_dict['end_date'],\
-        "registrationStartDate":cohort_dict['registration_start_date'],\
-        "registrationEndDate":cohort_dict['registration_end_date'],\
-        "maxStudents":cohort_dict['max_students'],\
+        "name":cohort_dict["name"],\
+        "description":cohort_dict["description"],\
+        "startDate":cohort_dict["start_date"],\
+        "endDate":cohort_dict["end_date"],\
+        "registrationStartDate":cohort_dict["registration_start_date"],\
+        "registrationEndDate":cohort_dict["registration_end_date"],\
+        "maxStudents":cohort_dict["max_students"],\
         "timestamp":datetime.datetime.utcnow()
     }]
-    insert_rows_to_bq(rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"])
+    insert_rows_to_bq\
+    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"])
     return {"cohort": convert_cohort_to_cohort_model(cohort)}
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
@@ -185,16 +186,17 @@ def update_cohort(cohort_id: str, update_cohort_model: UpdateCohortModel):
     cohort_details.update()
     rows=[{
       "cohortId":cohort_id,\
-        "name":update_cohort_dict['name'],\
-        "description":update_cohort_dict['description'],\
-        "startDate":update_cohort_dict['start_date'],\
-        "endDate":update_cohort_dict['end_date'],\
-        "registrationStartDate":update_cohort_dict['registration_start_date'],\
-        "registrationEndDate":update_cohort_dict['registration_end_date'],\
-        "maxStudents":update_cohort_dict['max_students'],\
+        "name":update_cohort_dict["name"],\
+        "description":update_cohort_dict["description"],\
+        "startDate":update_cohort_dict["start_date"],\
+        "endDate":update_cohort_dict["end_date"],\
+        "registrationStartDate":update_cohort_dict["registration_start_date"],\
+        "registrationEndDate":update_cohort_dict["registration_end_date"],\
+        "maxStudents":update_cohort_dict["max_students"],\
         "timestamp":datetime.datetime.utcnow()
     }]
-    insert_rows_to_bq(rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"])
+    insert_rows_to_bq\
+    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"])
     return {
         "message": f"Successfully Updated the Cohort with id {cohort_id}",
         "cohort": convert_cohort_to_cohort_model(cohort_details)
