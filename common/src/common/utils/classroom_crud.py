@@ -134,7 +134,8 @@ def copy_material(drive_file_dict,target_folder_id):
   new_id = result["id"]
   drive_file_dict["driveFile"]["driveFile"]["id"]=new_id
   drive_file_dict["driveFile"]["driveFile"].pop("alternateLink")
-  drive_file_dict["driveFile"]["driveFile"].pop("thumbnailUrl")
+  if "thumbnaiUrl" in drive_file_dict["driveFile"]["driveFile"].keys():
+    drive_file_dict["driveFile"]["driveFile"].pop("thumbnailUrl")
   return drive_file_dict
 
 
