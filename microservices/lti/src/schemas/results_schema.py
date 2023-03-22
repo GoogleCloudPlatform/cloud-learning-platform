@@ -1,5 +1,5 @@
 """
-Pydantic Model for Line item API's
+Pydantic Model for Admin Results API's
 """
 from pydantic import BaseModel
 from typing import Optional
