@@ -19,6 +19,8 @@ from schemas.classroom_courses import (
                           ClassroomCourseListResponseModel
                           )
 from utils.helper import FEED_TYPES
+# disabling for linting to pass
+# pylint: disable = broad-except
 
 router = APIRouter(prefix="/classroom_courses",
                    tags=["ClassroomCourses"],
@@ -108,35 +110,41 @@ def copy_courses(course_details: CourseDetails):
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(course_id)
     for coursework in coursework_list:
-      # Check if a coursework is linked to
-      #  a topic if yes then
-      # replace the old topic id to new
-      # topic id using topic_id_map
-      if "topicId" in coursework.keys():
-        coursework["topicId"] = topic_id_map[coursework["topicId"]]
-      # Check if a material is present in coursework
-      if "materials" in coursework.keys():
-        # Calling function to get edit_url and view url of google
-        #  form which returns
-        # a dictionary of view_links as keys and edit likns as
-        # values of google form
-        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
-        # Loop to check if a material in courssework has
-        #  a google form attached to it
-        # update the  view link to edit link and attach it as a form
-        for material in coursework["materials"]:
-          if "driveFile" in  material.keys():
-            material = classroom_crud.copy_material(material,target_folder_id)
-          if "form" in material.keys():
-            result1 = classroom_crud.drive_copy(
-              url_mapping[material["form"]["formUrl"]]["file_id"],
-                    target_folder_id,material["form"]["title"])
-            material["link"] = {
-                "title": material["form"]["title"],
-                "url": result1["webViewLink"]
-            }
-            # remove form from  material dict
-            material.pop("form")
+      try:
+        # Check if a coursework is linked to
+        #  a topic if yes then
+        # replace the old topic id to new
+        # topic id using topic_id_map
+        if "topicId" in coursework.keys():
+          coursework["topicId"] = topic_id_map[coursework["topicId"]]
+        # Check if a material is present in coursework
+        if "materials" in coursework.keys():
+          # Calling function to get edit_url and view url of google
+          #  form which returns
+          # a dictionary of view_links as keys and edit likns as
+          # values of google form
+          url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+          # Loop to check if a material in courssework has
+          #  a google form attached to it
+          # update the  view link to edit link and attach it as a form
+          for material in coursework["materials"]:
+            if "driveFile" in  material.keys():
+              material = classroom_crud.copy_material(material,target_folder_id)
+            if "form" in material.keys():
+              result1 = classroom_crud.drive_copy(
+                url_mapping[material["form"]["formUrl"]]["file_id"],
+                      target_folder_id,material["form"]["title"])
+              material["link"] = {
+                  "title": material["form"]["title"],
+                  "url": result1["webViewLink"]
+              }
+              # remove form from  material dict
+              material.pop("form")
+      except Exception as error:
+        Logger.error(f"Get coursework failed for {coursework}")
+        Logger.error(error)
+        coursework_list.remove(coursework)
+        continue
 
     # Create coursework in new course
     if coursework_list is not None:
@@ -145,34 +153,41 @@ def copy_courses(course_details: CourseDetails):
     coursework_material_list = classroom_crud.get_coursework_material(
         course_id)
     for coursework_material in coursework_material_list:
-      # Check if a coursework material is linked to a topic if yes then
-      # replace the old topic id to new topic id using topic_id_map
-      if "topicId" in coursework_material.keys():
-        coursework_material["topicId"] = topic_id_map[
-            coursework_material["topicId"]]
-      # Check if a material is present in coursework
-      if "materials" in coursework_material.keys():
-        # Calling function to get edit_url and view url of
-        # google form which returns
-        # a dictionary of view_links as keys and edit
-        #  likns as values of google form
-        url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
-        # Loop to check if a material in courssework has a google
-        # form attached to it
-        # update the  view link to edit link and attach it as a form
-        for material in coursework_material["materials"]:
-          if "driveFile" in  material.keys():
-            material = classroom_crud.copy_material(material,target_folder_id)
-          if "form" in material.keys():
-            new_copied_file_details = classroom_crud.drive_copy(
-              url_mapping[material["form"]["formUrl"]]["file_id"],
-                    target_folder_id,material["form"]["title"])
-            material["link"] = {
-                "title": material["form"]["title"],
-                "url": new_copied_file_details["webViewLink"]
-            }
-            # remove form from  material dict
-            material.pop("form")
+      try:
+        # Check if a coursework material is linked to a topic if yes then
+        # replace the old topic id to new topic id using topic_id_map
+        if "topicId" in coursework_material.keys():
+          coursework_material["topicId"] = topic_id_map[
+              coursework_material["topicId"]]
+        # Check if a material is present in coursework
+        if "materials" in coursework_material.keys():
+          # Calling function to get edit_url and view url of
+          # google form which returns
+          # a dictionary of view_links as keys and edit
+          #  likns as values of google form
+          url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+          # Loop to check if a material in courssework has a google
+          # form attached to it
+          # update the  view link to edit link and attach it as a form
+          for material in coursework_material["materials"]:
+            if "driveFile" in  material.keys():
+              material = classroom_crud.copy_material(material,target_folder_id)
+            if "form" in material.keys():
+              new_copied_file_details = classroom_crud.drive_copy(
+                url_mapping[material["form"]["formUrl"]]["file_id"],
+                      target_folder_id,material["form"]["title"])
+              material["link"] = {
+                  "title": material["form"]["title"],
+                  "url": new_copied_file_details["webViewLink"]
+              }
+              # remove form from  material dict
+              material.pop("form")
+
+      except Exception as error:
+        Logger.error(f"Get coursework material failed for {coursework_material}")
+        Logger.error(error)
+        coursework_list.remove(coursework_material)
+        continue
     # Create coursework in new course
     if coursework_material_list is not None:
       classroom_crud.create_coursework_material(new_course["id"],

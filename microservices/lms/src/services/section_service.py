@@ -6,8 +6,8 @@ from common.models import  Section
 from common.utils.http_exceptions import (
                       InternalServerError)
 from services import common_service
-from googleapiclient.errors import HttpError
-
+# disabling for linting to pass
+# pylint: disable = broad-except
 
 
 def copy_course_background_task(course_template_details,
@@ -53,7 +53,6 @@ def copy_course_background_task(course_template_details,
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(
         course_template_details.classroom_id)
-    print("GET coursework method worked")
     for coursework in coursework_list:
       try:
         #Check if a coursework is linked to a topic if yes then
@@ -83,16 +82,16 @@ def copy_course_background_task(course_template_details,
               }
               # remove form from  material dict
               material.pop("form")
-      except HttpError as error:
+      except Exception as error:
         Logger.error(f"Get coursework failed for \
               course_id{course_template_details.classroom_id} for {coursework}")
         Logger.error(error)
+        coursework_list.remove(coursework)
         continue
 
     # Create coursework in new course
     if coursework_list is not None:
-      classroom_crud.create_coursework(new_course["id"], coursework_list)
-
+      classroom_crud.create_coursework(new_course["id"],coursework_list)
     # Get the list of courseworkMaterial
     coursework_material_list = classroom_crud.get_coursework_material(
       course_template_details.classroom_id)
@@ -128,15 +127,16 @@ def copy_course_background_task(course_template_details,
               }
               # remove form from  material dict
               material.pop("form")
-      except HttpError as error:
+      except Exception as error:
         Logger.error(f"Get coursework material failed for \
               course_id{course_template_details.classroom_id} for {coursework_material}")
         Logger.error(error)
+        coursework_material_list.remove(coursework_material)
         continue
     # Create coursework in new course
     if coursework_material_list is not None:
-      classroom_crud.create_coursework_material(new_course["id"],
-      coursework_material_list)
+        classroom_crud.create_coursework_material(new_course["id"],
+        coursework_material_list)
     # add Instructional designer
     sections_details.teachers.append(
         course_template_details.instructional_designer)
@@ -164,7 +164,7 @@ def copy_course_background_task(course_template_details,
         "photo_url" :  user_profile["photoUrl"]
           }
         common_service.create_teacher(headers,data)
-      except HttpError as error:
+      except Exception as error:
         Logger.error(f"Create teacher failed for \
             for {teacher_email}")
         Logger.error(error)
