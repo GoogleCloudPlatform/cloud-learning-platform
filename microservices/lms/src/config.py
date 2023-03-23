@@ -23,6 +23,8 @@ PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
   PROJECT_ID
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
+ENABLE_UVICORN_LOGS=bool(
+  os.getenv("ENABLE_UVICORN_LOGS","false").lower() in ("true",))
 SCOPES = [
     "https://www.googleapis.com/auth/cloud-platform",
     "https://www.googleapis.com/auth/cloud-platform.read-only",
