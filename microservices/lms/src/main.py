@@ -59,7 +59,7 @@ async def add_process_time_header(request: Request, call_next):
     time_elapsed = round(process_time * 1000)
     status = f"{response.status_code} {responses[response.status_code]}"
     try:
-      client_ip = request.headers.getlist("X-Forwarded-For")[0]
+      client_ip = request.headers.getlist("X-Forwarded-For")[0].split(",")[0]
     except IndexError:
       client_ip=f"{request.client.host}:{request.client.port}"
     Logger.info(
