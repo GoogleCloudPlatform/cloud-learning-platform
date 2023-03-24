@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW
-  userCollectionView AS
+  `lms_analytics.userCollectionView` AS
 SELECT 
 uuid,	
 id,			

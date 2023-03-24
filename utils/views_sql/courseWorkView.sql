@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW
-  courseWorkCollectionView AS
+  `lms_analytics.courseWorkCollectionView` AS
 SELECT 
 uuid,			
 id,			
