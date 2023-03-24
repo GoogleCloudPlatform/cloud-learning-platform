@@ -123,7 +123,8 @@ def test_create_course_template(client_with_emulator):
             with mock.patch(
             "routes.course_template.common_service.create_teacher"
             ):
-              response = client_with_emulator.post(
+              with mock.patch("routes.course_template.insert_rows_to_bq"):
+                response = client_with_emulator.post(
             API_URL, json=INSERT_COURSE_TEMPLATE_EXAMPLE)
   response_json = response.json()
   assert response.status_code == 200, "Status 200"
@@ -208,7 +209,8 @@ def test_update_course_template(client_with_emulator):
                 with mock.patch(
             "routes.course_template.common_service.create_teacher"
             ):
-                  response = client_with_emulator.patch(url, json=json_body)
+                  with mock.patch("routes.course_template.insert_rows_to_bq"):
+                    response = client_with_emulator.patch(url, json=json_body)
   response_course_template = response.json()
   loaded_course_template = response_course_template.pop("course_template")
   assert response.status_code == 200, "Status 200"
@@ -232,6 +234,7 @@ def test_update_nonexists_course_template(client_with_emulator):
     with mock.patch("routes.course_template.classroom_crud.update_course"):
       with mock.patch("routes.course_template.classroom_crud.add_teacher"):
         with mock.patch("routes.course_template.classroom_crud.delete_teacher"):
-          response = client_with_emulator.patch(url, json=json_body)
+          with mock.patch("routes.course_template.insert_rows_to_bq"):
+            response = client_with_emulator.patch(url, json=json_body)
   assert response.status_code == 404, "Status 404"
   assert response.json() == data, "Return data doesn't match."
