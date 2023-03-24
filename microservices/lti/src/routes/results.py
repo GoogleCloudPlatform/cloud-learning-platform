@@ -8,10 +8,12 @@ from common.utils.errors import (ResourceNotFoundException, InvalidTokenError)
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (InternalServerError, ResourceNotFound,
                                           Unauthenticated)
-from schemas.results_schema import (UpdateResultModel, ResultResponseModel)
+from schemas.results_schema import (UpdateResultModel,
+                                    GetAllResultsResponseModel,
+                                    ResultResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.line_item_service import get_line_item_results, get_result_of_line_item
-from typing import List, Optional
+from typing import Optional
 # pylint: disable=unused-argument, use-maxsplit-arg, line-too-long
 
 auth_scheme = HTTPBearer(auto_error=False)
@@ -23,7 +25,7 @@ router = APIRouter(
 @router.get(
     "/{context_id}/line_items/{line_item_id}/results",
     name="Get all the results of a specific line item",
-    response_model=List[ResultResponseModel],
+    response_model=GetAllResultsResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
@@ -68,7 +70,11 @@ def get_results_of_line_item_for_admin(
         skip=skip,
         limit=limit)
 
-    return result_fields
+    return {
+        "success": True,
+        "data": result_fields,
+        "message": "Sucessfully fetched results"
+    }
 
   except InvalidTokenError as e:
     Logger.error(e)
@@ -109,7 +115,11 @@ def get_result_for_admin(context_id: str, line_item_id: str, result_id: str):
     result_fields = get_result_of_line_item(
         context_id=context_id, line_item_id=line_item_id, result_id=result_id)
 
-    return result_fields
+    return {
+        "success": True,
+        "data": result_fields,
+        "message": "Sucessfully fetched result details"
+    }
 
   except InvalidTokenError as e:
     Logger.error(e)
@@ -173,7 +183,11 @@ def update_result(context_id: str, line_item_id: str, result_id: str,
     result_fields[
         "scoreOf"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}"
 
-    return result_fields
+    return {
+        "success": True,
+        "data": result_fields,
+        "message": "Sucessfully udpated result details"
+    }
 
   except InvalidTokenError as e:
     Logger.error(e)
