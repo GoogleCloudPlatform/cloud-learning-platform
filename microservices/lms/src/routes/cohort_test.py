@@ -191,7 +191,7 @@ def test_update_cohort_nonexits_course_template(client_with_emulator,
   json_body = {"max_students": 5000, "course_template": "non_exits_id"}
   with mock.patch("routes.cohort.Logger"):
     with mock.patch("routes.cohort.insert_rows_to_bq"):
-     response = client_with_emulator.patch(url, json=json_body)
+      response = client_with_emulator.patch(url, json=json_body)
   assert response.status_code == 404, "Status 404"
   assert response.json() == data, "Return data doesn't match."
 
