@@ -125,7 +125,8 @@ def test_get_cohort(client_with_emulator, create_course_template):
 def test_create_cohort(client_with_emulator, create_course_template):
   INPUT_COHORT_TEST_DATA["course_template_id"] = create_course_template.id
   with mock.patch("routes.cohort.Logger"):
-    response = client_with_emulator.post(API_URL, json=INPUT_COHORT_TEST_DATA)
+    with mock.patch("routes.cohort.insert_rows_to_bq"):
+      response = client_with_emulator.post(API_URL, json=INPUT_COHORT_TEST_DATA)
   response_json = json.loads(response.text)
   assert response.status_code == 200, "Status 200"
   assert response_json["success"] is True, "Response Success"
@@ -163,7 +164,8 @@ def test_update_cohort(client_with_emulator, create_course_template):
   }
   json_body = {"max_students": 5000, "end_date": "2023-01-25T00:00:00"}
   with mock.patch("routes.cohort.Logger"):
-    response = client_with_emulator.patch(url, json=json_body)
+    with mock.patch("routes.cohort.insert_rows_to_bq"):
+      response = client_with_emulator.patch(url, json=json_body)
   response_cohort = response.json()
   loaded_cohort = response_cohort.pop("cohort")
   assert response.status_code == 200, "Status 200"
@@ -188,7 +190,8 @@ def test_update_cohort_nonexits_course_template(client_with_emulator,
   }
   json_body = {"max_students": 5000, "course_template": "non_exits_id"}
   with mock.patch("routes.cohort.Logger"):
-    response = client_with_emulator.patch(url, json=json_body)
+    with mock.patch("routes.cohort.insert_rows_to_bq"):
+     response = client_with_emulator.patch(url, json=json_body)
   assert response.status_code == 404, "Status 404"
   assert response.json() == data, "Return data doesn't match."
 
@@ -203,7 +206,8 @@ def test_update_nonexists_cohort(client_with_emulator):
   }
   json_body = {"max_students": 5000, "end_date": "2023-01-25T00:00:00"}
   with mock.patch("routes.cohort.Logger"):
-    response = client_with_emulator.patch(url, json=json_body)
+    with mock.patch("routes.cohort.insert_rows_to_bq"):
+      response = client_with_emulator.patch(url, json=json_body)
   assert response.status_code == 404, "Status 404"
   assert response.json() == data, "Return data doesn't match."
 
