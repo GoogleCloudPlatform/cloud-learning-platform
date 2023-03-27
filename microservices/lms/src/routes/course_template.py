@@ -1,13 +1,14 @@
 '''Course Template Endpoint'''
 from fastapi import APIRouter, Request
+import datetime
 from googleapiclient.errors import HttpError
 from common.models import CourseTemplate, Cohort
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest, CustomHTTPException
 from common.utils import classroom_crud
-from config import CLASSROOM_ADMIN_EMAIL
-from utils.helper import convert_cohort_to_cohort_model
+from config import (CLASSROOM_ADMIN_EMAIL,BQ_TABLE_DICT)
+from utils.helper import (convert_cohort_to_cohort_model,insert_rows_to_bq)
 from services import common_service
 from schemas.cohort import CohortListResponseModel
 from schemas.course_template import CourseTemplateModel, CourseTemplateListModel, CreateCourseTemplateResponseModel, InputCourseTemplateModel, DeleteCourseTemplateModel, UpdateCourseTemplateModel, UpdateCourseTemplateResponseModel
@@ -204,7 +205,16 @@ request: Request):
     course_template.classroom_code = classroom.get("enrollmentCode")
     course_template.classroom_url = classroom.get("alternateLink")
     course_template.admin=CLASSROOM_ADMIN_EMAIL
-    course_template.save()
+    course_template_id = course_template.save().id
+    rows=[{
+      "courseTemplateId":course_template_id,\
+      "classroomId":course_template.classroom_id,\
+        "name":course_template.name,"description":course_template.description,\
+        "timestamp":datetime.datetime.utcnow(),\
+        "instructionalDesigner":course_template.instructional_designer
+    }]
+    insert_rows_to_bq\
+    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
     return {"course_template": course_template}
   except HttpError as hte:
     Logger.error(hte)
@@ -289,6 +299,15 @@ def update_course_template(
         description=course_template.description,
         course_name=course_template.name)
     course_template.update()
+    rows=[{
+      "courseTemplateId":course_template_id,\
+      "classroomId":course_template.classroom_id,\
+        "name":course_template.name,"description":course_template.description,\
+        "timestamp":datetime.datetime.utcnow(),\
+        "instructionalDesigner":course_template.instructional_designer
+    }]
+    insert_rows_to_bq\
+    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
     return {
         "message": "Successfully Updated the " +
         f"Course Template with id {course_template_id}",

@@ -120,7 +120,9 @@ def test_create_section(client_with_emulator, create_fake_data):
                       "services.section_service.classroom_crud.drive_copy"):
                                   with mock.patch(
                       "services.section_service.classroom_crud.copy_material"):
-                                    resp = client_with_emulator.post(url,
+                                    with mock.patch(
+                        "services.section_service.insert_rows_to_bq"):
+                                      resp = client_with_emulator.post(url,
                               json=section_details)
   assert resp.status_code == 202
 
@@ -267,7 +269,8 @@ def test_update_section(client_with_emulator, create_fake_data):
       return_value=mocked_value):
         with mock.patch("routes.section.classroom_crud.acceept_invite"):
           with mock.patch("routes.section.common_service.create_teacher"):
-            resp = client_with_emulator.patch(url, json=data)
+            with mock.patch("routes.section.insert_rows_to_bq"):
+              resp = client_with_emulator.patch(url, json=data)
   assert resp.status_code == 200
 
 
