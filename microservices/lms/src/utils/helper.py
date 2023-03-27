@@ -2,9 +2,8 @@
 import datetime
 from fastapi import Depends
 from common.utils.auth_service import validate_user_type_and_token, auth_scheme
-from common.utils.logging_handler import Logger
 from google.cloud import bigquery
-from config import PROJECT_ID,BQ_DATASET,BQ_REGION
+from config import BQ_REGION
 
 bq_client = bigquery.Client(location=BQ_REGION)
 
