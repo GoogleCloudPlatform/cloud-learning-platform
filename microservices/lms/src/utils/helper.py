@@ -2,6 +2,11 @@
 import datetime
 from fastapi import Depends
 from common.utils.auth_service import validate_user_type_and_token, auth_scheme
+from common.utils.logging_handler import Logger
+from google.cloud import bigquery
+from config import PROJECT_ID,BQ_DATASET,BQ_REGION
+
+bq_client = bigquery.Client(location=BQ_REGION)
 
 FEED_TYPES = ("COURSE_WORK_CHANGES", "COURSE_ROSTER_CHANGES")
 def convert_cohort_to_cohort_model(cohort):
@@ -78,3 +83,21 @@ def get_json_value(dict_object, key):
   if key in dict_object.keys():
     return dict_object[key]
   return None
+
+def insert_rows_to_bq(rows,table_name):
+  """Insert rows to BQ
+
+  Args:
+    rows (list): _description_
+
+  Returns:
+    Bool: _description_
+  """
+  table = bq_client.get_table(f"{PROJECT_ID}.{BQ_DATASET}.{table_name}")
+  errors = bq_client.insert_rows(
+    table=table, rows=rows)
+  if errors == []:
+    Logger.info(f"New data pushed data {rows[0]} in {table_name}")
+    return True
+  Logger.info(f"Encountered errors while inserting rows: {errors}")
+  return False

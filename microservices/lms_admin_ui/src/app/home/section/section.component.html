@@ -87,6 +87,8 @@
 
                 <mat-tab-group>
                     <mat-tab label="Faculty Management">
+
+
                         <table mat-table [dataSource]="tableData" matSort class="mat-elevation-z8" style="width: 100%;">
 
                             <!-- Name Column -->
@@ -121,7 +123,13 @@
                         </table>
                     </mat-tab>
                     <mat-tab label="Student Management">
-                        <table mat-table [dataSource]="studentTableData" class="mat-elevation-z8" style="width: 100%;">
+
+                        <ngx-skeleton-loader *ngIf="studentTableLoader" count="3"
+                        [theme]="{'height': '40px','margin-top':'15px','background-color': '#EAEAEA'}">
+                    </ngx-skeleton-loader>
+
+
+                        <table *ngIf="!studentTableLoader" mat-table [dataSource]="studentTableData" class="mat-elevation-z8" style="width: 100%;">
 
                             <!-- First Name Column -->
                             <ng-container matColumnDef="first name">
@@ -168,8 +176,17 @@
                                 </td>
                             </ng-container>
 
+                            <ng-container matColumnDef="empty-row">
+                                <mat-cell *matCellDef="let element">No Data</mat-cell>
+                              </ng-container>
+
                             <tr mat-header-row *matHeaderRowDef="studentDisplayedColumns"></tr>
                             <tr mat-row *matRowDef="let row; columns: studentDisplayedColumns;"></tr>
+
+                            <tr class="mat-row" *matNoDataRow>
+                                <td class="mat-cell" colspan="4">No data found</td>
+                              </tr>
+
                         </table>
                     </mat-tab>
                 </mat-tab-group>
