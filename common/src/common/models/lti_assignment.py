@@ -14,7 +14,7 @@
 """
 Module to add lti assignment in FireO
 """
-from fireo.fields import TextField, DateTime, NumberField, IDField
+from fireo.fields import TextField, DateTime, NumberField, IDField, ListField
 from common.models import BaseModel
 
 
@@ -24,8 +24,10 @@ class LTIAssignment(BaseModel):
   section_id = TextField(required=True)
   lti_assignment_title = TextField()
   lti_content_item_id = TextField()
+  prev_content_item_ids = ListField()
   tool_id = TextField()
   course_work_id = TextField()
+  prev_context_ids = ListField()
   max_points = NumberField()
   start_date = DateTime()
   end_date = DateTime()

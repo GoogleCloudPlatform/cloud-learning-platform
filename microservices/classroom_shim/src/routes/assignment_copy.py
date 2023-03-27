@@ -1,76 +1,38 @@
-"""Classroom Courses endpoint"""
+'''LTI Assignment Endpoints'''
 import traceback
-from common.utils.errors import  ValidationError
-from common.utils.http_exceptions import (CustomHTTPException,
-                                          InternalServerError,
-                                          BadRequest)
-from common.utils import classroom_crud
-from common.utils.logging_handler import Logger
+import requests
 from fastapi import APIRouter
-from googleapiclient.errors import HttpError
-from schemas.error_schema import (ConflictResponseModel,
-                                  InternalServerErrorResponseModel,
+from common.utils.logging_handler import Logger
+from common.utils.errors import ResourceNotFoundException
+from common.utils.http_exceptions import (ResourceNotFound, InternalServerError)
+from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
-from schemas.classroom_courses import (
-                          CourseDetails,
-                          EnableNotificationsResponse,
-                          CopyCourseResponse,
-                          ClassroomCourseListResponseModel
-                          )
-from utils.helper import FEED_TYPES
+from lti_assignment import get_lti_assignment
+from pydantic import BaseModel
+# pylint: disable=line-too-long
 
-router = APIRouter(prefix="/classroom_courses",
-                   tags=["ClassroomCourses"],
-                   responses={
-                       500: {
-                           "model": InternalServerErrorResponseModel
-                       },
-                       404: {
-                           "model": NotFoundErrorResponseModel
-                       },
-                       409: {
-                           "model": ConflictResponseModel
-                       },
-                       422: {
-                           "model": ValidationErrorResponseModel
-                       }
-                   })
-
-@router.get("", response_model=ClassroomCourseListResponseModel)
-def get_courses(skip: int = 0, limit: int = 10):
-  """Get courses list
-  Raises:
-    HTTPException: 500 Internal Server Error if something fails
-
-  Returns:
-    List of courses in classroom ,
-    {'status': 'Failed'} if the user creation raises an exception
-  """
-  try:
-    if skip < 0:
-      raise ValidationError("Invalid value passed to \"skip\" query parameter")
-    if limit < 1:
-      raise ValidationError(
-          "Invalid value passed to \"limit\" query parameter")
-    course_list = classroom_crud.get_course_list()
-    return {"data": list(course_list)[skip:limit]}
-  except ValidationError as ve:
-    raise BadRequest(str(ve)) from ve
-  except HttpError as hte:
-    Logger.error(hte)
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
-  except Exception as e:
-    Logger.error(e)
-    error = traceback.format_exc().replace("\n", " ")
-    Logger.error(error)
-    raise InternalServerError(str(e)) from e
+router = APIRouter(
+    tags=["LTI Assignments Copy"],
+    responses={
+        500: {
+            "model": InternalServerErrorResponseModel
+        },
+        404: {
+            "model": NotFoundErrorResponseModel
+        },
+        422: {
+            "model": ValidationErrorResponseModel
+        }
+    })
 
 
-@router.post("/copy_course",response_model=CopyCourseResponse)
+class CourseDetails(BaseModel):
+  """Course Detail model"""
+  course_id: str
+
+
+@router.post("/copy_course")
 def copy_courses(course_details: CourseDetails):
   """Copy course  API
 
@@ -95,8 +57,7 @@ def copy_courses(course_details: CourseDetails):
     new_course = classroom_crud.create_course(current_course["name"],
                                               current_course["description"],
                                               current_course["section"],
-                                              current_course["ownerId"]
-                                              )
+                                              current_course["ownerId"])
     saved_lti_assignments_in_coursework = []
     target_folder_id = new_course["teacherFolder"]["id"]
     # Get topics of current course
@@ -124,12 +85,12 @@ def copy_courses(course_details: CourseDetails):
         #  a google form attached to it
         # update the  view link to edit link and attach it as a form
         for material in coursework["materials"]:
-          if "driveFile" in  material.keys():
-            material = classroom_crud.copy_material(material,target_folder_id)
+          if "driveFile" in material.keys():
+            material = classroom_crud.copy_material(material, target_folder_id)
           if "form" in material.keys():
             result1 = classroom_crud.drive_copy(
-              url_mapping[material["form"]["formUrl"]]["file_id"],
-                    target_folder_id,material["form"]["title"])
+                url_mapping[material["form"]["formUrl"]]["file_id"],
+                target_folder_id, material["form"]["title"])
             material["link"] = {
                 "title": material["form"]["title"],
                 "url": result1["webViewLink"]
@@ -153,8 +114,7 @@ def copy_courses(course_details: CourseDetails):
     if coursework_list is not None:
       classroom_crud.create_coursework(new_course["id"], coursework_list)
     # Get the list of courseworkMaterial
-    coursework_material_list = classroom_crud.get_coursework_material(
-        course_id)
+    coursework_material_list = classroom_crud.get_coursework_material(course_id)
     for coursework_material in coursework_material_list:
       # Check if a coursework material is linked to a topic if yes then
       # replace the old topic id to new topic id using topic_id_map
@@ -170,12 +130,12 @@ def copy_courses(course_details: CourseDetails):
         # Loop to check if a material in coursework has a google form attached to it
         # update the view link to edit link and attach it as a form
         for material in coursework_material["materials"]:
-          if "driveFile" in  material.keys():
-            material = classroom_crud.copy_material(material,target_folder_id)
+          if "driveFile" in material.keys():
+            material = classroom_crud.copy_material(material, target_folder_id)
           if "form" in material.keys():
             new_copied_file_details = classroom_crud.drive_copy(
-              url_mapping[material["form"]["formUrl"]]["file_id"],
-                    target_folder_id,material["form"]["title"])
+                url_mapping[material["form"]["formUrl"]]["file_id"],
+                target_folder_id, material["form"]["title"])
             material["link"] = {
                 "title": material["form"]["title"],
                 "url": new_copied_file_details["webViewLink"]
@@ -186,54 +146,71 @@ def copy_courses(course_details: CourseDetails):
     if coursework_material_list is not None:
       classroom_crud.create_coursework_material(new_course["id"],
                                                 coursework_material_list)
-    response={}
+    response = {}
     response["new_course"] = new_course
     response["coursework_list"] = coursework_list
-    return {"data":response}
+    return {"data": response}
   except HttpError as hte:
     Logger.error(hte)
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
+    raise CustomHTTPException(
+        status_code=hte.resp.status, success=False, message=str(hte),
+        data=None) from hte
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
 
-@router.post("/{course_id}/enable_notifications",
-             response_model=EnableNotificationsResponse)
-def classroom_enable_notifications_pub_sub(course_id:str):
-  """Resgister course with a pub/sub topic
-
-  Args:
-      course_id (str): unique course id
-  Raises:
-      InternalServerError: 500 Internal Server Error if something fails
-      CustomHTTPException: raise error according to the HTTPError exception
-  Returns:
-      _type_: _description_
+@router.post("/lti-assignment/copy")
+def create_lti_assignment(data: dict):
+  """
+  input data format: {
+    lti_assignment_id: "123",
+    context_id: "123"
+  }
   """
   try:
-    responses = [classroom_crud.enable_notifications(course_id,
-              i) for i in FEED_TYPES
-      ]
-    return {
-        "message":
-        "Successfully enable the notifications of the course using " +
-        f"{course_id} id",
-        "data": responses
+    # fetch content_item and related line_items
+    assignment_data = get_lti_assignment(data.get("lti_assignment_id"))
+    content_item_id = assignment_data.get("data").get("lti_content_item_id")
+    tool_id = assignment_data.get("data").get("tool_id")
+
+    content_item_req = requests.get(
+        f"http://lti/lti/api/v1/content_item/{content_item_id}",
+        headers={"Authorization": f"Bearer {'123'}"},
+        timeout=60)
+    content_item_data = content_item_req.json().get("data")
+
+    # create a copy of above content item
+    content_item_data["context_id"] = data.get("context_id")
+    copy_content_item_req = requests.post(
+        "http://lti/lti/api/v1/content_item",
+        headers={"Authorization": f"Bearer {'123'}"},
+        json=content_item_data,
+        timeout=60)
+
+    copy_content_item_data = copy_content_item_req.json().get("data")
+
+    copy_content_item_id = copy_content_item_data.get("id")
+
+    new_lti_assignment_data = {
+        **assignment_data, "section_id": data.get("context_id"),
+        "lti_content_item_id": copy_content_item_data.get("id"),
+        "course_work_id": None
     }
-  except ValidationError as ve:
-    raise BadRequest(str(ve)) from ve
-  except HttpError as hte:
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
-  except InternalServerError as ie:
-    raise InternalServerError(str(ie)) from ie
+    copy_lti_assignment_item_req = requests.post(
+        "http://lti/lti/api/v1/content_item",
+        headers={"Authorization": f"Bearer {'123'}"},
+        json=new_lti_assignment_data,
+        timeout=60)
+
+    new_lti_assignment_data = copy_lti_assignment_item_req.json()
+    return {"data": new_lti_assignment_data}
+
+  except ResourceNotFoundException as e:
+    Logger.error(e)
+    raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
