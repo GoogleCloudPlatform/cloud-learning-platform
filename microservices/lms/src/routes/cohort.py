@@ -10,6 +10,7 @@ from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest
 from common.utils import classroom_crud
 from common.utils.cache_service import set_key, get_key
+from common.utils.bq_helper import insert_rows_to_bq
 from schemas.cohort import (CohortListResponseModel, CohortModel,
                             CreateCohortResponseModel, InputCohortModel,
                             DeleteCohortResponseModel,
@@ -22,7 +23,7 @@ from schemas.section import SectionListResponseModel
 from schemas.student import GetProgressPercentageCohortResponseModel
 from config import BQ_TABLE_DICT
 from utils.helper import (convert_cohort_to_cohort_model,
-                          convert_section_to_section_model,insert_rows_to_bq)
+                          convert_section_to_section_model)
 
 
 router = APIRouter(prefix="/cohorts",
@@ -144,8 +145,10 @@ def create_cohort(input_cohort: InputCohortModel):
         "maxStudents":cohort_dict["max_students"],\
         "timestamp":datetime.datetime.utcnow()
     }]
-    insert_rows_to_bq\
-    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"])
+    insert_rows_to_bq(
+      rows=rows,
+      table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"]
+      )
     return {"cohort": convert_cohort_to_cohort_model(cohort)}
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
@@ -195,8 +198,10 @@ def update_cohort(cohort_id: str, update_cohort_model: UpdateCohortModel):
         "maxStudents":update_cohort_dict["max_students"],\
         "timestamp":datetime.datetime.utcnow()
     }]
-    insert_rows_to_bq\
-    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"])
+    insert_rows_to_bq(
+      rows=rows,
+      table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"]
+      )
     return {
         "message": f"Successfully Updated the Cohort with id {cohort_id}",
         "cohort": convert_cohort_to_cohort_model(cohort_details)

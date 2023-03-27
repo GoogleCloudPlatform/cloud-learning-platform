@@ -18,8 +18,8 @@ import datetime
 import json
 import uuid
 from common.utils.logging_handler import Logger
+from common.utils.bq_helper import insert_rows_to_bq
 from googleapiclient.errors import HttpError
-from helper.bq_helper import insert_rows_to_bq
 from helper.classroom_helper import get_course_work,get_student_submissions
 from helper.json_helper import convert_dict_array_to_json,convert_to_json
 from config import BQ_TABLE_DICT

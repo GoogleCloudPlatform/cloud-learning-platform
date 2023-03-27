@@ -83,21 +83,3 @@ def get_json_value(dict_object, key):
   if key in dict_object.keys():
     return dict_object[key]
   return None
-
-def insert_rows_to_bq(rows,table_name):
-  """Insert rows to BQ
-
-  Args:
-    rows (list): _description_
-
-  Returns:
-    Bool: _description_
-  """
-  table = bq_client.get_table(f"{PROJECT_ID}.{BQ_DATASET}.{table_name}")
-  errors = bq_client.insert_rows(
-    table=table, rows=rows)
-  if errors == []:
-    Logger.info(f"New data pushed data {rows[0]} in {table_name}")
-    return True
-  Logger.info(f"Encountered errors while inserting rows: {errors}")
-  return False

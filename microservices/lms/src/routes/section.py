@@ -8,6 +8,7 @@ from common.utils.http_exceptions import (CustomHTTPException,
                                           ResourceNotFound, BadRequest)
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
+from common.utils.bq_helper import insert_rows_to_bq
 from fastapi import APIRouter, Request,BackgroundTasks,status
 from googleapiclient.errors import HttpError
 from schemas.classroom_courses import EnableNotificationsResponse
@@ -25,7 +26,7 @@ from services import common_service
 from services.section_service import copy_course_background_task
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model,
-                          FEED_TYPES,insert_rows_to_bq)
+                          FEED_TYPES)
 from config import BQ_TABLE_DICT
 
 # disabling for linting to pass
@@ -365,8 +366,10 @@ def update_section(sections_details: UpdateSection,request: Request):
           "courseTemplateId":updated_section["course_template"].split("/")[1],\
           "timestamp":datetime.datetime.utcnow()
     }]
-    insert_rows_to_bq\
-    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
+    insert_rows_to_bq(
+      rows=rows,
+      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"]
+      )
     return {"data": updated_section}
   except ResourceNotFoundException as err:
     Logger.error(err)

@@ -17,9 +17,8 @@ Bigquery helper Service
 """
 
 from google.cloud import bigquery
-from google.cloud.exceptions import NotFound
 from common.utils.logging_handler import Logger
-from config import PROJECT_ID,BQ_DATASET,BQ_TABLE_DICT,BQ_REGION
+from common.config import PROJECT_ID,BQ_DATASET,BQ_REGION
 
 bq_client = bigquery.Client(location=BQ_REGION)
 
@@ -35,7 +34,7 @@ def insert_rows_to_bq(rows,table_name):
   table = bq_client.get_table(f"{PROJECT_ID}.{BQ_DATASET}.{table_name}")
   errors = bq_client.insert_rows(
     table=table, rows=rows)
-  if errors == []:
+  if not errors:
     Logger.info(f"New data pushed data {rows[0]} in {table_name}")
     return True
   Logger.info(f"Encountered errors while inserting rows: {errors}")
@@ -55,12 +54,10 @@ def run_query(query):
   results = query_job.result()
   return results
 
-def check_bq_tables():
-  try:
-    for table in BQ_TABLE_DICT.values():
-      bq_client.get_table(f"{PROJECT_ID}.{BQ_DATASET}.{table}")
-    return True
-  except NotFound as ne:
-    Logger.info(str(ne))
-    Logger.info(f"BQ Table {PROJECT_ID}.{BQ_DATASET}.{table} not found")
-    return False
+def get_client():
+  """Function to return configured bq_client
+
+  Returns:
+    Client: bigquery client object
+  """
+  return bq_client
