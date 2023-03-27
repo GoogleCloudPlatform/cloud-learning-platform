@@ -52,7 +52,7 @@ message_id as courseWork_message_id FROM
 SELECT 
         uuid,
         courseWork_id,
-        coursework_title,
+        courseWork_title,
         course_id,
         course_name,
         course_section,

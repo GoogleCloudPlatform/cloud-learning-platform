@@ -1,45 +1,45 @@
 CREATE OR REPLACE VIEW
   `lms_analytics.submittedCourseWorkCollectionView` AS
 SELECT * FROM
-(SELECT uuid	as userColl_uuid,	
-id as userColl_id,
-name as userColl_name,		
-emailAddress as userColl_emailAddress,
-photoUrl	as userColl_photoUrl,			
-verifiedTeacher	as userColl_verifiedTeacher,		
-permissions	as userColl_permissions,		
-event_type	as userColl_event_type,			
-timestamp	as userColl_timestamp,			
-message_id as userColl_message_id FROM(
+(SELECT uuid	as user_uuid,	
+id as user_id,
+name as user_name,		
+emailAddress as user_email_address,
+photoUrl	as user_photo_url,			
+verifiedTeacher	as user_verified_teacher,		
+permissions	as user_permissions,		
+event_type	as user_event_type,			
+timestamp	as user_timestamp,			
+message_id as user_message_id FROM(
 SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY timestamp DESC) AS row_num
 FROM `lms_analytics.userCollection`
 ) a
     WHERE
       a.row_num = 1
-      AND a.event_type != 'DELETED') as user,(SELECT uuid as submittedColl_uuid,
-        courseId as submittedColl_courseID,
-        courseWorkId as submittedColl_courseWorkId,
-        id as submittedColl_id,
-        userId as submittedColl_userId,
-        creationTime as submittedColl_creationTime,
-        updateTime as submittedColl_updateTime,
-        `state` as submittedColl_state,
-        late as submittedColl_late,
-        draftGrade as submittedColl_draftGrade,
-        assignedGrade as submittedColl_assignedGrade,
-        alternateLink as submittedColl_alternateLink,
-        courseWorkType as submittedColl_courseWorkType,
-        associatedWithDeveloper as submittedColl_associatedWithDeveloper,
-        assignmentSubmission as submittedColl_assignmentSubmission,
-        submissionHistory as submittedColl_submissionHistory,
-        shortAnswerSubmission as submittedColl_shortAnswerSubmission,
-        multipleChoiceSubmission as submittedColl_multipleChoiceSubmission,
-        event_type as submittedColl_event_type,
-        `timestamp` as submittedColl_timestamp,
-        message_id as submittedColl_message_id FROM(
+      AND a.event_type != 'DELETED') as user,(SELECT uuid as submission_uuid,
+        courseId as submission_course_id,
+        courseWorkId as submission_course_work_id,
+        id as submission_id,
+        userId as submission_user_id,
+        creationTime as submission_creation_time,
+        updateTime as submission_update_time,
+        `state` as submission_state,
+        late as submission_late,
+        draftGrade as submission_draft_grade,
+        assignedGrade as submission_assigned_grade,
+        alternateLink as submission_alternate_link,
+        courseWorkType as submission_course_work_type,
+        associatedWithDeveloper as submission_associated_with_developer,
+        assignmentSubmission as submission_assignment_submission,
+        submissionHistory as submission_submission_history,
+        shortAnswerSubmission as submission_short_answer_submission,
+        multipleChoiceSubmission as submission_multiple_choice_submission,
+        event_type as submission_event_type,
+        `timestamp` as submission_timestamp,
+        message_id as submission_message_id FROM(
 SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY timestamp DESC) AS row_num
 FROM `lms_analytics.submittedCourseWorkCollection`
 ) b
     WHERE
       b.row_num = 1
-      AND b.event_type != 'DELETED') as submitted where user.userColl_id=submitted.submittedColl_userId
+      AND b.event_type != 'DELETED') as submitted where user.user_id=submitted.submission_user_id
