@@ -119,7 +119,7 @@ def main():
   logger.info(
       "Classroom Pubsub Registration / Notifications API Cronjob STARTING")
 
-  auth_client = Authentication(LMS_BACKEND_ROBOT_USERNAME,
+  auth_client = UserCredentialsLMS_BACKEND_ROBOT_USERNAME,
                                LMS_BACKEND_ROBOT_PASSWORD)
   id_token = auth_client.get_id_token()
   skip = 0

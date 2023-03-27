@@ -6,7 +6,7 @@ from common.utils.logging_handler import Logger
 # pylint: disable=line-too-long,broad-exception-raised,broad-exception-caught
 
 
-class Authentication:
+class UserCredentials:
   """Class to fetch token for user account"""
 
   def __init__(self, email, password):

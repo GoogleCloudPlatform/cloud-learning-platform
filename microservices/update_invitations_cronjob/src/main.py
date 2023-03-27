@@ -56,7 +56,7 @@ except Exception as e:
 def main():
   Logger.info("Update Invites cronjob started")
 
-  auth_client = Authentication(LMS_BACKEND_ROBOT_USERNAME,
+  auth_client = UserCredentialsLMS_BACKEND_ROBOT_USERNAME,
                                LMS_BACKEND_ROBOT_PASSWORD)
   id_token = auth_client.get_id_token()
   api_endpoint = "http://lms/lms/api/v1/sections/update_invites"

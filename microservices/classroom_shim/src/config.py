@@ -54,5 +54,5 @@ try:
 except Exception as e:
   LMS_BACKEND_ROBOT_PASSWORD = None
 
-auth_client = Authentication(LMS_BACKEND_ROBOT_USERNAME,
+auth_client = UserCredentialsLMS_BACKEND_ROBOT_USERNAME,
                              LMS_BACKEND_ROBOT_PASSWORD)
