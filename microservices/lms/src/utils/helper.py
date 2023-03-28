@@ -2,10 +2,6 @@
 import datetime
 from fastapi import Depends
 from common.utils.auth_service import validate_user_type_and_token, auth_scheme
-from google.cloud import bigquery
-from config import BQ_REGION
-
-bq_client = bigquery.Client(location=BQ_REGION)
 
 FEED_TYPES = ("COURSE_WORK_CHANGES", "COURSE_ROSTER_CHANGES")
 def convert_cohort_to_cohort_model(cohort):
