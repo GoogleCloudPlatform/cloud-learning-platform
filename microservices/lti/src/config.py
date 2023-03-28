@@ -3,7 +3,7 @@
 """
 # pylint: disable=line-too-long, broad-except
 import os
-from common.utils.token_handler import Authentication
+from common.utils.token_handler import UserCredentials
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
@@ -96,5 +96,5 @@ try:
 except Exception as e:
   LMS_BACKEND_ROBOT_PASSWORD = None
 
-auth_client = UserCredentialsLMS_BACKEND_ROBOT_USERNAME,
-                             LMS_BACKEND_ROBOT_PASSWORD)
+auth_client = UserCredentials(LMS_BACKEND_ROBOT_USERNAME,
+                              LMS_BACKEND_ROBOT_PASSWORD)

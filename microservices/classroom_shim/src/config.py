@@ -6,7 +6,7 @@ from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 from google.cloud import secretmanager
-from common.utils.token_handler import Authentication
+from common.utils.token_handler import UserCredentials
 # pylint: disable=line-too-long,broad-except
 
 secrets = secretmanager.SecretManagerServiceClient()
@@ -54,5 +54,5 @@ try:
 except Exception as e:
   LMS_BACKEND_ROBOT_PASSWORD = None
 
-auth_client = UserCredentialsLMS_BACKEND_ROBOT_USERNAME,
-                             LMS_BACKEND_ROBOT_PASSWORD)
+auth_client = UserCredentials(LMS_BACKEND_ROBOT_USERNAME,
+                              LMS_BACKEND_ROBOT_PASSWORD)

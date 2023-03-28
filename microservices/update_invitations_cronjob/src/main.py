@@ -24,7 +24,7 @@ import os
 import sys
 import requests
 import traceback
-from common.utils.token_handler import Authentication
+from common.utils.token_handler import UserCredentials
 from common.utils.logging_handler import Logger
 from google.cloud import secretmanager
 # pylint: disable=line-too-long,broad-except,missing-timeout
@@ -56,8 +56,8 @@ except Exception as e:
 def main():
   Logger.info("Update Invites cronjob started")
 
-  auth_client = UserCredentialsLMS_BACKEND_ROBOT_USERNAME,
-                               LMS_BACKEND_ROBOT_PASSWORD)
+  auth_client = UserCredentials(LMS_BACKEND_ROBOT_USERNAME,
+                                LMS_BACKEND_ROBOT_PASSWORD)
   id_token = auth_client.get_id_token()
   api_endpoint = "http://lms/lms/api/v1/sections/update_invites"
 
