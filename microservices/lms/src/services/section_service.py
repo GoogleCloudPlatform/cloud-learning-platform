@@ -135,7 +135,7 @@ def copy_course_background_task(course_template_details,
               }
               # remove form from  material dict
               material.pop("form")
-        final_coursewok_material.append(coursework_material)  
+        final_coursewok_material.append(coursework_material)
       except Exception as error:
         title = coursework_material["title"]
         Logger.error(f"Get coursework material failed for\
@@ -157,7 +157,8 @@ def copy_course_background_task(course_template_details,
                               teacher_email,"TEACHER")
         # Storing classroom details
         classroom_crud.acceept_invite(invitation_object["id"],teacher_email)
-        user_profile = classroom_crud.get_user_profile_information(teacher_email)
+        user_profile = classroom_crud.\
+          get_user_profile_information(teacher_email)
         # Save the new record of seecion in firestore
         data = {
         "first_name":user_profile["name"]["givenName"],
