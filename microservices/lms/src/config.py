@@ -23,7 +23,6 @@ PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
   PROJECT_ID
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 BQ_DATASET = DATABASE_PREFIX +  "lms_analytics"
-BQ_REGION= os.getenv("BQ_REGION", "US")
 
 BQ_TABLE_DICT = {
     "BQ_COLL_SECTION_TABLE": "section",
