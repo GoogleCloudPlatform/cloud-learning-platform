@@ -4,7 +4,7 @@ from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.models import  Section
 from common.utils.http_exceptions import (
-                      InternalServerError)
+                      InternalServerError,ResourceNotFound)
 from services import common_service
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -53,6 +53,7 @@ def copy_course_background_task(course_template_details,
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(
         course_template_details.classroom_id)
+    final_coursewok=[]
     for coursework in coursework_list:
       try:
         #Check if a coursework is linked to a topic if yes then
@@ -65,7 +66,8 @@ def copy_course_background_task(course_template_details,
           # google form which returns
           # a dictionary of view_links as keys and edit
           #  likns as values of google form
-          url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+          url_mapping = classroom_crud.\
+            get_edit_url_and_view_url_mapping_of_form()
           # Loop to check if a material in courssework has a google
           # form attached to it
           # update the  view link to edit link and attach it as a form
@@ -73,6 +75,8 @@ def copy_course_background_task(course_template_details,
             if "driveFile" in  material.keys():
               material = classroom_crud.copy_material(material,target_folder_id)
             if "form" in material.keys():
+              if "title" not in material["form"].keys():
+                raise ResourceNotFound("Form to be copied is deleted")
               result1 = classroom_crud.drive_copy(
                 url_mapping[material["form"]["formUrl"]]["file_id"],
                         target_folder_id,material["form"]["title"])
@@ -82,17 +86,19 @@ def copy_course_background_task(course_template_details,
               }
               # remove form from  material dict
               material.pop("form")
+        final_coursewok.append(coursework)
       except Exception as error:
+        title = coursework["title"]
         Logger.error(f"Get coursework failed for \
-              course_id{course_template_details.classroom_id} for {coursework}")
+              course_id{course_template_details.classroom_id} for {title}")
+        error=traceback.format_exc().replace("\n", " ")
         Logger.error(error)
-        coursework_list.remove(coursework)
         continue
-
     # Create coursework in new course
-    if coursework_list is not None:
-      classroom_crud.create_coursework(new_course["id"],coursework_list)
+    if final_coursewok is not None:
+      classroom_crud.create_coursework(new_course["id"],final_coursewok)
     # Get the list of courseworkMaterial
+    final_coursewok_material = []
     coursework_material_list = classroom_crud.get_coursework_material(
       course_template_details.classroom_id)
     for coursework_material in coursework_material_list:
@@ -108,16 +114,15 @@ def copy_course_background_task(course_template_details,
           # google form which returns
           # a dictionary of view_links as keys and edit
           #  links as values of google form
-          url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+          url_mapping = classroom_crud.\
+            get_edit_url_and_view_url_mapping_of_form()
           # Loop to check if a material in courssework has a google
           # form attached to it
           # update the  view link to edit link and attach it as a form
           for material in coursework_material["materials"]:
             if "driveFile" in  material.keys():
               material = classroom_crud.copy_material(material,target_folder_id)
-            print(material)
             if "form" in material.keys():
-              print("In form Loop ",url_mapping[material["form"]["formUrl"]])
               new_copied_file_details = classroom_crud.drive_copy(
                 url_mapping[material["form"]["formUrl"]]["file_id"],
                 target_folder_id,material["form"]["title"])
@@ -127,22 +132,24 @@ def copy_course_background_task(course_template_details,
               }
               # remove form from  material dict
               material.pop("form")
+        final_coursewok_material.append(coursework_material)  
       except Exception as error:
-        Logger.error(f"Get coursework material failed for \
-              course_id{course_template_details.classroom_id} for {coursework_material}")
+        title = coursework_material["title"]
+        Logger.error(f"Get coursework material failed for\
+        course_id{course_template_details.classroom_id} for {title}")
+        error=traceback.format_exc().replace("\n", " ")
         Logger.error(error)
-        coursework_material_list.remove(coursework_material)
         continue
     # Create coursework in new course
-    if coursework_material_list is not None:
-        classroom_crud.create_coursework_material(new_course["id"],
-        coursework_material_list)
+    if final_coursewok_material is not None:
+      classroom_crud.create_coursework_material(new_course["id"],
+        final_coursewok_material)
     # add Instructional designer
     sections_details.teachers.append(
         course_template_details.instructional_designer)
+    final_teachers=[]
     for teacher_email in set(sections_details.teachers):
       try:
-        print("TEACHER NAME",teacher_email)
         invitation_object = classroom_crud.invite_user(new_course["id"],
                               teacher_email,"TEACHER")
         # Storing classroom details
@@ -164,11 +171,12 @@ def copy_course_background_task(course_template_details,
         "photo_url" :  user_profile["photoUrl"]
           }
         common_service.create_teacher(headers,data)
+        final_teachers.append(teacher_email)
       except Exception as error:
+        error=traceback.format_exc().replace("\n", " ")
         Logger.error(f"Create teacher failed for \
             for {teacher_email}")
         Logger.error(error)
-        sections_details.teachers.remove(teacher_email)
         continue
     section = Section()
     section.name =course_template_details.name
@@ -180,7 +188,7 @@ def copy_course_background_task(course_template_details,
     section.classroom_id = new_course["id"]
     section.classroom_code = new_course["enrollmentCode"]
     section.classroom_url = new_course["alternateLink"]
-    section.teachers = list(set(sections_details.teachers))
+    section.teachers = list(set(final_teachers))
     section.enrolled_students_count=0
     section_id =section.save().id
     classroom_id = new_course["id"]

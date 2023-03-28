@@ -2,7 +2,7 @@
 import traceback
 from common.utils.errors import  ValidationError
 from common.utils.http_exceptions import (CustomHTTPException,
-                                          InternalServerError,
+                        InternalServerError,ResourceNotFound,
                                           BadRequest)
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
@@ -109,6 +109,7 @@ def copy_courses(course_details: CourseDetails):
       topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(course_id)
+    final_coursework =[]
     for coursework in coursework_list:
       try:
         # Check if a coursework is linked to
@@ -123,7 +124,8 @@ def copy_courses(course_details: CourseDetails):
           #  form which returns
           # a dictionary of view_links as keys and edit likns as
           # values of google form
-          url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+          url_mapping = classroom_crud.\
+            get_edit_url_and_view_url_mapping_of_form()
           # Loop to check if a material in courssework has
           #  a google form attached to it
           # update the  view link to edit link and attach it as a form
@@ -131,6 +133,8 @@ def copy_courses(course_details: CourseDetails):
             if "driveFile" in  material.keys():
               material = classroom_crud.copy_material(material,target_folder_id)
             if "form" in material.keys():
+              if "title" not in material["form"].keys():
+                raise ResourceNotFound("Form to be copied is deleted")
               result1 = classroom_crud.drive_copy(
                 url_mapping[material["form"]["formUrl"]]["file_id"],
                       target_folder_id,material["form"]["title"])
@@ -140,18 +144,21 @@ def copy_courses(course_details: CourseDetails):
               }
               # remove form from  material dict
               material.pop("form")
+        final_coursework.append(coursework)
       except Exception as error:
-        Logger.error(f"Get coursework failed for {coursework}")
+        title = coursework["title"]
+        Logger.error(f"Get coursework failed for {title}")
+        error=traceback.format_exc().replace("\n", " ")
         Logger.error(error)
-        coursework_list.remove(coursework)
         continue
 
     # Create coursework in new course
-    if coursework_list is not None:
-      classroom_crud.create_coursework(new_course["id"], coursework_list)
+    if final_coursework is not None:
+      classroom_crud.create_coursework(new_course["id"], final_coursework)
     # Get the list of courseworkMaterial
     coursework_material_list = classroom_crud.get_coursework_material(
         course_id)
+    final_coursework_material=[]
     for coursework_material in coursework_material_list:
       try:
         # Check if a coursework material is linked to a topic if yes then
@@ -165,7 +172,8 @@ def copy_courses(course_details: CourseDetails):
           # google form which returns
           # a dictionary of view_links as keys and edit
           #  likns as values of google form
-          url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+          url_mapping = classroom_crud.\
+            get_edit_url_and_view_url_mapping_of_form()
           # Loop to check if a material in courssework has a google
           # form attached to it
           # update the  view link to edit link and attach it as a form
@@ -173,6 +181,8 @@ def copy_courses(course_details: CourseDetails):
             if "driveFile" in  material.keys():
               material = classroom_crud.copy_material(material,target_folder_id)
             if "form" in material.keys():
+              if "title" not in material["form"].keys():
+                raise ResourceNotFound("Form to be copied is deleted")
               new_copied_file_details = classroom_crud.drive_copy(
                 url_mapping[material["form"]["formUrl"]]["file_id"],
                       target_folder_id,material["form"]["title"])
@@ -182,19 +192,22 @@ def copy_courses(course_details: CourseDetails):
               }
               # remove form from  material dict
               material.pop("form")
-
+        final_coursework_material.append(coursework_material)
       except Exception as error:
-        Logger.error(f"Get coursework material failed for {coursework_material}")
+        title = coursework_material["title"]
+        error=traceback.format_exc().replace("\n", " ")
+        Logger.error(
+          f"Get coursework material failed for {title}")
         Logger.error(error)
-        coursework_list.remove(coursework_material)
         continue
     # Create coursework in new course
-    if coursework_material_list is not None:
+    if final_coursework_material is not None:
       classroom_crud.create_coursework_material(new_course["id"],
-                                                coursework_material_list)
+                                                final_coursework_material)
     response={}
     response["new_course"] = new_course
-    response["coursework_list"] = coursework_list
+    response["coursework_list"] = final_coursework
+    response["coursework_material"]=final_coursework_material
     return {"data":response}
   except HttpError as hte:
     Logger.error(hte)
