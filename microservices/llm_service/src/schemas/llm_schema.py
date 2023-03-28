@@ -3,35 +3,29 @@ Pydantic Model for Grade API's
 """
 from typing import Optional
 from pydantic import BaseModel
-from schemas.schema_examples import LLM_MODEL
+from schemas.schema_examples import LLM_MODEL_EXAMPLE
 
 
 class LLMModel(BaseModel):
-  """LLM Pydantic Model
-
-  Args:
-      BaseModel (_type_): _description_
-  """
-  user_id: str
-  lti_content_item_id: str
-  comment: Optional[str]
-  maximum_grade: Optional[float] = None
-  assigned_grade: Optional[float] = None
-  draft_grade: Optional[float] = None
-  validate_title: Optional[bool] = False
-  line_item_title: Optional[str] = None
+  """LLM model"""
+  userid: str
+  llm_type: str
+  context: Optional[str] = ""
+  primer: Optional[list[str]] = ""
+  history: Optional[list[str]] = []
+  memory: Optional[str] = ""
 
   class Config():
-    "Pydantic Config Class"
     orm_mode = True
-    schema_extra = {"example": LLM_MODEL}
-
+    schema_extra = {
+        "example": LLM_MODEL_EXAMPLE
+    }
 
 class LLMGenerateResponse(BaseModel):
   """LLM Generate Response model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully generated text"
-  data: Optional[str] = None
+  data: Optional[str] = ""
 
   class Config():
     orm_mode = True
