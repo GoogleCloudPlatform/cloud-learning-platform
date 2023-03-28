@@ -63,15 +63,14 @@ ERROR_RESPONSES = {
     }
 }
 
+# Langchain LLM configuration
+
 OPENAI_API_KEY = secrets.access_secret_version(
     request={
         "name": "projects/" + GCP_PROJECT +
-                "/secrets/openai_key/versions/1"
+                "/secrets/openai-api-key/versions/latest"
     }).payload.data.decode("utf-8")
 
 LANGCHAIN_LLM = {
   "openai": OpenAI(openai_api_key=OPENAI_API_KEY, model_name="gpt-3.5-turbo")
 }
-
-SERVICES = {"user-management": {"host": "user-management", "port": 80}}
-
