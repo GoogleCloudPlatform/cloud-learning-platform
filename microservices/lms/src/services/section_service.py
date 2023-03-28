@@ -8,7 +8,7 @@ from common.utils.http_exceptions import (
                       InternalServerError)
 from common.utils.bq_helper import insert_rows_to_bq
 from services import common_service
-from config import BQ_TABLE_DICT
+from config import BQ_TABLE_DICT,BQ_DATASET
 
 
 def copy_course_background_task(course_template_details,
@@ -176,6 +176,7 @@ def copy_course_background_task(course_template_details,
     }]
     insert_rows_to_bq(
       rows=rows,
+      dataset=BQ_DATASET,
       table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"]
       )
     Logger.info(message)

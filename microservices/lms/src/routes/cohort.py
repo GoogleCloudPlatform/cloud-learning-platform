@@ -21,7 +21,7 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import SectionListResponseModel
 from schemas.student import GetProgressPercentageCohortResponseModel
-from config import BQ_TABLE_DICT
+from config import BQ_TABLE_DICT,BQ_DATASET
 from utils.helper import (convert_cohort_to_cohort_model,
                           convert_section_to_section_model)
 
@@ -147,6 +147,7 @@ def create_cohort(input_cohort: InputCohortModel):
     }]
     insert_rows_to_bq(
       rows=rows,
+      dataset=BQ_DATASET,
       table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"]
       )
     return {"cohort": convert_cohort_to_cohort_model(cohort)}
@@ -200,6 +201,7 @@ def update_cohort(cohort_id: str, update_cohort_model: UpdateCohortModel):
     }]
     insert_rows_to_bq(
       rows=rows,
+      dataset=BQ_DATASET,
       table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"]
       )
     return {

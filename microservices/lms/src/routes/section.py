@@ -27,7 +27,7 @@ from services.section_service import copy_course_background_task
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model,
                           FEED_TYPES)
-from config import BQ_TABLE_DICT
+from config import BQ_TABLE_DICT,BQ_DATASET
 
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -368,6 +368,7 @@ def update_section(sections_details: UpdateSection,request: Request):
     }]
     insert_rows_to_bq(
       rows=rows,
+      dataset=BQ_DATASET,
       table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"]
       )
     return {"data": updated_section}

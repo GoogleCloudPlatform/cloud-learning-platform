@@ -21,7 +21,7 @@ from common.utils.bq_helper import insert_rows_to_bq
 from helper.classroom_helper import get_user
 from helper.json_helper import convert_dict_array_to_json
 from googleapiclient.errors import HttpError
-from config import BQ_TABLE_DICT
+from config import BQ_TABLE_DICT,BQ_DATASET
 # disabling for linting to pass
 # pylint: disable = broad-except
 def save_roster(data):
@@ -41,9 +41,13 @@ def save_roster(data):
     }]
     if data["eventType"] == "DELETED":
       return insert_rows_to_bq(
-          rows=rows, table_name=BQ_TABLE_DICT["BQ_LOG_RS_TABLE"])
+          rows=rows,
+          dataset=BQ_DATASET,
+          table_name=BQ_TABLE_DICT["BQ_LOG_RS_TABLE"])
     return insert_rows_to_bq(
-        rows=rows, table_name=BQ_TABLE_DICT["BQ_LOG_RS_TABLE"]) & save_user(
+        rows=rows,
+        dataset=BQ_DATASET,
+        table_name=BQ_TABLE_DICT["BQ_LOG_RS_TABLE"]) & save_user(
         data["resourceId"]["userId"], data["message_id"], data["eventType"])
   except HttpError as ae:
     Logger.error(ae)
@@ -60,4 +64,5 @@ def save_user(user_id,message_id,event_type):
   user["event_type"]=event_type
   user["permissions"] = convert_dict_array_to_json(user, "permissions")
   return insert_rows_to_bq(rows=[user],
+                           dataset=BQ_DATASET,
                            table_name=BQ_TABLE_DICT["BQ_COLL_USER_TABLE"])

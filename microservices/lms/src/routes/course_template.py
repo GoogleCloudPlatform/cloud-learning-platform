@@ -8,7 +8,7 @@ from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest, CustomHTTPException
 from common.utils import classroom_crud
 from common.utils.bq_helper import insert_rows_to_bq
-from config import (CLASSROOM_ADMIN_EMAIL,BQ_TABLE_DICT)
+from config import (CLASSROOM_ADMIN_EMAIL,BQ_TABLE_DICT,BQ_DATASET)
 from utils.helper import (convert_cohort_to_cohort_model)
 from services import common_service
 from schemas.cohort import CohortListResponseModel
@@ -216,6 +216,7 @@ request: Request):
     }]
     insert_rows_to_bq(
       rows=rows,
+      dataset=BQ_DATASET,
       table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"]
       )
     return {"course_template": course_template}
@@ -311,6 +312,7 @@ def update_course_template(
     }]
     insert_rows_to_bq(
       rows=rows,
+      dataset=BQ_DATASET,
       table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"]
       )
     return {

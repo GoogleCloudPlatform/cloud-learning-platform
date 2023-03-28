@@ -18,11 +18,11 @@ Bigquery helper Service
 
 from google.cloud import bigquery
 from common.utils.logging_handler import Logger
-from common.config import PROJECT_ID,BQ_DATASET,BQ_REGION
+from common.config import PROJECT_ID,BQ_REGION
 
 bq_client = bigquery.Client(location=BQ_REGION)
 
-def insert_rows_to_bq(rows,table_name):
+def insert_rows_to_bq(rows,dataset,table_name):
   """Insert rows to BQ
 
   Args:
@@ -31,7 +31,7 @@ def insert_rows_to_bq(rows,table_name):
   Returns:
     Bool: _description_
   """
-  table = bq_client.get_table(f"{PROJECT_ID}.{BQ_DATASET}.{table_name}")
+  table = bq_client.get_table(f"{PROJECT_ID}.{dataset}.{table_name}")
   errors = bq_client.insert_rows(
     table=table, rows=rows)
   if not errors:

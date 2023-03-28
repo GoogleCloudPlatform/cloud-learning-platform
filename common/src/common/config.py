@@ -31,7 +31,6 @@ API_BASE_URL = os.getenv("API_BASE_URL")
 CLOUD_LOGGING_ENABLED=bool(
   os.getenv("CLOUD_LOGGING_ENABLED","true").lower() in ("true",))
 
-BQ_DATASET = DATABASE_PREFIX + os.getenv("BQ_DATASET", "lms_analytics")
 BQ_REGION= os.getenv("BQ_REGION", "US")
 
 SERVICES = {
