@@ -101,39 +101,44 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
     members_data.extend(student_data)
 
     for member in members_data:
-      members_info = {
-          "user_id": member.get("user_id"),
-          "status": "Active",
-          "given_name": member.get("first_name"),
-          "family_name": member.get("last_name"),
-          "name": member.get("first_name", "") + member.get("last_name", ""),
-          "email": member.get("email"),
-          "picture": member.get("photo_url"),
-          "lis_person_sourcedid": member.get("user_id")
-      }
+      if member.get("user_type") == "learner" and member.get(
+          "enrollment_status", "") == "invited":
+        pass
 
-      if member.get("user_type") == "learner":
-        members_info["roles"] = [
-            "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
-            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Learner",
-            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
-        ]
+      else:
+        members_info = {
+            "user_id": member.get("user_id"),
+            "status": "Active",
+            "given_name": member.get("first_name"),
+            "family_name": member.get("last_name"),
+            "name": member.get("first_name", "") + member.get("last_name", ""),
+            "email": member.get("email"),
+            "picture": member.get("photo_url"),
+            "lis_person_sourcedid": member.get("user_id")
+        }
 
-      elif member.get("user_type") == "faculty":
-        members_info["roles"] = [
-            "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
-            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Faculty",
-            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor"
-        ]
+        if member.get("user_type") == "learner":
+          members_info["roles"] = [
+              "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
+              "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Learner",
+              "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
+          ]
 
-      elif member.get("user_type") == "admin":
-        members_info["roles"] = [
-            "http://purl.imsglobal.org/vocab/lis/v2/membership#Administrator",
-            "http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator",
-            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
-        ]
+        elif member.get("user_type") == "faculty":
+          members_info["roles"] = [
+              "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
+              "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Faculty",
+              "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor"
+          ]
 
-      members_list.append(members_info)
+        elif member.get("user_type") == "admin":
+          members_info["roles"] = [
+              "http://purl.imsglobal.org/vocab/lis/v2/membership#Administrator",
+              "http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator",
+              "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
+          ]
+
+        members_list.append(members_info)
 
     output_data = {
         "id": nrps_id,

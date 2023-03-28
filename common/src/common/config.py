@@ -28,6 +28,8 @@ PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
   PROJECT_ID
 
 API_BASE_URL = os.getenv("API_BASE_URL")
+CLOUD_LOGGING_ENABLED=bool(
+  os.getenv("CLOUD_LOGGING_ENABLED","true").lower() in ("true",))
 
 
 SERVICES = {

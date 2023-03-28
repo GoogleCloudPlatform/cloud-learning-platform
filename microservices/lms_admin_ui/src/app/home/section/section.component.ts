@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+import { Location } from '@angular/common';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
@@ -43,7 +44,9 @@ export class SectionComponent implements OnInit {
   sectionDetails: any[] = []
   loadCard: boolean = false
   loadSection: boolean = false
-  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, public _HomeService: HomeService, public router: Router) { }
+  studentTableLoader:boolean=true
+  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, public _HomeService: HomeService, 
+    public router: Router, private _location: Location) { }
   @ViewChild(MatSort) sort: MatSort;
 
 
@@ -78,8 +81,10 @@ export class SectionComponent implements OnInit {
     this._HomeService.getSectionList(cohortid).subscribe((res: any) => {
       this.sectionDetails = res.data
       if (this.sectionDetails.length > 0) {
-        if (this.router.url.split('/')[3]) {
-          this.selectedSection = this.sectionDetails.find(o => o.id == this.router.url.split('/')[3])
+        if (location.pathname.split('/' )[3]) {
+          console.log('if router url split',this.router.url.split('/'))
+          this.selectedSection = this.sectionDetails.find(o => o.id == location.pathname.split('/')[3])
+          console.log('selected sec', this.selectedSection )
         }
         else {
           this.selectedSection = this.sectionDetails[0]
@@ -96,15 +101,35 @@ export class SectionComponent implements OnInit {
       , '_blank');
   }
   getSectionStudents() {
+    this.studentTableLoader = true
     this._HomeService.getStudentsInSection(this.selectedSection.id).subscribe((res: any) => {
       this.studentTableData = []
       this.studentTableData = res.data
       console.log('student data', this.studentTableData)
-    })
+      this.studentTableLoader = false
+    },
+    (err:any)=>{
+      this.studentTableLoader = false
+    }
+    )
+  }
+
+  updateUrl(url: string) {
+    console.log('path',location.pathname)
+    let pathArr = location.pathname.split('/')
+    if(pathArr.length == 4){
+      pathArr[3] = url
+    }
+    else{
+      pathArr.push(url)
+    }
+    console.log(pathArr.toString().replace(/,/g,'/'))
+    this._location.go(pathArr.toString().replace(/,/g,'/'))
   }
 
   createTableData() {
     console.log('selected sec', this.selectedSection)
+    this.updateUrl(this.selectedSection.id)
     this.getSectionStudents()
     this.tableData = []
     for (let x of this.selectedSection.teachers) {
