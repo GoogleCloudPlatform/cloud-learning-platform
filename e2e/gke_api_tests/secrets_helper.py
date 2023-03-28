@@ -40,38 +40,70 @@ def get_student_email_and_token():
         dict: returns a dict which contains student email and token
     """
   student_email_token_name_mapping = {
-    "personal-test-user-1-username": "add_student_token","personal-test-user-2-username": "add_student_token_2",
-    "personal-test-user-3-username":"add_student_token_3", "personal-test-user-4-username":"add_student_token_4"}
-  
-#   random_idex=random.choice(["personal-test-user-1-username","personal-test-user-2-username"])
-  random_index=random.choice(["personal-test-user-1-username","personal-test-user-2-username",
-    "personal-test-user-3-username", "personal-test-user-4-username"
-  ])
-  client = secretmanager.SecretManagerServiceClient()
-#   student_email_secret_id = "personal-test-user-1-username"
-  # student_email_secret_id = "personal-test-user-2-username"
-  student_email_secret_id = random_index
-  student_token_secret_id = student_email_token_name_mapping[random_index]
-  print("________Student Email and token for E2E__________",student_email_secret_id,student_token_secret_id)
+    "personal-test-user-1-username": "add_student_token",
+    "personal-test-user-2-username": "add_student_token_2",
+    "personal-test-user-3-username":"add_student_token_3", 
+    "personal-test-user-4-username":"add_student_token_4"}
+
+  keys = ["personal-test-user-1-username",
+          "personal-test-user-2-username",
+          "personal-test-user-3-username",
+          "personal-test-user-4-username"]
+
+  test_user1 = random.choice(keys)
+  student_email_secret_id = test_user1
+  student_token_secret_id = student_email_token_name_mapping[test_user1]
+
+  invite_student_email_secret_id = random.choice([ele for ele in keys if ele != test_user1])
+  invite_student_email_token_secret_id = student_email_token_name_mapping[invite_student_email_secret_id]
   student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
   student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
+  # Student Email to enroll student
+  client = secretmanager.SecretManagerServiceClient()
   student_email_response = client.access_secret_version(
       request={"name": student_email_name})
   student_token_response = client.access_secret_version(
       request={"name": student_token_name})
+  # student email for invite fixture
+  invite_student_email_name =  f"projects/{PROJECT_ID}/secrets/{invite_student_email_secret_id}/versions/latest"
+  invite_student_email_response = client.access_secret_version(
+      request={"name":invite_student_email_name})
+  # Token for invite student
+  invite_student_token_response = f"projects/{PROJECT_ID}/secrets/{invite_student_email_token_secret_id}/versions/latest"   
+  invite_student_token_response = client.access_secret_version(
+      request={"name":invite_student_token_response})
+
+  # credentials_dict = json.loads(
+  #     student_token_response.payload.data.decode("UTF-8"))
+  # creds = Credentials.from_authorized_user_info(
+  #     credentials_dict, scopes=credentials_dict["scopes"])
+  # if not creds or not creds.valid:
+  #   if creds and creds.expired and creds.refresh_token:
+  #     creds.refresh(Request())
+  #     credentials_dict = json.loads(creds.to_json())
+  student_creds_dict = get_access_token(student_token_response)
+  invite_student_creds_dict = get_access_token(invite_student_token_response)
+  data = {
+      "email": student_email_response.payload.data.decode("UTF-8"),
+      "access_token":student_creds_dict["token"],
+      "invite_student_email":invite_student_email_response.payload.data.decode("UTF-8"),
+      "invite_student_token": invite_student_creds_dict["token"]
+  }
+  print(data)
+  return data
+
+def get_access_token(credential_object):
   credentials_dict = json.loads(
-      student_token_response.payload.data.decode("UTF-8"))
+      credential_object.payload.data.decode("UTF-8"))
   creds = Credentials.from_authorized_user_info(
       credentials_dict, scopes=credentials_dict["scopes"])
   if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
       creds.refresh(Request())
       credentials_dict = json.loads(creds.to_json())
-  data = {
-      "email": student_email_response.payload.data.decode("UTF-8"),
-      "access_token":credentials_dict["token"]
-  }
-  return data
+  return credentials_dict
+
+
 
 
 def get_workspace_student_email_and_token():
@@ -112,3 +144,4 @@ def get_user_email_and_password_for_e2e():
   return json.loads(user_email_password_response.payload.data.decode(
       "UTF-8"))
 
+get_student_email_and_token()

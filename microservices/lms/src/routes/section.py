@@ -1,5 +1,6 @@
 """ Section endpoints """
 import traceback
+import datetime
 from common.models import Cohort, CourseTemplate, Section
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (CustomHTTPException,
@@ -23,7 +24,9 @@ from schemas.update_section import UpdateSection
 from services import common_service
 from services.section_service import copy_course_background_task
 from utils.helper import (convert_section_to_section_model,
-                          convert_assignment_to_assignment_model,FEED_TYPES)
+                          convert_assignment_to_assignment_model,
+                          FEED_TYPES,insert_rows_to_bq)
+from config import BQ_TABLE_DICT
 
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -323,8 +326,8 @@ def update_section(sections_details: UpdateSection,request: Request):
     add_teacher_list = list(
         set(sections_details.teachers) - set(section.teachers))
     for i in add_teacher_list:
-      invitation_object = classroom_crud.invite_teacher(
-                            sections_details.course_id,i)
+      invitation_object = classroom_crud.invite_user(
+                            sections_details.course_id,i,"TEACHER")
       # Storing classroom details
       classroom_crud.acceept_invite(invitation_object["id"],i)
       user_profile = classroom_crud.get_user_profile_information(i)
@@ -352,6 +355,18 @@ def update_section(sections_details: UpdateSection,request: Request):
     section.teachers = sections_details.teachers
     section.update()
     updated_section = convert_section_to_section_model(section)
+    rows=[{
+      "sectionId":sections_details.id,\
+      "courseId":sections_details.course_id,\
+      "classroomUrl":updated_section["classroom_url"],\
+        "name":sections_details.section_name,\
+        "description":sections_details.description,\
+          "cohortId":updated_section["cohort"].split("/")[1],\
+          "courseTemplateId":updated_section["course_template"].split("/")[1],\
+          "timestamp":datetime.datetime.utcnow()
+    }]
+    insert_rows_to_bq\
+    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
     return {"data": updated_section}
   except ResourceNotFoundException as err:
     Logger.error(err)

@@ -1,5 +1,6 @@
 '''Cohort Endpoint'''
 import traceback
+import datetime
 from fastapi import APIRouter, Request
 from services import student_service
 from common.models import Cohort, CourseTemplate,CourseEnrollmentMapping
@@ -19,8 +20,9 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import SectionListResponseModel
 from schemas.student import GetProgressPercentageCohortResponseModel
+from config import BQ_TABLE_DICT
 from utils.helper import (convert_cohort_to_cohort_model,
-                          convert_section_to_section_model)
+                          convert_section_to_section_model,insert_rows_to_bq)
 
 
 router = APIRouter(prefix="/cohorts",
@@ -130,7 +132,20 @@ def create_cohort(input_cohort: InputCohortModel):
     cohort_dict.pop("course_template_id")
     cohort = Cohort.from_dict(cohort_dict)
     cohort.course_template = course_template
-    cohort.save()
+    cohort_id = cohort.save().id
+    rows=[{
+      "cohortId":cohort_id,\
+        "name":cohort_dict["name"],\
+        "description":cohort_dict["description"],\
+        "startDate":cohort_dict["start_date"],\
+        "endDate":cohort_dict["end_date"],\
+        "registrationStartDate":cohort_dict["registration_start_date"],\
+        "registrationEndDate":cohort_dict["registration_end_date"],\
+        "maxStudents":cohort_dict["max_students"],\
+        "timestamp":datetime.datetime.utcnow()
+    }]
+    insert_rows_to_bq\
+    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"])
     return {"cohort": convert_cohort_to_cohort_model(cohort)}
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
@@ -169,6 +184,19 @@ def update_cohort(cohort_id: str, update_cohort_model: UpdateCohortModel):
         else:
           setattr(cohort_details, key, update_cohort_dict[key])
     cohort_details.update()
+    rows=[{
+      "cohortId":cohort_id,\
+        "name":update_cohort_dict["name"],\
+        "description":update_cohort_dict["description"],\
+        "startDate":update_cohort_dict["start_date"],\
+        "endDate":update_cohort_dict["end_date"],\
+        "registrationStartDate":update_cohort_dict["registration_start_date"],\
+        "registrationEndDate":update_cohort_dict["registration_end_date"],\
+        "maxStudents":update_cohort_dict["max_students"],\
+        "timestamp":datetime.datetime.utcnow()
+    }]
+    insert_rows_to_bq\
+    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"])
     return {
         "message": f"Successfully Updated the Cohort with id {cohort_id}",
         "cohort": convert_cohort_to_cohort_model(cohort_details)
@@ -280,7 +308,7 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
       for section in result:
         submitted_course_work_list = 0
         record = CourseEnrollmentMapping.\
-          find_course_enrollment_record(section.key,user_id)
+          find_enrolled_student_record(section.key,user_id)
         if record is not None:
           course_work_list = len\
             (classroom_crud.get_course_work_list(section.key.split("/")[1]))
@@ -316,3 +344,4 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
+  

@@ -103,7 +103,7 @@ def test_create_section(client_with_emulator, create_fake_data):
                   with mock.patch(
             "services.section_service.classroom_crud.enable_notifications"):
                     with mock.patch(
-                  "services.section_service.classroom_crud.invite_teacher",
+                  "services.section_service.classroom_crud.invite_user",
                     return_value={"id":"12wewew"}):
                       with mock.patch(
       "services.section_service.classroom_crud.get_user_profile_information",
@@ -120,7 +120,9 @@ def test_create_section(client_with_emulator, create_fake_data):
                       "services.section_service.classroom_crud.drive_copy"):
                                   with mock.patch(
                       "services.section_service.classroom_crud.copy_material"):
-                                    resp = client_with_emulator.post(url,
+                                    with mock.patch(
+                        "services.section_service.insert_rows_to_bq"):
+                                      resp = client_with_emulator.post(url,
                               json=section_details)
   assert resp.status_code == 202
 
@@ -150,7 +152,7 @@ def test_create_section_course_template_not_found(client_with_emulator,
           with mock.patch("routes.section.classroom_crud.get_coursework"):
             with mock.patch(
                 "routes.section.classroom_crud.create_coursework"):
-              with mock.patch("routes.section.classroom_crud.invite_teacher"):
+              with mock.patch("routes.section.classroom_crud.invite_user"):
                 with mock.patch(
                 "routes.section.classroom_crud.get_user_profile_information",
                 return_value=mocked_value):
@@ -203,7 +205,7 @@ def test_create_section_cohort_not_found(client_with_emulator,
         "routes.section.classroom_crud.get_user_profile_information",
                 return_value=mocked_value):
                   with mock.patch(
-        "routes.section.classroom_crud.invite_teacher"):
+        "routes.section.classroom_crud.invite_user"):
                     with mock.patch(
         "routes.section.common_service.create_teacher"):
                       with mock.patch(
@@ -267,7 +269,8 @@ def test_update_section(client_with_emulator, create_fake_data):
       return_value=mocked_value):
         with mock.patch("routes.section.classroom_crud.acceept_invite"):
           with mock.patch("routes.section.common_service.create_teacher"):
-            resp = client_with_emulator.patch(url, json=data)
+            with mock.patch("routes.section.insert_rows_to_bq"):
+              resp = client_with_emulator.patch(url, json=data)
   assert resp.status_code == 200
 
 

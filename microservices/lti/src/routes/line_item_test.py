@@ -17,7 +17,7 @@ from common.testing.firestore_emulator import (firestore_emulator,
 from common.utils.http_exceptions import add_exception_handlers
 from schemas.schema_examples import (BASIC_TOOL_EXAMPLE,
                                      BASIC_CONTENT_ITEM_EXAMPLE,
-                                     POST_LINE_ITEM_EXAMPLE,
+                                     BASIC_LINE_ITEM_EXAMPLE,
                                      BASIC_SCORE_EXAMPLE)
 from uuid import uuid4
 with mock.patch(
@@ -45,7 +45,7 @@ test_scope = {
 test_keyset = {"public_keyset": "gGet21v2brb"}
 
 # assigning url
-context_id = POST_LINE_ITEM_EXAMPLE["contextId"]
+context_id = "1vb9B3YNv0Ivby94"
 api_url = f"{API_URL}/{context_id}/line_items"
 
 
@@ -65,14 +65,14 @@ def test_post_and_get_line_item(mock_token, clean_firestore, create_tool):
   test_scope_data = {**test_scope, "sub": test_tool.client_id}
   mock_token.return_value = test_scope_data
 
-  input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
+  input_line_item = copy.deepcopy(BASIC_LINE_ITEM_EXAMPLE)
 
   url = api_url
   headers = {"Authorization": "Bearer test_token"}
   post_resp = client_with_emulator.post(
       url, json=input_line_item, headers=headers)
 
-  assert post_resp.status_code == 200, "Status code not 200 for POST line_item"
+  assert post_resp.status_code == 200, "Status code not 200 for POST line item"
 
   post_json_response = post_resp.json()
   line_item_id = post_json_response.get("id")
@@ -118,13 +118,13 @@ def test_get_all_line_items(mock_token, clean_firestore, create_tool):
   test_scope_data = {**test_scope, "sub": test_tool.client_id}
   mock_token.return_value = test_scope_data
 
-  input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
+  input_line_item = copy.deepcopy(BASIC_LINE_ITEM_EXAMPLE)
 
   url = api_url
   headers = {"Authorization": "Bearer test_token"}
   post_resp = client_with_emulator.post(
       url, json=input_line_item, headers=headers)
-  assert post_resp.status_code == 200, "Status code not 200 for POST line_item"
+  assert post_resp.status_code == 200, "Status code not 200 for POST line item"
 
   # now see if GET all endpoint returns data
   get_resp = client_with_emulator.get(url, headers=headers)
@@ -148,13 +148,13 @@ def test_update_line_item(mock_token, clean_firestore, create_tool):
   test_scope_data = {**test_scope, "sub": test_tool.client_id}
   mock_token.return_value = test_scope_data
 
-  input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
+  input_line_item = copy.deepcopy(BASIC_LINE_ITEM_EXAMPLE)
 
   headers = {"Authorization": "Bearer test_token"}
   url = api_url
   post_resp = client_with_emulator.post(
       url, json=input_line_item, headers=headers)
-  assert post_resp.status_code == 200, "Status code not 200 for POST line_item"
+  assert post_resp.status_code == 200, "Status code not 200 for POST line item"
 
   post_json_response = post_resp.json()
   line_item_id = post_json_response.get("id")
@@ -165,7 +165,7 @@ def test_update_line_item(mock_token, clean_firestore, create_tool):
   post_json_response["scoreMaximum"] = 100
   update_resp = client_with_emulator.put(
       url, json=post_json_response, headers=headers)
-  assert update_resp.status_code == 200, "Status code not 200 for PUT line_item"
+  assert update_resp.status_code == 200, "Status code not 200 for PUT line item"
 
   update_json_response = update_resp.json()
 
@@ -192,13 +192,13 @@ def test_delete_line_item(mock_token, clean_firestore, create_tool):
   test_scope_data = {**test_scope, "sub": test_tool.client_id}
   mock_token.return_value = test_scope_data
 
-  input_line_item = copy.deepcopy(POST_LINE_ITEM_EXAMPLE)
+  input_line_item = copy.deepcopy(BASIC_LINE_ITEM_EXAMPLE)
 
   headers = {"Authorization": "Bearer test_token"}
   url = api_url
   post_resp = client_with_emulator.post(
       url, json=input_line_item, headers=headers)
-  assert post_resp.status_code == 200, "Status code not 200 for POST line_item"
+  assert post_resp.status_code == 200, "Status code not 200 for POST line item"
 
   post_json_response = post_resp.json()
   line_item_id = post_json_response.get("id")
@@ -235,7 +235,8 @@ def test_post_score(mock_pass_back, mock_unverified_token, mock_token_scopes,
   content_item_id = content_item.id
 
   input_line_item = {
-      **POST_LINE_ITEM_EXAMPLE, "resourceLinkId": content_item_id
+      **BASIC_LINE_ITEM_EXAMPLE, "resourceLinkId": content_item_id,
+      "contextId": context_id
   }
   line_item = LineItem.from_dict(input_line_item)
   line_item.save()
@@ -244,8 +245,10 @@ def test_post_score(mock_pass_back, mock_unverified_token, mock_token_scopes,
   headers = {"Authorization": "Bearer test_token"}
   input_score = copy.deepcopy(BASIC_SCORE_EXAMPLE)
   url = f"{api_url}/{line_item_id}/scores"
+  print("url", url)
   post_resp = client_with_emulator.post(url, json=input_score, headers=headers)
 
-  assert post_resp.status_code == 200, "Status code not 200 for POST line_item"
+  print("post_resp", post_resp, post_resp.status_code, post_resp.json())
+  assert post_resp.status_code == 200, "Status code not 200 for POST line item"
   json_resp = post_resp.json()
   assert json_resp.get("userId") == input_score.get("userId")

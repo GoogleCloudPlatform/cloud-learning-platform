@@ -97,6 +97,12 @@ jobs:
         run: |
           gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
 
+      - name: Add BQ Tables
+        run: |
+          cd utils/
+          python -m pip install -r requirements.txt
+          BQ_DATASET=lms_analytics python bq_setup.py
+
       - name: Build and deploy to cluster
         run: |
           skaffold run \

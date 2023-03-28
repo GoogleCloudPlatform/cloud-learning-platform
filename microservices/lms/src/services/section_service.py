@@ -1,11 +1,14 @@
 """Section API services"""
 import traceback
+import datetime
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.models import  Section
 from common.utils.http_exceptions import (
                       InternalServerError)
 from services import common_service
+from config import BQ_TABLE_DICT
+from utils.helper import insert_rows_to_bq
 
 
 def copy_course_background_task(course_template_details,
@@ -126,8 +129,8 @@ def copy_course_background_task(course_template_details,
         course_template_details.instructional_designer)
     for teacher_email in set(sections_details.teachers):
       print("TEACHER NAME",teacher_email)
-      invitation_object = classroom_crud.invite_teacher(new_course["id"],
-                            teacher_email)
+      invitation_object = classroom_crud.invite_user(new_course["id"],
+                            teacher_email,"TEACHER")
       # Storing classroom details
       classroom_crud.acceept_invite(invitation_object["id"],teacher_email)
       user_profile = classroom_crud.get_user_profile_information(teacher_email)
@@ -161,6 +164,18 @@ def copy_course_background_task(course_template_details,
     section.enrolled_students_count=0
     section_id =section.save().id
     classroom_id = new_course["id"]
+    rows=[{
+      "sectionId":section_id,\
+      "courseId":new_course["id"],\
+      "classroomUrl":new_course["alternateLink"],\
+        "name":new_course["section"],\
+        "description":new_course["description"],\
+          "cohortId":cohort_details.id,\
+        "courseTemplateId":course_template_details.id,\
+          "timestamp":datetime.datetime.utcnow()
+    }]
+    insert_rows_to_bq\
+    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
     Logger.info(message)
     Logger.info(f"Background Task Completed for section Creation for cohort\
                 {cohort_details.id}")
