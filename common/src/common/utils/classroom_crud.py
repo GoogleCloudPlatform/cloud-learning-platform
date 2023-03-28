@@ -282,6 +282,23 @@ def get_coursework_material(course_id):
     return None
 
 
+def create_single_coursework(course_id, coursework):
+  """create coursework in a classroom course
+
+  Args:
+    course_id: where coursework need to be created
+    coursework : list of dictionary of coursework to be created
+  Returns:
+    returns success
+    """ ""
+
+  service = build("classroom", "v1", credentials=get_credentials())
+  data = service.courses().courseWork().create(
+      courseId=course_id, body=coursework).execute()
+  print("coursework data", data)
+  Logger.info(data)
+  Logger.info("Create coursework method worked")
+  return data
 
 def create_coursework(course_id, coursework_list):
   """create coursework in a classroom course
@@ -469,7 +486,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   """
   # Call search by email usermanagement API to get the student data
   response = requests.get(f"\
-  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",\
+  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}"                                                                                                                                          ,\
     headers=headers)
   # If the response is success check if student is inactive i.e  raise error
   searched_student = []
@@ -479,7 +496,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
       if searched_student[0]["status"]=="inactive":
         raise InternalServerError("Student inactive in \
           database is trying to enroll.Please update\
-             the student status")
+             the student status"                                                                )
 
   # Given student is active then call create
   # student in classroom course function
@@ -487,7 +504,7 @@ def enroll_student(headers ,access_token, course_id,student_email,course_code):
   access_token_details = requests.get(
     f"https://oauth2.googleapis.com/tokeninfo?access_token={access_token}")
   Logger.info(
-f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
+  f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
   {access_token_details.json()}"
   )
   create_student_in_course(access_token,student_email,course_id,course_code)
@@ -497,9 +514,9 @@ f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
   gaia_id = profile["metadata"]["sources"][0]["id"]
   # Call user API
   data = {
-  "first_name":profile["names"][0]["givenName"],
+  "first_name": profile["names"][0]["givenName"],
   "last_name": profile["names"][0]["familyName"],
-  "email":student_email,
+  "email": student_email,
   "user_type": "learner",
   "user_type_ref": "",
   "user_groups": [],
@@ -507,8 +524,8 @@ f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
   "is_registered": True,
   "failed_login_attempts_count": 0,
   "access_api_docs": False,
-  "gaia_id":gaia_id,
-  "photo_url":profile["photos"][0]["url"]
+  "gaia_id": gaia_id,
+  "photo_url": profile["photos"][0]["url"]
   }
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user usermanagement API and return user data else
@@ -541,7 +558,7 @@ def get_edit_url_and_view_url_mapping_of_form():
       # view_link_and_edit_link_matching[result["responderUri"]] = \
       #   file.get("webViewLink")
       view_link_and_edit_link_matching[result["responderUri"]] = \
-      {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
+      {"webViewLink": file.get("webViewLink"),"file_id": file.get("id")}
     if page_token is None:
       break
   return view_link_and_edit_link_matching
@@ -625,7 +642,7 @@ def enable_notifications(course_id, feed_type):
           }
       },
       "cloudPubsubTopic": {
-        "topicName":"projects/"+
+        "topicName": "projects/"+
         f"{PUB_SUB_PROJECT_ID}/topics/{DATABASE_PREFIX}classroom-notifications"
       }
   }
@@ -847,5 +864,3 @@ def post_grade_of_the_user(section_id: str,
         data=None) from ae
   except Exception as e:
     raise InternalServerError(str(e)) from e
-
-

@@ -4,12 +4,15 @@ import requests
 from fastapi import APIRouter
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException
-from common.utils.http_exceptions import (ResourceNotFound, InternalServerError)
+from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
+                                          CustomHTTPException)
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
-from lti_assignment import get_lti_assignment
+from lti_assignment import get_lti_assignment, update_lti_assignment
+from common.utils import classroom_crud
 from pydantic import BaseModel
+from googleapiclient.errors import HttpError
 # pylint: disable=line-too-long
 
 router = APIRouter(
@@ -69,6 +72,7 @@ def copy_courses(course_details: CourseDetails):
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(course_id)
     for coursework in coursework_list:
+      lti_assignment_ids = []
       # Check if a coursework is linked to a topic
       # if yes then replace the old topic id to new
       # topic id using topic_id_map
@@ -101,18 +105,30 @@ def copy_courses(course_details: CourseDetails):
           if "link" in material.keys():
             link = material["link"]
             if "classroom_shim/api/v1?lti_assignment=" in link["url"]:
-              pass
-              # start course work copy:
-              #   get content item and tool id
-              #     copy the content item with the tool info
-              #       COPY the line items if any
-              #   use this content item to create an lti assignment
-              #     create coursework
-              #   update the lti assignment with the course work details
+              split_url = link["url"].split(
+                  "classroom_shim/api/v1?lti_assignment=")
+              lti_assignment_id = split_url[-1]
+              copy_assignment = copy_lti_assignment({
+                  "lti_assignment_id": lti_assignment_id,
+                  "context_id": new_course["id"]
+              })
+
+      # create coursework
+      coursework_data = classroom_crud.create_single_coursework(
+          new_course["id"], coursework)
+      print("\n\n***coursework_data from classroom", coursework_data)
+      for assignment_id in lti_assignment_ids:
+        coursework_id = coursework_data.get("id")
+        # get assignment
+        lti_assignment = get_lti_assignment(assignment_id)
+        lti_assignment["data"]["coursework_id"] = coursework_id
+        # patch assignment
+        update_lti_assignment(assignment_id, lti_assignment["data"])
+      # update the lti assignment with the course work details
 
     # Create coursework in new course
-    if coursework_list is not None:
-      classroom_crud.create_coursework(new_course["id"], coursework_list)
+    # if coursework_list is not None:
+    #   classroom_crud.create_coursework(new_course["id"], coursework_list)
     # Get the list of courseworkMaterial
     coursework_material_list = classroom_crud.get_coursework_material(course_id)
     for coursework_material in coursework_material_list:
@@ -162,7 +178,7 @@ def copy_courses(course_details: CourseDetails):
 
 
 @router.post("/lti-assignment/copy")
-def create_lti_assignment(data: dict):
+def copy_lti_assignment(data: dict):
   """
   input data format: {
     lti_assignment_id: "123",
