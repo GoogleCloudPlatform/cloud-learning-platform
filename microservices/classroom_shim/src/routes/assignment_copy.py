@@ -9,7 +9,9 @@ from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
-from lti_assignment import get_lti_assignment, update_lti_assignment
+from schemas.lti_assignment_schema import InputLTIAssignmentModel, UpdateLTIAssignmentModel
+from routes.lti_assignment import get_lti_assignment, update_lti_assignment, create_lti_assignment
+from common.utils.secrets import get_backend_robot_id_token
 from common.utils import classroom_crud
 from pydantic import BaseModel
 from googleapiclient.errors import HttpError
@@ -112,6 +114,9 @@ def copy_courses(course_details: CourseDetails):
                   "lti_assignment_id": lti_assignment_id,
                   "context_id": new_course["id"]
               })
+              material["link"] = link.replace(
+                  lti_assignment_id,
+                  copy_assignment.get("data").get("id"))
 
       # create coursework
       coursework_data = classroom_crud.create_single_coursework(
@@ -123,7 +128,9 @@ def copy_courses(course_details: CourseDetails):
         lti_assignment = get_lti_assignment(assignment_id)
         lti_assignment["data"]["coursework_id"] = coursework_id
         # patch assignment
-        update_lti_assignment(assignment_id, lti_assignment["data"])
+        update_lti_assignment(
+            assignment_id,
+            UpdateLTIAssignmentModel.parse_obj(lti_assignment["data"]))
       # update the lti assignment with the course work details
 
     # Create coursework in new course
@@ -192,21 +199,23 @@ def copy_lti_assignment(data: dict):
     tool_id = assignment_data.get("data").get("tool_id")
 
     content_item_req = requests.get(
-        f"http://lti/lti/api/v1/content_item/{content_item_id}",
-        headers={"Authorization": f"Bearer {'123'}"},
+        f"http://lti/lti/api/v1/content-item/{content_item_id}",
+        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
         timeout=60)
     content_item_data = content_item_req.json().get("data")
 
     # create a copy of above content item
     content_item_data["context_id"] = data.get("context_id")
+    del content_item_data["id"]
+    del content_item_data["created_time"]
+    del content_item_data["last_modified_time"]
     copy_content_item_req = requests.post(
-        "http://lti/lti/api/v1/content_item",
-        headers={"Authorization": f"Bearer {'123'}"},
+        "http://lti/lti/api/v1/content-item",
+        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
         json=content_item_data,
         timeout=60)
 
     copy_content_item_data = copy_content_item_req.json().get("data")
-
     copy_content_item_id = copy_content_item_data.get("id")
 
     new_lti_assignment_data = {
@@ -214,14 +223,9 @@ def copy_lti_assignment(data: dict):
         "lti_content_item_id": copy_content_item_data.get("id"),
         "course_work_id": None
     }
-    copy_lti_assignment_item_req = requests.post(
-        "http://lti/lti/api/v1/content_item",
-        headers={"Authorization": f"Bearer {'123'}"},
-        json=new_lti_assignment_data,
-        timeout=60)
-
-    new_lti_assignment_data = copy_lti_assignment_item_req.json()
-    return {"data": new_lti_assignment_data}
+    new_lti_assignment_item = create_lti_assignment(
+        InputLTIAssignmentModel.parse_obj(new_lti_assignment_data))
+    return new_lti_assignment_data
 
   except ResourceNotFoundException as e:
     Logger.error(e)

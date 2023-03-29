@@ -21,8 +21,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: lti
-  minReplicas: 3
-  maxReplicas: 110
+  minReplicas: 1
+  maxReplicas: 1
   metrics:
   - type: Resource
     #resource:
