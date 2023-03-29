@@ -186,6 +186,56 @@ def test_enroll_student_already_present(client_with_emulator, create_fake_data):
   assert resp.status_code == 409, "Status 409"
   assert resp.json()["success"] is False
 
+def test_enroll_student_already_present_section\
+  (client_with_emulator, create_fake_data):
+
+  url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
+  with mock.patch("routes.student.classroom_crud.enroll_student",
+  return_value ={"user_id":"test_user_id"}):
+    with mock.patch(
+      "services.student_service.check_student_can_enroll_in_section",
+    return_value =False):
+      with mock.patch("routes.student.Logger"):
+        resp = client_with_emulator.post(url, json=input_data)
+  assert resp.status_code == 409, "Status 409"
+  assert resp.json()["success"] is False
+
+def test_enroll_student_section(client_with_emulator, create_fake_data):
+
+  url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
+  with mock.patch("routes.student.classroom_crud.enroll_student",
+  return_value ={"user_id":"test_user_id"}):
+    with mock.patch(
+      "services.student_service.check_student_can_enroll_in_cohort",
+    return_value =True):
+      with mock.patch("routes.student.Logger"):
+        resp = client_with_emulator.post(url, json=input_data)
+  assert resp.status_code == 200, "Status 200"
+  assert resp.json()["success"] is True
+  assert resp.json()["data"]["classroom_url"] == "https://classroom.google.com"
+  assert resp.json()["data"]["classroom_id"] == "cl_id"
+
+def test_enroll_student_section_negative(client_with_emulator):
+  url = BASE_URL + "/sections/fake_section_id/students"
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
+  with mock.patch("routes.section.classroom_crud.enroll_student"):
+    with mock.patch("routes.section.Logger"):
+      resp = client_with_emulator.post(url, json=input_data)
+
+  assert resp.status_code == 404, "Status 404"
+  assert resp.json()["success"] is False, "Check success"
+
 def test_get_student_in_cohort_email(client_with_emulator,create_fake_data):
   cohort_id = create_fake_data["cohort"]
   url = BASE_URL + f"/cohorts/{cohort_id}/students/clplmstestuser1@gmail.com"
