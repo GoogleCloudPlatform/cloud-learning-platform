@@ -6,7 +6,8 @@ import argparse
 from os import listdir
 from google.cloud import bigquery
 from google.api_core.exceptions import BadRequest
-
+# disabling for linting to pass
+# pylint: disable = broad-exception-raised
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
 GCP_PROJECT = os.getenv("PROJECT_ID", None)
@@ -20,7 +21,7 @@ bq_client = bigquery.Client(location=BQ_REGION)
 
 
 def create_bigquery_dataset(dataset):
-  """Delete a dataset from the bigquery"""
+  """Create a dataset in the bigquery"""
   dataset_id = f"{GCP_PROJECT}.{dataset}"
   print("Dataset_id", dataset_id)
   dataset = bigquery.Dataset(dataset_id)
@@ -65,6 +66,7 @@ def create_tables(dataset):
 
 
 def create_views(dataset):
+  """Create tables in the bigquery """
   print("dataset", dataset)
   sql_file_list = []
 
@@ -111,7 +113,8 @@ if __name__ == "__main__":
   # be logged in to the respective GCP project using google sdk
 
   # Set the following environment variables
-  # BQ_DATASET -<dataset-name> (default -> lms_analytics), GCP_PROJECT -<project_id>
+  # BQ_DATASET -<dataset-name> (default -> lms_analytics),
+  # GCP_PROJECT -<project_id>
   # Run the following command with the required arguments to trigger the script
   # cd utils
   # PYTHONPATH=../common/src python3 bq_setup.py

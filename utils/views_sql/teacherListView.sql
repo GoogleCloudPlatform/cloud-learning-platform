@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW
-`lms_analytics.studentListView` as
+`lms_analytics.teacherListView` as
 SELECT
 roster_resource.userId,
 roster_collection,
@@ -9,4 +9,4 @@ course_id,
 section_name,
 cohort_name,
 FROM `lms_analytics.courseRosterEnrichmentView`
-WHERE roster_collection = 'courses.students'
+WHERE roster_collection = 'courses.teachers'
