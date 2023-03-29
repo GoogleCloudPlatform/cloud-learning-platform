@@ -22,7 +22,7 @@ from google.cloud import pubsub_v1
 from common.utils.logging_handler import Logger
 from config import PUB_SUB_PROJECT_ID, DATABASE_PREFIX
 from service import roster_service,course_work_service
-from helper.bq_helper import check_bq_tables
+from helper.bq_check import check_bq_tables
 
 # disabling for linting to pass
 # pylint: disable = broad-except

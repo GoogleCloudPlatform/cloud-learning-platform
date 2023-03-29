@@ -18,11 +18,11 @@ import datetime
 import json
 import uuid
 from common.utils.logging_handler import Logger
+from common.utils.bq_helper import insert_rows_to_bq
 from googleapiclient.errors import HttpError
-from helper.bq_helper import insert_rows_to_bq
 from helper.classroom_helper import get_course_work,get_student_submissions
 from helper.json_helper import convert_dict_array_to_json,convert_to_json
-from config import BQ_TABLE_DICT
+from config import BQ_TABLE_DICT,BQ_DATASET
 # disabling for linting to pass
 # pylint: disable = broad-except
 
@@ -45,6 +45,7 @@ def save_course_work(data):
     if data["eventType"] == "DELETED":
       return insert_rows_to_bq(
             rows=rows,
+            dataset=BQ_DATASET,
             table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"]
         )
 
@@ -52,6 +53,7 @@ def save_course_work(data):
       if data["collection"].split(".")[2] == "studentSubmissions":
         return insert_rows_to_bq(
             rows=rows,
+            dataset=BQ_DATASET,
             table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"]
             ) & save_student_submission(
                 course_id=data["resourceId"]["courseId"],
@@ -61,6 +63,7 @@ def save_course_work(data):
                 event_type=data["eventType"])
     else:
       return insert_rows_to_bq(rows=rows,
+                               dataset=BQ_DATASET,
                                table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"]
                                ) & save_course_work_collection(
             course_id=data["resourceId"]["courseId"],
@@ -100,6 +103,7 @@ def save_course_work_collection(course_id,course_work_id,message_id,event_type):
   course_work["event_type"] = event_type
   course_work["timestamp"] = datetime.datetime.utcnow()
   return insert_rows_to_bq(rows=[course_work],
+                           dataset=BQ_DATASET,
                            table_name=BQ_TABLE_DICT["BQ_COLL_CW_TABLE"])
 
 
@@ -130,7 +134,9 @@ def save_student_submission(course_id, course_work_id,
       submission, "multipleChoiceSubmission")
   submission["event_type"] = event_type
   submission["timestamp"] = datetime.datetime.utcnow()
-  return insert_rows_to_bq([submission], BQ_TABLE_DICT["BQ_COLL_SCW_TABLE"])
+  return insert_rows_to_bq(rows=[submission],
+                           dataset=BQ_DATASET,
+                           table_name=BQ_TABLE_DICT["BQ_COLL_SCW_TABLE"])
 
 
 

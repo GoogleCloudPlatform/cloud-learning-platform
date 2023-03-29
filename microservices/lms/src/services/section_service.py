@@ -5,14 +5,13 @@ from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.models import  Section
 from common.utils.http_exceptions import (
-                      InternalServerError,ResourceNotFound)
+                     InternalServerError,ResourceNotFound)
+from common.utils.bq_helper import insert_rows_to_bq
 from services import common_service
-from config import BQ_TABLE_DICT
-from utils.helper import insert_rows_to_bq
+from config import BQ_TABLE_DICT,BQ_DATASET
+
 # disabling for linting to pass
 # pylint: disable = broad-except
-
-
 def copy_course_background_task(course_template_details,
                                 sections_details,
                                 cohort_details,headers,message=""):
@@ -206,8 +205,11 @@ def copy_course_background_task(course_template_details,
         "courseTemplateId":course_template_details.id,\
           "timestamp":datetime.datetime.utcnow()
     }]
-    insert_rows_to_bq\
-    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
+    insert_rows_to_bq(
+      rows=rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"]
+      )
     Logger.info(message)
     Logger.info(f"Background Task Completed for section Creation for cohort\
                 {cohort_details.id}")

@@ -7,7 +7,8 @@ from google.cloud import firestore_admin_v1
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
 PROJECT_ID = os.getenv("PROJECT_ID", None)
-
+# disabling for linting to pass
+# pylint: disable = broad-exception-raised, broad-except
 
 def delete_index(index_id):
   client = firestore_admin_v1.FirestoreAdminClient()
@@ -21,8 +22,9 @@ def delete_index(index_id):
 
 
 def fetch_and_remove_indexes(collection):
-  parent = "projects/{}/databases/(default)/collectionGroups/{}".format(
-      PROJECT_ID, collection)
+  """Fetch and remove indexes"""
+  parent = (f"projects/{PROJECT_ID}/databases/"
+            +f"(default)/collectionGroups/{collection}")
 
   client = firestore_admin_v1.FirestoreAdminClient()
   request = firestore_admin_v1.ListIndexesRequest(parent=parent)
@@ -46,9 +48,10 @@ if __name__ == "__main__":
   with open("indexe_rules.json", encoding="utf-8") as indexes_file:
     indexes = json.load(indexes_file)
 
-  collection_groups = list(set([i["collection_group"] for i in indexes]))
+  collection_groups = [i["collection_group"] for i in indexes]
 
-  collection_groups = [DATABASE_PREFIX + i for i in collection_groups]
+  collection_groups = [DATABASE_PREFIX + i for i in list(
+    set(collection_groups))]
 
   for collection_group in collection_groups:
     fetch_and_remove_indexes(collection_group)
