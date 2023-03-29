@@ -8,7 +8,7 @@ from google.cloud import firestore_admin_v1
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
 PROJECT_ID = os.getenv("PROJECT_ID", None)
 # disabling for linting to pass
-# pylint: disable = broad-except
+# pylint: disable = broad-exception-raised, broad-except
 
 def delete_index(index_id):
   client = firestore_admin_v1.FirestoreAdminClient()

@@ -7,7 +7,7 @@ from os import listdir
 from google.cloud import bigquery
 from google.api_core.exceptions import BadRequest
 # disabling for linting to pass
-# pylint: disable = broad-except
+# pylint: disable = broad-exception-raised
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
 GCP_PROJECT = os.getenv("PROJECT_ID", None)

@@ -11,7 +11,7 @@ PROJECT_ID = os.getenv("PROJECT_ID", None)
 
 client = firestore_admin_v1.FirestoreAdminClient()
 # disabling for linting to pass
-# pylint: disable = broad-except
+# pylint: disable = broad-exception-raised, broad-except
 
 def create_index(index_data):
   """Create index in the firestore"""

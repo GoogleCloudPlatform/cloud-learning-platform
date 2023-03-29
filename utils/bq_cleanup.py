@@ -5,7 +5,7 @@ import os
 from google.cloud import bigquery
 
 # disabling for linting to pass
-# pylint: disable = broad-except
+# pylint: disable = broad-exception-raised
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
