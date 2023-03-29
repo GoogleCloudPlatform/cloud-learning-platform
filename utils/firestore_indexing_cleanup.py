@@ -48,9 +48,10 @@ if __name__ == "__main__":
   with open("indexe_rules.json", encoding="utf-8") as indexes_file:
     indexes = json.load(indexes_file)
 
-  collection_groups = list(set([i["collection_group"] for i in indexes]))
+  collection_groups = [i["collection_group"] for i in indexes]
 
-  collection_groups = [DATABASE_PREFIX + i for i in collection_groups]
+  collection_groups = [DATABASE_PREFIX + i for i in list(
+    set(collection_groups))]
 
   for collection_group in collection_groups:
     fetch_and_remove_indexes(collection_group)
