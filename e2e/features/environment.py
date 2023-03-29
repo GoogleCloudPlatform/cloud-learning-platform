@@ -204,7 +204,8 @@ def enroll_student_course(context):
     "section_id": section.id,
     "user_id":temp_user.id,
     "email": student_email_and_token["email"].lower(),
-    "cohort_id":section.cohort.id
+    "cohort_id":section.cohort.id,
+    "access_token":student_email_and_token["access_token"].lower()
     }
   print("Enroll student fixture cohort id",section.cohort.id)
   yield context.enroll_student_data

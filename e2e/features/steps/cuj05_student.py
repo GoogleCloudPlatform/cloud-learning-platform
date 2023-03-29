@@ -209,6 +209,27 @@ def step_impl_30(context):
   assert context.status == 422, "Status 422"
   assert context.response["success"] is False, "Check success"
 
+# Negative scenario student is already enrolled and trying to enroll again
+@behave.given("A student is aleardy enrolled in course and trying to enroll in same course")
+def step_impl_31(context):
+  section_id = context.enroll_student_data["section_id"]
+  student_email = context.enroll_student_data["email"]
+  access_token = context.enroll_student_data["access_token"]
+  context.url = f'{API_URL}/sections/{section_id}/students'
+  context.payload = {"email": student_email,"access_token":access_token}
+
+
+@behave.when("API request is sent to enroll student to a section with valid section id")
+def step_impl_32(context):
+  resp = requests.post(context.url, json=context.payload,headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then("Student will not be enrolled and API will throw a conflict error")
+def step_impl_33(context):
+  assert context.status == 409, "Status 409"
+  assert context.response["success"] is True, "Check success"
 
 
 

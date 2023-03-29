@@ -60,3 +60,9 @@ Feature:Delete, List students in section
     Given A user has access to the portal and wants to enroll a student into a section
     When API request is sent to enroll student to a section with incorrect request payload and valid section id
     Then Student will not be enrolled and API will throw a validation error for request body
+
+  @fixture.create.enroll_student_course
+  Scenario: Enroll a student who is already enrolled in course
+    Given A student is aleardy enrolled in course and trying to enroll in same course
+    When API request is sent to enroll student to a section with valid section id
+    Then Student will not be enrolled and API will throw a conflict error
