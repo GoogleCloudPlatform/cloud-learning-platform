@@ -73,7 +73,7 @@ def create_views(dataset):
   file_path = "views_sql/"
   sql_files = listdir(file_path)
   sql_file_list = [file_path + i for i in sql_files]
-  sql_file_list.sort(key=lambda x:x[-6:])
+  sql_file_list.sort(key=lambda x:x[-7:])
   for each_file in sql_file_list:
     print(f"Running ddl_file: {each_file}")
     create_table_using_sql_file(dataset,
