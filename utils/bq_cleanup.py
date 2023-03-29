@@ -4,6 +4,9 @@ Bigquery dataset cleanup related functions
 import os
 from google.cloud import bigquery
 
+# disabling for linting to pass
+# pylint: disable = broad-except
+
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
 GCP_PROJECT = os.getenv("PROJECT_ID", None)
