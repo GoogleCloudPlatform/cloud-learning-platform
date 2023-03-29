@@ -165,7 +165,7 @@ def step_impl_23(context):
   print("ADD_STUDENT RESPONSE _________",resp.json())
 
 
-@behave.then("Section will be fetch using the given id and student is enrolled using student credentials and a response model object will be return")
+@behave.then("Student is enrolled in given section")
 def step_impl_24(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
@@ -185,7 +185,7 @@ def step_impl_26(context):
   context.response = resp.json()
 
 
-@behave.then("Student will not be enrolled and API will throw a resource not found error")
+@behave.then("Student is not enrolled and api returns section not found error")
 def step_impl_27(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
@@ -204,7 +204,7 @@ def step_impl_29(context):
   context.response = resp.json()
 
 
-@behave.then("Student will not be enrolled and API will throw a validation error")
+@behave.then("Student will not be enrolled and API will throw a validation error for request body")
 def step_impl_30(context):
   assert context.status == 422, "Status 422"
   assert context.response["success"] is False, "Check success"
