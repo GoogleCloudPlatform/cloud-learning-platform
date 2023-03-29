@@ -461,7 +461,6 @@ def enroll_student_section(section_id: str,
         f"Successfully Added the Student with email {input_data.email}",
         "data" : response_dict
     }
-
   except InvalidTokenError as ive:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)

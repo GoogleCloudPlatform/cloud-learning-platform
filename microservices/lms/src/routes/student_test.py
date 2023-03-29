@@ -211,12 +211,12 @@ def test_enroll_student_section(client_with_emulator, create_fake_data):
       "email": "student@gmail.com",
       "access_token": CREDENTIAL_JSON["token"]
   }
-  with mock.patch("routes.student.classroom_crud.enroll_student",
-  return_value ={"user_id":"test_user_id"}):
-    with mock.patch(
-      "services.student_service.check_student_can_enroll_in_cohort",
-    return_value =True):
-      with mock.patch("routes.student.Logger"):
+  with mock.patch("routes.student.Logger"):
+    with mock.patch("routes.student.classroom_crud.enroll_student",
+      return_value ={"user_id":"test_user_id"}):
+      with mock.patch(
+        "services.student_service.check_student_can_enroll_in_section",
+        return_value =True):
         resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True

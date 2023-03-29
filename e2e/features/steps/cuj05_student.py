@@ -143,3 +143,72 @@ def step_impl_20(context):
 def step_impl_21(context):
   assert context.status == 200, "Status 200"
   assert "invitation_id" in context.response["data"].keys()
+
+# --------------------------------Enroll student to section-------------------------------
+
+
+@behave.given("A user has access privileges and wants to enroll a student into a section")
+def step_impl_22(context):
+  # context.url = f'{API_URL}/sections/{context.sections.id}/students'
+  context.url = f'{API_URL}/sections/{context.sections.id}/students'
+  context.payload = get_student_email_and_token()
+
+
+
+@behave.when("API request is sent to enroll student to a section with correct request payload and valid section id")
+def step_impl_23(context):
+  resp = requests.post(context.url, json=context.payload,headers=context.header)
+  print("THIS IS RESPONSE FROM ENROLLL STUDNET POSITIVE__")
+  print(resp.json())
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("ADD_STUDENT RESPONSE _________",resp.json())
+
+
+@behave.then("Section will be fetch using the given id and student is enrolled using student credentials and a response model object will be return")
+def step_impl_24(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "Check success"
+
+# Negative scenario invalid section id
+
+@behave.given("A user has access to portal and needs to enroll a student into a section")
+def setp_impl_25(context):
+  context.url = f'{API_URL}/sections/fake_id_data/students'
+  context.payload = get_student_email_and_token()
+
+
+@behave.when("API request is sent to enroll student to a section with correct request payload and invalid section id")
+def step_impl_26(context):
+  resp = requests.post(context.url, json=context.payload,headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then("Student will not be enrolled and API will throw a resource not found error")
+def step_impl_27(context):
+  assert context.status == 404, "Status 404"
+  assert context.response["success"] is False, "Check success"
+
+# Negative scenario incorrect request payload
+@behave.given("A user has access to the portal and wants to enroll a student into a section")
+def step_impl_28(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/students'
+  context.payload ={"email":"email@gmail.com","credentials":{"token":"token"}}
+
+
+@behave.when("API request is sent to enroll student to a section with incorrect request payload and valid section id")
+def step_impl_29(context):
+  resp = requests.post(context.url, json=context.payload,headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then("Student will not be enrolled and API will throw a validation error")
+def step_impl_30(context):
+  assert context.status == 422, "Status 422"
+  assert context.response["success"] is False, "Check success"
+
+
+
+
