@@ -228,6 +228,7 @@ def step_impl_32(context):
 
 @behave.then("Student will not be enrolled and API will throw a conflict error")
 def step_impl_33(context):
+  print("STatus of conflict enrollstudent",context.status,context.response)
   assert context.status == 409, "Status 409"
   assert context.response["success"] is False, "Checks failure"
 
