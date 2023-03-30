@@ -215,12 +215,15 @@ def step_impl_31(context):
   section_id = context.enroll_student_data["section_id"]
   student_email = context.enroll_student_data["email"]
   access_token = context.enroll_student_data["access_token"]
+  print("ENrolled student data from Fixture_ conflict__",context.enroll_student_data)
   context.url = f'{API_URL}/sections/{section_id}/students'
   context.payload = {"email": student_email,"access_token":access_token}
+  print("Enroll Payload for conflict__________",context.payload)
 
 
 @behave.when("API request is sent to enroll student to a section with valid section id")
 def step_impl_32(context):
+
   resp = requests.post(context.url, json=context.payload,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
