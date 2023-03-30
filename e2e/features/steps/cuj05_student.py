@@ -142,9 +142,9 @@ def step_impl_21(context):
 
 @behave.given("A user has access privileges and wants to enroll a student into a section")
 def step_impl_22(context):
-  # context.url = f'{API_URL}/sections/{context.sections.id}/students'
   context.url = f'{API_URL}/sections/{context.sections.id}/students'
-  context.payload = get_student_email_and_token()
+  student_details = get_student_email_and_token()
+  context.payload = {"email":student_details["email"],"access_token":student_details["access_token"]}
 
 
 
