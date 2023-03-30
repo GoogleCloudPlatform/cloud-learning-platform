@@ -70,6 +70,37 @@ def check_student_can_enroll_in_cohort(email,headers,sections):
         return False
   return True
 
+def check_student_can_enroll_in_section(email,headers,section):
+  """
+    Args:
+    section :section objects
+    email : student email
+    headers : Authentication headers
+    Returns: boolean value
+    True : Student can be enroll
+
+  """
+  try:
+    student_details = classroom_crud.get_user_details_by_email(user_email=email,
+                                                               headers=headers)
+  except ResourceNotFoundException as rte:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    Logger.error(rte)
+    Logger.info("Student is not present in database")
+    return True
+  print("Student details____",student_details)
+  if student_details["data"] != []:
+    user_id = student_details["data"][0]["user_id"]
+    result = CourseEnrollmentMapping.find_course_enrollment_record(
+                            section_key=section.key,
+                            user_id=user_id)
+    if result is not None:
+      Logger.error(f"Student {email} is present in section_id {section.id}")
+      return False
+  return True
+
+
 def invite_student(section,student_email,headers):
   """
     Args:
