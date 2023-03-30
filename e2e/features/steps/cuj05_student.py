@@ -74,8 +74,6 @@ def step_impl_10(context):
 @behave.when("API request with valid cohort Id  user_id is sent")
 def step_impl_11(context):
   resp = requests.get(context.url,headers=context.header)
-  print("GET student cohort response",resp.status_code)
-  print(resp.json())
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -95,7 +93,6 @@ def step_impl_13(context):
 @behave.when("API request is sent with valid section id and email")
 def step_impl_14(context):
   resp = requests.post(context.url,headers=context.header)
-  print(resp.json())
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -123,7 +120,6 @@ def step_impl_18(context):
 #------------------------------Invite student to cohort------------------------------
 @behave.given("A user is invited to a cohort_id using email")
 def step_impl_19(context):
-  print("IN Invite student ID",context.sections.cohort.id)
   student_email =get_student_email_and_token()
   context.url = f'{API_URL}/cohorts/{context.sections.cohort.id}/invite/{student_email["invite_student_email"]}'
 
@@ -132,11 +128,8 @@ def step_impl_19(context):
 @behave.when("API request is sent with valid cohort id and email")
 def step_impl_20(context):
   resp = requests.post(context.url,headers=context.header)
-  print("THIS IS RESPONSE FROM INVITE STUDNET cohort ")
-  print(resp.json())
   context.status = resp.status_code
   context.response = resp.json()
-  print("ADD_STUDENT RESPONSE _________",resp.json())
 
 
 @behave.then("Invitation is sent to student via email and student invited to section with min enrolled student count")
@@ -158,11 +151,8 @@ def step_impl_22(context):
 @behave.when("API request is sent to enroll student to a section with correct request payload and valid section id")
 def step_impl_23(context):
   resp = requests.post(context.url, json=context.payload,headers=context.header)
-  print("THIS IS RESPONSE FROM ENROLLL STUDNET POSITIVE__")
-  print(resp.json())
   context.status = resp.status_code
   context.response = resp.json()
-  print("ADD_STUDENT RESPONSE _________",resp.json())
 
 
 @behave.then("Student is enrolled in given section")
@@ -215,10 +205,8 @@ def step_impl_31(context):
   section_id = context.enroll_student_data["section_id"]
   student_email = context.enroll_student_data["email"]
   access_token = context.enroll_student_data["access_token"]
-  print("ENrolled student data from Fixture_ conflict__",context.enroll_student_data)
   context.url = f'{API_URL}/sections/{section_id}/students'
   context.payload = {"email": student_email,"access_token":access_token}
-  print("Enroll Payload for conflict__________",context.payload)
 
 
 @behave.when("API request is sent to enroll student to a section with valid section id")
@@ -231,7 +219,6 @@ def step_impl_32(context):
 
 @behave.then("Student will not be enrolled and API will throw a conflict error")
 def step_impl_33(context):
-  print("STatus of conflict enrollstudent",context.status,context.response)
   assert context.status == 409, "Status 409"
   assert context.response["success"] is False, "Checks failure"
 
