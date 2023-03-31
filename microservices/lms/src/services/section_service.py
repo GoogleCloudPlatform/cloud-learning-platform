@@ -13,7 +13,7 @@ from config import BQ_TABLE_DICT, BQ_DATASET
 
 
 # disabling for linting to pass
-# pylint: disable = broad-except
+# pylint: disable = broad-except, line-too-long
 def copy_course_background_task(course_template_details,
                                 sections_details,
                                 cohort_details,
@@ -206,7 +206,7 @@ def copy_course_background_task(course_template_details,
         classroom_crud.acceept_invite(invitation_object["id"], teacher_email)
         user_profile = classroom_crud.\
           get_user_profile_information(teacher_email)
-        # Save the new record of seecion in firestore
+        # Save the new record of section in firestore
         data = {
             "first_name": user_profile["name"]["givenName"],
             "last_name": user_profile["name"]["familyName"],

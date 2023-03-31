@@ -99,7 +99,6 @@ def copy_courses(course_details: CourseDetails):
                                               current_course["section"],
                                               current_course["ownerId"]
                                               )
-    saved_lti_assignments_in_coursework = []
     target_folder_id = new_course["teacherFolder"]["id"]
     # Get topics of current course
     topics = classroom_crud.get_topics(course_id)
@@ -122,11 +121,11 @@ def copy_courses(course_details: CourseDetails):
         if "materials" in coursework.keys():
           # Calling function to get edit_url and view url of google
           #  form which returns
-          # a dictionary of view_links as keys and edit likns as
+          # a dictionary of view_links as keys and edit links as
           # values of google form
           url_mapping = classroom_crud.\
             get_edit_url_and_view_url_mapping_of_form()
-          # Loop to check if a material in courssework has
+          # Loop to check if a material in coursework has
           #  a google form attached to it
           # update the  view link to edit link and attach it as a form
           for material in coursework["materials"]:
@@ -171,10 +170,10 @@ def copy_courses(course_details: CourseDetails):
           # Calling function to get edit_url and view url of
           # google form which returns
           # a dictionary of view_links as keys and edit
-          #  likns as values of google form
+          #  links as values of google form
           url_mapping = classroom_crud.\
             get_edit_url_and_view_url_mapping_of_form()
-          # Loop to check if a material in courssework has a google
+          # Loop to check if a material in coursework has a google
           # form attached to it
           # update the  view link to edit link and attach it as a form
           for material in coursework_material["materials"]:
@@ -224,7 +223,7 @@ def copy_courses(course_details: CourseDetails):
 @router.post("/{course_id}/enable_notifications",
              response_model=EnableNotificationsResponse)
 def classroom_enable_notifications_pub_sub(course_id:str):
-  """Resgister course with a pub/sub topic
+  """Register course with a pub/sub topic
 
   Args:
       course_id (str): unique course id
