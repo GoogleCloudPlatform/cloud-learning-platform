@@ -225,7 +225,7 @@ def copy_lti_assignment(data: dict):
     }
     new_lti_assignment_item = create_lti_assignment(
         InputLTIAssignmentModel.parse_obj(new_lti_assignment_data))
-    return new_lti_assignment_data
+    return new_lti_assignment_item
 
   except ResourceNotFoundException as e:
     Logger.error(e)
