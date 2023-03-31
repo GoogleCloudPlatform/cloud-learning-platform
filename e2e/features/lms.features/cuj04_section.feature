@@ -1,14 +1,14 @@
 @fixture.get.header
-Feature: Add student to section
+Feature: Add student to cohort
 
   @fixture.create.section
-  Scenario: Add student to a section using a payload
-    Given A user has access privileges and wants to enroll a student into a section
-    When API request is sent to enroll student to a section with correct request payload and valid section id
+  Scenario: Add student to a cohort using a payload
+    Given A user has access privileges and wants to enroll a student into a cohort
+    When API request is sent to enroll student to a section with correct request payload and valid cohort id
     Then Section will be fetch using the given id and student is enrolled using student credentials and a response model object will be return
 
-  Scenario: Unable to Add student to a section using a payload
-    Given A user has access to portal and needs to enroll a student into a section
+  Scenario: Unable to Add student to a cohort using a payload
+    Given A user has access to portal and needs to enroll a student into a cohort
     When API request is sent to enroll student to a section with correct request payload and invalid cohort id
     Then Student will not be enrolled and API will throw a resource not found error
 
@@ -20,8 +20,8 @@ Feature: Add student to section
 
   @fixture.create.section
   Scenario: Add student to a section using a workspace email and a payload
-    Given A user has access privileges and wants to enroll a student using his/her workspace email into a section
-    When API request is sent to enroll workspace email as a student to a section with correct request payload and valid section id
+    Given A user has access privileges and wants to enroll a student using his/her workspace email into a cohort
+    When API request is sent to enroll workspace email as a student to a cohort with correct request payload and valid cohort id
     Then Section will be fetch using the given id and student is enrolled using student access token and his workspace email and a response model object will be return
 
   @fixture.create.section
