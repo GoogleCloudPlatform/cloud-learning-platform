@@ -17,7 +17,6 @@
 """
 # pylint: disable=unspecified-encoding
 import os
-import json
 from common.utils.logging_handler import Logger
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
@@ -71,6 +70,11 @@ OPENAI_API_KEY = secrets.access_secret_version(
                 "/secrets/openai-api-key/versions/latest"
     }).payload.data.decode("utf-8")
 
+OPENAI_LLM_TYPE = "openai"
+
+LLM_TYPES = [OPENAI_LLM_TYPE]
+
 LANGCHAIN_LLM = {
-  "openai": OpenAI(openai_api_key=OPENAI_API_KEY, model_name="gpt-3.5-turbo")
+  OPENAI_LLM_TYPE: OpenAI(openai_api_key=OPENAI_API_KEY,
+                          model_name="gpt-3.5-turbo")
 }

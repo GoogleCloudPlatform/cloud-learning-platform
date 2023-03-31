@@ -11,11 +11,39 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" Langchain service """
-from langchain import PromptTemplate, LLMChain
-from config import LANGCHAIN_LLM
 
-def langchain_llm_generate(llm, prompt):
-  openai_llm = LANGCHAIN_LLM.get("openai")
-  result = openai_llm(prompt)
-  return result
+""" Langchain service """
+
+from common.utils.http_exceptions import InternalServerError
+from typing import Optional
+from langchain import LLMModel, PromptTemplate, LLMChain
+from config import LANGCHAIN_LLM, OPENAI_LLM_TYPE
+
+async def langchain_llm_generate(prompt: str, llm_type: str,
+                                 llm: Optional[LLMModel] = None):
+  """
+  Use langchain to generate text with an LLM given a prompt.  This is 
+    always done asychronously, and so must be used in a route defined with 
+    async def.
+
+  Args:
+    prompt: the text prompt to pass to the LLM
+
+    llm_type: the type of LLM to use (default to openai)
+
+    llm (optional): a langchain llm object to use, perhaps specific to 
+      a user
+
+  Returns:
+    the text result.
+  """
+  try:
+    if llm is None:
+      llm = LANGCHAIN_LLM.get(llm_type, OPENAI_LLM_TYPE)
+
+    # we always use await for LLM calls
+    result = await llm.agenerate(prompt)
+
+    return result
+  except Exception as e:
+    raise InternalServerError(str(e)) from e

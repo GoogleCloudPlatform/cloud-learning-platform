@@ -25,14 +25,14 @@ from schemas.error_schema import (NotFoundErrorResponseModel,
                                   PayloadTooLargeResponseModel)
 from services.json_import import json_import
 from services.langchain_service import langchain_llm_generate
-from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES
+from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, OPENAI_LLM_TYPE
 
 router = APIRouter(tags=["LLMs"], responses=ERROR_RESPONSES)
 
 # pylint: disable = broad-except
 
 @router.post("/llm/generate", response_model=LLMGenerateResponse)
-def generate(prompt: Required[str] = "", config: Optional[dict] = None):
+async def generate(prompt: Required[str] = "", config: Optional[dict] = None):
   """
   Generate text with an LLM
 
@@ -44,24 +44,30 @@ def generate(prompt: Required[str] = "", config: Optional[dict] = None):
   """
   result = []
   user_llm = None
+  userid = None
+
+  # default to openai LLM
+  llm_type = OPENAI_LLM_TYPE
+
   if config is not None:
-    llm_type = config.get("llm_type")
+    llm_type = config.get("llm_type", OPENAI_LLM_TYPE)
     userid = config.get("userid")
-    user_llm = LLMModel.find(userid, llm_type)
 
-  if user_llm is None:
-    user_llm = LLMModel(userid=userid, llm_type=llm_type)
+  try:
+    if userid is not None:
+      user_llm = LLMModel.find(userid, llm_type)
 
-  prompt = langchain_llm_generate(user_llm, prompt)
+    prompt = await langchain_llm_generate(prompt, llm_type, user_llm)
 
-  if prompt:
-    result = {"result": prompt}
+    if prompt:
+      result = {"result": prompt}
 
-    return {
-        "success": True,
-        "message": "Successfully generated text",
-        "data": result
-    }
-  else:
-    return BadRequest("Missing or invalid request parameters")
-
+      return {
+          "success": True,
+          "message": "Successfully generated text",
+          "data": result
+      }
+    else:
+      return BadRequest("Missing or invalid request parameters")
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
