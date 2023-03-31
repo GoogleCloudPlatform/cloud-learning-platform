@@ -197,7 +197,7 @@ ANALYTICS_SUBMISSION_EXAMPLE={
     "submission_late": False,
     "submission_draft_grade": 10,
     "submission_assigned_grade": 10,
-    "submission_alternate_link": 
+    "submission_alternate_link":
         "https://classroom.google.com/c/xyz/a/wert/submissions/student/ter",
     "submission_course_work_type": "ASSIGNMENT",
     "submission_associated_with_developer": True,
@@ -255,7 +255,7 @@ ANALYTICS_COURSE_WORK_EXAMPLE={
     "course_work_state": "PUBLISHED",
     "course_work_alternate_link":
         "https://classroom.google.com/c/xyz/a/gh/details",
-    "course_work_creation_time": 
+    "course_work_creation_time":
         "2023-03-02T17:50:24.127000+00:00",
     "course_work_update_time": "2023-03-02T17:50:23.406000+00:00",
     "course_work_due_date": "2023-03-15",
@@ -270,7 +270,7 @@ ANALYTICS_COURSE_WORK_EXAMPLE={
         "string"
     ]
     },
-    "course_work_submission_modification_mode" : 
+    "course_work_submission_modification_mode" :
         "MODIFIABLE_UNTIL_TURNED_IN",
     "course_work_creator_user_id": "12309876543",
     "course_work_topic_id": "09876544445678",

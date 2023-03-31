@@ -33,7 +33,7 @@ def convert_str_to_dict(obj):
   """convert obj to dict if required
 
   Args:
-      obj (str): json string 
+      obj (str): json string
 
   Returns:
       dict: return dict
