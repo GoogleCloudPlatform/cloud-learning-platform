@@ -1,7 +1,6 @@
 """
   Classroom Shim Microservice
 """
-
 # pylint: disable=pointless-string-statement
 # pylint: disable=wrong-import-position
 """ For Local Development
@@ -35,10 +34,11 @@ def health_check():
 
 api = FastAPI(title="Classroom Shim Service APIs", version="latest")
 
-api.include_router(assignment_copy.router)
 api.include_router(launch.router)
-api.include_router(lti_assignment.router)
-api.include_router(grade.router)
+api.include_router(
+    assignment_copy.router, dependencies=[Depends(validate_user)])
+api.include_router(lti_assignment.router, dependencies=[Depends(validate_user)])
+api.include_router(grade.router, dependencies=[Depends(validate_user)])
 
 add_exception_handlers(app)
 add_exception_handlers(api)
