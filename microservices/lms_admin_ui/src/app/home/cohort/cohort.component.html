@@ -98,7 +98,15 @@
 </ng-template> -->
 
 <mat-menu #subMenu="matMenu" yPosition="below">
-    <div class="edit-menu">
+
+    <div class="edit-menu child-1">
+        <button (click)="openInviteModal()" mat-menu-item class="button"><span class="material-symbols-rounded"
+                style="padding-right: 10px;">
+                person_add
+            </span>Invite student</button>
+    </div>
+
+    <div class="edit-menu child-2">
         <button (click)="openEditModal()" mat-menu-item class="button"><span class="material-symbols-rounded"
                 style="padding-right: 10px;">
                 edit

@@ -1,0 +1,44 @@
+<h1 mat-dialog-title>Invite student in {{InviteStudentModalData.mode}}</h1>
+<div mat-dialog-content>
+
+
+    <form [formGroup]="inviteStudentForm" class="invite-student-form">
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Cohort name</mat-label>
+            <input matInput formControlName="cohortName">
+        </mat-form-field>
+
+        <ng-container *ngIf="InviteStudentModalData.mode == 'Section'">
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Section name</mat-label>
+            <input matInput formControlName="sectionName">
+        </mat-form-field>
+    </ng-container>
+
+    <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Student email</mat-label>
+        <input matInput formControlName="studentEmail">
+        <mat-hint align="start"> <div class="hint-style"><span class="material-symbols-rounded info-icon">info</span> <strong>Please enter an email</strong></div> </mat-hint>
+    </mat-form-field>
+
+        <ng-template #elseTemplate>
+            <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Instructional Designer</mat-label>
+                <input matInput formControlName="instructional_designer">
+                <mat-hint align="start"> <div class="hint-style"><span class="material-symbols-rounded info-icon">info</span> <strong>Please enter an email</strong></div> </mat-hint>
+            </mat-form-field>
+        </ng-template>
+
+    </form>
+
+
+</div>
+<div mat-dialog-actions>
+    <button mat-flat-button (click)="onNoClick()">Cancel</button>
+    <button mat-flat-button color="primary" (click)="inviteStudent()" [disabled]="!inviteStudentForm.valid">
+        <mat-icon *ngIf="showProgressSpinner" style="margin-right:5px;">
+            <mat-spinner diameter="20"></mat-spinner>
+        </mat-icon>Invite
+    </button>
+</div>

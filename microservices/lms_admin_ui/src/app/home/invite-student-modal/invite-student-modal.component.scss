@@ -1,0 +1,22 @@
+:host ::ng-deep .mat-progress-spinner circle,
+.mat-spinner circle {
+    stroke: #FFFFFF;
+}
+
+.hint-style{
+    display: flex;
+    align-items: center;
+    .info-icon{
+        font-size: 1rem;
+        font-weight: 800;
+        margin-right: 5px;
+    }
+}
+
+:host ::ng-deep .mat-dialog-content {
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+  }
+.invite-student-form{
+    margin-bottom: 3%;
+}

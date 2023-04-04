@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { CreateCohortModalComponent } from '../create-cohort-modal/create-cohort-modal.component';
+import { InviteStudentModalComponent } from '../invite-student-modal/invite-student-modal.component';
 interface LooseObject {
   [key: string]: any
 }
@@ -41,6 +42,24 @@ export class CohortComponent implements OnInit {
       }
     });
   }
+
+  openInviteModal() {
+    let inviteStudentModalData: LooseObject = {}
+    inviteStudentModalData['mode'] = 'Cohort'
+    inviteStudentModalData['init_data'] = this.selectedCohort
+    inviteStudentModalData['extra_data'] = ''
+    const dialogRef = this.dialog.open(InviteStudentModalComponent, {
+      width: '500px',
+      data: inviteStudentModalData
+    });
+
+    // dialogRef.afterClosed().subscribe(result => {
+    //   if (result.data == 'success') {
+    //     // this.getCohortList()
+    //   }
+    // });
+  }
+
   checkIfActive(start: string, end: string): boolean {
     let startDate = Date.parse(start)
     let endDate = Date.parse(end)

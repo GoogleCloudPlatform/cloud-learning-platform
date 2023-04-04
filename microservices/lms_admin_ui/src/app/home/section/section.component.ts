@@ -7,6 +7,7 @@ import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA
 import { CreateSectionComponent } from '../create-section/create-section.component';
 import { HomeService } from '../service/home.service';
 import { Router, NavigationStart, NavigationEnd, Event as NavigationEvent } from '@angular/router';
+import { InviteStudentModalComponent } from '../invite-student-modal/invite-student-modal.component';
 
 interface LooseObject {
   [key: string]: any
@@ -239,6 +240,27 @@ export class SectionComponent implements OnInit {
         this.getSectionStudents()
       }
     });
+  }
+
+  openInviteStudentDialog(){
+    let tempObj: LooseObject = {}
+    tempObj['cohort_name'] = this.cohortDetails.name
+    tempObj['section'] = this.selectedSection.section
+
+    let inviteStudentModalData: LooseObject = {}
+    inviteStudentModalData['mode'] = 'Section'
+    inviteStudentModalData['init_data'] = tempObj
+    inviteStudentModalData['extra_data'] = ''
+    const dialogRef = this.dialog.open(InviteStudentModalComponent, {
+      width: '500px',
+      data: inviteStudentModalData
+    });
+
+    // dialogRef.afterClosed().subscribe(result => {
+    //   if (result.data == 'success') {
+    //     this.getSectionStudents()
+    //   }
+    // });
   }
 
 }
