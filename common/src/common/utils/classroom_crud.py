@@ -111,9 +111,10 @@ def drive_copy(file_id,target_folder_id,name):
 
   copied_file = {"name": name,"parents": [target_folder_id]}
   service= build("drive", "v3", credentials=get_credentials())
-  return service.files().copy(
+  form_copy = service.files().copy(
   fileId=file_id,fields="webViewLink,name,mimeType,id",
   body=copied_file).execute()
+  return form_copy
 
 
 def copy_material(drive_file_dict,target_folder_id):
@@ -125,8 +126,9 @@ def copy_material(drive_file_dict,target_folder_id):
   Returns:
     new created drive_file_dict with new copied file id in target folder 
   """ ""
-
   file_id = drive_file_dict["driveFile"]["driveFile"]["id"]
+  if "title" not in drive_file_dict["driveFile"]["driveFile"].keys():
+    raise ResourceNotFoundException(f"File with id {file_id} not found")
   name = drive_file_dict["driveFile"]["driveFile"]["title"]
   result = drive_copy(file_id=file_id,
                       target_folder_id=target_folder_id,
@@ -134,7 +136,8 @@ def copy_material(drive_file_dict,target_folder_id):
   new_id = result["id"]
   drive_file_dict["driveFile"]["driveFile"]["id"]=new_id
   drive_file_dict["driveFile"]["driveFile"].pop("alternateLink")
-  drive_file_dict["driveFile"]["driveFile"].pop("thumbnailUrl")
+  if "thumbnaiUrl" in drive_file_dict["driveFile"]["driveFile"].keys():
+    drive_file_dict["driveFile"]["driveFile"].pop("thumbnailUrl")
   return drive_file_dict
 
 
@@ -553,7 +556,6 @@ def get_view_link_from_id(form_id):
   service = build("forms", "v1", credentials=get_credentials())
   result = service.forms().get(formId=form_id).execute()
   return result
-
 
 def invite_user(course_id, email,role):
   """Invite teacher to google classroom using course id and email

@@ -7,8 +7,9 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest, CustomHTTPException
 from common.utils import classroom_crud
-from config import (CLASSROOM_ADMIN_EMAIL,BQ_TABLE_DICT)
-from utils.helper import (convert_cohort_to_cohort_model,insert_rows_to_bq)
+from common.utils.bq_helper import insert_rows_to_bq
+from config import (CLASSROOM_ADMIN_EMAIL,BQ_TABLE_DICT,BQ_DATASET)
+from utils.helper import (convert_cohort_to_cohort_model)
 from services import common_service
 from schemas.cohort import CohortListResponseModel
 from schemas.course_template import CourseTemplateModel, CourseTemplateListModel, CreateCourseTemplateResponseModel, InputCourseTemplateModel, DeleteCourseTemplateModel, UpdateCourseTemplateModel, UpdateCourseTemplateResponseModel
@@ -213,8 +214,11 @@ request: Request):
         "timestamp":datetime.datetime.utcnow(),\
         "instructionalDesigner":course_template.instructional_designer
     }]
-    insert_rows_to_bq\
-    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
+    insert_rows_to_bq(
+      rows=rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"]
+      )
     return {"course_template": course_template}
   except HttpError as hte:
     Logger.error(hte)
@@ -306,8 +310,11 @@ def update_course_template(
         "timestamp":datetime.datetime.utcnow(),\
         "instructionalDesigner":course_template.instructional_designer
     }]
-    insert_rows_to_bq\
-    (rows=rows,table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
+    insert_rows_to_bq(
+      rows=rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"]
+      )
     return {
         "message": "Successfully Updated the " +
         f"Course Template with id {course_template_id}",

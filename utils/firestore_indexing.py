@@ -10,12 +10,14 @@ DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PROJECT_ID = os.getenv("PROJECT_ID", None)
 
 client = firestore_admin_v1.FirestoreAdminClient()
-
+# disabling for linting to pass
+# pylint: disable = broad-exception-raised, broad-except
 
 def create_index(index_data):
+  """Create index in the firestore"""
   collection_group = DATABASE_PREFIX + index_data.get("collection_group")
-  project = "projects/{}/databases/(default)/collectionGroups/{}".format(
-      PROJECT_ID, collection_group)
+  project = (f"projects/{PROJECT_ID}/databases/"
+             +f"(default)/collectionGroups/{collection_group}")
   del index_data["collection_group"]
   request = firestore_admin_v1.CreateIndexRequest(parent=project,
                                                   index=index_data)

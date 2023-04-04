@@ -37,7 +37,9 @@ class CopyCourseResponse(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully Copied the course",
-            "data": {}
+            "data": {"new_course":{},
+                    "coursework_list":[],
+                    "coursework_material":[]}
         }
     }
 
