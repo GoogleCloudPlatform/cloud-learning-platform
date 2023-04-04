@@ -31,9 +31,11 @@ router = APIRouter(
 @router.post("/lti-assignment/copy")
 def copy_lti_assignment(data: dict):
   """
-  input data format: {
+  Endpoint to copy LTIAssignment data model and its related child datamodel.
+  data format: {
     lti_assignment_id: "123",
-    context_id: "123"
+    context_id: "123",
+    section_id: "123"
   }
   """
   try:
@@ -61,7 +63,7 @@ def copy_lti_assignment(data: dict):
     copy_content_item_data = copy_content_item_req.json().get("data")
 
     new_lti_assignment_data = {
-        **assignment_data, "section_id": data.get("context_id"),
+        **assignment_data, "section_id": data.get("section_id"),
         "lti_content_item_id": copy_content_item_data.get("id"),
         "course_work_id": None
     }

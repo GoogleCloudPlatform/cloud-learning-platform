@@ -42,6 +42,54 @@ def copy_course_background_task(course_template_details,
     new_course = classroom_crud.create_course(course_template_details.name,
                                               sections_details.description,
                                               sections_details.name, "me")
+    # add Instructional designer
+    sections_details.teachers.append(
+        course_template_details.instructional_designer)
+    final_teachers = []
+    for teacher_email in set(sections_details.teachers):
+      try:
+        invitation_object = classroom_crud.invite_user(new_course["id"],
+                                                       teacher_email, "TEACHER")
+        # Storing classroom details
+        classroom_crud.acceept_invite(invitation_object["id"], teacher_email)
+        user_profile = classroom_crud.\
+          get_user_profile_information(teacher_email)
+        # Save the new record of section in firestore
+        data = {
+            "first_name": user_profile["name"]["givenName"],
+            "last_name": user_profile["name"]["familyName"],
+            "email": teacher_email,
+            "user_type": "faculty",
+            "user_type_ref": "",
+            "user_groups": [],
+            "status": "active",
+            "is_registered": True,
+            "failed_login_attempts_count": 0,
+            "access_api_docs": False,
+            "gaia_id": user_profile["id"],
+            "photo_url": user_profile["photoUrl"]
+        }
+        common_service.create_teacher(headers, data)
+        final_teachers.append(teacher_email)
+      except Exception as error:
+        error = traceback.format_exc().replace("\n", " ")
+        Logger.error(f"Create teacher failed for for {teacher_email}")
+        Logger.error(error)
+        continue
+
+    section = Section()
+    section.name = course_template_details.name
+    section.section = sections_details.name
+    section.description = sections_details.description
+    # Reference document can be get using get() method
+    section.course_template = course_template_details
+    section.cohort = cohort_details
+    section.classroom_id = new_course["id"]
+    section.classroom_code = new_course["enrollmentCode"]
+    section.classroom_url = new_course["alternateLink"]
+    section.teachers = list(set(final_teachers))
+    section.enrolled_students_count = 0
+    section_id = section.save().id
 
     target_folder_id = new_course["teacherFolder"]["id"]
     Logger.info(f"ID of target drive folder for section {target_folder_id}")
@@ -92,9 +140,9 @@ def copy_course_background_task(course_template_details,
               }
               # remove form from  material dict
               material.pop("form")
-              ## Update lti assignment with the course work details
             if "link" in material.keys():
               link = material["link"]
+              # Update lti assignment with the course work details
               if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link[
                   "url"]:
                 split_url = link["url"].split(
@@ -108,7 +156,8 @@ def copy_course_background_task(course_template_details,
                     },
                     json={
                         "lti_assignment_id": lti_assignment_id,
-                        "context_id": new_course["id"]
+                        "context_id": new_course["id"],
+                        "section_id": section_id
                     },
                     timeout=60)
 
@@ -121,7 +170,7 @@ def copy_course_background_task(course_template_details,
             new_course["id"], coursework)
         for assignment_id in lti_assignment_ids:
           coursework_id = coursework_data.get("id")
-          # get assignment
+          # get lti assignment
           lti_assignment = requests.get(
               f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
               headers={
@@ -129,7 +178,7 @@ def copy_course_background_task(course_template_details,
               },
               timeout=60)
           lti_assignment["data"]["coursework_id"] = coursework_id
-          # patch assignment
+          # update assignment with new coursework id
           lti_assignment = requests.patch(
               f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
               headers={
@@ -194,64 +243,16 @@ def copy_course_background_task(course_template_details,
     if final_coursework_material is not None:
       classroom_crud.create_coursework_material(new_course["id"],
                                                 final_coursework_material)
-    # add Instructional designer
-    sections_details.teachers.append(
-        course_template_details.instructional_designer)
-    final_teachers = []
-    for teacher_email in set(sections_details.teachers):
-      try:
-        invitation_object = classroom_crud.invite_user(new_course["id"],
-                                                       teacher_email, "TEACHER")
-        # Storing classroom details
-        classroom_crud.acceept_invite(invitation_object["id"], teacher_email)
-        user_profile = classroom_crud.\
-          get_user_profile_information(teacher_email)
-        # Save the new record of section in firestore
-        data = {
-            "first_name": user_profile["name"]["givenName"],
-            "last_name": user_profile["name"]["familyName"],
-            "email": teacher_email,
-            "user_type": "faculty",
-            "user_type_ref": "",
-            "user_groups": [],
-            "status": "active",
-            "is_registered": True,
-            "failed_login_attempts_count": 0,
-            "access_api_docs": False,
-            "gaia_id": user_profile["id"],
-            "photo_url": user_profile["photoUrl"]
-        }
-        common_service.create_teacher(headers, data)
-        final_teachers.append(teacher_email)
-      except Exception as error:
-        error = traceback.format_exc().replace("\n", " ")
-        Logger.error(f"Create teacher failed for \
-            for {teacher_email}")
-        Logger.error(error)
-        continue
-    section = Section()
-    section.name = course_template_details.name
-    section.section = sections_details.name
-    section.description = sections_details.description
-    # Reference document can be get using get() method
-    section.course_template = course_template_details
-    section.cohort = cohort_details
-    section.classroom_id = new_course["id"]
-    section.classroom_code = new_course["enrollmentCode"]
-    section.classroom_url = new_course["alternateLink"]
-    section.teachers = list(set(final_teachers))
-    section.enrolled_students_count = 0
-    section_id = section.save().id
     classroom_id = new_course["id"]
-    rows=[{
-      "sectionId": section_id,\
-      "courseId": new_course["id"],\
-      "classroomUrl": new_course["alternateLink"],\
-        "name": new_course["section"],\
-        "description": new_course["description"],\
-          "cohortId": cohort_details.id,\
-        "courseTemplateId": course_template_details.id,\
-          "timestamp": datetime.datetime.utcnow()
+    rows = [{
+        "sectionId": section_id,
+        "courseId": new_course["id"],
+        "classroomUrl": new_course["alternateLink"],
+        "name": new_course["section"],
+        "description": new_course["description"],
+        "cohortId": cohort_details.id,
+        "courseTemplateId": course_template_details.id,
+        "timestamp": datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(
         rows=rows,
