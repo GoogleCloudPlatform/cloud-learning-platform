@@ -21,8 +21,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: classroom-shim
-  minReplicas: 1
-  maxReplicas: 1
+  minReplicas: 3
+  maxReplicas: 110
   metrics:
   - type: Resource
     #resource:

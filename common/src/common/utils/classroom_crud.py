@@ -125,7 +125,7 @@ def copy_material(drive_file_dict, target_folder_id):
   target_folder_id:(str) folder_id of destination folder 
   Returns:
     new created drive_file_dict with new copied file id in target folder 
-"""
+  """
   file_id = drive_file_dict["driveFile"]["driveFile"]["id"]
   if "title" not in drive_file_dict["driveFile"]["driveFile"].keys():
     raise ResourceNotFoundException(f"File with id {file_id} not found")
@@ -297,7 +297,6 @@ def create_single_coursework(course_id, coursework):
   service = build("classroom", "v1", credentials=get_credentials())
   data = service.courses().courseWork().create(
       courseId=course_id, body=coursework).execute()
-  print("coursework data", data)
   Logger.info(data)
   Logger.info("Create coursework method worked")
   return data
@@ -361,7 +360,7 @@ def get_course_work_list(section_id):
         be fetched
     Returns:
       returns success
-    """
+  """
 
   section_details = Section.find_by_id(section_id)
   service = build("classroom", "v1", credentials=get_credentials())
