@@ -30,6 +30,9 @@ requires:
 - path: ./microservices/lti
   configs: [lti]
 
+- path: ./microservices/llm_service
+  configs: [llm-service]
+
 - path: ./microservices/classroom_notification_service
   configs: [classroom-notification-service]
 

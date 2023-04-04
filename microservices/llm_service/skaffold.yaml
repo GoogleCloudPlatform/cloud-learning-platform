@@ -1,3 +1,17 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 apiVersion: skaffold/v2beta12
 kind: Config
 metadata:
@@ -39,26 +53,47 @@ profiles:
     googleCloudBuild: {}
     artifacts:
     - image: llm-service
-      docker:
-        cacheFrom:
-          - llm-service:latest
       requires:
-        - image: common
-          alias: BASE_IMG
+      - image: common
+        alias: BASE_IMG
   deploy:
     kustomize:
       paths:
       - ./kustomize/custom
-- name: dev
+- name: prod_non_cloudbuild
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
+- name: prod
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: gcr.io/aitutor-dev/llm-service
+    - image: llm-service
       docker:
         cacheFrom:
-          - gcr.io/aitutor-dev/llm-service:latest
+          - llm-service
+          - llm-service:latest
       requires:
-        - image: gcr.io/aitutor-dev/common
+      - image: common
+        alias: BASE_IMG
+- name: dev
+  activation:
+  - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: gcr.io/core-learning-services-dev/llm-service
+      docker:
+        cacheFrom:
+          - gcr.io/core-learning-services-dev/llm-service
+          - gcr.io/core-learning-services-dev/llm-service:latest
+      requires:
+        - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG
       sync:
         infer:
