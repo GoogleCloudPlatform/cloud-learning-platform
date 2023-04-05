@@ -53,9 +53,9 @@ export class HomeService {
     return this.http.delete(`${environment.apiurl}sections/${sectionId}/students/${userId}`)
   }
   inviteInCohort(cohort_id: string,student_email:string) {
-    return this.http.post(`${environment.apiurl}/cohorts/${cohort_id}/invite/${student_email}`,null)
+    return this.http.post(`${environment.apiurl}cohorts/${cohort_id}/invite/${student_email}`,null)
   }
   inviteInSection(section_id: string,student_email:string) {
-    return this.http.post(`${environment.apiurl}/sections/${section_id}/invite/${student_email}`,null)
+    return this.http.post(`${environment.apiurl}sections/${section_id}/invite/${student_email}`,null)
   }
 }

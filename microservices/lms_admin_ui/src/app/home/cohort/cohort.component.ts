@@ -50,6 +50,7 @@ export class CohortComponent implements OnInit {
     inviteStudentModalData['extra_data'] = ''
     const dialogRef = this.dialog.open(InviteStudentModalComponent, {
       width: '500px',
+      // height:'500px',
       data: inviteStudentModalData
     });
 

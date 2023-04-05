@@ -35,20 +35,62 @@ export class InviteStudentModalComponent implements OnInit{
     inviteStudent():void{
       console.log(this.inviteStudentForm.value.studentEmail)
       if (this.InviteStudentModalData.mode == 'Cohort'){
+        this.showProgressSpinner=true
 this._HomeService.inviteInCohort(this.InviteStudentModalData.init_data.id,this.inviteStudentForm.value.studentEmail).subscribe((res:any)=>{
-// console.log(res.status)
-},error=>{
-  console.log(error)
-  if(error.status == 409){
-    console.log('ping')
+  if (res.success == true) {
+    this.dialogRef.close({ data: 'success' });
+
+    const successOverviewDialogRef = this.dialog.open(SuccessOverviewDialog, {
+      width: '500px',
+      data: "Student invited successfully! Please ask student to check email"
+    });
   }
-}
-)
+this.showProgressSpinner=false
+},error=>{
+  if(error.status == 409){
+    this.inviteStudentForm.controls['studentEmail'].setErrors({ 'user present': true})
+  }
+  this.showProgressSpinner=false
+})
 }
 else{
+console.log(this.InviteStudentModalData)
+  this.showProgressSpinner=true
+  this._HomeService.inviteInSection(this.InviteStudentModalData.init_data.section_id,this.inviteStudentForm.value.studentEmail).subscribe((res:any)=>{
+    if (res.success == true) {
+      this.dialogRef.close({ data: 'success' });
+  
+      const successOverviewDialogRef = this.dialog.open(SuccessOverviewDialog, {
+        width: '500px',
+        data: "Student invited successfully! Please ask student to check email"
+      });
+    }
+  this.showProgressSpinner=false
+  },error=>{
+    if(error.status == 409){
+      this.inviteStudentForm.controls['studentEmail'].setErrors({ 'user present': true})
+    }
+    this.showProgressSpinner=false
+  })
+
 
 }
     }
+
+    getErrorMessage() {
+      if (this.inviteStudentForm.controls['studentEmail'].hasError('required')) {
+        return 'You must enter a value';
+      }else if(this.inviteStudentForm.controls['studentEmail'].hasError('user present')){
+        return 'User already exists';
+      }
+      else if(this.inviteStudentForm.controls['studentEmail'].hasError('email')){
+        return 'Not a valid email';
+      }
+      else{
+        return 'error'
+      }
+      }
+
     onNoClick(): void {
       this.dialogRef.close({ data: 'close' });
     }

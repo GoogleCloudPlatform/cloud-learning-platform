@@ -34,7 +34,7 @@ export interface student {
 export class SectionComponent implements OnInit {
   selectedSection: any
   displayedColumns: string[] = ['email', 'role'];
-  studentDisplayedColumns: string[] = ['first name', 'last name', 'email', 'created time', 'action'];
+  studentDisplayedColumns: string[] = ['first name', 'last name', 'email', 'created time','status','action'];
 
   tableData: staff[] = []
   studentTableData: student[] = []
@@ -243,9 +243,11 @@ export class SectionComponent implements OnInit {
   }
 
   openInviteStudentDialog(){
+    console.log('selected sec',this.selectedSection)
     let tempObj: LooseObject = {}
     tempObj['cohort_name'] = this.cohortDetails.name
     tempObj['section'] = this.selectedSection.section
+    tempObj['section_id'] = this.selectedSection.id
 
     let inviteStudentModalData: LooseObject = {}
     inviteStudentModalData['mode'] = 'Section'
@@ -256,11 +258,11 @@ export class SectionComponent implements OnInit {
       data: inviteStudentModalData
     });
 
-    // dialogRef.afterClosed().subscribe(result => {
-    //   if (result.data == 'success') {
-    //     this.getSectionStudents()
-    //   }
-    // });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.data == 'success') {
+        this.getSectionStudents()
+      }
+    });
   }
 
 }

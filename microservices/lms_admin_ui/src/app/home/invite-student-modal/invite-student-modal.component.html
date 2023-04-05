@@ -19,7 +19,11 @@
     <mat-form-field appearance="fill" style="width: 100%;">
         <mat-label>Student email</mat-label>
         <input matInput formControlName="studentEmail">
-        <mat-hint align="start"> <div class="hint-style"><span class="material-symbols-rounded info-icon">info</span> <strong>Please enter an email</strong></div> </mat-hint>
+        <mat-error *ngIf="inviteStudentForm.get('studentEmail').invalid">{{getErrorMessage()}}</mat-error>
+        <!-- <mat-hint align="start" *ngIf="userPresentError"><div class="hint-style-error"><span class="material-symbols-rounded info-icon">warning</span><strong>User already exists</strong></div></mat-hint> -->
+        <!-- <mat-hint align="start"> <div class="hint-style"><span class="material-symbols-rounded info-icon">info</span> <strong>Please enter an email</strong></div> </mat-hint> -->
+        
+
     </mat-form-field>
 
         <ng-template #elseTemplate>

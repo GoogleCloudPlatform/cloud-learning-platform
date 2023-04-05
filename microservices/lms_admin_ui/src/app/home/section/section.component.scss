@@ -59,3 +59,8 @@
     background-color: #a2ea8c;
     color: rgb(7 96 26 / 87%);
 }
+.disabledRow{
+    background-color: #eeeeee;
+    opacity: 0.5;
+    pointer-events: none;
+}
