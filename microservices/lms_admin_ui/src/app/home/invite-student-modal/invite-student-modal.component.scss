@@ -1,0 +1,42 @@
+:host ::ng-deep .mat-progress-spinner circle,
+.mat-spinner circle {
+    stroke: #FFFFFF;
+}
+
+:host ::ng-deep .mat-form-field-hint-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+:host ::ng-deep .mat-hint {
+    padding: 4px 0px;
+}
+
+.hint-style{
+    display: flex;
+    align-items: center;
+    .info-icon{
+        font-size: 1rem;
+        font-weight: 800;
+        margin-right: 5px;
+    }
+}
+
+.hint-style-error{
+    display: flex;
+    align-items: center;
+    color: red;
+    .info-icon{
+        font-size: 1rem;
+        font-weight: 800;
+        margin-right: 5px;
+    }
+}
+
+:host ::ng-deep .mat-dialog-content {
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+  }
+.invite-student-form{
+    margin-bottom: 3%;
+}

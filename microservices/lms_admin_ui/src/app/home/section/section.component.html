@@ -65,6 +65,11 @@
                     <button mat-button (click)="openEditSelectionDialog()"><span class="material-symbols-rounded">
                             edit
                         </span> View / Edit info</button>
+
+                        <button mat-button (click)="openInviteStudentDialog()"><span class="material-symbols-rounded" style="padding-right: 3px;">
+                            person_add
+                        </span> Invite student</button>
+
                     <button mat-button disabled><span class="material-symbols-rounded">
                             insights
                         </span> View Reports</button>
@@ -162,6 +167,14 @@
                                 </th>
                                 <td mat-cell *matCellDef="let element"> {{element.created_time | date:'short'}} </td>
                             </ng-container>
+                            
+                             <!-- Status  Column -->
+                             <ng-container matColumnDef="status">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Status
+                                </th>
+                                <td mat-cell *matCellDef="let element"> {{element.enrollment_status}} </td>
+                            </ng-container>
 
                             <!-- Action  Column -->
                             <ng-container matColumnDef="action">
@@ -181,7 +194,8 @@
                               </ng-container>
 
                             <tr mat-header-row *matHeaderRowDef="studentDisplayedColumns"></tr>
-                            <tr mat-row *matRowDef="let row; columns: studentDisplayedColumns;"></tr>
+                            <tr mat-row *matRowDef="let row; columns: studentDisplayedColumns;"
+                            [ngClass]="{'disabledRow': row.enrollment_status == 'invited'}"></tr>
 
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="4">No data found</td>
