@@ -16,11 +16,11 @@
 
 from common.utils.http_exceptions import InternalServerError
 from typing import Optional
-from langchain import LLMModel, PromptTemplate, LLMChain
+from langchain.llms.base import LLM
 from config import LANGCHAIN_LLM, OPENAI_LLM_TYPE
 
 async def langchain_llm_generate(prompt: str, llm_type: str,
-                                 llm: Optional[LLMModel] = None):
+                                 llm: Optional[LLM] = None):
   """
   Use langchain to generate text with an LLM given a prompt.  This is 
     always done asychronously, and so must be used in a route defined with 
