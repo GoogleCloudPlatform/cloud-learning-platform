@@ -13,44 +13,69 @@
 # limitations under the License.
 """Enable Notifications API Nightly CronJob
 
-    Continusouly hits the /enable_notifications API nightly to keep
+    Continuously hits the /enable_notifications API nightly to keep
     the 7 day TTL for Class Notifications running
 
     https://developers.google.com/classroom/best-practices/push-notifications#overview
 
 """
 
-import requests
+import os
 import sys
+import requests
 import traceback
-from common.utils.secrets import get_backend_robot_id_token
+from common.utils.token_handler import UserCredentials
 from common.utils.logging_handler import Logger
+from google.cloud import secretmanager
+# pylint: disable=line-too-long,broad-except,missing-timeout
+
+secrets = secretmanager.SecretManagerServiceClient()
+PROJECT_ID = os.environ.get("PROJECT_ID", "")
+
+try:
+  LMS_BACKEND_ROBOT_USERNAME = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/lms-backend-robot-username/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  Logger.error("Failed to fetch robot username")
+  LMS_BACKEND_ROBOT_USERNAME = None
+
+try:
+  LMS_BACKEND_ROBOT_PASSWORD = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/lms-backend-robot-password/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  Logger.error("Failed to fetch robot password")
+  LMS_BACKEND_ROBOT_PASSWORD = None
 
 
 def main():
-  Logger.info(
-      "Update Invites cronjob started")
+  Logger.info("Update Invites cronjob started")
 
-  id_token = get_backend_robot_id_token()
+  auth_client = UserCredentials(LMS_BACKEND_ROBOT_USERNAME,
+                                LMS_BACKEND_ROBOT_PASSWORD)
+  id_token = auth_client.get_id_token()
   api_endpoint = "http://lms/lms/api/v1/sections/update_invites"
 
-  res = requests.patch(url=api_endpoint,
-                        headers={
-                            "Content-Type": "application/json",
-                            "Authorization": f"Bearer {id_token}"
-                        })
+  res = requests.patch(
+      url=api_endpoint,
+      headers={
+          "Content-Type": "application/json",
+          "Authorization": f"Bearer {id_token}"
+      })
   Logger.info(f"Response of patch api {res.status_code}")
-  if res.status_code!=200:
+  if res.status_code != 200:
     Logger.error(
-f"Update Invites status API failed with status code {res.status_code}"
-    )
+        f"Update Invites status API failed with status code {res.status_code}")
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     return False
-  Logger.info(
-      "Update invites cronjob finished")
+  Logger.info("Update invites cronjob finished")
   return True
-
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 """Requests Handler"""
 import json
 import requests
-from common.utils.secrets import get_backend_robot_id_token
+from config import auth_client
 
 
 def get_method(url: str,
@@ -22,7 +22,7 @@ def get_method(url: str,
   """
 
   if use_bot_account:
-    token = get_backend_robot_id_token()
+    token = auth_client.get_id_token()
 
   if token:
     headers = {"Authorization": f"Bearer {token}"}
