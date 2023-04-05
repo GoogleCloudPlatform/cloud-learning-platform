@@ -27,8 +27,8 @@ from langchain.llms import OpenAI
 secrets = secretmanager.SecretManagerServiceClient()
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
-GCP_PROJECT = os.environ.get("GCP_PROJECT", "aitutor-dev")
-os.environ["GOOGLE_CLOUD_PROJECT"] = GCP_PROJECT
+PROJECT_ID = os.environ.get("PROJECT_ID", "cloud-learning-services-dev")
+os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
 try:
@@ -66,7 +66,7 @@ ERROR_RESPONSES = {
 
 OPENAI_API_KEY = secrets.access_secret_version(
     request={
-        "name": "projects/" + GCP_PROJECT +
+        "name": "projects/" + PROJECT_ID +
                 "/secrets/openai-api-key/versions/latest"
     }).payload.data.decode("utf-8")
 
