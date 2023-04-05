@@ -13,7 +13,7 @@
 # limitations under the License.
 """ LLM endpoints """
 import traceback
-from typing import Required, Optional
+from typing import Optional
 from fastapi import APIRouter
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
@@ -32,7 +32,7 @@ router = APIRouter(tags=["LLMs"], responses=ERROR_RESPONSES)
 # pylint: disable = broad-except
 
 @router.post("/llm/generate", response_model=LLMGenerateResponse)
-async def generate(prompt: Required[str] = "", config: Optional[dict] = None):
+async def generate(prompt: str = "", config: Optional[dict] = None):
   """
   Generate text with an LLM
 
