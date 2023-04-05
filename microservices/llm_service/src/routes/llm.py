@@ -32,7 +32,7 @@ router = APIRouter(tags=["LLMs"], responses=ERROR_RESPONSES)
 # pylint: disable = broad-except
 
 @router.post("/llm/generate", response_model=LLMGenerateResponse)
-async def generate(prompt: str = "", config: Optional[dict] = None):
+async def generate(gen_config: LLMModel):
   """
   Generate text with an LLM
 
@@ -42,6 +42,8 @@ async def generate(prompt: str = "", config: Optional[dict] = None):
   Returns:
       LLMGenerateResponse: 
   """
+  genconfig_dict = {**gen_config.dict()}
+
   result = []
   user_llm = None
   userid = None
@@ -49,13 +51,13 @@ async def generate(prompt: str = "", config: Optional[dict] = None):
   # default to openai LLM
   llm_type = OPENAI_LLM_TYPE
 
-  if config is not None:
-    llm_type = config.get("llm_type", OPENAI_LLM_TYPE)
-    userid = config.get("userid")
+  prompt = genconfig_dict.get("prompt")
+  llm_type = genconfig_dict.get("llm_type", OPENAI_LLM_TYPE)
+  userid = genconfig_dict.get("userid")
 
   try:
-    if userid is not None:
-      user_llm = LLMModel.find(userid, llm_type)
+    #if userid is not None:
+    #  user_llm = LLMModel.find(userid, llm_type)
 
     prompt = await langchain_llm_generate(prompt, llm_type, user_llm)
 
