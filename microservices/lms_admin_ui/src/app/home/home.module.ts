@@ -20,6 +20,7 @@ import { EditSectionComponent } from './edit-section/edit-section.component';
 import { SectionListComponent } from './section-list/section-list.component';
 import { DeleteOverviewDialog } from './section/section.component';
 import { SuccessOverviewDialog } from './home.component';
+import { CourseTemplateDetailsDialog } from './home.component';
 import { InviteStudentModalComponent } from './invite-student-modal/invite-student-modal.component';
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { InviteStudentModalComponent } from './invite-student-modal/invite-stude
     SectionListComponent,
     DeleteOverviewDialog,
     SuccessOverviewDialog,
+    CourseTemplateDetailsDialog,
     InviteStudentModalComponent
 
   ],
