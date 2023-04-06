@@ -265,6 +265,30 @@ export class SectionComponent implements OnInit {
     });
   }
 
+  checkIfActive(start: string, end: string): boolean {
+    let startDate = Date.parse(start)
+    let endDate = Date.parse(end)
+    let d = Date.now()
+    if (d.valueOf() >= startDate.valueOf() && d.valueOf() <= endDate.valueOf()) {
+      return true
+    }
+    else {
+      return false
+    }
+
+  }
+  ifUpcoming(start: string): boolean {
+    let startDate = Date.parse(start)
+    let d = Date.now()
+    if (d.valueOf() < startDate.valueOf()) {
+      return true
+    }
+    else {
+      return false
+    }
+  }
+
+
 }
 
 @Component({

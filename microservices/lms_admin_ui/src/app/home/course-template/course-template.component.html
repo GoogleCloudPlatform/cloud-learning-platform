@@ -2,7 +2,7 @@
     <div *ngFor="let courseTemplate of courseTemplateList" class="data-obj-card">
         <div class="block-header">
             <div class="title">
-                <a class="text" color="primary">{{courseTemplate.name}}</a>
+                <a class="text" color="primary" (click)="openDetailsDialogue(courseTemplate)">{{courseTemplate.name}}</a>
                 <button mat-stroked-button (click)="openClassroom(courseTemplate.classroom_url)" color="primary" style="padding: 0 20px 0 14px;
             margin-left: 4%;
             line-height: 30px;">

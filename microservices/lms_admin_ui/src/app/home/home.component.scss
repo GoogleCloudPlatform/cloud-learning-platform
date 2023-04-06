@@ -43,3 +43,15 @@
     font-size: 1.3rem;
     margin-top: 10%;
 }
+.template-details-content-outer{
+    margin: 5% 0%;
+    .row{
+        margin-bottom: 1%;
+        .heading{
+            font-weight: 700;
+        }
+        .details{
+            font-size: 0.8rem;
+        }
+    }
+}
