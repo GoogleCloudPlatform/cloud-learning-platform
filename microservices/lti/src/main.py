@@ -15,7 +15,7 @@ import uvicorn
 from fastapi import FastAPI, Depends
 from routes import (tool_registration, content_item, content_item_return,
                     platform_registration, platform_auth, platform_launch,
-                    tool_auth, tool_launch, line_item, nrps)
+                    tool_auth, tool_launch, line_item, nrps, results)
 from utils.helper import validate_user
 from common.utils.http_exceptions import add_exception_handlers
 from common.utils.auth_service import validate_token
@@ -42,6 +42,7 @@ api.include_router(
 api.include_router(platform_auth.router)
 api.include_router(content_item_return.router)
 api.include_router(content_item.router, dependencies=[Depends(validate_user)])
+api.include_router(results.router, dependencies=[Depends(validate_user)])
 api.include_router(line_item.router)
 api.include_router(nrps.router)
 

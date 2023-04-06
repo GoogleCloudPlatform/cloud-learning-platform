@@ -13,19 +13,44 @@
 # limitations under the License.
 """Enable Notifications API Nightly CronJob
 
-    Continusouly hits the /enable_notifications API nightly to keep
+    Continuously hits the /enable_notifications API nightly to keep
     the 7 day TTL for Class Notifications running
 
     https://developers.google.com/classroom/best-practices/push-notifications#overview
 
 """
 
+import os
 import sys
 import requests
-from common.utils.secrets import get_backend_robot_id_token
-
+from common.utils.token_handler import UserCredentials
 from common.utils.logging_handler import Logger as logger
 from common.utils.errors import CronJobException
+from google.cloud import secretmanager
+# pylint: disable=line-too-long,broad-except
+
+secrets = secretmanager.SecretManagerServiceClient()
+PROJECT_ID = os.environ.get("PROJECT_ID", "")
+
+try:
+  LMS_BACKEND_ROBOT_USERNAME = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/lms-backend-robot-username/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  logger.error("Failed to fetch robot username")
+  LMS_BACKEND_ROBOT_USERNAME = None
+
+try:
+  LMS_BACKEND_ROBOT_PASSWORD = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/lms-backend-robot-password/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  logger.error("Failed to fetch robot password")
+  LMS_BACKEND_ROBOT_PASSWORD = None
 
 
 def enable_notifications(section_id, id_token):
@@ -41,12 +66,13 @@ def enable_notifications(section_id, id_token):
   api_endpoint = "http://lms/lms/api/v1/sections"+\
     f"/{section_id}/enable_notifications"
 
-  res = requests.post(url=api_endpoint,
-                        headers={
-                            "Content-Type": "application/json",
-                            "Authorization": f"Bearer {id_token}"
-                        },
-                        timeout=60)
+  res = requests.post(
+      url=api_endpoint,
+      headers={
+          "Content-Type": "application/json",
+          "Authorization": f"Bearer {id_token}"
+      },
+      timeout=60)
   res.raise_for_status()
 
   res_json = res.json()
@@ -57,7 +83,7 @@ def enable_notifications(section_id, id_token):
                            f"with error: {res_json['message']}")
 
 
-def get_sections(id_token,limit,skip):
+def get_sections(id_token, limit, skip):
   """Get list of sections from LMS API
 
   Args:
@@ -72,12 +98,13 @@ def get_sections(id_token,limit,skip):
   api_endpoint = "http://lms/lms/api/v1/sections?" +\
       f"skip={skip}&limit={limit}"
 
-  res = requests.get(url=api_endpoint,
-                     headers={
-                         "Content-Type": "application/json",
-                         "Authorization": f"Bearer {id_token}"
-                     },
-                     timeout=60)
+  res = requests.get(
+      url=api_endpoint,
+      headers={
+          "Content-Type": "application/json",
+          "Authorization": f"Bearer {id_token}"
+      },
+      timeout=60)
   res.raise_for_status()
 
   res_json = res.json()
@@ -92,40 +119,41 @@ def main():
   logger.info(
       "Classroom Pubsub Registration / Notifications API Cronjob STARTING")
 
-  id_token = get_backend_robot_id_token()
-  skip=0
-  page_size=20
-  num_enabled=0
-  num_sections=0
-  skip_increment=20
+  auth_client = UserCredentials(LMS_BACKEND_ROBOT_USERNAME,
+                                LMS_BACKEND_ROBOT_PASSWORD)
+  id_token = auth_client.get_id_token()
+  skip = 0
+  page_size = 20
+  num_enabled = 0
+  num_sections = 0
+  skip_increment = 20
   while True:
     # get list of sections according to skip & limit value
-    sections = get_sections(id_token,limit=page_size,skip=skip)
+    sections = get_sections(id_token, limit=page_size, skip=skip)
     if not sections:
       break
 
-    num_sections+=len(sections)
+    num_sections += len(sections)
     # enable notification for each section
     for section in sections:
       # added try except so that if any section enable notification
       # get failed it will get continue
       try:
         enable_notifications(section["id"], id_token)
-        num_enabled+=1
+        num_enabled += 1
       except requests.HTTPError as rte:
         logger.info(str(rte))
     if len(sections) < page_size:
       break
-    skip +=skip_increment
-  if num_enabled<num_sections:
+    skip += skip_increment
+  if num_enabled < num_sections:
     logger.error(f"Cron Job failed only {num_enabled}" +
                  " these number of sections get enabled out of " +
                  f"{num_sections} sections")
     sys.exit(1)
 
-  logger.info(
-    "Cron Job Successfully enabled notifications for "+
-    f"{num_enabled} out of {num_sections} number of sections")
+  logger.info("Cron Job Successfully enabled notifications for " +
+              f"{num_enabled} out of {num_sections} number of sections")
   logger.info(
       "Classroom Pubsub Registration / Notifications API Cronjob FINISHED")
 
