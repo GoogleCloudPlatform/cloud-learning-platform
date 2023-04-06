@@ -265,6 +265,93 @@ def get_coursework(course_id):
     logger.error(error)
     return None
 
+def get_coursework_submissions(course_id,coursework_id,user_id):
+  """Get  list of coursework from classroom
+
+  Args: course_id
+  Returns:
+    returns list of coursework of given course in classroom
+    """ ""
+
+  service = build("classroom", "v1", credentials=get_credentials())
+  submissions = []
+  page_token = None
+  try:
+    while True:
+            coursework = service.courses().courseWork()
+            response = coursework.studentSubmissions().list(
+                pageToken=page_token,
+                courseId=course_id,
+                courseWorkId=coursework_id,
+                userId=user_id).execute()
+            submissions.extend(response.get('studentSubmissions', []))
+            page_token = response.get('nextPageToken', None)
+            if not page_token:
+                break
+    return submissions
+  except HttpError as error:
+    logger.error(error)
+    return None
+  
+def patch_student_submission(course_id,coursework_id,student_submission_id,assigned_grade,draft_grade):
+  """Get  list of coursework from classroom
+
+  Args: course_id
+  Returns:
+    returns list of coursework of given course in classroom
+    """ ""
+
+  service = build("classroom", "v1",credentials=get_credentials())
+  submissions = []
+  studentSubmission={"assignedGrade": assigned_grade,
+                  "draftGrade": draft_grade}
+  patch_result=service.courses().courseWork().studentSubmissions().patch(
+    courseId=course_id,
+    courseWorkId=coursework_id,
+    id=student_submission_id,
+    updateMask="assignedGrade,draftGrade",
+    body=studentSubmission).execute()
+  print("This is patch resultt__",patch_result,student_submission_id,assigned_grade)
+  return patch_result
+
+
+def get_one_coursework(course_id,coursework_id):
+  """Get  list of coursework from classroom
+
+  Args: course_id
+  Returns:
+    returns list of coursework of given course in classroom
+    """ ""
+
+  service = build("classroom", "v1", credentials=get_credentials())
+  try:
+    coursework = service.courses().courseWork().get(
+        courseId=course_id,id=coursework_id).execute()
+    return coursework
+  except HttpError as error:
+    logger.error(error)
+    return None
+
+
+
+def student_submissions(course_id,coursework_id):
+  """Get  list of coursework from classroom
+
+  Args: course_id
+  Returns:
+    returns list of coursework of given course in classroom
+    """ ""
+
+  service = build("classroom", "v1", credentials=get_credentials())
+  try:
+    coursework = service.courses().courseWork().get(
+        courseId=course_id,id=coursework_id).execute()
+    return coursework
+  except HttpError as error:
+    logger.error(error)
+    return None
+
+
 def get_coursework_material(course_id):
   """Get  list of coursework from classroom
 
@@ -555,6 +642,13 @@ def get_view_link_from_id(form_id):
 
   service = build("forms", "v1", credentials=get_credentials())
   result = service.forms().get(formId=form_id).execute()
+  return result
+
+def retrive_all_form_responses(form_id):
+  "Query google forms api  using form id and get view url of  google form"
+  DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
+  service = build("forms", "v1", credentials=get_credentials(),discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
+  result = service.forms().responses().list(formId=form_id).execute()
   return result
 
 

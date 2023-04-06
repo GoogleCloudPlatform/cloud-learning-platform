@@ -460,3 +460,47 @@ def get_assignment(section_id: str, assignment_id: str):
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
+@router.post("/import_grade/{classroom_id}/{coursework_id}")
+def import_grade(classroom_id: str,coursework_id:str):
+  """Get a section details from db
+
+  Args:
+      section_id (str): section_id in firestore
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      ResourceNotFound: 404 Section with section id is not found
+  Returns:
+    {"status":"Success","new_course":{}}: Returns section details from  db,
+    {'status': 'Failed'} if the user creation raises an exception
+  """
+  try:
+    result = classroom_crud.get_one_coursework(classroom_id,coursework_id)
+    print("COursework Print_____",result)
+    url_mapping = classroom_crud.\
+            get_edit_url_and_view_url_mapping_of_form()
+    print("Get Url mapping worked")
+    for material in result["materials"]:
+      print("Insidde form loop")
+      if "form" in material.keys():
+        form_details = url_mapping[material["form"]["formUrl"]]
+        form_id = form_details["file_id"]
+        # Get all responses for the form
+        all_responses_of_form = classroom_crud.retrive_all_form_responses(form_id)
+        # Get student 
+        print("This is responses of form _____form_id__",all_responses_of_form)
+        for response in all_responses_of_form["responses"]:
+          print("In response loopp________",response)
+      
+          submissions=classroom_crud.get_coursework_submissions(classroom_id,coursework_id,
+                                                    response["respondentEmail"])
+          print("SUBMISSIONS__________",submissions[0]["id"])
+          
+          patch_result= classroom_crud.patch_student_submission(classroom_id,coursework_id,submissions[0]["id"],response["totalScore"]+5,response["totalScore"]+5)
+          print("PAtch result for submission id,email ",coursework_id,submissions[0]["id"],response["respondentEmail"],patch_result)
+    return "success"
+  except Exception as e:
+    error = traceback.format_exc().replace("\n", " ")
+    Logger.error(error)
+    raise InternalServerError(str(e)) from e
+
