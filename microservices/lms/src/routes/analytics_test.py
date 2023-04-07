@@ -34,7 +34,7 @@ def create_fake_data_list(client_with_emulator):
     course_work["course_work_due_date"],"%Y-%m-%d").date()
   course_work["course_work_due_time"]=datetime.datetime.strptime(
     course_work["course_work_due_time"],"%H:%M:%S").time()
-  course_work.pop("submission")
+  # course_work.pop("submission")
   data.update(course)
   data.update(course_work)
   data.update(ANALYTICS_SUBMISSION_EXAMPLE)

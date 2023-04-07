@@ -292,7 +292,12 @@ ANALYTICS_COURSE_WORK_EXAMPLE={
             "string"
         ]
     },
-    "submission": ANALYTICS_SUBMISSION_EXAMPLE
+    # "submission": ANALYTICS_SUBMISSION_EXAMPLE
+    "submission_id": "Cg4Int098765xdfy5678",
+    "submission_assigned_grade": 10,
+    "submission_creation_time": "2023-03-23T13:27:50.745000+00:00",
+    "submission_update_time": "2023-03-23T13:27:50.657000+00:00",
+    "submission_late": False
     }
 
 ANALYTICS_COURSE_EXAMPLE={

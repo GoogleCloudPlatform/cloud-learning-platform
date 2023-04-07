@@ -4,8 +4,7 @@ from fastapi import Depends
 from common.utils.auth_service import validate_user_type_and_token, auth_scheme
 from common.utils.errors import ResourceNotFoundException
 from schemas.analytics import (
-  AnalyticsCourse,AnalyticsCourseWork,
-  AnalyticsSubmission,AnalyticsUser,AnalyticsResponse)
+  AnalyticsCourse,AnalyticsCourseWork,AnalyticsUser,AnalyticsResponse)
 
 FEED_TYPES = ("COURSE_WORK_CHANGES", "COURSE_ROSTER_CHANGES")
 def convert_cohort_to_cohort_model(cohort):
@@ -112,9 +111,9 @@ def convert_query_result_to_analytics_model(query_result,student_id,user_id):
         user.user_id=user_id
       course_obj=AnalyticsCourse.parse_obj(row)
     course_work_obj=AnalyticsCourseWork.parse_obj(row)
-    if row["submission_id"]:
-      submission_obj=AnalyticsSubmission.parse_obj(row)
-      course_work_obj.submission=submission_obj
+    # if row["submission_id"]:
+    #   submission_obj=AnalyticsSubmission.parse_obj(row)
+    #   course_work_obj.submission=submission_obj
     course_obj.course_work_list.append(course_work_obj)
   if flag:
     raise ResourceNotFoundException(
