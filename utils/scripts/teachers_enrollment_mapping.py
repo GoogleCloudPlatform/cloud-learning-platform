@@ -33,8 +33,8 @@ def create_teacher_course_enrollment_mapping(teacher,section):
     print(f"User not found by this {teacher} email. Section {section.id}")
 
 def main():
-  sections=Section.fetch_all(limit=1)
-  print("hi")
+  print("Started Script")
+  sections=Section.fetch_all()
   for section in sections:
     for teacher in section.teachers:
       create_teacher_course_enrollment_mapping(teacher,section)
