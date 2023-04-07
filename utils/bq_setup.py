@@ -36,9 +36,11 @@ def create_table_using_sql_file(dataset, file_name):
   """Create a table using the query from the given file in the BQ dataset"""
   dataset_id = f"{GCP_PROJECT}.{dataset}"
   print("Dataset_id", dataset_id)
+  old_dataset=os.getenv("BQ_DATASET", "lms_analytics")
   job_config = bigquery.QueryJobConfig(default_dataset=dataset_id)
   with open(file_name, "r", encoding="utf-8") as file:
     query = file.read()
+  query=query.replace(old_dataset,dataset)
   query_job = bq_client.query(
       query, project=GCP_PROJECT, job_config=job_config)
   error = ""
@@ -56,7 +58,7 @@ def create_tables(dataset):
   print("dataset", dataset)
   sql_file_list = []
 
-  file_path = "sql/"
+  file_path = "tables_sql/"
   sql_files = listdir(file_path)
   sql_file_list = [file_path + i for i in sql_files]
 

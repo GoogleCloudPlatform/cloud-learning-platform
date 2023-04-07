@@ -5,20 +5,90 @@
         [theme]="{'height': '100px','margin-top':'30px','background-color': '#EAEAEA'}">
     </ngx-skeleton-loader>
 
-
-
     <mat-card *ngIf="!loadCard" style="margin-top:2%;margin-bottom: 3%;">
         <mat-card-content>
+<div class="cohort-title"><span class="name">{{cohortDetails.name}}</span>
 
+    <div class="status-chip">
+        <mat-chip-list *ngIf="ifUpcoming(cohortDetails.start_date); else active">
+            <mat-chip class="active-chip">Upcoming</mat-chip>
+        </mat-chip-list>
+
+        <ng-template #active>
+            <mat-chip-list>
+                <mat-chip *ngIf="checkIfActive(cohortDetails.start_date,cohortDetails.end_date); else elseChip"
+                    class="active-chip">Active</mat-chip>
+                <ng-template #elseChip>
+                    <mat-chip class="deactive-chip">Expired</mat-chip>
+                </ng-template>
+            </mat-chip-list>
+        </ng-template>
+    </div>
+
+</div>
             <div class="object-details">
-                <div class="element"><span class="element-heading">Cohort Name : </span> <span
-                        class="element-content">{{cohortDetails.name}}</span></div>
+                <div style="width:50%;">
                 <div class="element"><span class="element-heading">Cohort Description : </span> <span
                         class="element-content">{{cohortDetails.description}}</span></div>
                 <div class="element"><span class="element-heading">Instructional Designer : </span> <span
                         class="element-content">{{courseTemplateDetails.instructional_designer}}</span></div>
                 <div class="element"><span class="element-heading">Course Admin : </span> <span
                         class="element-content">{{courseTemplateDetails.admin}}</span></div>
+                        <div class="element"><span class="element-heading">Course Template : </span> <span
+                            class="element-content">{{courseTemplateDetails.name}}</span></div>
+                    </div>
+
+                    <div style="width: 50%;">
+
+                        <div class="element">
+                            <div class="date-element-heading">
+                            <span class="material-symbols-rounded">
+                            date_range
+                        </span>
+                            <span class="title">Cohort duration :
+                            </span>
+                        </div>
+
+                        <div class="date-element-content">    
+                        <span class="content">{{cohortDetails.start_date | date: 'EEEE, MMM d, y'}}</span>
+                            <span class="to">to</span>
+                            <span class="content">{{cohortDetails.end_date | date: 'EEEE, MMM d, y'}}</span>
+                        </div>
+                        </div>
+
+
+                        <div class="element">
+                            <div class="date-element-heading">
+                            <span class="material-symbols-rounded">
+                            date_range
+                        </span>
+                            <span class="title">Registration window :
+                            </span>
+                        </div>
+
+                        <div class="date-element-content">    
+                        <span class="content">{{cohortDetails.registration_start_date | date: 'EEEE, MMM d, y'}}</span>
+                            <span class="to">to</span>
+                            <span class="content">{{cohortDetails.registration_end_date | date: 'EEEE, MMM d, y'}}</span>
+                        </div>
+                        </div>
+
+                        <div class="element">
+                            <div class="date-element-heading">
+                            <span class="material-symbols-rounded">
+                            person
+                        </span>
+                            <span class="title">Enrollment count :
+                            </span>
+                        </div>
+
+                        <div class="date-element-content">    
+                        <span>{{cohortDetails.enrolled_students_count}}</span>
+                        </div>
+                        </div>
+
+
+                    </div>
             </div>
 
         </mat-card-content>
@@ -65,6 +135,11 @@
                     <button mat-button (click)="openEditSelectionDialog()"><span class="material-symbols-rounded">
                             edit
                         </span> View / Edit info</button>
+
+                        <button mat-button (click)="openInviteStudentDialog()"><span class="material-symbols-rounded" style="padding-right: 3px;">
+                            person_add
+                        </span> Invite student</button>
+
                     <button mat-button disabled><span class="material-symbols-rounded">
                             insights
                         </span> View Reports</button>
@@ -162,6 +237,14 @@
                                 </th>
                                 <td mat-cell *matCellDef="let element"> {{element.created_time | date:'short'}} </td>
                             </ng-container>
+                            
+                             <!-- Status  Column -->
+                             <ng-container matColumnDef="status">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Status
+                                </th>
+                                <td mat-cell *matCellDef="let element"> {{element.enrollment_status}} </td>
+                            </ng-container>
 
                             <!-- Action  Column -->
                             <ng-container matColumnDef="action">
@@ -181,7 +264,8 @@
                               </ng-container>
 
                             <tr mat-header-row *matHeaderRowDef="studentDisplayedColumns"></tr>
-                            <tr mat-row *matRowDef="let row; columns: studentDisplayedColumns;"></tr>
+                            <tr mat-row *matRowDef="let row; columns: studentDisplayedColumns;"
+                            [ngClass]="{'disabledRow': row.enrollment_status == 'invited'}"></tr>
 
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="4">No data found</td>

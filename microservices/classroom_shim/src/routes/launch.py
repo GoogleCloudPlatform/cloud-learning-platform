@@ -4,10 +4,9 @@ import requests
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from config import ERROR_RESPONSES, API_DOMAIN, FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, PROJECT_ID
+from config import ERROR_RESPONSES, API_DOMAIN, FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, PROJECT_ID, auth_client
 from common.models import LTIAssignment
 from common.utils.auth_service import validate_token
-from common.utils.secrets import get_backend_robot_id_token
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  UnauthorizedUserError)
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
@@ -36,7 +35,7 @@ def login(request: Request, lti_assignment_id: str):
     content_item_url = f"http://lti/lti/api/v1/content-item/{lti_assignment.lti_content_item_id}"
     res = requests.get(
         url=content_item_url,
-        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+        headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
         timeout=60)
     data = res.json()
     lti_content_item = data.get("data")
@@ -47,7 +46,7 @@ def login(request: Request, lti_assignment_id: str):
       tool_url = f"http://lti/lti/api/v1/tool/{lti_assignment.tool_id}"
       res = requests.get(
           url=tool_url,
-          headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+          headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
           timeout=60)
       lti_tool = res.json().get("data")
       title = lti_tool.get("name", "")
@@ -84,7 +83,7 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
   try:
     # verify user if it exists
     user_email = user_details.get("email")
-    headers = {"Authorization": f"Bearer {get_backend_robot_id_token()}"}
+    headers = {"Authorization": f"Bearer {auth_client.get_id_token()}"}
     fetch_user_request = requests.get(
         "http://user-management/user-management/api/v1/user/search/email",
         params={"email": user_email},

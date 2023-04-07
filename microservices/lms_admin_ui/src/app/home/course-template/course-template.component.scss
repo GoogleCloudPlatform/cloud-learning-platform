@@ -27,6 +27,10 @@ $primary-color : #8c1d40;
                 color: $primary-color;
                 font-weight: 700;
                 text-decoration: none;
+                cursor: pointer;
+            }
+            .text:hover {
+                text-decoration: underline;
             }
 
             .icon {

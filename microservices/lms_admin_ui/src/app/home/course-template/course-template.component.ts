@@ -1,6 +1,7 @@
 import { CreateCourseTemplateModalComponent } from './../create-course-template-modal/create-course-template-modal.component';
 import { Component, OnInit, Input } from '@angular/core';
 import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { CourseTemplateDetailsDialog } from '../home.component';
 interface LooseObject {
   [key: string]: any
 }
@@ -39,4 +40,13 @@ export class CourseTemplateComponent implements OnInit {
     window.open(link
       , '_blank');
   }
+
+openDetailsDialogue(data:any){
+  const CourseTemplateDetailsDialogRef = this.dialog.open(CourseTemplateDetailsDialog, {
+    width: '600px',
+    data: data
+  });
+}
+
+
 }
