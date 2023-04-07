@@ -1,7 +1,7 @@
 import behave
 import requests
 from testing_objects.test_config import API_URL
-from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
+from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA,DATABASE_PREFIX
 
 # -------------------------------CREATE Course Template-------------------------------------
 # ----Positive Scenario-----
@@ -132,7 +132,7 @@ def step_impl_12(context):
 @behave.given("A user has access privileges and needs to update a Course Template Record")
 def setp_impl_13(context):
   context.url = f'{API_URL}/course_templates/{context.course_template.id}'
-  context.payload={"name":"updated_name","description":"updated_description"}
+  context.payload={"name":f"{DATABASE_PREFIX}test_course_updated_name","description":"updated_description"}
   
 
 
