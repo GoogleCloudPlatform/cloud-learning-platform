@@ -22,7 +22,7 @@ from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 from google.cloud import secretmanager
-from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 
 secrets = secretmanager.SecretManagerServiceClient()
 
@@ -75,6 +75,6 @@ OPENAI_LLM_TYPE = "openai"
 LLM_TYPES = [OPENAI_LLM_TYPE]
 
 LANGCHAIN_LLM = {
-  OPENAI_LLM_TYPE: OpenAI(openai_api_key=OPENAI_API_KEY,
-                          model_name="gpt-3.5-turbo")
+  OPENAI_LLM_TYPE: ChatOpenAI(openai_api_key=OPENAI_API_KEY,
+                              model_name="gpt-3.5-turbo")
 }

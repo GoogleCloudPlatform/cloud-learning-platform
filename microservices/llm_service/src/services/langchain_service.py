@@ -14,9 +14,23 @@
 
 """ Langchain service """
 
+from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
+from common.utils.logging_handler import Logger
 from typing import Optional
 from langchain.llms.base import LLM
+from langchain import PromptTemplate, LLMChain
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    AIMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
+from langchain.schema import (
+    AIMessage,
+    HumanMessage,
+    SystemMessage
+)
 from config import LANGCHAIN_LLM, OPENAI_LLM_TYPE
 
 async def langchain_llm_generate(prompt: str, llm_type: str,
@@ -37,13 +51,24 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
   Returns:
     the text result.
   """
+  Logger.info(f"generating text with llm_type {llm_type}")
   try:
     if llm is None:
-      llm = LANGCHAIN_LLM.get(llm_type, OPENAI_LLM_TYPE)
+      llm = LANGCHAIN_LLM.get(llm_type)
+      if llm is None:
+        raise ResourceNotFoundException(f"Cannot find llm type '{llm_type}'")
 
-    # we always use await for LLM calls
-    result = await llm.agenerate(prompt)
-
-    return result
+    if llm_type == OPENAI_LLM_TYPE:
+      # use langchain chat interface for openai
+      msg = [HumanMessage(content=prompt)]
+      Logger.info(f"generating text for [{prompt}]")
+      result = await llm.agenerate([msg])
+      Logger.info(f"result {result.generations[0][0].message.content}")
+    else:
+      # we always use await for LLM calls
+      result = await llm.agenerate([prompt])
+    
+    result_text = result.generations[0][0].message.content
+    return result_text
   except Exception as e:
     raise InternalServerError(str(e)) from e
