@@ -21,14 +21,12 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  PayloadTooLargeError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, PayloadTooLarge)
-from schemas.llm_schema import (LLMGenerateModel, UserLLMModel, 
+from schemas.llm_schema import (LLMGenerateModel, UserLLMModel,
                                 LLMGetResponse, LLMGenerateResponse)
 from schemas.error_schema import (NotFoundErrorResponseModel,
                                   PayloadTooLargeResponseModel)
-from services.json_import import json_import
-from services.langchain_service import langchain_llm_generate
-from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, \
-                   OPENAI_LLM_TYPE_GPT3_5, LLM_TYPES
+from services.llm_generate import llm_generate
+from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, LLM_TYPES
 
 router = APIRouter(prefix="/llm", tags=["LLMs"], responses=ERROR_RESPONSES)
 
@@ -66,23 +64,19 @@ async def generate(gen_config: LLMGenerateModel):
   genconfig_dict = {**gen_config.dict()}
 
   prompt = genconfig_dict.get("prompt")
+  if prompt is None or prompt == "":
+    return BadRequest("Missing or invalid payload parameters")
 
-  # default to openai LLM
   llm_type = genconfig_dict.get("llm_type")
-  if llm_type is None:
-    llm_type = OPENAI_LLM_TYPE_GPT3_5
 
   try:
-    if prompt is not None:
-      result = await langchain_llm_generate(prompt, llm_type)      
+    result = await llm_generate(prompt, llm_type)
 
-      return {
-          "success": True,
-          "message": "Successfully generated text",
-          "content": result
-      }
-    else:
-      return BadRequest("Missing or invalid payload parameters")
+    return {
+        "success": True,
+        "message": "Successfully generated text",
+        "content": result
+    }
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
@@ -90,7 +84,7 @@ async def generate(gen_config: LLMGenerateModel):
 @router.post("/{userid}/generate", response_model=LLMGenerateResponse)
 async def generate_user(userid: str, gen_config: UserLLMModel):
   """
-  Generate text with an user specific LLM
+  Generate text and track history for user
 
   Args:
       prompt(str): Input prompt for model
@@ -104,26 +98,22 @@ async def generate_user(userid: str, gen_config: UserLLMModel):
   user_llm = None
 
   prompt = genconfig_dict.get("prompt")
+  if prompt is None or prompt == "":
+    return BadRequest("Missing or invalid payload parameters")
 
-  # default to openai LLM
-  llm_type = genconfig_dict.get("llm_type", OPENAI_LLM_TYPE)
+  llm_type = genconfig_dict.get("llm_type")
+
+  user_llm = UserLLM.find_by_userid(userid, llm_type)
+  if user_llm is None:
+    raise ResourceNotFoundException(f"LLM not found for {userid}")
 
   try:
-    user_llm = UserLLM.find_by_userid(userid, llm_type)
-    if user_llm is None:
-      raise ResourceNotFoundException(f"LLM not found for {userid}")
+    result = await llm_generate(prompt, llm_type, user_llm)
 
-    prompt = await langchain_llm_generate(prompt, llm_type, user_llm)
-
-    if prompt:
-      result = {"result": prompt}
-
-      return {
-          "success": True,
-          "message": "Successfully generated text",
-          "data": result
-      }
-    else:
-      return BadRequest("Missing or invalid request parameters")
+    return {
+        "success": True,
+        "message": "Successfully generated text",
+        "content": result
+    }
   except Exception as e:
     raise InternalServerError(str(e)) from e

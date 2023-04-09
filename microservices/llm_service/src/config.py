@@ -23,7 +23,7 @@ from schemas.error_schema import (UnauthorizedResponseModel,
                                   ValidationErrorResponseModel)
 from google.cloud import secretmanager
 from langchain.chat_models import ChatOpenAI
-from services.vertex_language_models import TextGenerationModel, ChatModel
+from services.vertex_service import TextGenerationModel, ChatModel
 
 
 secrets = secretmanager.SecretManagerServiceClient()
@@ -55,7 +55,7 @@ if ENABLE_OPENAI_LLM is None or ENABLE_OPENAI_LLM == "":
   ENABLE_OPENAI_LLM = True
 Logger.info(f"ENABLE_OPENAI_LLM = {ENABLE_OPENAI_LLM}")
 
-ENABLE_GOOGLE_LLM = (os.getenv("ENABLE_GOOGLE_LLM", "false").lower() == "true")
+ENABLE_GOOGLE_LLM = os.getenv("ENABLE_GOOGLE_LLM", "false").lower() == "true"
 if ENABLE_GOOGLE_LLM is None or ENABLE_GOOGLE_LLM == "":
   ENABLE_OPENAI_LLM = False
 Logger.info(f"ENABLE_GOOGLE_LLM = {ENABLE_GOOGLE_LLM}")
@@ -94,7 +94,7 @@ VERTEX_LLM_TYPE_BISON_001 = "VertexAI-Bison-001"
 VERTEX_LLM_TYPE_BISON_ALPHA = "VertexAI-Bison-alpha"
 
 LLM_TYPES = []
-OPENAI_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, OPENAI_LLM_TYPE_GPT4] 
+OPENAI_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, OPENAI_LLM_TYPE_GPT4]
 GOOGLE_LLM_TYPES = [VERTEX_LLM_TYPE_BISON_001, VERTEX_LLM_TYPE_BISON_ALPHA]
 
 if ENABLE_OPENAI_LLM:
@@ -112,13 +112,13 @@ if ENABLE_OPENAI_LLM:
     OPENAI_LLM_TYPE_GPT3_5: ChatOpenAI(openai_api_key=OPENAI_API_KEY,
                                 model_name="gpt-3.5-turbo"),
     OPENAI_LLM_TYPE_GPT4: ChatOpenAI(openai_api_key=OPENAI_API_KEY,
-                                model_name="gpt-4")                              
+                                model_name="gpt-4")
   }
 
 GOOGLE_LLM = {}
 if ENABLE_GOOGLE_LLM:
   GOOGLE_LLM = {
-    VERTEX_LLM_TYPE_BISON_001: 
+    VERTEX_LLM_TYPE_BISON_001:
       TextGenerationModel.from_pretrained("text-bison-001"),
     VERTEX_LLM_TYPE_BISON_ALPHA:
       ChatModel.from_pretrained("text-bison-alpha")

@@ -12,21 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Langchain service """
+""" LLM Generation Service """
 
+from common.models import UserLLM
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
+from services.langchain_service import langchain_llm_generate
 from typing import Optional
-from common.models import UserLLM
-from langchain.schema import HumanMessage
 
-from config import LANGCHAIN_LLM, OPENAI_LLM_TYPES
+from config import LANGCHAIN_LLM, GOOGLE_LLM, OPENAI_LLM_TYPE_GPT3_5
 
-async def langchain_llm_generate(prompt: str, llm_type: str,
-                                 user_llm: Optional[UserLLM] = None):
+async def llm_generate(prompt: str, llm_type: str,
+                       user_llm: Optional[UserLLM] = None):
   """
-  Use langchain to generate text with an LLM given a prompt.  This is 
+  Generate text with an LLM given a prompt.  This is 
     always done asychronously, and so must be used in a route defined with 
     async def.
 
@@ -35,31 +35,25 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
 
     llm_type: the type of LLM to use (default to openai)
 
-    llm (optional): a langchain llm object to use, perhaps specific to 
-      a user
+    llm (optional): an user llm model
 
   Returns:
     the text result.
   """
-  Logger.info(f"generating text with langchain llm_type {llm_type}")
+  # default to openai LLM
+  if llm_type is None:
+    llm_type = OPENAI_LLM_TYPE_GPT3_5
+
+  Logger.info(f"generating text with llm_type {llm_type}")
   try:
-    if user_llm is not None:
-      pass
-    llm = LANGCHAIN_LLM.get(llm_type)
-    if llm is None:
+    if llm_type in LANGCHAIN_LLM.keys():
+      result = await langchain_llm_generate(prompt, llm_type, user_llm)
+    elif llm_type in GOOGLE_LLM.keys():
+      google_llm = GOOGLE_LLM.get(llm_type)
+      result = await google_llm.predict(prompt)
+    else:
       raise ResourceNotFoundException(f"Cannot find llm type '{llm_type}'")
 
-    if llm_type in OPENAI_LLM_TYPES:
-      # use langchain chat interface for openai
-      msg = [HumanMessage(content=prompt)]
-      Logger.info(f"generating text for [{prompt}]")
-      result = await llm.agenerate([msg])
-      Logger.info(f"result {result.generations[0][0].message.content}")
-    else:
-      # we always use await for LLM calls
-      result = await llm.agenerate([prompt])
-
-    result_text = result.generations[0][0].message.content
-    return result_text
+    return result
   except Exception as e:
     raise InternalServerError(str(e)) from e
