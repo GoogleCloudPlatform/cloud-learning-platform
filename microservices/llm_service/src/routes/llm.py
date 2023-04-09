@@ -21,16 +21,36 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  PayloadTooLargeError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, PayloadTooLarge)
-from schemas.llm_schema import (LLMGenerateModel, UserLLMModel, LLMGenerateResponse)
+from schemas.llm_schema import (LLMGenerateModel, UserLLMModel, 
+                                LLMGetResponse, LLMGenerateResponse)
 from schemas.error_schema import (NotFoundErrorResponseModel,
                                   PayloadTooLargeResponseModel)
 from services.json_import import json_import
 from services.langchain_service import langchain_llm_generate
-from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, OPENAI_LLM_TYPE
+from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, \
+                   OPENAI_LLM_TYPE_GPT3_5, LLM_TYPES
 
 router = APIRouter(prefix="/llm", tags=["LLMs"], responses=ERROR_RESPONSES)
 
 # pylint: disable = broad-except
+
+@router.get("", response_model=LLMGetResponse)
+def get_llm_list():
+  """
+  Get available LLMs
+
+  Returns:
+      LLMGetResponse 
+  """
+  try:
+    return {
+      "success": True,
+      "message": "Successfully retrieved llm types",
+      "data": LLM_TYPES
+    }
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
 
 @router.post("/generate", response_model=LLMGenerateResponse)
 async def generate(gen_config: LLMGenerateModel):
@@ -50,7 +70,7 @@ async def generate(gen_config: LLMGenerateModel):
   # default to openai LLM
   llm_type = genconfig_dict.get("llm_type")
   if llm_type is None:
-    llm_type = OPENAI_LLM_TYPE
+    llm_type = OPENAI_LLM_TYPE_GPT3_5
 
   try:
     if prompt is not None:

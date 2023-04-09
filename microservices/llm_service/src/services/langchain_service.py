@@ -19,19 +19,9 @@ from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
 from typing import Optional
 from langchain.llms.base import LLM
-from langchain import PromptTemplate, LLMChain
-from langchain.prompts.chat import (
-    ChatPromptTemplate,
-    SystemMessagePromptTemplate,
-    AIMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-)
-from langchain.schema import (
-    AIMessage,
-    HumanMessage,
-    SystemMessage
-)
-from config import LANGCHAIN_LLM, OPENAI_LLM_TYPE
+from langchain.schema import HumanMessage
+
+from config import LANGCHAIN_LLM, OPENAI_LLM_TYPES
 
 async def langchain_llm_generate(prompt: str, llm_type: str,
                                  llm: Optional[LLM] = None):
@@ -58,7 +48,7 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
       if llm is None:
         raise ResourceNotFoundException(f"Cannot find llm type '{llm_type}'")
 
-    if llm_type == OPENAI_LLM_TYPE:
+    if llm_type in OPENAI_LLM_TYPES:
       # use langchain chat interface for openai
       msg = [HumanMessage(content=prompt)]
       Logger.info(f"generating text for [{prompt}]")

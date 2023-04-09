@@ -18,6 +18,22 @@ from typing import Optional
 from pydantic import BaseModel
 from schemas.schema_examples import LLM_GENERATE_EXAMPLE, USER_LLM_MODEL_EXAMPLE
 
+class LLMGetResponse(BaseModel):
+  """LLM Get list model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully retrieved llm types"
+  data: Optional[list[str]] = []
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully generated text",
+            "data": []
+        }
+    }
+
 class LLMGenerateModel(BaseModel):
   """LLM Generate model"""
   prompt: str
