@@ -26,6 +26,9 @@ def grade_pass_back(input_grade: dict, user_id: str, line_item_id: str):
       Logger.error(
           f"Failed: Grade pass back for user id - {user_id} for line item {line_item_id}"
       )
+      Logger.error(
+          f"Grade pass back API Status code - '{grade_res.status_code}' with error - '{grade_res.text}'"
+      )
       return False
   except Exception as e:
     Logger.error(e)
