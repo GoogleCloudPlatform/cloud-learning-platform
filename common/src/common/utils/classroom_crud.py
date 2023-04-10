@@ -495,7 +495,7 @@ def enroll_student(headers, access_token, course_id, student_email,
   Return:
     dict: returns a dict which contains student and classroom details
   """
-  # Call search by email user management API to get the student data
+  # Call search by email user-management API to get the student data
   response = requests.get(
       f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",
       headers=headers,
@@ -540,7 +540,7 @@ def enroll_student(headers, access_token, course_id, student_email,
       "photo_url": profile["photos"][0]["url"]
   }
   # Check if searched user is [] ,i.e student is enrolling for first time
-  # then call create user user management API and return user data else
+  # then call create user user-management API and return user data else
   # return searched user data
   if searched_student == []:
     response = requests.post(
