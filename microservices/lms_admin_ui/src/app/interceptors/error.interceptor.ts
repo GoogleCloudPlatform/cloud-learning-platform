@@ -20,22 +20,21 @@ export class ErrorInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(catchError((error: HttpErrorResponse) => {
       let errorMsg = '';
+      let errorObj = {}
       if (error.error instanceof ErrorEvent) {
         console.log('This is client side error');
         errorMsg = `Error: ${error.error.message}`;
       } else {
-        console.log('This is server side error');
-        errorMsg = `Error Code: ${error.status},  Message: ${error.message}`;
         if (error.status == 401) {
           this.authService.signOut()
         }
         else {
-          this.openFailureSnackBar('Internal Server Error', 'Close')
-          console.log("error")
+          this.openFailureSnackBar(error.error.message?'Error : '+error.error.message:'Error : Internal Server Error', 'Close')
         }
+        errorObj['status'] = error.status
+        errorObj['message'] = error.error.message
       }
-      console.log(errorMsg);
-      return throwError(errorMsg);
+      return throwError(errorObj);
     }));
   }
 

@@ -15,7 +15,9 @@ from schemas.line_item_schema import (LineItemModel, LineItemResponseModel,
                                       DeleteLineItem, FullLineItemModel,
                                       BasicScoreModel, ResultResponseModel)
 from schemas.error_schema import NotFoundErrorResponseModel
-from services.line_item_service import create_new_line_item
+from services.line_item_service import (create_new_line_item,
+                                        get_line_item_results,
+                                        get_result_of_line_item)
 from services.grade_service import grade_pass_back
 from typing import List, Optional
 from services.validate_service import validate_access, get_tool_info_using_token
@@ -421,26 +423,12 @@ def get_results_of_line_item(context_id: str,
       raise ResourceNotFoundException(
           f"Line item with id {line_item_id} in {context_id} not found")
 
-    result_fields = []
-    if user_id:
-      result = Result.collection.filter("lineItemId", "==",
-                                        line_item_id).filter(
-                                            "userId", "==", user_id).get()
-      if result:
-        result_fields = [{
-            "id": result.id,
-            **result.get_fields(reformat_datetime=True)
-        }]
-    else:
-      result = Result.collection.filter("lineItemId", "==",
-                                        line_item_id).offset(skip).fetch(limit)
-      for i in result:
-        result_data = i.get_fields(reformat_datetime=True)
-        result_data[
-            "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{i.id}"
-        result_data[
-            "scoreOf"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}"
-        result_fields.append(result_data)
+    result_fields = get_line_item_results(
+        context_id=context_id,
+        line_item_id=line_item_id,
+        user_id=user_id,
+        skip=skip,
+        limit=limit)
 
     return result_fields
 
@@ -486,22 +474,8 @@ def get_result(context_id: str,
   Result: `ResultResponseModel`
   """
   try:
-    line_item = LineItem.find_by_id(line_item_id)
-
-    if line_item.contextId != context_id:
-      raise ResourceNotFoundException(
-          f"Line item with id {line_item_id} in {context_id} not found")
-
-    result = Result.find_by_id(result_id)
-    if result.lineItemId != line_item_id:
-      raise ResourceNotFoundException(
-          "Incorrect result id provided for the given line item")
-    result_fields = result.get_fields(reformat_datetime=True)
-    result_fields[
-        "id"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}/results/{result.id}"
-
-    result_fields[
-        "scoreOf"] = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/line_items/{line_item_id}"
+    result_fields = get_result_of_line_item(
+        context_id=context_id, line_item_id=line_item_id, result_id=result_id)
 
     return result_fields
 
@@ -552,9 +526,13 @@ def create_score_for_line_item(context_id: str,
 
     input_score_dict = {**input_score.dict()}
 
-    if input_score_dict["scoreGiven"] > input_score_dict["scoreMaximum"]:
-      raise ValidationError(
-          "Score maximum should not be greater than the given score")
+    if input_score_dict.get("scoreGiven") is not None:
+      if input_score_dict.get("scoreMaximum") is not None:
+        if input_score_dict["scoreGiven"] > input_score_dict["scoreMaximum"]:
+          raise ValidationError(
+              "Score maximum should not be greater than the given score")
+      else:
+        raise ValidationError("Score maximum should not be a null value")
 
     input_score_dict["lineItemId"] = line_item_id
 
@@ -620,12 +598,17 @@ def create_score_for_line_item(context_id: str,
       if input_score_dict["gradingProgress"] == "FullyGraded":
         input_grade_dict["assigned_grade"] = input_result_dict["resultScore"]
 
-      gpb_resp = grade_pass_back(input_grade_dict, user_id, line_item_id)
-      if gpb_resp:
-        result = Result.collection.filter("scoreOf", "==", line_item_id).filter(
-            "userId", "==", input_score_dict["userId"]).get()
-        result.isGradeSyncCompleted = True
-        result.update()
+      if input_grade_dict.get(
+          "draft_grade") is not None or input_grade_dict.get(
+              "assigned_grade") is not None:
+        gpb_resp = grade_pass_back(input_grade_dict, user_id, line_item_id)
+        if gpb_resp:
+          result = Result.collection.filter(
+              "scoreOf", "==",
+              line_item_id).filter("userId", "==",
+                                   input_score_dict["userId"]).get()
+          result.isGradeSyncCompleted = True
+          result.update()
 
     else:
       Logger.error(

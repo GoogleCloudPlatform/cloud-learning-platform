@@ -72,15 +72,6 @@ def get_student_email_and_token():
   invite_student_token_response = f"projects/{PROJECT_ID}/secrets/{invite_student_email_token_secret_id}/versions/latest"   
   invite_student_token_response = client.access_secret_version(
       request={"name":invite_student_token_response})
-
-  # credentials_dict = json.loads(
-  #     student_token_response.payload.data.decode("UTF-8"))
-  # creds = Credentials.from_authorized_user_info(
-  #     credentials_dict, scopes=credentials_dict["scopes"])
-  # if not creds or not creds.valid:
-  #   if creds and creds.expired and creds.refresh_token:
-  #     creds.refresh(Request())
-  #     credentials_dict = json.loads(creds.to_json())
   student_creds_dict = get_access_token(student_token_response)
   invite_student_creds_dict = get_access_token(invite_student_token_response)
   data = {

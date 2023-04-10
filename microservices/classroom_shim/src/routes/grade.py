@@ -6,13 +6,13 @@ from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import InternalServerError
 from common.utils.classroom_crud import (post_grade_of_the_user,
                                          get_submitted_course_work_list)
-from common.utils.secrets import get_backend_robot_id_token
+from config import auth_client
 from schemas.grade_schema import PostGradeModel, PostGradeResponseModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
 
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, broad-exception-raised
 
 router = APIRouter(
     tags=["Grade"],
@@ -76,7 +76,7 @@ def update_classroom_grade(input_grade: PostGradeModel):
 
     user_id = input_grade_dict["user_id"]
 
-    headers = {"Authorization": f"Bearer {get_backend_robot_id_token()}"}
+    headers = {"Authorization": f"Bearer {auth_client.get_id_token()}"}
 
     submissions = get_submitted_course_work_list(
         section_id=lti_assignment.section_id,

@@ -106,6 +106,12 @@ FULL_RESULT_EXAMPLE = {
     **BASIC_RESULT_EXAMPLE
 }
 
+FULL_RESULT_WITH_TIMESTAMPS_EXAMPLE = {
+    **FULL_RESULT_EXAMPLE,
+    "created_time": "2023-01-16T12:54:36.736+00:00",
+    "last_modified_time": "2023-02-08T09:25:47.817+00:00"
+}
+
 BASIC_CONTENT_ITEM_EXAMPLE = {
     "tool_id": "A6cS8vaCsOavO",
     "content_item_type": "ltiResourceLink",

@@ -26,7 +26,7 @@ class AddStudentResponseModel(BaseModel):
         }
     }
 
-class AddStudentToCohortModel(BaseModel):
+class AddStudentModel(BaseModel):
   """Input Model to add student in section"""
   email: constr(min_length=7, max_length=128,
                 regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
