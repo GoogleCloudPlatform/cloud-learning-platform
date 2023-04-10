@@ -193,7 +193,6 @@ def enroll_student_course(context):
   course_enrollment_mapping.section = section
   course_enrollment_mapping.status ="active"
   temp_user = TempUser.from_dict(student_data)
-
   temp_user.user_id = ""
   temp_user.save()
   temp_user.user_id = temp_user.id
@@ -209,6 +208,29 @@ def enroll_student_course(context):
   print("Enroll student fixture cohort id",section.cohort.id)
   yield context.enroll_student_data
 
+@fixture
+def import_google_form_grade(context):
+  section = use_fixture(create_section,context)
+  classroom_code = section.classroom_code
+  classroom_id = section.classroom_id
+  a_creds = service_account.Credentials.from_service_account_info(
+      CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("classroom", "v1", credentials=creds)
+  body={"title": "Test_quize",
+      "description":"test desc",
+      "workType": "ASSIGNMENT",
+      "materials":[
+    {"link":
+      {"url": "https://docs.google.com/forms/d/1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM/edit",
+       "state": "PUBLISHED",
+       }}
+      ] }
+  coursework = service.courses().courseWork().create(courseId=section.classroom_id,
+                                                 body=body).execute()
+  
+  context.coursework_id = coursework.get("id")
+  yield context.coursework
 
 @fixture
 def create_assignment(context):

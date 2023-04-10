@@ -36,7 +36,9 @@ SCOPES = [
     "https://www.googleapis.com/auth/forms.body.readonly",
     "https://www.googleapis.com/auth/classroom.profile.photos",
     "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
+    "https://www.googleapis.com/auth/forms.body",
+    "https://www.googleapis.com/auth/drive.file"
 ]
 
 
@@ -324,13 +326,9 @@ def get_one_coursework(course_id,coursework_id):
     """ ""
 
   service = build("classroom", "v1", credentials=get_credentials())
-  try:
-    coursework = service.courses().courseWork().get(
-        courseId=course_id,id=coursework_id).execute()
-    return coursework
-  except HttpError as error:
-    logger.error(error)
-    return None
+  coursework = service.courses().courseWork().get(
+        courseId=course_id ,id=coursework_id).execute()
+  return coursework
 
 
 
@@ -651,6 +649,21 @@ def retrive_all_form_responses(form_id):
   result = service.forms().responses().list(formId=form_id).execute()
   return result
 
+
+
+def create_google_form(form_body):
+  "Query google forms api  using form id and get view url of  google form"
+  DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
+  service = build("forms", "v1", credentials=get_credentials(),discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
+  result = service.forms().create(body=form_body).execute()
+  return result
+
+def batch_update_google_form(form_id ,form_body):
+  "Query google forms api  using form id and get view url of  google form"
+  DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
+  service = build("forms", "v1", credentials=get_credentials(),discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
+  result = service.forms().batchUpdate(formId=form_id, body=form_body).execute()
+  return result
 
 def invite_user(course_id, email,role):
   """Invite teacher to google classroom using course id and email

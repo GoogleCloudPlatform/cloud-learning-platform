@@ -19,7 +19,7 @@ from schemas.error_schema import (ConflictResponseModel,
 from schemas.section import (
     DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
-    UpdateSectionResponseModel,TeachersListResponseModel,
+    UpdateSectionResponseModel,TeachersListResponseModel,ImportGradeResponseModel,
     GetTeacherResponseModel,AssignmentModel)
 from schemas.update_section import UpdateSection
 from services import common_service
@@ -461,8 +461,8 @@ def get_assignment(section_id: str, assignment_id: str):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-@router.post("/import_grade/{classroom_id}/{coursework_id}")
-def import_grade(classroom_id: str,coursework_id:str):
+@router.post("/{section_id}/coursework/{coursework_id}",response_model=ImportGradeResponseModel)
+def import_grade(section_id: str,coursework_id:str):
   """Get a section details from db
 
   Args:
@@ -475,32 +475,171 @@ def import_grade(classroom_id: str,coursework_id:str):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    result = classroom_crud.get_one_coursework(classroom_id,coursework_id)
-    print("COursework Print_____",result)
+    print()
+    section = Section.find_by_id(section_id)
+    result = classroom_crud.get_one_coursework(section.classroom_id,coursework_id)    
     url_mapping = classroom_crud.\
             get_edit_url_and_view_url_mapping_of_form()
-    print("Get Url mapping worked")
-    for material in result["materials"]:
-      print("Insidde form loop")
-      if "form" in material.keys():
-        form_details = url_mapping[material["form"]["formUrl"]]
-        form_id = form_details["file_id"]
-        # Get all responses for the form
-        all_responses_of_form = classroom_crud.retrive_all_form_responses(form_id)
-        # Get student 
-        print("This is responses of form _____form_id__",all_responses_of_form)
-        for response in all_responses_of_form["responses"]:
-          print("In response loopp________",response)
-      
-          submissions=classroom_crud.get_coursework_submissions(classroom_id,coursework_id,
-                                                    response["respondentEmail"])
-          print("SUBMISSIONS__________",submissions[0]["id"])
-          
-          patch_result= classroom_crud.patch_student_submission(classroom_id,coursework_id,submissions[0]["id"],response["totalScore"]+5,response["totalScore"]+5)
-          print("PAtch result for submission id,email ",coursework_id,submissions[0]["id"],response["respondentEmail"],patch_result)
-    return "success"
+    count =0
+    student_grades = {}
+    if "materials" in result["materials"]:
+      for material in result["materials"]:
+        if "form" in material.keys():
+          form_details = url_mapping[material["form"]["formUrl"]]
+          form_id = form_details["file_id"]
+          # Get all responses for the form
+          all_responses_of_form = classroom_crud.retrive_all_form_responses(form_id)
+          # Get student 
+          if all_responses_of_form =={}:
+            return {"data":{"count":0,"student_grades":{}}}
+
+          for response in all_responses_of_form["responses"]:
+            # print("In response loopp________",response)
+        
+            submissions=classroom_crud.get_coursework_submissions(section.classroom_id,coursework_id,
+                                                      response["respondentEmail"])
+            # print("SUBMISSIONS__________",submissions[0]["id"])
+            count+=1
+            student_grades[response["respondentEmail"]]=response["totalScore"]
+            print("Increment count and mapping",count,student_grades)
+            patch_result= classroom_crud.patch_student_submission(section.classroom_id,coursework_id,submissions[0]["id"],response["totalScore"],response["totalScore"])
+      print("Count ",count,student_grades)
+      return {"data":{"count":count,"student_grades":student_grades}}
+    else:
+      return {"data":{"count":count,"student_grades":student_grades}}
+  except HttpError as hte:
+    Logger.error(hte)
+    message = str(hte)
+    if hte.resp.status == 404:
+      message = "Coursework not found"
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=message,
+                              data=None) from hte
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
     raise InternalServerError(str(e)) from e
 
+@router.post("/create_form")
+def create_form():
+  try:
+    form_body = {
+    "info": {
+    "title": "test_Explorer2"
+   
+  }
+    }
+    result =  classroom_crud.create_google_form(form_body)
+    print(result)
+    form_id = result["formId"]
+    NEW_QUESTION = {
+    "requests": [{
+        
+      # "updateSettings": {
+      #   "settings": {
+      #     "quizSettings": {
+      #       "isQuiz": True
+      #     }
+      #   }
+      # },
+    "createItem":{
+            "item": {
+                "title": "In what year did the United States land a mission on the moon?",
+                "questionItem": {
+                    "question": {
+                        "required": True,
+                        "choiceQuestion": {
+                            "type": "RADIO",
+                            "options": [
+                                {"value": "1965"},
+                                {"value": "1967"},
+                                {"value": "1969"},
+                                {"value": "1971"}
+                            ],
+                            "shuffle": True
+                        },
+                        # "grading":{"pointValue": 5,"correctAnswers": {"answers": [
+                        #           {
+                        #             "value": "1965"
+                        #           }]}
+                        #           }
+                    }
+                },
+            },
+            "location": {
+                "index": 0
+            }
+        
+    }
+    }]
+}
+
+    update_result = classroom_crud.batch_update_google_form(form_id,NEW_QUESTION)
+    print("Update result succss")
+    return result ,update_result
+  except Exception as e:
+    Logger.error(e)
+
+@router.post("/update_form/{form_id}")
+def update_form(form_id: str):
+  try:
+    print("Hello Inside Update API")
+    NEW_QUESTION = {
+    "requests": [{
+        "updateSettings": {
+          "settings": {
+            "quizSettings": {
+              "isQuiz": True
+            }
+          },"updateMask":"*"
+        }
+        }]}
+    update_result = classroom_crud.batch_update_google_form(form_id,NEW_QUESTION)
+    print("Update result succss")
+    return update_result
+  except Exception as e:
+    Logger.error(e)
+
+@router.post("/setup_grading/{form_id}")
+def setup_grading(form_id:str):
+  try:
+    print("Hello Inside setup grading Update API")
+    NEW_QUESTION = {
+    "requests": [{
+    "createItem":{
+            "item": {
+                "title": "In what year did the United States land a mission on the moon?",
+                "questionItem": {
+                    "question": {
+                        "required": True,
+                        "choiceQuestion": {
+                            "type": "RADIO",
+                            "options": [
+                                {"value": "1965"},
+                                {"value": "1967"},
+                                {"value": "1969"},
+                                {"value": "1971"}
+                            ],
+                            "shuffle": True
+                        },
+                        "grading":{"pointValue": 5,"correctAnswers": {"answers": [
+                                  {
+                                    "value": "1965"
+                                  }]}
+                                  }
+                    }
+                },
+            },
+            "location": {
+                "index": 0
+            }
+    }
+    }]
+}
+
+    update_result = classroom_crud.batch_update_google_form(form_id,NEW_QUESTION)
+    print("Update result succss")
+    return update_result
+  except Exception as e:
+    Logger.error(e)
