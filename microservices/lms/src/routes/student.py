@@ -6,7 +6,7 @@ from services import student_service
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
 ValidationError,InvalidTokenError)
-from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
+from common.utils.http_exceptions import (ClassroomHttpException,InternalServerError,
                              ResourceNotFound, BadRequest,InvalidToken,Conflict)
 from common.models import CourseEnrollmentMapping,Section,Cohort,TempUser
 from common.utils import classroom_crud
@@ -290,10 +290,8 @@ def delete_student(section_id: str,user:str,request: Request):
   except HttpError as ae:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -387,15 +385,12 @@ def enroll_student_cohort(cohort_id: str,
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     if ae.resp.status == 409:
-      raise CustomHTTPException(status_code=ae.resp.status,
-              success=False,
-    message="Student already exist in classroom",data=None) from ae
+      raise ClassroomHttpException(status_code=ae.resp.status,
+    message="Student already exist in classroom") from ae
     else :
-      raise CustomHTTPException(status_code=ae.resp.status,
-                                success=False,
+      raise ClassroomHttpException(status_code=ae.resp.status,
       message="Can't enroll student to classroom,\
-  Please check organizations policy or authentication scopes",
-                                data=None) from ae
+  Please check organizations policy or authentication scopes") from ae
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -477,15 +472,12 @@ def enroll_student_section(section_id: str,
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     # if ae.resp.status == 409:
-    #   raise CustomHTTPException(status_code=ae.resp.status,
-    #           success=False,
-    # message="Student already exist in classroom",data=None) from ae
+    #   raise ClassroomHttpException(status_code=ae.resp.status,
+    # message="Student already exist in classroom") from ae
     # else :
-    raise CustomHTTPException(status_code=ae.resp.status,
-                                success=False,
+    raise ClassroomHttpException(status_code=ae.resp.status,
       message="Can't enroll student to classroom,\
-  Please check organizations policy or authentication scopes",
-                                data=None) from ae
+  Please check organizations policy or authentication scopes") from ae
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -528,10 +520,8 @@ def invite_student(section_id: str,student_email:str,
     Logger.error(conflict)
     raise Conflict(str(conflict)) from conflict
   except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -593,10 +583,8 @@ def invite_student_cohort(cohort_id: str,student_email:str,
     Logger.error(conflict)
     raise Conflict(str(conflict)) from conflict
   except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -684,10 +672,8 @@ def update_invites(request: Request):
   except HttpError as ae:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
