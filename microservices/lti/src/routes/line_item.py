@@ -526,9 +526,13 @@ def create_score_for_line_item(context_id: str,
 
     input_score_dict = {**input_score.dict()}
 
-    if input_score_dict["scoreGiven"] > input_score_dict["scoreMaximum"]:
-      raise ValidationError(
-          "Score maximum should not be greater than the given score")
+    if input_score_dict.get("scoreGiven") is not None:
+      if input_score_dict.get("scoreMaximum") is not None:
+        if input_score_dict["scoreGiven"] > input_score_dict["scoreMaximum"]:
+          raise ValidationError(
+              "Score maximum should not be greater than the given score")
+      else:
+        raise ValidationError("Score maximum should not be a null value")
 
     input_score_dict["lineItemId"] = line_item_id
 
@@ -594,12 +598,17 @@ def create_score_for_line_item(context_id: str,
       if input_score_dict["gradingProgress"] == "FullyGraded":
         input_grade_dict["assigned_grade"] = input_result_dict["resultScore"]
 
-      gpb_resp = grade_pass_back(input_grade_dict, user_id, line_item_id)
-      if gpb_resp:
-        result = Result.collection.filter("scoreOf", "==", line_item_id).filter(
-            "userId", "==", input_score_dict["userId"]).get()
-        result.isGradeSyncCompleted = True
-        result.update()
+      if input_grade_dict.get(
+          "draft_grade") is not None or input_grade_dict.get(
+              "assigned_grade") is not None:
+        gpb_resp = grade_pass_back(input_grade_dict, user_id, line_item_id)
+        if gpb_resp:
+          result = Result.collection.filter(
+              "scoreOf", "==",
+              line_item_id).filter("userId", "==",
+                                   input_score_dict["userId"]).get()
+          result.isGradeSyncCompleted = True
+          result.update()
 
     else:
       Logger.error(
