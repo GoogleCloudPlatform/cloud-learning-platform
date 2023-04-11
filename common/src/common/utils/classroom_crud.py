@@ -664,6 +664,14 @@ def batch_update_google_form(form_id ,form_body):
   service = build("forms", "v1", credentials=get_credentials(),discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
   result = service.forms().batchUpdate(formId=form_id, body=form_body).execute()
   return result
+
+def get_google_form(form_id):
+  "Query google forms api  using form id and get view url of  google form"
+  DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
+  service = build("forms", "v1", credentials=get_credentials(),discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
+  result = service.forms().get(formId=form_id).execute()
+  return result
+
 def invite_user(course_id, email,role):
   """Invite teacher to google classroom using course id and email
 

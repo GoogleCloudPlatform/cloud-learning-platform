@@ -28,7 +28,7 @@ from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model,
                           FEED_TYPES)
 from config import BQ_TABLE_DICT,BQ_DATASET
-
+import numpy as np
 # disabling for linting to pass
 # pylint: disable = broad-except
 
@@ -643,3 +643,93 @@ def setup_grading(form_id:str):
     return update_result
   except Exception as e:
     Logger.error(e)
+
+@router.get("/get_form/{form_id}")
+def get_form(form_id: str):
+  try:
+    update_result = classroom_crud.get_google_form(form_id)
+    print("Get form result")
+    return update_result
+  except Exception as e:
+    Logger.error(e)
+
+@router.get("/remove_duplicate/")
+def get_form(form_id: str):
+  try:
+    links =[]
+    you_tube_video = []
+    coursework = {
+  "courseId": "563344568996",
+  "id": "518510549348",
+  "title": "test_assignment",
+  "description": "5+4=?",
+  "materials": [
+    {
+      "link": {
+        "url": "https://developers.google.com/forms/api/reference/rest",
+        "title": "Google Forms API  |  Google Developers",
+        "thumbnailUrl": "https://classroom.google.com/webthumbnail?url=https://developers.google.com/forms/api/reference/rest"
+      }
+    },
+    {
+      "link": {
+        "url": "https://developers.google.com/forms/api/reference/rest",
+        "title": "Google Forms API  |  Google Developers",
+        "thumbnailUrl": "https://classroom.google.com/webthumbnail?url=https://developers.google.com/forms/api/reference/rest"
+      }
+    },
+    {
+      "youtubeVideo": {
+        "id": "TlQhI-73rLA",
+        "title": "Introducing Google Classroom add-ons",
+        "alternateLink": "https://www.youtube.com/watch?v=TlQhI-73rLA",
+        "thumbnailUrl": "https://i.ytimg.com/vi/TlQhI-73rLA/default.jpg"
+      }
+    },
+    {
+      "youtubeVideo": {
+        "id": "TlQhI-73rLA",
+        "title": "Introducing Google Classroom add-ons",
+        "alternateLink": "https://www.youtube.com/watch?v=TlQhI-73rLA",
+        "thumbnailUrl": "https://i.ytimg.com/vi/TlQhI-73rLA/default.jpg"
+      }
+    }
+  ],
+  "state": "PUBLISHED",
+  "alternateLink": "https://classroom.google.com/c/NTYzMzQ0NTY4OTk2/a/NTE4NTEwNTQ5MzQ4/details",
+  "creationTime": "2023-04-10T10:20:12.244Z",
+  "updateTime": "2023-04-10T14:06:58.574Z",
+  "maxPoints": 10,
+  "workType": "ASSIGNMENT",
+  "submissionModificationMode": "MODIFIABLE_UNTIL_TURNED_IN",
+  "assignment": {
+    "studentWorkFolder": {
+      "id": "1DDIUZ2yyRnAtZGNbkh_q-x2zVSCZy8fSo1m18YR2DRXjYiUkwECkHKyEr40u6nkDhVouHSjA"
+    }
+  },
+  "assigneeMode": "ALL_STUDENTS",
+  "creatorUserId": "108246450606823720702"
+}
+
+  # coursework2 = list(np.unique(coursework["materials"]))
+    material2 = []
+    for material in coursework["materials"]:
+      if "link" in material.keys():
+        if(material["link"]["url"] not in links):
+          links.append(material["link"]["url"])
+          material2.append(material)
+        # else:
+        #   coursework["materials"].remove(material)
+      if "youtubeVideo" in  material.keys():
+        if(material["youtubeVideo"]["id"] not in you_tube_video):
+          print("YOUTUBE VIDEO ID",material["youtubeVideo"]["id"])
+          you_tube_video.append(material["youtubeVideo"]["id"])
+          material2.append(material)
+        # else:
+        #   coursework["materials"].remove(material)
+    print("Get form result")
+    return material2
+  except Exception as e:
+    Logger.error(e)
+
+
