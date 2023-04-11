@@ -355,7 +355,8 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
 
 @router.get("/{cohort_id}/get_progress_percentage/not_turned_in/{user}",
       response_model=GetProgressPercentageCohortResponseModel)
-def get_progress_percentage_not_turned_in(cohort_id: str, user: str, request: Request):
+def get_progress_percentage_not_turned_in(\
+  cohort_id: str, user: str, request: Request):
   """Get progress percentage of assignments having assigned grades
 
   Args:
