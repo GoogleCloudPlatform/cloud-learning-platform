@@ -336,7 +336,7 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
             progress_percent}
           section_with_progress_percentage.append(data)
       cached_value = set_key(f"{cohort_id}::{user_id}",\
-      section_with_progress_percentage, 86400)
+      section_with_progress_percentage, 3600)
       Logger.info\
       (f"progress percentage caching status for cohort_id \
       {cohort_id}, user_id {user_id} : {cached_value}")
@@ -352,10 +352,10 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
-  
+
 @router.get("/{cohort_id}/get_progress_percentage/not_turned_in/{user}",
       response_model=GetProgressPercentageCohortResponseModel)
-def get_progress_percentage(cohort_id: str, user: str, request: Request):
+def get_progress_percentage_not_turned_in(cohort_id: str, user: str, request: Request):
   """Get progress percentage of assignments having assigned grades
 
   Args:
@@ -407,7 +407,7 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
           section_with_progress_percentage.append(data)
       cached_value = set_key(\
       f"not_turned_in::{cohort_id}::{user_id}",\
-      section_with_progress_percentage, 86400)
+      section_with_progress_percentage, 3600)
       Logger.info\
       (f"progress percentage caching status for \
        not_turned_in cohort_id \
