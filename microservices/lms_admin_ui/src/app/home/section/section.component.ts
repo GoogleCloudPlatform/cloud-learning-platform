@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject,OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -8,6 +8,7 @@ import { CreateSectionComponent } from '../create-section/create-section.compone
 import { HomeService } from '../service/home.service';
 import { Router, NavigationStart, NavigationEnd, Event as NavigationEvent } from '@angular/router';
 import { InviteStudentModalComponent } from '../invite-student-modal/invite-student-modal.component';
+import { Subscription } from 'rxjs';
 
 interface LooseObject {
   [key: string]: any
@@ -31,7 +32,7 @@ export interface student {
   templateUrl: './section.component.html',
   styleUrls: ['./section.component.scss']
 })
-export class SectionComponent implements OnInit {
+export class SectionComponent implements OnInit,OnDestroy {
   selectedSection: any
   displayedColumns: string[] = ['email', 'role'];
   studentDisplayedColumns: string[] = ['first name', 'last name', 'email', 'created time','status','action'];
@@ -46,6 +47,7 @@ export class SectionComponent implements OnInit {
   loadCard: boolean = false
   loadSection: boolean = false
   studentTableLoader:boolean=true
+  getStudentListSub:Subscription
   constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, public _HomeService: HomeService, 
     public router: Router, private _location: Location) { }
   @ViewChild(MatSort) sort: MatSort;
@@ -103,7 +105,10 @@ export class SectionComponent implements OnInit {
   }
   getSectionStudents() {
     this.studentTableLoader = true
-    this._HomeService.getStudentsInSection(this.selectedSection.id).subscribe((res: any) => {
+    if(this.getStudentListSub){
+      this.getStudentListSub.unsubscribe();
+    }
+    this.getStudentListSub=this._HomeService.getStudentsInSection(this.selectedSection.id).subscribe((res: any) => {
       this.studentTableData = []
       this.studentTableData = res.data
       console.log('student data', this.studentTableData)
@@ -287,7 +292,11 @@ export class SectionComponent implements OnInit {
       return false
     }
   }
-
+  ngOnDestroy(): void {
+    if(this.getStudentListSub){
+      this.getStudentListSub.unsubscribe();
+    }
+  }
 
 }
 
@@ -312,4 +321,5 @@ export class DeleteOverviewDialog {
   onNoClick(): void {
     this.dialogRef.close({ data: 'closed' });
   }
+
 }
