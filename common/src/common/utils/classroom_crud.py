@@ -557,7 +557,6 @@ def get_view_link_from_id(form_id):
   result = service.forms().get(formId=form_id).execute()
   return result
 
-
 def invite_user(course_id, email,role):
   """Invite teacher to google classroom using course id and email
 

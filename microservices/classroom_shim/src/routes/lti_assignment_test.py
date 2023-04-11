@@ -1,22 +1,25 @@
 """
   Tests for LTI Assignment endpoints
 """
+# disabling pylint rules that conflict with pytest fixtures
+# pylint: disable=unused-argument,redefined-outer-name,unused-import,line-too-long
 import os
 import json
 import datetime
 import pytest
-
-# disabling pylint rules that conflict with pytest fixtures
-# pylint: disable=unused-argument,redefined-outer-name,unused-import,line-too-long
 from copy import deepcopy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from common.models import LTIAssignment
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from common.utils.http_exceptions import add_exception_handlers
-from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE
-from testing.test_config import API_URL
-from routes.lti_assignment import router
+import mock
+with mock.patch(
+    "google.cloud.secretmanager.SecretManagerServiceClient",
+    side_effect=mock.MagicMock()) as mok:
+  from routes.lti_assignment import router
+  from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE
+  from testing.test_config import API_URL
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"

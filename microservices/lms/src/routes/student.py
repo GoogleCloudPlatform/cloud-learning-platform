@@ -6,7 +6,7 @@ from services import student_service
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
 ValidationError,InvalidTokenError)
-from common.utils.http_exceptions import (CustomHTTPException,InternalServerError,
+from common.utils.http_exceptions import (ClassroomHttpException,InternalServerError,
                              ResourceNotFound, BadRequest,InvalidToken,Conflict)
 from common.models import CourseEnrollmentMapping,Section,Cohort,TempUser
 from common.utils import classroom_crud
@@ -17,7 +17,7 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
 from schemas.section import(StudentListResponseModel,\
    DeleteStudentFromSectionResponseModel)
 from schemas.student import(AddStudentResponseModel,\
-  AddStudentToCohortModel,GetStudentDetailsResponseModel,\
+  AddStudentModel,GetStudentDetailsResponseModel,\
     GetProgressPercentageResponseModel,InviteStudentToSectionResponseModel,
     UpdateInviteResponseModel)
 
@@ -290,10 +290,8 @@ def delete_student(section_id: str,user:str,request: Request):
   except HttpError as ae:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -303,8 +301,8 @@ def delete_student(section_id: str,user:str,request: Request):
 
 @cohort_student_router.post("/{cohort_id}/students",
 response_model=AddStudentResponseModel)
-def enroll_student_section(cohort_id: str,
-                           input_data: AddStudentToCohortModel,
+def enroll_student_cohort(cohort_id: str,
+                           input_data: AddStudentModel,
                            request: Request):
   """
   Args:
@@ -337,7 +335,7 @@ def enroll_student_section(cohort_id: str,
                                                      headers=headers,
                                                      sections=sections):
       raise Conflict(f"User {input_data.email} is already\
-                      registered for cohort {cohort_id}")
+                      enrolled for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {input_data.email}")
@@ -386,17 +384,105 @@ def enroll_student_section(cohort_id: str,
   except HttpError as ae:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-    message="Can't enroll student to classroom,\
-Please check organizations policy or authentication scopes",
-                              data=None) from ae
+    if ae.resp.status == 409:
+      raise ClassroomHttpException(status_code=ae.resp.status,
+    message="Student already exist in classroom") from ae
+    else :
+      raise ClassroomHttpException(status_code=ae.resp.status,
+      message="Can't enroll student to classroom,\
+  Please check organizations policy or authentication scopes") from ae
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
+@section_student_router.post("/{section_id}/students",
+response_model=AddStudentResponseModel)
+def enroll_student_section(section_id: str,
+                           input_data: AddStudentModel,
+                           request: Request):
+  """
+  Args:
+    input_data(AddStudentModel):
+      An AddStudentToSectionModel object which contains email and credentials
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    AddStudentResponseModel: if the student successfully added,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    section = Section.find_by_id(section_id)
+    headers = {"Authorization": request.headers.get("Authorization")}
+    if not student_service.check_student_can_enroll_in_section(
+                                              email=input_data.email,
+                                                     headers=headers,
+                                                     section=section):
+      raise Conflict(f"User {input_data.email} is already\
+                      enrolled for section {section_id}")
+    Logger.info(f"Section {section.id},\
+                enroll student intiated for {input_data.email}")
+    user_object = classroom_crud.enroll_student(
+        headers=headers,
+        access_token=input_data.access_token,
+        student_email=input_data.email,
+        course_id=section.classroom_id,
+        course_code=section.classroom_code)
+    cohort = section.cohort
+    cohort.enrolled_students_count += 1
+    cohort.update()
+    section.enrolled_students_count +=1
+    section.update()
+
+    course_enrollment_mapping = CourseEnrollmentMapping()
+    course_enrollment_mapping.section = section
+    course_enrollment_mapping.user = user_object["user_id"]
+    course_enrollment_mapping.status = "active"
+    course_enrollment_mapping.role = "learner"
+    course_enrollment_id = course_enrollment_mapping.save().id
+    response_dict = {}
+    response_dict = {"course_enrollment_id":course_enrollment_id,
+        "student_email":input_data.email,"section_id":section.id,
+        "cohort_id": section.cohort.id,
+        "classroom_id":section.classroom_id,
+        "classroom_url":section.classroom_url}
+    return {
+        "message":
+        f"Successfully Added the Student with email {input_data.email}",
+        "data" : response_dict
+    }
+  except InvalidTokenError as ive:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InvalidToken(str(ive)) from ive
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    Logger.error(conflict)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    # if ae.resp.status == 409:
+    #   raise ClassroomHttpException(status_code=ae.resp.status,
+    # message="Student already exist in classroom") from ae
+    # else :
+    raise ClassroomHttpException(status_code=ae.resp.status,
+      message="Can't enroll student to classroom,\
+  Please check organizations policy or authentication scopes") from ae
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
 
 @section_student_router.post("/{section_id}/invite/{student_email}",
                              response_model=InviteStudentToSectionResponseModel)
@@ -434,10 +520,8 @@ def invite_student(section_id: str,student_email:str,
     Logger.error(conflict)
     raise Conflict(str(conflict)) from conflict
   except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -499,10 +583,8 @@ def invite_student_cohort(cohort_id: str,student_email:str,
     Logger.error(conflict)
     raise Conflict(str(conflict)) from conflict
   except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -590,10 +672,8 @@ def update_invites(request: Request):
   except HttpError as ae:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)

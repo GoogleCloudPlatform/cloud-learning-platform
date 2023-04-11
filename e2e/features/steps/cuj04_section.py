@@ -7,27 +7,23 @@ from testing_objects.user import TEST_USER
 from e2e.gke_api_tests.secrets_helper import get_student_email_and_token,get_workspace_student_email_and_token
 from environment import create_course
 
-# -------------------------------Enroll student to Section-------------------------------------
+# -------------------------------Enroll student to cohort-------------------------------------
 # ----Positive Scenario-----
 
 
-@behave.given("A user has access privileges and wants to enroll a student into a section")
+@behave.given("A user has access privileges and wants to enroll a student into a cohort")
 def step_impl_1(context):
   # context.url = f'{API_URL}/sections/{context.sections.id}/students'
-  print("IN ENROLL STUDNET_ chort ID",context.cohort.id)
   context.url = f'{API_URL}/cohorts/{context.cohort.id}/students'
   context.payload = get_student_email_and_token()
 
 
 
-@behave.when("API request is sent to enroll student to a section with correct request payload and valid section id")
+@behave.when("API request is sent to enroll student to a section with correct request payload and valid cohort id")
 def step_impl_2(context):
   resp = requests.post(context.url, json=context.payload,headers=context.header)
-  print("THIS IS RESPONSE FROM ENROLLL STUDNET POSITIVE__")
-  print(resp.json())
   context.status = resp.status_code
   context.response = resp.json()
-  print("ADD_STUDENT RESPONSE _________",resp.json())
 
 
 @behave.then("Section will be fetch using the given id and student is enrolled using student credentials and a response model object will be return")
@@ -38,7 +34,7 @@ def step_impl_3(context):
 # -----Negative Scenario-----
 
 
-@behave.given("A user has access to portal and needs to enroll a student into a section")
+@behave.given("A user has access to portal and needs to enroll a student into a cohort")
 def setp_impl_4(context):
   context.url = f'{API_URL}/cohorts/fake_id_data/students'
   context.payload = get_student_email_and_token()
@@ -79,18 +75,16 @@ def step_impl_9(context):
 # -----Positive Scenario--------
 
 
-@behave.given("A user has access privileges and wants to enroll a student using his/her workspace email into a section")
+@behave.given("A user has access privileges and wants to enroll a student using his/her workspace email into a cohort")
 def step_impl_10(context):
-  print("FOR WORKSPACE EMAIL cohort ID")
   context.url = f'{API_URL}/cohorts/{context.cohort.id}/students'
   context.payload = get_workspace_student_email_and_token()
 
 
-@behave.when("API request is sent to enroll workspace email as a student to a section with correct request payload and valid section id")
+@behave.when("API request is sent to enroll workspace email as a student to a cohort with correct request payload and valid cohort id")
 def step_impl_11(context):
   resp = requests.post(context.url, json=context.payload,
                        headers=context.header)
-  print("THIS IS RESPONSE FOR WORKSPACE ",resp.json())
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -225,7 +219,6 @@ def step_impl_32(context):
                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
-  print("List teachers API response in E2E",resp.status_code,resp.json())
 
 
 @behave.then(
@@ -254,7 +247,6 @@ def step_impl_35(context):
                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
-  print("List teachers API response in E2E invaalid section id",resp.status_code,resp.json())
 
 
 @behave.then(
@@ -281,7 +273,6 @@ def step_impl_38(context):
                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
-  print("Get teacher API response in E2E  section id",resp.status_code,resp.json())
 
 @behave.then(
     "Get the details of teacher from user collection"

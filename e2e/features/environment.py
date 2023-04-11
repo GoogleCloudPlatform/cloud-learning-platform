@@ -1,13 +1,14 @@
 import os
 import json
+import time
 import requests
 from behave import fixture, use_fixture
 from common.models import CourseTemplate, Cohort,Section, TempUser ,CourseEnrollmentMapping
 from common.testing.example_objects import TEST_SECTION,TEST_COHORT
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE
-from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,get_student_email_and_token
+from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL
+from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,get_student_email_and_token,get_required_emails_from_secret_manager
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.user import TEST_USER
 from google.oauth2.credentials import Credentials
@@ -15,12 +16,23 @@ import logging
 
 USER_EMAIL_PASSWORD_DICT = get_user_email_and_password_for_e2e()
 
+EMAILS = get_required_emails_from_secret_manager()
+TEACHER_EMAIL = EMAILS["teacher"]
 CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
-SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
-          "https://www.googleapis.com/auth/classroom.courses.readonly",
-          "https://www.googleapis.com/auth/classroom.coursework.students",
-          "https://www.googleapis.com/auth/classroom.rosters"]
+SCOPES = [
+  "https://www.googleapis.com/auth/classroom.courses",
+  "https://www.googleapis.com/auth/classroom.courses.readonly",
+  "https://www.googleapis.com/auth/classroom.coursework.students",
+  "https://www.googleapis.com/auth/classroom.rosters",
+  "https://www.googleapis.com/auth/classroom.coursework.me",
+  "https://www.googleapis.com/auth/classroom.topics",
+  "https://www.googleapis.com/auth/drive",
+  "https://www.googleapis.com/auth/forms.body.readonly",
+  "https://www.googleapis.com/auth/classroom.profile.photos",
+  "https://www.googleapis.com/auth/classroom.courseworkmaterials",
+  "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+          ]
 
 def create_course(name,section,description):
   """Create course Function in classroom
@@ -204,7 +216,8 @@ def enroll_student_course(context):
     "section_id": section.id,
     "user_id":temp_user.id,
     "email": student_email_and_token["email"].lower(),
-    "cohort_id":section.cohort.id
+    "cohort_id":section.cohort.id,
+    "access_token":student_email_and_token["access_token"]
     }
   print("Enroll student fixture cohort id",section.cohort.id)
   yield context.enroll_student_data
@@ -227,6 +240,70 @@ def create_assignment(context):
   result["section_id"] = section.id
   context.assignment = result
   yield context.assignment
+
+@fixture
+def create_analytics_data(context):
+  """Create Analytics data"""
+  print("Analytics data fixture")
+  header=use_fixture(get_header,context)
+  data={}
+  section=use_fixture(create_section,context)
+  res=requests.post(url=f'{API_URL}/sections/{section.id}/enable_notifications',
+                    headers=header)
+  res.raise_for_status()
+  student_email_and_token = get_student_email_and_token()
+  res=requests.post(url=f'{API_URL}/cohorts/{section.cohort.id}/students',
+                    json=student_email_and_token,
+                    headers=header)
+  res.raise_for_status()
+  resp=requests.get(headers=header,
+url=f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_email"]}')
+  resp.raise_for_status()
+  data["student_data"]=resp.json()["data"]
+  data["course_details"]={
+    "id":section.classroom_id,
+    "name":section.name,
+    "section":section.section
+    }
+  a_creds = service_account.Credentials.from_service_account_info(
+      CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("classroom", "v1", credentials=creds)
+  result = service.courses().courseWork(
+    ).create(courseId=section.classroom_id,
+        body={
+              "title": "test course work",
+              "description": "test desc",
+              "workType": "ASSIGNMENT",
+              "state": "PUBLISHED",
+               "maxPoints": 100,
+               "associatedWithDeveloper": True
+          }).execute()
+  data["course_work"]=result
+  context.analytics_data=data
+  result_sub = service.courses().courseWork(
+    ).studentSubmissions(
+      ).list(courseId=result["courseId"],
+        courseWorkId=result["id"],
+        userId=data["student_data"]["gaia_id"]).execute()
+  data["submission"]=result_sub["studentSubmissions"][0]
+  # creds = Credentials(token=student_email_and_token["access_token"])
+  # service = build("classroom", "v1", credentials=creds)
+  service.courses().courseWork().studentSubmissions().patch(
+        courseId=data["submission"]["courseId"],
+        courseWorkId=data["submission"]["courseWorkId"],
+        id=data["submission"]["id"],
+        updateMask="assignedGrade,draftGrade",
+        body={"assignedGrade":10,"draftGrade":10}).execute()
+  yield context.analytics_data
+
+def wait(secs):
+  def decorator(func):
+    def wrapper(*args, **kwargs):
+      time.sleep(secs)
+      return func(*args, **kwargs)
+    return wrapper
+  return decorator
 
 @fixture
 def invite_student(context):
@@ -282,7 +359,8 @@ fixture_registry = {
     "fixture.create.enroll_student_course":enroll_student_course,
     "fixture.get.header": get_header,
     "fixture.create.assignment": create_assignment,
-    "fixture.invite.student": invite_student
+    "fixture.invite.student": invite_student,
+    "fixture.create.analytics.data":create_analytics_data
 }
 
 def before_tag(context, tag):
