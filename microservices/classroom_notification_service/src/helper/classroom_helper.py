@@ -32,7 +32,7 @@ def get_service():
   creds = service_account.Credentials.from_service_account_info(
       get_gke_pd_sa_key_from_secret_manager(), scopes=SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-  return build("classroom", "v1", credentials=creds)
+  return build("classroom", "v1", credentials=creds,num_retries=15)
 
 def get_user(user_id):
   """ get user details from classroom

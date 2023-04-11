@@ -1,0 +1,35 @@
+<h1 mat-dialog-title><div style="display: flex;align-items: center;"><span>Course template details</span> <span class="material-symbols-rounded info-icon" style="font-size: 1.3rem;
+    margin-left: 3%;margin-top: 4px;">info</span></div></h1>
+<div mat-dialog-content>
+<div class="template-details-content-outer">
+    <div class="row"><span class="heading">Name : </span><span class="details">{{CourseTemplateDetailsDialogData.name}}</span></div>
+    <div class="row"><span class="heading">Description : </span><span class="details">{{CourseTemplateDetailsDialogData.description}}</span></div>
+    <div class="row"><span class="heading">Instructional Designer : </span><span class="details">{{CourseTemplateDetailsDialogData.instructional_designer}}</span></div>
+    <div class="row"><span class="heading">Admin : </span><span class="details">{{CourseTemplateDetailsDialogData.admin}}</span></div>
+
+</div>
+
+</div>
+<div mat-dialog-actions>
+    <button mat-flat-button (click)="close()">Close</button>
+    <!-- <button mat-flat-button color="primary" (click)="close()">
+        Ok
+    </button> -->
+</div>
+
+<style>
+  .template-details-content-outer{
+    margin-bottom: 3%;
+    margin-top:1%;
+  }
+  .template-details-content-outer .row{
+        margin-bottom: 3%;
+  }
+  .template-details-content-outer .row .heading{
+            font-weight: 700;
+        }
+.template-details-content-outer .row .details{
+            font-size: 0.8rem;
+            margin-left: 1%;
+        }
+</style>

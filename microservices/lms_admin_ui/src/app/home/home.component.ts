@@ -208,13 +208,22 @@ export class SuccessOverviewDialog {
     @Inject(MAT_DIALOG_DATA) public successDialogData: any
   ) { }
 
-  // deleteStudent() {
-  //   this._HomeService.deleteStudent(this.deleteDialogData.user_id, this.deleteDialogData.section_id).subscribe((res: any) => {
-  //     if (res.success == true) {
-  //       this.dialogRef.close({ data: 'success' });
-  //     }
-  //   })
-  // }
+  close(): void {
+    this.dialogRef.close({ data: 'closed' });
+  }
+}
+
+@Component({
+  selector: 'course-template-details-dialog',
+  templateUrl: 'course-template-details-dialog.html',
+})
+export class CourseTemplateDetailsDialog {
+  constructor(
+    public dialogRef: MatDialogRef<CourseTemplateDetailsDialog>,
+    @Inject(MAT_DIALOG_DATA) public CourseTemplateDetailsDialogData: any
+  ) {
+    console.log('dialog data',CourseTemplateDetailsDialogData)
+   }
 
   close(): void {
     this.dialogRef.close({ data: 'closed' });
