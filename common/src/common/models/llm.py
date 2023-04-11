@@ -17,6 +17,7 @@ Module to add cohort in Fireo
 from fireo.fields import TextField, IDField, ReferenceField
 from common.models import BaseModel, User
 
+# pylint: disable=unused-argument
 
 class UserLLM(BaseModel):
   """UserLLM ORM class

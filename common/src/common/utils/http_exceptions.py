@@ -188,8 +188,8 @@ class PayloadTooLarge(CustomHTTPException):
   """
 
   def __init__(self, message: str = "Content too large"):
-    super().__init__(status_code=413, 
-                     message=message, 
-                     success=False, 
+    super().__init__(status_code=413,
+                     message=message,
+                     success=False,
                      data=None)
 
