@@ -22,5 +22,6 @@ patchesStrategicMerge:
 - deployment-custom.yaml
 configMapGenerator:
 - name: env-vars
+  behavior: merge
   envs:
   - env.properties
