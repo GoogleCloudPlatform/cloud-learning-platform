@@ -242,7 +242,7 @@ def enroll_student_course(context):
 
 @fixture
 def import_google_form_grade(context):
-  print("IMPORT Google grade fixture started")
+  print("IMPORT Google grade fixture started",section.classroom_id)
   section = use_fixture(create_section,context)
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
@@ -253,10 +253,12 @@ def import_google_form_grade(context):
       "workType": "ASSIGNMENT",
       "materials":[
     {"link":
-      {"url": "https://docs.google.com/forms/d/1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM/edit",
-       "state": "PUBLISHED",
+      {
+        "title": "quize1 assignment",
+        "url": "https://docs.google.com/forms/d/1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM/edit"
        }}
-      ] }
+      ],
+      "state":"PUBLISHED"}
   coursework = service.courses().courseWork().create(courseId=section.classroom_id,
                                                  body=body).execute()
   print("Coursework created",coursework)
