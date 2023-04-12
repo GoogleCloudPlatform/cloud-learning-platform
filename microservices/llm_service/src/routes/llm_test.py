@@ -31,6 +31,7 @@ LLM_TESTDATA_FILENAME = os.path.join(TESTING_FOLDER_PATH,
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
+os.environ["OPENAI_API_KEY"] = "fake-key"
 
 def test_get_llm_list(clean_firestore):
   pass
@@ -44,7 +45,6 @@ def test_llm_generate(clean_firestore):
   with mock.patch("routes.llm.Logger"):
     with mock.patch("routes.llm.llm_generate"):
       resp = client_with_emulator.post(url, params=params)
-  json_response = resp.json()
   assert resp.status_code == 200, "Status is not 200"
 
 

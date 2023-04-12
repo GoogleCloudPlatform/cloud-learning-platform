@@ -16,6 +16,8 @@
 
 This module is *experimental* and can be changed in the future.
 """
+# pylint: disable = bad-indentation,trailing-whitespace,unused-argument
+# pylint: disable = missing-class-docstring,no-value-for-parameter
 
 import dataclasses
 

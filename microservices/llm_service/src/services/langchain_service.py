@@ -26,8 +26,8 @@ from config import LANGCHAIN_LLM, OPENAI_LLM_TYPES
 async def langchain_llm_generate(prompt: str, llm_type: str,
                                  user_llm: Optional[UserLLM] = None):
   """
-  Use langchain to generate text with an LLM given a prompt.  This is 
-    always done asychronously, and so must be used in a route defined with 
+  Use langchain to generate text with an LLM given a prompt.  This is
+    always done asychronously, and so must be used in a route defined with
     async def.
 
   Args:
@@ -35,7 +35,7 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
 
     llm_type: the type of LLM to use (default to openai)
 
-    llm (optional): a langchain llm object to use, perhaps specific to 
+    llm (optional): a langchain llm object to use, perhaps specific to
       a user
 
   Returns:

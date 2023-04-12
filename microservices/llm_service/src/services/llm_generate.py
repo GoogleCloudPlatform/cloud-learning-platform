@@ -26,8 +26,8 @@ from config import LANGCHAIN_LLM, GOOGLE_LLM, OPENAI_LLM_TYPE_GPT3_5
 async def llm_generate(prompt: str, llm_type: str,
                        user_llm: Optional[UserLLM] = None):
   """
-  Generate text with an LLM given a prompt.  This is 
-    always done asychronously, and so must be used in a route defined with 
+  Generate text with an LLM given a prompt.  This is
+    always done asychronously, and so must be used in a route defined with
     async def.
 
   Args:

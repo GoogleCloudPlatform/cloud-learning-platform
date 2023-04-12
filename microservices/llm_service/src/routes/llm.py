@@ -11,6 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# pylint: disable = broad-except,unused-import
+
 """ LLM endpoints """
 import traceback
 from typing import Optional
@@ -30,7 +33,6 @@ from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, LLM_TYPES
 
 router = APIRouter(prefix="/llm", tags=["LLMs"], responses=ERROR_RESPONSES)
 
-# pylint: disable = broad-except
 
 @router.get("", response_model=LLMGetResponse)
 def get_llm_list():
@@ -38,7 +40,7 @@ def get_llm_list():
   Get available LLMs
 
   Returns:
-      LLMGetResponse 
+      LLMGetResponse
   """
   try:
     return {
@@ -59,7 +61,7 @@ async def generate(gen_config: LLMGenerateModel):
       prompt(str): Input prompt for model
 
   Returns:
-      LLMGenerateResponse: 
+      LLMGenerateResponse
   """
   genconfig_dict = {**gen_config.dict()}
 
@@ -90,7 +92,7 @@ async def generate_user(userid: str, gen_config: UserLLMModel):
       prompt(str): Input prompt for model
 
   Returns:
-      LLMGenerateResponse: 
+      LLMGenerateResponse
   """
   genconfig_dict = {**gen_config.dict()}
 

@@ -75,12 +75,13 @@ ERROR_RESPONSES = {
 }
 
 # LLM configuration
-
-OPENAI_API_KEY = secrets.access_secret_version(
-    request={
-        "name": "projects/" + PROJECT_ID +
-                "/secrets/openai-api-key/versions/latest"
-    }).payload.data.decode("utf-8")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if OPENAI_API_KEY is None:
+  OPENAI_API_KEY = secrets.access_secret_version(
+      request={
+          "name": "projects/" + PROJECT_ID +
+                  "/secrets/openai-api-key/versions/latest"
+      }).payload.data.decode("utf-8")
 
 GOOGLE_API_KEY = secrets.access_secret_version(
     request={
