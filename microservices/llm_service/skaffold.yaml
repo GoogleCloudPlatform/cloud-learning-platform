@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 apiVersion: skaffold/v2beta12
 kind: Config
 metadata:
-  name: lms
+  name: llm-service
 requires:
   - path: ../../common
     configs: [common]
@@ -30,7 +30,7 @@ build:
   local:
     concurrency: 0
   artifacts:
-  - image: lms
+  - image: llm-service
     requires:
       - image: common
         alias: BASE_IMG
@@ -40,7 +40,7 @@ build:
         - '**/*.json'
 portForward:
 - resourceType: service
-  resourceName: lms
+  resourceName: llm-service
   port: 80
   localPort: 8888
 deploy:
@@ -52,7 +52,7 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: lms
+    - image: llm-service
       requires:
       - image: common
         alias: BASE_IMG
@@ -73,11 +73,11 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: lms
+    - image: llm-service
       docker:
         cacheFrom:
-          - lms
-          - lms:latest
+          - llm-service
+          - llm-service:latest
       requires:
       - image: common
         alias: BASE_IMG
@@ -87,11 +87,11 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: gcr.io/core-learning-services-dev/lms
+    - image: gcr.io/core-learning-services-dev/llm-service
       docker:
         cacheFrom:
-          - gcr.io/core-learning-services-dev/lms
-          - gcr.io/core-learning-services-dev/lms:latest
+          - gcr.io/core-learning-services-dev/llm-service
+          - gcr.io/core-learning-services-dev/llm-service:latest
       requires:
         - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG

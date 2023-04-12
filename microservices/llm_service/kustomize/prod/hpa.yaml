@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Flatten import namespace for models
-"""
-
-from .base_model import *
-from .user import *
-from .course_template import *
-from .cohort import *
-from .section import *
-from .lti import *
-from .course_enrollment_mapping import *
-from .temp_user import *
-from .lti_assignment import *
-from .llm import *
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cpu-pod-scaling-llm-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: llm-service
+  minReplicas: 3
+  maxReplicas: 110
+  metrics:
+  - type: Resource
+    #resource:
+    #  name: memory
+    #  targetAverageValue: 500Mi
+    resource:
+      name: cpu
+      targetAverageUtilization: 60

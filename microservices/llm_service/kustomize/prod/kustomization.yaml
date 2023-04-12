@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Flatten import namespace for models
-"""
-
-from .base_model import *
-from .user import *
-from .course_template import *
-from .cohort import *
-from .section import *
-from .lti import *
-from .course_enrollment_mapping import *
-from .temp_user import *
-from .lti_assignment import *
-from .llm import *
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+bases:
+- ../base
+resources:
+- hpa.yaml
+patchesStrategicMerge:
+- deployment-prod.yaml
+configMapGenerator:
+- name: env-vars
+  behavior: replace
+  envs:
+  - env.properties
