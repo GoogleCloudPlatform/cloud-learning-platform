@@ -259,6 +259,7 @@ def import_google_form_grade(context):
   coursework = service.courses().courseWork().create(courseId=section.classroom_id,
                                                  body=body).execute()
   context.coursework_id = coursework.get("id")
+  context.coursework = coursework
   classroom_code = section.classroom_code
   classroom_id = section.classroom_id
   student_email_and_token = get_student_email_and_token()
