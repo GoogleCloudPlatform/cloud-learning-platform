@@ -5,7 +5,7 @@ from googleapiclient.errors import HttpError
 from common.models import CourseTemplate, Cohort
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
-from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest, CustomHTTPException
+from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest, ClassroomHttpException
 from common.utils import classroom_crud
 from common.utils.bq_helper import insert_rows_to_bq
 from config import (CLASSROOM_ADMIN_EMAIL,BQ_TABLE_DICT,BQ_DATASET)
@@ -222,10 +222,8 @@ request: Request):
     return {"course_template": course_template}
   except HttpError as hte:
     Logger.error(hte)
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -324,10 +322,8 @@ def update_course_template(
     raise BadRequest(str(ve)) from ve
   except HttpError as hte:
     Logger.error(hte)
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:

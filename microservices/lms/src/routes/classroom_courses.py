@@ -1,7 +1,7 @@
 """Classroom Courses endpoint"""
 import traceback
 from common.utils.errors import  ValidationError
-from common.utils.http_exceptions import (CustomHTTPException,
+from common.utils.http_exceptions import (ClassroomHttpException,
                         InternalServerError,ResourceNotFound,
                                           BadRequest)
 from common.utils import classroom_crud
@@ -61,10 +61,8 @@ def get_courses(skip: int = 0, limit: int = 10):
     raise BadRequest(str(ve)) from ve
   except HttpError as hte:
     Logger.error(hte)
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
   except Exception as e:
     Logger.error(e)
     error = traceback.format_exc().replace("\n", " ")
@@ -210,10 +208,8 @@ def copy_courses(course_details: CourseDetails):
     return {"data":response}
   except HttpError as hte:
     Logger.error(hte)
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
@@ -229,7 +225,7 @@ def classroom_enable_notifications_pub_sub(course_id:str):
       course_id (str): unique course id
   Raises:
       InternalServerError: 500 Internal Server Error if something fails
-      CustomHTTPException: raise error according to the HTTPError exception
+      ClassroomHttpException: raise error according to the HTTPError exception
   Returns:
       _type_: _description_
   """
@@ -246,10 +242,8 @@ def classroom_enable_notifications_pub_sub(course_id:str):
   except ValidationError as ve:
     raise BadRequest(str(ve)) from ve
   except HttpError as hte:
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
   except InternalServerError as ie:
     raise InternalServerError(str(ie)) from ie
   except Exception as e:

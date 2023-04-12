@@ -3,7 +3,7 @@ import traceback
 import datetime
 from common.models import Cohort, CourseTemplate, Section
 from common.utils.errors import ResourceNotFoundException, ValidationError
-from common.utils.http_exceptions import (CustomHTTPException,
+from common.utils.http_exceptions import (ClassroomHttpException,
                                           InternalServerError,
                                           ResourceNotFound, BadRequest)
 from common.utils import classroom_crud
@@ -100,10 +100,8 @@ def create_section(sections_details: SectionDetails,
     raise ResourceNotFound(str(err)) from err
   except HttpError as hte:
     Logger.error(hte)
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
@@ -135,10 +133,8 @@ def get_section(section_id: str):
     raise ResourceNotFound(str(err)) from err
   except HttpError as ae:
     Logger.error(ae)
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -174,10 +170,8 @@ def get_teachers_list(section_id: str, request: Request):
     raise ResourceNotFound(str(err)) from err
   except HttpError as ae:
     Logger.error(ae)
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -220,10 +214,8 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
     raise ResourceNotFound(str(err)) from err
   except HttpError as ae:
     Logger.error(ae)
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -256,10 +248,8 @@ def delete_section(section_id: str):
     raise ResourceNotFound(str(err)) from err
   except HttpError as ae:
     Logger.error(ae)
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -377,10 +367,8 @@ def update_section(sections_details: UpdateSection,request: Request):
     raise ResourceNotFound(str(err)) from err
   except HttpError as hte:
     Logger.error(hte)
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(e)
@@ -396,7 +384,7 @@ def section_enable_notifications_pub_sub(section_id:str):
   Raises:
       InternalServerError: 500 Internal Server Error if something fails
       ResourceNotFound: 404 Section with section id is not found
-      CustomHTTPException: raise error according to the HTTPError exception
+      ClassroomHttpException: raise error according to the HTTPError exception
   Returns:
       _type_: _description_
   """
@@ -418,10 +406,8 @@ def section_enable_notifications_pub_sub(section_id:str):
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except HttpError as hte:
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
   except InternalServerError as ie:
     raise InternalServerError(str(ie)) from ie
   except Exception as e:
@@ -438,7 +424,7 @@ def get_assignment(section_id: str, assignment_id: str):
       assignment_id (str): course work/assignment unique id
   Raises:
       InternalServerError: 500 Internal Server Error if something fails
-      CustomHTTPException: raise error according to the HTTPError exception
+      ClassroomHttpException: raise error according to the HTTPError exception
       ResourceNotFound: 404 Section with section id is not found
   Returns:
       AssignmentModel: AssignmentModel object which
@@ -450,10 +436,8 @@ def get_assignment(section_id: str, assignment_id: str):
                                                 course_work_id=assignment_id)
     return convert_assignment_to_assignment_model(assignment)
   except HttpError as hte:
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=str(hte),
-                              data=None) from hte
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
