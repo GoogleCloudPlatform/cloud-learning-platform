@@ -188,50 +188,6 @@ ANALYTICS_USER_EXAMPLE={
     "user_verified_teacher": True
   }
 
-ANALYTICS_SUBMISSION_EXAMPLE={
-    "submission_id": "Cg4Int098765xdfy5678",
-    "submission_user_id": "0987654234567812111",
-    "submission_creation_time": "2023-03-23T13:27:50.745000+00:00",
-    "submission_update_time": "2023-03-23T13:27:50.657000+00:00",
-    "submission_state": "CREATED",
-    "submission_late": False,
-    "submission_draft_grade": 10,
-    "submission_assigned_grade": 10,
-    "submission_alternate_link":
-        "https://classroom.google.com/c/xyz/a/wert/submissions/student/ter",
-    "submission_course_work_type": "ASSIGNMENT",
-    "submission_associated_with_developer": True,
-    "submission_assignment_submission": {
-        "attachments": [
-            {
-            "object" :"Attachment"
-            }
-        ]
-    },
-    "submission_submission_history": [
-        {
-        "stateHistory": {
-            "actorUserId": "3456789",
-            "state": "CREATED",
-            "stateTimestamp": "2023-03-23T13:27:50.657Z"
-        },
-        "gradeHistory": {
-                "pointsEarned": 10,
-                "maxPoints": 100,
-                "gradeTimestamp": "2023-03-23T13:27:50.657Z",
-                "actorUserId": "345676543",
-                "gradeChangeType": "ASSIGNED_GRADE_POINTS_EARNED_CHANGE"
-            }
-        }
-    ],
-    "submission_short_answer_submission": {
-                    "answer": "string"
-                },
-    "submission_multiple_choice_submission": {
-                "answer": "string"
-                }
-
-          }
 ANALYTICS_COURSE_WORK_EXAMPLE={
     "course_work_id": "596333555555",
     "course_work_title": "assignment 2",
@@ -292,7 +248,6 @@ ANALYTICS_COURSE_WORK_EXAMPLE={
             "string"
         ]
     },
-    # "submission": ANALYTICS_SUBMISSION_EXAMPLE
     "submission_id": "Cg4Int098765xdfy5678",
     "submission_assigned_grade": 10,
     "submission_creation_time": "2023-03-23T13:27:50.745000+00:00",

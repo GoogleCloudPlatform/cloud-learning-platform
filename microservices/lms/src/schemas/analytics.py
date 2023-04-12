@@ -5,6 +5,7 @@ import datetime
 import json
 from pydantic import BaseModel, validator
 from typing import  Optional
+from common.utils.logging_handler import Logger
 from schemas.schema_examples import (
   ANALYTICS_USER_EXAMPLE,ANALYTICS_COURSE_EXAMPLE,ANALYTICS_COURSE_WORK_EXAMPLE
   )
@@ -64,42 +65,6 @@ class AnalyticsUser(BaseModel):
       "example":ANALYTICS_USER_EXAMPLE
     }
 
-# class AnalyticsSubmission(BaseModel):
-#   """Submission Pydantic Model for Analytics Response"""
-#   submission_id: Optional[str]=""
-#   submission_user_id: Optional[str]=""
-#   submission_creation_time: Optional[datetime.datetime]=None
-#   submission_update_time: Optional[datetime.datetime]=None
-#   submission_state: Optional[str]=""
-#   submission_late: Optional[bool]=None
-#   submission_draft_grade: Optional[int]=0
-#   submission_assigned_grade: Optional[int]=0
-#   submission_alternate_link: Optional[str]=""
-#   submission_course_work_type: Optional[str]=""
-#   submission_associated_with_developer: Optional[bool]=None
-#   submission_assignment_submission: Optional[dict]={}
-#   submission_submission_history: Optional[list[dict]]=[]
-#   submission_short_answer_submission: Optional[dict]={}
-#   submission_multiple_choice_submission: Optional[dict]={}
-
-#   class Config():
-#     orm_mode = True
-#     schema_extra = {
-#       "example":ANALYTICS_SUBMISSION_EXAMPLE
-#     }
-
-#   @validator("submission_assignment_submission",
-#              "submission_short_answer_submission",
-#              "submission_multiple_choice_submission",pre=True)
-#   @classmethod
-#   def dict_validator(cls, v):
-#     return convert_str_to_dict(v)
-
-#   @validator("submission_submission_history",pre=True)
-#   @classmethod
-#   def list_dict_validator(cls,v):
-#     return convert_str_array_to_dict_array(v)
-
 class AnalyticsCourseWork(BaseModel):
   """Course Work Pydantic Model for Analytics Response"""
   course_work_id : Optional[str]=""
@@ -154,6 +119,8 @@ class AnalyticsCourseWork(BaseModel):
   def dict_to_datetime_date(cls,v):
     if not v:
       return None
+    if isinstance(v,str):
+      return datetime.date.fromisoformat(v)
     if isinstance(v,datetime.date):
       return v
     return datetime.date(
@@ -166,6 +133,8 @@ class AnalyticsCourseWork(BaseModel):
   def dict_to_datetime_time(cls,v):
     if not v:
       return None
+    if isinstance(v,str):
+      return datetime.time().fromisoformat(v)
     if isinstance(v,datetime.time):
       return v
     return datetime.time(

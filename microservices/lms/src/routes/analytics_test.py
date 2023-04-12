@@ -12,7 +12,7 @@ from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from schemas.schema_examples import (
   ANALYTICS_USER_EXAMPLE, ANALYTICS_COURSE_WORK_EXAMPLE,
-  ANALYTICS_SUBMISSION_EXAMPLE,ANALYTICS_COURSE_EXAMPLE)
+  ANALYTICS_COURSE_EXAMPLE)
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 SUCCESS_RESPONSE = {"status": "Success"}
@@ -37,7 +37,6 @@ def create_fake_data_list(client_with_emulator):
   # course_work.pop("submission")
   data.update(course)
   data.update(course_work)
-  data.update(ANALYTICS_SUBMISSION_EXAMPLE)
   return data
 
 def test_get_analytics(client_with_emulator,create_fake_data_list):

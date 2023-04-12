@@ -1,3 +1,4 @@
+import datetime
 import os
 import json
 import time
@@ -5,12 +6,14 @@ import requests
 from behave import fixture, use_fixture
 from common.models import CourseTemplate, Cohort,Section, TempUser ,CourseEnrollmentMapping
 from common.testing.example_objects import TEST_SECTION,TEST_COHORT
+from common.utils.bq_helper import insert_rows_to_bq
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL
 from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,get_student_email_and_token,get_required_emails_from_secret_manager
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.user import TEST_USER
+from testing_objects.bq_helper import BQ_DATASET,BQ_TABLE_DICT
 from google.oauth2.credentials import Credentials
 import logging
 
@@ -295,6 +298,52 @@ url=f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_emai
         id=data["submission"]["id"],
         updateMask="assignedGrade,draftGrade",
         body={"assignedGrade":10,"draftGrade":10}).execute()
+  section_rows=[{
+      "sectionId":section.id,
+      "courseId":section.classroom_id,
+      "classroomUrl":section.classroom_url,
+      "name":section.section,
+      "description":section.description,
+      "cohortId":section.cohort.id,
+      "courseTemplateId":section.course_template.id,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+  cohort=section.cohort
+  cohort_rows=[{
+      "cohortId":cohort.id,
+      "name":cohort.name,
+      "description":cohort.description,\
+      "startDate":cohort.start_date,\
+      "endDate":cohort.end_date,
+      "registrationStartDate":cohort.registration_start_date,
+      "registrationEndDate":cohort.registration_end_date,
+      "maxStudents":cohort.max_students,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+  course_template=section.course_template
+  course_template_rows=[{
+      "courseTemplateId":course_template.id,
+      "classroomId":course_template.classroom_id,
+        "name":course_template.name,
+        "description":course_template.description,
+        "timestamp":datetime.datetime.utcnow(),
+        "instructionalDesigner":course_template.instructional_designer
+    }]
+  insert_rows_to_bq(
+      rows=course_template_rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"]
+      )
+  insert_rows_to_bq(
+      rows=cohort_rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"]
+      )
+  insert_rows_to_bq(
+      rows=section_rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"]
+      )
   yield context.analytics_data
 
 def wait(secs):

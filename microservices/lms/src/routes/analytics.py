@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request
 from services import student_service
 from common.utils.logging_handler import Logger
 from common.utils.bq_helper import run_query
+from common.utils.cache_service import set_key, get_key
 from common.utils.errors import (ResourceNotFoundException,
 ValidationError)
 from common.utils.http_exceptions import (InternalServerError,
@@ -53,11 +54,19 @@ def get_student_analytics(student_id: str,request: Request):
     headers = {"Authorization": request.headers.get("Authorization")}
     user_email,user_id=student_service.get_user_email(
       student_id,headers)
+    res_data=get_key(f"analytics::{user_email}::{user_id}::response")
+    if res_data:
+      return AnalyticsResponse(
+        user=res_data["user"],
+        section_list=res_data["section_list"])
     result= run_query(
       query=f"Select * from {TABLE_ID} where "+
       f"user_email_address=\"{user_email}\" order by course_id;")
-    return convert_query_result_to_analytics_model(result,
+    res_data=convert_query_result_to_analytics_model(result,
                                           student_id,user_id)
+    set_key(f"analytics::{user_email}::{user_id}::response",
+            res_data.dict(),3600)
+    return res_data
   except ValidationError as ve:
     Logger.error(ve)
     raise BadRequest(str(ve)) from ve
