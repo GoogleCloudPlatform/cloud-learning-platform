@@ -293,7 +293,7 @@ def step_impl_40(context):
     "API request is sent which has valid section_id and coursework_id"
 )
 def step_impl_41(context):
-  resp = requests.get(context.url,
+  resp = requests.post(context.url,
                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()

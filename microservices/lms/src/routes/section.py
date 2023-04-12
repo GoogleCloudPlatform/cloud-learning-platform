@@ -474,7 +474,7 @@ def import_grade(section_id: str,coursework_id:str):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    print()
+    print("IIn import grade api")
     section = Section.find_by_id(section_id)
     result = classroom_crud.get_one_coursework(section.classroom_id,coursework_id)    
     url_mapping = classroom_crud.\
