@@ -242,6 +242,7 @@ def enroll_student_course(context):
 
 @fixture
 def import_google_form_grade(context):
+  print("IMPORT Google grade fixture started")
   section = use_fixture(create_section,context)
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
@@ -258,8 +259,10 @@ def import_google_form_grade(context):
       ] }
   coursework = service.courses().courseWork().create(courseId=section.classroom_id,
                                                  body=body).execute()
+  print("Coursework created",coursework)
   context.coursework_id = coursework.get("id")
   context.coursework = coursework
+  print("Context set coursework",context.coursework)
   classroom_code = section.classroom_code
   classroom_id = section.classroom_id
   student_email_and_token = get_student_email_and_token()
