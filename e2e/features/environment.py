@@ -157,6 +157,7 @@ def create_cohort(context):
 
 @fixture
 def create_section(context):
+  print("Innn create section fixture")
   """Fixture to create section temprorary data"""
   section = Section.from_dict(TEST_SECTION)
   cohort=use_fixture(create_cohort,context)
@@ -188,6 +189,7 @@ def create_section(context):
   temp_user1.user_id = temp_user.id
   temp_user1.update()
   context.sections=section
+  print("Create section fixture done",context.sections.id)
   yield context.sections
 
 def create_student_enrollment_record(student_data,section):
@@ -242,8 +244,10 @@ def enroll_student_course(context):
 
 @fixture
 def import_google_form_grade(context):
+  "Fixture for import grade"
+  print("Import gradd fixture started")
+  section = use_fixture(create_section, context)
   print("IMPORT Google grade fixture started",section.classroom_id)
-  section = use_fixture(create_section,context)
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
@@ -264,6 +268,7 @@ def import_google_form_grade(context):
   print("Coursework created",coursework)
   context.coursework_id = coursework.get("id")
   context.coursework = coursework
+  context.section_id = section.id
   print("Context set coursework",context.coursework)
   classroom_code = section.classroom_code
   classroom_id = section.classroom_id
@@ -292,25 +297,6 @@ def create_assignment(context):
   result["section_id"] = section.id
   context.assignment = result
   yield context.assignment
-
-# @fixture
-# def create_assignment_with_google_form(context):
-#   """Create assignment fixture"""
-#   section = use_fixture(create_section, context)
-#   a_creds = service_account.Credentials.from_service_account_info(
-#       CLASSROOM_KEY, scopes=SCOPES)
-#   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-#   service = build("classroom", "v1", credentials=creds)
-#   result = service.courses().courseWork().create(courseId=section.classroom_id,
-#                                                  body={
-#                                                      "title": "Quize assignment",
-#                                                      "description": "test desc",
-#                                                      "workType": "ASSIGNMENT"
-#                                                  }).execute()
-
-#   result["section_id"] = section.id
-#   context.assignment = result
-#   yield context.assignment
 
 @fixture
 def create_analytics_data(context):
