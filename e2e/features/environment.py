@@ -67,7 +67,7 @@ def enroll_student_classroom(access_token,course_id,student_email,course_code):
   Return:
     dict: returns a dict which contains student and classroom details
   """
-
+  print("In enroll student function",student_email)
   creds = Credentials(token=access_token)
   service = build("classroom", "v1", credentials=creds)
   student = {"userId": student_email}
@@ -93,6 +93,7 @@ def enroll_student_classroom(access_token,course_id,student_email,course_code):
   "gaia_id":gaia_id,
   "photo_url":profile["photos"][0]["url"]
   }
+  print("ENrolled in classroom")
   return data
 
 def accept_invite(access_token,email,invitation_id):
@@ -204,6 +205,7 @@ def create_student_enrollment_record(student_data,section):
   temp_user.update()
   course_enrollment_mapping.user = temp_user.user_id
   course_enrollment_mapping.save()
+  print("enrolled in classroom__",student_data["email"])
   return{
     "user_id":temp_user.user_id,
     "course_enrollment_mapping_id":course_enrollment_mapping.id

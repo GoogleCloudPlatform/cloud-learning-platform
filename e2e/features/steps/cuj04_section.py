@@ -304,6 +304,6 @@ def step_impl_41(context):
 )
 def step_impl_42(context):
   assert context.status == 200, "Status 200"
-  assert context.response["count"] == 1, "count not matching of update"
+  assert context.response["data"]["count"] == 1, "count not matching of update"
 
 
