@@ -280,3 +280,30 @@ def step_impl_38(context):
 def step_impl_39(context):
   assert context.status == 200, "Status 200"
 
+# -----------------------------------Import grade coursework- Positive-------------------------------
+
+@behave.given(
+    "A teacher has access to portal and wants to  update grades of student for a coursework with form quize of a section"
+)
+def step_impl_40(context):
+  context.url = f'{API_URL}/sections/{context.sections["id"]}/coursework/{context.coursework["id"]}'
+  print("CONTEXT URL for import grade",context.url)
+
+@behave.when(
+    "API request is sent which has valid section_id and coursework_id"
+)
+def step_impl_41(context):
+  resp = requests.get(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("Response of Import grade api ",context.response)
+
+@behave.then(
+    "Student grades updated in classroom"
+)
+def step_impl_42(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["count"] == 1, "count not matching of update"
+
+

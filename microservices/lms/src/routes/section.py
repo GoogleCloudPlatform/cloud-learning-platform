@@ -28,7 +28,6 @@ from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model,
                           FEED_TYPES)
 from config import BQ_TABLE_DICT,BQ_DATASET
-import numpy as np
 # disabling for linting to pass
 # pylint: disable = broad-except
 

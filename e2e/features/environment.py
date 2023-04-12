@@ -190,16 +190,7 @@ def create_section(context):
   context.sections=section
   yield context.sections
 
-@fixture
-def enroll_student_course(context):
-  """Fixture to enroll studnet in course"""
- 
-  section = use_fixture(create_section,context)
-  classroom_code = section.classroom_code
-  classroom_id = section.classroom_id
-  student_email_and_token = get_student_email_and_token()
-  student_data = enroll_student_classroom(student_email_and_token["access_token"],
-  classroom_id,student_email_and_token["email"].lower(),classroom_code)  
+def create_student_enrollment_record(student_data,section):
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.role = "learner"
   course_enrollment_mapping.section = section
@@ -211,9 +202,37 @@ def enroll_student_course(context):
   temp_user.update()
   course_enrollment_mapping.user = temp_user.user_id
   course_enrollment_mapping.save()
+  return{
+    "user_id":temp_user.user_id,
+    "course_enrollment_mapping_id":course_enrollment_mapping.id
+  }
+
+
+@fixture
+def enroll_student_course(context):
+  """Fixture to enroll studnet in course"""
+ 
+  section = use_fixture(create_section,context)
+  classroom_code = section.classroom_code
+  classroom_id = section.classroom_id
+  student_email_and_token = get_student_email_and_token()
+  student_data = enroll_student_classroom(student_email_and_token["access_token"],
+  classroom_id,student_email_and_token["email"].lower(),classroom_code)  
+  courese_enrollment_mapping = create_student_enrollment_record(student_data=student_data,section=section)
+  # course_enrollment_mapping = CourseEnrollmentMapping()
+  # course_enrollment_mapping.role = "learner"
+  # course_enrollment_mapping.section = section
+  # course_enrollment_mapping.status ="active"
+  # temp_user = TempUser.from_dict(student_data)
+  # temp_user.user_id = ""
+  # temp_user.save()
+  # temp_user.user_id = temp_user.id
+  # temp_user.update()
+  # course_enrollment_mapping.user = temp_user.user_id
+  # course_enrollment_mapping.save()
   context.enroll_student_data = {
     "section_id": section.id,
-    "user_id":temp_user.id,
+    "user_id":courese_enrollment_mapping["user_id"],
     "email": student_email_and_token["email"].lower(),
     "cohort_id":section.cohort.id,
     "access_token":student_email_and_token["access_token"]
@@ -224,8 +243,6 @@ def enroll_student_course(context):
 @fixture
 def import_google_form_grade(context):
   section = use_fixture(create_section,context)
-  classroom_code = section.classroom_code
-  classroom_id = section.classroom_id
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
@@ -241,8 +258,15 @@ def import_google_form_grade(context):
       ] }
   coursework = service.courses().courseWork().create(courseId=section.classroom_id,
                                                  body=body).execute()
-  
   context.coursework_id = coursework.get("id")
+  classroom_code = section.classroom_code
+  classroom_id = section.classroom_id
+  student_email_and_token = get_student_email_and_token()
+  student_data = enroll_student_classroom(student_email_and_token["access_token"],
+  classroom_id,student_email_and_token["email"].lower(),classroom_code)  
+  courese_enrollment_mapping = create_student_enrollment_record(student_data=student_data,section=section)
+  print("IMport Grade fixture worked complete for section ,coursework_id",
+        section.id,coursework.get("id"),section.classroom_code,student_data["email"])
   yield context.coursework
 
 @fixture
@@ -262,6 +286,25 @@ def create_assignment(context):
   result["section_id"] = section.id
   context.assignment = result
   yield context.assignment
+
+# @fixture
+# def create_assignment_with_google_form(context):
+#   """Create assignment fixture"""
+#   section = use_fixture(create_section, context)
+#   a_creds = service_account.Credentials.from_service_account_info(
+#       CLASSROOM_KEY, scopes=SCOPES)
+#   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+#   service = build("classroom", "v1", credentials=creds)
+#   result = service.courses().courseWork().create(courseId=section.classroom_id,
+#                                                  body={
+#                                                      "title": "Quize assignment",
+#                                                      "description": "test desc",
+#                                                      "workType": "ASSIGNMENT"
+#                                                  }).execute()
+
+#   result["section_id"] = section.id
+#   context.assignment = result
+#   yield context.assignment
 
 @fixture
 def create_analytics_data(context):
@@ -382,7 +425,8 @@ fixture_registry = {
     "fixture.get.header": get_header,
     "fixture.create.assignment": create_assignment,
     "fixture.invite.student": invite_student,
-    "fixture.create.analytics.data":create_analytics_data
+    "fixture.create.analytics.data":create_analytics_data,
+    "fixture.import.google_form_grade":import_google_form_grade
 }
 
 def before_tag(context, tag):

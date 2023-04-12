@@ -80,7 +80,7 @@ def hello():
 
 api = FastAPI(title="LMS Service APIs",
               version="latest",
-              # dependencies=[Depends(validate_user)]
+              dependencies=[Depends(validate_user)]
               )
 
 
