@@ -44,9 +44,11 @@ def test_get_analytics(client_with_emulator,create_fake_data_list):
          +f"{create_fake_data_list['user_email_address']}")
   with mock.patch("routes.analytics.student_service.get_user_email",
    return_value=(create_fake_data_list["user_email_address"],"user_id")):
-    with mock.patch("routes.analytics.run_query",
-                  return_value=[create_fake_data_list]):
-      resp = client_with_emulator.get(url)
+    with mock.patch("routes.analytics.student.get_key",return_value=None):
+      with mock.patch("routes.analytics.student.set_key"):
+        with mock.patch("routes.analytics.run_query",
+                      return_value=[create_fake_data_list]):
+          resp = client_with_emulator.get(url)
   data={
     "user":ANALYTICS_USER_EXAMPLE,
     "section_list":[ANALYTICS_COURSE_EXAMPLE]
@@ -59,8 +61,10 @@ def test_get_analytics_negative(client_with_emulator):
   url= BASE_URL + "/analytics/students/xyz@gmail.com"
   with mock.patch("routes.analytics.student_service.get_user_email",
                   return_value=("xyz@gmail.com","user_id")):
-    with mock.patch("routes.analytics.run_query",
-                  return_value=[]):
-      resp = client_with_emulator.get(url)
+    with mock.patch("routes.analytics.student.get_key",return_value=None):
+      with mock.patch("routes.analytics.student.set_key"):
+        with mock.patch("routes.analytics.run_query",
+                      return_value=[]):
+          resp = client_with_emulator.get(url)
 
   assert resp.status_code == 404, "Status 404"
