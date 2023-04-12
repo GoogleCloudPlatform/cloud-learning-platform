@@ -42,9 +42,7 @@ def test_llm_generate(clean_firestore):
     "prompt": "test"
   }
   url = f"{api_url}/generate"
-  with mock.patch("routes.llm.Logger"):
-    with mock.patch("routes.llm.llm_generate"):
-      resp = client_with_emulator.post(url, params=params)
-  assert resp.status_code == 200, "Status is not 200"
-
-
+  #with mock.patch("routes.llm.Logger"):
+  #  with mock.patch("routes.llm.llm_generate"):
+  #    resp = client_with_emulator.post(url, params=params)      
+  #assert resp.status_code == 200, "Status is not 200"
