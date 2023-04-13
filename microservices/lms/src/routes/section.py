@@ -97,7 +97,7 @@ def create_section(sections_details: SectionDetails,
                  section name{sections_details.name}")
     return { "success": True,
             "message": "Section will be created shortly",
-            "data": result}
+            "data": None}
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
