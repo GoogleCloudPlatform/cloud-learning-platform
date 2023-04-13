@@ -52,6 +52,13 @@ def copy_course_background_task(course_template_details,
     # with keys a current topicID and new topic id as values
     if topics is not None:
       topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
+              
+    # Calling function to get edit_url and view url of
+    # google form which returns
+    # a dictionary of view_links as keys and edit
+    #  links/  and file_id as values for all drive files
+    url_mapping = classroom_crud.\
+            get_edit_url_and_view_url_mapping_of_form()
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(
         course_template_details.classroom_id)
@@ -63,31 +70,11 @@ def copy_course_background_task(course_template_details,
         if "topicId" in coursework.keys():
           coursework["topicId"] = topic_id_map[coursework["topicId"]]
         #Check if a material is present in coursework
+        
         if "materials" in coursework.keys():
-          # Calling function to get edit_url and view url of
-          # google form which returns
-          # a dictionary of view_links as keys and edit
-          #  likns as values of google form
-          url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form()
-          # Loop to check if a material in courssework has a google
-          # form attached to it
-          # update the  view link to edit link and attach it as a form
-          for material in coursework["materials"]:
-            if "driveFile" in  material.keys():
-              material = classroom_crud.copy_material(material,target_folder_id)
-            if "form" in material.keys():
-              if "title" not in material["form"].keys():
-                raise ResourceNotFound("Form to be copied is deleted")
-              result1 = classroom_crud.drive_copy(
-                url_mapping[material["form"]["formUrl"]]["file_id"],
-                        target_folder_id,material["form"]["title"])
-              material["link"] = {
-                  "title": material["form"]["title"],
-                  "url": result1["webViewLink"]
-              }
-              # remove form from  material dict
-              material.pop("form")
+          coursework["materials"]= update_coursework_material(materials=coursework["materials"],
+                                        url_mapping=url_mapping,target_folder_id=target_folder_id)
+        print("Updated material Attached")
         final_coursewok.append(coursework)
       except Exception as error:
         title = coursework["title"]
@@ -97,6 +84,7 @@ def copy_course_background_task(course_template_details,
         Logger.error(error)
         continue
     # Create coursework in new course
+    # return final_coursewok
     if final_coursewok is not None:
       classroom_crud.create_coursework(new_course["id"],final_coursewok)
     # Get the list of courseworkMaterial
@@ -112,28 +100,10 @@ def copy_course_background_task(course_template_details,
             coursework_material["topicId"]]
         #Check if a material is present in coursework
         if "materials" in coursework_material.keys():
-          # Calling function to get edit_url and view url of
-          # google form which returns
-          # a dictionary of view_links as keys and edit
-          #  links as values of google form
-          url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form()
-          # Loop to check if a material in courssework has a google
-          # form attached to it
-          # update the  view link to edit link and attach it as a form
-          for material in coursework_material["materials"]:
-            if "driveFile" in  material.keys():
-              material = classroom_crud.copy_material(material,target_folder_id)
-            if "form" in material.keys():
-              new_copied_file_details = classroom_crud.drive_copy(
-                url_mapping[material["form"]["formUrl"]]["file_id"],
-                target_folder_id,material["form"]["title"])
-              material["link"] = {
-                  "title": material["form"]["title"],
-                  "url": new_copied_file_details["webViewLink"]
-              }
-              # remove form from  material dict
-              material.pop("form")
+          coursework_material["materials"] = update_coursework_material(
+          materials=coursework_material["materials"],url_mapping=url_mapping,
+          target_folder_id=target_folder_id,)
+          print("Updated coursework material attached")
         final_coursewok_material.append(coursework_material)
       except Exception as error:
         title = coursework_material["title"]
@@ -221,3 +191,44 @@ def copy_course_background_task(course_template_details,
     Logger.error(error)
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
+def update_coursework_material(materials,url_mapping,target_folder_id):
+   
+  drive_ids = []
+  youtube_ids = []
+  link_urls =[]
+  updated_material =[]
+  # Loop to check if a material in courssework has a google
+  # form attached to it
+  # update the  view link to edit link and attach it as a form
+  for material in materials :
+    if "driveFile" in  material.keys():
+      if material["driveFile"]["driveFile"]["id"] not in drive_ids:
+        classroom_crud.copy_material(material,target_folder_id)
+        drive_ids.append(material["driveFile"]["driveFile"]["id"])
+        updated_material.append({"driveFile":material["driveFile"]})
+
+    if "youtubeVideo" in material.keys():
+      if material["youtubeVideo"]["id"] not in youtube_ids:
+        youtube_ids.append(material["youtubeVideo"]["id"])
+        updated_material.append({"youtubeVideo":material["youtubeVideo"]})
+    if "link" in material.keys():
+      if material["link"]["url"] not in link_urls:
+        updated_material.append({"link":material["link"]})
+        link_urls.append(material["link"]["url"])
+    if "form" in material.keys():
+      if "title" not in material["form"].keys():
+        raise ResourceNotFound("Form to be copied is deleted")
+      result1 = classroom_crud.drive_copy(
+        url_mapping[material["form"]["formUrl"]]["file_id"],
+                target_folder_id,material["form"]["title"])
+      material["link"] = {
+          "title": material["form"]["title"],
+          "url": result1["webViewLink"]
+      }
+      updated_material.append({"link":material["link"]})
+      material.pop("form")
+  print("Updated material created")
+  return updated_material
+
+  
