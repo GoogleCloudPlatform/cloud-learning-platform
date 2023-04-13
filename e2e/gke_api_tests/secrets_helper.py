@@ -40,12 +40,13 @@ def get_student_email_and_token():
         dict: returns a dict which contains student email and token
     """
   student_email_token_name_mapping = {
-    "personal-test-user-1-username": "add_student_token",
+    # "personal-test-user-1-username": "add_student_token",
     "personal-test-user-2-username": "add_student_token_2",
     "personal-test-user-3-username":"add_student_token_3", 
     "personal-test-user-4-username":"add_student_token_4"}
 
-  keys = ["personal-test-user-1-username",
+  keys = [
+          # "personal-test-user-1-username",
           "personal-test-user-2-username",
           "personal-test-user-3-username",
           "personal-test-user-4-username"]
@@ -59,6 +60,7 @@ def get_student_email_and_token():
   student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
   student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
   # Student Email to enroll student
+  print("Get email and student name ",student_email_secret_id,invite_student_email_secret_id)
   client = secretmanager.SecretManagerServiceClient()
   student_email_response = client.access_secret_version(
       request={"name": student_email_name})
