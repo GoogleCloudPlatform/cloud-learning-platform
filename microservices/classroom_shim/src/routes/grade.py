@@ -90,7 +90,7 @@ def update_classroom_grade(input_grade: PostGradeModel):
                              submission_id, assigned_grade, draft_grade)
     else:
       raise Exception(
-          f"Submission not found for the user id - {user_id} and section id - {lti_assignment.section_id} and course work id - {course_work_id}"
+          f"Submission not found for the user with id - {user_id}, section id - {lti_assignment.section_id} and course work id - {course_work_id}"
       )
 
     return {"success": True}
