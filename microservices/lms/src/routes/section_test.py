@@ -491,10 +491,12 @@ def test_form_grade_import(client_with_emulator,create_fake_data):
   "state": "PUBLISHED",}
   with mock.patch("routes.section.classroom_crud.get_one_coursework",
                   return_value=get_course_work_data):
-    with mock.patch("routes.section.classroom_crud.url_mapping",
-                  {"https://docs.google.com/forms/d/e/1FAIpQL":{"file_id":"test123"}
+    with mock.patch(
+"routes.section.classroom_crud.get_edit_url_and_view_url_mapping_of_form",
+{"https://docs.google.com/forms/d/e/1FAIpQL":{"file_id":"test123"}
                    }):
-      with mock.patch("routes.section.classroom_crud.retrive_all_form_responses",
+      with mock.patch(
+        "routes.section.classroom_crud.retrive_all_form_responses",
                   return_value={}):
         resp = client_with_emulator.patch(url)
   result_json = resp.json()

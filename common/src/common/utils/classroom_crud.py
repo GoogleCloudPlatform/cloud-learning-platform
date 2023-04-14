@@ -224,7 +224,6 @@ def get_topics(course_id):
     logger.error(error)
     return None
 
-
 def create_topics(course_id, topics):
   """create topic in course
 
@@ -246,7 +245,6 @@ def create_topics(course_id, topics):
     topic_id_map[old_topic_id] = response["topicId"]
   Logger.info(f"Topics created for course_id{course_id}")
   return topic_id_map
-
 
 def get_coursework(course_id):
   """Get  list of coursework from classroom
@@ -383,8 +381,6 @@ def create_coursework_material(course_id, coursework_material_list):
                                               body=coursework_item).execute()
   Logger.info("Create coursework Material worked")
   return "success"
-
-
 
 def delete_course_by_id(course_id):
   """Delete a course from classroom

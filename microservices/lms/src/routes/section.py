@@ -478,7 +478,7 @@ def import_grade(section_id: str,coursework_id:str):
   try:
     section = Section.find_by_id(section_id)
     result = classroom_crud.get_one_coursework(
-      section.classroom_id,coursework_id)
+    section.classroom_id,coursework_id)
     #Get url mapping of google forms view links and edit ids 
     url_mapping = classroom_crud.\
             get_edit_url_and_view_url_mapping_of_form()
@@ -490,10 +490,10 @@ def import_grade(section_id: str,coursework_id:str):
           form_details = \
             url_mapping[material["form"]["formUrl"]]
           form_id = form_details["file_id"]
-          # Get all responses for the form if no responses of 
-          # the form then return 
+          # Get all responses for the form if no responses of
+          # the form then return
           all_responses_of_form = classroom_crud.\
-            retrive_all_form_responses(form_id) 
+          retrive_all_form_responses(form_id)
           if all_responses_of_form =={}:
             return {"data":{"count":0,"student_grades":{}}}
 
