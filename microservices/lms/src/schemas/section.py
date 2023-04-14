@@ -263,7 +263,6 @@ class AssignmentModel(BaseModel):
     schema_extra = {
         "example": ASSIGNMENT_MODEL
     }
-     
 class ImportGradeResponseModel(BaseModel):
   """Import grade esponseModel Details Model"""
   success: Optional[bool] = True
@@ -279,7 +278,7 @@ class ImportGradeResponseModel(BaseModel):
       "data":{"count":10,
       "student_grades" : {
       "student1@gmail.com":10,
-      "student1@gmail.com":7,
+      "student2@gmail.com":7,
       "student3@gmail.com":5  }
               }
         }

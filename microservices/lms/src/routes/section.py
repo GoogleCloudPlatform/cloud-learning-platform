@@ -19,7 +19,8 @@ from schemas.error_schema import (ConflictResponseModel,
 from schemas.section import (
     DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
-    UpdateSectionResponseModel,TeachersListResponseModel,ImportGradeResponseModel,
+    UpdateSectionResponseModel,TeachersListResponseModel,
+    ImportGradeResponseModel,
     GetTeacherResponseModel,AssignmentModel)
 from schemas.update_section import UpdateSection
 from services import common_service
@@ -463,8 +464,7 @@ def get_assignment(section_id: str, assignment_id: str):
 @router.patch("/{section_id}/coursework/{coursework_id}",
               response_model=ImportGradeResponseModel)
 def import_grade(section_id: str,coursework_id:str):
-  """Get a section details from db and use the coursework OD
-
+  """Get a section details from db and use the coursework Id
   Args:
       section_id (str): section_id in firestore
       coursework_id(str): coursework_id of coursework in classroom
@@ -487,9 +487,11 @@ def import_grade(section_id: str,coursework_id:str):
     if "materials" in result.keys():
       for material in result["materials"]:
         if "form" in material.keys():
-          form_details = url_mapping[material["form"]["formUrl"]]
+          form_details = \
+            url_mapping[material["form"]["formUrl"]]
           form_id = form_details["file_id"]
-          # Get all responses for the form if no responses of the form then return 
+          # Get all responses for the form if no responses of 
+          # the form then return 
           all_responses_of_form = classroom_crud.\
             retrive_all_form_responses(form_id) 
           if all_responses_of_form =={}:
@@ -499,7 +501,7 @@ def import_grade(section_id: str,coursework_id:str):
             submissions=classroom_crud.list_coursework_submissions_user(
                                                   section.classroom_id,
                                                   coursework_id,
-                                                  response["respondentEmail"])            
+                                            response["respondentEmail"])            
             if submissions !=[]:
               if submissions[0]["state"] == "TURNED_IN":
                 count+=1

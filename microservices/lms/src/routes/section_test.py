@@ -321,7 +321,6 @@ def test_list_teachers(client_with_emulator,create_fake_data):
   with mock.patch("routes.section.common_service.call_search_user_api",
   return_value=TEMP_USER):
     resp = client_with_emulator.get(url)
-    print("Test teachers list response___",resp.json())
   assert resp.status_code == 200
   assert resp.json()["success"] is True
 
@@ -492,44 +491,12 @@ def test_form_grade_import(client_with_emulator,create_fake_data):
   "state": "PUBLISHED",}
   with mock.patch("routes.section.classroom_crud.get_one_coursework",
                   return_value=get_course_work_data):
-    with mock.patch("routes.section.classroom_crud.retrive_all_form_responses",
+    with mock.patch("routes.section.classroom_crud.url_mapping",
+                  {"https://docs.google.com/forms/d/e/1FAIpQL":{"file_id":"test123"}
+                   }):
+      with mock.patch("routes.section.classroom_crud.retrive_all_form_responses",
                   return_value={}):
-      resp = client_with_emulator.patch(url)
+        resp = client_with_emulator.patch(url)
   result_json = resp.json()
   assert resp.status_code == 200, "Status 200"
   assert result_json["data"]["count"] == 0 ,"Count match for updated grades"
-
-def test_form_grade_import(client_with_emulator,create_fake_data):
-  url = BASE_URL + \
-      f"/sections/{create_fake_data['section']}/coursework/5789246900"
-  get_course_work_data = {
-  "courseId": "604063268646",
-  "id": "553046445746",
-  "title": "youtube coursewok",
-  "materials": [
-    {
-      "youtubeVideo": {
-        "id": "pl-tBjAM9g4",
-        "title": "How to Use Google Classroom - Tutorial for Beginners",
-        "alternateLink": "https://www.youtube.com/watch?v=pl-tBjAM9g4",
-        "thumbnailUrl": "https://i.ytimg.com/vi/pl-tBjAM9g4/default.jpg"
-      }
-    },
-    {
-      "form": {
-        "formUrl": "https://docs.google.com/forms/d/e/1FAIpQL",
-        "title": "e2e_form1",
-        "thumbnailUrl": "https://lh6.googleusercontent.com/E7m"
-      }
-    }
-  ],
-  "state": "PUBLISHED",}
-  with mock.patch("routes.section.classroom_crud.get_one_coursework",
-                  return_value=get_course_work_data):
-    with mock.patch("routes.section.classroom_crud.retrive_all_form_responses",
-                  return_value={}):
-      resp = client_with_emulator.patch(url)
-  result_json = resp.json()
-  assert resp.status_code == 200, "Status 200"
-  assert result_json["data"]["count"] == 0 ,"Count match for updated grades"
-

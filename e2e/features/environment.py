@@ -67,7 +67,6 @@ def enroll_student_classroom(access_token,course_id,student_email,course_code):
   Return:
     dict: returns a dict which contains student and classroom details
   """
-  print("In enroll student function",student_email)
   creds = Credentials(token=access_token)
   service = build("classroom", "v1", credentials=creds)
   student = {"userId": student_email}
@@ -93,7 +92,6 @@ def enroll_student_classroom(access_token,course_id,student_email,course_code):
   "gaia_id":gaia_id,
   "photo_url":profile["photos"][0]["url"]
   }
-  print("ENrolled in classroom")
   return data
 
 def accept_invite(access_token,email,invitation_id):
@@ -158,7 +156,6 @@ def create_cohort(context):
 
 @fixture
 def create_section(context):
-  print("Innn create section fixture")
   """Fixture to create section temprorary data"""
   section = Section.from_dict(TEST_SECTION)
   cohort=use_fixture(create_cohort,context)
@@ -190,11 +187,9 @@ def create_section(context):
   temp_user1.user_id = temp_user.id
   temp_user1.update()
   context.sections=section
-  print("Create section fixture done",context.sections.id)
   yield context.sections
 
 def create_student_enrollment_record(student_data,section):
-  print("Enrollment in db started")
   course_enrollment_mapping = CourseEnrollmentMapping()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
   course_enrollment_mapping.role = "learner"
   course_enrollment_mapping.section = section
@@ -206,7 +201,6 @@ def create_student_enrollment_record(student_data,section):
   temp_user.update()
   course_enrollment_mapping.user = temp_user.user_id
   course_enrollment_mapping.save()
-  print("enrolled in classroom__",student_data["email"])
   return{
     "user_id":temp_user.user_id,
     "course_enrollment_mapping_id":course_enrollment_mapping.id
@@ -224,17 +218,6 @@ def enroll_student_course(context):
   student_data = enroll_student_classroom(student_email_and_token["access_token"],
   classroom_id,student_email_and_token["email"].lower(),classroom_code)  
   courese_enrollment_mapping = create_student_enrollment_record(student_data=student_data,section=section)
-  # course_enrollment_mapping = CourseEnrollmentMapping()
-  # course_enrollment_mapping.role = "learner"
-  # course_enrollment_mapping.section = section
-  # course_enrollment_mapping.status ="active"
-  # temp_user = TempUser.from_dict(student_data)
-  # temp_user.user_id = ""
-  # temp_user.save()
-  # temp_user.user_id = temp_user.id
-  # temp_user.update()
-  # course_enrollment_mapping.user = temp_user.user_id
-  # course_enrollment_mapping.save()
   context.enroll_student_data = {
     "section_id": section.id,
     "user_id":courese_enrollment_mapping["user_id"],
@@ -242,15 +225,12 @@ def enroll_student_course(context):
     "cohort_id":section.cohort.id,
     "access_token":student_email_and_token["access_token"]
     }
-  print("Enroll student fixture cohort id",section.cohort.id)
   yield context.enroll_student_data
 
 @fixture
 def import_google_form_grade(context):
   "Fixture for import grade"
-  print("Import gradd fixture started")
   section = use_fixture(create_section, context)
-  print("IMPORT Google grade fixture started",section.classroom_id)
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
@@ -268,19 +248,15 @@ def import_google_form_grade(context):
       "state":"PUBLISHED"}
   coursework = service.courses().courseWork().create(courseId=section.classroom_id,
                                                  body=body).execute()
-  print("Coursework created",coursework)
   context.coursework_id = coursework.get("id")
   context.coursework = coursework
   context.section_id = section.id
-  print("Context set coursework",context.coursework,section.classroom_code,section.classroom_id)
   classroom_code = section.classroom_code
   classroom_id = section.classroom_id
   student_email_and_token = get_student_email_and_token()
   student_data = enroll_student_classroom(student_email_and_token["access_token"],
   classroom_id,student_email_and_token["email"].lower(),classroom_code)  
   courese_enrollment_mapping = create_student_enrollment_record(student_data=student_data,section=section)
-  print("IMport Grade fixture worked complete for section ,coursework_id",
-        section.id,coursework.get("id"),section.classroom_code,student_data["email"])
   yield context.coursework
 
 @fixture

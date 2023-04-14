@@ -315,7 +315,6 @@ def patch_student_submission(course_id,coursework_id,student_submission_id,assig
     id=student_submission_id,
     updateMask="assignedGrade,draftGrade",
     body=studentSubmission).execute()
-  print("This is patch resultt__",patch_result,student_submission_id,assigned_grade)
   return patch_result
 
 
@@ -331,23 +330,6 @@ def get_one_coursework(course_id,coursework_id):
   coursework = service.courses().courseWork().get(
         courseId=course_id ,id=coursework_id).execute()
   return coursework
-
-def student_submissions(course_id,coursework_id):
-  """Get  list of coursework from classroom
-
-  Args: course_id
-  Returns:
-    returns list of coursework of given course in classroom
-    """ ""
-
-  service = build("classroom", "v1", credentials=get_credentials())
-  try:
-    coursework = service.courses().courseWork().get(
-        courseId=course_id,id=coursework_id).execute()
-    return coursework
-  except HttpError as error:
-    logger.error(error)
-    return None
 
 def get_coursework_material(course_id):
   """Get  list of coursework from classroom
