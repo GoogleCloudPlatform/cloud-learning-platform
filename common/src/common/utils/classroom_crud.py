@@ -289,7 +289,7 @@ def list_coursework_submissions_user(course_id,coursework_id,user_id):
       submissions.extend(response.get("studentSubmissions", []))
       page_token = response.get("nextPageToken", None)
       if not page_token:
-          break
+        break
     return submissions
   except HttpError as error:
     logger.error(error)
@@ -316,20 +316,6 @@ def patch_student_submission(course_id,coursework_id,
     updateMask="assignedGrade,draftGrade",
     body=student_submission).execute()
   return patch_result
-
-
-# def get_one_coursework(course_id,coursework_id):
-#   """Get  list of coursework from classroom
-
-#   Args: course_id
-#   Returns:
-#     returns list of coursework of given course in classroom
-#     """ ""
-
-#   service = build("classroom", "v1", credentials=get_credentials())
-#   coursework = service.courses().courseWork().get(
-#         courseId=course_id ,id=coursework_id).execute()
-#   return coursework
 
 def get_coursework_material(course_id):
   """Get  list of coursework from classroom

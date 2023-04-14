@@ -5,7 +5,9 @@ from common.models import Cohort, CourseTemplate, Section
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ClassroomHttpException,
                                           InternalServerError,
-                                          ResourceNotFound, BadRequest)
+                                          ResourceNotFound, BadRequest,
+                                          CustomHTTPException
+                                          )
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.utils.bq_helper import insert_rows_to_bq
@@ -457,7 +459,8 @@ def import_grade(section_id: str,coursework_id:str):
       coursework_id(str): coursework_id of coursework in classroom
   Raises:
       HTTPException: 500 Internal Server Error if something fails
-      ResourceNotFound: 404 Section with section id is not found or coursework is not found
+      ResourceNotFound: 404 Section with section id is not found or
+        coursework is not found
   Returns:
     {"status":"Success","new_course":{}}: Returns section details from  db,
     {'status': 'Failed'} if the user creation raises an exception
@@ -467,9 +470,7 @@ def import_grade(section_id: str,coursework_id:str):
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
     #Get url mapping of google forms view links and edit ids 
-    url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form()
-    print("URL MAPPING_____",url_mapping)
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
     count =0
     student_grades = {}
     if "materials" in result.keys():
@@ -477,9 +478,8 @@ def import_grade(section_id: str,coursework_id:str):
         if "form" in material.keys():
           form_details = \
             url_mapping[material["form"]["formUrl"]]
-          print("FORM DEATILS _________",form_details)
+
           form_id = form_details["file_id"]
-          print("File ID________",form_id)
           # Get all responses for the form if no responses of
           # the form then return
           all_responses_of_form = classroom_crud.\
@@ -491,16 +491,16 @@ def import_grade(section_id: str,coursework_id:str):
             submissions=classroom_crud.list_coursework_submissions_user(
                                                   section.classroom_id,
                                                   coursework_id,
-                                            response["respondentEmail"])            
+                                          response["respondentEmail"])
             if submissions !=[]:
               if submissions[0]["state"] == "TURNED_IN":
                 count+=1
-                student_grades[response["respondentEmail"]]=response["totalScore"]
+                student_grades[
+                response["respondentEmail"]]=response["totalScore"]
                 classroom_crud.patch_student_submission(section.classroom_id,
-                                              coursework_id,submissions[0]["id"],
+                                        coursework_id,submissions[0]["id"],
                                               response["totalScore"],
                                               response["totalScore"])
-      
       return {"data":{"count":count,"student_grades":student_grades}}
     else:
       return {"data":{"count":count,"student_grades":student_grades}}
