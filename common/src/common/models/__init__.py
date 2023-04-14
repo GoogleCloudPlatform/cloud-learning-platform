@@ -25,3 +25,4 @@ from .lti import *
 from .course_enrollment_mapping import *
 from .temp_user import *
 from .lti_assignment import *
+from .llm import *

@@ -65,4 +65,11 @@ class CronJobException(Exception):
     self.message = message
     super().__init__(self.message)
 
-  
+
+class PayloadTooLargeError(Exception):
+  """Error class to be raised when payload is larger than the server is
+  willing to process"""
+
+  def __init__(self, message="Payload too large"):
+    self.message = message
+    super().__init__(self.message)

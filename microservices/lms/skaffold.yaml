@@ -19,6 +19,11 @@ metadata:
 requires:
   - path: ../../common
     configs: [common]
+    activeProfiles:
+    - name: custom
+      activatedBy: [custom]
+    - name: dev
+      activatedBy: [dev]
 build:
   tagPolicy:
     gitCommit: {}
