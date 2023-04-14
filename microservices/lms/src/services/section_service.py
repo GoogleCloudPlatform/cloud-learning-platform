@@ -51,8 +51,7 @@ def copy_course_background_task(course_template_details,
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
     if topics is not None:
-      topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
-              
+      topic_id_map = classroom_crud.create_topics(new_course["id"], topics)    
     # Calling function to get edit_url and view url of
     # google form which returns
     # a dictionary of view_links as keys and edit
@@ -70,11 +69,11 @@ def copy_course_background_task(course_template_details,
         if "topicId" in coursework.keys():
           coursework["topicId"] = topic_id_map[coursework["topicId"]]
         #Check if a material is present in coursework
-        
         if "materials" in coursework.keys():
-          coursework["materials"]= update_coursework_material(materials=coursework["materials"],
-                                        url_mapping=url_mapping,target_folder_id=target_folder_id)
-        print("Updated material Attached")
+          coursework["materials"]= update_coursework_material(
+                          materials=coursework["materials"],
+                          url_mapping=url_mapping,
+                          target_folder_id=target_folder_id)
         final_coursewok.append(coursework)
       except Exception as error:
         title = coursework["title"]
@@ -100,6 +99,7 @@ def copy_course_background_task(course_template_details,
             coursework_material["topicId"]]
         #Check if a material is present in coursework
         if "materials" in coursework_material.keys():
+
           coursework_material["materials"] = update_coursework_material(
           materials=coursework_material["materials"],url_mapping=url_mapping,
           target_folder_id=target_folder_id,)
@@ -193,14 +193,31 @@ def copy_course_background_task(course_template_details,
     raise InternalServerError(str(e)) from e
 
 def update_coursework_material(materials,url_mapping,target_folder_id):
-   
+  """Takes the material attached to any type of cursework and copy it in the
+    target folder Id also removes duplicates from material list
+  Args:
+    materials (list of dictionary): Coursework materials list which is obtained
+      from list coursework method
+    url_mapping (dict):Dict of view url as key and edit url, fileid as values
+    target_folder_id(str):Drive folder Id of section
+  Returns:
+    updated_material : (list of dict) returns a updated
+  """
   drive_ids = []
   youtube_ids = []
   link_urls =[]
   updated_material =[]
-  # Loop to check if a material in courssework has a google
-  # form attached to it
-  # update the  view link to edit link and attach it as a form
+  # Loop to check the different types of material attached to coursework
+  # 1.If a material is driveFile call called copy_material function which
+  #  copies is drivefile in target_folder_id and updates the driveFile
+  #  dict with new file id for section drive folder
+  # 2.If a material is YoutubeVideo or link check for duplicate youtube 
+  #   video and link
+  # 3.If a material is form use url_mapping dictionary to get the file_id
+  # of form which is used to copy form in target_folder_id of section and
+  # attach form as link in coursework since attaching forms via api is not
+  # supported by classroom
+
   for material in materials :
     if "driveFile" in  material.keys():
       if material["driveFile"]["driveFile"]["id"] not in drive_ids:
@@ -211,7 +228,8 @@ def update_coursework_material(materials,url_mapping,target_folder_id):
     if "youtubeVideo" in material.keys():
       if material["youtubeVideo"]["id"] not in youtube_ids:
         youtube_ids.append(material["youtubeVideo"]["id"])
-        updated_material.append({"youtubeVideo":material["youtubeVideo"]})
+        updated_material.append(
+          {"youtubeVideo":material["youtubeVideo"]})
     if "link" in material.keys():
       if material["link"]["url"] not in link_urls:
         updated_material.append({"link":material["link"]})
@@ -228,7 +246,6 @@ def update_coursework_material(materials,url_mapping,target_folder_id):
       }
       updated_material.append({"link":material["link"]})
       material.pop("form")
-  print("Updated material created")
   return updated_material
 
   
