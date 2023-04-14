@@ -279,4 +279,3 @@ def step_impl_38(context):
 )
 def step_impl_39(context):
   assert context.status == 200, "Status 200"
-
