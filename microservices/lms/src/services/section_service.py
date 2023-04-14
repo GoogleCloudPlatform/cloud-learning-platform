@@ -51,7 +51,7 @@ def copy_course_background_task(course_template_details,
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
     if topics is not None:
-      topic_id_map = classroom_crud.create_topics(new_course["id"], topics)    
+      topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
     # Calling function to get edit_url and view url of
     # google form which returns
     # a dictionary of view_links as keys and edit
@@ -211,7 +211,7 @@ def update_coursework_material(materials,url_mapping,target_folder_id):
   # 1.If a material is driveFile call called copy_material function which
   #  copies is drivefile in target_folder_id and updates the driveFile
   #  dict with new file id for section drive folder
-  # 2.If a material is YoutubeVideo or link check for duplicate youtube 
+  # 2.If a material is YoutubeVideo or link check for duplicate youtube
   #   video and link
   # 3.If a material is form use url_mapping dictionary to get the file_id
   # of form which is used to copy form in target_folder_id of section and
@@ -247,5 +247,3 @@ def update_coursework_material(materials,url_mapping,target_folder_id):
       updated_material.append({"link":material["link"]})
       material.pop("form")
   return updated_material
-
-  
