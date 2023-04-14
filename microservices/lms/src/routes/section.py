@@ -469,7 +469,7 @@ def import_grade(section_id: str,coursework_id:str):
     section = Section.find_by_id(section_id)
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
-    #Get url mapping of google forms view links and edit ids 
+    #Get url mapping of google forms view links and edit ids
     url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
     count =0
     student_grades = {}
