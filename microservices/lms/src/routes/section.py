@@ -460,50 +460,55 @@ def get_assignment(section_id: str, assignment_id: str):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-@router.post("/{section_id}/coursework/{coursework_id}",response_model=ImportGradeResponseModel)
+@router.patch("/{section_id}/coursework/{coursework_id}",
+              response_model=ImportGradeResponseModel)
 def import_grade(section_id: str,coursework_id:str):
-  """Get a section details from db
+  """Get a section details from db and use the coursework OD
 
   Args:
       section_id (str): section_id in firestore
+      coursework_id(str): coursework_id of coursework in classroom
   Raises:
       HTTPException: 500 Internal Server Error if something fails
-      ResourceNotFound: 404 Section with section id is not found
+      ResourceNotFound: 404 Section with section id is not found or coursework is not found
   Returns:
     {"status":"Success","new_course":{}}: Returns section details from  db,
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    print("IIn import grade api",coursework_id,section_id)
     section = Section.find_by_id(section_id)
-    print("Section classid",section.classroom_id)
-    result = classroom_crud.get_one_coursework(section.classroom_id,coursework_id)    
+    result = classroom_crud.get_one_coursework(
+      section.classroom_id,coursework_id)
+    #Get url mapping of google forms view links and edit ids 
     url_mapping = classroom_crud.\
             get_edit_url_and_view_url_mapping_of_form()
     count =0
     student_grades = {}
-    if "materials" in result["materials"]:
+    if "materials" in result.keys():
       for material in result["materials"]:
         if "form" in material.keys():
           form_details = url_mapping[material["form"]["formUrl"]]
           form_id = form_details["file_id"]
-          # Get all responses for the form
-          all_responses_of_form = classroom_crud.retrive_all_form_responses(form_id)
-          # Get student 
+          # Get all responses for the form if no responses of the form then return 
+          all_responses_of_form = classroom_crud.\
+            retrive_all_form_responses(form_id) 
           if all_responses_of_form =={}:
             return {"data":{"count":0,"student_grades":{}}}
 
           for response in all_responses_of_form["responses"]:
-            # print("In response loopp________",response)
-        
-            submissions=classroom_crud.get_coursework_submissions(section.classroom_id,coursework_id,
-                                                      response["respondentEmail"])
-            # print("SUBMISSIONS__________",submissions[0]["id"])
-            count+=1
-            student_grades[response["respondentEmail"]]=response["totalScore"]
-            print("Increment count and mapping",count,student_grades)
-            patch_result= classroom_crud.patch_student_submission(section.classroom_id,coursework_id,submissions[0]["id"],response["totalScore"],response["totalScore"])
-      print("Count ",count,student_grades)
+            submissions=classroom_crud.list_coursework_submissions_user(
+                                                  section.classroom_id,
+                                                  coursework_id,
+                                                  response["respondentEmail"])            
+            if submissions !=[]:
+              if submissions[0]["state"] == "TURNED_IN":
+                count+=1
+                student_grades[response["respondentEmail"]]=response["totalScore"]
+                classroom_crud.patch_student_submission(section.classroom_id,
+                                              coursework_id,submissions[0]["id"],
+                                              response["totalScore"],
+                                              response["totalScore"])
+      
       return {"data":{"count":count,"student_grades":student_grades}}
     else:
       return {"data":{"count":count,"student_grades":student_grades}}
@@ -520,216 +525,3 @@ def import_grade(section_id: str,coursework_id:str):
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
     raise InternalServerError(str(e)) from e
-
-@router.post("/create_form")
-def create_form():
-  try:
-    form_body = {
-    "info": {
-    "title": "test_Explorer2"
-   
-  }
-    }
-    result =  classroom_crud.create_google_form(form_body)
-    print(result)
-    form_id = result["formId"]
-    NEW_QUESTION = {
-    "requests": [{
-        
-      # "updateSettings": {
-      #   "settings": {
-      #     "quizSettings": {
-      #       "isQuiz": True
-      #     }
-      #   }
-      # },
-    "createItem":{
-            "item": {
-                "title": "In what year did the United States land a mission on the moon?",
-                "questionItem": {
-                    "question": {
-                        "required": True,
-                        "choiceQuestion": {
-                            "type": "RADIO",
-                            "options": [
-                                {"value": "1965"},
-                                {"value": "1967"},
-                                {"value": "1969"},
-                                {"value": "1971"}
-                            ],
-                            "shuffle": True
-                        },
-                        # "grading":{"pointValue": 5,"correctAnswers": {"answers": [
-                        #           {
-                        #             "value": "1965"
-                        #           }]}
-                        #           }
-                    }
-                },
-            },
-            "location": {
-                "index": 0
-            }
-        
-    }
-    }]
-}
-
-    update_result = classroom_crud.batch_update_google_form(form_id,NEW_QUESTION)
-    print("Update result succss")
-    return result ,update_result
-  except Exception as e:
-    Logger.error(e)
-
-@router.post("/update_form/{form_id}")
-def update_form(form_id: str):
-  try:
-    print("Hello Inside Update API")
-    NEW_QUESTION = {
-    "requests": [{
-        "updateSettings": {
-          "settings": {
-            "quizSettings": {
-              "isQuiz": True
-            }
-          },"updateMask":"*"
-        }
-        }]}
-    update_result = classroom_crud.batch_update_google_form(form_id,NEW_QUESTION)
-    print("Update result succss")
-    return update_result
-  except Exception as e:
-    Logger.error(e)
-
-@router.post("/setup_grading/{form_id}")
-def setup_grading(form_id:str):
-  try:
-    print("Hello Inside setup grading Update API")
-    NEW_QUESTION = {
-    "requests": [{
-    "createItem":{
-            "item": {
-                "title": "In what year did the United States land a mission on the moon?",
-                "questionItem": {
-                    "question": {
-                        "required": True,
-                        "choiceQuestion": {
-                            "type": "RADIO",
-                            "options": [
-                                {"value": "1965"},
-                                {"value": "1967"},
-                                {"value": "1969"},
-                                {"value": "1971"}
-                            ],
-                            "shuffle": True
-                        },
-                        "grading":{"pointValue": 5,"correctAnswers": {"answers": [
-                                  {
-                                    "value": "1965"
-                                  }]}
-                                  }
-                    }
-                },
-            },
-            "location": {
-                "index": 0
-            }
-    }
-    }]
-}
-
-    update_result = classroom_crud.batch_update_google_form(form_id,NEW_QUESTION)
-    print("Update result succss")
-    return update_result
-  except Exception as e:
-    Logger.error(e)
-
-@router.get("/get_form/{form_id}")
-def get_form(form_id: str):
-  try:
-    update_result = classroom_crud.get_google_form(form_id)
-    print("Get form result")
-    return update_result
-  except Exception as e:
-    Logger.error(e)
-
-@router.get("/remove_duplicate/")
-def get_form(form_id: str):
-  try:
-    links =[]
-    you_tube_video = []
-    coursework = {
-  "courseId": "563344568996",
-  "id": "518510549348",
-  "title": "test_assignment",
-  "description": "5+4=?",
-  "materials": [
-    {
-      "link": {
-        "url": "https://developers.google.com/forms/api/reference/rest",
-        "title": "Google Forms API  |  Google Developers",
-        "thumbnailUrl": "https://classroom.google.com/webthumbnail?url=https://developers.google.com/forms/api/reference/rest"
-      }
-    },
-    {
-      "link": {
-        "url": "https://developers.google.com/forms/api/reference/rest",
-        "title": "Google Forms API  |  Google Developers",
-        "thumbnailUrl": "https://classroom.google.com/webthumbnail?url=https://developers.google.com/forms/api/reference/rest"
-      }
-    },
-    {
-      "youtubeVideo": {
-        "id": "TlQhI-73rLA",
-        "title": "Introducing Google Classroom add-ons",
-        "alternateLink": "https://www.youtube.com/watch?v=TlQhI-73rLA",
-        "thumbnailUrl": "https://i.ytimg.com/vi/TlQhI-73rLA/default.jpg"
-      }
-    },
-    {
-      "youtubeVideo": {
-        "id": "TlQhI-73rLA",
-        "title": "Introducing Google Classroom add-ons",
-        "alternateLink": "https://www.youtube.com/watch?v=TlQhI-73rLA",
-        "thumbnailUrl": "https://i.ytimg.com/vi/TlQhI-73rLA/default.jpg"
-      }
-    }
-  ],
-  "state": "PUBLISHED",
-  "alternateLink": "https://classroom.google.com/c/NTYzMzQ0NTY4OTk2/a/NTE4NTEwNTQ5MzQ4/details",
-  "creationTime": "2023-04-10T10:20:12.244Z",
-  "updateTime": "2023-04-10T14:06:58.574Z",
-  "maxPoints": 10,
-  "workType": "ASSIGNMENT",
-  "submissionModificationMode": "MODIFIABLE_UNTIL_TURNED_IN",
-  "assignment": {
-    "studentWorkFolder": {
-      "id": "1DDIUZ2yyRnAtZGNbkh_q-x2zVSCZy8fSo1m18YR2DRXjYiUkwECkHKyEr40u6nkDhVouHSjA"
-    }
-  },
-  "assigneeMode": "ALL_STUDENTS",
-  "creatorUserId": "108246450606823720702"
-}
-
-  # coursework2 = list(np.unique(coursework["materials"]))
-    material2 = []
-    for material in coursework["materials"]:
-      if "link" in material.keys():
-        if(material["link"]["url"] not in links):
-          links.append(material["link"]["url"])
-          material2.append(material)
-        # else:
-        #   coursework["materials"].remove(material)
-      if "youtubeVideo" in  material.keys():
-        if(material["youtubeVideo"]["id"] not in you_tube_video):
-          print("YOUTUBE VIDEO ID",material["youtubeVideo"]["id"])
-          you_tube_video.append(material["youtubeVideo"]["id"])
-          material2.append(material)
-        # else:
-        #   coursework["materials"].remove(material)
-    print("Get form result")
-    return material2
-  except Exception as e:
-    Logger.error(e)
-
-

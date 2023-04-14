@@ -293,17 +293,17 @@ def step_impl_40(context):
     "API request is sent which has valid section_id and coursework_id"
 )
 def step_impl_41(context):
-  resp = requests.post(context.url,
+  resp = requests.patch(context.url,
                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
   print("Response of Import grade api ",context.response)
 
 @behave.then(
-    "Student grades updated in classroom"
+    "Student grades are not updated in classroom"
 )
 def step_impl_42(context):
   assert context.status == 200, "Status 200"
-  assert context.response["data"]["count"] == 1, "count not matching of update"
+  assert context.response["data"]["count"] == 0, "count not matching of update"
 
 

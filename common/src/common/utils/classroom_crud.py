@@ -267,10 +267,12 @@ def get_coursework(course_id):
     logger.error(error)
     return None
 
-def get_coursework_submissions(course_id,coursework_id,user_id):
+def list_coursework_submissions_user(course_id,coursework_id,user_id):
   """Get  list of coursework from classroom
 
-  Args: course_id
+  Args: course_id: classroom course_id
+  coursework_id: coursework_id of claaassroom coursework
+  user_id : email or the numeric identifier for the user or me
   Returns:
     returns list of coursework of given course in classroom
     """ ""
@@ -330,8 +332,6 @@ def get_one_coursework(course_id,coursework_id):
         courseId=course_id ,id=coursework_id).execute()
   return coursework
 
-
-
 def student_submissions(course_id,coursework_id):
   """Get  list of coursework from classroom
 
@@ -348,7 +348,6 @@ def student_submissions(course_id,coursework_id):
   except HttpError as error:
     logger.error(error)
     return None
-
 
 def get_coursework_material(course_id):
   """Get  list of coursework from classroom
@@ -368,8 +367,6 @@ def get_coursework_material(course_id):
   except HttpError as error:
     logger.error(error)
     return None
-
-
 
 def create_coursework(course_id, coursework_list):
   """create coursework in a classroom course
@@ -486,7 +483,6 @@ def add_teacher(course_id, teacher_email):
   course = service.courses().teachers().create(courseId=course_id,
                                                body=teacher).execute()
   return course
-
 
 def delete_teacher(course_id, teacher_email):
   """delete teacher in a classroom
@@ -634,7 +630,6 @@ def get_edit_url_and_view_url_mapping_of_form():
       break
   return view_link_and_edit_link_matching
 
-
 def get_view_link_from_id(form_id):
   "Query google forms api  using form id and get view url of  google form"
 
@@ -647,29 +642,6 @@ def retrive_all_form_responses(form_id):
   DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
   service = build("forms", "v1", credentials=get_credentials(),discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
   result = service.forms().responses().list(formId=form_id).execute()
-  return result
-
-
-
-def create_google_form(form_body):
-  "Query google forms api  using form id and get view url of  google form"
-  DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
-  service = build("forms", "v1", credentials=get_credentials(),discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
-  result = service.forms().create(body=form_body).execute()
-  return result
-
-def batch_update_google_form(form_id ,form_body):
-  "Query google forms api  using form id and get view url of  google form"
-  DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
-  service = build("forms", "v1", credentials=get_credentials(),discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
-  result = service.forms().batchUpdate(formId=form_id, body=form_body).execute()
-  return result
-
-def get_google_form(form_id):
-  "Query google forms api  using form id and get view url of  google form"
-  DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
-  service = build("forms", "v1", credentials=get_credentials(),discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
-  result = service.forms().get(formId=form_id).execute()
   return result
 
 def invite_user(course_id, email,role):
@@ -714,8 +686,6 @@ def get_invite(invitation_id):
   service = build("classroom", "v1", credentials=get_credentials())
   invitation = service.invitations().get(id=invitation_id).execute()
   return invitation
-
-
 
 def enable_notifications(course_id, feed_type):
   """_summary_
@@ -964,5 +934,3 @@ def post_grade_of_the_user(section_id: str,
         data=None) from ae
   except Exception as e:
     raise InternalServerError(str(e)) from e
-
-

@@ -274,11 +274,13 @@ class ImportGradeResponseModel(BaseModel):
     orm_mode = True
     schema_extra = {
       "example": {
-      "count":10,
+      "success":True,
+      "message":"Success",
+      "data":{"count":10,
       "student_grades" : {
       "student1@gmail.com":10,
       "student1@gmail.com":7,
-      "student3@gmail.com":5  
+      "student3@gmail.com":5  }
               }
         }
     }
