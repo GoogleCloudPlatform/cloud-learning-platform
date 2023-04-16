@@ -278,7 +278,6 @@ def list_coursework_submissions_user(course_id,coursework_id,user_id):
   service = build("classroom", "v1", credentials=get_credentials())
   submissions = []
   page_token = None
-  
   while True:
     coursework = service.courses().courseWork()
     response = coursework.studentSubmissions().list(

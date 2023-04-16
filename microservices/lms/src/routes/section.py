@@ -506,7 +506,6 @@ def import_grade(section_id: str,coursework_id:str):
       return {"data":{"count":count,"student_grades":student_grades}}
     else:
       return {"data":{"count":count,"student_grades":student_grades}}
-    
   except HttpError as hte:
     Logger.error(hte)
     message = str(hte)

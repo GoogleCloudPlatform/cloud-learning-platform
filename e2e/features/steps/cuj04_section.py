@@ -319,8 +319,6 @@ def step_impl_43(context):
     "API request is sent which has valid input"
 )
 def step_impl_44(context):
-  resp = requests.patch(context.url,
-                       headers=context.header)
   submission =list_coursework_submission_user(context.access_token,
                                               context.classroom_id,
                                               context.coursework["id"],"me")
@@ -329,6 +327,8 @@ def step_impl_44(context):
 
   create_coursework_submission(context.access_token,context.classroom_id,
                                context.coursework["id"],submission[0]["id"])
+  resp = requests.patch(context.url,
+                       headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
   print("Response of Import grade api turn in",context.response)
@@ -339,5 +339,5 @@ def step_impl_44(context):
 def step_impl_45(context):
   assert context.status == 200, "Status 200"
   assert context.response["data"]["count"] == 1, "count  match update"
-  assert context.student_email in context.response["data"]["student_grades"]
+  assert context.student_email in context.response["data"]["student_grades"].keys()
 
