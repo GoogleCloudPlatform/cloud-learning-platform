@@ -23,7 +23,6 @@ from schemas.error_schema import (UnauthorizedResponseModel,
                                   ValidationErrorResponseModel)
 from google.cloud import secretmanager
 from langchain.chat_models import ChatOpenAI
-from services.vertex_service import TextGenerationModel, ChatModel
 
 
 secrets = secretmanager.SecretManagerServiceClient()
@@ -45,22 +44,10 @@ except FileNotFoundError as e:
 
 CONTAINER_NAME = os.getenv("CONTAINER_NAME")
 DEPLOYMENT_NAME = os.getenv("DEPLOYMENT_NAME")
-
 API_BASE_URL = os.getenv("API_BASE_URL")
-
 SERVICE_NAME = os.getenv("SERVICE_NAME")
 
-ENABLE_OPENAI_LLM = os.getenv("ENABLE_OPENAI_LLM", "true")
-if ENABLE_OPENAI_LLM is None or ENABLE_OPENAI_LLM == "":
-  ENABLE_OPENAI_LLM = True
-Logger.info(f"ENABLE_OPENAI_LLM = {ENABLE_OPENAI_LLM}")
-
-ENABLE_GOOGLE_LLM = os.getenv("ENABLE_GOOGLE_LLM", "false").lower() == "true"
-if ENABLE_GOOGLE_LLM is None or ENABLE_GOOGLE_LLM == "":
-  ENABLE_OPENAI_LLM = False
-Logger.info(f"ENABLE_GOOGLE_LLM = {ENABLE_GOOGLE_LLM}")
-
-PAYLOAD_FILE_SIZE = 2097152  #2MB
+PAYLOAD_FILE_SIZE = 1024
 
 ERROR_RESPONSES = {
     500: {
@@ -75,6 +62,23 @@ ERROR_RESPONSES = {
 }
 
 # LLM configuration
+
+def get_environ_flag(env_flag_str, default=True):
+  default_str = str(default)
+  evn_val = os.getenv(env_flag_str, default_str)
+  if evn_val is None or evn_val == "":
+    evn_val = default_str  
+  evn_flag = evn_val.lower() == "true"
+  Logger.info(f"{env_flag_str} = {evn_flag}")
+  return evn_flag
+
+ENABLE_OPENAI_LLM = get_environ_flag("ENABLE_OPENAI_LLM", True)
+
+ENABLE_GOOGLE_LLM = get_environ_flag("ENABLE_GOOGLE_LLM", True)
+
+ENABLE_COHERE_LLM = get_environ_flag("ENABLE_COHERE_LLM", False)
+
+
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if OPENAI_API_KEY is None:
   OPENAI_API_KEY = secrets.access_secret_version(
@@ -82,45 +86,48 @@ if OPENAI_API_KEY is None:
           "name": "projects/" + PROJECT_ID +
                   "/secrets/openai-api-key/versions/latest"
       }).payload.data.decode("utf-8")
+  OPENAI_API_KEY = OPENAI_API_KEY.strip()
 
-GOOGLE_API_KEY = secrets.access_secret_version(
-    request={
-        "name": "projects/" + PROJECT_ID +
-                "/secrets/google-api-access-token/versions/latest"
-    }).payload.data.decode("utf-8")
+def load_google_access_token():
+  google_access_token = secrets.access_secret_version(
+      request={
+          "name": "projects/" + PROJECT_ID +
+                  "/secrets/google-api-access-token/versions/latest"
+      }).payload.data.decode("utf-8")
+  google_access_token = google_access_token.strip()
+  return google_access_token
+
+GOOGLE_VERTEX_ENDPOINT = "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-large-language-models/locations/us-central1/endpoints/{}:predict"
 
 OPENAI_LLM_TYPE_GPT3_5 = "OpenAI-GPT3.5"
 OPENAI_LLM_TYPE_GPT4 = "OpenAI-GPT4"
-VERTEX_LLM_TYPE_BISON_001 = "VertexAI-Bison-001"
-VERTEX_LLM_TYPE_BISON_ALPHA = "VertexAI-Bison-alpha"
+VERTEX_LLM_TYPE_BISON_001 = "VertexAI-Text-alpha"
+VERTEX_LLM_TYPE_BISON_CHAT = "VertexAI-Chat-alpha"
 
 LLM_TYPES = []
 OPENAI_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, OPENAI_LLM_TYPE_GPT4]
-GOOGLE_LLM_TYPES = [VERTEX_LLM_TYPE_BISON_001, VERTEX_LLM_TYPE_BISON_ALPHA]
+GOOGLE_LLM_TYPES = [VERTEX_LLM_TYPE_BISON_001, VERTEX_LLM_TYPE_BISON_CHAT]
 
 if ENABLE_OPENAI_LLM:
-  #LLM_TYPES = LLM_TYPES.extend(OPENAI_LLM_TYPES)
-  LLM_TYPES = OPENAI_LLM_TYPES
+  LLM_TYPES.extend(OPENAI_LLM_TYPES)
 
 if ENABLE_GOOGLE_LLM:
-  LLM_TYPES = LLM_TYPES.extend(GOOGLE_LLM_TYPES)
-
-Logger.info(f"LLM types loaded {LLM_TYPES}")
+  LLM_TYPES.extend(GOOGLE_LLM_TYPES)
 
 LANGCHAIN_LLM = {}
 if ENABLE_OPENAI_LLM:
-  LANGCHAIN_LLM = {
+  LANGCHAIN_LLM.update({
     OPENAI_LLM_TYPE_GPT3_5: ChatOpenAI(openai_api_key=OPENAI_API_KEY,
                                 model_name="gpt-3.5-turbo"),
     OPENAI_LLM_TYPE_GPT4: ChatOpenAI(openai_api_key=OPENAI_API_KEY,
                                 model_name="gpt-4")
-  }
+  })
 
 GOOGLE_LLM = {}
 if ENABLE_GOOGLE_LLM:
   GOOGLE_LLM = {
-    VERTEX_LLM_TYPE_BISON_001:
-      TextGenerationModel.from_pretrained("text-bison-001"),
-    VERTEX_LLM_TYPE_BISON_ALPHA:
-      ChatModel.from_pretrained("text-bison-alpha")
+    VERTEX_LLM_TYPE_BISON_001: "text-bison-001",
+    VERTEX_LLM_TYPE_BISON_CHAT: "text-bison-alpha"
   }
+
+Logger.info(f"LLM types loaded {LLM_TYPES}")

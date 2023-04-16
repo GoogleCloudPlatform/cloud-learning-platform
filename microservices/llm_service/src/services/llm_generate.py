@@ -20,8 +20,11 @@ from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
 from services.langchain_service import langchain_llm_generate
 from typing import Optional
+import requests
 
-from config import LANGCHAIN_LLM, GOOGLE_LLM, OPENAI_LLM_TYPE_GPT3_5
+from config import (LANGCHAIN_LLM, GOOGLE_LLM, 
+                    OPENAI_LLM_TYPE_GPT3_5, GOOGLE_VERTEX_ENDPOINT)
+from config import load_google_access_token
 
 async def llm_generate(prompt: str, llm_type: str,
                        user_llm: Optional[UserLLM] = None):
@@ -50,10 +53,46 @@ async def llm_generate(prompt: str, llm_type: str,
       result = await langchain_llm_generate(prompt, llm_type, user_llm)
     elif llm_type in GOOGLE_LLM.keys():
       google_llm = GOOGLE_LLM.get(llm_type)
-      result = await google_llm.predict(prompt)
+      result = await google_llm_predict(prompt, google_llm)
     else:
       raise ResourceNotFoundException(f"Cannot find llm type '{llm_type}'")
 
     return result
   except Exception as e:
     raise InternalServerError(str(e)) from e
+
+async def google_llm_predict(prompt, google_llm):
+  headers = get_google_headers()
+
+  payload = {
+    'instances': [
+      { 'content': prompt }
+    ],
+    'parameters': {
+      'temperature': 0.0,
+      'maxOutputTokens': 1024,
+      'topP': 0.95,
+      'topK': 40
+    }
+  }
+
+  endpoint_url = GOOGLE_VERTEX_ENDPOINT.format(google_llm)
+
+  result = None
+  try:
+    response = requests.post(endpoint_url, json=payload, headers=headers)
+    result = response.json()['predictions'][0]['content']
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+  return result
+
+def get_google_headers():
+  token = load_google_access_token()
+  headers = {
+    "Authorization": "Bearer {}".format(token),
+    "Content-Type": "application/json"
+  }
+  return headers
+  
