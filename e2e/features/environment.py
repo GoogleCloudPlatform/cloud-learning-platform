@@ -247,7 +247,7 @@ def import_google_form_grade(context):
        }}
       ],
       "state":"PUBLISHED"}
-  coursework = create_coursework(section.classroom_id,coursework_body=coursework_body)
+  coursework = create_coursework(section.classroom_id,coursework_body)
   print("Create coursework worked____")
   context.coursework_id = coursework.get("id")
   context.coursework = coursework

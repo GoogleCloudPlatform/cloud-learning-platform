@@ -9,10 +9,10 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
 PROJECT_ID = os.getenv("PROJECT_ID", "")
-# CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
-# CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
-CLASSROOM_KEY = "lms"
-CLASSROOM_ADMIN_EMAIL = "lms"
+CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
+CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
+# CLASSROOM_KEY = "lms"
+# CLASSROOM_ADMIN_EMAIL = "lms"
 
 SCOPES = [
   "https://www.googleapis.com/auth/classroom.courses",
@@ -198,4 +198,15 @@ def list_coursework_submission_user(access_token,course_id,coursework_id,user_id
 
 # create_coursework_submission(access_token,course_id,coursework_id,submission_id)
 # list_coursework_submission_user(access_token2,course_id,coursework_id,"me")
-
+# coursework_body = coursework_body = {"title": "Test_quize",
+#       "description":"test desc",
+#       "workType": "ASSIGNMENT",
+#       "materials":[
+#     {"link":
+#       {
+#         "title": "quize1 assignment",
+#         "url": "https://docs.google.com/forms/d/1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM/edit"
+#        }}
+#       ],
+#       "state":"PUBLISHED"}
+# create_coursework(course_id,coursework_body=coursework_body)
