@@ -467,7 +467,7 @@ def test_negative_get_assignment(client_with_emulator, create_fake_data):
 
 def test_get_coursework_list(client_with_emulator):
   url = BASE_URL + \
-      f"/sections/9xieFlma8bcWYyLPOg0c/get_coursework_list"
+      "/sections/9xieFlma8bcWYyLPOg0c/get_coursework_list"
   with mock.patch("routes.section.classroom_crud.get_course_work_list",
                   return_value=[{},{}]):
     resp = client_with_emulator.get(url)
