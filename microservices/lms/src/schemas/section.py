@@ -263,7 +263,6 @@ class AssignmentModel(BaseModel):
     schema_extra = {
         "example": ASSIGNMENT_MODEL
     }
-   
 class GetCourseWorkList(BaseModel):
   """Coursework list model"""
   success: Optional[bool] = True

@@ -465,9 +465,9 @@ def test_negative_get_assignment(client_with_emulator, create_fake_data):
   assert resp.status_code == 404, "Status 404"
   assert data["success"] is False, "Data doesn't Match"
 
-def test_get_coursework_list(client_with_emulator, create_fake_data):
+def test_get_coursework_list(client_with_emulator):
   url = BASE_URL + \
-      f"/sections/{create_fake_data['section']}/get_coursework_list"
+      f"/sections/9xieFlma8bcWYyLPOg0c/get_coursework_list"
   with mock.patch("routes.section.classroom_crud.get_course_work_list",
                   return_value=[{},{}]):
     resp = client_with_emulator.get(url)
