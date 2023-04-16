@@ -26,7 +26,8 @@ from services import common_service
 from services.section_service import copy_course_background_task
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model,
-                          FEED_TYPES,convert_coursework_to_short_coursework_model)
+                          FEED_TYPES,
+                    convert_coursework_to_short_coursework_model)
 from config import BQ_TABLE_DICT,BQ_DATASET
 
 # disabling for linting to pass
@@ -447,7 +448,7 @@ def get_assignment(section_id: str, assignment_id: str):
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
-  
+
 @router.get("/{section_id}/get_coursework_list",
             response_model=GetCourseWorkList)
 def get_coursework_list(section_id: str):
@@ -464,7 +465,8 @@ def get_coursework_list(section_id: str):
   """
   try:
     data=[]
-    course_work_list = classroom_crud.get_course_work_list(section_id=section_id)
+    course_work_list = classroom_crud.get_course_work_list\
+      (section_id=section_id)
     for x in course_work_list:
       data.append(convert_coursework_to_short_coursework_model(x))
     return {"data":data}

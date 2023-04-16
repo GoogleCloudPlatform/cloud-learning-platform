@@ -77,17 +77,17 @@ def convert_coursework_to_short_coursework_model(coursework):
        according to coursework object
   """
   keys = coursework.keys()
-  shortCourseWork={}
-  shortCourseWork["courseId"] = coursework["courseId"]
-  shortCourseWork["courseWorkId"]  = coursework["id"]
-  shortCourseWork["title"] = coursework["title"]
-  shortCourseWork["state"] = coursework["state"]
-  shortCourseWork["creationTime"] = coursework["creationTime"]
+  shortcoursework={}
+  shortcoursework["courseId"] = coursework["courseId"]
+  shortcoursework["courseWorkId"]  = coursework["id"]
+  shortcoursework["title"] = coursework["title"]
+  shortcoursework["state"] = coursework["state"]
+  shortcoursework["creationTime"] = coursework["creationTime"]
   if "materials" in keys:
-    shortCourseWork["materials"] = coursework["materials"]
+    shortcoursework["materials"] = coursework["materials"]
   else:
-    shortCourseWork["materials"] = []
-  return shortCourseWork
+    shortcoursework["materials"] = []
+  return shortcoursework
 
 
 def get_json_value(dict_object, key):
