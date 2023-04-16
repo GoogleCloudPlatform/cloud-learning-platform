@@ -64,7 +64,30 @@ def convert_assignment_to_assignment_model(assignment):
   assignment["max_grade"] = get_json_value(assignment, "maxPoints")
   assignment["work_type"] = get_json_value(assignment, "workType")
   assignment["assignee_mode"] = get_json_value(assignment, "assigneeMode")
+
   return assignment
+
+
+def convert_coursework_to_short_coursework_model(coursework):
+  """Convert coursework dict to shortcoursework object
+  Args:
+      coursework (dict): dict which contains all the coursework details
+  Returns:
+      dict: dict which contains shortcoursework details
+       according to coursework object
+  """
+  keys = coursework.keys()
+  shortCourseWork={}
+  shortCourseWork["courseId"] = coursework["courseId"]
+  shortCourseWork["courseWorkId"]  = coursework["id"]
+  shortCourseWork["title"] = coursework["title"]
+  shortCourseWork["state"] = coursework["state"]
+  shortCourseWork["creationTime"] = coursework["creationTime"]
+  if "materials" in keys:
+    shortCourseWork["materials"] = coursework["materials"]
+  else:
+    shortCourseWork["materials"] = []
+  return shortCourseWork
 
 
 def get_json_value(dict_object, key):

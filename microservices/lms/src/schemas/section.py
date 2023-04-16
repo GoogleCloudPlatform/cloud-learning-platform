@@ -264,3 +264,18 @@ class AssignmentModel(BaseModel):
         "example": ASSIGNMENT_MODEL
     }
      
+class GetCourseWorkList(BaseModel):
+  """Coursework list model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success"
+  data: Optional[list] =[]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data":[]
+      }
+      }

@@ -20,13 +20,13 @@ from schemas.section import (
     DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     UpdateSectionResponseModel,TeachersListResponseModel,
-    GetTeacherResponseModel,AssignmentModel)
+    GetTeacherResponseModel,AssignmentModel,GetCourseWorkList)
 from schemas.update_section import UpdateSection
 from services import common_service
 from services.section_service import copy_course_background_task
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model,
-                          FEED_TYPES)
+                          FEED_TYPES,convert_coursework_to_short_coursework_model)
 from config import BQ_TABLE_DICT,BQ_DATASET
 
 # disabling for linting to pass
@@ -438,6 +438,36 @@ def get_assignment(section_id: str, assignment_id: str):
     assignment = classroom_crud.get_course_work(course_id=section.classroom_id,
                                                 course_work_id=assignment_id)
     return convert_assignment_to_assignment_model(assignment)
+  except HttpError as hte:
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+  
+@router.get("/{section_id}/get_coursework_list",
+            response_model=GetCourseWorkList)
+def get_coursework_list(section_id: str):
+  """Get course work details using section id
+  Args:
+      section_id (str): section unique id
+  Raises:
+      InternalServerError: 500 Internal Server Error if something fails
+      ClassroomHttpException: raise error according to the HTTPError exception
+      ResourceNotFound: 404 Section with section id is not found
+  Returns:
+      AssignmentModel: AssignmentModel object which
+        contains all the course work details
+  """
+  try:
+    data=[]
+    course_work_list = classroom_crud.get_course_work_list(section_id=section_id)
+    for x in course_work_list:
+      data.append(convert_coursework_to_short_coursework_model(x))
+    return {"data":data}
   except HttpError as hte:
     raise ClassroomHttpException(status_code=hte.resp.status,
                               message=str(hte)) from hte
