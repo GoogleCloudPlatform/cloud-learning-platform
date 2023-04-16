@@ -287,7 +287,7 @@ def step_impl_39(context):
     "A teacher has access to portal and wants to  update grades of student for a coursework with form quize of a section"
 )
 def step_impl_40(context):
-  context.url = f'{API_URL}/sections/{context.section_id}/coursework/{context.coursework["id"]}'
+  context.url = f'{API_URL}/sections/{context.sections.id}/coursework/{context.coursework_id}'
   print("CONTEXT URL for import grade",context.url)
 
 @behave.when(
@@ -312,7 +312,7 @@ def step_impl_42(context):
     "A teacher wants to update grades of student for a coursework with for turnIn  assignment with google form"
 )
 def step_impl_43(context):
-  context.url = f'{API_URL}/sections/{context.section_id}/coursework/{context.coursework["id"]}'
+  context.url = f'{API_URL}/sections/{context.sections.id}/coursework/{context.coursework_id}'
   print("CONTEXT URL for import grade",context.url)
 
 @behave.when(

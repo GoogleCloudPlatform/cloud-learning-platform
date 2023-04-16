@@ -233,7 +233,9 @@ def enroll_student_course(context):
 @fixture
 def import_google_form_grade(context):
   "Fixture for import grade"
+  print("Import grade fixture started")
   section = use_fixture(create_section, context)
+  print("Sections fixure worked___")
   coursework_body = {"title": "Test_quize",
       "description":"test desc",
       "workType": "ASSIGNMENT",
@@ -246,6 +248,7 @@ def import_google_form_grade(context):
       ],
       "state":"PUBLISHED"}
   coursework = create_coursework(section.classroom_id,coursework_body=coursework_body)
+  print("Create coursework worked____")
   context.coursework_id = coursework.get("id")
   context.coursework = coursework
   context.section_id = section.id
@@ -253,7 +256,8 @@ def import_google_form_grade(context):
   classroom_id = section.classroom_id
   student_email_and_token = get_student_email_and_token()
   student_data = enroll_student_classroom(student_email_and_token["access_token"],
-  classroom_id,student_email_and_token["email"].lower(),classroom_code)  
+  classroom_id,student_email_and_token["email"].lower(),classroom_code) 
+  print("Enroll student worked") 
   context.access_token = student_email_and_token["access_token"]
   context.student_email =student_email_and_token["email"].lower() 
   context.classroom_id = classroom_id 
