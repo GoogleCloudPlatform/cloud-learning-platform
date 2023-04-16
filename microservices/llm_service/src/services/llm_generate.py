@@ -22,7 +22,7 @@ from services.langchain_service import langchain_llm_generate
 from typing import Optional
 import requests
 
-from config import (LANGCHAIN_LLM, GOOGLE_LLM, 
+from config import (LANGCHAIN_LLM, GOOGLE_LLM,
                     OPENAI_LLM_TYPE_GPT3_5, GOOGLE_VERTEX_ENDPOINT)
 from config import load_google_access_token
 
@@ -62,17 +62,28 @@ async def llm_generate(prompt: str, llm_type: str,
     raise InternalServerError(str(e)) from e
 
 async def google_llm_predict(prompt, google_llm):
+  """
+  Generate text with a Google LLM given a prompt.
+
+  Args:
+    prompt: the text prompt to pass to the LLM
+
+    google)llm: name of the vertex llm model
+
+  Returns:
+    the text result.
+  """
   headers = get_google_headers()
 
   payload = {
-    'instances': [
-      { 'content': prompt }
+    "instances": [
+      { "content": prompt }
     ],
-    'parameters': {
-      'temperature': 0.0,
-      'maxOutputTokens': 1024,
-      'topP': 0.95,
-      'topK': 40
+    "parameters": {
+      "temperature": 0.0,
+      "maxOutputTokens": 1024,
+      "topP": 0.95,
+      "topK": 40
     }
   }
 
@@ -80,8 +91,9 @@ async def google_llm_predict(prompt, google_llm):
 
   result = None
   try:
-    response = requests.post(endpoint_url, json=payload, headers=headers)
-    result = response.json()['predictions'][0]['content']
+    response = requests.post(endpoint_url, json=payload, headers=headers,
+                             timeout=60*5)
+    result = response.json()["predictions"][0]["content"]
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -91,7 +103,7 @@ async def google_llm_predict(prompt, google_llm):
 def get_google_headers():
   token = load_google_access_token()
   headers = {
-    "Authorization": "Bearer {}".format(token),
+    "Authorization": f"Bearer {token}",
     "Content-Type": "application/json"
   }
   return headers

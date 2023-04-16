@@ -15,7 +15,7 @@
 """
   LLM Service config file
 """
-# pylint: disable=unspecified-encoding
+# pylint: disable=unspecified-encoding,line-too-long
 import os
 from common.utils.logging_handler import Logger
 from schemas.error_schema import (UnauthorizedResponseModel,
@@ -67,7 +67,7 @@ def get_environ_flag(env_flag_str, default=True):
   default_str = str(default)
   evn_val = os.getenv(env_flag_str, default_str)
   if evn_val is None or evn_val == "":
-    evn_val = default_str  
+    evn_val = default_str
   evn_flag = evn_val.lower() == "true"
   Logger.info(f"{env_flag_str} = {evn_flag}")
   return evn_flag

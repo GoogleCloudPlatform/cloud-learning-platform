@@ -20,7 +20,7 @@ from typing import Optional
 from fastapi import APIRouter
 from common.models import UserLLM
 from common.utils.logging_handler import Logger
-from common.utils.errors import (ResourceNotFoundException, 
+from common.utils.errors import (ResourceNotFoundException,
                                  PayloadTooLargeError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, PayloadTooLarge)
