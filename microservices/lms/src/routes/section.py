@@ -485,9 +485,11 @@ def import_grade(section_id: str,coursework_id:str):
           all_responses_of_form = classroom_crud.\
           retrive_all_form_responses(form_id)
           if all_responses_of_form =={}:
-            return {"data":{"count":0,"student_grades":{}}}
+            return {"data":{"count":0,"student_grades":{}},
+                    "message":"Responses not available form google form"}
 
           for response in all_responses_of_form["responses"]:
+            print("This is respondent email",response["respondentEmail"])
             submissions=classroom_crud.list_coursework_submissions_user(
                                                   section.classroom_id,
                                                   coursework_id,
@@ -504,6 +506,7 @@ def import_grade(section_id: str,coursework_id:str):
       return {"data":{"count":count,"student_grades":student_grades}}
     else:
       return {"data":{"count":count,"student_grades":student_grades}}
+    
   except HttpError as hte:
     Logger.error(hte)
     message = str(hte)
@@ -513,6 +516,9 @@ def import_grade(section_id: str,coursework_id:str):
                               success=False,
                               message=message,
                               data=None) from hte
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)

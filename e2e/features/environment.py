@@ -8,7 +8,10 @@ from common.testing.example_objects import TEST_SECTION,TEST_COHORT
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL
-from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,get_student_email_and_token,get_required_emails_from_secret_manager
+from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,\
+  get_student_email_and_token,\
+    get_required_emails_from_secret_manager,create_coursework
+
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.user import TEST_USER
 from google.oauth2.credentials import Credentials
@@ -231,11 +234,7 @@ def enroll_student_course(context):
 def import_google_form_grade(context):
   "Fixture for import grade"
   section = use_fixture(create_section, context)
-  a_creds = service_account.Credentials.from_service_account_info(
-      CLASSROOM_KEY, scopes=SCOPES)
-  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-  service = build("classroom", "v1", credentials=creds)
-  body={"title": "Test_quize",
+  coursework_body = {"title": "Test_quize",
       "description":"test desc",
       "workType": "ASSIGNMENT",
       "materials":[
@@ -246,8 +245,7 @@ def import_google_form_grade(context):
        }}
       ],
       "state":"PUBLISHED"}
-  coursework = service.courses().courseWork().create(courseId=section.classroom_id,
-                                                 body=body).execute()
+  coursework = create_coursework(section.classroom_id,coursework_body)
   context.coursework_id = coursework.get("id")
   context.coursework = coursework
   context.section_id = section.id
@@ -256,6 +254,10 @@ def import_google_form_grade(context):
   student_email_and_token = get_student_email_and_token()
   student_data = enroll_student_classroom(student_email_and_token["access_token"],
   classroom_id,student_email_and_token["email"].lower(),classroom_code)  
+  context.access_token = student_email_and_token["access_token"]
+  context.student_email =student_email_and_token["email"].lower() 
+  context.classroom_id = classroom_id 
+  print("access token set in context",context.access_token)
   courese_enrollment_mapping = create_student_enrollment_record(student_data=student_data,section=section)
   yield context.coursework
 

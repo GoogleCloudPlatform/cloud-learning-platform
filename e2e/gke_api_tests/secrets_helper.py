@@ -3,10 +3,31 @@ import json
 import os
 import random
 from google.cloud import secretmanager
+from googleapiclient.discovery import build
+from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
 PROJECT_ID = os.getenv("PROJECT_ID", "")
+# CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
+# CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
+CLASSROOM_KEY = "lms"
+CLASSROOM_ADMIN_EMAIL = "lms"
+
+SCOPES = [
+  "https://www.googleapis.com/auth/classroom.courses",
+  "https://www.googleapis.com/auth/classroom.courses.readonly",
+  "https://www.googleapis.com/auth/classroom.coursework.students",
+  "https://www.googleapis.com/auth/classroom.rosters",
+  "https://www.googleapis.com/auth/classroom.coursework.me",
+  "https://www.googleapis.com/auth/classroom.topics",
+  "https://www.googleapis.com/auth/drive",
+  "https://www.googleapis.com/auth/forms.body.readonly",
+  "https://www.googleapis.com/auth/classroom.profile.photos",
+  "https://www.googleapis.com/auth/classroom.courseworkmaterials",
+  "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+  ]
+
 
 
 def get_required_emails_from_secret_manager():
@@ -40,13 +61,13 @@ def get_student_email_and_token():
         dict: returns a dict which contains student email and token
     """
   student_email_token_name_mapping = {
-    # "personal-test-user-1-username": "add_student_token",
+    "personal-test-user-1-username": "add_student_token",
     "personal-test-user-2-username": "add_student_token_2",
     "personal-test-user-3-username":"add_student_token_3", 
     "personal-test-user-4-username":"add_student_token_4"}
 
   keys = [
-          # "personal-test-user-1-username",
+          "personal-test-user-1-username",
           "personal-test-user-2-username",
           "personal-test-user-3-username",
           "personal-test-user-4-username"]
@@ -137,4 +158,44 @@ def get_user_email_and_password_for_e2e():
   return json.loads(user_email_password_response.payload.data.decode(
       "UTF-8"))
 
-get_student_email_and_token()
+def create_coursework(course_id,coursework_body):
+  a_creds = service_account.Credentials.from_service_account_info(
+      CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("classroom", "v1", credentials=creds)
+  body=coursework_body
+  coursework = service.courses().courseWork().create(courseId=course_id,
+                                                 body=body).execute()
+  return coursework
+
+
+def create_coursework_submission(access_token,course_id,coursework_id,submission_id):
+  print("Submission creation started")
+  creds = Credentials(token=access_token)
+  service = build("classroom", "v1", credentials=creds)
+  result = service.courses().courseWork().studentSubmissions().turnIn(
+    courseId=course_id,
+    courseWorkId=coursework_id,
+    id=submission_id,body={}).execute()
+  print("This is result Turn In done ",result)
+  return result
+  
+def list_coursework_submission_user(access_token,course_id,coursework_id,user_id):
+  creds = Credentials(token=access_token)
+  print("Credentialss ",creds)
+  service = build("classroom", "v1", credentials=creds)
+  result = service.courses().courseWork().studentSubmissions().list(
+    courseId=course_id,
+    courseWorkId=coursework_id,
+    userId=user_id).execute()
+  print("This is result list assignrmt ",result["studentSubmissions"])
+  return result["studentSubmissions"]
+# access_token =  "ya29.a0Ael9sCNy-q4Bo9rHaC5MXEAGhwDnKVouceCSmq2Qiq7KCnZSpFONIaYHaVFj0MbbcaL15VfziLbCy25G4GiNpnpaF3yWA0CWLpeF8Zf8kuMm5cCIod4prfYXxjiQrm4xBmmLYZYppRCbITE0fGMG7OkYoKW1aCgYKAcwSARESFQF4udJhHgo3XfS5CzCBQ2ZqC6-1Hw0163"
+# access_token2 = "ya29.a0Ael9sCMMXS_LDGjlU-lseY8iGE7RvRqbweGczW200uX_vrXV4jsnSb-xWXWUfrOyBXjEU2rTmmQLBtgQ9JsYdqplXBAMZYAYppJYC45-qY_PRyGeuJqFYGMpLUS_sRildeA-a6eSWx-ac7BgXVwLFV6JSpWBaCgYKAboSARESFQF4udJh7vSqBoF5Gs3bgNnVh3Uqpw0163"
+# course_id = 604063268646
+# coursework_id =553046445746
+# submission_id = "Cg4Ire6typwRELKdjKGMEA"
+
+# create_coursework_submission(access_token,course_id,coursework_id,submission_id)
+# list_coursework_submission_user(access_token2,course_id,coursework_id,"me")
+

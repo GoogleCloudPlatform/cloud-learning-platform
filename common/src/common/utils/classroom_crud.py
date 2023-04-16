@@ -278,22 +278,20 @@ def list_coursework_submissions_user(course_id,coursework_id,user_id):
   service = build("classroom", "v1", credentials=get_credentials())
   submissions = []
   page_token = None
-  try:
-    while True:
-      coursework = service.courses().courseWork()
-      response = coursework.studentSubmissions().list(
-          pageToken=page_token,
-          courseId=course_id,
-          courseWorkId=coursework_id,
-          userId=user_id).execute()
-      submissions.extend(response.get("studentSubmissions", []))
-      page_token = response.get("nextPageToken", None)
-      if not page_token:
-        break
-    return submissions
-  except HttpError as error:
-    logger.error(error)
-    return None
+  
+  while True:
+    coursework = service.courses().courseWork()
+    response = coursework.studentSubmissions().list(
+        pageToken=page_token,
+        courseId=course_id,
+        courseWorkId=coursework_id,
+        userId=user_id).execute()
+    submissions.extend(response.get("studentSubmissions", []))
+    page_token = response.get("nextPageToken", None)
+    if not page_token:
+      break
+  return submissions
+
 
 def patch_student_submission(course_id,coursework_id,
                              student_submission_id,
