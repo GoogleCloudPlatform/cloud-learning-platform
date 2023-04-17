@@ -4,7 +4,8 @@ import requests
 from testing_objects.test_config import API_URL
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA 
 from testing_objects.user import TEST_USER
-from e2e.gke_api_tests.secrets_helper import get_student_email_and_token,get_workspace_student_email_and_token
+from e2e.gke_api_tests.secrets_helper import get_student_email_and_token,\
+  get_workspace_student_email_and_token,create_coursework_submission,list_coursework_submission_user
 from environment import create_course
 
 # -------------------------------Enroll student to cohort-------------------------------------
@@ -280,3 +281,62 @@ def step_impl_38(context):
 def step_impl_39(context):
   assert context.status == 200, "Status 200"
 
+# -----------------------------------Import grade coursework- Positive-------------------------------
+
+@behave.given(
+    "A teacher has access to portal and wants to  update grades of student for a coursework with form quize of a section"
+)
+def step_impl_40(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/coursework/{context.coursework_id}'
+  print("CONTEXT URL for import grade",context.url)
+
+@behave.when(
+    "API request is sent which has valid section_id and coursework_id"
+)
+def step_impl_41(context):
+  resp = requests.patch(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("Response of Import grade api not turn in ",context.response)
+
+@behave.then(
+    "Student grades are not updated in classroom"
+)
+def step_impl_42(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["data"]["count"] == 0, "count not matching of update"
+
+
+@behave.given(
+    "A teacher wants to update grades of student for a coursework with for turnIn  assignment with google form"
+)
+def step_impl_43(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/coursework/{context.coursework_id}'
+  print("CONTEXT URL for import grade",context.url)
+
+@behave.when(
+    "API request is sent which has valid input"
+)
+def step_impl_44(context):
+  submission =list_coursework_submission_user(context.access_token,
+                                              context.classroom_id,
+                                              context.coursework["id"],"me")
+  print("get Coursework submission of user",context.student_email,
+        context.access_token,submission)
+
+  create_coursework_submission(context.access_token,context.classroom_id,
+                               context.coursework["id"],submission[0]["id"])
+  resp = requests.patch(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("Response of Import grade api turn in",context.response)
+
+@behave.then(
+    "Student grades are  updated in classroom ans student_email is present in api response"
+)
+def step_impl_45(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["data"]["count"] == 1, "count  match update"
+  assert context.student_email in context.response["data"]["student_grades"].keys()

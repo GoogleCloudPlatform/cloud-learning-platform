@@ -1,0 +1,31 @@
+[
+    {
+        "name": "Short name or label for the assessment item.",
+        "question": "Assessment item question",
+        "answer": "Answer for the question",
+        "context": "Context from which the question was created",
+        "options": [],
+        "question_type": "Type of question",
+        "assessment_type": "Practice",
+        "use_type": "Field to distinguish the type of assessment profile (Formative/Summative)",
+        "metadata": {},
+        "author": "A person or organization chiefly responsible for the intellectual or artistic content of this assessment item",
+        "difficulty": 1,
+        "alignments": {
+          "competency_alignments": [],
+          "skill_alignments": [],
+          "learning_resource_alignment": [],
+          "rubric_alignment": []
+        },
+        "references": {
+          "competencies": [],
+          "skills": []
+        },
+        "parent_nodes": {
+          "learning_experiences": [],
+          "learning_objects": []
+        },
+        "child_nodes": {},
+        "learnosity_reference": "learnosity_session1"
+      }
+]

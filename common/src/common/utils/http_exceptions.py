@@ -93,6 +93,7 @@ class BadRequest(CustomHTTPException):
   def __init__(self, message: str = "Bad Request", data=None):
     super().__init__(status_code=422, message=message, success=False, data=data)
 
+
 class ResourceNotFound(CustomHTTPException):
   """Exception raised if a Resource is not found.
   A specific resource is not found.
@@ -103,6 +104,7 @@ class ResourceNotFound(CustomHTTPException):
   def __init__(self, message: str = "Resource Not Found"):
     super().__init__(status_code=404, message=message, \
       success=False, data=None)
+
 
 class InternalServerError(CustomHTTPException):
   """Exception raised for errors caused by the server.
@@ -118,6 +120,8 @@ class InternalServerError(CustomHTTPException):
   def __init__(self, message: Any = "Internal Server Error"):
     super().__init__(status_code=500, message=message, \
       success=False, data=None)
+
+
 class Conflict(CustomHTTPException):
   """Exception raised for conflicts.
   Conflict of the request with current system state.
@@ -174,3 +178,18 @@ class Unauthorized(CustomHTTPException):
                      message=message,
                      success=False,
                      data=None)
+
+
+class PayloadTooLarge(CustomHTTPException):
+  """Exception raised for payload too large error.
+
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "Content too large"):
+    super().__init__(status_code=413,
+                     message=message,
+                     success=False,
+                     data=None)
+

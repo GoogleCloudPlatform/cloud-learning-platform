@@ -113,3 +113,41 @@ INPUT_COHORT_TEST_DATA = {
     "registration_end_date": "2022-11-14T00:00:00",
     "max_students": 100
 }
+GET_COURSEWORK_DATA = {
+  "courseId": "604063268646",
+  "id": "553046445746",
+  "title": "youtube coursewok",
+  "materials": [
+    {
+      "youtubeVideo": {
+        "id": "pl-tBjAM9g4",
+        "title": "How to Use Google Classroom - Tutorial for Beginners",
+        "alternateLink": "https://www.youtube.com/watch?v=pl-tBjAM9g4",
+        "thumbnailUrl": "https://i.ytimg.com/vi/pl-tBjAM9g4/default.jpg"
+      }
+    },
+    {
+      "form": {
+        "formUrl": "https://docs.google.com/forms/d/e/1FAIpQL",
+        "title": "e2e_form1",
+        "thumbnailUrl": "https://lh6.googleusercontent.com/E7m"
+      }
+    }
+  ],
+  "state": "PUBLISHED"}
+
+FORM_RESPONSE_LIST = {"responses":
+    [{"respondentEmail":"clplmstestuser1@gmail.com","totalScore":5}]
+    }
+
+LIST_COURSEWORK_SUBMISSION_USER=[{"state":"TURNED_IN",
+                                  "courseWorkId":"553046445746",
+                                  "courseId":"604063268646",
+                                  "userId":"107386744676889596754",
+                                  "id":"Cg4IubuS9uwQELKdjKGMEA",
+                                  "courseWorkType":"ASSIGNMENT"}]
+
+EDIT_VIEW_URL_FILE_ID_MAPPING_FORM ={
+    "https://docs.google.com/forms/d/e/1FAIpQL":
+    {"file_id":"test123",
+    "webViewLink":"https://docs.google.com/forms/d/e/1FAIpQL/edit"}}
