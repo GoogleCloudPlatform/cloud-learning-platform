@@ -5,7 +5,9 @@ from common.models import Cohort, CourseTemplate, Section
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ClassroomHttpException,
                                           InternalServerError,
-                                          ResourceNotFound, BadRequest)
+                                          ResourceNotFound, BadRequest,
+                                          CustomHTTPException
+                                          )
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.utils.bq_helper import insert_rows_to_bq
@@ -20,6 +22,7 @@ from schemas.section import (
     DeleteSectionResponseModel,
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     UpdateSectionResponseModel,TeachersListResponseModel,
+    ImportGradeResponseModel,
     GetTeacherResponseModel,AssignmentModel)
 from schemas.update_section import UpdateSection
 from services import common_service
@@ -28,7 +31,6 @@ from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model,
                           FEED_TYPES)
 from config import BQ_TABLE_DICT,BQ_DATASET
-
 # disabling for linting to pass
 # pylint: disable = broad-except
 
@@ -446,4 +448,77 @@ def get_assignment(section_id: str, assignment_id: str):
     raise ResourceNotFound(str(err)) from err
   except Exception as e:
     Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+@router.patch("/{section_id}/coursework/{coursework_id}",
+              response_model=ImportGradeResponseModel)
+def import_grade(section_id: str,coursework_id:str):
+  """Get a section details from db and use the coursework Id
+  Args:
+      section_id (str): section_id in firestore
+      coursework_id(str): coursework_id of coursework in classroom
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      ResourceNotFound: 404 Section with section id is not found or
+        coursework is not found
+  Returns:
+    {"status":"Success","new_course":{}}: Returns section details from  db,
+    {'status': 'Failed'} if the user creation raises an exception
+  """
+  try:
+    section = Section.find_by_id(section_id)
+    result = classroom_crud.get_course_work(
+    section.classroom_id,coursework_id)
+    #Get url mapping of google forms view links and edit ids
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+    count =0
+    student_grades = {}
+    if "materials" in result.keys():
+      for material in result["materials"]:
+        if "form" in material.keys():
+          form_details = \
+            url_mapping[material["form"]["formUrl"]]
+
+          form_id = form_details["file_id"]
+          # Get all responses for the form if no responses of
+          # the form then return
+          all_responses_of_form = classroom_crud.\
+          retrive_all_form_responses(form_id)
+          if all_responses_of_form =={}:
+            return {"data":{"count":0,"student_grades":{}},
+                    "message":"Responses not available form google form"}
+
+          for response in all_responses_of_form["responses"]:
+            print("This is respondent email",response["respondentEmail"])
+            submissions=classroom_crud.list_coursework_submissions_user(
+                                                  section.classroom_id,
+                                                  coursework_id,
+                                          response["respondentEmail"])
+            if submissions !=[]:
+              if submissions[0]["state"] == "TURNED_IN":
+                count+=1
+                student_grades[
+                response["respondentEmail"]]=response["totalScore"]
+                classroom_crud.patch_student_submission(section.classroom_id,
+                                        coursework_id,submissions[0]["id"],
+                                              response["totalScore"],
+                                              response["totalScore"])
+      return {"data":{"count":count,"student_grades":student_grades}}
+    else:
+      return {"data":{"count":count,"student_grades":student_grades}}
+  except HttpError as hte:
+    Logger.error(hte)
+    message = str(hte)
+    if hte.resp.status == 404:
+      message = "Coursework not found"
+    raise CustomHTTPException(status_code=hte.resp.status,
+                              success=False,
+                              message=message,
+                              data=None) from hte
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    error = traceback.format_exc().replace("\n", " ")
+    Logger.error(error)
     raise InternalServerError(str(e)) from e
