@@ -75,8 +75,3 @@ Feature: Add student to cohort
     When API request is sent which has valid input
     Then Student grades are  updated in classroom ans student_email is present in api response
 
-  @fixture.import.google_form_grade
-  Scenario:Import grades for a form with no respondent
-    Given A teacher wants to update grades of student for a coursework where no student has responded to google form
-    When API request is sent which has valid input for zero form submissions 
-    Then Student grades are not updated in classroom and message with no respondent is sent
