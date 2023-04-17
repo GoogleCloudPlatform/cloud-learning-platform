@@ -585,8 +585,6 @@ def get_edit_url_and_view_url_mapping_of_form():
     view_link_and_edit_link_matching = {}
     for file in response.get("files", []):
       result = get_view_link_from_id(file.get("id"))
-      # view_link_and_edit_link_matching[result["responderUri"]] = \
-      #   file.get("webViewLink")
       view_link_and_edit_link_matching[result["responderUri"]] = \
       {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
     if page_token is None:

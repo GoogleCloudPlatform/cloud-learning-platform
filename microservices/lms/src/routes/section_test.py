@@ -470,30 +470,8 @@ def test_form_grade_import_form_with_no_response(client_with_emulator,
                                                  create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/coursework/5789246900"
-  get_course_work_data = {
-  "courseId": "604063268646",
-  "id": "553046445746",
-  "title": "youtube coursewok",
-  "materials": [
-    {
-      "youtubeVideo": {
-        "id": "pl-tBjAM9g4",
-        "title": "How to Use Google Classroom - Tutorial for Beginners",
-        "alternateLink": "https://www.youtube.com/watch?v=pl-tBjAM9g4",
-        "thumbnailUrl": "https://i.ytimg.com/vi/pl-tBjAM9g4/default.jpg"
-      }
-    },
-    {
-      "form": {
-        "formUrl": "https://docs.google.com/forms/d/e/1FAIpQL",
-        "title": "e2e_form1",
-        "thumbnailUrl": "https://lh6.googleusercontent.com/E7m"
-      }
-    }
-  ],
-  "state": "PUBLISHED"}
   with mock.patch("routes.section.classroom_crud.get_course_work",
-                  return_value=get_course_work_data):
+                  return_value=GET_COURSEWORK_DATA):
     with mock.patch(
 "routes.section.classroom_crud.get_edit_url_and_view_url_mapping_of_form",
 return_value={"https://docs.google.com/forms/d/e/1FAIpQL":

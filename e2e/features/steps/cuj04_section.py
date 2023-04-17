@@ -341,3 +341,29 @@ def step_impl_45(context):
   assert context.response["data"]["count"] == 1, "count  match update"
   assert context.student_email in context.response["data"]["student_grades"].keys()
 
+
+@behave.given(
+    "A teacher wants to update grades of student for a coursework where no student has responded to google form"
+)
+def step_impl_46(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/coursework/{context.coursework_id}'
+  print("CONTEXT URL for import grade",context.url)
+
+@behave.when(
+    "API request is sent which has valid input for zero form submissions"
+)
+def step_impl_47(context):
+  
+  resp = requests.patch(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("Response of Import grade api turn in",context.response)
+
+@behave.then(
+    "Student grades are not updated in classroom and message with no respondent is sent"
+)
+def step_impl_48(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["data"]["count"] == 1, "count  match update"
+  assert context.student_email in context.response["data"]["student_grades"].keys()

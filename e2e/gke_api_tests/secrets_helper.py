@@ -190,23 +190,28 @@ def list_coursework_submission_user(access_token,course_id,coursework_id,user_id
     userId=user_id).execute()
   print("This is result list assignrmt ",result["studentSubmissions"])
   return result["studentSubmissions"]
-# access_token =  "ya29.a0Ael9sCNy-q4Bo9rHaC5MXEAGhwDnKVouceCSmq2Qiq7KCnZSpFONIaYHaVFj0MbbcaL15VfziLbCy25G4GiNpnpaF3yWA0CWLpeF8Zf8kuMm5cCIod4prfYXxjiQrm4xBmmLYZYppRCbITE0fGMG7OkYoKW1aCgYKAcwSARESFQF4udJhHgo3XfS5CzCBQ2ZqC6-1Hw0163"
-# access_token2 = "ya29.a0Ael9sCMMXS_LDGjlU-lseY8iGE7RvRqbweGczW200uX_vrXV4jsnSb-xWXWUfrOyBXjEU2rTmmQLBtgQ9JsYdqplXBAMZYAYppJYC45-qY_PRyGeuJqFYGMpLUS_sRildeA-a6eSWx-ac7BgXVwLFV6JSpWBaCgYKAboSARESFQF4udJh7vSqBoF5Gs3bgNnVh3Uqpw0163"
-# course_id = 604063268646
-# coursework_id =553046445746
-# submission_id = "Cg4Ire6typwRELKdjKGMEA"
 
-# create_coursework_submission(access_token,course_id,coursework_id,submission_id)
-# list_coursework_submission_user(access_token2,course_id,coursework_id,"me")
-# coursework_body = coursework_body = {"title": "Test_quize",
-#       "description":"test desc",
-#       "workType": "ASSIGNMENT",
-#       "materials":[
-#     {"link":
-#       {
-#         "title": "quize1 assignment",
-#         "url": "https://docs.google.com/forms/d/1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM/edit"
-#        }}
-#       ],
-#       "state":"PUBLISHED"}
-# create_coursework(course_id,coursework_body=coursework_body)
+def create_google_form(title):
+  form_body = {
+    "info": {
+        "title": title,
+    }
+  }
+  a_creds = service_account.Credentials.from_service_account_info(
+CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  discovery_doc = "https://forms.googleapis.com/$discovery/rest?version=v1"
+  service = build("forms", "v1", credentials=creds,
+                  discoveryServiceUrl=discovery_doc,
+                    static_discovery=False)
+  result = service.forms().create(body=form_body).execute()
+  return result
+
+def get_file(file_id):
+  a_creds = service_account.Credentials.from_service_account_info(
+CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("drive", "v3", credentials=creds)
+  response = service.files().get(fileId=file_id,  
+    fields="name,webViewLink").execute()
+  return response
