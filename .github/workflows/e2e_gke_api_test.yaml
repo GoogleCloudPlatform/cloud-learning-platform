@@ -226,11 +226,13 @@ jobs:
     - name: Run pytest
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        CLOUD_LOGGING_ENABLED=False
         PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m pytest e2e/gke_api_tests/
     
     - name: Run behave
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        CLOUD_LOGGING_ENABLED=False
         PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m behave e2e/features/
 
   dataset-cleanup:
