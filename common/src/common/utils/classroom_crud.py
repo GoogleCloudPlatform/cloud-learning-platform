@@ -7,7 +7,7 @@ from googleapiclient.errors import HttpError
 from common.utils.errors import InvalidTokenError,UserManagementServiceError,ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
-
+from common.utils.sa_jwt import jwtCredentials
 from common.models import Section,CourseEnrollmentMapping
 
 from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
@@ -43,10 +43,16 @@ SCOPES = [
 
 
 def get_credentials():
-  classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
-  creds = service_account.Credentials.from_service_account_info(classroom_key,
-                                                                scopes=SCOPES)
-  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  # classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
+  # creds = service_account.Credentials.from_service_account_info(classroom_key,
+  #                                                               scopes=SCOPES)
+  # creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
+  creds = jwtCredentials.from_default_with_subject(
+    "lms_admin_teacher@dhodun.altostrat.com",
+    "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
+    _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
+    scopes=SCOPES)
   return creds
 
 
@@ -57,10 +63,16 @@ def impersonate_teacher_creds(teacher_email):
   Return:
     creds(dict): returns a dict which credentils
   """
-  classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
-  creds = service_account.Credentials.from_service_account_info(classroom_key,
-                                                                scopes=SCOPES)
-  creds = creds.with_subject(teacher_email)
+  # classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
+  # creds = service_account.Credentials.from_service_account_info(classroom_key,
+  #                                                               scopes=SCOPES)
+  # creds = creds.with_subject(teacher_email)
+  _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
+  creds = jwtCredentials.from_default_with_subject(
+    teacher_email,
+    "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
+    _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
+    scopes=SCOPES)
   return creds
 
 
