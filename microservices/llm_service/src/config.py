@@ -24,7 +24,6 @@ from schemas.error_schema import (UnauthorizedResponseModel,
 from google.cloud import secretmanager
 from langchain.chat_models import ChatOpenAI
 
-
 secrets = secretmanager.SecretManagerServiceClient()
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80

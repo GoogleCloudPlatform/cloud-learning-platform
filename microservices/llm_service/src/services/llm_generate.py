@@ -107,4 +107,3 @@ def get_google_headers():
     "Content-Type": "application/json"
   }
   return headers
-  

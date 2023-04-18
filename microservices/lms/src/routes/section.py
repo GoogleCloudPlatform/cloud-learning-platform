@@ -89,6 +89,9 @@ def create_section(sections_details: SectionDetails,
                              sections_details,
                              cohort_details,
                              headers,message = "started process")
+    # result = copy_course_background_task(course_template_details,
+    #                          sections_details,
+    #                          cohort_details,headers)
     Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
                  section name{sections_details.name}")
