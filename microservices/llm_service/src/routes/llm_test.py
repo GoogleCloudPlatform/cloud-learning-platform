@@ -21,6 +21,7 @@ LLM_TESTDATA_FILENAME = os.path.join(TESTING_FOLDER_PATH,
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 os.environ["OPENAI_API_KEY"] = "fake-key"
+os.environ["COHERE_API_KEY"] = "fake-key"
 
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
