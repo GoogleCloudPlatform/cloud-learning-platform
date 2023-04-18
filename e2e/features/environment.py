@@ -229,7 +229,7 @@ def enroll_student_course(context):
     "cohort_id":section.cohort.id,
     "access_token":student_email_and_token["access_token"]
     }
-  yield context.enroll_student_data
+  return context.enroll_student_data
 
 @fixture
 def import_google_form_grade(context):
