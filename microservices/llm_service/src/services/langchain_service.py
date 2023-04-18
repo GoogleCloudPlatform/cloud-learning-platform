@@ -64,7 +64,7 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
       # we always use await for LLM calls if we can
       result = await llm.agenerate([prompt])
       result_text = result.generations[0][0].message.content
-    
+
     return result_text
   except Exception as e:
     raise InternalServerError(str(e)) from e
