@@ -21,7 +21,7 @@ from typing import Optional
 from common.models import UserLLM
 from langchain.schema import HumanMessage
 
-from config import LANGCHAIN_LLM, OPENAI_LLM_TYPES
+from config import LANGCHAIN_LLM, CHAT_LLM_TYPES, COHERE_LLM_TYPES
 
 async def langchain_llm_generate(prompt: str, llm_type: str,
                                  user_llm: Optional[UserLLM] = None):
@@ -49,17 +49,22 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
     if llm is None:
       raise ResourceNotFoundException(f"Cannot find llm type '{llm_type}'")
 
-    if llm_type in OPENAI_LLM_TYPES:
+    result_text = ""
+    if llm_type in CHAT_LLM_TYPES:
       # use langchain chat interface for openai
       msg = [HumanMessage(content=prompt)]
       Logger.info(f"generating text for [{prompt}]")
       result = await llm.agenerate([msg])
+      result_text = result.generations[0][0].message.content
       Logger.info(f"result {result.generations[0][0].message.content}")
+    elif llm_type in COHERE_LLM_TYPES:
+      result = llm.generate([prompt])
+      result_text = result.generations[0][0].text
     else:
-      # we always use await for LLM calls
+      # we always use await for LLM calls if we can
       result = await llm.agenerate([prompt])
-
-    result_text = result.generations[0][0].message.content
+      result_text = result.generations[0][0].message.content
+    
     return result_text
   except Exception as e:
     raise InternalServerError(str(e)) from e

@@ -23,6 +23,7 @@ from schemas.error_schema import (UnauthorizedResponseModel,
                                   ValidationErrorResponseModel)
 from google.cloud import secretmanager
 from langchain.chat_models import ChatOpenAI
+from langchain.llms import Cohere
 
 secrets = secretmanager.SecretManagerServiceClient()
 
@@ -75,7 +76,7 @@ ENABLE_OPENAI_LLM = get_environ_flag("ENABLE_OPENAI_LLM", True)
 
 ENABLE_GOOGLE_LLM = get_environ_flag("ENABLE_GOOGLE_LLM", True)
 
-ENABLE_COHERE_LLM = get_environ_flag("ENABLE_COHERE_LLM", False)
+ENABLE_COHERE_LLM = get_environ_flag("ENABLE_COHERE_LLM", True)
 
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -86,6 +87,15 @@ if OPENAI_API_KEY is None:
                   "/secrets/openai-api-key/versions/latest"
       }).payload.data.decode("utf-8")
   OPENAI_API_KEY = OPENAI_API_KEY.strip()
+
+COHERE_API_KEY = os.getenv("COHERE_API_KEY")
+if COHERE_API_KEY is None:
+  COHERE_API_KEY = secrets.access_secret_version(
+      request={
+          "name": "projects/" + PROJECT_ID +
+                  "/secrets/cohere-api-key/versions/latest"
+      }).payload.data.decode("utf-8")
+  COHERE_API_KEY = COHERE_API_KEY.strip()
 
 def load_google_access_token():
   google_access_token = secrets.access_secret_version(
@@ -100,16 +110,24 @@ GOOGLE_VERTEX_ENDPOINT = "https://us-central1-aiplatform.googleapis.com/v1/proje
 
 OPENAI_LLM_TYPE_GPT3_5 = "OpenAI-GPT3.5"
 OPENAI_LLM_TYPE_GPT4 = "OpenAI-GPT4"
+COHERE_LLM_TYPE = "Cohere"
 VERTEX_LLM_TYPE_BISON_001 = "VertexAI-Text-alpha"
 VERTEX_LLM_TYPE_BISON_CHAT = "VertexAI-Chat-alpha"
 
 LLM_TYPES = []
 #OPENAI_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, OPENAI_LLM_TYPE_GPT4]
 OPENAI_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5]
+COHERE_LLM_TYPES = [COHERE_LLM_TYPE]
 GOOGLE_LLM_TYPES = [VERTEX_LLM_TYPE_BISON_001, VERTEX_LLM_TYPE_BISON_CHAT]
+
+# these LLMs are trained as chat models
+CHAT_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, VERTEX_LLM_TYPE_BISON_CHAT]
 
 if ENABLE_OPENAI_LLM:
   LLM_TYPES.extend(OPENAI_LLM_TYPES)
+
+if ENABLE_COHERE_LLM:
+  LLM_TYPES.extend(COHERE_LLM_TYPES)
 
 if ENABLE_GOOGLE_LLM:
   LLM_TYPES.extend(GOOGLE_LLM_TYPES)
@@ -120,7 +138,8 @@ if ENABLE_OPENAI_LLM:
     OPENAI_LLM_TYPE_GPT3_5: ChatOpenAI(openai_api_key=OPENAI_API_KEY,
                                 model_name="gpt-3.5-turbo"),
     OPENAI_LLM_TYPE_GPT4: ChatOpenAI(openai_api_key=OPENAI_API_KEY,
-                                model_name="gpt-4")
+                                model_name="gpt-4"),
+    COHERE_LLM_TYPE: Cohere(cohere_api_key=COHERE_API_KEY, max_tokens=1024)
   })
 
 GOOGLE_LLM = {}

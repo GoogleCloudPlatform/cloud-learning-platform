@@ -11,3 +11,4 @@ google-cloud-resource-manager==1.9.1
 packaging==21.3 
 shapely==1.8.5.post1
 google-cloud-aiplatform==1.23.0
+cohere==4.1.4
