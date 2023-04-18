@@ -23,7 +23,6 @@ TEST_USER = {
     "email": email,
     "status": "active",
     "user_type": "other",
-    "user_type_ref": "",
     "user_groups": [],
     "is_registered": True,
     "failed_login_attempts_count": 0,

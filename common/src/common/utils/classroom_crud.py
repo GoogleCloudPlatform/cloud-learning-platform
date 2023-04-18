@@ -548,7 +548,6 @@ f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
   "last_name": profile["names"][0]["familyName"],
   "email":student_email,
   "user_type": "learner",
-  "user_type_ref": "",
   "user_groups": [],
   "status": "active",
   "is_registered": True,
