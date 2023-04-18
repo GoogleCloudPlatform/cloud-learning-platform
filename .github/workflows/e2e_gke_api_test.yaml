@@ -41,6 +41,7 @@ env:
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
+  CLOUD_LOGGING_ENABLED: False
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
 # cookiecutter:raw 
@@ -226,13 +227,11 @@ jobs:
     - name: Run pytest
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        CLOUD_LOGGING_ENABLED=False
         PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m pytest e2e/gke_api_tests/
     
     - name: Run behave
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        CLOUD_LOGGING_ENABLED=False
         PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m behave e2e/features/
 
   dataset-cleanup:
