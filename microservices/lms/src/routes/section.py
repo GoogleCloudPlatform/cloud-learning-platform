@@ -11,7 +11,7 @@ from common.utils.http_exceptions import (ClassroomHttpException,
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.utils.bq_helper import insert_rows_to_bq
-from common.utils.sa_jwt import jwtCredentials
+from common.utils.jwt_creds import JwtCredentials
 from fastapi import APIRouter, Request,BackgroundTasks,status
 from googleapiclient.errors import HttpError
 from schemas.classroom_courses import EnableNotificationsResponse
@@ -532,7 +532,7 @@ def test_jwt():
   SCOPES = ['https://www.googleapis.com/auth/drive']
   _DEFAULT_TOKEN_LIFETIME_SECS = 3600  # 1 hour in seconds
   _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
-  creds = jwtCredentials.from_default_with_subject(
+  creds = JwtCredentials.from_default_with_subject(
     "lms_admin_teacher@dhodun.altostrat.com",
     "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
     _GOOGLE_OAUTH2_TOKEN_ENDPOINT,

@@ -18,9 +18,9 @@ from googleapiclient.errors import HttpError
 _DEFAULT_TOKEN_LIFETIME_SECS = 3600  # 1 hour in seconds
 _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
 
-ADMIN_TEACHER_EMAIL = "<INSERT_ADMIN_TEACHER_EMAIL>"
+# ADMIN_TEACHER_EMAIL = "<INSERT_ADMIN_TEACHER_EMAIL>"
 
-class jwtCredentials(service_account.Credentials):
+class JwtCredentials(service_account.Credentials):
 
   def _make_authorization_grant_assertion(self):
     """Create the OAuth 2.0 assertion.
