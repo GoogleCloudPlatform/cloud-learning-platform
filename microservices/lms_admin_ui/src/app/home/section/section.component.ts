@@ -27,6 +27,16 @@ export interface student {
   created_time: string;
 }
 
+export interface coursework {
+  courseId: string,
+      courseWorkId: string,
+      title: string,
+      state: string,
+      creationTime: string,
+      materials: [],
+      status:string
+}
+
 @Component({
   selector: 'app-section',
   templateUrl: './section.component.html',
@@ -36,9 +46,11 @@ export class SectionComponent implements OnInit,OnDestroy {
   selectedSection: any
   displayedColumns: string[] = ['email', 'role'];
   studentDisplayedColumns: string[] = ['first name', 'last name', 'email', 'created time','status','action'];
+  courseworkDisplayColumns: string[] = ['title', 'state', 'created time','action']
 
   tableData: staff[] = []
   studentTableData: student[] = []
+  courseworkTable: coursework[] = []
   dataSource = new MatTableDataSource(this.tableData);
 
   cohortDetails: any
@@ -47,6 +59,7 @@ export class SectionComponent implements OnInit,OnDestroy {
   loadCard: boolean = false
   loadSection: boolean = false
   studentTableLoader:boolean=true
+  courseworkTableLoader:boolean=true
   getStudentListSub:Subscription
   constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, public _HomeService: HomeService, 
     public router: Router, private _location: Location) { }
@@ -99,6 +112,30 @@ export class SectionComponent implements OnInit,OnDestroy {
     })
   }
 
+  getCourseworkDetails(){
+    this.courseworkTableLoader=true
+    this._HomeService.getCourseworkDetails(this.selectedSection.id).subscribe((res:any)=>{
+this.transformCourseworkTableData(res.data)
+this.courseworkTableLoader=false
+    },
+    (err:any)=>{
+      this.courseworkTableLoader=false
+    })
+  }
+
+transformCourseworkTableData(data:any){
+  this.courseworkTable=[]
+  for (let x of data){
+    x['status'] = 'import'
+    this.courseworkTable.push(x)
+  }
+  console.log('coursework',this.courseworkTable)
+// for (let i=0;i<=data.length;i++){
+// data[i]['status'] = 'import'
+// }
+// this.courseworkTable = data
+}
+
   openClassroom() {
     window.open(this.selectedSection.classroom_url
       , '_blank');
@@ -137,6 +174,7 @@ export class SectionComponent implements OnInit,OnDestroy {
     console.log('selected sec', this.selectedSection)
     this.updateUrl(this.selectedSection.id)
     this.getSectionStudents()
+    this.getCourseworkDetails()
     this.tableData = []
     for (let x of this.selectedSection.teachers) {
       let staffObj: staff = { name: '', email: '', role: '' }
@@ -291,6 +329,25 @@ export class SectionComponent implements OnInit,OnDestroy {
     else {
       return false
     }
+  }
+  callGradeImport(rowNumber:any,courseworkId:string){
+    console.log("row num", rowNumber)
+    this.courseworkTable[rowNumber]['status'] = 'loading'
+this._HomeService.gradeImport(this.selectedSection.id,courseworkId).subscribe((res:any)=>{
+  // this.courseworkTable[rowNumber]['status'] = 'import_done'
+},(err:any)=>{
+  // this.courseworkTable[rowNumber]['status'] = 'import_error'
+})
+  }
+  checkMaterialsArray(materials:any[]){
+    let status:boolean=false
+    for (let x of materials){
+      if('form' in x){
+        status = true
+        break
+      }
+    }
+    return status
   }
   ngOnDestroy(): void {
     if(this.getStudentListSub){

@@ -273,6 +273,64 @@
 
                         </table>
                     </mat-tab>
+
+                    <mat-tab label="Coursework Management">
+
+                        <ngx-skeleton-loader *ngIf="courseworkTableLoader" count="3"
+                        [theme]="{'height': '40px','margin-top':'15px','background-color': '#EAEAEA'}">
+                    </ngx-skeleton-loader>
+
+
+                        <table *ngIf="!courseworkTableLoader" mat-table [dataSource]="courseworkTable" class="mat-elevation-z8" style="width: 100%;">
+
+                            <!-- First Name Column -->
+                            <ng-container matColumnDef="title">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Title
+                                </th>
+                                <td mat-cell *matCellDef="let element"> {{element.title}} </td>
+                            </ng-container>
+
+                            <!-- Last Name Column -->
+                            <ng-container matColumnDef="state">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    State
+                                </th>
+                                <td mat-cell *matCellDef="let element"> {{element.state}} </td>
+                            </ng-container>
+
+                            <!-- Email Column -->
+                            <ng-container matColumnDef="created time">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Creation time
+                                </th>
+                                <td mat-cell *matCellDef="let element"> {{element.creationTime | date:'short'}} </td>
+                            </ng-container>
+
+                            <!-- Action  Column -->
+                            <ng-container matColumnDef="action">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Action
+                                </th>
+                                <td mat-cell *matCellDef="let element;let i = index">
+                                    <button *ngIf="checkMaterialsArray(element.materials)" mat-button (click)="callGradeImport(i,element.courseWorkId)">
+                                        <span *ngIf="element.status == 'import'" class="button-content-outer"><span class="material-symbols-rounded">download</span><span class="text">Import Grades</span></span>
+                                        <span *ngIf="element.status == 'loading'" class="button-content-outer"><mat-spinner diameter="20" style="margin-right:5px;"></mat-spinner><span class="text">Importing</span></span>
+                                        <span *ngIf="element.status == 'import_done'" class="button-content-outer"><span class="material-symbols-rounded">check</span><span class="text">Import Grades</span></span>
+                                        <span *ngIf="element.status == 'import_error'" class="button-content-outer"><span class="material-symbols-rounded">close</span><span class="text">Retry Import</span></span>
+                                    </button>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="courseworkDisplayColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: courseworkDisplayColumns;"></tr>
+
+                            <tr class="mat-row" *matNoDataRow>
+                                <td class="mat-cell" colspan="4">No data found</td>
+                              </tr>
+
+                        </table>
+                    </mat-tab>
                 </mat-tab-group>
             </ng-container>
 
