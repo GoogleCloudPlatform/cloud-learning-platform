@@ -2,6 +2,7 @@ import uuid
 import behave
 import requests
 from testing_objects.test_config import API_URL
+from common.config import USER_MANAGEMENT_BASE_URL
 
 # ------------------------------Delete student to Section-------------------------------------
 
@@ -28,7 +29,10 @@ def step_impl_3(context):
 @behave.given("A user wants to remove a student from a section using email id")
 def step_impl_4(context):
   context.url = f'{API_URL}/sections/{context.enroll_student_data["section_id"]}/students/{context.enroll_student_data["email"]}'
-
+  res=requests.get(
+      f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={context.enroll_student_data['email']}",
+      headers=context.header)
+  print(f"User managment api res:{res.status_code}:{res.json()}")
 
 
 @behave.when("API request with valid section Id and email is sent to delete student")
