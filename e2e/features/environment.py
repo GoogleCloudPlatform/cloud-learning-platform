@@ -198,11 +198,16 @@ def create_student_enrollment_record(student_data,section):
   course_enrollment_mapping.role = "learner"
   course_enrollment_mapping.section = section
   course_enrollment_mapping.status ="active"
-  temp_user = TempUser.from_dict(student_data)
-  temp_user.user_id = ""
-  temp_user.save()
-  temp_user.user_id = temp_user.id
-  temp_user.update()
+  temp_user=TempUser.find_by_email(student_data["email"])
+  if temp_user is None:
+    print("Creating new user")
+    temp_user = TempUser.from_dict(student_data)
+    temp_user.user_id = ""
+    temp_user.save()
+    temp_user.user_id = temp_user.id
+    temp_user.update()
+  else:
+    print(f"User already exist {temp_user.to_dict()}")
   course_enrollment_mapping.user = temp_user.user_id
   course_enrollment_mapping.save()
   return{
@@ -227,7 +232,8 @@ def enroll_student_course(context):
     "user_id":courese_enrollment_mapping["user_id"],
     "email": student_email_and_token["email"].lower(),
     "cohort_id":section.cohort.id,
-    "access_token":student_email_and_token["access_token"]
+    "access_token":student_email_and_token["access_token"],
+    "course_enrollment_mapping_id":courese_enrollment_mapping["course_enrollment_mapping_id"]
     }
   return context.enroll_student_data
 

@@ -1,7 +1,8 @@
 import uuid
 import behave
 import requests
-from testing_objects.test_config import API_URL,API_URL_USER_SERVICE
+from testing_objects.test_config import API_URL
+from common.models import CourseEnrollmentMapping
 
 # ------------------------------Delete student to Section-------------------------------------
 
@@ -40,10 +41,8 @@ def step_impl_5(context):
 @behave.then("Student is marked as inactive in course enrollment mapping and removed from google classroom using email id")
 def step_impl_6(context):
   print(f"______DELETE USING EMAIL RESPONSE______:{context.response},{context.status}")
-  res=requests.get(
-      f"{API_URL_USER_SERVICE}/user/search/email?email={context.enroll_student_data['email']}",
-      headers=context.header)
-  print(f"User managment api res:{res.status_code}:{res.json()}")
+  if context.status!=200:
+    print(f"Course Mapping: {CourseEnrollmentMapping.find_by_id(context.enroll_student_data['course_enrollment_mapping_id']).to_dict()}")
   assert context.status == 200, "Status 200"
 
 #----Negative delete using email---------
