@@ -5,7 +5,7 @@ from environment import wait
 
 #----------Positive---------------
 @behave.given("A user has access to the portal and wants student analytics data")
-@wait(20)
+@wait(60)
 def step_impl_01(context):
   context.email=context.analytics_data['student_data']['email']
   context.url=f'{API_URL}/analytics/students/{context.email}'
@@ -22,10 +22,11 @@ def step_impl_02(context):
 @behave.then("Analytics data will be fetch from Big query view using student email")
 def step_impl_03(context):
   assert context.status == 200, "Status 200"
-  assert context.response["user"]["user_email_address"]== context.analytics_data['student_data']['email'],"Check Data"
-  assert context.response["user"]["user_gaia_id"]== context.analytics_data['student_data']["gaia_id"],"Check Data"
-  assert context.response["section_list"][0]["course_work_list"][0]["course_work_id"]== context.analytics_data["submission"]["courseWorkId"],"Check Data"
-  assert context.response["section_list"][0]["course_work_list"][0]["submission_id"]== context.analytics_data["submission"]["id"],"Check Data"
+  print(f"response: {context.response}\n\n fixture_data:{context.analytics_data}")
+  assert context.response["user"]["user_email_address"]== context.analytics_data['student_data']['email'],"Check student email"
+  assert context.response["user"]["user_gaia_id"]== context.analytics_data['student_data']["gaia_id"],"Check student gaia id"
+  assert context.response["section_list"][0]["course_work_list"][0]["course_work_id"]== context.analytics_data["submission"]["courseWorkId"],"Check course work id"
+  assert context.response["section_list"][0]["course_work_list"][0]["submission_id"]== context.analytics_data["submission"]["id"],"Check student submission id"
 
 
 @behave.given("A user has access privileges and wants to get student analytics data")
@@ -43,10 +44,11 @@ def step_impl_05(context):
 @behave.then("Get student email using user API and using that email analytics data will be fetch from bq view")
 def step_impl_06(context):
   assert context.status == 200, "Status 200"
-  assert context.response["user"]["user_email_address"]== context.analytics_data['student_data']['email'],"Check Data 1"
-  assert context.response["user"]["user_gaia_id"]== context.analytics_data['student_data']["gaia_id"],"Check Data 2"
-  assert context.response["section_list"][0]["course_work_list"][0]["course_work_id"]== context.analytics_data["submission"]["courseWorkId"],"Check Data 3"
-  assert context.response["section_list"][0]["course_work_list"][0]["submission_id"]== context.analytics_data["submission"]["id"],"Check Data 4"
+  print(f"response: {context.response}\n\n fixture_data:{context.analytics_data}")
+  assert context.response["user"]["user_email_address"]== context.analytics_data['student_data']['email'],"Check email"
+  assert context.response["user"]["user_gaia_id"]== context.analytics_data['student_data']["gaia_id"],"Check gaia id"
+  assert context.response["section_list"][0]["course_work_list"][0]["course_work_id"]== context.analytics_data["submission"]["courseWorkId"],"Check course work id"
+  assert context.response["section_list"][0]["course_work_list"][0]["submission_id"]== context.analytics_data["submission"]["id"],"Check student submission id"
   
 
 #----------Negative---------------
