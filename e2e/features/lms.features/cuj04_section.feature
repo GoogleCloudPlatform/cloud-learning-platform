@@ -1,4 +1,5 @@
 @fixture.get.header
+@fixture.import.google_form_grade
 Feature: Add student to cohort
 
   @fixture.create.section
@@ -63,13 +64,13 @@ Feature: Add student to cohort
     When API request is sent which contains valid section id and teacher email
     Then Get the details of teacher from user collection
 
-  @fixture.import.google_form_grade
+
   Scenario:Update the student  assignment grades for non domain students who has not Turn_in assignment
     Given A teacher has access to portal and wants to  update grades of student for a coursework with form quize of a section
     When API request is sent which has valid section_id and coursework_id
     Then Student grades are not updated in classroom
   
-  @fixture.import.google_form_grade
+
   Scenario:Update the student  assignment grades for non domain students who has Turn_in assignment
     Given A teacher wants to update grades of student for a coursework with for turnIn  assignment with google form
     When API request is sent which has valid input

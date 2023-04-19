@@ -20,14 +20,12 @@ from typing import Optional
 from fastapi import APIRouter
 from common.models import UserLLM
 from common.utils.logging_handler import Logger
-from common.utils.errors import (ResourceNotFoundException, ValidationError,
+from common.utils.errors import (ResourceNotFoundException,
                                  PayloadTooLargeError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, PayloadTooLarge)
 from schemas.llm_schema import (LLMGenerateModel, UserLLMModel,
                                 LLMGetResponse, LLMGenerateResponse)
-from schemas.error_schema import (NotFoundErrorResponseModel,
-                                  PayloadTooLargeResponseModel)
 from services.llm_generate import llm_generate
 from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, LLM_TYPES
 
@@ -68,6 +66,10 @@ async def generate(gen_config: LLMGenerateModel):
   prompt = genconfig_dict.get("prompt")
   if prompt is None or prompt == "":
     return BadRequest("Missing or invalid payload parameters")
+
+  if len(prompt) > PAYLOAD_FILE_SIZE:
+    return PayloadTooLargeError(
+      f"Prompt must be less than {PAYLOAD_FILE_SIZE}")
 
   llm_type = genconfig_dict.get("llm_type")
 

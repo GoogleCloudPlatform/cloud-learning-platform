@@ -41,6 +41,7 @@ env:
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
+  CLOUD_LOGGING_ENABLED: False
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
 # cookiecutter:raw 

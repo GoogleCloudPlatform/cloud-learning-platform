@@ -417,6 +417,8 @@ def test_enable_notifications_using_fake_section_id(client_with_emulator):
 def test_get_assignment(client_with_emulator, create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/assignments/5789246"
+  print("========")
+  print(url)
   course_work_data = {
       "courseId": "555555555",
       "id": "5789246",
@@ -483,6 +485,22 @@ def test_negative_get_assignment(client_with_emulator, create_fake_data):
   data = resp.json()
   assert resp.status_code == 404, "Status 404"
   assert data["success"] is False, "Data doesn't Match"
+
+def test_get_coursework_list(client_with_emulator,create_fake_data):
+  url = BASE_URL + \
+      f"/sections/{create_fake_data['section']}/get_coursework_list"
+  course_work_data = {
+    "courseId": "555555555",
+      "id": "5789246",
+      "title": "test assignment",
+      "state": "PUBLISHED",
+      "creationTime": "2023-02-16T10:45:49.833Z",
+      "materials":[]
+  }
+  with mock.patch("routes.section.classroom_crud.get_course_work_list",
+                  return_value=[course_work_data]):
+    resp = client_with_emulator.get(url)
+  assert resp.status_code == 200
 
 def test_form_grade_import_form_with_no_response(client_with_emulator,
                                                  create_fake_data):
