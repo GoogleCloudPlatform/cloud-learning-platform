@@ -2,6 +2,7 @@ from e2e.gke_api_tests.endpoint_proxy import get_baseurl
 from common.utils.errors import ResourceNotFoundException
 base_url = get_baseurl("lms")
 auth_url = get_baseurl("authentication")
+
 if not base_url:
   raise ResourceNotFoundException("Unable to locate the service URL for lms")
 else:

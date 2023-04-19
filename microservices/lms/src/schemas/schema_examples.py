@@ -143,6 +143,15 @@ ASSIGNMENT_MODEL = {
     "assignee_mode": "ALL_STUDENTS"
 }
 
+SHORT_COURSEWORK_MODEL = {
+    "courseId": "555555555",
+    "id": "5789246",
+    "title": "test assignment",
+    "state": "PUBLISHED",
+    "creationTime": "2023-02-16T10:45:49.833Z",
+    "materials":[]
+}
+
 STUDENT = {
       "first_name": "steve4",
       "last_name": "jobs",
