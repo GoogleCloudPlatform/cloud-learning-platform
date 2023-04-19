@@ -379,6 +379,38 @@ def update_section(sections_details: UpdateSection,request: Request):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+@router.patch("/{section_id}/update_classroom_code",
+              response_model=GetSectiontResponseModel)
+def update_section_classroom_code(section_id:str):
+  """_summary_
+
+  Args:
+      section_id (str): _description_
+      classroom_code (str): _description_
+
+  Raises:
+      ResourceNotFound: _description_
+      InternalServerError: _description_
+
+  Returns:
+      _type_: _description_
+  """
+  try:
+    section=Section.find_by_id(section_id)
+    course=classroom_crud.get_course_by_id(section.classroom_id)
+    section.classroom_code=course["enrollmentCode"]
+    section.update()
+    return {
+      "message":"Successfully updated the classroom code",
+      "data":convert_section_to_section_model(section)
+      }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
 @router.post("/{section_id}/enable_notifications",
              response_model=EnableNotificationsResponse)
 def section_enable_notifications_pub_sub(section_id:str):

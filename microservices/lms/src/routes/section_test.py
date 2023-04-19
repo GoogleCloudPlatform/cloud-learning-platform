@@ -315,6 +315,24 @@ def test_update_section_course_id_not_found(client_with_emulator,
   resp.json()
   assert resp.status_code == 404
 
+def test_update_section_classroom_code(client_with_emulator, create_fake_data):
+  section = Section.find_by_id(create_fake_data["section"])
+  url = BASE_URL + f"/sections/{section.id}/update_classroom_code"
+  with mock.patch("routes.section.Logger"):
+    with mock.patch("routes.section.classroom_crud.get_course_by_id",
+                    return_value={"enrollmentCode":"xyz123z"}):
+      resp = client_with_emulator.patch(url)
+  assert resp.status_code == 200
+  assert resp.json()["data"]["classroom_code"] == "xyz123z"
+
+def test_negative_update_section_classroom_code(client_with_emulator):
+  url = BASE_URL + "/sections/xyz/update_classroom_code"
+  with mock.patch("routes.section.Logger"):
+    with mock.patch("routes.section.classroom_crud.get_course_by_id",
+                    return_value={"enrollmentCode":"xyz123z"}):
+      resp = client_with_emulator.patch(url)
+  assert resp.status_code == 404
+
 def test_list_teachers(client_with_emulator,create_fake_data):
 
 

@@ -340,3 +340,54 @@ def step_impl_45(context):
   assert context.status == 200, "Status 200"
   assert context.response["data"]["count"] == 1, "count  match update"
   assert context.student_email in context.response["data"]["student_grades"].keys()
+
+# -------------------------------update classroom code of a section-------------------------------------
+# ----Positive Scenario-----
+
+@behave.given(
+    "A user has access privileges and wants to update classroom code for a section"
+)
+def step_impl_13(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/update_classroom_code'
+
+@behave.when(
+    "API request is sent to update classroom code for a section using valid section id"
+)
+def step_impl_14(context):
+  resp = requests.patch(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Code will be updated using unique section id and a response model object will be return"
+)
+def step_impl_15(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "Check success"
+
+# -----Negative Scenario-----
+
+@behave.given(
+    "A user has access to portal and needs to update classroom code for a section"
+)
+def step_impl_16(context):
+  context.url = f'{API_URL}/sections/fake_section_id/update_classroom_code'
+
+@behave.when(
+    "API request is sent to update classroom code for a section using invalid section id"
+)
+def step_impl_17(context):
+  resp = requests.patch(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Code will not be updated and API will throw a resource not found error"
+)
+def step_impl_18(context):
+  assert context.status == 404, "Status 404"
+  assert context.response["success"] is False, "Check success"

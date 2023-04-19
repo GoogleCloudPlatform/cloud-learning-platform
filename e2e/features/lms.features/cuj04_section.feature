@@ -75,3 +75,13 @@ Feature: Add student to cohort
     When API request is sent which has valid input
     Then Student grades are  updated in classroom ans student_email is present in api response
 
+  @fixture.create.section
+  Scenario: Update classroom code of a section using a section id
+    Given A user has access privileges and wants to update classroom code for a section
+    When API request is sent to update classroom code for a section using valid section id
+    Then Code will be updated using unique section id and a response model object will be return
+
+  Scenario: Unable to update section for a section
+    Given A user has access to portal and needs to update classroom code for a section
+    When API request is sent to update classroom code for a section using invalid section id
+    Then Code will not be updated and API will throw a resource not found error
