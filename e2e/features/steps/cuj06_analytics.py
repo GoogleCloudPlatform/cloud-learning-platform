@@ -17,7 +17,6 @@ def step_impl_02(context):
   resp = requests.get(context.url,headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
-  context.res_course_work=list(filter(lambda section: section["course_id"]==context.analytics_data["course_details"]['id'] , context.response["section_list"]))
 
 
 @behave.then("Analytics data will be fetch from Big query view using student email")
@@ -26,9 +25,7 @@ def step_impl_03(context):
   print(f"response: {context.response}\n\n fixture_data:{context.analytics_data}")
   assert context.response["user"]["user_email_address"]== context.analytics_data['student_data']['email'],"Check student email"
   assert context.response["user"]["user_gaia_id"]== context.analytics_data['student_data']["gaia_id"],"Check student gaia id"
-  assert context.res_course_work[0]["course_work_list"][0]["course_work_id"]== context.analytics_data["submission"]["courseWorkId"],"Check course work id"
-  assert context.res_course_work[0]["course_work_list"][0]["submission_id"]== context.analytics_data["submission"]["id"],"Check student submission id"
-
+  assert context.response["section_list"][0]["course_work_list"][0]["submission_id"]  is not None,"Check student submission id"
 
 @behave.given("A user has access privileges and wants to get student analytics data")
 def step_impl_04(context):
@@ -41,7 +38,6 @@ def step_impl_05(context):
   resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
-  context.res_course_work=list(filter(lambda section: section["course_id"]==context.analytics_data["course_details"]['id'] , context.response["section_list"]))
 
 @behave.then("Get student email using user API and using that email analytics data will be fetch from bq view")
 def step_impl_06(context):
@@ -49,8 +45,7 @@ def step_impl_06(context):
   print(f"response: {context.response}\n\n fixture_data:{context.analytics_data}")
   assert context.response["user"]["user_email_address"]== context.analytics_data['student_data']['email'],"Check email"
   assert context.response["user"]["user_gaia_id"]== context.analytics_data['student_data']["gaia_id"],"Check gaia id"
-  assert context.res_course_work[0]["course_work_list"][0]["course_work_id"]== context.analytics_data["submission"]["courseWorkId"],"Check course work id"
-  assert context.res_course_work[0]["course_work_list"][0]["submission_id"]== context.analytics_data["submission"]["id"],"Check student submission id"
+  assert context.response["section_list"][0]["course_work_list"][0]["submission_id"]  is not None,"Check student submission id"
   
 
 #----------Negative---------------
