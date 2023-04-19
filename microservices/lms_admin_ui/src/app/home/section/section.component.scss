@@ -120,3 +120,11 @@ $primary-color : #8c1d40;
     /* padding: 3%; */
     padding: 4px 9px;
 }
+.button-content-outer{
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    .text{
+        margin-left: 5px;
+    }
+}
