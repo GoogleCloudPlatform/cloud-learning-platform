@@ -2,25 +2,26 @@
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from config import CLASSROOM_ADMIN_EMAIL
-from helper.secrets_helper import get_gke_pd_sa_key_from_secret_manager
-
+# from helper.secrets_helper import get_gke_pd_sa_key_from_secret_manager
+from common.utils.jwt_creds import JwtCredentials
 FEED_TYPE_DICT = {
     "COURSE_WORK_CHANGES": "courseWorkChangesInfo",
     "COURSE_ROSTER_CHANGES": "courseRosterChangesInfo"
 }
-REGISTER_SCOPES = [
-    "https://www.googleapis.com/auth/classroom.push-notifications",
-    "https://www.googleapis.com/auth/" +
-    "classroom.student-submissions.students.readonly",
-    "https://www.googleapis.com/auth/classroom.rosters.readonly"
-]
+# REGISTER_SCOPES = [
+    
+# ]
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.rosters",
     "https://www.googleapis.com/auth/classroom.coursework.students.readonly",
     "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
     "https://www.googleapis.com/auth/classroom.rosters.readonly",
     "https://www.googleapis.com/auth/classroom.profile.emails",
-    "https://www.googleapis.com/auth/classroom.profile.photos"
+    "https://www.googleapis.com/auth/classroom.profile.photos",
+    "https://www.googleapis.com/auth/classroom.push-notifications",
+    "https://www.googleapis.com/auth/" +
+    "classroom.student-submissions.students.readonly",
+    "https://www.googleapis.com/auth/classroom.rosters.readonly"
 ]
 
 def get_service():
@@ -29,9 +30,15 @@ def get_service():
   Returns:
     _type_: _description_
   """
-  creds = service_account.Credentials.from_service_account_info(
-      get_gke_pd_sa_key_from_secret_manager(), scopes=SCOPES)
-  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  # creds = service_account.Credentials.from_service_account_info(
+  #     get_gke_pd_sa_key_from_secret_manager(), scopes=SCOPES)
+  # creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
+  creds = JwtCredentials.from_default_with_subject(
+    CLASSROOM_ADMIN_EMAIL,
+    service_account,
+    _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
+    scopes=SCOPES)
   return build("classroom", "v1", credentials=creds,num_retries=15)
 
 def get_user(user_id):

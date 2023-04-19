@@ -20,12 +20,12 @@ FEED_TYPE_DICT = {
     "COURSE_WORK_CHANGES": "courseWorkChangesInfo",
     "COURSE_ROSTER_CHANGES": "courseRosterChangesInfo"
 }
-REGISTER_SCOPES = [
-    "https://www.googleapis.com/auth/classroom.push-notifications",
-    "https://www.googleapis.com/auth/"+
-    "classroom.student-submissions.students.readonly",
-    "https://www.googleapis.com/auth/classroom.rosters.readonly"
-]
+# REGISTER_SCOPES = [
+#     "https://www.googleapis.com/auth/classroom.push-notifications",
+#     "https://www.googleapis.com/auth/"+
+#     "classroom.student-submissions.students.readonly",
+#     "https://www.googleapis.com/auth/classroom.rosters.readonly"
+# ]
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.rosters",
@@ -38,7 +38,11 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.courseworkmaterials",
     "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
     "https://www.googleapis.com/auth/forms.body",
-    "https://www.googleapis.com/auth/drive.file"
+    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/classroom.push-notifications",
+    "https://www.googleapis.com/auth/"+
+    "classroom.student-submissions.students.readonly",
+    "https://www.googleapis.com/auth/classroom.rosters.readonly"
 ]
 
 
@@ -677,10 +681,10 @@ def enable_notifications(course_id, feed_type):
   Returns:
       _type_: _description_
   """
-  creds =service_account.Credentials.from_service_account_info(
-      helper.get_gke_pd_sa_key_from_secret_manager(), scopes=REGISTER_SCOPES)
-  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-  service = build("classroom", "v1", credentials=creds)
+  # creds =service_account.Credentials.from_service_account_info(
+  #     helper.get_gke_pd_sa_key_from_secret_manager(), scopes=SCOPES)
+  # creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("classroom", "v1", credentials=get_credentials())
   body = {
       "feed": {
           "feedType": feed_type,
