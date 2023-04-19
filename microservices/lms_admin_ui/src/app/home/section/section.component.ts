@@ -61,6 +61,7 @@ export class SectionComponent implements OnInit,OnDestroy {
   studentTableLoader:boolean=true
   courseworkTableLoader:boolean=true
   getStudentListSub:Subscription
+  disableCourseworkAction:boolean=false
   constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, public _HomeService: HomeService, 
     public router: Router, private _location: Location) { }
   @ViewChild(MatSort) sort: MatSort;
@@ -332,11 +333,14 @@ transformCourseworkTableData(data:any){
   }
   callGradeImport(rowNumber:any,courseworkId:string){
     console.log("row num", rowNumber)
+    this.disableCourseworkAction=true
     this.courseworkTable[rowNumber]['status'] = 'loading'
 this._HomeService.gradeImport(this.selectedSection.id,courseworkId).subscribe((res:any)=>{
-  // this.courseworkTable[rowNumber]['status'] = 'import_done'
+  this.courseworkTable[rowNumber]['status'] = 'import_done'
+  this.disableCourseworkAction=false
 },(err:any)=>{
-  // this.courseworkTable[rowNumber]['status'] = 'import_error'
+  this.courseworkTable[rowNumber]['status'] = 'import_error'
+  this.disableCourseworkAction=false
 })
   }
   checkMaterialsArray(materials:any[]){
