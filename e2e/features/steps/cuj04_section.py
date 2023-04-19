@@ -347,13 +347,13 @@ def step_impl_45(context):
 @behave.given(
     "A user has access privileges and wants to update classroom code for a section"
 )
-def step_impl_13(context):
+def step_impl_46(context):
   context.url = f'{API_URL}/sections/{context.sections.id}/update_classroom_code'
 
 @behave.when(
     "API request is sent to update classroom code for a section using valid section id"
 )
-def step_impl_14(context):
+def step_impl_47(context):
   resp = requests.patch(context.url,
                        headers=context.header)
   context.status = resp.status_code
@@ -363,7 +363,7 @@ def step_impl_14(context):
 @behave.then(
     "Code will be updated using unique section id and a response model object will be return"
 )
-def step_impl_15(context):
+def step_impl_48(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 
@@ -372,13 +372,13 @@ def step_impl_15(context):
 @behave.given(
     "A user has access to portal and needs to update classroom code for a section"
 )
-def step_impl_16(context):
+def step_impl_49(context):
   context.url = f'{API_URL}/sections/fake_section_id/update_classroom_code'
 
 @behave.when(
     "API request is sent to update classroom code for a section using invalid section id"
 )
-def step_impl_17(context):
+def step_impl_50(context):
   resp = requests.patch(context.url,
                        headers=context.header)
   context.status = resp.status_code
@@ -388,6 +388,6 @@ def step_impl_17(context):
 @behave.then(
     "Code will not be updated and API will throw a resource not found error"
 )
-def step_impl_18(context):
+def step_impl_51(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
