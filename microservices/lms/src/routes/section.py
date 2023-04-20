@@ -87,14 +87,12 @@ def create_section(sections_details: SectionDetails,
       raise ResourceNotFoundException(
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
+    template_drive_folder_id = current_course["teacherFolder"]["id"]
     background_tasks.add_task(copy_course_background_task,
                               course_template_details,
                              sections_details,
-                             cohort_details,
+                             cohort_details,template_drive_folder_id,
                              headers,message = "started process")
-    # result = copy_course_background_task(course_template_details,
-    #                          sections_details,
-    #                          cohort_details,headers)
     Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
                  section name{sections_details.name}")
@@ -524,10 +522,13 @@ def import_grade(section_id: str,coursework_id:str):
   """
   try:
     section = Section.find_by_id(section_id)
+    classroom_course = classroom_crud.get_course_by_id(section.classroom_id)
+    folder_id = classroom_course["teacherFolder"]["id"]
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
     #Get url mapping of google forms view links and edit ids
-    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form(
+      folder_id)
     count =0
     student_grades = {}
     if "materials" in result.keys():
