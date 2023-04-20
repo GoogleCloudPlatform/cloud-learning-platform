@@ -561,9 +561,6 @@ def import_grade(section_id: str,coursework_id:str):
                                         coursework_id,submissions[0]["id"],
                                               response["totalScore"],
                                               response["totalScore"])
-        else:
-          return {"data":{"count":count,"student_grades":student_grades},
-                  "message":"Google form is not present in this coursework"}
       return {"data":{"count":count,"student_grades":student_grades}}
     else:
       return {"data":{"count":count,"student_grades":student_grades}}
