@@ -40,6 +40,18 @@ def get_user_id(user,headers):
       raise ResourceNotFoundException(f"user {user} not found")
   return user
 
+def get_user_email(user,headers):
+  regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+  if re.fullmatch(regex, user):
+    result=classroom_crud.get_user_details_by_email(
+        user_email=user.lower(), headers=headers)["data"]
+    if result != []:
+      return user.lower(), result[0]["user_id"]
+    else:
+      raise ResourceNotFoundException(f"user {user} not found")
+  return classroom_crud.get_user_details(
+        user_id=user, headers=headers)["data"]["email"].lower(),user
+
 def check_student_can_enroll_in_cohort(email,headers,sections):
   """
     Args:
@@ -139,7 +151,6 @@ def invite_student(section,student_email,headers):
     user_id = create_user_response.json()["data"]["user_id"]
   else:
     if searched_student[0]["status"] =="inactive":
-      print("33")
       raise InternalServerError("Student inactive in \
           database. Please update\
           the student status")
