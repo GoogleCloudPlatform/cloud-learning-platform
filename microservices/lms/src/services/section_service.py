@@ -14,7 +14,8 @@ from config import BQ_TABLE_DICT,BQ_DATASET
 # pylint: disable = broad-except
 def copy_course_background_task(course_template_details,
                                 sections_details,
-                                cohort_details,template_drive_folder_id,headers,message=""):
+                                cohort_details,template_drive_folder_id,
+                                headers,message=""):
   """Create section  Background Task to copy course and updated database
   for newly created section
   Args:

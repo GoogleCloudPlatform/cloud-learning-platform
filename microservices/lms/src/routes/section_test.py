@@ -515,7 +515,10 @@ return_value={"https://docs.google.com/forms/d/e/1FAIpQL":
       with mock.patch(
         "routes.section.classroom_crud.retrive_all_form_responses",
                   return_value={}):
-        resp = client_with_emulator.patch(url)
+        with mock.patch(
+        "routes.section.classroom_crud.get_course_by_id",
+                  return_value={"teacherFolder":{"id":"123344"}}):
+          resp = client_with_emulator.patch(url)
   result_json = resp.json()
   assert resp.status_code == 200, "Status 200"
   assert result_json["data"]["count"] == 0 ,"Count match for updated grades"
@@ -538,7 +541,10 @@ return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
                   return_value=LIST_COURSEWORK_SUBMISSION_USER):
           with mock.patch(
         "routes.section.classroom_crud.patch_student_submission"):
-            resp = client_with_emulator.patch(url)
+            with mock.patch(
+        "routes.section.classroom_crud.get_course_by_id",
+                return_value={"teacherFolder":{"id":"123344"}}):
+              resp = client_with_emulator.patch(url)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
   assert resp_json["data"]["count"] == 1 ,"Count match for updated grades"

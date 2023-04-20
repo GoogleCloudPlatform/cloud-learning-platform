@@ -527,7 +527,8 @@ def import_grade(section_id: str,coursework_id:str):
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
     #Get url mapping of google forms view links and edit ids
-    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form(folder_id)
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form(
+      folder_id)
     count =0
     student_grades = {}
     if "materials" in result.keys():
@@ -566,43 +567,6 @@ def import_grade(section_id: str,coursework_id:str):
       return {"data":{"count":count,"student_grades":student_grades}}
     else:
       return {"data":{"count":count,"student_grades":student_grades}}
-  except HttpError as hte:
-    Logger.error(hte)
-    message = str(hte)
-    if hte.resp.status == 404:
-      message = "Coursework not found"
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=message,
-                              data=None) from hte
-  except ResourceNotFoundException as err:
-    Logger.error(err)
-    raise ResourceNotFound(str(err)) from err
-  except Exception as e:
-    Logger.error(e)
-    error = traceback.format_exc().replace("\n", " ")
-    Logger.error(error)
-    raise InternalServerError(str(e)) from e
-
-@router.patch("/{file_id}")
-def fille(file_id: str):
-  """Get a section details from db and use the coursework Id
-  Args:
-      section_id (str): section_id in firestore
-      coursework_id(str): coursework_id of coursework in classroom
-  Raises:
-      HTTPException: 500 Internal Server Error if something fails
-      ResourceNotFound: 404 Section with section id is not found or
-        coursework is not found
-  Returns:
-    {"status":"Success","new_course":{}}: Returns section details from  db,
-    {'status': 'Failed'} if the user creation raises an exception
-  """
-  try:
-    result = classroom_crud.get_file(file_id)
-    print(type(result))
-    
-    return result
   except HttpError as hte:
     Logger.error(hte)
     message = str(hte)
