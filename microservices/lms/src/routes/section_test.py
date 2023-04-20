@@ -506,18 +506,18 @@ def test_form_grade_import_form_with_no_response(client_with_emulator,
                                                  create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/coursework/5789246900"
-  with mock.patch("routes.section.classroom_crud.get_course_work",
+  with mock.patch(
+        "routes.section.classroom_crud.get_course_by_id",
+                  return_value={"teacherFolder":{"id":"123344"}}):
+    with mock.patch("routes.section.classroom_crud.get_course_work",
                   return_value=GET_COURSEWORK_DATA):
-    with mock.patch(
+      with mock.patch(
 "routes.section.classroom_crud.get_edit_url_and_view_url_mapping_of_form",
 return_value={"https://docs.google.com/forms/d/e/1FAIpQL":
               {"file_id":"test123"}}):
-      with mock.patch(
+        with mock.patch(
         "routes.section.classroom_crud.retrive_all_form_responses",
                   return_value={}):
-        with mock.patch(
-        "routes.section.classroom_crud.get_course_by_id",
-                  return_value={"teacherFolder":{"id":"123344"}}):
           resp = client_with_emulator.patch(url)
   result_json = resp.json()
   assert resp.status_code == 200, "Status 200"
@@ -528,22 +528,22 @@ def test_form_grade_import_form_with_response(client_with_emulator,
                                                  create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/coursework/5789246900"
-  with mock.patch("routes.section.classroom_crud.get_course_work",
-                  return_value=GET_COURSEWORK_DATA):
-    with mock.patch(
-"routes.section.classroom_crud.get_edit_url_and_view_url_mapping_of_form",
-return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
-      with mock.patch(
-        "routes.section.classroom_crud.retrive_all_form_responses",
-                  return_value=FORM_RESPONSE_LIST):
-        with mock.patch(
-        "routes.section.classroom_crud.list_coursework_submissions_user",
-                  return_value=LIST_COURSEWORK_SUBMISSION_USER):
-          with mock.patch(
-        "routes.section.classroom_crud.patch_student_submission"):
-            with mock.patch(
+  with mock.patch(
         "routes.section.classroom_crud.get_course_by_id",
                 return_value={"teacherFolder":{"id":"123344"}}):
+    with mock.patch("routes.section.classroom_crud.get_course_work",
+                  return_value=GET_COURSEWORK_DATA):
+      with mock.patch(
+"routes.section.classroom_crud.get_edit_url_and_view_url_mapping_of_form",
+return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
+        with mock.patch(
+        "routes.section.classroom_crud.retrive_all_form_responses",
+                  return_value=FORM_RESPONSE_LIST):
+          with mock.patch(
+        "routes.section.classroom_crud.list_coursework_submissions_user",
+                  return_value=LIST_COURSEWORK_SUBMISSION_USER):
+            with mock.patch(
+        "routes.section.classroom_crud.patch_student_submission"):
               resp = client_with_emulator.patch(url)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
