@@ -520,8 +520,9 @@ return_value={"https://docs.google.com/forms/d/e/1FAIpQL":
                   return_value={}):
           resp = client_with_emulator.patch(url)
   result_json = resp.json()
-  assert resp.status_code == 200, "Status 200"
-  assert result_json["data"]["count"] == 0 ,"Count match for updated grades"
+  assert resp.status_code == 404, "Status 404"
+  assert result_json[
+    "message"] == "Responses not available for google form","message"
 
 
 def test_form_grade_import_form_with_response(client_with_emulator,
@@ -546,7 +547,6 @@ return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
         "routes.section.classroom_crud.patch_student_submission"):
               resp = client_with_emulator.patch(url)
   resp_json = resp.json()
-  assert resp.status_code == 200, "Status 200"
-  assert resp_json["data"]["count"] == 1 ,"Count match for updated grades"
-  assert "clplmstestuser1@gmail.com" in resp_json["data"]["student_grades"],\
-  "email of updated user"
+  assert resp.status_code == 202, "Status 202"
+  assert resp_json[
+    "message"] == "Grades for coursework will be updated shortly","message"

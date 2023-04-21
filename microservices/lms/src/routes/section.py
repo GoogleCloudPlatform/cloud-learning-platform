@@ -26,7 +26,8 @@ from schemas.section import (
     ImportGradeResponseModel)
 from schemas.update_section import UpdateSection
 from services import common_service
-from services.section_service import copy_course_background_task
+from services.section_service import copy_course_background_task,\
+update_grades
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model,
                           FEED_TYPES,
@@ -506,8 +507,10 @@ def get_coursework_list(section_id: str):
     raise ClassroomHttpException(status_code=hte.resp.status,
                               message=str(hte)) from hte
 @router.patch("/{section_id}/coursework/{coursework_id}",
-              response_model=ImportGradeResponseModel)
-def import_grade(section_id: str,coursework_id:str):
+              response_model=ImportGradeResponseModel,
+              status_code=status.HTTP_202_ACCEPTED)
+def import_grade(section_id: str,coursework_id:str,
+                 background_tasks: BackgroundTasks):
   """Get a section details from db and use the coursework Id
   Args:
       section_id (str): section_id in firestore
@@ -531,9 +534,11 @@ def import_grade(section_id: str,coursework_id:str):
       folder_id)
     count =0
     student_grades = {}
+    is_google_form_present = False
     if "materials" in result.keys():
       for material in result["materials"]:
         if "form" in material.keys():
+          is_google_form_present = True
           form_details = \
             url_mapping[material["form"]["formUrl"]]
 
@@ -543,27 +548,22 @@ def import_grade(section_id: str,coursework_id:str):
           all_responses_of_form = classroom_crud.\
           retrive_all_form_responses(form_id)
           if all_responses_of_form =={}:
-            return {"data":{"count":0,"student_grades":{}},
-                    "message":"Responses not available form google form"}
+            raise ResourceNotFoundException(
+              "Responses not available for google form")
+          background_tasks.add_task(update_grades,all_responses_of_form,
+                                    section,coursework_id)
 
-          for response in all_responses_of_form["responses"]:
-            print("This is respondent email",response["respondentEmail"])
-            submissions=classroom_crud.list_coursework_submissions_user(
-                                                  section.classroom_id,
-                                                  coursework_id,
-                                          response["respondentEmail"])
-            if submissions !=[]:
-              if submissions[0]["state"] == "TURNED_IN":
-                count+=1
-                student_grades[
-                response["respondentEmail"]]=response["totalScore"]
-                classroom_crud.patch_student_submission(section.classroom_id,
-                                        coursework_id,submissions[0]["id"],
-                                              response["totalScore"],
-                                              response["totalScore"])
-      return {"data":{"count":count,"student_grades":student_grades}}
+      if is_google_form_present:
+        return {"data":{"count":count,"student_grades":student_grades},
+                "message":"Grades for coursework will be updated shortly"}
+      else:
+        raise ResourceNotFoundException(
+          f"Form is not present for coursework_id {coursework_id}"
+          )
     else:
-      return {"data":{"count":count,"student_grades":student_grades}}
+      raise ResourceNotFoundException(
+          f"Form is not present for coursework_id {coursework_id}"
+          )
   except HttpError as hte:
     Logger.error(hte)
     message = str(hte)
@@ -581,3 +581,5 @@ def import_grade(section_id: str,coursework_id:str):
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
     raise InternalServerError(str(e)) from e
+
+
