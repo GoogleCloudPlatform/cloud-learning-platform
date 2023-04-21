@@ -522,7 +522,7 @@ return_value={"https://docs.google.com/forms/d/e/1FAIpQL":
   result_json = resp.json()
   assert resp.status_code == 404, "Status 404"
   assert result_json[
-    "message"] == "Responses not available form google form","message"
+    "message"] == "Responses not available for google form","message"
 
 
 def test_form_grade_import_form_with_response(client_with_emulator,
