@@ -549,7 +549,7 @@ def import_grade(section_id: str,coursework_id:str,
           retrive_all_form_responses(form_id)
           if all_responses_of_form =={}:
             raise ResourceNotFoundException(
-              "Responses not available form google form")
+              "Responses not available for google form")
           background_tasks.add_task(update_grades,all_responses_of_form,
                                     section,coursework_id)
 
