@@ -301,7 +301,7 @@ COURSE_EXAMPLE={
   "teacher_folder": {
     "id": "234567xdcfgyhu345678",
     "title": "course name section",
-    "alternate_link": 
+    "alternate_link":
       "https://drive.google.com/drive/folders/234567xdcfgyhu345678"
   },
   "course_material_sets":[{"drive_file":"ewrty"}],

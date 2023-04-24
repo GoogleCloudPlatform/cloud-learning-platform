@@ -184,7 +184,7 @@ def dict_keys_from_camel_to_snake_case(dict_obj):
     return [dict_keys_from_camel_to_snake_case(i) if isinstance(
       i, (dict, list)) else i for i in dict_obj]
   return {to_snake(key):dict_keys_from_camel_to_snake_case(
-    value) if isinstance(value, (dict, list)) 
+    value) if isinstance(value, (dict, list))
           else value for key, value in dict_obj.items()}
 
 def convert_course_dict_to_classroom_model(dict_object):

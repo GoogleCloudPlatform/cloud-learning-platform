@@ -28,7 +28,7 @@ course_dict={
   "teacherFolder": {
     "id": "234567xdcfgyhu345678",
     "title": "course name section",
-    "alternateLink": 
+    "alternateLink":
       "https://drive.google.com/drive/folders/234567xdcfgyhu345678"
   },
   "guardiansEnabled": False,
