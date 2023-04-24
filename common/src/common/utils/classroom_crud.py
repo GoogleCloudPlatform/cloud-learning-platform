@@ -637,14 +637,6 @@ def get_view_link_from_id(form_id):
   result = service.forms().get(formId=form_id).execute()
   return result
 
-def get_file(file_id):
-  service = build("drive", "v3", credentials=get_credentials())
-  response = service.files().list(
-        q="mimeType=\"application/vnd.google-apps.form\"",
-        spaces="drive",
-        fields="nextPageToken, "
-        "files(id, name,webViewLink,thumbnailLink)").execute()
-  return response
 
 def retrive_all_form_responses(form_id):
   "Query google forms api  using form id and get view url of  google form"
@@ -775,6 +767,8 @@ def list_student_section(section_id,headers):
     response = requests.\
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     user_record = response.json()["data"]
+    print(user_record)
+    
     user_record["invitation_id"]=record.invitation_id
     user_record["enrollment_status"]=record.status
     users.append(user_record)
