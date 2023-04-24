@@ -399,6 +399,10 @@ def update_section_classroom_code(section_id:str):
   try:
     section=Section.find_by_id(section_id)
     course=classroom_crud.get_course_by_id(section.classroom_id)
+    if course is None:
+      raise ResourceNotFoundException(
+          "Classroom with section id" +
+          f" {section_id} is not found")
     section.classroom_code=course["enrollmentCode"]
     section.update()
     return {
