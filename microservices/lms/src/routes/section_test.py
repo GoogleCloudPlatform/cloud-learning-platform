@@ -506,41 +506,47 @@ def test_form_grade_import_form_with_no_response(client_with_emulator,
                                                  create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/coursework/5789246900"
-  with mock.patch("routes.section.classroom_crud.get_course_work",
+  with mock.patch(
+        "routes.section.classroom_crud.get_course_by_id",
+                  return_value={"teacherFolder":{"id":"123344"}}):
+    with mock.patch("routes.section.classroom_crud.get_course_work",
                   return_value=GET_COURSEWORK_DATA):
-    with mock.patch(
+      with mock.patch(
 "routes.section.classroom_crud.get_edit_url_and_view_url_mapping_of_form",
 return_value={"https://docs.google.com/forms/d/e/1FAIpQL":
               {"file_id":"test123"}}):
-      with mock.patch(
+        with mock.patch(
         "routes.section.classroom_crud.retrive_all_form_responses",
                   return_value={}):
-        resp = client_with_emulator.patch(url)
+          resp = client_with_emulator.patch(url)
   result_json = resp.json()
-  assert resp.status_code == 200, "Status 200"
-  assert result_json["data"]["count"] == 0 ,"Count match for updated grades"
+  assert resp.status_code == 404, "Status 404"
+  assert result_json[
+    "message"] == "Responses not available for google form","message"
 
 
 def test_form_grade_import_form_with_response(client_with_emulator,
                                                  create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/coursework/5789246900"
-  with mock.patch("routes.section.classroom_crud.get_course_work",
+  with mock.patch(
+        "routes.section.classroom_crud.get_course_by_id",
+                return_value={"teacherFolder":{"id":"123344"}}):
+    with mock.patch("routes.section.classroom_crud.get_course_work",
                   return_value=GET_COURSEWORK_DATA):
-    with mock.patch(
+      with mock.patch(
 "routes.section.classroom_crud.get_edit_url_and_view_url_mapping_of_form",
 return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
-      with mock.patch(
+        with mock.patch(
         "routes.section.classroom_crud.retrive_all_form_responses",
                   return_value=FORM_RESPONSE_LIST):
-        with mock.patch(
+          with mock.patch(
         "routes.section.classroom_crud.list_coursework_submissions_user",
                   return_value=LIST_COURSEWORK_SUBMISSION_USER):
-          with mock.patch(
+            with mock.patch(
         "routes.section.classroom_crud.patch_student_submission"):
-            resp = client_with_emulator.patch(url)
+              resp = client_with_emulator.patch(url)
   resp_json = resp.json()
-  assert resp.status_code == 200, "Status 200"
-  assert resp_json["data"]["count"] == 1 ,"Count match for updated grades"
-  assert "clplmstestuser1@gmail.com" in resp_json["data"]["student_grades"],\
-  "email of updated user"
+  assert resp.status_code == 202, "Status 202"
+  assert resp_json[
+    "message"] == "Grades for coursework will be updated shortly","message"

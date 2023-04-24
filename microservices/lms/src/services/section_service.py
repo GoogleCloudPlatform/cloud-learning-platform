@@ -14,7 +14,8 @@ from config import BQ_TABLE_DICT,BQ_DATASET
 # pylint: disable = broad-except
 def copy_course_background_task(course_template_details,
                                 sections_details,
-                                cohort_details,headers,message=""):
+                                cohort_details,template_drive_folder_id,
+                                headers,message=""):
   """Create section  Background Task to copy course and updated database
   for newly created section
   Args:
@@ -57,7 +58,7 @@ def copy_course_background_task(course_template_details,
     # a dictionary of view_links as keys and edit
     #  links/  and file_id as values for all drive files
     url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form()
+            get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(
         course_template_details.classroom_id)
@@ -247,3 +248,32 @@ def update_coursework_material(materials,url_mapping,target_folder_id):
       updated_material.append({"link":material["link"]})
       material.pop("form")
   return updated_material
+
+
+def update_grades(all_form_responses,section,coursework_id):
+  """Takes the forms all responses ,section, and coursework_id and
+  updates the grades of student who have responsed to form and
+  submitted the coursework
+  """
+  student_grades = {}
+  count =0
+  Logger.info(f"Student grade update background tasks started\
+              for coursework_id {coursework_id}")
+  for response in all_form_responses["responses"]:
+    print("This is respondent email",response["respondentEmail"])
+    submissions=classroom_crud.list_coursework_submissions_user(
+                                          section.classroom_id,
+                                          coursework_id,
+                                  response["respondentEmail"])
+    if submissions !=[]:
+      if submissions[0]["state"] == "TURNED_IN":
+        count+=1
+        student_grades[
+        response["respondentEmail"]]=response["totalScore"]
+        classroom_crud.patch_student_submission(section.classroom_id,
+                                coursework_id,submissions[0]["id"],
+                                      response["totalScore"],
+                                      response["totalScore"])
+  Logger.info(f"Student grades updated\
+               for number{count} student_data {student_grades}")
+  return count,student_grades

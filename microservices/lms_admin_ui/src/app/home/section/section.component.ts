@@ -9,6 +9,8 @@ import { HomeService } from '../service/home.service';
 import { Router, NavigationStart, NavigationEnd, Event as NavigationEvent } from '@angular/router';
 import { InviteStudentModalComponent } from '../invite-student-modal/invite-student-modal.component';
 import { Subscription } from 'rxjs';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+
 
 interface LooseObject {
   [key: string]: any
@@ -61,8 +63,9 @@ export class SectionComponent implements OnInit,OnDestroy {
   studentTableLoader:boolean=true
   courseworkTableLoader:boolean=true
   getStudentListSub:Subscription
+  importGradesSub:Subscription
   disableCourseworkAction:boolean=false
-  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, public _HomeService: HomeService, 
+  constructor(private _liveAnnouncer: LiveAnnouncer, private _snackBar: MatSnackBar, public dialog: MatDialog, public _HomeService: HomeService, 
     public router: Router, private _location: Location) { }
   @ViewChild(MatSort) sort: MatSort;
 
@@ -131,10 +134,6 @@ transformCourseworkTableData(data:any){
     this.courseworkTable.push(x)
   }
   console.log('coursework',this.courseworkTable)
-// for (let i=0;i<=data.length;i++){
-// data[i]['status'] = 'import'
-// }
-// this.courseworkTable = data
 }
 
   openClassroom() {
@@ -173,6 +172,10 @@ transformCourseworkTableData(data:any){
 
   createTableData() {
     console.log('selected sec', this.selectedSection)
+    if(this.importGradesSub){
+      this.importGradesSub.unsubscribe();
+    }
+    this.disableCourseworkAction=false
     this.updateUrl(this.selectedSection.id)
     this.getSectionStudents()
     this.getCourseworkDetails()
@@ -335,9 +338,10 @@ transformCourseworkTableData(data:any){
     console.log("row num", rowNumber)
     this.disableCourseworkAction=true
     this.courseworkTable[rowNumber]['status'] = 'loading'
-this._HomeService.gradeImport(this.selectedSection.id,courseworkId).subscribe((res:any)=>{
+    this.importGradesSub = this._HomeService.gradeImport(this.selectedSection.id,courseworkId).subscribe((res:any)=>{
   this.courseworkTable[rowNumber]['status'] = 'import_done'
   this.disableCourseworkAction=false
+  this.openSuccessSnackBar(res.message,'Close')
 },(err:any)=>{
   this.courseworkTable[rowNumber]['status'] = 'import_error'
   this.disableCourseworkAction=false
@@ -353,9 +357,20 @@ this._HomeService.gradeImport(this.selectedSection.id,courseworkId).subscribe((r
     }
     return status
   }
+
+  openSuccessSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 6000,
+      panelClass: ['green-snackbar'],
+    });
+  }
+
   ngOnDestroy(): void {
     if(this.getStudentListSub){
       this.getStudentListSub.unsubscribe();
+    }
+    if(this.importGradesSub){
+      this.importGradesSub.unsubscribe();
     }
   }
 

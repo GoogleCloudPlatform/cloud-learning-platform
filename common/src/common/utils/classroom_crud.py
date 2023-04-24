@@ -569,27 +569,67 @@ f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
   else :
     return searched_student[0]
 
-def get_edit_url_and_view_url_mapping_of_form():
+# def get_edit_url_and_view_url_mapping_of_form():
+#   """  Query google drive api and get all the forms a user owns
+#       return a dictionary of view link as keys and edit link as values
+#   """
+#   service = build("drive", "v3", credentials=get_credentials())
+#   page_token = None
+#   while True:
+#     response = service.files().list(
+#         q="mimeType=\"application/vnd.google-apps.form\"",
+#         spaces="drive",
+#         fields="nextPageToken, "
+#         "files(id, name,webViewLink,thumbnailLink)",
+#         pageToken=page_token).execute()
+#     view_link_and_edit_link_matching = {}
+#     for file in response.get("files", []):
+#       result = get_view_link_from_id(file.get("id"))
+#       view_link_and_edit_link_matching[result["responderUri"]] = \
+#       {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
+#     if page_token is None:
+#       break
+#   return view_link_and_edit_link_matching
+
+def get_edit_url_and_view_url_mapping_of_form(folder_id):
   """  Query google drive api and get all the forms a user owns
       return a dictionary of view link as keys and edit link as values
   """
-  service = build("drive", "v3", credentials=get_credentials())
+  forms = list_folders_children(folder_id,
+            "mimeType=\"application/vnd.google-apps.form\"")
+  view_link_and_edit_link_matching = {}
+  for form in forms:
+    result = get_view_link_from_id(form.get("id"))
+    # Call get file api to get
+    file = get_file(form.get("id"))
+    view_link_and_edit_link_matching[result["responderUri"]] = \
+    {"webViewLink":file.get("webViewLink"),"file_id":form.get("id")}
+  return view_link_and_edit_link_matching
+
+def list_folders_children(folder_id,search_query=""):
+  """
+  List the files or childrens of given folder_id 
+  filters according to search query if given else gets all the 
+  childrens of folder
+  """
+  service = build("drive", "v2", credentials=get_credentials())
   page_token = None
   while True:
-    response = service.files().list(
-        q="mimeType=\"application/vnd.google-apps.form\"",
-        spaces="drive",
-        fields="nextPageToken, "
-        "files(id, name,webViewLink,thumbnailLink)",
-        pageToken=page_token).execute()
-    view_link_and_edit_link_matching = {}
-    for file in response.get("files", []):
-      result = get_view_link_from_id(file.get("id"))
-      view_link_and_edit_link_matching[result["responderUri"]] = \
-      {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
-    if page_token is None:
+    param = {}
+    if page_token:
+      param["pageToken"] = page_token
+    children = service.children().list(
+          folderId=folder_id,q=search_query, **param).execute()
+    page_token = children.get("nextPageToken")
+    if not page_token:
       break
-  return view_link_and_edit_link_matching
+  return children.get("items", [])
+
+
+def get_file(file_id):
+  service = build("drive", "v3", credentials=get_credentials())
+  response = service.files().get(fileId=file_id,fields="*").execute()
+  return response
 
 def get_view_link_from_id(form_id):
   "Query google forms api  using form id and get view url of  google form"
