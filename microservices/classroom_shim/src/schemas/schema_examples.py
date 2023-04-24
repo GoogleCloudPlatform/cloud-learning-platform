@@ -30,3 +30,9 @@ LTI_POST_GRADE_MODEL = {
     "draft_grade": "20",
     "validate_title": False
 }
+
+CONTEXT_EXAMPLE = {
+    "id": "BOqh34378v3qGir",
+    "name": "Context name",
+    "description": "Context description"
+}

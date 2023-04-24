@@ -16,7 +16,6 @@ from urllib.parse import urlparse, urlunparse, urlencode, parse_qsl
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.lti_token import encode_token
 
-
 # pylint: disable=dangerous-default-value
 
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
@@ -85,7 +84,9 @@ def get_resource_launch_init(lti_content_item_id: str,
           "lti_content_item_id":
               lti_content_item_id,
           "context_id":
-              context_id
+              context_id,
+          "context_type":
+              custom_params.get("context_type")
       }
       lti_message_hint = encode_token(final_lti_message_hint_dict)
 

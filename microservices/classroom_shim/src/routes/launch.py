@@ -102,7 +102,7 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
     user_id = user_data.get("user_id")
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
     lti_content_item_id = lti_assignment.lti_content_item_id
-    context_id = lti_assignment.section_id
+    context_id = lti_assignment.context_id
 
     custom_params = {}
     if lti_assignment.start_date:
@@ -127,45 +127,88 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
     custom_params["$ResourceLink.RelaunchURL"] = url
 
     # TODO: implementation of "$Context.id.history" as a custom parameter
+
+    if lti_assignment.context_type is None:
+      Logger.info(
+          f"Request had been failed as the context type is null for {lti_assignment.id}"
+      )
+      raise Exception(
+          "Request failed with code 1010, Please contact administrator")
+
     final_lti_message_hint_dict = {
-        "custom_params_for_substitution": custom_params
+        "custom_params_for_substitution": custom_params,
+        "context_type": lti_assignment.context_type
     }
 
     url = f"{API_DOMAIN}/lti/api/v1/resource-launch-init?lti_content_item_id={lti_content_item_id}&user_id={user_id}&context_id={context_id}"
     user_type = user_details.get("user_type")
-    if user_type == "learner":
-      api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.section_id}/students/{user_email}"
-      fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
 
-      if fetch_user_mapping.status_code == 200:
-        learner_data = fetch_user_mapping.json().get("data")
+    if lti_assignment.context_type == "course_template":
 
-        if learner_data.get("enrollment_status") == "invited":
-          raise UnauthorizedUserError(
-              "Enrollment in progress, please retry again after 20 minutes")
-
-      elif fetch_user_mapping.status_code == 404:
+      if user_type == "learner":
         raise UnauthorizedUserError(
-            "Access Denied with code 1003, Please contact administrator")
-      else:
-        raise Exception(
-            "Request failed with code 1004, Please contact administrator")
+            "Access Denied with code 1011, Please contact administrator")
 
-    elif user_type in ("faculty", "admin"):
-      api_url = f"http://lms/lms/api/v1/sections/{lti_assignment.section_id}/teachers/{user_email}"
-      fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
-      if fetch_user_mapping.status_code == 200:
-        faculty_data = fetch_user_mapping.json().get("data")
-      elif fetch_user_mapping.status_code == 404:
-        raise UnauthorizedUserError(
-            "Access Denied with code 1005, Please contact administrator")
+      elif user_type in ("faculty", "admin"):
+        course_template_url = f"http://lms/lms/api/v1/course_templates/{context_id}"
+
+        course_template_resp = requests.get(
+            course_template_url, headers=headers, timeout=60)
+
+        if course_template_resp.status_code == 200:
+          course_template_resp_data = course_template_resp.json()
+          faculty_list = []
+          faculty_list.append(
+              course_template_resp_data.get("instructional_designer"))
+          faculty_list.append(course_template_resp_data.get("admin"))
+
+          if user_email not in faculty_list:
+            raise UnauthorizedUserError(
+                "Access Denied with code 1012, Please contact administrator")
+        else:
+          raise Exception(
+              "Request failed with code 1013, Please contact administrator")
       else:
-        raise Exception(
-            "Request failed with code 1006, Please contact administrator")
+        raise UnauthorizedUserError(
+            "Access Denied with code 1014, Please contact administrator")
 
     else:
-      raise UnauthorizedUserError(
-          "Access Denied with code 1007, Please contact administrator")
+      if user_type == "learner":
+        api_url = f"http://lms/lms/api/v1/sections/{context_id}/students/{user_email}"
+        fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
+
+        if fetch_user_mapping.status_code == 200:
+          learner_data = fetch_user_mapping.json().get("data")
+
+          if learner_data.get("enrollment_status") == "invited":
+            raise UnauthorizedUserError(
+                "Enrollment in progress, please retry again after 20 minutes")
+
+        elif fetch_user_mapping.status_code == 404:
+          raise UnauthorizedUserError(
+              "Access Denied with code 1003, Please contact administrator")
+        else:
+          raise Exception(
+              "Request failed with code 1004, Please contact administrator")
+
+      elif user_type in ("faculty", "admin"):
+        api_url = f"http://lms/lms/api/v1/sections/{context_id}/teachers/{user_email}"
+        fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
+
+        print("fetch_user_mapping.status_code", fetch_user_mapping.status_code)
+
+        if fetch_user_mapping.status_code == 200:
+          faculty_data = fetch_user_mapping.json().get("data")
+        elif fetch_user_mapping.status_code == 404:
+          raise UnauthorizedUserError(
+              "Access Denied with code 1005, Please contact administrator")
+        else:
+          raise Exception(
+              "Request failed with code 1006, Please contact administrator")
+
+      else:
+        raise UnauthorizedUserError(
+            "Access Denied with code 1007, Please contact administrator")
 
     return {"url": url, "message_hint": final_lti_message_hint_dict}
 
