@@ -1,6 +1,7 @@
 import uuid
 import behave
 import requests
+import time
 from testing_objects.test_config import API_URL
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA 
 from testing_objects.user import TEST_USER
@@ -304,9 +305,14 @@ def step_impl_41(context):
     "Student grades are not updated in classroom"
 )
 def step_impl_42(context):
-  assert context.status == 200, "Status 200"
+  assert context.status == 200, "Status 202"
   assert context.response["data"]["count"] == 0, "count not matching of update"
-
+  result = list_coursework_submission_user(context.access_token,
+                                  context.classroom_id,
+                                  context.coursework["id"],"me")
+  print("This is result after list coursework submission Before turn in",result)
+  assert "assignedGrade" not in result[0].keys()
+  
 
 @behave.given(
     "A teacher wants to update grades of student for a coursework with for turnIn  assignment with google form"
@@ -337,10 +343,14 @@ def step_impl_44(context):
     "Student grades are  updated in classroom ans student_email is present in api response"
 )
 def step_impl_45(context):
-  assert context.status == 200, "Status 200"
-  assert context.response["data"]["count"] == 1, "count  match update"
-  assert context.student_email in context.response["data"]["student_grades"].keys()
-
+  time.sleep(6)
+  assert context.status == 202, "Status 202"
+  assert context.response["message"] == "Grades for coursework will be updated shortly","message not matching"
+  result = list_coursework_submission_user(context.access_token,
+                                  context.classroom_id,
+                                  context.coursework["id"],"me")
+  print("This is result after Turn in list coursework submission",result)
+  assert "assignedGrade" in result[0].keys()
 # -------------------------------update classroom code of a section-------------------------------------
 # ----Positive Scenario-----
 
