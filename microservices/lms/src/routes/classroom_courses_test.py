@@ -52,8 +52,8 @@ def test_get_course(client_with_emulator):
                   return_value=course_dict):
     resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
-  assert resp.json()["name"]==course_dict["name"], "check data"
-  assert resp.json()["owner_id"]==course_dict["ownerId"],"check data"
+  assert resp.json()["data"]["name"]==course_dict["name"], "check data"
+  assert resp.json()["data"]["owner_id"]==course_dict["ownerId"],"check data"
 
 def test_negative_get_course(client_with_emulator):
   url = BASE_URL + "/classroom_courses/12345678"
