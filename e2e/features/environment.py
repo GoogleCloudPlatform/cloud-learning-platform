@@ -1,3 +1,4 @@
+import datetime
 import os
 import json
 import time
@@ -5,16 +6,18 @@ import requests
 from behave import fixture, use_fixture
 from common.models import CourseTemplate, Cohort,Section, TempUser ,CourseEnrollmentMapping
 from common.testing.example_objects import TEST_SECTION,TEST_COHORT
+from common.utils.bq_helper import insert_rows_to_bq
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL
 from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,\
   get_student_email_and_token,\
   get_required_emails_from_secret_manager,create_coursework,create_google_form,\
-get_file
+get_file,get_gmail_student_email_and_token
 
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.user import TEST_USER
+from testing_objects.bq_helper import BQ_DATASET,BQ_TABLE_DICT
 from google.oauth2.credentials import Credentials
 import logging
 
@@ -197,11 +200,16 @@ def create_student_enrollment_record(student_data,section):
   course_enrollment_mapping.role = "learner"
   course_enrollment_mapping.section = section
   course_enrollment_mapping.status ="active"
-  temp_user = TempUser.from_dict(student_data)
-  temp_user.user_id = ""
-  temp_user.save()
-  temp_user.user_id = temp_user.id
-  temp_user.update()
+  temp_user=TempUser.find_by_email(student_data["email"])
+  if temp_user is None:
+    print("Creating new user")
+    temp_user = TempUser.from_dict(student_data)
+    temp_user.user_id = ""
+    temp_user.save()
+    temp_user.user_id = temp_user.id
+    temp_user.update()
+  else:
+    print(f"User already exist {temp_user.to_dict()}")
   course_enrollment_mapping.user = temp_user.user_id
   course_enrollment_mapping.save()
   return{
@@ -226,9 +234,10 @@ def enroll_student_course(context):
     "user_id":courese_enrollment_mapping["user_id"],
     "email": student_email_and_token["email"].lower(),
     "cohort_id":section.cohort.id,
-    "access_token":student_email_and_token["access_token"]
+    "access_token":student_email_and_token["access_token"],
+    "course_enrollment_mapping_id":courese_enrollment_mapping["course_enrollment_mapping_id"]
     }
-  yield context.enroll_student_data
+  return context.enroll_student_data
 
 @fixture
 def import_google_form_grade(context):
@@ -253,7 +262,7 @@ def import_google_form_grade(context):
   context.section_id = section.id
   classroom_code = section.classroom_code
   classroom_id = section.classroom_id
-  student_email_and_token = get_student_email_and_token()
+  student_email_and_token = get_gmail_student_email_and_token()
   student_data = enroll_student_classroom(student_email_and_token["access_token"],
   classroom_id,student_email_and_token["email"].lower(),classroom_code) 
   context.access_token = student_email_and_token["access_token"]
@@ -333,6 +342,52 @@ url=f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_emai
         id=data["submission"]["id"],
         updateMask="assignedGrade,draftGrade",
         body={"assignedGrade":10,"draftGrade":10}).execute()
+  section_rows=[{
+      "sectionId":section.id,
+      "courseId":section.classroom_id,
+      "classroomUrl":section.classroom_url,
+      "name":section.section,
+      "description":section.description,
+      "cohortId":section.cohort.id,
+      "courseTemplateId":section.course_template.id,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+  cohort=section.cohort
+  cohort_rows=[{
+      "cohortId":cohort.id,
+      "name":cohort.name,
+      "description":cohort.description,\
+      "startDate":cohort.start_date,\
+      "endDate":cohort.end_date,
+      "registrationStartDate":cohort.registration_start_date,
+      "registrationEndDate":cohort.registration_end_date,
+      "maxStudents":cohort.max_students,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+  course_template=section.course_template
+  course_template_rows=[{
+      "courseTemplateId":course_template.id,
+      "classroomId":course_template.classroom_id,
+        "name":course_template.name,
+        "description":course_template.description,
+        "timestamp":datetime.datetime.utcnow(),
+        "instructionalDesigner":course_template.instructional_designer
+    }]
+  insert_rows_to_bq(
+      rows=course_template_rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"]
+      )
+  insert_rows_to_bq(
+      rows=cohort_rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"]
+      )
+  insert_rows_to_bq(
+      rows=section_rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"]
+      )
   yield context.analytics_data
 
 def wait(secs):

@@ -315,6 +315,24 @@ def test_update_section_course_id_not_found(client_with_emulator,
   resp.json()
   assert resp.status_code == 404
 
+def test_update_section_classroom_code(client_with_emulator, create_fake_data):
+  section = Section.find_by_id(create_fake_data["section"])
+  url = BASE_URL + f"/sections/{section.id}/update_classroom_code"
+  with mock.patch("routes.section.Logger"):
+    with mock.patch("routes.section.classroom_crud.get_course_by_id",
+                    return_value={"enrollmentCode":"xyz123z"}):
+      resp = client_with_emulator.patch(url)
+  assert resp.status_code == 200
+  assert resp.json()["data"]["classroom_code"] == "xyz123z"
+
+def test_negative_update_section_classroom_code(client_with_emulator):
+  url = BASE_URL + "/sections/xyz/update_classroom_code"
+  with mock.patch("routes.section.Logger"):
+    with mock.patch("routes.section.classroom_crud.get_course_by_id",
+                    return_value={"enrollmentCode":"xyz123z"}):
+      resp = client_with_emulator.patch(url)
+  assert resp.status_code == 404
+
 def test_list_teachers(client_with_emulator,create_fake_data):
 
 
@@ -399,6 +417,8 @@ def test_enable_notifications_using_fake_section_id(client_with_emulator):
 def test_get_assignment(client_with_emulator, create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/assignments/5789246"
+  print("========")
+  print(url)
   course_work_data = {
       "courseId": "555555555",
       "id": "5789246",
@@ -466,45 +486,67 @@ def test_negative_get_assignment(client_with_emulator, create_fake_data):
   assert resp.status_code == 404, "Status 404"
   assert data["success"] is False, "Data doesn't Match"
 
+def test_get_coursework_list(client_with_emulator,create_fake_data):
+  url = BASE_URL + \
+      f"/sections/{create_fake_data['section']}/get_coursework_list"
+  course_work_data = {
+    "courseId": "555555555",
+      "id": "5789246",
+      "title": "test assignment",
+      "state": "PUBLISHED",
+      "creationTime": "2023-02-16T10:45:49.833Z",
+      "materials":[]
+  }
+  with mock.patch("routes.section.classroom_crud.get_course_work_list",
+                  return_value=[course_work_data]):
+    resp = client_with_emulator.get(url)
+  assert resp.status_code == 200
+
 def test_form_grade_import_form_with_no_response(client_with_emulator,
                                                  create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/coursework/5789246900"
-  with mock.patch("routes.section.classroom_crud.get_course_work",
+  with mock.patch(
+        "routes.section.classroom_crud.get_course_by_id",
+                  return_value={"teacherFolder":{"id":"123344"}}):
+    with mock.patch("routes.section.classroom_crud.get_course_work",
                   return_value=GET_COURSEWORK_DATA):
-    with mock.patch(
+      with mock.patch(
 "routes.section.classroom_crud.get_edit_url_and_view_url_mapping_of_form",
 return_value={"https://docs.google.com/forms/d/e/1FAIpQL":
               {"file_id":"test123"}}):
-      with mock.patch(
+        with mock.patch(
         "routes.section.classroom_crud.retrive_all_form_responses",
                   return_value={}):
-        resp = client_with_emulator.patch(url)
+          resp = client_with_emulator.patch(url)
   result_json = resp.json()
-  assert resp.status_code == 200, "Status 200"
-  assert result_json["data"]["count"] == 0 ,"Count match for updated grades"
+  assert resp.status_code == 404, "Status 404"
+  assert result_json[
+    "message"] == "Responses not available for google form","message"
 
 
 def test_form_grade_import_form_with_response(client_with_emulator,
                                                  create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/coursework/5789246900"
-  with mock.patch("routes.section.classroom_crud.get_course_work",
+  with mock.patch(
+        "routes.section.classroom_crud.get_course_by_id",
+                return_value={"teacherFolder":{"id":"123344"}}):
+    with mock.patch("routes.section.classroom_crud.get_course_work",
                   return_value=GET_COURSEWORK_DATA):
-    with mock.patch(
+      with mock.patch(
 "routes.section.classroom_crud.get_edit_url_and_view_url_mapping_of_form",
 return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
-      with mock.patch(
+        with mock.patch(
         "routes.section.classroom_crud.retrive_all_form_responses",
                   return_value=FORM_RESPONSE_LIST):
-        with mock.patch(
+          with mock.patch(
         "routes.section.classroom_crud.list_coursework_submissions_user",
                   return_value=LIST_COURSEWORK_SUBMISSION_USER):
-          with mock.patch(
+            with mock.patch(
         "routes.section.classroom_crud.patch_student_submission"):
-            resp = client_with_emulator.patch(url)
+              resp = client_with_emulator.patch(url)
   resp_json = resp.json()
-  assert resp.status_code == 200, "Status 200"
-  assert resp_json["data"]["count"] == 1 ,"Count match for updated grades"
-  assert "clplmstestuser1@gmail.com" in resp_json["data"]["student_grades"],\
-  "email of updated user"
+  assert resp.status_code == 202, "Status 202"
+  assert resp_json[
+    "message"] == "Grades for coursework will be updated shortly","message"
