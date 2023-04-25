@@ -13,7 +13,7 @@ from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL
 from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,\
   get_student_email_and_token,\
   get_required_emails_from_secret_manager,create_coursework,create_google_form,\
-get_file,get_gmail_student_email_and_token
+get_file,get_gmail_student_email_and_token,insert_file_into_folder
 
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.user import TEST_USER
@@ -194,6 +194,7 @@ def create_section(context):
   temp_user1.user_id = temp_user.id
   temp_user1.update()
   context.sections=section
+  context.classroom_drive_folder_id =classroom["teacherFolder"]["id"]
   yield context.sections
 
 def create_student_enrollment_record(student_data,section):
@@ -244,6 +245,11 @@ def enroll_student_course(context):
 def import_google_form_grade(context):
   "Fixture for import grade"
   section = use_fixture(create_section, context)
+  folder_id = context.classroom_drive_folder_id
+  file_id ="1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM"
+  print("Moving file to new folder_________",folder_id)
+  result =insert_file_into_folder(folder_id,file_id)
+  print("Insert done______",result)
   coursework_body = {"title": "Test_quize11",
       "description":"test desc",
       "workType": "ASSIGNMENT",
@@ -256,8 +262,6 @@ def import_google_form_grade(context):
       ],
       "state":"PUBLISHED"}
   coursework = create_coursework(section.classroom_id,coursework_body)
-  form_details = create_google_form("Test_quize")
-  file_data = get_file(form_details["formId"])
   context.coursework_id = coursework.get("id")
   context.coursework = coursework
   context.section_id = section.id

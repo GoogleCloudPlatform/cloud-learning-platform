@@ -27,7 +27,9 @@ SCOPES = [
   "https://www.googleapis.com/auth/forms.body.readonly",
   "https://www.googleapis.com/auth/classroom.profile.photos",
   "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-  "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+  "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
+  "https://www.googleapis.com/auth/drive.file",
+  "https://www.googleapis.com/auth/drive.appdata"
   ]
 
 
@@ -229,3 +231,15 @@ CLASSROOM_KEY, scopes=SCOPES)
   response = service.files().get(fileId=file_id,  
     fields="name,webViewLink").execute()
   return response
+
+def insert_file_into_folder(folder_id,file_id):
+
+  a_creds = service_account.Credentials.from_service_account_info(
+CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  discovery_doc = "https://forms.googleapis.com/$discovery/rest?version=v1"
+  service = build("drive", "v2", credentials=creds)
+  new_child = {'id': file_id}
+  result= service.children().insert(
+        folderId=folder_id, body=new_child).execute()
+  print("MOved to another folder success",result)
