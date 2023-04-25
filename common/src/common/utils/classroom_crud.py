@@ -36,9 +36,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/forms.body.readonly",
     "https://www.googleapis.com/auth/classroom.profile.photos",
     "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
-    "https://www.googleapis.com/auth/forms.body",
-    "https://www.googleapis.com/auth/drive.file"
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
 ]
 
 
@@ -614,6 +612,8 @@ def get_view_link_from_id(form_id):
 
   service = build("forms", "v1", credentials=get_credentials())
   result = service.forms().get(formId=form_id).execute()
+  print("AFter get form",result)
+
   return result
 
 def retrive_all_form_responses(form_id):
