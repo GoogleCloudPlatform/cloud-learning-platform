@@ -2,7 +2,7 @@ import uuid
 import behave
 import requests
 import time
-from testing_objects.test_config import API_URL
+from testing_objects.test_config import API_URL,e2e_google_form_id,e2e_drive_folder_id
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA 
 from testing_objects.user import TEST_USER
 from e2e.gke_api_tests.secrets_helper import get_student_email_and_token,\
@@ -312,6 +312,7 @@ def step_impl_42(context):
   result = list_coursework_submission_user(context.access_token,
                                   context.classroom_id,
                                   context.coursework["id"],"me")
+  insert_file_into_folder(e2e_drive_folder_id,e2e_google_form_id)
   print("This is result after list coursework submission Before turn in",result)
   assert "assignedGrade" not in result[0].keys()
 
@@ -346,14 +347,14 @@ def step_impl_44(context):
 )
 def step_impl_45(context):
   time.sleep(6)
-  # "Insert back to origin folderr 1JZuikDnHvta7jJwnHSjWw5IcS7EK0QTG"
-  insert_file_into_folder("1JZuikDnHvta7jJwnHSjWw5IcS7EK0QTG","1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM")
+  insert_file_into_folder(e2e_drive_folder_id,e2e_google_form_id)
   print("After inser to origin folder")
   assert context.status == 202, "Status 202"
   assert context.response["message"] == "Grades for coursework will be updated shortly","message not matching"
   result = list_coursework_submission_user(context.access_token,
                                   context.classroom_id,
                                   context.coursework["id"],"me")
+  print("This is result after Turn in list coursework submission",result)
   assert "assignedGrade" in result[0].keys()
 # -------------------------------update classroom code of a section-------------------------------------
 # ----Positive Scenario-----

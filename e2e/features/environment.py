@@ -9,7 +9,7 @@ from common.testing.example_objects import TEST_SECTION,TEST_COHORT
 from common.utils.bq_helper import insert_rows_to_bq
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL
+from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL,e2e_google_form_id
 from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,\
   get_student_email_and_token,\
   get_required_emails_from_secret_manager,create_coursework,create_google_form,\
@@ -246,10 +246,8 @@ def import_google_form_grade(context):
   "Fixture for import grade"
   section = use_fixture(create_section, context)
   folder_id = context.classroom_drive_folder_id
-  file_id ="1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM"
-  print("Moving file to new folder_________",folder_id)
-  result =insert_file_into_folder(folder_id,file_id)
-  print("Insert done______",result)
+  result =insert_file_into_folder(folder_id,e2e_google_form_id)
+  print("Inserted in classroom folder",result)
   coursework_body = {"title": "Test_quize11",
       "description":"test desc",
       "workType": "ASSIGNMENT",
