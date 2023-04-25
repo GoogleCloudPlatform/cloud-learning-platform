@@ -612,8 +612,6 @@ def get_view_link_from_id(form_id):
 
   service = build("forms", "v1", credentials=get_credentials())
   result = service.forms().get(formId=form_id).execute()
-  print("AFter get form",result)
-
   return result
 
 def retrive_all_form_responses(form_id):

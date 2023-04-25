@@ -29,8 +29,6 @@ SCOPES = [
   "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
   ]
 
-
-
 def get_required_emails_from_secret_manager():
   """Get Project user emails for e2e
 
