@@ -115,7 +115,7 @@ def test_create_section(client_with_emulator, create_fake_data):
                           with mock.patch(
                       "services.section_service.common_service.create_teacher"):
                             with mock.patch(
-          "services.section_service.classroom_crud.get_coursework_material_list"):
+      "services.section_service.classroom_crud.get_coursework_material_list"):
                               with mock.patch(
           "services.section_service.classroom_crud.create_coursework_material"):
                                 with mock.patch(

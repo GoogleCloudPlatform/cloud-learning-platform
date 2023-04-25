@@ -33,7 +33,6 @@ from utils.helper import (convert_section_to_section_model,
                           FEED_TYPES,
                     convert_coursework_to_short_coursework_model)
 from config import BQ_TABLE_DICT,BQ_DATASET
-from googleapiclient.discovery import build
 # disabling for linting to pass
 # pylint: disable = broad-except
 

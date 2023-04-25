@@ -767,8 +767,6 @@ def list_student_section(section_id,headers):
     response = requests.\
       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
     user_record = response.json()["data"]
-    print(user_record)
-    
     user_record["invitation_id"]=record.invitation_id
     user_record["enrollment_status"]=record.status
     users.append(user_record)
