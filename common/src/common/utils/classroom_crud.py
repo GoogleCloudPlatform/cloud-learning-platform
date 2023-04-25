@@ -569,28 +569,6 @@ f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
   else :
     return searched_student[0]
 
-# def get_edit_url_and_view_url_mapping_of_form():
-#   """  Query google drive api and get all the forms a user owns
-#       return a dictionary of view link as keys and edit link as values
-#   """
-#   service = build("drive", "v3", credentials=get_credentials())
-#   page_token = None
-#   while True:
-#     response = service.files().list(
-#         q="mimeType=\"application/vnd.google-apps.form\"",
-#         spaces="drive",
-#         fields="nextPageToken, "
-#         "files(id, name,webViewLink,thumbnailLink)",
-#         pageToken=page_token).execute()
-#     view_link_and_edit_link_matching = {}
-#     for file in response.get("files", []):
-#       result = get_view_link_from_id(file.get("id"))
-#       view_link_and_edit_link_matching[result["responderUri"]] = \
-#       {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
-#     if page_token is None:
-#       break
-#   return view_link_and_edit_link_matching
-
 def get_edit_url_and_view_url_mapping_of_form(folder_id):
   """  Query google drive api and get all the forms a user owns
       return a dictionary of view link as keys and edit link as values
