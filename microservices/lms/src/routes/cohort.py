@@ -286,7 +286,7 @@ def list_section(cohort_id: str, skip: int = 0, limit: int = 10):
 @router.get("/{cohort_id}/get_progress_percentage/{user}",
       response_model=GetProgressPercentageCohortResponseModel)
 def get_progress_percentage(cohort_id: str, user: str, request: Request):
-  """Get progress percentage
+  """Get progress percentage of assignments turned in
 
   Args:
     cohort_id : cohort_id for which progess is required
@@ -298,11 +298,12 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
   Returns:
     A number indicative of the percentage of the course completed
     by the student,
-    {'status': 'Failed'} if any exception is raised
+    {'status': 'Failed'} if any exception is raise
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
-    user_id = student_service.get_user_id(user=user, headers=headers)
+    user_id = student_service.get_user_id(user=user.strip(), headers=headers)
+    Logger.info(f"user id : {user_id}")
     section_with_progress_percentage = []
     cached_progress_percentage = get_key(f"{cohort_id}::{user_id}")
     if cached_progress_percentage is not None:
@@ -335,9 +336,82 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
             progress_percent}
           section_with_progress_percentage.append(data)
       cached_value = set_key(f"{cohort_id}::{user_id}",\
-      section_with_progress_percentage, 86400)
+      section_with_progress_percentage, 3600)
       Logger.info\
       (f"progress percentage caching status for cohort_id \
+      {cohort_id}, user_id {user_id} : {cached_value}")
+    return {"data":section_with_progress_percentage}
+
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+@router.get("/{cohort_id}/get_progress_percentage/not_turned_in/{user}",
+      response_model=GetProgressPercentageCohortResponseModel)
+def get_progress_percentage_not_turned_in(\
+  cohort_id: str, user: str, request: Request):
+  """Get progress percentage of assignments having assigned grades
+
+  Args:
+    cohort_id : cohort_id for which progess is required
+    user : email id or user id for whol progress is required
+
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+
+  Returns:
+    A number indicative of the percentage of the course completed
+    by the student,
+    {'status': 'Failed'} if any exception is raise
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    user_id = student_service.get_user_id(user=user.strip(), headers=headers)
+    section_with_progress_percentage = []
+    cached_progress_percentage = get_key(\
+    f"not_turned_in::{cohort_id}::{user_id}")
+    if cached_progress_percentage is not None:
+      section_with_progress_percentage = cached_progress_percentage
+    else:
+      cohort = Cohort.find_by_id(cohort_id)
+      # Using the cohort object reference key query sections model to get a list
+      # of section of a perticular cohort
+      result = Section.fetch_all_by_cohort(cohort_key=cohort.key)
+      for section in result:
+        submitted_course_work_list = 0
+        record = CourseEnrollmentMapping.\
+          find_enrolled_student_record(section.key,user_id)
+        if record is not None:
+          course_work_list = len\
+            (classroom_crud.get_course_work_list(section.key.split("/")[1]))
+          submitted_course_work = classroom_crud.get_submitted_course_work_list(
+          section.key.split("/")[1], user_id,headers)
+          for submission_obj in submitted_course_work:
+            if "assignedGrade" in submission_obj:
+              submitted_course_work_list = submitted_course_work_list + 1
+          progress_percent=0
+          if course_work_list !=0:
+            progress_percent = round\
+          ((submitted_course_work_list / course_work_list) * 100, 2)
+          else:
+            progress_percent = 0
+          data = {"section_id":\
+          section.key.split("/")[1],"progress_percentage":\
+            progress_percent}
+          section_with_progress_percentage.append(data)
+      cached_value = set_key(\
+      f"not_turned_in::{cohort_id}::{user_id}",\
+      section_with_progress_percentage, 3600)
+      Logger.info\
+      (f"progress percentage caching status for \
+       not_turned_in cohort_id \
       {cohort_id}, user_id {user_id} : {cached_value}")
     return {"data":section_with_progress_percentage}
 

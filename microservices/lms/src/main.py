@@ -25,7 +25,8 @@ from fastapi import FastAPI, Request, Depends
 import config
 from routes import (
   section,student,
-  course_template,cohort,classroom_courses
+  course_template,cohort,
+  classroom_courses,analytics
   # ,user
         )
 from utils.helper import validate_user
@@ -92,6 +93,7 @@ api.include_router(student.cohort_student_router)
 api.include_router(course_template.router)
 api.include_router(classroom_courses.router)
 api.include_router(cohort.router)
+api.include_router(analytics.router)
 
 add_exception_handlers(app)
 add_exception_handlers(api)

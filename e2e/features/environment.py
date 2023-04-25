@@ -1,3 +1,4 @@
+import datetime
 import os
 import json
 import time
@@ -5,12 +6,18 @@ import requests
 from behave import fixture, use_fixture
 from common.models import CourseTemplate, Cohort,Section, TempUser ,CourseEnrollmentMapping
 from common.testing.example_objects import TEST_SECTION,TEST_COHORT
+from common.utils.bq_helper import insert_rows_to_bq
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL
-from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,get_student_email_and_token,get_required_emails_from_secret_manager
+from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,\
+  get_student_email_and_token,\
+  get_required_emails_from_secret_manager,create_coursework,create_google_form,\
+get_file,get_gmail_student_email_and_token
+
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.user import TEST_USER
+from testing_objects.bq_helper import BQ_DATASET,BQ_TABLE_DICT
 from google.oauth2.credentials import Credentials
 import logging
 
@@ -67,7 +74,6 @@ def enroll_student_classroom(access_token,course_id,student_email,course_code):
   Return:
     dict: returns a dict which contains student and classroom details
   """
-
   creds = Credentials(token=access_token)
   service = build("classroom", "v1", credentials=creds)
   student = {"userId": student_email}
@@ -190,6 +196,29 @@ def create_section(context):
   context.sections=section
   yield context.sections
 
+def create_student_enrollment_record(student_data,section):
+  course_enrollment_mapping = CourseEnrollmentMapping()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+  course_enrollment_mapping.role = "learner"
+  course_enrollment_mapping.section = section
+  course_enrollment_mapping.status ="active"
+  temp_user=TempUser.find_by_email(student_data["email"])
+  if temp_user is None:
+    print("Creating new user")
+    temp_user = TempUser.from_dict(student_data)
+    temp_user.user_id = ""
+    temp_user.save()
+    temp_user.user_id = temp_user.id
+    temp_user.update()
+  else:
+    print(f"User already exist {temp_user.to_dict()}")
+  course_enrollment_mapping.user = temp_user.user_id
+  course_enrollment_mapping.save()
+  return{
+    "user_id":temp_user.user_id,
+    "course_enrollment_mapping_id":course_enrollment_mapping.id
+  }
+
+
 @fixture
 def enroll_student_course(context):
   """Fixture to enroll studnet in course"""
@@ -200,28 +229,48 @@ def enroll_student_course(context):
   student_email_and_token = get_student_email_and_token()
   student_data = enroll_student_classroom(student_email_and_token["access_token"],
   classroom_id,student_email_and_token["email"].lower(),classroom_code)  
-  course_enrollment_mapping = CourseEnrollmentMapping()
-  course_enrollment_mapping.role = "learner"
-  course_enrollment_mapping.section = section
-  course_enrollment_mapping.status ="active"
-  temp_user = TempUser.from_dict(student_data)
-
-  temp_user.user_id = ""
-  temp_user.save()
-  temp_user.user_id = temp_user.id
-  temp_user.update()
-  course_enrollment_mapping.user = temp_user.user_id
-  course_enrollment_mapping.save()
+  courese_enrollment_mapping = create_student_enrollment_record(student_data=student_data,section=section)
   context.enroll_student_data = {
     "section_id": section.id,
-    "user_id":temp_user.id,
+    "user_id":courese_enrollment_mapping["user_id"],
     "email": student_email_and_token["email"].lower(),
     "cohort_id":section.cohort.id,
-    "access_token":student_email_and_token["access_token"]
+    "access_token":student_email_and_token["access_token"],
+    "course_enrollment_mapping_id":courese_enrollment_mapping["course_enrollment_mapping_id"]
     }
-  print("Enroll student fixture cohort id",section.cohort.id)
-  yield context.enroll_student_data
+  return context.enroll_student_data
 
+@fixture
+def import_google_form_grade(context):
+  "Fixture for import grade"
+  section = use_fixture(create_section, context)
+  coursework_body = {"title": "Test_quize11",
+      "description":"test desc",
+      "workType": "ASSIGNMENT",
+      "materials":[
+    {"link":
+      {
+        "title": "quize1 assignment",
+        "url": "https://docs.google.com/forms/d/1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM/edit"
+       }}
+      ],
+      "state":"PUBLISHED"}
+  coursework = create_coursework(section.classroom_id,coursework_body)
+  form_details = create_google_form("Test_quize")
+  file_data = get_file(form_details["formId"])
+  context.coursework_id = coursework.get("id")
+  context.coursework = coursework
+  context.section_id = section.id
+  classroom_code = section.classroom_code
+  classroom_id = section.classroom_id
+  student_email_and_token = get_gmail_student_email_and_token()
+  student_data = enroll_student_classroom(student_email_and_token["access_token"],
+  classroom_id,student_email_and_token["email"].lower(),classroom_code) 
+  context.access_token = student_email_and_token["access_token"]
+  context.student_email =student_email_and_token["email"].lower() 
+  context.classroom_id = classroom_id 
+  courese_enrollment_mapping = create_student_enrollment_record(student_data=student_data,section=section)
+  yield context.coursework
 
 @fixture
 def create_assignment(context):
@@ -244,7 +293,6 @@ def create_assignment(context):
 @fixture
 def create_analytics_data(context):
   """Create Analytics data"""
-  print("Analytics data fixture")
   header=use_fixture(get_header,context)
   data={}
   section=use_fixture(create_section,context)
@@ -295,6 +343,52 @@ url=f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_emai
         id=data["submission"]["id"],
         updateMask="assignedGrade,draftGrade",
         body={"assignedGrade":10,"draftGrade":10}).execute()
+  section_rows=[{
+      "sectionId":section.id,
+      "courseId":section.classroom_id,
+      "classroomUrl":section.classroom_url,
+      "name":section.section,
+      "description":section.description,
+      "cohortId":section.cohort.id,
+      "courseTemplateId":section.course_template.id,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+  cohort=section.cohort
+  cohort_rows=[{
+      "cohortId":cohort.id,
+      "name":cohort.name,
+      "description":cohort.description,\
+      "startDate":cohort.start_date,\
+      "endDate":cohort.end_date,
+      "registrationStartDate":cohort.registration_start_date,
+      "registrationEndDate":cohort.registration_end_date,
+      "maxStudents":cohort.max_students,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+  course_template=section.course_template
+  course_template_rows=[{
+      "courseTemplateId":course_template.id,
+      "classroomId":course_template.classroom_id,
+        "name":course_template.name,
+        "description":course_template.description,
+        "timestamp":datetime.datetime.utcnow(),
+        "instructionalDesigner":course_template.instructional_designer
+    }]
+  insert_rows_to_bq(
+      rows=course_template_rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"]
+      )
+  insert_rows_to_bq(
+      rows=cohort_rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"]
+      )
+  insert_rows_to_bq(
+      rows=section_rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"]
+      )
   yield context.analytics_data
 
 def wait(secs):
@@ -360,7 +454,8 @@ fixture_registry = {
     "fixture.get.header": get_header,
     "fixture.create.assignment": create_assignment,
     "fixture.invite.student": invite_student,
-    "fixture.create.analytics.data":create_analytics_data
+    "fixture.create.analytics.data":create_analytics_data,
+    "fixture.import.google_form_grade":import_google_form_grade
 }
 
 def before_tag(context, tag):
@@ -381,7 +476,6 @@ def sign_up_user():
     user.save()
     user.user_id = user.id
     user.update()
-    print(f"created_user {user.user_id} ")
     req = requests.post(
         f"{API_URL_AUTHENTICATION_SERVICE}/sign-up/credentials",
         json=USER_EMAIL_PASSWORD_DICT,timeout=40)

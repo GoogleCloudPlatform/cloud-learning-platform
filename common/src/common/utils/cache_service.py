@@ -1,9 +1,15 @@
 """Utility methods for caching related operations."""
+import datetime
 import json
 import redis
 
 r = redis.Redis(host="redis-master", port=6379, db=0)
 
+def json_serial(obj):
+  """JSON serializer for objects not serializable by default json code"""
+  if isinstance(obj, (datetime.datetime, datetime.date,datetime.time)):
+    return obj.isoformat()
+  raise TypeError (f"Type {type(obj)} not serializable")
 
 def set_key(key, value, expiry_time=3600):
   """
@@ -15,7 +21,7 @@ def set_key(key, value, expiry_time=3600):
         Returns:
             True or False
     """
-  value = json.dumps(value)
+  value = json.dumps(value,default=json_serial)
   return r.set(key, value, ex=expiry_time)
 
 

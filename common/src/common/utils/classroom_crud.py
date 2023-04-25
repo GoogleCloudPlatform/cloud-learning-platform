@@ -36,7 +36,9 @@ SCOPES = [
     "https://www.googleapis.com/auth/forms.body.readonly",
     "https://www.googleapis.com/auth/classroom.profile.photos",
     "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
+    "https://www.googleapis.com/auth/forms.body",
+    "https://www.googleapis.com/auth/drive.file"
 ]
 
 
@@ -222,7 +224,6 @@ def get_topics(course_id):
     logger.error(error)
     return None
 
-
 def create_topics(course_id, topics):
   """create topic in course
 
@@ -245,7 +246,6 @@ def create_topics(course_id, topics):
   Logger.info(f"Topics created for course_id{course_id}")
   return topic_id_map
 
-
 def get_coursework(course_id):
   """Get  list of coursework from classroom
 
@@ -265,6 +265,55 @@ def get_coursework(course_id):
     logger.error(error)
     return None
 
+def list_coursework_submissions_user(course_id,coursework_id,user_id):
+  """Get  list of coursework from classroom
+
+  Args: course_id: classroom course_id
+  coursework_id: coursework_id of claaassroom coursework
+  user_id : email or the numeric identifier for the user or me
+  Returns:
+    returns list of coursework of given course in classroom
+    """ ""
+
+  service = build("classroom", "v1", credentials=get_credentials())
+  submissions = []
+  page_token = None
+  while True:
+    coursework = service.courses().courseWork()
+    response = coursework.studentSubmissions().list(
+        pageToken=page_token,
+        courseId=course_id,
+        courseWorkId=coursework_id,
+        userId=user_id).execute()
+    submissions.extend(response.get("studentSubmissions", []))
+    page_token = response.get("nextPageToken", None)
+    if not page_token:
+      break
+  return submissions
+
+
+def patch_student_submission(course_id,coursework_id,
+                             student_submission_id,
+                             assigned_grade,
+                             draft_grade):
+  """Get  list of coursework from classroom
+
+  Args: course_id
+  Returns:
+    returns list of coursework of given course in classroom
+    """ ""
+
+  service = build("classroom", "v1",credentials=get_credentials())
+  student_submission={"assignedGrade": assigned_grade,
+                  "draftGrade": draft_grade}
+  patch_result=service.courses().courseWork().studentSubmissions().patch(
+    courseId=course_id,
+    courseWorkId=coursework_id,
+    id=student_submission_id,
+    updateMask="assignedGrade,draftGrade",
+    body=student_submission).execute()
+  return patch_result
+
 def get_coursework_material(course_id):
   """Get  list of coursework from classroom
 
@@ -283,8 +332,6 @@ def get_coursework_material(course_id):
   except HttpError as error:
     logger.error(error)
     return None
-
-
 
 def create_coursework(course_id, coursework_list):
   """create coursework in a classroom course
@@ -319,8 +366,6 @@ def create_coursework_material(course_id, coursework_material_list):
                                               body=coursework_item).execute()
   Logger.info("Create coursework Material worked")
   return "success"
-
-
 
 def delete_course_by_id(course_id):
   """Delete a course from classroom
@@ -401,7 +446,6 @@ def add_teacher(course_id, teacher_email):
   course = service.courses().teachers().create(courseId=course_id,
                                                body=teacher).execute()
   return course
-
 
 def delete_teacher(course_id, teacher_email):
   """delete teacher in a classroom
@@ -525,36 +569,82 @@ f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
   else :
     return searched_student[0]
 
-def get_edit_url_and_view_url_mapping_of_form():
+# def get_edit_url_and_view_url_mapping_of_form():
+#   """  Query google drive api and get all the forms a user owns
+#       return a dictionary of view link as keys and edit link as values
+#   """
+#   service = build("drive", "v3", credentials=get_credentials())
+#   page_token = None
+#   while True:
+#     response = service.files().list(
+#         q="mimeType=\"application/vnd.google-apps.form\"",
+#         spaces="drive",
+#         fields="nextPageToken, "
+#         "files(id, name,webViewLink,thumbnailLink)",
+#         pageToken=page_token).execute()
+#     view_link_and_edit_link_matching = {}
+#     for file in response.get("files", []):
+#       result = get_view_link_from_id(file.get("id"))
+#       view_link_and_edit_link_matching[result["responderUri"]] = \
+#       {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
+#     if page_token is None:
+#       break
+#   return view_link_and_edit_link_matching
+
+def get_edit_url_and_view_url_mapping_of_form(folder_id):
   """  Query google drive api and get all the forms a user owns
       return a dictionary of view link as keys and edit link as values
   """
-  service = build("drive", "v3", credentials=get_credentials())
-  page_token = None
-  while True:
-    response = service.files().list(
-        q="mimeType=\"application/vnd.google-apps.form\"",
-        spaces="drive",
-        fields="nextPageToken, "
-        "files(id, name,webViewLink,thumbnailLink)",
-        pageToken=page_token).execute()
-    view_link_and_edit_link_matching = {}
-    for file in response.get("files", []):
-      result = get_view_link_from_id(file.get("id"))
-      # view_link_and_edit_link_matching[result["responderUri"]] = \
-      #   file.get("webViewLink")
-      view_link_and_edit_link_matching[result["responderUri"]] = \
-      {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
-    if page_token is None:
-      break
+  forms = list_folders_children(folder_id,
+            "mimeType=\"application/vnd.google-apps.form\"")
+  view_link_and_edit_link_matching = {}
+  for form in forms:
+    result = get_view_link_from_id(form.get("id"))
+    # Call get file api to get
+    file = get_file(form.get("id"))
+    view_link_and_edit_link_matching[result["responderUri"]] = \
+    {"webViewLink":file.get("webViewLink"),"file_id":form.get("id")}
   return view_link_and_edit_link_matching
 
+def list_folders_children(folder_id,search_query=""):
+  """
+  List the files or childrens of given folder_id 
+  filters according to search query if given else gets all the 
+  childrens of folder
+  """
+  service = build("drive", "v2", credentials=get_credentials())
+  page_token = None
+  while True:
+    param = {}
+    if page_token:
+      param["pageToken"] = page_token
+    children = service.children().list(
+          folderId=folder_id,q=search_query, **param).execute()
+    page_token = children.get("nextPageToken")
+    if not page_token:
+      break
+  return children.get("items", [])
+
+
+def get_file(file_id):
+  service = build("drive", "v3", credentials=get_credentials())
+  response = service.files().get(fileId=file_id,fields="*").execute()
+  return response
 
 def get_view_link_from_id(form_id):
   "Query google forms api  using form id and get view url of  google form"
 
   service = build("forms", "v1", credentials=get_credentials())
   result = service.forms().get(formId=form_id).execute()
+  return result
+
+def retrive_all_form_responses(form_id):
+  "Query google forms api  using form id and get view url of  google form"
+  discovery_doc = "https://forms.googleapis.com/$discovery/rest?version=v1"
+  service = build("forms", "v1", credentials=get_credentials(),
+              discoveryServiceUrl=discovery_doc,
+              static_discovery=False)
+  result = service.forms().responses().list(formId=form_id).execute()
   return result
 
 def invite_user(course_id, email,role):
@@ -599,8 +689,6 @@ def get_invite(invitation_id):
   service = build("classroom", "v1", credentials=get_credentials())
   invitation = service.invitations().get(id=invitation_id).execute()
   return invitation
-
-
 
 def enable_notifications(course_id, feed_type):
   """_summary_
@@ -849,5 +937,3 @@ def post_grade_of_the_user(section_id: str,
         data=None) from ae
   except Exception as e:
     raise InternalServerError(str(e)) from e
-
-

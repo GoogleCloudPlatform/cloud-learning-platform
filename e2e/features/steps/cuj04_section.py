@@ -4,7 +4,8 @@ import requests
 from testing_objects.test_config import API_URL
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA 
 from testing_objects.user import TEST_USER
-from e2e.gke_api_tests.secrets_helper import get_student_email_and_token,get_workspace_student_email_and_token
+from e2e.gke_api_tests.secrets_helper import get_student_email_and_token,\
+  get_workspace_student_email_and_token,create_coursework_submission,list_coursework_submission_user
 from environment import create_course
 
 # -------------------------------Enroll student to cohort-------------------------------------
@@ -280,3 +281,113 @@ def step_impl_38(context):
 def step_impl_39(context):
   assert context.status == 200, "Status 200"
 
+# -----------------------------------Import grade coursework- Positive-------------------------------
+
+@behave.given(
+    "A teacher has access to portal and wants to  update grades of student for a coursework with form quize of a section"
+)
+def step_impl_40(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/coursework/{context.coursework_id}'
+  print("CONTEXT URL for import grade",context.url)
+
+@behave.when(
+    "API request is sent which has valid section_id and coursework_id"
+)
+def step_impl_41(context):
+  resp = requests.patch(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("Response of Import grade api not turn in ",context.response)
+
+@behave.then(
+    "Student grades are not updated in classroom"
+)
+def step_impl_42(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["data"]["count"] == 0, "count not matching of update"
+
+
+@behave.given(
+    "A teacher wants to update grades of student for a coursework with for turnIn  assignment with google form"
+)
+def step_impl_43(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/coursework/{context.coursework_id}'
+  print("CONTEXT URL for import grade",context.url)
+
+@behave.when(
+    "API request is sent which has valid input"
+)
+def step_impl_44(context):
+  submission =list_coursework_submission_user(context.access_token,
+                                              context.classroom_id,
+                                              context.coursework["id"],"me")
+  print("get Coursework submission of user",context.student_email,
+        context.access_token,submission)
+
+  create_coursework_submission(context.access_token,context.classroom_id,
+                               context.coursework["id"],submission[0]["id"])
+  resp = requests.patch(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+  print("Response of Import grade api turn in",context.response)
+
+@behave.then(
+    "Student grades are  updated in classroom ans student_email is present in api response"
+)
+def step_impl_45(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["data"]["count"] == 1, "count  match update"
+  assert context.student_email in context.response["data"]["student_grades"].keys()
+
+# -------------------------------update classroom code of a section-------------------------------------
+# ----Positive Scenario-----
+
+@behave.given(
+    "A user has access privileges and wants to update classroom code for a section"
+)
+def step_impl_46(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/update_classroom_code'
+
+@behave.when(
+    "API request is sent to update classroom code for a section using valid section id"
+)
+def step_impl_47(context):
+  resp = requests.patch(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Code will be updated using unique section id and a response model object will be return"
+)
+def step_impl_48(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "Check success"
+
+# -----Negative Scenario-----
+
+@behave.given(
+    "A user has access to portal and needs to update classroom code for a section"
+)
+def step_impl_49(context):
+  context.url = f'{API_URL}/sections/fake_section_id/update_classroom_code'
+
+@behave.when(
+    "API request is sent to update classroom code for a section using invalid section id"
+)
+def step_impl_50(context):
+  resp = requests.patch(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Code will not be updated and API will throw a resource not found error"
+)
+def step_impl_51(context):
+  assert context.status == 404, "Status 404"
+  assert context.response["success"] is False, "Check success"

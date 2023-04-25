@@ -58,4 +58,10 @@ export class HomeService {
   inviteInSection(section_id: string,student_email:string) {
     return this.http.post(`${environment.apiurl}sections/${section_id}/invite/${student_email}`,null)
   }
+  getCourseworkDetails(sectionId:string){
+    return this.http.get(`${environment.apiurl}sections/${sectionId}/get_coursework_list`)
+  }
+  gradeImport(sectionId: any, courseworkId: any) {
+    return this.http.patch(`${environment.apiurl}sections/${sectionId}/coursework/${courseworkId}`, null)
+  }
 }
