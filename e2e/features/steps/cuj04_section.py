@@ -306,7 +306,7 @@ def step_impl_41(context):
     "Student grades are not updated in classroom"
 )
 def step_impl_42(context):
-  
+  time.sleep(6)
   assert context.status == 202, "Status 202"
   assert context.response["data"]["count"] == 0, "count not matching of update"
   result = list_coursework_submission_user(context.access_token,
@@ -346,7 +346,7 @@ def step_impl_44(context):
 )
 def step_impl_45(context):
   time.sleep(6)
-  print("Insert back to origin folderr 1JZuikDnHvta7jJwnHSjWw5IcS7EK0QTG")
+  # "Insert back to origin folderr 1JZuikDnHvta7jJwnHSjWw5IcS7EK0QTG"
   insert_file_into_folder("1JZuikDnHvta7jJwnHSjWw5IcS7EK0QTG","1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM")
   print("After inser to origin folder")
   assert context.status == 202, "Status 202"
@@ -354,7 +354,6 @@ def step_impl_45(context):
   result = list_coursework_submission_user(context.access_token,
                                   context.classroom_id,
                                   context.coursework["id"],"me")
-  print("This is result after Turn in list coursework submission",result)
   assert "assignedGrade" in result[0].keys()
 # -------------------------------update classroom code of a section-------------------------------------
 # ----Positive Scenario-----

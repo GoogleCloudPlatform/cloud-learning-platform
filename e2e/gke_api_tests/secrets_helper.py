@@ -242,4 +242,3 @@ CLASSROOM_KEY, scopes=SCOPES)
   new_child = {'id': file_id}
   result= service.children().insert(
         folderId=folder_id, body=new_child).execute()
-  print("MOved to another folder success",result)
