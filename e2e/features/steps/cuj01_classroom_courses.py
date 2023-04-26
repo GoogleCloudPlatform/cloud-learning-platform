@@ -131,7 +131,7 @@ def step_impl_12(context):
 )
 def step_impl_13(context):
   context.course = create_course(
-      COURSE_TEMPLATE_INPUT_DATA["name"], "testing_section",
+      COURSE_TEMPLATE_INPUT_DATA["name"], "retrieve section",
       COURSE_TEMPLATE_INPUT_DATA["description"])
   context.url = f'{API_URL}/classroom_courses/{context.course["id"]}'
 
