@@ -15,7 +15,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: E2E API Tests on GKE Microservices
+name: E2E API Tests on GKE Microservices on approval
 on:
   pull_request_review:
     types: [submitted]
@@ -45,11 +45,12 @@ env:
   CLOUD_LOGGING_ENABLED: False
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+  USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: True
 # cookiecutter:raw 
 jobs:
   deploy:
     if: github.event.review.state == 'approved'
-    name: Deploy all microservices in PR namespace
+    name: Deploy all microservices in PR namespace on approval
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository
