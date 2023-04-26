@@ -26,7 +26,7 @@ on:
       - 'common/**'
       - 'e2e/**'
       - 'utils/**'
-      - '.github/workflows/e2e_gke_api_test.yaml'
+      - '.github/workflows/e2e_gke_api_test_approve.yaml'
       - 'skaffold.yaml'
   workflow_dispatch:
 env:
