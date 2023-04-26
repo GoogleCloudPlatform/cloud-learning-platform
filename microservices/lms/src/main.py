@@ -84,7 +84,6 @@ api = FastAPI(title="LMS Service APIs",
               dependencies=[Depends(validate_user)]
               )
 
-
 # api.include_router(user.router)
 api.include_router(section.router)
 api.include_router(student.router)
