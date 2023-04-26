@@ -259,13 +259,16 @@ def update_grades(all_form_responses,section,coursework_id):
   Logger.info(f"Student grade update background tasks started\
               for coursework_id {coursework_id}")
   for response in all_form_responses["responses"]:
-    print("This is respondent email",response["respondentEmail"])
+    respondent_email = response["respondentEmail"]
+    Logger.info(f"This is respondent email {respondent_email}")
     submissions=classroom_crud.list_coursework_submissions_user(
                                           section.classroom_id,
                                           coursework_id,
                                   response["respondentEmail"])
+    Logger.info(f"Got submissions list for coursework {submissions}")
     if submissions !=[]:
       if submissions[0]["state"] == "TURNED_IN":
+        Logger.info(f"Updating grades for {respondent_email}")
         count+=1
         student_grades[
         response["respondentEmail"]]=response["totalScore"]
@@ -273,6 +276,7 @@ def update_grades(all_form_responses,section,coursework_id):
                                 coursework_id,submissions[0]["id"],
                                       response["totalScore"],
                                       response["totalScore"])
+      Logger.info(f"SUbmission state is not turn in {respondent_email}")
   Logger.info(f"Student grades updated\
                for number{count} student_data {student_grades}")
   return count,student_grades
