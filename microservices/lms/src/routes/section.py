@@ -550,7 +550,7 @@ def import_grade(section_id: str,coursework_id:str,
           # Get all responses for the form if no responses of
           # the form then return
           all_responses_of_form = classroom_crud.\
-          retrive_all_form_responses(form_id)
+          retrieve_all_form_responses(form_id)
           if all_responses_of_form =={}:
             raise ResourceNotFoundException(
               "Responses not available for google form")

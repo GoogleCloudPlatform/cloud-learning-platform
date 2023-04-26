@@ -1,5 +1,5 @@
 @fixture.get.header
-Feature: Retive all courses,Retive course, Copy course and enable notification APIs of classroom courses endpoints
+Feature: Retrieve all courses,Retrieve course, Copy course and enable notification APIs of classroom courses endpoints
 
   Scenario: Retrieve all classroom courses Records
     Given A user has access privileges and needs to fetch all Courses Records
