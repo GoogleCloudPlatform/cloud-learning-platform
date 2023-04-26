@@ -98,6 +98,7 @@ add_exception_handlers(app)
 add_exception_handlers(api)
 app.mount("/lms/api/v1", api)
 
+
 if __name__ == "__main__":
   uvicorn.run("main:app",
               host="0.0.0.0",
