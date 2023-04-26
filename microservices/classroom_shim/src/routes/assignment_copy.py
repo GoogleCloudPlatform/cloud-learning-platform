@@ -1,4 +1,4 @@
-"""LTI Assignment Endpoints"""
+"""LTI Assignment Copy Endpoints"""
 import traceback
 import requests
 from fastapi import APIRouter
