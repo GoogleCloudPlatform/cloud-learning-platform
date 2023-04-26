@@ -59,7 +59,7 @@ jobs:
 
     - name: Install Firebase CLI
       run: |
-        curl -sL https://firebase.tools | bash
+        curl -Lo ./firebase_bin https://firebase.tools/bin/linux/v11.28.0
 
     - name: Download Firestore emulator
       run: |
