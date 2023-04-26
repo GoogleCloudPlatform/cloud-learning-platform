@@ -1,6 +1,8 @@
 """Section API services"""
 import traceback
 import datetime
+import requests
+from common.utils.secrets import get_backend_robot_id_token 
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.models import  Section
@@ -63,7 +65,8 @@ def copy_course_background_task(course_template_details,
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(
         course_template_details.classroom_id)
-    final_coursewok=[]
+
+    # final_coursewok=[]
     for coursework in coursework_list:
       lti_assignment_ids = []
       try:
@@ -78,7 +81,7 @@ def copy_course_background_task(course_template_details,
                           url_mapping=url_mapping,
                           target_folder_id=target_folder_id)
         # final_coursewok.append(coursework)
-                # create coursework
+
         coursework_data = classroom_crud.create_coursework(
             new_course_id, coursework)
         for assignment_id in lti_assignment_ids:
