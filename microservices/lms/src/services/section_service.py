@@ -2,13 +2,13 @@
 import traceback
 import datetime
 import requests
-from common.utils.secrets import get_backend_robot_id_token 
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.models import  Section
 from common.utils.http_exceptions import (
                      InternalServerError,ResourceNotFound)
 from common.utils.bq_helper import insert_rows_to_bq
+from common.utils.secrets import get_backend_robot_id_token 
 from services import common_service
 from config import BQ_TABLE_DICT,BQ_DATASET
 
