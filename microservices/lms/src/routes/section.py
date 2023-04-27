@@ -179,6 +179,8 @@ def get_teachers_list(section_id: str, request: Request):
                               message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
     raise InternalServerError(str(e)) from e
 
 
@@ -223,6 +225,8 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
                               message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
     raise InternalServerError(str(e)) from e
 
 
