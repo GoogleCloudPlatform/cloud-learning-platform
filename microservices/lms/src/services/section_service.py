@@ -263,6 +263,8 @@ def update_grades(all_form_responses,section,coursework_id):
     for response in all_form_responses["responses"]:
       respondent_email = response["respondentEmail"]
       Logger.info(f"This is respondent email {respondent_email}")
+      # To do add total_Score key not present then make it zero and if student is dropped from 
+      # course add try except in list coursework submissions
       submissions=classroom_crud.list_coursework_submissions_user(
                                             section.classroom_id,
                                             coursework_id,
