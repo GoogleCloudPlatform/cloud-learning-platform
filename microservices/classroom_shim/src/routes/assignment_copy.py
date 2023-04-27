@@ -10,8 +10,8 @@ from common.utils.secrets import get_backend_robot_id_token
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
-from schemas.lti_assignment_schema import InputLTIAssignmentModel
-from routes.lti_assignment import get_lti_assignment, create_lti_assignment
+# from schemas.lti_assignment_schema import InputLTIAssignmentModel
+# from routes.lti_assignment import get_lti_assignment, create_lti_assignment
 # pylint: disable=line-too-long
 
 router = APIRouter(
@@ -80,16 +80,31 @@ def copy_lti_assignment(data: dict):
     prev_context_ids = lti_assignment_data["prev_context_ids"]
     prev_content_item_ids = lti_assignment_data["prev_content_item_ids"]
 
+    if prev_context_ids:
+      prev_context_ids.insert(0, data.get("context_id"))
+    else:
+      prev_context_ids = [data.get("context_id")]
+
+    if prev_content_item_ids:
+      prev_content_item_ids.insert(0, content_item_id)
+    else:
+      prev_context_ids = [content_item_id]
+
     new_lti_assignment_data = {
         **lti_assignment_data, "context_id": data.get("context_id"),
         "context_type": "section",
         "lti_content_item_id": copy_content_item_data.get("id"),
-        "prev_content_item_ids": 
-        "prev_context_ids": 
+        "prev_content_item_ids": prev_content_item_ids,
+        "prev_context_ids": prev_context_ids,
         "course_work_id": None
     }
-    new_lti_assignment_item = create_lti_assignment(
-        InputLTIAssignmentModel.parse_obj(new_lti_assignment_data))
+
+    new_lti_assignment = LTIAssignment.from_dict(new_lti_assignment_data)
+    new_lti_assignment.save()
+    new_lti_assignment_item = new_lti_assignment.to_dict()
+
+    # new_lti_assignment_item = create_lti_assignment(
+    #     InputLTIAssignmentModel.parse_obj(new_lti_assignment_data))
     return new_lti_assignment_item
 
   except ResourceNotFoundException as e:

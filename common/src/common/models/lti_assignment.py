@@ -30,15 +30,15 @@ def check_context_type(field_val):
 class LTIAssignment(BaseModel):
   """LTI Assignment Data Model"""
   id = IDField()
-  context_id = TextField(required=True)
+  lti_assignment_title = TextField()
   context_type = TextField(
       required=True, default="section", validator=check_context_type)
-  lti_assignment_title = TextField()
+  context_id = TextField(required=True)
+  prev_context_ids = ListField(default=[])
   lti_content_item_id = TextField()
-  prev_content_item_ids = ListField()
+  prev_content_item_ids = ListField(default=[])
   tool_id = TextField()
   course_work_id = TextField()
-  prev_context_ids = ListField()
   max_points = NumberField()
   start_date = DateTime()
   end_date = DateTime()
