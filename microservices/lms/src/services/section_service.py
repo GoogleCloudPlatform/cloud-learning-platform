@@ -255,29 +255,34 @@ def update_grades(all_form_responses,section,coursework_id):
   updates the grades of student who have responsed to form and
   submitted the coursework
   """
-  student_grades = {}
-  count =0
-  Logger.info(f"Student grade update background tasks started\
-              for coursework_id {coursework_id}")
-  for response in all_form_responses["responses"]:
-    respondent_email = response["respondentEmail"]
-    Logger.info(f"This is respondent email {respondent_email}")
-    submissions=classroom_crud.list_coursework_submissions_user(
-                                          section.classroom_id,
-                                          coursework_id,
-                                  response["respondentEmail"])
-    Logger.info(f"Got submissions list for coursework {submissions}")
-    if submissions !=[]:
-      if submissions[0]["state"] == "TURNED_IN":
-        Logger.info(f"Updating grades for {respondent_email}")
-        count+=1
-        student_grades[
-        response["respondentEmail"]]=response["totalScore"]
-        classroom_crud.patch_student_submission(section.classroom_id,
-                                coursework_id,submissions[0]["id"],
-                                      response["totalScore"],
-                                      response["totalScore"])
-      Logger.info(f"SUbmission state is not turn in {respondent_email}")
-  Logger.info(f"Student grades updated\
-               for number{count} student_data {student_grades}")
-  return count,student_grades
+  try:
+    student_grades = {}
+    count =0
+    Logger.info(f"Student grade update background tasks started\
+                for coursework_id {coursework_id}")
+    for response in all_form_responses["responses"]:
+      respondent_email = response["respondentEmail"]
+      Logger.info(f"This is respondent email {respondent_email}")
+      submissions=classroom_crud.list_coursework_submissions_user(
+                                            section.classroom_id,
+                                            coursework_id,
+                                    response["respondentEmail"])
+      Logger.info(f"Got submissions list for coursework {submissions}")
+      if submissions !=[]:
+        if submissions[0]["state"] == "TURNED_IN":
+          Logger.info(f"Updating grades for {respondent_email}")
+          count+=1
+          student_grades[
+          response["respondentEmail"]]=response["totalScore"]
+          classroom_crud.patch_student_submission(section.classroom_id,
+                                  coursework_id,submissions[0]["id"],
+                                        response["totalScore"],
+                                        response["totalScore"])
+        Logger.info(f"SUbmission state is not turn in {respondent_email}")
+    Logger.info(f"Student grades updated\
+                for number{count} student_data {student_grades}")
+    return count,student_grades
+except Exception as e:
+  error = traceback.format_exc().replace("\n", " ")
+  Logger.error(error)
+  Logger.error(e)
