@@ -273,7 +273,8 @@ def update_grades(all_form_responses,section,coursework_id):
           Logger.info(f"Updating grades for {respondent_email}")
           total_score = response["totalScore"]
           submission_id = submissions[0]["id"]
-          Logger.info(f"{section.classroom_id} { coursework_id} {total_score} {submission_id}")
+          Logger.info(f"{section.classroom_id} { coursework_id} {total_score}\
+                      {submission_id}")
           classroom_crud.patch_student_submission(section.classroom_id,
                                   coursework_id,submissions[0]["id"],
                                         response["totalScore"],
