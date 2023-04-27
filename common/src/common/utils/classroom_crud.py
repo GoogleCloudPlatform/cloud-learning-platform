@@ -288,7 +288,7 @@ def list_coursework_submissions_user(course_id,coursework_id,user_id):
     page_token = response.get("nextPageToken", None)
     if not page_token:
       break
-  Logger.info(f"List submission done {submissions}")
+  # Logger.info(f"List submission done {submissions}")
   return submissions
 
 
