@@ -3,6 +3,7 @@ Pydantic Model for LTI Assignment API's
 """
 import datetime
 from typing import Optional, List
+from typing_extensions import Literal
 from pydantic import BaseModel
 from schemas.schema_examples import (LTI_ASSIGNMENT_EXAMPLE,
                                      INSERT_LTI_ASSIGNMENT_EXAMPLE,
@@ -16,7 +17,8 @@ class LTIAssignmentModel(BaseModel):
       BaseModel (_type_): _description_
   """
   id: str
-  section_id: str
+  context_id: str
+  context_type: Literal["section", "course_template"] = "section"
   lti_assignment_title: Optional[str]
   lti_content_item_id: Optional[str]
   tool_id: Optional[str]
@@ -38,7 +40,8 @@ class UpdateLTIAssignmentModel(BaseModel):
   Args:
       BaseModel (_type_): _description_
   """
-  section_id: Optional[str]
+  context_id: Optional[str]
+  context_type: Literal["section", "course_template"] = "section"
   lti_assignment_title: Optional[str]
   lti_content_item_id: Optional[str]
   tool_id: Optional[str]
@@ -110,7 +113,8 @@ class InputLTIAssignmentModel(BaseModel):
   Args:
       BaseModel (_type_): _description_
   """
-  section_id: str
+  context_id: str
+  context_type: Literal["section", "course_template"]
   lti_content_item_id: Optional[str]
   lti_assignment_title: Optional[str]
   tool_id: Optional[str]
