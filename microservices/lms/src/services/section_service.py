@@ -271,18 +271,22 @@ def update_grades(all_form_responses,section,coursework_id):
       if submissions !=[]:
         if submissions[0]["state"] == "TURNED_IN":
           Logger.info(f"Updating grades for {respondent_email}")
-          count+=1
-          student_grades[
-          response["respondentEmail"]]=response["totalScore"]
+          total_score = response["totalScore"]
+          submission_id = submissions[0]["id"]
+          Logger.info(f"{section.classroom_id} { coursework_id} {total_score} {submission_id}")
           classroom_crud.patch_student_submission(section.classroom_id,
                                   coursework_id,submissions[0]["id"],
                                         response["totalScore"],
                                         response["totalScore"])
-        Logger.info(f"SUbmission state is not turn in {respondent_email}")
+          count+=1
+          student_grades[
+          response["respondentEmail"]]=response["totalScore"]
+        else :
+          Logger.info(f"SUbmission state is not turn in {respondent_email}")
     Logger.info(f"Student grades updated\
                 for number{count} student_data {student_grades}")
     return count,student_grades
-except Exception as e:
-  error = traceback.format_exc().replace("\n", " ")
-  Logger.error(error)
-  Logger.error(e)
+  except Exception as e:
+    error = traceback.format_exc().replace("\n", " ")
+    Logger.error(error)
+    Logger.error(e)
