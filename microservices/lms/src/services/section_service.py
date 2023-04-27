@@ -61,7 +61,7 @@ def copy_course_background_task(course_template_details,
     #  links/  and file_id as values for all drive files
     url_mapping = classroom_crud.\
             get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
-    new_course_id = new_course["id"]
+
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework(
         course_template_details.classroom_id)
@@ -76,32 +76,39 @@ def copy_course_background_task(course_template_details,
           coursework["topicId"] = topic_id_map[coursework["topicId"]]
         #Check if a material is present in coursework
         if "materials" in coursework.keys():
-          coursework["materials"]= update_coursework_material(
+          coursework_update_output = update_coursework_material(
                           materials=coursework["materials"],
                           url_mapping=url_mapping,
                           target_folder_id=target_folder_id)
+          coursework["materials"]= coursework_update_output["materials"] 
+          lti_assignment_ids.extend(coursework_update_output["lti_assignment_ids"])
         # final_coursewok.append(coursework)
 
         coursework_data = classroom_crud.create_coursework(
-            new_course_id, coursework)
+            new_course["id"], coursework)
         for assignment_id in lti_assignment_ids:
           coursework_id = coursework_data.get("id")
-          # get lti assignment
-          lti_assignment = requests.get(
-              f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
-              headers={
-                  "Authorization": f"Bearer {get_backend_robot_id_token()}"
-              },
-              timeout=60)
-          lti_assignment["data"]["coursework_id"] = coursework_id
+          # # get lti assignment
+          # lti_assignment = requests.get(
+          #     f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
+          #     headers={
+          #         "Authorization": f"Bearer {get_backend_robot_id_token()}"
+          #     },
+          #     timeout=60)
+          # lti_assignment["data"]["coursework_id"] = coursework_id
+
+          input_json = {"course_work_id":coursework_id}
           # update assignment with new coursework id
-          lti_assignment = requests.patch(
+          lti_assignment_req = requests.patch(
               f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
               headers={
                   "Authorization": f"Bearer {get_backend_robot_id_token()}"
               },
-              json=lti_assignment["data"],
+              json=input_json,
               timeout=60)
+
+          if lti_assignment_req.status_code != 200:
+            Logger.error(f"Failed to update assignment {assignment_id} with course work id {coursework_id}")
 
       except Exception as error:
         title = coursework["title"]
@@ -220,7 +227,7 @@ def copy_course_background_task(course_template_details,
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-def update_coursework_material(materials,url_mapping,target_folder_id,coursework_type=None,new_course_id=None,section_id=None):
+def update_coursework_material(materials,url_mapping,target_folder_id,coursework_type=None,section_id=None):
   """Takes the material attached to any type of cursework and copy it in the
     target folder Id also removes duplicates from material list
   Args:
@@ -235,6 +242,7 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
   youtube_ids = []
   link_urls =[]
   updated_material =[]
+  lti_assignment_ids = []
   # Loop to check the different types of material attached to coursework
   # 1.If a material is driveFile call called copy_material function which
   #  copies is drivefile in target_folder_id and updates the driveFile
@@ -276,16 +284,21 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
                 },
                 json={
                     "lti_assignment_id": lti_assignment_id,
-                    "context_id": new_course_id,
-                    "section_id": section_id
+                    "context_id": section_id
                 },
                 timeout=60)
 
-            updated_material_link_url = link["url"].replace(
-                lti_assignment_id,
-                copy_assignment.json().get("data").get("id"))
+            if copy_assignment.status_code == 200:
+              new_lti_assignment_id = copy_assignment.json().get("data").get("id")
+              updated_material_link_url = link["url"].replace(
+                  lti_assignment_id, new_lti_assignment_id)
+              lti_assignment_ids.append(new_lti_assignment_id)
 
-            updated_material.append({"link": {"url": updated_material_link_url}})
+              updated_material.append({"link": {"url": updated_material_link_url}})
+            else:
+              Logger.error(f"Copying an LTI Assignment failed for {lti_assignment_id}\
+                           in the new section {section_id} with status code: \
+                           {copy_assignment.status_code} and error msg: {copy_assignment.text}")
           else:
             updated_material.append({"link": material["link"]})
 
@@ -306,7 +319,10 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
       }
       updated_material.append({"link":material["link"]})
       material.pop("form")
-  return updated_material
+  return {
+    "material": updated_material,
+    "lti_assignment_ids": lti_assignment_ids
+  }
 
 
 def update_grades(all_form_responses,section,coursework_id):
