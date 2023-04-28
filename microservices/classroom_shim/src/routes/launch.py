@@ -123,6 +123,14 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
     if timezone:
       custom_params["$Person.address.timezone"] = timezone
 
+    if lti_assignment.prev_context_ids:
+      context_id_history = ",".join(lti_assignment.prev_context_ids)
+      custom_params["$Context.id.history"] = context_id_history
+
+    if lti_assignment.prev_content_item_ids:
+      resource_link_id_history = ",".join(lti_assignment.prev_content_item_ids)
+      custom_params["$ResourceLink.id.history"] = resource_link_id_history
+
     url = f"{API_DOMAIN}/classroom-shim/api/v1/launch-assignment?lti_assignment_id={lti_assignment_id}"
     custom_params["$ResourceLink.RelaunchURL"] = url
 

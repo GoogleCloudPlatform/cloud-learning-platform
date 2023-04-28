@@ -133,7 +133,8 @@ def get_resource_launch_init(lti_content_item_id: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def content_selection_launch_init(tool_id: str, user_id: str, context_id: str):
+def content_selection_launch_init(tool_id: str, user_id: str, context_id: str,
+                                  context_type: str):
   """The content selection launch init endpoint is used to initiate
   the process to choose the content from the selected external tool
   and then redirect the request to the tool login url.
@@ -167,7 +168,8 @@ def content_selection_launch_init(tool_id: str, user_id: str, context_id: str):
 
       lti_message_hint_dict = {
           "lti_request_type": "deep_link",
-          "context_id": context_id
+          "context_id": context_id,
+          "context_type": context_type
       }
 
       lti_message_hint = encode_token(lti_message_hint_dict)

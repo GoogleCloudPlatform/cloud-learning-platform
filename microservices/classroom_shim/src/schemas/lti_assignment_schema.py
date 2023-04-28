@@ -161,3 +161,16 @@ class DeleteLTIAssignmentResponseModel(BaseModel):
             "data": None
         }
     }
+
+
+class InputCopyLTIAssignmentModel(BaseModel):
+  """Pydantic Input LTI Assignment Model
+
+  Args:
+      BaseModel (_type_): _description_
+  """
+  lti_assignment_id: str
+  context_id: str
+
+  class Config():
+    orm_mode = True

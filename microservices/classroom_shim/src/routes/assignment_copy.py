@@ -7,6 +7,7 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError)
 from common.utils.secrets import get_backend_robot_id_token
+from schemas.lti_assignment_schema import InputCopyLTIAssignmentModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
@@ -30,7 +31,7 @@ router = APIRouter(
 
 
 @router.post("/lti-assignment/copy")
-def copy_lti_assignment(data: dict):
+def copy_lti_assignment(input_data: InputCopyLTIAssignmentModel):
   """
   Endpoint to copy LTIAssignment data model and its related child datamodel.
   data format: {
@@ -40,7 +41,9 @@ def copy_lti_assignment(data: dict):
   """
   try:
     # fetch content_item and related line_items
-    lti_assignment = LTIAssignment.find_by_id(data.get("lti_assignment_id"))
+    input_data_dict = {**input_data.dict()}
+    lti_assignment = LTIAssignment.find_by_id(
+        input_data_dict.get("lti_assignment_id"))
     lti_assignment_data = lti_assignment.to_dict()
     content_item_id = lti_assignment_data.get("lti_content_item_id")
 
@@ -58,7 +61,7 @@ def copy_lti_assignment(data: dict):
           f"Request failed with code 1300, Please contact administrator")
 
     # create a copy of above content item
-    content_item_data["context_id"] = data.get("context_id")
+    content_item_data["context_id"] = input_data_dict.get("context_id")
     del content_item_data["id"]
     del content_item_data["created_time"]
     del content_item_data["last_modified_time"]
@@ -81,31 +84,42 @@ def copy_lti_assignment(data: dict):
     prev_content_item_ids = lti_assignment_data["prev_content_item_ids"]
 
     if prev_context_ids:
-      prev_context_ids.insert(0, data.get("context_id"))
+      prev_context_ids.insert(0, input_data_dict.get("context_id"))
     else:
-      prev_context_ids = [data.get("context_id")]
+      prev_context_ids = [input_data_dict.get("context_id")]
 
     if prev_content_item_ids:
       prev_content_item_ids.insert(0, content_item_id)
     else:
-      prev_context_ids = [content_item_id]
+      prev_content_item_ids = [content_item_id]
 
     new_lti_assignment_data = {
-        **lti_assignment_data, "context_id": data.get("context_id"),
+        "lti_assignment_title": lti_assignment_data.get("lti_assignment_title"),
         "context_type": "section",
+        "context_id": input_data_dict.get("context_id"),
+        "prev_context_ids": prev_context_ids,
         "lti_content_item_id": copy_content_item_data.get("id"),
         "prev_content_item_ids": prev_content_item_ids,
-        "prev_context_ids": prev_context_ids,
-        "course_work_id": None
+        "course_work_id": None,
+        "tool_id": lti_assignment_data.get("tool_id"),
+        "max_points": lti_assignment_data.get("max_points"),
+        "start_date": lti_assignment_data.get("start_date"),
+        "end_date": lti_assignment_data.get("end_date"),
+        "due_date": lti_assignment_data.get("due_date")
     }
 
+    # Logger.info(f"new_lti_assignment_data - {new_lti_assignment_data}")
     new_lti_assignment = LTIAssignment.from_dict(new_lti_assignment_data)
     new_lti_assignment.save()
     new_lti_assignment_item = new_lti_assignment.to_dict()
 
     # new_lti_assignment_item = create_lti_assignment(
     #     InputLTIAssignmentModel.parse_obj(new_lti_assignment_data))
-    return new_lti_assignment_item
+    return {
+        "success": True,
+        "message": "Successfully copied the lti assignment",
+        "data": new_lti_assignment_item
+    }
 
   except ResourceNotFoundException as e:
     Logger.error(e)
