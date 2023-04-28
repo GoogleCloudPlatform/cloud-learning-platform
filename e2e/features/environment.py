@@ -413,15 +413,17 @@ def invite_student(context):
   course_enrollment_mapping.section = section
   course_enrollment_mapping.status ="invited"
   course_enrollment_mapping.invitation_id=invitation_dict["id"]
-  temp_user = TempUser.from_dict(TEST_USER)
+  temp_user = TempUser.find_by_email(student_data["invite_student_email"])
+  if temp_user is None:
+    temp_user = TempUser.from_dict(TEST_USER)
 
-  temp_user.user_id = ""
-  temp_user.email=student_data["invite_student_email"]
-  temp_user.gaia_id = ""
-  temp_user.photo_url = ""
-  temp_user.save()
-  temp_user.user_id = temp_user.id
-  temp_user.update()
+    temp_user.user_id = ""
+    temp_user.email=student_data["invite_student_email"]
+    temp_user.gaia_id = ""
+    temp_user.photo_url = ""
+    temp_user.save()
+    temp_user.user_id = temp_user.id
+    temp_user.update()
   course_enrollment_mapping.user = temp_user.user_id
   course_enrollment_id=course_enrollment_mapping.save().id
   context.invitation_data = {
