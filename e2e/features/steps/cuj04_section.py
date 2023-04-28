@@ -345,7 +345,7 @@ def step_impl_44(context):
     "Student grades are  updated in classroom ans student_email is present in api response"
 )
 def step_impl_45(context):
-  time.sleep(6)
+  time.sleep(15)
   insert_file_into_folder(e2e_drive_folder_id,e2e_google_form_id)
   print("After inser to origin folder")
   assert context.status == 202, "Status 202"
