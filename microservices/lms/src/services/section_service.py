@@ -270,6 +270,7 @@ def update_grades(all_form_responses,section,coursework_id):
                                     response["respondentEmail"])
       if submissions !=[]:
         if submissions[0]["state"] == "TURNED_IN":
+          Logger.info(f"Updating grades for {respondent_email}")
           if "totalScore" not in response.keys():
             response["totalScore"]=0
           classroom_crud.patch_student_submission(section.classroom_id,
@@ -279,6 +280,7 @@ def update_grades(all_form_responses,section,coursework_id):
           count+=1
           student_grades[
           response["respondentEmail"]]=response["totalScore"]
+          Logger.info(f"Updated grades for {respondent_email}")
         else :
           Logger.info(f"Submission state is not turn in {respondent_email}")
     except Exception as e:

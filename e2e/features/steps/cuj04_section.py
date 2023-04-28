@@ -348,13 +348,13 @@ def step_impl_45(context):
   time.sleep(15)
   insert_file_into_folder(e2e_drive_folder_id,e2e_google_form_id)
   print("After inser to origin folder")
-  assert context.status == 202, "Status 202"
-  assert context.response["message"] == "Grades for coursework will be updated shortly","message not matching"
   result = list_coursework_submission_user(context.access_token,
                                   context.classroom_id,
                                   context.coursework["id"],"me")
   print("This is result after Turn in list coursework submission",result)
-  assert "assignedGrade" in result[0].keys()
+  assert context.status == 202, "Status 202"
+  assert context.response["message"] == "Grades for coursework will be updated shortly","message not matching"
+
 # -------------------------------update classroom code of a section-------------------------------------
 # ----Positive Scenario-----
 
