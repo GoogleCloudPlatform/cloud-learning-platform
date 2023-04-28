@@ -93,10 +93,8 @@ def step_impl_20(context):
   context.response = resp.json()
 
 
-
 @behave.then("Invitation is sent to student via email and student invited to section with min enrolled student count")
 def step_impl_21(context):
-  print("This is invite student to cohort response code", context.status,context.response)
   assert context.status == 200, "Status 200"
   assert "invitation_id" in context.response["data"].keys()
 
@@ -120,7 +118,6 @@ def step_impl_23(context):
 
 @behave.then("Student is enrolled in given section")
 def step_impl_24(context):
-  print("Enroll student to section payload",context.status,context.response)
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 
@@ -183,7 +180,6 @@ def step_impl_32(context):
 
 @behave.then("Student will not be enrolled and API will throw a conflict error")
 def step_impl_33(context):
-  print("A student is aleardy enrolled in course and trying to enroll in same course",context.status,context.response)
   assert context.status == 409, "Status 409"
   assert context.response["success"] is False, "Checks failure"
 
