@@ -276,6 +276,7 @@ def list_coursework_submissions_user(course_id,coursework_id,user_id):
   service = build("classroom", "v1", credentials=get_credentials())
   submissions = []
   page_token = None
+  Logger.info(f"List submissions for {user_id}")
   while True:
     coursework = service.courses().courseWork()
     response = coursework.studentSubmissions().list(
@@ -287,6 +288,7 @@ def list_coursework_submissions_user(course_id,coursework_id,user_id):
     page_token = response.get("nextPageToken", None)
     if not page_token:
       break
+  Logger.info(f"List submission done {submissions}")
   return submissions
 
 
@@ -300,6 +302,7 @@ def patch_student_submission(course_id,coursework_id,
   Returns:
     returns list of coursework of given course in classroom
     """ ""
+  Logger.info(f"Patch grades started for submision_id {student_submission_id}")
   service = build("classroom", "v1",credentials=get_credentials())
   student_submission={"assignedGrade": assigned_grade,
                   "draftGrade": draft_grade}
@@ -309,6 +312,7 @@ def patch_student_submission(course_id,coursework_id,
     id=student_submission_id,
     updateMask="assignedGrade,draftGrade",
     body=student_submission).execute()
+  Logger.info(f"Patch grades done for submision_id {student_submission_id}")
   return patch_result
 
 def get_coursework_material_list(course_id):
@@ -803,7 +807,6 @@ def get_user_details_by_email(user_email, headers):
   if response_get_student.status_code == 404:
     raise \
         ResourceNotFoundException(response_get_student.json()["message"])
-  Logger.info(f"Search user by email resp {response_get_student.json()}")
   return response_get_student.json()
 
 def acceept_invite(invitation_id,email):

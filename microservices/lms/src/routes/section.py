@@ -557,8 +557,8 @@ def import_grade(section_id: str,coursework_id:str,
                                     section,coursework_id)
 
       if is_google_form_present:
-        return {
-          "message":"Grades for coursework will be updated shortly"}
+        return {"data":{"count":count,"student_grades":student_grades},
+                "message":"Grades for coursework will be updated shortly"}
       else:
         raise ResourceNotFoundException(
           f"Form is not present for coursework_id {coursework_id}"
