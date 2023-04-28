@@ -155,7 +155,7 @@ STUDENT = {
       "first_name": "steve4",
       "last_name": "jobs",
       "email": "clplmstestuser1@gmail.com",
-      "user_type": "other",
+      "user_type": "learner",
       "user_groups": [],
       "status": "active",
       "is_registered":True,

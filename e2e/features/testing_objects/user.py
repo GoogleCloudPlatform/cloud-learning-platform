@@ -22,7 +22,7 @@ TEST_USER = {
     "last_name": "lastname",
     "email": email,
     "status": "active",
-    "user_type": "other",
+    "user_type": "faculty",
     "user_groups": [],
     "is_registered": True,
     "failed_login_attempts_count": 0,
