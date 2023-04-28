@@ -249,34 +249,29 @@ def update_coursework_material(materials,url_mapping,target_folder_id):
       material.pop("form")
   return updated_material
 
-
 def update_grades(all_form_responses,section,coursework_id):
   """Takes the forms all responses ,section, and coursework_id and
   updates the grades of student who have responsed to form and
   submitted the coursework
   """
-  try:
-    student_grades = {}
-    count =0
-    Logger.info(f"Student grade update background tasks started\
-                for coursework_id {coursework_id}")
-    for response in all_form_responses["responses"]:
+  student_grades = {}
+  count =0
+  Logger.info(f"Student grade update background tasks started\
+              for coursework_id {coursework_id}")
+  for response in all_form_responses["responses"]:
+    try:
+      if "respondentEmail" not in response.keys():
+        raise Exception("Respondent Email is not collected in form for\
+        coursework {coursework_id} Update form settings to collect Email")
       respondent_email = response["respondentEmail"]
-      Logger.info(f"This is respondent email {respondent_email}")
-      # To do add total_Score key not present then make it zero and if student is dropped from 
-      # course add try except in list coursework submissions
       submissions=classroom_crud.list_coursework_submissions_user(
                                             section.classroom_id,
                                             coursework_id,
                                     response["respondentEmail"])
-      # Logger.info(f"Got submissions list for coursework {submissions}")
       if submissions !=[]:
         if submissions[0]["state"] == "TURNED_IN":
-          Logger.info(f"Updating grades for {respondent_email} {response}")
-          total_score = response["totalScore"]
-          submission_id = submissions[0]["id"]
-          Logger.info(f"{section.classroom_id} { coursework_id} {total_score}\
-                      {submission_id}")
+          if "totalScore" not in response.keys():
+            response["totalScore"]=0
           classroom_crud.patch_student_submission(section.classroom_id,
                                   coursework_id,submissions[0]["id"],
                                         response["totalScore"],
@@ -285,11 +280,12 @@ def update_grades(all_form_responses,section,coursework_id):
           student_grades[
           response["respondentEmail"]]=response["totalScore"]
         else :
-          Logger.info(f"SUbmission state is not turn in {respondent_email}")
+          Logger.info(f"Submission state is not turn in {respondent_email}")
+    except Exception as e:
+      error = traceback.format_exc().replace("\n", " ")
+      Logger.error(error)
+      Logger.error(e)
+      continue
     Logger.info(f"Student grades updated\
-                for number{count} student_data {student_grades}")
+                for {count} student_data {student_grades}")
     return count,student_grades
-  except Exception as e:
-    error = traceback.format_exc().replace("\n", " ")
-    Logger.error(error)
-    Logger.error(e)

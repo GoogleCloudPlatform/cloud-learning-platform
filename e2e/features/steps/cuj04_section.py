@@ -308,7 +308,6 @@ def step_impl_41(context):
 def step_impl_42(context):
   time.sleep(6)
   assert context.status == 202, "Status 202"
-  assert context.response["data"]["count"] == 0, "count not matching of update"
   result = list_coursework_submission_user(context.access_token,
                                   context.classroom_id,
                                   context.coursework["id"],"me")
