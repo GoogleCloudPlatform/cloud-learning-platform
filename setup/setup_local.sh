@@ -25,7 +25,7 @@ for variable in ${EnvVars[@]}; do
   fi
 done
 
-CLUSTER_NAME=study-hall-dev-365218-us-central1
+CLUSTER_NAME=core-learning-services-dev-us-central1
 EXPECTED_CONTEXT=gke_${PROJECT_ID}_${REGION}_${CLUSTER_NAME}
 
 BLUE=$(tput setaf 4)
