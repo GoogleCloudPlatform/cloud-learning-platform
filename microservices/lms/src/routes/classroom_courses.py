@@ -107,7 +107,7 @@ def copy_courses(course_details: CourseDetails):
     if topics is not None:
       topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
     # Get coursework of current course and create a new course
-    coursework_list = classroom_crud.get_coursework(course_id)
+    coursework_list = classroom_crud.get_coursework_list(course_id)
     final_coursework =[]
     for coursework in coursework_list:
       try:
@@ -155,7 +155,7 @@ def copy_courses(course_details: CourseDetails):
     if final_coursework is not None:
       classroom_crud.create_coursework(new_course["id"], final_coursework)
     # Get the list of courseworkMaterial
-    coursework_material_list = classroom_crud.get_coursework_material(
+    coursework_material_list = classroom_crud.get_coursework_material_list(
         course_id)
     final_coursework_material=[]
     for coursework_material in coursework_material_list:

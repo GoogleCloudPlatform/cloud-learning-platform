@@ -21,6 +21,7 @@ def step_impl_2(context):
 
 @behave.then("Student is marked as inactive in course enrollment mapping and removed from google classroom using user id")
 def step_impl_3(context):
+  print("Delete student in section using user id response",context.status,context.response)
   assert context.status == 200, "Status 200"
 
 

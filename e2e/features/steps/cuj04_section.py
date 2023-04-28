@@ -228,6 +228,7 @@ def step_impl_32(context):
     "List of teachers will be given with there details"
 )
 def step_impl_33(context):
+  print("LIST Teachers in secttion response",context.status, context.response)
   assert context.status == 200, "Status 200"
   assert context.response["success"] == True, "Success status doesn't match"
   assert context.response["data"][0]["user_type"] == "faculty", "User type faculty doesn't match"
@@ -281,6 +282,7 @@ def step_impl_38(context):
     "Get the details of teacher from user collection"
 )
 def step_impl_39(context):
+  print("GET TEACHER in section response",context.status,context.response)
   assert context.status == 200, "Status 200"
 
 # -----------------------------------Import grade coursework- Positive-------------------------------

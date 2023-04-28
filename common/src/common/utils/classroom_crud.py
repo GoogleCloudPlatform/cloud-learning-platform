@@ -244,7 +244,7 @@ def create_topics(course_id, topics):
   Logger.info(f"Topics created for course_id{course_id}")
   return topic_id_map
 
-def get_coursework(course_id):
+def get_coursework_list(course_id):
   """Get  list of coursework from classroom
 
   Args: course_id
@@ -311,7 +311,7 @@ def patch_student_submission(course_id,coursework_id,
     body=student_submission).execute()
   return patch_result
 
-def get_coursework_material(course_id):
+def get_coursework_material_list(course_id):
   """Get  list of coursework from classroom
 
   Args: course_id
@@ -545,7 +545,6 @@ f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
   "last_name": profile["names"][0]["familyName"],
   "email":student_email,
   "user_type": "learner",
-  "user_type_ref": "",
   "user_groups": [],
   "status": "active",
   "is_registered": True,
@@ -612,6 +611,7 @@ def get_view_link_from_id(form_id):
   service = build("forms", "v1", credentials=get_credentials())
   result = service.forms().get(formId=form_id).execute()
   return result
+
 
 def retrive_all_form_responses(form_id):
   "Query google forms api  using form id and get view url of  google form"
