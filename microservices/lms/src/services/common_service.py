@@ -17,7 +17,6 @@ def call_search_user_api(headers,email):
   response = requests.get(f"\
   {USER_MANAGEMENT_BASE_URL}/user/search/email?email={email.lower()}",\
     headers=headers)
-  Logger.info(f"Calling search user API {response.status_code}")
   return response
 
 def call_create_user_api(headers,body):
