@@ -1,12 +1,12 @@
 fireo==1.6.2
 google-cloud-logging==3.5.0
 google-cloud-secret-manager==2.16.1
-google-cloud-bigquery==3.9.0
+google-cloud-bigquery==3.10.0
 jsonschema==4.17.3
 fastapi==0.85.1
 google-crc32c==1.5.0
-google-auth==2.16.2
-google-api-python-client==2.85.0
+google-auth==2.17.3
+google-api-python-client==2.86.0
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.4.6
 oauth2client==4.1.3

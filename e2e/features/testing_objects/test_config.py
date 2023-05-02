@@ -13,3 +13,5 @@ if not auth_url:
 else:
   API_URL_AUTHENTICATION_SERVICE = f"{auth_url}/authentication/api/v1"
 
+e2e_google_form_id = "1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM"
+e2e_drive_folder_id = "1JZuikDnHvta7jJwnHSjWw5IcS7EK0QTG"
