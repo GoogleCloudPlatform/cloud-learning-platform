@@ -42,127 +42,8 @@ def copy_course_background_task(course_template_details,
                                               sections_details.description,
                                               sections_details.name, "me")
 
-    target_folder_id = new_course["teacherFolder"]["id"]
-    Logger.info(f"ID of target drive folder for section {target_folder_id}")
-    # Get topics of current course
-    topics = classroom_crud.get_topics(course_template_details.classroom_id)
-    # add new_course to pubsub topic for both course work and roaster changes
-    classroom_crud.enable_notifications(new_course["id"],
-                                        "COURSE_WORK_CHANGES")
-    classroom_crud.enable_notifications(new_course["id"],
-                                        "COURSE_ROSTER_CHANGES")
-    #If topics are present in course create topics returns a dict
-    # with keys a current topicID and new topic id as values
-    if topics is not None:
-      topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
-    # Calling function to get edit_url and view url of
-    # google form which returns
-    # a dictionary of view_links as keys and edit
-    #  links/  and file_id as values for all drive files
-    url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
+    # Create section with the required fields
 
-    # Get coursework of current course and create a new course
-    coursework_list = classroom_crud.get_coursework(
-        course_template_details.classroom_id)
-
-    # final_coursewok=[]
-    course_lti_assignment_ids = []
-    for coursework in coursework_list:
-      coursework_lti_assignment_ids = []
-      try:
-        #Check if a coursework is linked to a topic if yes then
-        # replace the old topic id to new topic id using topic_id_map
-        if "topicId" in coursework.keys():
-          coursework["topicId"] = topic_id_map[coursework["topicId"]]
-        #Check if a material is present in coursework
-        if "materials" in coursework.keys():
-          coursework_update_output = update_coursework_material(
-                          materials=coursework["materials"],
-                          url_mapping=url_mapping,
-                          target_folder_id=target_folder_id,
-                          coursework_type="coursework",
-                          section_id=new_course["id"])
-          coursework["materials"]= coursework_update_output["material"]
-          coursework_lti_assignment_ids.extend(coursework_update_output["lti_assignment_ids"])
-        # final_coursewok.append(coursework)
-
-        # Update the due date of the course work
-        # if coursework.get("dueDate"):
-        #   update_due_date = 
-        #   coursework.get("dueDate") = {}
-        coursework_data = classroom_crud.create_coursework(
-            new_course["id"], coursework)
-        for assignment_id in coursework_lti_assignment_ids:
-          coursework_id = coursework_data.get("id")
-          # # get lti assignment
-          # lti_assignment = requests.get(
-          #     f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
-          #     headers={
-          #         "Authorization": f"Bearer {get_backend_robot_id_token()}"
-          #     },
-          #     timeout=60)
-          # lti_assignment["data"]["coursework_id"] = coursework_id
-          Logger.info(f"Updated the course work id for new LTI assignment - {assignment_id}")
-          input_json = {"course_work_id":coursework_id}
-          # update assignment with new coursework id
-          lti_assignment_req = requests.patch(
-              f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
-              headers={
-                  "Authorization": f"Bearer {get_backend_robot_id_token()}"
-              },
-              json=input_json,
-              timeout=60)
-
-          if lti_assignment_req.status_code != 200:
-            Logger.error(f"Failed to update assignment {assignment_id} with course work id {coursework_id}")
-
-
-      except Exception as error:
-        title = coursework["title"]
-        Logger.error(f"Get coursework failed for \
-              course_id{course_template_details.classroom_id} for {title}")
-        error=traceback.format_exc().replace("\n", " ")
-        Logger.error(error)
-        continue
-
-      course_lti_assignment_ids.extend(coursework_lti_assignment_ids)
-    # # Create coursework in new course
-    # # return final_coursewok
-    # if final_coursewok is not None:
-    #   classroom_crud.create_coursework(new_course["id"],final_coursewok)
-    # Get the list of courseworkMaterial
-    final_coursewok_material = []
-    coursework_material_list = classroom_crud.get_coursework_material(
-      course_template_details.classroom_id)
-    for coursework_material in coursework_material_list:
-      try:
-        #Check if a coursework material is linked to a topic if yes then
-        # replace the old topic id to new topic id using topic_id_map
-        if "topicId" in coursework_material.keys():
-          coursework_material["topicId"] =topic_id_map[
-            coursework_material["topicId"]]
-        #Check if a material is present in coursework
-        if "materials" in coursework_material.keys():
-
-          coursework_material_update_output = update_coursework_material(
-          materials=coursework_material["materials"],url_mapping=url_mapping,
-          target_folder_id=target_folder_id,)
-          
-          coursework_material["materials"]= coursework_material_update_output["material"]
-          print("Updated coursework material attached")
-        final_coursewok_material.append(coursework_material)
-      except Exception as error:
-        title = coursework_material["title"]
-        Logger.error(f"Get coursework material failed for\
-        course_id{course_template_details.classroom_id} for {title}")
-        error=traceback.format_exc().replace("\n", " ")
-        Logger.error(error)
-        continue
-    # Create coursework in new course
-    if final_coursewok_material is not None:
-      classroom_crud.create_coursework_material(new_course["id"],
-        final_coursewok_material)
     # add Instructional designer
     sections_details.teachers.append(
         course_template_details.instructional_designer)
@@ -198,6 +79,7 @@ def copy_course_background_task(course_template_details,
             for {teacher_email}")
         Logger.error(error)
         continue
+
     section = Section()
     section.name =course_template_details.name
     section.section = sections_details.name
@@ -210,22 +92,168 @@ def copy_course_background_task(course_template_details,
     section.classroom_url = new_course["alternateLink"]
     section.teachers = list(set(final_teachers))
     section.enrolled_students_count=0
+    section.status="draft"
     section_id =section.save().id
     classroom_id = new_course["id"]
 
-    lti_assignment_patch_input = {"context_id": section_id}
-    for lti_assignment_id in course_lti_assignment_ids:
-      # update assignment with new section id
-      lti_assignment_req = requests.patch(
-          f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{lti_assignment_id}",
-          headers={
-              "Authorization": f"Bearer {get_backend_robot_id_token()}"
-          },
-          json=lti_assignment_patch_input,
-          timeout=60)
+    target_folder_id = new_course["teacherFolder"]["id"]
+    Logger.info(f"ID of target drive folder for section {target_folder_id}")
 
-      if lti_assignment_req.status_code != 200:
-        Logger.error(f"Failed to update assignment {lti_assignment_id} with context id {section_id}")
+    # Get topics of current course
+    topics = classroom_crud.get_topics(course_template_details.classroom_id)
+    # add new_course to pubsub topic for both course work and roaster changes
+    classroom_crud.enable_notifications(new_course["id"],
+                                        "COURSE_WORK_CHANGES")
+    classroom_crud.enable_notifications(new_course["id"],
+                                        "COURSE_ROSTER_CHANGES")
+    #If topics are present in course create topics returns a dict
+    # with keys a current topicID and new topic id as values
+    if topics is not None:
+      topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
+    # Calling function to get edit_url and view url of
+    # google form which returns
+    # a dictionary of view_links as keys and edit
+    #  links/  and file_id as values for all drive files
+    url_mapping = classroom_crud.\
+            get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
+
+    # Get coursework of current course and create a new course
+    coursework_list = classroom_crud.get_coursework(
+        course_template_details.classroom_id)
+
+    # final_coursewok=[]
+    for coursework in coursework_list:
+      coursework_lti_assignment_ids = []
+      try:
+        #Check if a coursework is linked to a topic if yes then
+        # replace the old topic id to new topic id using topic_id_map
+
+        lti_assignment_details = {
+          "section_id": section_id,
+          "start_date": None,
+          "end_date": None,
+          "due_date": None
+        }
+
+        # Update the due date of the course work if exists
+        if coursework.get("dueDate"):
+          coursework_due_date = coursework.get("dueDate")
+          coursework_due_time = coursework.get("dueTime")
+          coursework_due_datetime = datetime.datetime(
+              coursework_due_date.get("year"), coursework_due_date.get("month"),
+              coursework_due_date.get("day"), coursework_due_time.get("hours"),
+              coursework_due_time.get("minutes"))
+
+          curr_utc_timestamp = datetime.datetime.utcnow()
+          lti_assignment_details.start_date = cohort_details.start_date
+
+          if coursework_due_datetime < curr_utc_timestamp:
+            coursework["dueDate"] = {
+              "year": cohort_details.end_date.year,
+              "month": cohort_details.end_date.month,
+              "date": cohort_details.end_date.date
+            }
+            coursework["dueTime"] = {
+              "hours": cohort_details.end_date.hour,
+              "minutes": cohort_details.end_date.minute
+            }
+
+            lti_assignment_details.due_date = cohort_details.end_date
+            lti_assignment_details.end_date = cohort_details.end_date
+
+          else:
+            lti_assignment_details.due_date  = coursework_due_datetime
+            lti_assignment_details.end_date = coursework_due_datetime
+
+        if "topicId" in coursework.keys():
+          coursework["topicId"] = topic_id_map[coursework["topicId"]]
+        #Check if a material is present in coursework
+        if "materials" in coursework.keys():
+          coursework_update_output = update_coursework_material(
+                          materials=coursework["materials"],
+                          url_mapping=url_mapping,
+                          target_folder_id=target_folder_id,
+                          coursework_type="coursework",
+                          lti_assignment_details=lti_assignment_details)
+          coursework["materials"]= coursework_update_output["material"]
+          coursework_lti_assignment_ids.extend(coursework_update_output["lti_assignment_ids"])
+        # final_coursewok.append(coursework)
+
+        coursework_data = classroom_crud.create_coursework(
+            new_course["id"], coursework)
+        for assignment_id in coursework_lti_assignment_ids:
+          coursework_id = coursework_data.get("id")
+          # # get lti assignment
+          # lti_assignment = requests.get(
+          #     f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
+          #     headers={
+          #         "Authorization": f"Bearer {get_backend_robot_id_token()}"
+          #     },
+          #     timeout=60)
+          # lti_assignment["data"]["coursework_id"] = coursework_id
+          Logger.info(f"Updated the course work id for new LTI assignment - {assignment_id}")
+          input_json = {"course_work_id":coursework_id}
+          # update assignment with new coursework id
+          lti_assignment_req = requests.patch(
+              f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
+              headers={
+                  "Authorization": f"Bearer {get_backend_robot_id_token()}"
+              },
+              json=input_json,
+              timeout=60)
+
+          if lti_assignment_req.status_code != 200:
+            Logger.error(f"Failed to update assignment {assignment_id} with course work id {coursework_id}")
+
+
+      except Exception as error:
+        title = coursework["title"]
+        Logger.error(f"Get coursework failed for \
+              course_id{course_template_details.classroom_id} for {title}")
+        error=traceback.format_exc().replace("\n", " ")
+        Logger.error(error)
+        continue
+
+    # # Create coursework in new course
+    # # return final_coursewok
+    # if final_coursewok is not None:
+    #   classroom_crud.create_coursework(new_course["id"],final_coursewok)
+    # Get the list of courseworkMaterial
+    final_coursewok_material = []
+    coursework_material_list = classroom_crud.get_coursework_material(
+      course_template_details.classroom_id)
+    for coursework_material in coursework_material_list:
+      try:
+        #Check if a coursework material is linked to a topic if yes then
+        # replace the old topic id to new topic id using topic_id_map
+        if "topicId" in coursework_material.keys():
+          coursework_material["topicId"] =topic_id_map[
+            coursework_material["topicId"]]
+        #Check if a material is present in coursework
+        if "materials" in coursework_material.keys():
+
+          coursework_material_update_output = update_coursework_material(
+          materials=coursework_material["materials"],url_mapping=url_mapping,
+          target_folder_id=target_folder_id)
+
+          coursework_material["materials"]= coursework_material_update_output["material"]
+          print("Updated coursework material attached")
+        final_coursewok_material.append(coursework_material)
+      except Exception as error:
+        title = coursework_material["title"]
+        Logger.error(f"Get coursework material failed for\
+        course_id{course_template_details.classroom_id} for {title}")
+        error=traceback.format_exc().replace("\n", " ")
+        Logger.error(error)
+        continue
+    # Create coursework in new course
+    if final_coursewok_material is not None:
+      classroom_crud.create_coursework_material(new_course["id"],
+        final_coursewok_material)
+
+    # Classroom copy is successful then the section status is changed to published
+    section.status="published"
+    section.update()
 
     rows=[{
       "sectionId":section_id,\
@@ -254,7 +282,7 @@ def copy_course_background_task(course_template_details,
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-def update_coursework_material(materials,url_mapping,target_folder_id,coursework_type=None,section_id=None):
+def update_coursework_material(materials,url_mapping,target_folder_id,coursework_type=None,lti_assignment_details=None):
   """Takes the material attached to any type of cursework and copy it in the
     target folder Id also removes duplicates from material list
   Args:
@@ -296,7 +324,6 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
     if "link" in material.keys():
       if material["link"]["url"] not in link_urls:
 
-
         if coursework_type == "coursework":
           link = material["link"]
           # Update lti assignment with the course work details
@@ -313,7 +340,10 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
                 },
                 json={
                     "lti_assignment_id": lti_assignment_id,
-                    "context_id": section_id
+                    "context_id": lti_assignment_details.section_id,
+                    "start_date": lti_assignment_details.start_date,
+                    "end_date": lti_assignment_details.end_date,
+                    "due_date": lti_assignment_details.due_date
                 },
                 timeout=60)
 

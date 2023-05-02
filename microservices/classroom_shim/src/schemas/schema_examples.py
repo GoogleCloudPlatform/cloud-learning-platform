@@ -21,6 +21,14 @@ LTI_ASSIGNMENT_EXAMPLE = {
 }
 UPDATE_LTI_ASSIGNMENT_EXAMPLE = {**INSERT_LTI_ASSIGNMENT_EXAMPLE}
 
+COPY_LTI_ASSIGNMENT_EXAMPLE = {
+    "lti_assignment_id": "bV2EH89JdS76t7q34",
+    "context_id": "n0q082N1CN8Wb34y3",
+    "start_date": datetime.datetime(year=2023, month=1, day=14),
+    "end_date": datetime.datetime(year=2023, month=3, day=14),
+    "due_date": datetime.datetime(year=2023, month=2, day=14)
+}
+
 LTI_POST_GRADE_MODEL = {
     "user_id": "V2bpB62b8nPb18yn9",
     "comment": "Good work!",

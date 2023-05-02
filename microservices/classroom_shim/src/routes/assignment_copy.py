@@ -7,7 +7,8 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError)
 from common.utils.secrets import get_backend_robot_id_token
-from schemas.lti_assignment_schema import InputCopyLTIAssignmentModel
+from schemas.lti_assignment_schema import (InputCopyLTIAssignmentModel,
+                                           CopyLTIAssignmentResponseModel)
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
@@ -30,18 +31,28 @@ router = APIRouter(
     })
 
 
-@router.post("/lti-assignment/copy")
-def copy_lti_assignment(input_data: InputCopyLTIAssignmentModel):
-  """
-  Endpoint to copy LTIAssignment data model and its related child datamodel.
-  data format: {
-    lti_assignment_id: "123",
-    context_id: "123"
-  }
+@router.post(
+    "/lti-assignment/copy", response_model=CopyLTIAssignmentResponseModel)
+def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
+  """Copy an LTI Assignment endpoint
+
+  Args:
+      input_copy_lti_assignment (InputCopyLTIAssignmentModel): 
+          Details of new LTI Assignment and old one to be copied from
+
+  Raises:
+      ResourceNotFoundException: If the Course Template does not exist.
+      Exception: 500 Internal Server Error if something went wrong
+
+  Returns:
+      CopyLTIAssignmentResponseModel: LTI Assignment Object,
+      NotFoundErrorResponseModel: if the Course template not found,
+      InternalServerErrorResponseModel:
+          if the LTI Assignment creation raises an exception
   """
   try:
     # fetch content_item and related line_items
-    input_data_dict = {**input_data.dict()}
+    input_data_dict = {**input_copy_lti_assignment.dict()}
     lti_assignment = LTIAssignment.find_by_id(
         input_data_dict.get("lti_assignment_id"))
     lti_assignment_data = lti_assignment.to_dict()
@@ -93,6 +104,22 @@ def copy_lti_assignment(input_data: InputCopyLTIAssignmentModel):
     else:
       prev_content_item_ids = [content_item_id]
 
+    # Updating the dates of the new lti assignment
+    if input_data_dict.get("start_date"):
+      lti_assignment_start_date = input_data_dict.get("start_date")
+    else:
+      lti_assignment_start_date = lti_assignment_data.get("start_date")
+
+    if input_data_dict.get("end_date"):
+      lti_assignment_end_date = input_data_dict.get("end_date")
+    else:
+      lti_assignment_end_date = lti_assignment_data.get("end_date")
+
+    if input_data_dict.get("due_date"):
+      lti_assignment_due_date = input_data_dict.get("due_date")
+    else:
+      lti_assignment_due_date = lti_assignment_data.get("due_date")
+
     new_lti_assignment_data = {
         "lti_assignment_title": lti_assignment_data.get("lti_assignment_title"),
         "context_type": "section",
@@ -103,9 +130,9 @@ def copy_lti_assignment(input_data: InputCopyLTIAssignmentModel):
         "course_work_id": None,
         "tool_id": lti_assignment_data.get("tool_id"),
         "max_points": lti_assignment_data.get("max_points"),
-        "start_date": lti_assignment_data.get("start_date"),
-        "end_date": lti_assignment_data.get("end_date"),
-        "due_date": lti_assignment_data.get("due_date")
+        "start_date": lti_assignment_start_date,
+        "end_date": lti_assignment_end_date,
+        "due_date": lti_assignment_due_date
     }
 
     # Logger.info(f"new_lti_assignment_data - {new_lti_assignment_data}")

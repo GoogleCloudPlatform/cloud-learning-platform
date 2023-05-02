@@ -7,7 +7,8 @@ from typing_extensions import Literal
 from pydantic import BaseModel
 from schemas.schema_examples import (LTI_ASSIGNMENT_EXAMPLE,
                                      INSERT_LTI_ASSIGNMENT_EXAMPLE,
-                                     UPDATE_LTI_ASSIGNMENT_EXAMPLE)
+                                     UPDATE_LTI_ASSIGNMENT_EXAMPLE,
+                                     COPY_LTI_ASSIGNMENT_EXAMPLE)
 
 
 class LTIAssignmentModel(BaseModel):
@@ -171,6 +172,27 @@ class InputCopyLTIAssignmentModel(BaseModel):
   """
   lti_assignment_id: str
   context_id: str
+  start_date: Optional[datetime.datetime]
+  end_date: Optional[datetime.datetime]
+  due_date: Optional[datetime.datetime]
 
   class Config():
     orm_mode = True
+    schema_extra = {"example": COPY_LTI_ASSIGNMENT_EXAMPLE}
+
+
+class CopyLTIAssignmentResponseModel(BaseModel):
+  """Create LTI Assignment Response Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully copied the LTI Assignment"
+  data: Optional[LTIAssignmentModel]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully copied the LTI Assignment",
+            "data": LTI_ASSIGNMENT_EXAMPLE
+        }
+    }

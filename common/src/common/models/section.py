@@ -14,8 +14,17 @@
 """
 Module to add section in Fireo
 """
-from fireo.fields import TextField, ReferenceField, ListField, IDField,NumberField
+from fireo.fields import TextField, ReferenceField, ListField, IDField, NumberField
 from common.models import BaseModel, CourseTemplate, Cohort
+
+
+def check_section_status(field_val):
+  """validator method for status field"""
+  status = ["draft", "published"]
+  if field_val.lower() in ["draft", "published"]:
+    return True
+  return (False,
+          "Status must be one of " + ",".join("'" + i + "'" for i in status))
 
 
 class Section(BaseModel):
@@ -31,7 +40,9 @@ class Section(BaseModel):
   course_template = ReferenceField(CourseTemplate, required=True)
   cohort = ReferenceField(Cohort, required=True)
   teachers = ListField(required=True)
-  enrolled_students_count =  NumberField( default=0)
+  status = TextField(
+      required=True, default="draft", validator=check_section_status)
+  enrolled_students_count = NumberField(default=0)
 
   class Meta:
     ignore_none_field = False
