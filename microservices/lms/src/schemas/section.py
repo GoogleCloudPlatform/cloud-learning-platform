@@ -4,6 +4,7 @@ Pydantic Model for copy course API's
 import datetime
 from typing import Optional
 from pydantic import BaseModel, constr
+from schemas.student import UserModel
 from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE,\
   INSERT_SECTION_EXAMPLE,TEMP_USER,ASSIGNMENT_MODEL,\
     STUDENT,SHORT_COURSEWORK_MODEL
@@ -18,23 +19,27 @@ class Sections(BaseModel):
   classroom_id: str
   classroom_code: str
   classroom_url: str
-  teachers: list[constr(min_length=7, max_length=128,
+  teachers: list[constr(
+      min_length=7,
+      max_length=128,
       regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
       to_lower=True)]
   course_template: str
   cohort: str
-  enrolled_students_count:int
+  enrolled_students_count: int
 
   class Config():
     orm_mode = True
     schema_extra = {"example": SECTION_EXAMPLE}
 
+
 class TempUsers(BaseModel):
   "User Details"
-  user_id:str
+  user_id: str
   first_name: str
   last_name: str
-  email: constr(min_length=7, max_length=128,
+  email: constr(min_length=7,
+                max_length=128,
                 regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
                 to_lower=True)
   user_type: str
@@ -53,12 +58,15 @@ class SectionDetails(BaseModel):
   description: str
   course_template: str
   cohort: str
-  teachers: list[constr(min_length=7, max_length=128,
-    regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
-    to_lower=True)]
+  teachers: list[constr(
+      min_length=7,
+      max_length=128,
+      regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+      to_lower=True)]
+
   class Config():
-    orm_mode=True
-    schema_extra={"example":INSERT_SECTION_EXAMPLE}
+    orm_mode = True
+    schema_extra = {"example": INSERT_SECTION_EXAMPLE}
 
 
 class SectionListResponseModel(BaseModel):
@@ -76,6 +84,7 @@ class SectionListResponseModel(BaseModel):
             "data": [SECTION_EXAMPLE]
         }
     }
+
 
 class TeachersListResponseModel(BaseModel):
   """Get a list of Teachers"""
@@ -109,9 +118,6 @@ class GetTeacherResponseModel(BaseModel):
             "data": TEMP_USER
         }
     }
-
-
-
 
 
 class CreateSectiontResponseModel(BaseModel):
@@ -213,6 +219,7 @@ class DeleteSectionResponseModel(BaseModel):
         }
     }
 
+
 class DeleteStudentFromSectionResponseModel(BaseModel):
   """Delete student from section Model"""
   success: Optional[bool] = True
@@ -228,11 +235,13 @@ class DeleteStudentFromSectionResponseModel(BaseModel):
             "data": None
         }
     }
+
+
 class StudentListResponseModel(BaseModel):
   """list student for section  response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[list] =[]
+  data: Optional[list[UserModel]] = []
 
   class Config():
     orm_mode = True
@@ -240,9 +249,11 @@ class StudentListResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Success",
-            "data":[STUDENT]
-      }
-      }
+            "data": [STUDENT]
+        }
+    }
+
+
 class AssignmentModel(BaseModel):
   """Assignment Details Model"""
   id: str
@@ -261,14 +272,14 @@ class AssignmentModel(BaseModel):
 
   class Config():
     orm_mode = True
-    schema_extra = {
-        "example": ASSIGNMENT_MODEL
-    }
+    schema_extra = {"example": ASSIGNMENT_MODEL}
+
+
 class GetCourseWorkList(BaseModel):
   """Coursework list model"""
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[list] =[]
+  data: Optional[list] = []
 
   class Config():
     orm_mode = True
@@ -276,9 +287,11 @@ class GetCourseWorkList(BaseModel):
         "example": {
             "success": True,
             "message": "Success",
-            "data":[SHORT_COURSEWORK_MODEL]
-      }
-      }
+            "data": [SHORT_COURSEWORK_MODEL]
+        }
+    }
+
+
 class ImportGradeResponseModel(BaseModel):
   """Import grade esponseModel Details Model"""
   success: Optional[bool] = True
@@ -289,8 +302,8 @@ class ImportGradeResponseModel(BaseModel):
     orm_mode = True
     schema_extra = {
         "example": {
-      "success":True,
-      "message":"Success",
-      "data":None
+            "success": True,
+            "message": "Success",
+            "data": None
         }
-      }
+    }

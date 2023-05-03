@@ -9,7 +9,8 @@ import pytest
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
-from common.models import CourseTemplate, Cohort ,TempUser,CourseEnrollmentMapping,Section
+from common.models import (CourseTemplate, Cohort, User,
+                           CourseEnrollmentMapping,Section)
 from testing.test_config import BASE_URL
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
    COHORT_EXAMPLE, TEMP_USER,CREDENTIAL_JSON
@@ -55,7 +56,7 @@ def create_fake_data():
 
   section = Section.from_dict(test_section_dict)
   section.save()
-  temp_user = TempUser.from_dict(TEMP_USER)
+  temp_user = User.from_dict(TEMP_USER)
   temp_user.user_id = ""
   temp_user.save()
   temp_user.user_id = temp_user.id
@@ -64,7 +65,7 @@ def create_fake_data():
 
   course_enrollment_mapping= CourseEnrollmentMapping()
   course_enrollment_mapping.role = "learner"
-  course_enrollment_mapping.user = user_id
+  course_enrollment_mapping.user = temp_user
   course_enrollment_mapping.section = section
   course_enrollment_mapping.status = "active"
   course_enrollment_mapping.save()
@@ -74,7 +75,8 @@ def create_fake_data():
       "cohort": cohort.id,
       "course_template": course_template.id,
       "section": section.id,
-      "user_id":user_id
+      "user_id":user_id,
+      "email":temp_user.email
   }
 
 
@@ -95,22 +97,19 @@ def test_get_progress_percentage(client_with_emulator):
         resp = client_with_emulator.get(url)
   assert resp.status_code == 200
 
-def test_get_student_in_section(client_with_emulator):
-  url = BASE_URL + "/sections/5/students/clplmstestuser1@gmail.com"
+def test_get_student_in_section(client_with_emulator,create_fake_data):
+  url = (BASE_URL
+         + f"/sections/{create_fake_data['section']}/students/"
+         + create_fake_data["email"])
 
-  with mock.patch\
-  ("routes.student.student_service.get_user_id",return_value="user_id"):
-    with mock.patch("routes.student.classroom_crud.if_user_exists_in_section",
-                    return_value={}):
-      resp = client_with_emulator.get(url)
+  with mock.patch("routes.student.student_service.get_user_id",
+        return_value=create_fake_data["user_id"]):
+    resp = client_with_emulator.get(url)
   assert resp.status_code == 200
 
-def test_list_student_of_section(client_with_emulator):
-  url = BASE_URL + "/sections/5/students"
-
-  with mock.patch("routes.student.classroom_crud.list_student_section",
-                  return_value=[{}, {}]):
-    resp = client_with_emulator.get(url)
+def test_list_student_of_section(client_with_emulator,create_fake_data):
+  url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
+  resp = client_with_emulator.get(url)
   assert resp.status_code == 200
 
 def test_delete_student_from_section(client_with_emulator,create_fake_data):
@@ -157,8 +156,13 @@ def test_enroll_student(client_with_emulator, create_fake_data):
       "email": "student@gmail.com",
       "access_token": CREDENTIAL_JSON["token"]
   }
+  course_user=User.from_dict(TEMP_USER)
+  course_user.user_id=""
+  course_user.email=input_data["email"]
+  course_user.user_id=course_user.save().id
+  course_user.update()
   with mock.patch("routes.student.classroom_crud.enroll_student",
-  return_value ={"user_id":"test_user_id"}):
+  return_value ={"user_id":course_user.user_id}):
     with mock.patch(
       "services.student_service.check_student_can_enroll_in_cohort",
     return_value =True):
@@ -211,9 +215,14 @@ def test_enroll_student_section(client_with_emulator, create_fake_data):
       "email": "student@gmail.com",
       "access_token": CREDENTIAL_JSON["token"]
   }
+  course_user=User.from_dict(TEMP_USER)
+  course_user.user_id=""
+  course_user.email=input_data["email"]
+  course_user.user_id=course_user.save().id
+  course_user.update()
   with mock.patch("routes.student.Logger"):
     with mock.patch("routes.student.classroom_crud.enroll_student",
-      return_value ={"user_id":"test_user_id"}):
+      return_value ={"user_id":course_user.user_id}):
       with mock.patch(
         "services.student_service.check_student_can_enroll_in_section",
         return_value =True):
@@ -313,8 +322,6 @@ def test_update_invites(client_with_emulator,create_fake_data):
         }):
     with mock.patch(
       "routes.student.classroom_crud.get_user_profile_information"):
-      with mock.patch(
-      "routes.student.classroom_crud.get_user_details"):
         with mock.patch("routes.section.Logger"):
           resp = client_with_emulator.patch(url)
   print("Update invitest status code",resp.status_code,resp.json())
