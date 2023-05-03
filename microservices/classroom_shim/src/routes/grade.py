@@ -53,14 +53,18 @@ def update_classroom_grade(input_grade: PostGradeModel):
           lti_assignment = i
 
       if lti_assignment is None:
-        raise Exception(f"No title match found for the assignment - {input_grade_dict['line_item_title']} and content item ID - {input_grade_dict['lti_content_item_id']}")
+        raise Exception(
+            f"No title match found for the assignment - {input_grade_dict['line_item_title']} and content item ID - {input_grade_dict['lti_content_item_id']}"
+        )
     else:
       lti_assignment = LTIAssignment.collection.filter(
           "lti_content_item_id", "==",
           input_grade_dict["lti_content_item_id"]).get()
 
     if lti_assignment is None:
-      raise Exception(f"LTI Assignment not found for the content item ID - {input_grade_dict["lti_content_item_id"]}")
+      raise Exception(
+          f"LTI Assignment not found for the content item ID - {input_grade_dict['lti_content_item_id']}"
+      )
 
     lti_assignment_max_points = lti_assignment.max_points
     course_work_id = lti_assignment.course_work_id
