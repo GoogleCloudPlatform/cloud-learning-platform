@@ -223,7 +223,7 @@ def create_student_enrollment_record(student_data, section):
     temp_user.update()
   else:
     print(f"User already exist {temp_user.to_dict()}")
-  course_enrollment_mapping.user = User.find_by_id(temp_user.user_id)
+  course_enrollment_mapping.user = User.find_by_user_id(temp_user.user_id)
   course_enrollment_mapping.save()
   return {
       "user_id": temp_user.user_id,
