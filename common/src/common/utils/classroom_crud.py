@@ -274,7 +274,6 @@ def list_coursework_submissions_user(course_id,coursework_id,user_id):
   service = build("classroom", "v1", credentials=get_credentials())
   submissions = []
   page_token = None
-  Logger.info(f"List submissions for {user_id}")
   while True:
     coursework = service.courses().courseWork()
     response = coursework.studentSubmissions().list(
@@ -286,7 +285,6 @@ def list_coursework_submissions_user(course_id,coursework_id,user_id):
     page_token = response.get("nextPageToken", None)
     if not page_token:
       break
-  Logger.info(f"List submission done {submissions}")
   return submissions
 
 
@@ -300,7 +298,6 @@ def patch_student_submission(course_id,coursework_id,
   Returns:
     returns list of coursework of given course in classroom
     """ ""
-  Logger.info(f"Patch grades started for submision_id {student_submission_id}")
   service = build("classroom", "v1",credentials=get_credentials())
   student_submission={"assignedGrade": assigned_grade,
                   "draftGrade": draft_grade}
@@ -310,7 +307,6 @@ def patch_student_submission(course_id,coursework_id,
     id=student_submission_id,
     updateMask="assignedGrade,draftGrade",
     body=student_submission).execute()
-  Logger.info(f"Patch grades done for submision_id {student_submission_id}")
   return patch_result
 
 def get_coursework_material(course_id):
@@ -628,7 +624,7 @@ def get_view_link_from_id(form_id):
   result = service.forms().get(formId=form_id).execute()
   return result
 
-def retrive_all_form_responses(form_id):
+def retrieve_all_form_responses(form_id):
   "Query google forms api  using form id and get view url of  google form"
   discovery_doc = "https://forms.googleapis.com/$discovery/rest?version=v1"
   service = build("forms", "v1", credentials=get_credentials(),

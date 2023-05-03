@@ -284,7 +284,7 @@ class ImportGradeResponseModel(BaseModel):
   """Import grade esponseModel Details Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[dict] = {}
+  data: Optional[dict] = None
 
   class Config():
     orm_mode = True
@@ -292,11 +292,6 @@ class ImportGradeResponseModel(BaseModel):
         "example": {
       "success":True,
       "message":"Success",
-      "data":{"count":10,
-      "student_grades" : {
-      "student1@gmail.com":10,
-      "student2@gmail.com":7,
-      "student3@gmail.com":5  }
-              }
+      "data":None
         }
       }
