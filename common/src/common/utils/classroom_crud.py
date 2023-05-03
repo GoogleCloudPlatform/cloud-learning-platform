@@ -40,11 +40,13 @@ SCOPES = [
     "https://www.googleapis.com/auth/forms.body",
     "https://www.googleapis.com/auth/drive.file",
     "https://www.googleapis.com/auth/classroom.push-notifications",
-    "https://www.googleapis.com/auth/"+
+    "https://www.googleapis.com/auth/",
     "classroom.student-submissions.students.readonly",
     "https://www.googleapis.com/auth/classroom.rosters.readonly"
 ]
 
+Scopes_temp=["https://www.googleapis.com/auth/classroom.courses",
+             "https://www.googleapis.com/auth/classroom.rosters"]
 
 def get_credentials(email=CLASSROOM_ADMIN_EMAIL,
                     service_account="gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
@@ -58,7 +60,7 @@ def get_credentials(email=CLASSROOM_ADMIN_EMAIL,
     email,
     service_account,
     _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
-    scopes=SCOPES)
+    scopes=Scopes_temp)
   return creds
 
 
