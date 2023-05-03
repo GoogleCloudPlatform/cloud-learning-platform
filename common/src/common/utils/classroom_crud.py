@@ -530,7 +530,7 @@ def enroll_student(headers, access_token, course_id, student_email,
   """
   # Call search by email usermanagement API to get the student data
   response = requests.get(f"\
-  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ,\
+  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ,\
     headers=headers)
   # If the response is success check if student is inactive i.e  raise error
   searched_student = []
@@ -635,7 +635,7 @@ def get_view_link_from_id(form_id):
   return result
 
 
-def retrive_all_form_responses(form_id):
+def retrieve_all_form_responses(form_id):
   "Query google forms api  using form id and get view url of  google form"
   discovery_doc = "https://forms.googleapis.com/$discovery/rest?version=v1"
   service = build("forms",

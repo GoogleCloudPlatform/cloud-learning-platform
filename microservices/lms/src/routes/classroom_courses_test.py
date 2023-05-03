@@ -12,12 +12,55 @@ os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 SUCCESS_RESPONSE = {"status": "Success"}
 
+course_dict={
+  "id": "456789",
+  "name": "course_name",
+  "section": "section",
+  "description": "desc",
+  "ownerId": "1234567888887654",
+  "creationTime": "2023-04-20T10:44:05.896Z",
+  "updateTime": "2023-04-20T10:44:05.896Z",
+  "enrollmentCode": "ry7ui2z",
+  "courseState": "ACTIVE",
+  "alternateLink": "https://classroom.google.com/c/xcvbn",
+  "teacherGroupEmail": "course_name_section_teachers_678fg@google.com",
+  "courseGroupEmail": "course_name_section_hj678@google.com",
+  "teacherFolder": {
+    "id": "234567xdcfgyhu345678",
+    "title": "course name section",
+    "alternateLink":
+      "https://drive.google.com/drive/folders/234567xdcfgyhu345678"
+  },
+  "guardiansEnabled": False,
+  "calendarId": "dfghj56789@group.calendar.google.com",
+  "gradebookSettings": {
+    "calculationType": "TOTAL_POINTS",
+    "displaySetting": "HIDE_OVERALL_GRADE"
+  }
+}
 
 def test_get_courses(client_with_emulator):
   url = BASE_URL + "/classroom_courses"
-  with mock.patch("routes.classroom_courses.classroom_crud.get_course_list"):
+  with mock.patch("routes.classroom_courses.classroom_crud.get_course_list",
+                  return_value=[course_dict]):
     resp = client_with_emulator.get(url)
   assert resp.status_code == 200
+
+def test_get_course(client_with_emulator):
+  url = BASE_URL + f"/classroom_courses/{course_dict['id']}"
+  with mock.patch("routes.classroom_courses.classroom_crud.get_course_by_id",
+                  return_value=course_dict):
+    resp = client_with_emulator.get(url)
+  assert resp.status_code == 200, "Status 200"
+  assert resp.json()["data"]["name"]==course_dict["name"], "check data"
+  assert resp.json()["data"]["owner_id"]==course_dict["ownerId"],"check data"
+
+def test_negative_get_course(client_with_emulator):
+  url = BASE_URL + "/classroom_courses/12345678"
+  with mock.patch("routes.classroom_courses.classroom_crud.get_course_by_id",
+                  return_value=None):
+    resp = client_with_emulator.get(url)
+  assert resp.status_code == 404,"Status 404"
 
 def test_copy_course(client_with_emulator):
   url = BASE_URL + "/classroom_courses/copy_course"

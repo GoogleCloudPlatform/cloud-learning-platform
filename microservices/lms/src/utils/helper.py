@@ -1,5 +1,6 @@
 """ Helper Functions"""
 import datetime
+from functools import reduce
 from fastapi import Depends
 from common.utils.auth_service import validate_user_type_and_token, auth_scheme
 from common.utils.errors import ResourceNotFoundException
@@ -144,3 +145,90 @@ def convert_query_result_to_analytics_model(query_result,student_id,user_id):
   if not section_list:
     section_list.append(course_obj)
   return AnalyticsResponse(user=user,section_list=section_list)
+
+def check_key_exists_dict(dict_object,key):
+  """Check if key exists in the dict if then return value
+  if not then return None
+
+  Args:
+      dict_object (dict): _description_
+      key (str): _description_
+
+  Returns:
+      any: value wrt the key
+  """
+  if key in dict_object.keys():
+    return dict_object[key]
+  return None
+def to_snake(s):
+  """method to convert camel case string to snake case
+
+  Args:
+      s (str): _description_
+
+  Returns:
+      str: return string in snake case
+  """
+  return reduce(lambda x, y: x + ("_" if y.isupper() else "") + y, s).lower()
+
+def dict_keys_from_camel_to_snake_case(dict_obj):
+  """Convert dict keys from camel case to snake case
+
+  Args:
+      dict_obj (dict): dict object
+
+  Returns:
+      dict: dict object which contains all keys in snake case
+  """
+  if isinstance(dict_obj, list):
+    return [dict_keys_from_camel_to_snake_case(i) if isinstance(
+      i, (dict, list)) else i for i in dict_obj]
+  return {to_snake(key):dict_keys_from_camel_to_snake_case(
+    value) if isinstance(value, (dict, list))
+          else value for key, value in dict_obj.items()}
+
+def convert_course_dict_to_classroom_model(dict_object):
+  """convert course dict to classroom model
+
+  Args:
+      dict_object (_type_): _description_
+
+  Returns:
+      _type_: _description_
+  """
+  dict_object["description_heading"]=check_key_exists_dict(
+    dict_object,"descriptionHeading")
+  dict_object["owner_id"]=check_key_exists_dict(
+    dict_object,"ownerId")
+  dict_object["creation_time"]=check_key_exists_dict(
+    dict_object,"creationTime")
+  dict_object["update_time"]=check_key_exists_dict(
+    dict_object,"updateTime")
+  dict_object["alternate_link"]=check_key_exists_dict(
+    dict_object,"alternateLink")
+  dict_object["course_state"]=check_key_exists_dict(
+    dict_object,"courseState")
+  dict_object["enrollment_code"]=check_key_exists_dict(
+    dict_object,"enrollmentCode")
+  dict_object["teacher_group_email"]=check_key_exists_dict(
+    dict_object,"teacherGroupEmail")
+  dict_object["course_group_email"]=check_key_exists_dict(
+    dict_object,"courseGroupEmail")
+  if check_key_exists_dict(
+    dict_object,"teacherFolder"):
+    dict_object["teacher_folder"]=dict_keys_from_camel_to_snake_case(
+      dict_object["teacherFolder"]
+    )
+  if check_key_exists_dict(
+    dict_object,"courseMaterialSets"):
+    dict_object[
+      "course_material_sets"]=dict_keys_from_camel_to_snake_case(
+      dict_object["courseMaterialSets"]
+    )
+  dict_object["guardians_enabled"]=check_key_exists_dict(
+    dict_object,"guardiansEnabled")
+  dict_object["calendar_id"]=check_key_exists_dict(dict_object,"calendarId")
+  if check_key_exists_dict(dict_object,"gradebookSettings"):
+    dict_object["gradebook_settings"]=dict_keys_from_camel_to_snake_case(
+      dict_object["gradebookSettings"])
+  return dict_object
