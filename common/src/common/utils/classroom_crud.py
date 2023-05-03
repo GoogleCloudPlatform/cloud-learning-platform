@@ -613,7 +613,7 @@ def get_view_link_from_id(form_id):
   result = service.forms().get(formId=form_id).execute()
   return result
 
-def retrive_all_form_responses(form_id):
+def retrieve_all_form_responses(form_id):
   "Query google forms api  using form id and get view url of  google form"
   discovery_doc = "https://forms.googleapis.com/$discovery/rest?version=v1"
   service = build("forms", "v1", credentials=get_credentials(),
