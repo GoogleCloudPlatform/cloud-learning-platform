@@ -1,0 +1,9 @@
+<h2 mat-dialog-title>Confirm ?</h2>
+<div mat-dialog-content style="padding-bottom: 4%;padding-top: 1%;">
+    <div *ngFor="let item of Object.keys(toolData)">
+        <b>{{item}}</b> <b>{{toolData[item]}}</b>
+    </div>
+</div>
+<div mat-dialog-actions style="display: flex;justify-content: end;">
+    <button mat-flat-button color="primary" (click)="onNoClick()">Close</button>
+</div>

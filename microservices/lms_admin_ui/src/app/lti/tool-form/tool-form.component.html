@@ -1,0 +1,82 @@
+<form [formGroup]="toolForm" (ngSubmit)="onSubmit(toolForm)">
+    <div>
+        <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Name</mat-label>
+            <input formControlName="name" matInput>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Description</mat-label>
+            <input formControlName="description" matInput>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Tool URL</mat-label>
+            <input formControlName="tool_url" matInput>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Tool Login URL</mat-label>
+            <input formControlName="tool_login_url" matInput>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Public Key Type</mat-label>
+            <mat-select formControlName="public_key_type" (selectionChange)="onDropdownChange()">
+                <mat-option value="JWK URL">JWK URL</mat-option>
+                <mat-option value="Public Key">Public Key</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div *ngIf="toolForm.value.public_key_type === 'Public Key'">
+        <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Tool Public Key</mat-label>
+            <textarea formControlName="tool_public_key" matInput></textarea>
+        </mat-form-field>
+    </div>
+    <div *ngIf="toolForm.value.public_key_type === 'JWK URL'">
+        <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Tool Keyset URL</mat-label>
+            <input formControlName="tool_keyset_url" matInput>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Content Selection URL</mat-label>
+            <input formControlName="content_selection_url" matInput>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Redirect URI's</mat-label>
+            <textarea formControlName="redirect_uris" matInput></textarea>
+        </mat-form-field>
+    </div>
+    <div>
+        <section class="example-section">
+            <mat-checkbox formControlName="enable_grade_sync" class="example-margin">Enable Grade Sync</mat-checkbox>
+        </section>
+    </div>
+    <div>
+        <section class="example-section">
+            <mat-checkbox formControlName="enable_nrps" class="example-margin">Enable NRPS</mat-checkbox>
+        </section>
+    </div>
+    <div>
+        <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Custom Params</mat-label>
+            <textarea formControlName="custom_params" matInput></textarea>
+        </mat-form-field>
+    </div>
+    <div>
+        <section class="example-section">
+            <mat-checkbox formControlName="validate_title_for_grade_sync" class="example-margin">Validate Title For
+                Grade Sync</mat-checkbox>
+        </section>
+    </div>
+    <button type="submit">Send</button>
+</form>
