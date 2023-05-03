@@ -52,7 +52,7 @@ init() {
   gcloud config set project $PROJECT_ID
 
   printf "\n${BLUE}Set up gcloud and kubectl context ...${NORMAL}\n"
-  gcloud container clusters get-credentials core-learning-services-dev-us-central1 --zone ${REGION} --project ${PROJECT_ID}
+  gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${REGION} --project ${PROJECT_ID}
 }
 
 setup_namespace() {

@@ -1,11 +1,13 @@
 import uuid
 import behave
 import requests
-from testing_objects.test_config import API_URL
+import time
+from testing_objects.test_config import API_URL,e2e_google_form_id,e2e_drive_folder_id
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA 
 from testing_objects.user import TEST_USER
 from e2e.gke_api_tests.secrets_helper import get_student_email_and_token,\
-  get_workspace_student_email_and_token,create_coursework_submission,list_coursework_submission_user
+  get_workspace_student_email_and_token,create_coursework_submission,\
+list_coursework_submission_user,insert_file_into_folder
 from environment import create_course
 
 # -------------------------------Enroll student to cohort-------------------------------------
@@ -304,8 +306,14 @@ def step_impl_41(context):
     "Student grades are not updated in classroom"
 )
 def step_impl_42(context):
-  assert context.status == 200, "Status 200"
-  assert context.response["data"]["count"] == 0, "count not matching of update"
+  time.sleep(6)
+  assert context.status == 202, "Status 202"
+  result = list_coursework_submission_user(context.access_token,
+                                  context.classroom_id,
+                                  context.coursework["id"],"me")
+  insert_file_into_folder(e2e_drive_folder_id,e2e_google_form_id)
+  print("This is result after list coursework submission Before turn in",result)
+  assert "assignedGrade" not in result[0].keys()
 
 
 @behave.given(
@@ -337,9 +345,15 @@ def step_impl_44(context):
     "Student grades are  updated in classroom ans student_email is present in api response"
 )
 def step_impl_45(context):
-  assert context.status == 200, "Status 200"
-  assert context.response["data"]["count"] == 1, "count  match update"
-  assert context.student_email in context.response["data"]["student_grades"].keys()
+  time.sleep(15)
+  insert_file_into_folder(e2e_drive_folder_id,e2e_google_form_id)
+  print("After inser to origin folder")
+  result = list_coursework_submission_user(context.access_token,
+                                  context.classroom_id,
+                                  context.coursework["id"],"me")
+  print("This is result after Turn in list coursework submission",result)
+  assert context.status == 202, "Status 202"
+  assert context.response["message"] == "Grades for coursework will be updated shortly","message not matching"
 
 # -------------------------------update classroom code of a section-------------------------------------
 # ----Positive Scenario-----
