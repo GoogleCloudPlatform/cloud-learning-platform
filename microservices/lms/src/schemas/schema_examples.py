@@ -72,6 +72,7 @@ SECTION_EXAMPLE = {
     "classroom_id": "123456789100",
     "classroom_code": "abcdef",
     "classroom_url": "https://classroom.google.com",
+    "status": "provisioned",
     "teachers": ["test_user_1@gmail.com"],
     "course_template": "course_templates/7d2zTApD-id",
     "cohort": "cohorts/1j-id",
