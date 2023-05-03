@@ -26,7 +26,6 @@ def call_create_user_api(headers,body):
   Returns:
       response object : response from create user
   """
-
   response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
   json=body,headers=headers)
   return response

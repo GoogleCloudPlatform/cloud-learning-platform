@@ -536,8 +536,6 @@ def import_grade(section_id: str,coursework_id:str,
     #Get url mapping of google forms view links and edit ids
     url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form(
       folder_id)
-    count =0
-    student_grades = {}
     is_google_form_present = False
     if "materials" in result.keys():
       for material in result["materials"]:
@@ -558,8 +556,8 @@ def import_grade(section_id: str,coursework_id:str,
                                     section,coursework_id)
 
       if is_google_form_present:
-        return {"data":{"count":count,"student_grades":student_grades},
-                "message":"Grades for coursework will be updated shortly"}
+        return {
+           "message":"Grades for coursework will be updated shortly"}
       else:
         raise ResourceNotFoundException(
           f"Form is not present for coursework_id {coursework_id}"
