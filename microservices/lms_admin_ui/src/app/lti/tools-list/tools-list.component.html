@@ -1,6 +1,9 @@
 <div class="custom-outer-container">
 
-    <button mat-flat-button color="primary" style="float: right;" (click)="openCreateToolDialog()">Add tool</button>
+    <div>
+        <h2 style="float: left;">Manage LTI Tools</h2>
+        <button mat-flat-button color="primary" style="float: right;" (click)="openCreateToolDialog()">Add tool</button>
+    </div>
 
     <ngx-skeleton-loader *ngIf="isLoadingData" count="3"
         [theme]="{'height': '40px','margin-top':'15px','background-color': '#EAEAEA'}">
