@@ -20,8 +20,11 @@ from common.models import BaseModel, CourseTemplate, Cohort
 
 def check_section_status(field_val):
   """validator method for status field"""
-  status = ["draft", "published"]
-  if field_val.lower() in ["draft", "published"]:
+  status = [
+      "PROVISIONING", "FAILED_TO_PROVISION", "PROVISIONED",
+      "PROVISIONED_NOT_ACTIVE", "ACTIVE", "ARCHIVE"
+  ]
+  if field_val.upper() in status:
     return True
   return (False,
           "Status must be one of " + ",".join("'" + i + "'" for i in status))
@@ -41,7 +44,7 @@ class Section(BaseModel):
   cohort = ReferenceField(Cohort, required=True)
   teachers = ListField(required=True)
   status = TextField(
-      required=True, default="draft", validator=check_section_status)
+      required=True, default="PROVISIONING", validator=check_section_status)
   enrolled_students_count = NumberField(default=0)
 
   class Meta:
