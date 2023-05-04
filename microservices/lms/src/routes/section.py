@@ -398,6 +398,10 @@ def update_section_classroom_code(section_id:str):
   try:
     section=Section.find_by_id(section_id)
     course=classroom_crud.get_course_by_id(section.classroom_id)
+    if course is None:
+      raise ResourceNotFoundException(
+          "Classroom with section id" +
+          f" {section_id} is not found")
     section.classroom_code=course["enrollmentCode"]
     section.update()
     return {
@@ -544,7 +548,7 @@ def import_grade(section_id: str,coursework_id:str,
           # Get all responses for the form if no responses of
           # the form then return
           all_responses_of_form = classroom_crud.\
-          retrive_all_form_responses(form_id)
+          retrieve_all_form_responses(form_id)
           if all_responses_of_form =={}:
             raise ResourceNotFoundException(
               "Responses not available for google form")

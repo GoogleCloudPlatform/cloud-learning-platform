@@ -1,5 +1,5 @@
 @fixture.create.analytics.data
-Feature: Retive messages from Pub/Sub and push them to bigquery
+Feature: Retrieve messages from Pub/Sub and push them to bigquery
 
   Scenario: Roaster Changes Occurs in a registered Classroom
     Given A user has been added to classroom as a student

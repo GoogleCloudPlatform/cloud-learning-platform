@@ -516,7 +516,7 @@ def test_form_grade_import_form_with_no_response(client_with_emulator,
 return_value={"https://docs.google.com/forms/d/e/1FAIpQL":
               {"file_id":"test123"}}):
         with mock.patch(
-        "routes.section.classroom_crud.retrive_all_form_responses",
+        "routes.section.classroom_crud.retrieve_all_form_responses",
                   return_value={}):
           resp = client_with_emulator.patch(url)
   result_json = resp.json()
@@ -538,7 +538,7 @@ def test_form_grade_import_form_with_response(client_with_emulator,
 "routes.section.classroom_crud.get_edit_url_and_view_url_mapping_of_form",
 return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
         with mock.patch(
-        "routes.section.classroom_crud.retrive_all_form_responses",
+        "routes.section.classroom_crud.retrieve_all_form_responses",
                   return_value=FORM_RESPONSE_LIST):
           with mock.patch(
         "routes.section.classroom_crud.list_coursework_submissions_user",
