@@ -2,8 +2,8 @@
 Pydantic Model for copy course API's
 """
 from typing import Optional
-from pydantic import BaseModel, constr, validator
-from schemas.schema_examples import INVITE_STUDENT, GET_STUDENT_EXAMPLE, COURSE_ENROLLMENT_USER_EXAMPLE
+from pydantic import BaseModel, constr
+from schemas.schema_examples import INVITE_STUDENT, COURSE_ENROLLMENT_USER_EXAMPLE
 
 
 class UserModel(BaseModel):

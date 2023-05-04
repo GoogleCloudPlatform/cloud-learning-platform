@@ -321,8 +321,8 @@ def test_update_invites(client_with_emulator,create_fake_data):
       "role": "STUDENT"
         }):
     with mock.patch(
-      "routes.student.classroom_crud.get_user_profile_information"):
-        with mock.patch("routes.section.Logger"):
-          resp = client_with_emulator.patch(url)
+    "routes.student.classroom_crud.get_user_profile_information"):
+      with mock.patch("routes.section.Logger"):
+        resp = client_with_emulator.patch(url)
   print("Update invitest status code",resp.status_code,resp.json())
   assert resp.status_code == 200

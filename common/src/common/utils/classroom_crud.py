@@ -529,8 +529,8 @@ def enroll_student(headers, access_token, course_id, student_email,
     dict: returns a dict which contains student and classroom details
   """
   # Call search by email usermanagement API to get the student data
-  response = requests.get(f"\
-  {USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ,\
+  response = requests.get(
+    f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",
     headers=headers)
   # If the response is success check if student is inactive i.e  raise error
   searched_student = []
