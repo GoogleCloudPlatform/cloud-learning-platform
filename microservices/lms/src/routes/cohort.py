@@ -1,4 +1,5 @@
 '''Cohort Endpoint'''
+import sys
 import traceback
 import datetime
 from fastapi import APIRouter, Request
@@ -20,7 +21,7 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import SectionListResponseModel
-from schemas.student import GetProgressPercentageCohortResponseModel
+from schemas.student import (GetProgressPercentageCohortResponseModel,GetOverallPercentage)
 from config import BQ_TABLE_DICT,BQ_DATASET
 from utils.helper import (convert_cohort_to_cohort_model,
                           convert_section_to_section_model)
@@ -425,4 +426,82 @@ def get_progress_percentage_not_turned_in(\
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
+
+@router.get("/{cohort_id}/get_overall_grade/{user}",
+      response_model=GetOverallPercentage)
+def get_overall_percentage(cohort_id: str, user: str, request: Request):
+  """Get overall grade for a student per course
+
+  Args:
+    cohort_id : cohort_id for which overall grade is required
+    user : email id or user id for whose overall grade is required
+
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+
+  Returns:
+    A number indicative of the overall grade and category average
+    by the student,
+    {'status': 'Failed'} if any exception is raise
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    responseList = []
+    user_id = student_service.get_user_id(user=user.strip(), headers=headers)
+    cohort = Cohort.find_by_id(cohort_id)
+    result = Section.fetch_all_by_cohort(cohort_key=cohort.key)
+    for section in result:
+      record = CourseEnrollmentMapping.\
+          find_enrolled_student_record(section.key,user_id)
+      if record is not None:
+          course_work_list = classroom_crud.get_coursework(section.classroom_id)
+          submitted_course_work = classroom_crud.get_submitted_course_work_list(
+          section.key.split("/")[1], user_id,headers)
+          overall_grade = 0
+          category_grade=[]
+          for course_work_obj in course_work_list:
+            if ("gradeCategory" in course_work_obj and \
+                next(item for item in submitted_course_work if \
+                item["courseWorkId"] == course_work_obj['id'])['state'] == 'RETURNED'):
+              category_id=course_work_obj['gradeCategory']['id']
+              category_weight=course_work_obj['gradeCategory']['weight']/10000
+              total_max_points = 0
+              total_assigned_points = 0
+              coursework_count=0
+              category_data={'category_name':\
+                             course_work_obj['gradeCategory']['name'],\
+                             'category_id':\
+                              course_work_obj['gradeCategory']['id'],\
+                             'category_weight':category_weight,
+                              'category_average':0}
+              for i in course_work_list:
+                if ("gradeCategory" in i and i['gradeCategory']['id'] == category_id):
+                  total_max_points = total_max_points+i['maxPoints']
+                  total_assigned_points = total_assigned_points+\
+                  next(item for item in submitted_course_work if \
+                      item["courseWorkId"] == i['id'])['assignedGrade']
+                  coursework_count = coursework_count+1
+              category_data['category_average'] = ((total_assigned_points/total_max_points)/coursework_count)*100
+              if not any(d['category_id'] == category_id for d in category_grade):
+                category_grade.append(category_data)
+              assignment_weight = (course_work_obj['maxPoints']/total_max_points)*(category_weight/100)
+              assigned_grade_by_max_points = next(item for item in submitted_course_work if \
+              item["courseWorkId"] == course_work_obj['id'])['assignedGrade']/course_work_obj['maxPoints']
+              assignment_grade=assigned_grade_by_max_points*assignment_weight
+              overall_grade = overall_grade+assignment_grade
+          data={'section_id':section.key.split("/")[1],'overall_grade':round(overall_grade*100,2),\
+                'category_grade':category_grade}
+          responseList.append(data)
+    
+    return {"data":responseList}
   
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
