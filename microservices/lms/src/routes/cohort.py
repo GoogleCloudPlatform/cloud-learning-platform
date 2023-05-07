@@ -462,7 +462,8 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
           for course_work_obj in course_work_list:
             if ("gradeCategory" in course_work_obj and \
                 next(item for item in submitted_course_work if \
-                item["courseWorkId"] == course_work_obj['id'])['state'] == 'RETURNED'):
+                item['courseWorkId'] == \
+                course_work_obj['id'])['state'] == 'RETURNED'):
               category_id=course_work_obj['gradeCategory']['id']
               category_weight=course_work_obj['gradeCategory']['weight']/10000
               total_max_points = 0
@@ -475,24 +476,32 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
                              'category_weight':category_weight,
                               'category_average':0}
               for i in course_work_list:
-                if ("gradeCategory" in i and i['gradeCategory']['id'] == category_id):
+                if ("gradeCategory" in i and \
+                i['gradeCategory']['id'] == category_id):
                   total_max_points = total_max_points+i['maxPoints']
                   total_assigned_points = total_assigned_points+\
                   next(item for item in submitted_course_work if \
-                      item["courseWorkId"] == i['id'])['assignedGrade']
+                      item['courseWorkId'] == i['id'])['assignedGrade']
                   coursework_count = coursework_count+1
-              category_data['category_average'] = ((total_assigned_points/total_max_points)/coursework_count)*100
-              if not any(d['category_id'] == category_id for d in category_grade):
+              category_data['category_average'] = \
+              ((total_assigned_points/total_max_points)/coursework_count)*100
+              if not any(d['category_id'] == category_id for \
+              d in category_grade):
                 category_grade.append(category_data)
-              assignment_weight = (course_work_obj['maxPoints']/total_max_points)*(category_weight/100)
-              assigned_grade_by_max_points = next(item for item in submitted_course_work if \
-              item["courseWorkId"] == course_work_obj['id'])['assignedGrade']/course_work_obj['maxPoints']
+              assignment_weight = \
+              (course_work_obj['maxPoints']/total_max_points)*\
+              (category_weight/100)
+              assigned_grade_by_max_points = \
+              next(item for item in submitted_course_work if \
+              item['courseWorkId'] == \
+              course_work_obj['id'])['assignedGrade']/\
+              course_work_obj['maxPoints']
               assignment_grade=assigned_grade_by_max_points*assignment_weight
               overall_grade = overall_grade+assignment_grade
-          data={'section_id':section.key.split("/")[1],'overall_grade':round(overall_grade*100,2),\
+          data={'section_id':section.key.split("/")[1],\
+            'overall_grade':round(overall_grade*100,2),\
                 'category_grade':category_grade}
           responseList.append(data)
-    
     return {"data":responseList}
   
   except ResourceNotFoundException as err:
