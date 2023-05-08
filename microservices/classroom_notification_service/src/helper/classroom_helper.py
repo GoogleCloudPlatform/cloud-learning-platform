@@ -2,6 +2,7 @@
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from config import CLASSROOM_ADMIN_EMAIL
+from common.utils.logging_handler import Logger
 # from helper.secrets_helper import get_gke_pd_sa_key_from_secret_manager
 from common.utils.jwt_creds import JwtCredentials
 FEED_TYPE_DICT = {
@@ -33,10 +34,11 @@ def get_service():
   # creds = service_account.Credentials.from_service_account_info(
   #     get_gke_pd_sa_key_from_secret_manager(), scopes=SCOPES)
   # creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  Logger.info(f"This is admin email {CLASSROOM_ADMIN_EMAIL}")
   _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
   creds = JwtCredentials.from_default_with_subject(
     CLASSROOM_ADMIN_EMAIL,
-    service_account,
+    "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
     _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
     scopes=SCOPES)
   return build("classroom", "v1", credentials=creds,num_retries=15)
@@ -49,7 +51,7 @@ def get_user(user_id):
   Returns:
     dict: User details
   """
-  service=get_service()
+  service= get_service()
   return service.userProfiles().get(userId=user_id).execute()
 
 def get_course_work(course_id,course_work_id):
@@ -62,6 +64,7 @@ def get_course_work(course_id,course_work_id):
   Returns:
     _type_: _description_
   """
+  Logger.info("")
   service=get_service()
   return service.courses().courseWork().get(
     courseId=course_id,id=course_work_id).execute()

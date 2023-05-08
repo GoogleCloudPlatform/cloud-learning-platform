@@ -11,7 +11,7 @@ from google.oauth2 import service_account
 from google.auth import _helpers
 from google.auth import credentials
 from google.auth.transport.requests import AuthorizedSession
-
+from common.utils.logging_handler import Logger
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -63,6 +63,7 @@ class JwtCredentials(service_account.Credentials):
   @classmethod
   def from_default_with_subject(self, subject, service_account_email,
                                 token_uri, scopes):
+    Logger.info(f"This is default method {subject} {service_account_email} {token_uri}")
     return self(signer=None,
                 service_account_email=service_account_email,
                 token_uri=token_uri,
