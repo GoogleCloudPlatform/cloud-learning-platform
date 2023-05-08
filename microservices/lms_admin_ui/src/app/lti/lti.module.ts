@@ -7,11 +7,15 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MaterialSharedModule } from '../shared/material-shared.module';
 import { LtiRoutingModule } from './lti-routing.module';
+import { CreateAssignmentComponent } from './create-assignment/create-assignment.component';
+import { ContentSelectorComponent } from './content-selector/content-selector.component';
 
 @NgModule({
   declarations: [
     ToolsListComponent,
-    ToolFormComponent
+    ToolFormComponent,
+    CreateAssignmentComponent,
+    ContentSelectorComponent
   ],
   imports: [
     CommonModule,
