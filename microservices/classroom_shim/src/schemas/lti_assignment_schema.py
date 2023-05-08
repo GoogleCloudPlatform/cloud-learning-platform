@@ -172,6 +172,7 @@ class InputCopyLTIAssignmentModel(BaseModel):
   """
   lti_assignment_id: str
   context_id: str
+  prev_context_id: str
   start_date: Optional[datetime.datetime]
   end_date: Optional[datetime.datetime]
   due_date: Optional[datetime.datetime]
