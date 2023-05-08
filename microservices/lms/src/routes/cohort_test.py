@@ -273,7 +273,7 @@ def test_list_section_cohort_not_found(client_with_emulator):
 
 def test_get_overall_percentage(client_with_emulator,create_fake_data):
   url = BASE_URL+\
-  f"/cohorts/{create_fake_data['cohort']}/get_overall_percentage/test@gmail.com"
+  f"/cohorts/{create_fake_data['cohort']}/get_overall_grade/test@gmail.com"
   course_work_data = [{
     "courseId": "608197437928",
       "id": "608197730201",
@@ -301,7 +301,7 @@ def test_get_overall_percentage(client_with_emulator,create_fake_data):
       "assignedGrade": 50,
   }]
   with mock.patch("routes.cohort.student_service.get_user_id",\
-                  return_value="student@gmail.com"):
+                  return_value="test@gmail.com"):
     with mock.patch("routes.cohort.classroom_crud.get_coursework",\
                     return_value=course_work_data):
       with mock.patch\
