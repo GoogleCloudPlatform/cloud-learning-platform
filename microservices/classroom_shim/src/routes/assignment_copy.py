@@ -95,9 +95,9 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     prev_content_item_ids = lti_assignment_data["prev_content_item_ids"]
 
     if prev_context_ids:
-      prev_context_ids.insert(0, input_data_dict.get("context_id"))
+      prev_context_ids.insert(0, input_data_dict.get("prev_context_id"))
     else:
-      prev_context_ids = [input_data_dict.get("context_id")]
+      prev_context_ids = [input_data_dict.get("prev_context_id")]
 
     if prev_content_item_ids:
       prev_content_item_ids.insert(0, content_item_id)
