@@ -21,7 +21,7 @@ from fireo.fields import (TextField)
 
 USER_TYPES = [
     "learner", "faculty", "assessor", "admin", "coach", "instructor", "lxe",
-    "curriculum_designer"
+    "curriculum_designer","robot"
 ]
 
 
