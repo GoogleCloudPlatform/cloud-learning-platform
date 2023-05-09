@@ -12,9 +12,6 @@ class CourseTemplateModel(BaseModel):
   name: str
   description: str
   admin: str
-  instructional_designer: constr(min_length=7, max_length=128,
-          regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
-          to_lower=True)
   classroom_id: Optional[str]
   classroom_code: Optional[str]
   classroom_url: Optional[str]
@@ -28,9 +25,6 @@ class UpdateCourseTemplateModel(BaseModel):
   """Update Course Template Pydantic Model"""
   name: Optional[str] = None
   description: Optional[str] = None
-  instructional_designer: Optional[constr(min_length=7, max_length=128,
-    regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
-    to_lower=True)] = None
 
   class Config():
     orm_mode = True
@@ -75,9 +69,6 @@ class InputCourseTemplateModel(BaseModel):
   """Insert Course Template Model"""
   name: str
   description: str
-  instructional_designer: constr(min_length=7, max_length=128,
-        regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
-        to_lower=True)
 
   class Config():
     orm_mode = True
@@ -115,4 +106,38 @@ class UpdateCourseTemplateResponseModel(BaseModel):
             "message": "Successfully Updated the Course Template",
             "course_template": COURSE_TEMPLATE_EXAMPLE
         }
+    }
+
+class AddInstructionalDesigner(BaseModel):
+  email: constr(min_length=7, max_length=128,
+          regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+          to_lower=True)
+  class Config():
+    orm_mode = True
+    schema_extra = {
+      "example": {
+        "email":"xyz@gmail.com"
+      }
+    }
+
+class EnrollmentResponseModel(BaseModel):
+  """Enrollment Response Pydantic Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully enrolled instructional designer"
+  data: Optional[dict] = {}
+  
+  class Config():
+    orm_mode=True
+    schema_extra ={
+      "example":{
+        "success": True,
+        "message": "Successfully enrolled instructional designer",
+        "data":{
+        "enrollment_id": "12345678",
+        "email": "xcvb@gmail.com",
+        "course_template_id": "234red3fr32",
+        "classroom_id": "234r21we123",
+        "classroom_url": "https://classroom.google.com"
+    }
+      }
     }
