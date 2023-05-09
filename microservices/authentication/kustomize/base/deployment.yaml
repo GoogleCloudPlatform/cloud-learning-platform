@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentication
+  template:
+    metadata:
+      labels:
+        app: authentication
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: authentication
+        image: authentication
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "200Mi"
+          limits:
+            memory: "500Mi"
+            cpu: "500m" 
+        env:
+        # Define the environment variable
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: API_BASE_URL
+          # Required format: api/version
+          value: api/v1
+        - name: SERVICE_NAME
+          value: authentication
+        - name: COLLECTION
+          value: users
+        - name: REDIS_HOST
+          value: redis-master
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT
+        - name: FIREBASE_API_KEY # value to be added/removed later
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: FIREBASE_API_KEY
+
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10

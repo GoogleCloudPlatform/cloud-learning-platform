@@ -1,0 +1,81 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: authentication
+requires:
+  - path: ../../common
+    configs: [common]
+build:
+  tagPolicy:
+    gitCommit:
+      ignoreChanges: true
+  local:
+    concurrency: 0
+  artifacts:
+  - image: authentication
+    requires:
+      - image: common
+        alias: BASE_IMG
+    sync:
+      infer:
+        - '**/*.py'
+        - '**/*.json'
+portForward:
+- resourceType: service
+  resourceName: authentication
+  port: 80
+  localPort: 8889
+deploy:
+  kustomize:
+    paths:
+    - ./kustomize/minikube
+profiles:
+- name: custom
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: authentication
+      docker:
+        cacheFrom:
+          - authentication:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/custom
+- name: dev
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: gcr.io/aitutor-dev/authentication
+      docker:
+        cacheFrom:
+          - gcr.io/aitutor-dev/authentication:latest
+      requires:
+        - image: gcr.io/aitutor-dev/common
+          alias: BASE_IMG
+      sync:
+        infer:
+          - '**/*.py'
+          - '**/*.json'
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/dev
+- name: prod
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: authentication
+      docker:
+        cacheFrom:
+          - authentication:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
