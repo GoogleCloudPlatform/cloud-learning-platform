@@ -22,7 +22,17 @@ def check_section_status(field_val):
   """validator method for status field"""
   status = [
       "PROVISIONING", "FAILED_TO_PROVISION", "PROVISIONED",
-      "PROVISIONED_NOT_ACTIVE", "ACTIVE", "ARCHIVE"
+      "ARCHIVE"
+  ]
+  if field_val.upper() in status:
+    return True
+  return (False,
+          "Status must be one of " + ",".join("'" + i + "'" for i in status))
+
+def check_enrollment_status(field_val):
+  """validator method for status field"""
+  status = [
+      "OPEN","CLOSED"
   ]
   if field_val.upper() in status:
     return True
@@ -45,6 +55,7 @@ class Section(BaseModel):
   teachers = ListField(required=True)
   status = TextField(
       required=True, default="PROVISIONING", validator=check_section_status)
+  enrollment_status = TextField(default="CLOSED",validator=check_enrollment_status)
   enrolled_students_count = NumberField(default=0)
 
   class Meta:
