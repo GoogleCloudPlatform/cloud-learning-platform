@@ -1,9 +1,8 @@
 """LTI Assignment Copy Endpoints"""
 import traceback
 import requests
-import datetime
 from fastapi import APIRouter
-from common.models import LTIAssignment, Cohort
+from common.models import LTIAssignment
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError)
@@ -30,42 +29,6 @@ router = APIRouter(
             "model": ValidationErrorResponseModel
         }
     })
-
-
-@router.post("/test/api")
-def test_api():
-
-  cohort_details = Cohort.find_by_id("cohorts/9oOet5ncilQPV56pqWHm")
-  lti_assignment_details = {
-      "section_id": "Test ID",
-      "start_date": None,
-      "end_date": None,
-      "due_date": None
-  }
-
-  lti_assignment_details["start_date"] = (
-      cohort_details.start_date).strftime("%Y-%m-%dT%H:%M:%S%z")
-  lti_assignment_details["end_date"] = (
-      cohort_details.end_date).strftime("%Y-%m-%dT%H:%M:%S%z")
-  lti_assignment_details["due_date"] = (
-      datetime.datetime.utcnow()).strftime("%Y-%m-%dT%H:%M:%S%z")
-
-  input_json = {
-      "lti_assignment_id": "xr5Pby7PA1W62gR62MhJ",
-      "context_id": lti_assignment_details.get("section_id"),
-      "start_date": lti_assignment_details.get("start_date"),
-      "end_date": lti_assignment_details.get("end_date"),
-      "due_date": lti_assignment_details.get("due_date")
-  }
-  print("input_json", input_json)
-  copy_assignment = requests.post(
-      "http://localhost:9060/classroom-shim/api/v1/lti-assignment/copy",
-      json=input_json,
-      timeout=60)
-  print("copy_assignment res", copy_assignment.status_code,
-        copy_assignment.text)
-  print("copy_assignment", copy_assignment.json())
-  return True
 
 
 @router.post(
@@ -104,9 +67,8 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     if content_item_req.status_code == 200:
       content_item_data = content_item_req.json().get("data")
     else:
-      print("1300")
-      # Logger.error(f"Request failed with code 1300 and the status code \
-      #       {content_item_req.status_code} and error: {content_item_req.text}")
+      Logger.error(f"Request failed with code 1300 and the status code \
+            {content_item_req.status_code} and error: {content_item_req.text}")
       raise Exception(
           f"Request failed with code 1300, Please contact administrator")
 
@@ -124,10 +86,9 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     if copy_content_item_req.status_code == 200:
       copy_content_item_data = copy_content_item_req.json().get("data")
     else:
-      print("1310")
-      # Logger.error(f"Request failed with code 1310 and the status code \
-      #       {copy_content_item_req.status_code} and error: {copy_content_item_req.text}"
-      # )
+      Logger.error(f"Request failed with code 1310 and the status code \
+            {copy_content_item_req.status_code} and error: {copy_content_item_req.text}"
+                  )
       raise Exception(
           f"Request failed with code 1310, Please contact administrator")
 
@@ -145,20 +106,22 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
       prev_content_item_ids = [content_item_id]
 
     # Updating the dates of the new lti assignment
+
+    lti_assignment_start_date = lti_assignment_data.get("start_date")
+    lti_assignment_end_date = lti_assignment_data.get("end_date")
+    lti_assignment_due_date = lti_assignment_data.get("due_date")
+
     if input_data_dict.get("start_date"):
-      lti_assignment_start_date = input_data_dict.get("start_date")
-    else:
-      lti_assignment_start_date = lti_assignment_data.get("start_date")
+      if lti_assignment_data.get("start_date"):
+        if input_data_dict.get("start_date") > lti_assignment_data.get(
+            "start_date"):
+          lti_assignment_start_date = input_data_dict.get("start_date")
 
     if input_data_dict.get("end_date"):
       lti_assignment_end_date = input_data_dict.get("end_date")
-    else:
-      lti_assignment_end_date = lti_assignment_data.get("end_date")
 
     if input_data_dict.get("due_date"):
       lti_assignment_due_date = input_data_dict.get("due_date")
-    else:
-      lti_assignment_due_date = lti_assignment_data.get("due_date")
 
     new_lti_assignment_data = {
         "lti_assignment_title": lti_assignment_data.get("lti_assignment_title"),
@@ -182,7 +145,6 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
 
     # new_lti_assignment_item = create_lti_assignment(
     #     InputLTIAssignmentModel.parse_obj(new_lti_assignment_data))
-    print("In Shim service", new_lti_assignment_item)
     return {
         "success": True,
         "message": "Successfully copied the lti assignment",
@@ -190,11 +152,9 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     }
 
   except ResourceNotFoundException as e:
-    # Logger.error(e)
-    print(e)
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
-    # Logger.error(e)
-    # Logger.error(traceback.print_exc())
-    print(e)
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e

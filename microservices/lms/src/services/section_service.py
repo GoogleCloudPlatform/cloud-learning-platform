@@ -326,9 +326,9 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
           {"youtubeVideo":material["youtubeVideo"]})
     if "link" in material.keys():
       if material["link"]["url"] not in link_urls:
+        link = material["link"]
 
         if coursework_type == "coursework":
-          link = material["link"]
           # Update lti assignment with the course work details
           Logger.info(f"In lti course work link material - {link}")
           if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
@@ -372,7 +372,8 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
             updated_material.append({"link": material["link"]})
 
         else:
-          updated_material.append({"link": material["link"]})
+          if "/classroom-shim/api/v1/launch?lti_assignment_id=" not in link["url"]:
+            updated_material.append({"link": material["link"]})
 
         link_urls.append(material["link"]["url"])
 
