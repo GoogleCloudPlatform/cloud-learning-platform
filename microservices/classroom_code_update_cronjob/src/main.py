@@ -31,7 +31,7 @@ try:
   LMS_BACKEND_ROBOT_USERNAME = secrets.access_secret_version(
       request={
           "name":
-              f"projects/{PROJECT_ID}/secrets/lms-backend-robot-username/versions/latest"
+          f"projects/{PROJECT_ID}/secrets/lms-backend-robot-username/versions/latest"
       }).payload.data.decode("utf-8")
 except Exception as e:
   logger.error("Failed to fetch robot username")
@@ -41,14 +41,14 @@ try:
   LMS_BACKEND_ROBOT_PASSWORD = secrets.access_secret_version(
       request={
           "name":
-              f"projects/{PROJECT_ID}/secrets/lms-backend-robot-password/versions/latest"
+          f"projects/{PROJECT_ID}/secrets/lms-backend-robot-password/versions/latest"
       }).payload.data.decode("utf-8")
 except Exception as e:
   logger.error("Failed to fetch robot password")
   LMS_BACKEND_ROBOT_PASSWORD = None
 
 
-def update_section_code(section_id,id_token):
+def update_section_code(section_id, id_token):
   """Update Classroom code for a given section
 
   Args:
@@ -61,13 +61,12 @@ def update_section_code(section_id,id_token):
   api_endpoint = "http://lms/lms/api/v1/sections"+\
     f"/{section_id}/update_classroom_code"
 
-  res = requests.patch(
-      url=api_endpoint,
-      headers={
-          "Content-Type": "application/json",
-          "Authorization": f"Bearer {id_token}"
-      },
-      timeout=60)
+  res = requests.patch(url=api_endpoint,
+                       headers={
+                           "Content-Type": "application/json",
+                           "Authorization": f"Bearer {id_token}"
+                       },
+                       timeout=60)
   res.raise_for_status()
 
   res_json = res.json()
@@ -78,7 +77,7 @@ def update_section_code(section_id,id_token):
                            f"with error: {res_json['message']}")
 
 
-def get_course(course_id,id_token):
+def get_course(course_id, id_token):
   """Update Classroom code for a given section
 
   Args:
@@ -90,13 +89,12 @@ def get_course(course_id,id_token):
   """
   api_endpoint = f"http://lms/lms/api/v1/classroom_courses/{course_id}"
 
-  res = requests.get(
-      url=api_endpoint,
-      headers={
-          "Content-Type": "application/json",
-          "Authorization": f"Bearer {id_token}"
-      },
-      timeout=60)
+  res = requests.get(url=api_endpoint,
+                     headers={
+                         "Content-Type": "application/json",
+                         "Authorization": f"Bearer {id_token}"
+                     },
+                     timeout=60)
   res.raise_for_status()
 
   res_json = res.json()
@@ -105,6 +103,7 @@ def get_course(course_id,id_token):
   else:
     raise CronJobException("Could not Get Course " +
                            f"with error: {res_json['message']}")
+
 
 def get_sections(id_token, limit, skip):
   """Get list of sections from LMS API
@@ -121,13 +120,12 @@ def get_sections(id_token, limit, skip):
   api_endpoint = "http://lms/lms/api/v1/sections?" +\
       f"skip={skip}&limit={limit}"
 
-  res = requests.get(
-      url=api_endpoint,
-      headers={
-          "Content-Type": "application/json",
-          "Authorization": f"Bearer {id_token}"
-      },
-      timeout=60)
+  res = requests.get(url=api_endpoint,
+                     headers={
+                         "Content-Type": "application/json",
+                         "Authorization": f"Bearer {id_token}"
+                     },
+                     timeout=60)
   res.raise_for_status()
 
   res_json = res.json()
@@ -139,8 +137,7 @@ def get_sections(id_token, limit, skip):
 
 
 def main():
-  logger.info(
-      "Classroom Code Update Cronjob STARTING")
+  logger.info("Classroom Code Update Cronjob STARTING")
 
   auth_client = UserCredentials(LMS_BACKEND_ROBOT_USERNAME,
                                 LMS_BACKEND_ROBOT_PASSWORD)
@@ -163,17 +160,19 @@ def main():
       # added try except so that if any update section
       # get failed it will get continue
       try:
-        course=get_course(section["classroom_id"],id_token)
+        course = get_course(section["classroom_id"], id_token)
         if not course["enrollment_code"]:
-          num_turn_off_sections+=1
-          logger.warning({"message":{
-            "error":"Classroom Code doesn't exists for this course",
-            "course_id":course["id"]
-            },
-            "text":f"Classroom Code doesn't exists for this course id: {course['id']}"
+          num_turn_off_sections += 1
+          logger.warning({
+              "message": {
+                  "error": "Classroom Code doesn't exists for this course",
+                  "course_id": course["id"]
+              },
+              "text":
+              f"Classroom Code doesn't exists for this course id: {course['id']}"
           })
         else:
-          if section["classroom_code"]!=course["enrollment_code"]:
+          if section["classroom_code"] != course["enrollment_code"]:
             update_section_code(section["id"], id_token)
             num_updated_sections += 1
       except requests.HTTPError as rte:
@@ -181,11 +180,12 @@ def main():
     if len(sections) < page_size:
       break
     skip += skip_increment
-  logger.info("Cron Job Successfully run "
-              + f"{num_updated_sections} out of {num_sections} sections code updated "
-              + f"and {update_section_code} doesn't have code {num_turn_off_sections}")
   logger.info(
-      "Classroom Code Update Cronjob FINISHED")
+      "Cron Job Successfully run " +
+      f"{num_updated_sections} out of {num_sections} sections code updated " +
+      f"and {num_turn_off_sections} doesn't have code")
+  logger.info("Classroom Code Update Cronjob FINISHED")
+
 
 if __name__ == "__main__":
   main()

@@ -267,7 +267,7 @@ def update_grades(all_form_responses, section, coursework_id):
   for response in all_form_responses["responses"]:
     try:
       if "respondentEmail" not in response.keys():
-        raise Exception("Respondent Email is not collected in form for\
+        raise Exception(f"Respondent Email is not collected in form for\
         coursework {coursework_id} Update form settings to collect Email")
       respondent_email = response["respondentEmail"]
       submissions = classroom_crud.list_coursework_submissions_user(
@@ -292,6 +292,6 @@ def update_grades(all_form_responses, section, coursework_id):
       Logger.error(error)
       Logger.error(e)
       continue
-    Logger.info(f"Student grades updated\
+  Logger.info(f"Student grades updated\
                 for {count} student_data {student_grades}")
-    return count, student_grades
+  return count,student_grades

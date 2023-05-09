@@ -140,3 +140,17 @@ class GetProgressPercentageCohortResponseModel(BaseModel):
   """Get Progress Percentage"""
   success: Optional[bool] = True
   data: list = None
+
+class GetOverallPercentage(BaseModel):
+  """Get Overall Percentage"""
+  success:Optional[bool]=True
+  data: Optional[list] =None
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "data":None
+      }
+      }
