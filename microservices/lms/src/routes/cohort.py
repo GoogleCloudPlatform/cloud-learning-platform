@@ -453,12 +453,16 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
       record = CourseEnrollmentMapping.\
           find_enrolled_student_record(section.key,user_id)
       if record is not None:
+        # get all coursework and submitted course for the student in the section
         course_work_list = classroom_crud.get_coursework(section.classroom_id)
         submitted_course_work = classroom_crud.get_submitted_course_work_list(
         section.key.split("/")[1], user_id,headers)
         overall_grade = 0
         category_grade=[]
         for course_work_obj in course_work_list:
+          # check if gradeCategory exists in the coursework object
+          # check if assigned grade exists for the coursework in submitted \
+          # coursework
           if ("gradeCategory" in course_work_obj and \
               "assignedGrade" in \
               next(item for item in submitted_course_work if \
@@ -492,6 +496,7 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
             if not any(d["category_id"] == category_id for \
             d in category_grade):
               category_grade.append(category_data)
+            # calculate coursework weight with respect to the category weight
             assignment_weight = \
             (course_work_obj["maxPoints"]/total_max_points)*\
             (category_weight/100)
@@ -500,6 +505,7 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
             item["courseWorkId"] == \
             course_work_obj["id"])["assignedGrade"]/\
             course_work_obj["maxPoints"]
+            # calculate coursework's contribution towards overall grade
             assignment_grade=assigned_grade_by_max_points*assignment_weight
             overall_grade = overall_grade+assignment_grade
         data={"section_id":section.key.split("/")[1],\
