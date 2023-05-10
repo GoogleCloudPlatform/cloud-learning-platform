@@ -270,3 +270,42 @@ def test_list_section_cohort_not_found(client_with_emulator):
   # json_response = resp.json()
 
   assert resp.status_code == 404
+
+def test_get_overall_percentage(client_with_emulator,create_fake_data):
+  url = BASE_URL+\
+  f"/cohorts/{create_fake_data['cohort']}/get_overall_grade/test@gmail.com"
+  course_work_data = [{
+    "courseId": "608197437928",
+      "id": "608197730201",
+      "title": "test assignment",
+      "state": "PUBLISHED",
+      "maxPoints":100,
+      "creationTime": "2023-02-16T10:45:49.833Z",
+      "materials":[],
+      "gradeCategory": {
+        "id": "519721188066",
+        "name": "category 3",
+        "weight": 600000,
+        "defaultGradeDenominator": 100
+      }
+  }]
+  submitted_course_work_data=[{
+    "courseId": "608197437928",
+      "courseWorkId": "608197730201",
+      "id": "Cg4I3PC2n7kOEJm_o9vZEQ",
+      "userId": "112879484175618986691",
+      "creationTime": "2023-05-06T15:23:49.535Z",
+      "updateTime": "2023-05-06T15:25:39.348Z",
+      "state": "RETURNED",
+      "draftGrade": 50,
+      "assignedGrade": 50,
+  }]
+  with mock.patch("routes.cohort.student_service.get_user_id",\
+                  return_value="test@gmail.com"):
+    with mock.patch("routes.cohort.classroom_crud.get_coursework",\
+                    return_value=course_work_data):
+      with mock.patch\
+        ("routes.cohort.classroom_crud.get_submitted_course_work_list",\
+                      return_value=submitted_course_work_data):
+        resp = client_with_emulator.get(url)
+  assert resp.status_code == 200
