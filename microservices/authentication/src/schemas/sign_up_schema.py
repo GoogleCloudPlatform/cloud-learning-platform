@@ -7,7 +7,7 @@ from schemas.schema_examples import (
     SIGN_UP_WITH_CREDENTIALS_API_INPUT_EXAMPLE,
     SIGN_UP_WITH_CREDENTIALS_API_RESPONSE_EXAMPLE)
 
-
+# pylint: disable=invalid-name
 class SignUpWithCredentialsModel(BaseModel):
   """Sign Up with Credentials Input Pydantic Model"""
   email: str

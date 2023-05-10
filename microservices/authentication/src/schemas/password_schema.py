@@ -9,6 +9,7 @@ from schemas.schema_examples import (
     CHANGE_PASSWORD_RESPONSE_EXAMPLE, RESET_PASSWORD_RESPONSE_EXAMPLE,
     RESET_PASSWORD_EXAMPLE, CHANGE_PASSWORD_EXAMPLE)
 
+# pylint: disable=invalid-name
 
 class SendPasswordResetEmailModel(BaseModel):
   """Send Password Reset Email Pydantic Model"""
