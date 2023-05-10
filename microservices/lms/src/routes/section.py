@@ -332,7 +332,6 @@ def update_section(sections_details: UpdateSection,request: Request):
       "last_name": user_profile["name"]["familyName"],
       "email":i,
       "user_type": "faculty",
-      "user_type_ref": "",
       "user_groups": [],
       "status": "active",
       "is_registered": True,

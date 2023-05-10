@@ -136,7 +136,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         repository: GPS-Solutions/ailearning-backend
-        ref: 9317c5e71bccd9cc1c52d6036f7b1f8695dedca5
+        ref: bbf05a7c5bce2fad279a486e1a593fa0a031f544
         # adding run_id so we can fold in the repo without collision
         path: ${{ format('ailearning-backend_{0}', github.run_id) }}
         token: ${{ secrets.GH_PAT }}
