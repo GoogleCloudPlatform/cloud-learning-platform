@@ -312,14 +312,18 @@ def create_analytics_data(context):
                     headers=header)
   res.raise_for_status()
   student_email_and_token = get_student_email_and_token()
+  print("In analytics fixturee__ student email and token value",student_email_and_token)
   res=requests.post(url=f'{API_URL}/cohorts/{section.cohort.id}/students',
                     json=student_email_and_token,
                     headers=header)
+  print("Added student for cohort____",res.status_code)
   res.raise_for_status()
   resp=requests.get(headers=header,
 url=f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_email"]}')
+  print("Added student for section____",resp.status_code)
   resp.raise_for_status()
   data["student_data"]=resp.json()["data"]
+  print("REsponse of get student in section",data)
   data["course_details"]={
     "id":section.classroom_id,
     "name":section.name,
@@ -341,6 +345,7 @@ url=f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_emai
           }).execute()
   data["course_work"]=result
   context.analytics_data=data
+  print("Contex value for analytics data set")
   result_sub = service.courses().courseWork(
     ).studentSubmissions(
       ).list(courseId=result["courseId"],
