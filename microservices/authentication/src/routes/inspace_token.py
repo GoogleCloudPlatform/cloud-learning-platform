@@ -30,9 +30,9 @@ auth_scheme = HTTPBearer(auto_error=False)
             "model": NotFoundErrorResponseModel
            }})
 def get_token(user_id: str, token: auth_scheme = Depends()):
-  """The get users endpoint will return the token for inspace  
+  """The get users endpoint will return the token for inspace
     ### Args:
-       user_id (str): Unique identifier for user  
+       user_id (str): Unique identifier for user
 
     ### Raises:
       ResourceNotFoundException: If the user does not exist
