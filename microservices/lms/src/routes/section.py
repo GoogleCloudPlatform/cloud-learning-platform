@@ -167,9 +167,6 @@ def get_teachers_list(section_id: str, request: Request):
     for teacher in teachers:
       result = common_service.call_search_user_api(headers=headers,
       email=teacher)
-      Logger.info(f"REsponse of Get {teacher} {section_id} ETacher APII {result.status_code}")
-      result_json = result.json()
-      Logger.info(f"Result json {result_json}")
       if result.json()["data"] !=[]:
         teacher_details.append(result.json()["data"][0])
     return {"data": teacher_details}
@@ -211,10 +208,6 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
     if teacher_email in teachers:
       result = common_service.call_search_user_api(headers=headers,
       email=teacher_email)
-      Logger.info(
-      f"REsponse of Get {teacher_email} {section_id} ETacher APII {result.status_code}")
-      result_json = result.json()
-      Logger.info(f"Result json {result_json}")
       if result.json()["data"] == [] or result.json()["data"] is None :
         raise ResourceNotFoundException(
           f"{teacher_email} not found in Users data")
