@@ -19,7 +19,8 @@ import os
 from datetime import datetime
 import fireo
 from fireo.models import Model
-from fireo.fields import DateTime, TextField, NumberField, ListField, BooleanField
+from fireo.fields import DateTime, TextField, NumberField, ListField, \
+  BooleanField,MapField
 from common.utils.errors import ResourceNotFoundException
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
@@ -184,6 +185,8 @@ class TempUser(TempBaseModel):
   gaia_id = TextField()
   photo_url = TextField()
   is_deleted = BooleanField(default=False)
+  inspace_user = MapField(default={})
+
   class Meta:
     collection_name = TempBaseModel.DATABASE_PREFIX + "users"
     ignore_none_field = False
