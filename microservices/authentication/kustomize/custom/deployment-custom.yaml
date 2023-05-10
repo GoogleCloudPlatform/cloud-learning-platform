@@ -5,10 +5,11 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccountName: ksa
       containers:
       - name: authentication
         image: authentication
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         - name: DATABASE_PREFIX
           valueFrom:
@@ -20,4 +21,3 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: INSPACE_BASE_URL
-
