@@ -323,12 +323,12 @@ url=f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_emai
   print("Added student for section____",resp.status_code)
   resp.raise_for_status()
   data["student_data"]=resp.json()["data"]
-  print("REsponse of get student in section",data)
   data["course_details"]={
     "id":section.classroom_id,
     "name":section.name,
     "section":section.section
     }
+  print("REsponse of get student in section",data)
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
