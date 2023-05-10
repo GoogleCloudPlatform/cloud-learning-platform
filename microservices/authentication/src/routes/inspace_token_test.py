@@ -79,15 +79,15 @@ def test_get_inspace_token_without_inspace_user(mock_validate_token,
     "is_inspace_user": True,
     "inspace_user_id": ""
   }
-  user = User.from_dict(user_dict)
-  user.user_id = ""
-  user.save()
-  user.user_id = user.id
-  user.update()
-  user_dict["user_id"] = user.id
+  user = TempUser.from_dict(user_dict)
+  TempUser.user_id = ""
+  TempUser.save()
+  TempUser.user_id = TempUser.id
+  TempUser.update()
+  user_dict["user_id"] = TempUser.id
 
   headers = {"Authorization": "Bearer ey8273bqo...obx"}
-  url = f"{api_url}/token/{user.user_id}"
+  url = f"{api_url}/token/{TempUser.user_id}"
   resp = client_with_emulator.get(url, headers=headers)
   json_response = resp.json()
 
@@ -107,15 +107,15 @@ def test_get_inspace_token_with_inspace_user_false(mock_validate_token,
     "is_inspace_user": False,
     "inspace_user_id": ""
   }
-  user = User.from_dict(user_dict)
-  user.user_id = ""
-  user.save()
-  user.user_id = user.id
-  user.update()
-  user_dict["user_id"] = user.id
+  user = TempUser.from_dict(user_dict)
+  TempUser.user_id = ""
+  TempUser.save()
+  TempUser.user_id = TempUser.id
+  TempUser.update()
+  user_dict["user_id"] = TempUser.id
 
   headers = {"Authorization": "Bearer ey8273bqo...obx"}
-  url = f"{api_url}/token/{user.user_id}"
+  url = f"{api_url}/token/{TempUser.user_id}"
   resp = client_with_emulator.get(url, headers=headers)
 
   assert resp.status_code == 500

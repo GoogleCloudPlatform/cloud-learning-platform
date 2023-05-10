@@ -3,6 +3,7 @@
 import traceback
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
+# TODO: Replace TempUser with User once user management is available
 from common.models import TempUser
 from common.utils.http_exceptions import (InternalServerError,
                               ResourceNotFound, BadRequest)
@@ -54,12 +55,12 @@ def get_token(user_id: str, token: auth_scheme = Depends()):
     if not is_inspace_enabled():
       raise Exception("you don't have permission to access this endpoint")
 
-    user = User.find_by_user_id(user_id)
-    if user.inspace_user is None or \
-      user.inspace_user["is_inspace_user"] is False:
+    user = TempUser.find_by_user_id(user_id)
+    if TempUser.inspace_user is None or \
+      TempUser.inspace_user["is_inspace_user"] is False:
       raise Exception(f"Inspace user does not exist for user id {user_id}")
 
-    if user.inspace_user["inspace_user_id"] != "":
+    if TempUser.inspace_user["inspace_user_id"] != "":
       token_response = get_inspace_token(user_id)
     else:
       status_code, inspace_user_res = get_inspace_user_helper(user)
@@ -68,8 +69,8 @@ def get_token(user_id: str, token: auth_scheme = Depends()):
           "is_inspace_user": True,
           "inspace_user_id": inspace_user_res["inspaceUser"]["id"],
         }
-        user.inspace_user = inspace_user
-        user.update()
+        TempUser.inspace_user = inspace_user
+        TempUser.update()
         token_response = get_inspace_token(user_id)
       else:
         if create_inspace_user_helper(user):

@@ -2,6 +2,7 @@
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable= unused-import
 import pytest
+# TODO: Replace TempUser with User once user management is available
 from common.models import TempUser
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
@@ -22,9 +23,9 @@ BASIC_USER_MODEL_EXAMPLE = {
 
 @pytest.fixture(name="create_user")
 def create_user():
-  user = User.from_dict(BASIC_USER_MODEL_EXAMPLE)
-  user.user_id = ""
-  user.save()
-  user.user_id = user.id
-  user.update()
+  user = TempUser.from_dict(BASIC_USER_MODEL_EXAMPLE)
+  TempUser.user_id = ""
+  TempUser.save()
+  TempUser.user_id = TempUser.id
+  TempUser.update()
   return user

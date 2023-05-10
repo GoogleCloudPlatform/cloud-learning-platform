@@ -51,7 +51,7 @@ def sign_up_with_credentials(credentials: SignUpWithCredentialsModel):
     Returns the id token as well as refresh token
   """
   try:
-    user_data = User.find_by_email(credentials.email)
+    user_data = TempUser.find_by_email(credentials.email)
     if not user_data:
       raise UnauthorizedUserError("Unauthorized")
     if user_data.get_fields(reformat_datetime=True).get("status") == "inactive":

@@ -36,8 +36,8 @@ def generate_id_token(input_params: GenerateTokenRequestModel):
     token_resp = generate_token(input_dict)
 
     decoded_token = verify_token(token_resp["id_token"])
-    user = User.find_by_email(decoded_token["email"])
-    token_resp["user_id"] = user.user_id
+    user = TempUser.find_by_email(decoded_token["email"])
+    token_resp["user_id"] = TempUser.user_id
     return {
         "success": True,
         "message": "Token generated successfully",

@@ -71,11 +71,11 @@ def test_valid_id(mock_generate_token, mock_auth, clean_firestore):
 
   # new_user = {**BASIC_USER_MODEL_EXAMPLE, "email": USER_EMAIL}
   new_user = BASIC_USER_MODEL_EXAMPLE
-  user = User.from_dict(new_user)
-  user.user_id = ""
-  user.save()
-  user.user_id = user.id
-  user.update()
+  user = TempUser.from_dict(new_user)
+  TempUser.user_id = ""
+  TempUser.save()
+  TempUser.user_id = TempUser.id
+  TempUser.update()
 
   url = f"{API_URL}/generate"
 
