@@ -167,7 +167,7 @@ def get_teachers_list(section_id: str, request: Request):
     for teacher in teachers:
       result = common_service.call_search_user_api(headers=headers,
       email=teacher)
-      Logger.info(f"REsponse of Get {teacher}  ETacher APII {result.status_code}")
+      Logger.info(f"REsponse of Get {teacher} {section_id} ETacher APII {result.status_code}")
       result_json = result.json()
       Logger.info(f"Result json {result_json}")
       if result.json()["data"] !=[]:
@@ -211,7 +211,7 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
     if teacher_email in teachers:
       result = common_service.call_search_user_api(headers=headers,
       email=teacher_email)
-      Logger.info(f"REsponse of Get {teacher_email}  ETacher APII {result.status_code}")
+      Logger.info(f"REsponse of Get {teacher_email} {section_id} ETacher APII {result.status_code}")
       result_json = result.json()
       Logger.info(f"Result json {result_json}")
       if result.json()["data"] == [] or result.json()["data"] is None :
