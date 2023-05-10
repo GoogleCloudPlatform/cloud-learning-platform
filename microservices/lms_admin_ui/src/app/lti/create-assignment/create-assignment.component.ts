@@ -33,7 +33,8 @@ export class CreateAssignmentComponent {
       "end_date": [new Date("5/10/2023")],
       "due_date": [new Date("5/10/2023")],
       "lti_assignment_title": ["something", (Validators.required)],
-      "max_points": [55, Validators.required]
+      "max_points": [55, Validators.required],
+      "content_item_id": [null]
     });
     // } else {
     // let redirectUris = this.dialogData.extra_data.redirect_uris
@@ -115,7 +116,8 @@ export class CreateAssignmentComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result.data == "success") {
+      if (result.data.status == "success") {
+        this.toolForm.get("content_item_id").setValue(result.data.response[0].content_item_id)
       }
       console.log("result", result)
     });

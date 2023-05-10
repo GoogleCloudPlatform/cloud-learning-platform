@@ -1,4 +1,4 @@
 <p>content-selector works!</p>
 <div *ngIf="!loadingIframe">
-    <iframe [src]="iframeUrl" frameborder="0"></iframe>
+    <iframe [src]="getUrl(iframeUrl)" frameborder="0" width="500px" height="500px"></iframe>
 </div>
