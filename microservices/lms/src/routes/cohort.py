@@ -453,7 +453,7 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
       record = CourseEnrollmentMapping.\
           find_enrolled_student_record(section.key,user_id)
       if record is not None:
-        course_work_list = classroom_crud.get_coursework(section.classroom_id)
+        course_work_list = classroom_crud.get_coursework_list(section.classroom_id)
         submitted_course_work = classroom_crud.get_submitted_course_work_list(
         section.key.split("/")[1], user_id,headers)
         overall_grade = 0
