@@ -309,3 +309,4 @@ def test_get_overall_percentage(client_with_emulator,create_fake_data):
                       return_value=submitted_course_work_data):
         resp = client_with_emulator.get(url)
   assert resp.status_code == 200
+
