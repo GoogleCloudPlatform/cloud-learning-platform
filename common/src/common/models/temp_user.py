@@ -183,6 +183,7 @@ class TempUser(TempBaseModel):
   access_api_docs = BooleanField(default=False)
   gaia_id = TextField()
   photo_url = TextField()
+  is_deleted = TextField(default=False)
   class Meta:
     collection_name = TempBaseModel.DATABASE_PREFIX + "users"
     ignore_none_field = False
