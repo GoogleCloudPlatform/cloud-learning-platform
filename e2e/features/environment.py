@@ -177,21 +177,28 @@ def create_section(context):
   section.classroom_url = classroom["alternateLink"]
   section.save()
   # Create teachers in the DB 
-  temp_user = TempUser.from_dict(TEST_USER)
-  temp_user.email = TEST_SECTION["teachers"][0]
-  temp_user.user_type = "faculty"
-  temp_user.first_name = TEST_SECTION["teachers"][0].split("@")[0]
-  temp_user.user_id = ""
-  temp_user.save()
-  temp_user.user_id = temp_user.id
-  temp_user.update()
-  temp_user1 = TempUser.from_dict(TEST_USER)
-  temp_user1.email = TEST_SECTION["teachers"][1].split("@")[0]
-  temp_user1.user_type = "faculty"
-  temp_user1.user_id = ""
-  temp_user1.save()
-  temp_user1.user_id = temp_user.id
-  temp_user1.update()
+  temp_user=TempUser.find_by_email(TEST_SECTION["teachers"][0])
+  if temp_user is None:
+      print("Creating new teacher",TEST_SECTION["teachers"][0])
+      temp_user = TempUser.from_dict(TEST_USER)
+      temp_user.user_type = "faculty"
+      temp_user.email =TEST_SECTION["teachers"][0]
+      temp_user.first_name = TEST_SECTION["teachers"][0].split("@")[0]
+      temp_user.user_id = ""
+      temp_user.save()
+      temp_user.user_id = temp_user.id
+      temp_user.update()
+  temp_user1 = TempUser.find_by_email(TEST_SECTION["teachers"][1])
+  if temp_user1 is None:
+    print("Creating a new teacher",TEST_SECTION["teachers"][1])
+    temp_user1 = TempUser.from_dict(TEST_USER)
+    temp_user1.first_name = TEST_SECTION["teachers"][1].split("@")[0]
+    temp_user1.email = TEST_SECTION["teachers"][1]
+    temp_user1.user_type = "faculty"
+    temp_user1.user_id = ""
+    temp_user1.save()
+    temp_user1.user_id = temp_user.id
+    temp_user1.update()
   context.sections=section
   context.classroom_drive_folder_id =classroom["teacherFolder"]["id"]
   yield context.sections

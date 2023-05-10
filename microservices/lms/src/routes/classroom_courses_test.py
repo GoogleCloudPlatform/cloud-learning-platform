@@ -75,7 +75,7 @@ def test_copy_course(client_with_emulator):
             with mock.patch(
               "routes.classroom_courses.classroom_crud.create_coursework"):
               with mock.patch(
-              "routes.classroom_courses.classroom_crud.get_coursework_material_list"
+    "routes.classroom_courses.classroom_crud.get_coursework_material_list"
               ):
                 with mock.patch(
             "routes.classroom_courses.classroom_crud.create_coursework_material"
@@ -105,7 +105,7 @@ def test_copy_course_not_found(client_with_emulator):
             "routes.classroom_courses.classroom_crud.create_coursework_material"
             ):
                 with mock.patch(
-              "routes.classroom_courses.classroom_crud.get_coursework_material_list"
+        "routes.classroom_courses.classroom_crud.get_coursework_material_list"
                   ):
                   with mock.patch(
               "routes.classroom_courses.classroom_crud.drive_copy"):
