@@ -28,7 +28,9 @@ PROJECT_ID = os.environ.get("PROJECT_ID", "")
 
 def check_user_type(field_val):
   """validator method for user type field"""
-  user_types = ["learner", "faculty", "other"]
+  user_types = ["learner", "faculty", "robot",
+            "assessor", "admin", "coach", "instructor",
+              "lxe", "curriculum_designer"]
   if field_val.lower() in user_types:
     return True
   return (False, "User Type must be one of " +
@@ -173,7 +175,7 @@ class TempUser(TempBaseModel):
   last_name = TextField(required=True)
   email = TextField(required=True)
   user_type = TextField(required=True, validator=check_user_type)
-  user_type_ref = TextField()
+  user_type_ref = TextField(default="")
   user_groups = ListField()
   status = TextField(validator=check_status)
   is_registered = BooleanField()

@@ -244,7 +244,7 @@ def create_topics(course_id, topics):
   Logger.info(f"Topics created for course_id{course_id}")
   return topic_id_map
 
-def get_coursework(course_id):
+def get_coursework_list(course_id):
   """Get  list of coursework from classroom
 
   Args: course_id
@@ -311,7 +311,7 @@ def patch_student_submission(course_id,coursework_id,
     body=student_submission).execute()
   return patch_result
 
-def get_coursework_material(course_id):
+def get_coursework_material_list(course_id):
   """Get  list of coursework from classroom
 
   Args: course_id

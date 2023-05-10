@@ -60,7 +60,7 @@ def copy_course_background_task(course_template_details,
     url_mapping = classroom_crud.\
             get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
     # Get coursework of current course and create a new course
-    coursework_list = classroom_crud.get_coursework(
+    coursework_list = classroom_crud.get_coursework_list(
         course_template_details.classroom_id)
     final_coursewok=[]
     for coursework in coursework_list:
@@ -89,7 +89,7 @@ def copy_course_background_task(course_template_details,
       classroom_crud.create_coursework(new_course["id"],final_coursewok)
     # Get the list of courseworkMaterial
     final_coursewok_material = []
-    coursework_material_list = classroom_crud.get_coursework_material(
+    coursework_material_list = classroom_crud.get_coursework_material_list(
       course_template_details.classroom_id)
     for coursework_material in coursework_material_list:
       try:
