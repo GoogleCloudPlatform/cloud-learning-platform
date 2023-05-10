@@ -20,6 +20,7 @@ on:
   pull_request:
     branches:
       - main
+      - feature
     paths:
       - 'microservices/classroom_code_update_cronjob'
       - 'common/**'
