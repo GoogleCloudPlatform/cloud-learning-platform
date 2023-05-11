@@ -62,7 +62,6 @@ def copy_course_background_task(course_template_details,
         "last_name": user_profile["name"]["familyName"],
         "email":teacher_email,
         "user_type": "faculty",
-        "user_type_ref": "",
         "user_groups": [],
         "status": "active",
         "is_registered": True,
@@ -118,7 +117,7 @@ def copy_course_background_task(course_template_details,
             get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
 
     # Get coursework of current course and create a new course
-    coursework_list = classroom_crud.get_coursework(
+    coursework_list = classroom_crud.get_coursework_list(
         course_template_details.classroom_id)
 
     # final_coursewok=[]
@@ -223,7 +222,7 @@ def copy_course_background_task(course_template_details,
     #   classroom_crud.create_coursework(new_course["id"],final_coursewok)
     # Get the list of courseworkMaterial
     final_coursewok_material = []
-    coursework_material_list = classroom_crud.get_coursework_material(
+    coursework_material_list = classroom_crud.get_coursework_material_list(
       course_template_details.classroom_id)
     for coursework_material in coursework_material_list:
       try:
@@ -407,7 +406,7 @@ def update_grades(all_form_responses,section,coursework_id):
   for response in all_form_responses["responses"]:
     try:
       if "respondentEmail" not in response.keys():
-        raise Exception("Respondent Email is not collected in form for\
+        raise Exception(f"Respondent Email is not collected in form for\
         coursework {coursework_id} Update form settings to collect Email")
       respondent_email = response["respondentEmail"]
       submissions=classroom_crud.list_coursework_submissions_user(
@@ -434,6 +433,6 @@ def update_grades(all_form_responses,section,coursework_id):
       Logger.error(error)
       Logger.error(e)
       continue
-    Logger.info(f"Student grades updated\
+  Logger.info(f"Student grades updated\
                 for {count} student_data {student_grades}")
-    return count,student_grades
+  return count,student_grades

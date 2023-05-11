@@ -37,6 +37,7 @@ def update_classroom_grade(input_grade: PostGradeModel):
   try:
     input_grade_dict = {**input_grade.dict()}
 
+    lti_assignment = None
     # TODO: Need to check where the comment can be added in the classroom
     if input_grade_dict["comment"]:
       pass
@@ -51,10 +52,19 @@ def update_classroom_grade(input_grade: PostGradeModel):
         if i.lti_assignment_title == input_grade_dict["line_item_title"]:
           lti_assignment = i
 
+      if lti_assignment is None:
+        raise Exception(
+            f"No title match found for the assignment - {input_grade_dict['line_item_title']} and content item ID - {input_grade_dict['lti_content_item_id']}"
+        )
     else:
       lti_assignment = LTIAssignment.collection.filter(
           "lti_content_item_id", "==",
           input_grade_dict["lti_content_item_id"]).get()
+
+    if lti_assignment is None:
+      raise Exception(
+          f"LTI Assignment not found for the content item ID - {input_grade_dict['lti_content_item_id']}"
+      )
 
     lti_assignment_max_points = lti_assignment.max_points
     course_work_id = lti_assignment.course_work_id
@@ -89,7 +99,7 @@ def update_classroom_grade(input_grade: PostGradeModel):
       post_grade_of_the_user(lti_assignment.section_id, course_work_id,
                              submission_id, assigned_grade, draft_grade)
     else:
-      raise Exception(
+      Logger.error(
           f"Submission not found for the user with id - {user_id}, section id - {lti_assignment.section_id} and course work id - {course_work_id}"
       )
 

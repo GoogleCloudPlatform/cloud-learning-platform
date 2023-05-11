@@ -101,8 +101,6 @@ TEMP_USER = {
   "last_name": "",
   "email":"clplmstestuser1@gmail.com",
   "user_type": "learner",
-  "user_type_ref": "",
-  "user_groups": [],
   "status": "active",
   "is_registered": True,
   "failed_login_attempts_count": 0,

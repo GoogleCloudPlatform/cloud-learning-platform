@@ -179,6 +179,8 @@ def get_teachers_list(section_id: str, request: Request):
                               message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -222,6 +224,8 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
     raise ClassroomHttpException(status_code=ae.resp.status,
                               message=str(ae)) from ae
   except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
@@ -335,7 +339,6 @@ def update_section(sections_details: UpdateSection,request: Request):
       "last_name": user_profile["name"]["familyName"],
       "email":i,
       "user_type": "faculty",
-      "user_type_ref": "",
       "user_groups": [],
       "status": "active",
       "is_registered": True,
