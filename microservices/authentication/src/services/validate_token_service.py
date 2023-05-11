@@ -29,7 +29,7 @@ def validate_token(bearer_token):
   final_data = {**decoded_token}
   user = TempUser.find_by_email(decoded_token["email"])
   if user is not None:
-    user_fields = TempUser.get_fields(reformat_datetime=True)
+    user_fields = user.get_fields(reformat_datetime=True)
     if user_fields.get("status") == "inactive":
       raise UnauthorizedUserError("Unauthorized")
     final_data["access_api_docs"] = False if user_fields.get(

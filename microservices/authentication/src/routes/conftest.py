@@ -24,8 +24,8 @@ BASIC_USER_MODEL_EXAMPLE = {
 @pytest.fixture(name="create_user")
 def create_user():
   user = TempUser.from_dict(BASIC_USER_MODEL_EXAMPLE)
-  TempUser.user_id = ""
-  TempUser.save()
-  TempUser.user_id = TempUser.id
-  TempUser.update()
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
   return user

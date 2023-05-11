@@ -56,11 +56,11 @@ def get_token(user_id: str, token: auth_scheme = Depends()):
       raise Exception("you don't have permission to access this endpoint")
 
     user = TempUser.find_by_user_id(user_id)
-    if TempUser.inspace_user is None or \
-      TempUser.inspace_user["is_inspace_user"] is False:
+    if user.inspace_user is None or \
+      user.inspace_user["is_inspace_user"] is False:
       raise Exception(f"Inspace user does not exist for user id {user_id}")
 
-    if TempUser.inspace_user["inspace_user_id"] != "":
+    if user.inspace_user["inspace_user_id"] != "":
       token_response = get_inspace_token(user_id)
     else:
       status_code, inspace_user_res = get_inspace_user_helper(user)
@@ -69,8 +69,8 @@ def get_token(user_id: str, token: auth_scheme = Depends()):
           "is_inspace_user": True,
           "inspace_user_id": inspace_user_res["inspaceUser"]["id"],
         }
-        TempUser.inspace_user = inspace_user
-        TempUser.update()
+        user.inspace_user = inspace_user
+        user.update()
         token_response = get_inspace_token(user_id)
       else:
         if create_inspace_user_helper(user):
