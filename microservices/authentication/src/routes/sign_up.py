@@ -62,7 +62,7 @@ def sign_up_with_credentials(credentials: SignUpWithCredentialsModel):
         "password": credentials.password,
         "returnSecureToken": True
     }
-    resp = requests.post(url, data)
+    resp = requests.post(url, data,timeout=60)
     resp_data =  resp.json()
     print("IDP SIGNUP RESPONSE", resp_data)
     if resp.status_code == 200:

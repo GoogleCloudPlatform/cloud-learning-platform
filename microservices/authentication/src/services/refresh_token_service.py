@@ -36,5 +36,5 @@ def get_id_token(payload):
       "https://securetoken.googleapis.com/v1/token",
       payload,
       headers={"Content-Type": "application/x-www-form-urlencoded"},
-      params={"key": FIREBASE_API_KEY})
+      params={"key": FIREBASE_API_KEY},timeout=60)
   return resp.json()
