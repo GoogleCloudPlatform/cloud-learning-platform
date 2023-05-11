@@ -90,7 +90,11 @@ def get_lti_assignment(lti_assignment_id: str):
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
     lti_assignment_data = lti_assignment.to_dict()
 
-    return {"data": lti_assignment_data}
+    return {
+        "success": True,
+        "message": "Successfully fetched assignment",
+        "data": lti_assignment_data
+    }
 
   except ResourceNotFoundException as e:
     Logger.error(e)
