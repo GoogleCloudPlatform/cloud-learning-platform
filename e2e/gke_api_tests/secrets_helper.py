@@ -9,10 +9,9 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
 PROJECT_ID = os.getenv("PROJECT_ID", "")
-CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
+# CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
-# CLASSROOM_KEY = "lms"
-# CLASSROOM_ADMIN_EMAIL = "lms"
+
 
 SCOPES = [
   "https://www.googleapis.com/auth/classroom.courses",
@@ -159,9 +158,9 @@ def get_user_email_and_password_for_e2e():
       "UTF-8"))
 
 def create_coursework(course_id,coursework_body):
-  a_creds = service_account.Credentials.from_service_account_info(
-      CLASSROOM_KEY, scopes=SCOPES)
-  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  # a_creds = service_account.Credentials.from_service_account_info(
+  #     CLASSROOM_KEY, scopes=SCOPES)
+  # creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
   body=coursework_body
   coursework = service.courses().courseWork().create(courseId=course_id,
@@ -197,9 +196,9 @@ def create_google_form(title):
         "title": title,
     }
   }
-  a_creds = service_account.Credentials.from_service_account_info(
-CLASSROOM_KEY, scopes=SCOPES)
-  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+#   a_creds = service_account.Credentials.from_service_account_info(
+# CLASSROOM_KEY, scopes=SCOPES)
+#   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   discovery_doc = "https://forms.googleapis.com/$discovery/rest?version=v1"
   service = build("forms", "v1", credentials=creds,
                   discoveryServiceUrl=discovery_doc,

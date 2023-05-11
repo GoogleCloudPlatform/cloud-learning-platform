@@ -26,7 +26,7 @@ FEED_TYPE_DICT = {
 #     "classroom.student-submissions.students.readonly",
 #     "https://www.googleapis.com/auth/classroom.rosters.readonly"
 # ]
-SCOPES = [
+SCOPES_t = [
     "https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.rosters",
     "https://www.googleapis.com/auth/classroom.topics",
@@ -45,7 +45,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.rosters.readonly"
 ]
 
-Scopes_temp=["https://www.googleapis.com/auth/classroom.courses",
+SCOPES=["https://www.googleapis.com/auth/classroom.courses",
               "https://www.googleapis.com/auth/classroom.rosters",
               "https://www.googleapis.com/auth/classroom.topics",
               "https://www.googleapis.com/auth/classroom.coursework.students",
@@ -64,34 +64,10 @@ Scopes_temp=["https://www.googleapis.com/auth/classroom.courses",
 def get_credentials(email=CLASSROOM_ADMIN_EMAIL,
                     service_account="gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
                     ):
-  # classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
-  # creds = service_account.Credentials.from_service_account_info(classroom_key,
-  #                                                               scopes=SCOPES)
-  # creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
   creds = JwtCredentials.from_default_with_subject(
     email,
     service_account,
-    _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
-    scopes=Scopes_temp)
-  return creds
-
-
-def impersonate_teacher_creds(teacher_email):
-  """Impersonate teacher in a classroom
-  Args:
-    teacher_email(str): teacher email which needs to be impersonated
-  Return:
-    creds(dict): returns a dict which credentils
-  """
-  # classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
-  # creds = service_account.Credentials.from_service_account_info(classroom_key,
-  #                                                               scopes=SCOPES)
-  # creds = creds.with_subject(teacher_email)
-  _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
-  creds = JwtCredentials.from_default_with_subject(
-    teacher_email,
-    "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
     _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
     scopes=SCOPES)
   return creds
@@ -133,6 +109,7 @@ def get_course_by_id(course_id):
   except HttpError as error:
     logger.error(error)
     return None
+
 def drive_copy(file_id,target_folder_id,name):
   """copy the file in the target_folder 
   Args: 
