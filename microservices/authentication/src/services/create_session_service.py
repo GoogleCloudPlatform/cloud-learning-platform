@@ -5,6 +5,7 @@ from common.models import Session
 from common.utils.http_exceptions import InternalServerError
 
 def create_session(user_id: str = None):
+  """ Create a new session"""
   try:
     new_session = Session()
     data = {"user_id": user_id}

@@ -65,10 +65,10 @@ def test_validate_token(mock_get_key, mock_verify_token, mock_set_key,
                         clean_firestore):
   user_dict = {**BASIC_USER_MODEL_EXAMPLE}
   user = TempUser.from_dict(user_dict)
-  TempUser.user_id = ""
-  TempUser.save()
-  TempUser.user_id = TempUser.id
-  TempUser.update()
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
   # arrange
   bearer_token = "Bearer XYZ"
   mock_get_key.return_value = None
@@ -89,10 +89,10 @@ def test_validate_token(mock_get_key, mock_verify_token, mock_set_key,
 def test_validate_token_cached(mock_get_key, clean_firestore):
   user_dict = {**BASIC_USER_MODEL_EXAMPLE}
   user = TempUser.from_dict(user_dict)
-  TempUser.user_id = ""
-  TempUser.save()
-  TempUser.user_id = TempUser.id
-  TempUser.update()
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
   # arrange
   bearer_token = "Bearer PQR"
   mock_get_key.return_value = auth_details
