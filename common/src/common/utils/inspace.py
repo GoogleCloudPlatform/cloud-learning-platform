@@ -10,7 +10,7 @@ from common.models.user import User
 from common.utils.logging_handler import Logger
 from common.utils.jwt_token_generator import TokenGenerator
 
-# pylint: disable = broad-exception-raised
+# pylint: disable=broad-except
 
 STAFF_USERS = ["assessor", "instructor", "coach"]
 
