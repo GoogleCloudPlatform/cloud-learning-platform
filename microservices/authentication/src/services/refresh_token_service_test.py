@@ -18,7 +18,7 @@ token_credentials = {
 
 
 def mocked_requests_post(*args, **kwargs):
-
+  """Mock requests"""
   class MockResponse:
 
     def __init__(self, json_data, status_code):
@@ -40,7 +40,8 @@ def mocked_requests_post(*args, **kwargs):
 def test_get_id_token(mock_post):
   # arrange
   refresh_token = "ABC"
-  payload = "grant_type=refresh_token&refresh_token={}".format(refresh_token)
+  payload = f"grant_type=refresh_token&refresh_token={refresh_token}"
+
   mock_post.side_effect = mocked_requests_post
   # action
   resp = get_id_token(payload)

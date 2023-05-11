@@ -18,11 +18,11 @@ def validate_token(bearer_token):
         Decoded Token and User type: Dict
   """
   token = bearer_token
-  cached_token = get_key("cache::{}".format(token))
+  cached_token = get_key(f"cache::{token}")
   if cached_token is None:
     decoded_token = verify_token(token)
-    cache_token = set_key("cache::{}".format(token), decoded_token, 1800)
-    Logger.info("Id Token caching status: {}".format(cache_token))
+    cache_token = set_key(f"cache::{token}", decoded_token, 1800)
+    Logger.info(f"Id Token caching status: {cache_token}")
   else:
     decoded_token = cached_token
 

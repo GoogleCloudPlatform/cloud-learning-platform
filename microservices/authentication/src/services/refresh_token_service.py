@@ -14,8 +14,10 @@ def generate_token(req_body):
         token_credentials: Dict
   """
 
-  payload = "grant_type=refresh_token&refresh_token={}".format(
-      req_body["refresh_token"])
+  payload = (
+      f"grant_type=refresh_token&"
+      f"refresh_token={req_body['refresh_token']}"
+  )
   response = get_id_token(payload)
   if "error" in response:
     raise InvalidRefreshTokenError(response["error"]["message"])
@@ -36,5 +38,6 @@ def get_id_token(payload):
       "https://securetoken.googleapis.com/v1/token",
       payload,
       headers={"Content-Type": "application/x-www-form-urlencoded"},
-      params={"key": FIREBASE_API_KEY},timeout=60)
+      params={"key": FIREBASE_API_KEY},
+      timeout=60)
   return resp.json()
