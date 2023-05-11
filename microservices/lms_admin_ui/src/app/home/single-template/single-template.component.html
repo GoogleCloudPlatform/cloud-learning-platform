@@ -1,1 +1,114 @@
-<p>single-template works!</p>
+<div class="custom-outer-container">
+    <app-breadcrum></app-breadcrum>
+
+    <ngx-skeleton-loader *ngIf="!loadCard" count="1"
+        [theme]="{'height': '100px','margin-top':'30px','background-color': '#EAEAEA'}">
+    </ngx-skeleton-loader>
+
+    <mat-card *ngIf="loadCard" style="margin-top:2%;margin-bottom: 3%;">
+        <mat-card-content>
+            <div class="cohort-title"><span class="name">{{courseTemplateDetails.name}}</span>
+
+            </div>
+            <div class="object-details">
+                <div style="width:50%;">
+                    <div class="element"><span class="element-heading">Cohort Description : </span> <span
+                            class="element-content">{{courseTemplateDetails.description}}</span></div>
+                    <div class="element"><span class="element-heading">Instructional Designer : </span> <span
+                            class="element-content">{{courseTemplateDetails.instructional_designer}}</span></div>
+                    <div class="element"><span class="element-heading">Course Admin : </span> <span
+                            class="element-content">{{courseTemplateDetails.admin}}</span></div>
+                </div>
+            </div>
+
+        </mat-card-content>
+    </mat-card>
+
+    <div class="section-management">
+        <span class="heading">Course Template management</span>
+
+        <button mat-flat-button color="primary" (click)="openAddAssignmentDialog()"><span
+                class="material-symbols-rounded">
+                add
+            </span> Add LTI Assignment</button>
+    </div>
+
+    <ng-container>
+
+
+        <mat-tab-group>
+            <mat-tab label="LTI Assignment">
+
+                <ngx-skeleton-loader *ngIf="!loadTable" count="3"
+                    [theme]="{'height': '40px','margin-top':'15px','background-color': '#EAEAEA'}">
+                </ngx-skeleton-loader>
+
+
+                <table *ngIf="loadTable" mat-table [dataSource]="ltiAssignments" class="mat-elevation-z8"
+                    style="width: 100%;">
+
+                    <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef>
+                            Assignment ID
+                        </th>
+                        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="lti_assignment_title">
+                        <th mat-header-cell *matHeaderCellDef>
+                            Title
+                        </th>
+                        <td mat-cell *matCellDef="let element"> {{element.lti_assignment_title}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="start_date">
+                        <th mat-header-cell *matHeaderCellDef>
+                            Start Date
+                        </th>
+                        <td mat-cell *matCellDef="let element"> {{element.start_date | date:'short'}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="end_date">
+                        <th mat-header-cell *matHeaderCellDef>
+                            End Date
+                        </th>
+                        <td mat-cell *matCellDef="let element"> {{element.end_date | date:'short'}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="due_date">
+                        <th mat-header-cell *matHeaderCellDef>
+                            Due Date
+                        </th>
+                        <td mat-cell *matCellDef="let element"> {{element.due_date | date:'short'}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef>
+                            Action
+                        </th>
+                        <td mat-cell *matCellDef="let element;let i = index">
+                            <span class="material-symbols-rounded" style="cursor: pointer; margin-right: 8px;"
+                                (click)="openUpdateDialog(element.id, element)">
+                                edit
+                            </span>
+                            <span class="material-symbols-rounded" style="cursor: pointer;"
+                                (click)="openDeleteDialog(element.id, element.name)">
+                                Delete
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="ltiAssignmentsDisplayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ltiAssignmentsDisplayedColumns;"></tr>
+
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" colspan="4">No data found</td>
+                    </tr>
+
+                </table>
+            </mat-tab>
+        </mat-tab-group>
+    </ng-container>
+
+
+</div>

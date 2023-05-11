@@ -4,14 +4,14 @@ import { ToolsListComponent } from './tools-list/tools-list.component';
 import { CreateAssignmentComponent } from './create-assignment/create-assignment.component';
 
 const routes: Routes = [
-  {
-    path: '',
-    component: CreateAssignmentComponent
-  },
   // {
   //   path: '',
-  //   component: ToolsListComponent
-  // }
+  //   component: CreateAssignmentComponent
+  // },
+  {
+    path: '',
+    component: ToolsListComponent
+  }
 ];
 
 @NgModule({
