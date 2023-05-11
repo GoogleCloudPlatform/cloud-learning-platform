@@ -185,8 +185,7 @@ class TempUser(TempBaseModel):
   gaia_id = TextField()
   photo_url = TextField()
   is_deleted = BooleanField(default=False)
-  inspace_user = MapField(default={"user_id":"",
-                        "is_inspace_user": False})
+  inspace_user = MapField(default={})
 
   class Meta:
     collection_name = TempBaseModel.DATABASE_PREFIX + "users"
