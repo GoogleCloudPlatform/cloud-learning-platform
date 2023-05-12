@@ -1,11 +1,11 @@
 """Session Data Model"""
 
 from fireo.fields import (TextField, MapField)
-from common.models import BaseModel
+from common.models import TempBaseModel
 from common.utils.errors import ResourceNotFoundException
 
 
-class Session(BaseModel):
+class Session(TempBaseModel):
   """Data model class for Learner Profile"""
   # schema for object
   session_id = TextField(required=True)
@@ -14,7 +14,7 @@ class Session(BaseModel):
   session_data = MapField(default=None)
 
   class Meta:
-    collection_name = BaseModel.DATABASE_PREFIX + "v3_sessions"
+    collection_name = TempBaseModel.DATABASE_PREFIX + "v3_sessions"
     ignore_none_field = False
 
   @classmethod
