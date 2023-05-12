@@ -54,11 +54,6 @@ spec:
           value: users
         - name: REDIS_HOST
           value: redis-master
-        - name: IS_DEVELOPMENT
-          valueFrom:
-            configMapKeyRef:
-              name: env-vars
-              key: IS_DEVELOPMENT
         - name: FIREBASE_API_KEY # value to be added/removed later
           valueFrom:
             configMapKeyRef:
