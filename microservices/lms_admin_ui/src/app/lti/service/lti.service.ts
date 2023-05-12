@@ -29,8 +29,8 @@ export class LtiService {
     return this.http.put(`${environment.ltiUrl}tool/${id}`, data)
   }
 
-  contentSelectionLaunch(tool_id: string, user_id: string, context_id: string) {
-    return this.http.get(`${environment.ltiUrl}content-selection-launch-init?tool_id=${tool_id}&user_id=${user_id}&context_id=${context_id}`)
+  contentSelectionLaunch(tool_id: string, user_id: string, context_id: string, context_type: string) {
+    return this.http.get(`${environment.ltiUrl}content-selection-launch-init?tool_id=${tool_id}&user_id=${user_id}&context_id=${context_id}&context_type=${context_type}`)
   }
 
 }

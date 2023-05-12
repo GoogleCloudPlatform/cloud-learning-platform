@@ -1,4 +1,8 @@
 <p>content-selector works!</p>
+<div *ngIf="loadingIframe">
+    <ngx-skeleton-loader count="1" [theme]="{'height': '500px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
+    </ngx-skeleton-loader>
+</div>
 <div *ngIf="!loadingIframe">
     <iframe [src]="getUrl(iframeUrl)" frameborder="0" width="500px" height="500px"></iframe>
 </div>

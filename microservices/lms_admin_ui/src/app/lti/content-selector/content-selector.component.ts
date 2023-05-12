@@ -26,13 +26,12 @@ export class ContentSelectorComponent {
       const decoded = JSON.parse(data);
       console.log("decoded", decoded)
       this.dialogRef.close({ data: decoded });
-      // this.showIframe = false
     });
   }
 
   getToolUrl() {
     let data = this.dialogData.extra_data
-    this.ltiService.contentSelectionLaunch(data.toolId, data.userId, data.contextId).subscribe(
+    this.ltiService.contentSelectionLaunch(data.toolId, data.userId, data.contextId, data.contextType).subscribe(
       (response: any) => {
         this.loadingIframe = false
         this.iframeUrl = response.url

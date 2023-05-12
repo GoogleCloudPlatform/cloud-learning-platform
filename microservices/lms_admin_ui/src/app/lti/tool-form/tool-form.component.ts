@@ -80,18 +80,13 @@ export class ToolFormComponent {
   }
 
   onSubmit(toolForm) {
-    console.log(toolForm.value)
     const data = this.processFormInputs(toolForm.value)
-    console.log(data)
     if (this.dialogData.mode == "Create") {
       this.ltiService.postTool(data).subscribe(response => {
-        console.log("response", response)
         this.dialogRef.close({ data: 'success' })
       })
     } else {
-      console.log("this.dialogData.extra_data", this.dialogData.extra_data)
       this.ltiService.updateTool(this.dialogData.extra_data.id, data).subscribe(response => {
-        console.log("response", response)
         this.dialogRef.close({ data: 'success' })
       })
     }

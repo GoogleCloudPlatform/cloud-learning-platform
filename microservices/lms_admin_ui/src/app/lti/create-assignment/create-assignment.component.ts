@@ -66,7 +66,7 @@ export class CreateAssignmentComponent {
     const data = toolForm.value
     console.log(data)
     if (this.dialogData.mode == "Create") {
-      this.homeService.postLtiAssignments({...data, section_id: this.dialogData.extra_data.courseTemplateId}).subscribe(response => {
+      this.homeService.postLtiAssignments({ ...data, section_id: this.dialogData.extra_data.courseTemplateId }).subscribe(response => {
         console.log("response", response)
         this.dialogRef.close({ data: 'success' })
       })
@@ -91,8 +91,8 @@ export class CreateAssignmentComponent {
     ltiModalData['mode'] = 'Open'
     ltiModalData['init_data'] = ''
     ltiModalData['extra_data'] = {
-      // contextId: this.dialogData.extra_data.courseTemplateId,
-      contextId: "LS5TfQ4Q5UAV1SCDW3ZE",
+      contextId: this.dialogData.extra_data.courseTemplateId,
+      contextType: "course_template",
       toolId: toolForm.value.tool_id,
       userId: "vcmt4ZemmyFm59rDzl1U"
     }
@@ -118,6 +118,8 @@ export class CreateAssignmentComponent {
     })
   }
 
-
+  onNoClick(): void {
+    this.dialogRef.close({ data: 'closed' });
+  }
 
 }
