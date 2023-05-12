@@ -11,6 +11,7 @@ from common.utils.logging_handler import Logger
 from common.utils.jwt_token_generator import TokenGenerator
 
 # pylint: disable=broad-except
+# pylint: disable = broad-exception-raised
 
 STAFF_USERS = ["assessor", "instructor", "coach"]
 
