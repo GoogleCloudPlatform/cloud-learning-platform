@@ -1,0 +1,8 @@
+pytest
+mock
+faker
+backports-unittest-mock
+google-cloud-logging
+protobuf==3.19.5
+regex==2022.10.31
+redis==4.5.4

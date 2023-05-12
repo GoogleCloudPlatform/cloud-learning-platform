@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learning-object-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: learning-object-service
+        image: learning-object-service
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "500Mi"
+        env:
+        - name: CONTENT_SERVING_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: CONTENT_SERVING_BUCKET
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX
