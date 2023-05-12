@@ -11,11 +11,11 @@ spec:
         image: learning-object-service
         imagePullPolicy: Always
         env:
-        - name: GCP_PROJECT
+        - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: GCP_PROJECT
+              key: PROJECT_ID
         - name: EXTERNAL_DATA_GCP_PROJECT
           valueFrom:
             configMapKeyRef:
@@ -26,3 +26,8 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: CONTENT_SERVING_BUCKET
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX

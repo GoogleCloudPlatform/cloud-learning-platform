@@ -1,3 +1,17 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 apiVersion: skaffold/v2beta12
 kind: Config
 metadata:
@@ -5,25 +19,10 @@ metadata:
 requires:
   - path: ../../common
     configs: [common]
-    activeProfiles:
-    - name: custom
-      activatedBy: [custom]
-    - name: dev
-      activatedBy: [dev]
-    - name: prod
-      activatedBy: [prod]
-  - path: ../assessment_service
-    configs: [assessment-service]
-    activeProfiles:
-    - name: custom
-      activatedBy: [custom]
-    - name: dev
-      activatedBy: [dev]
-    - name: prod
-      activatedBy: [prod]
 build:
   tagPolicy:
-    gitCommit: {}
+    gitCommit:
+      ignoreChanges: true
   local:
     concurrency: 0
   artifacts:
@@ -61,15 +60,18 @@ profiles:
       paths:
       - ./kustomize/custom
 - name: dev
+  activation:
+  - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: gcr.io/aitutor-dev/learning-object-service
+    - image: gcr.io/core-learning-services-dev/learning-object-service
       docker:
         cacheFrom:
-          - gcr.io/aitutor-dev/learning-object-service:latest
+          - gcr.io/core-learning-services-dev/learning-object-service
+          - gcr.io/core-learning-services-dev/learning-object-service:latest
       requires:
-        - image: gcr.io/aitutor-dev/common
+        - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG
       sync:
         infer:
@@ -80,16 +82,22 @@ profiles:
       paths:
       - ./kustomize/dev
 - name: prod
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: learning-object-service
+    - image: authentication
       docker:
         cacheFrom:
-          - learning-object-service:latest
+          - authentication
+          - authentication:latest
       requires:
         - image: common
           alias: BASE_IMG
+- name: prod_non_cloudbuild
   deploy:
     kustomize:
       paths:
