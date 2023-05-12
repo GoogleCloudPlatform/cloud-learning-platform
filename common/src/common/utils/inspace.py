@@ -17,7 +17,7 @@ STAFF_USERS = ["assessor", "instructor", "coach"]
 
 secrets = secretmanager.SecretManagerServiceClient()
 
-GCP_PROJECT = os.environ.get("GCP_PROJECT", default="aitutor-dev")
+GCP_PROJECT = os.environ.get("PROJECT_ID")
 
 INSPACE_BASE_URL = os.getenv("INSPACE_BASE_URL", default=None)
 
