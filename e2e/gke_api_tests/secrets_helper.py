@@ -7,11 +7,11 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
-
+from common.utils.jwt_creds import JwtCredentials
 PROJECT_ID = os.getenv("PROJECT_ID", "")
 # CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
-CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
-
+# CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
+CLASSROOM_ADMIN_EMAIL = "lms_admin_teacher@dhodun.altostrat.com"
 
 SCOPES = [
   "https://www.googleapis.com/auth/classroom.courses",
@@ -116,7 +116,16 @@ def get_access_token(credential_object):
       credentials_dict = json.loads(creds.to_json())
   return credentials_dict
 
-
+def get_credentials(email=CLASSROOM_ADMIN_EMAIL,
+                    service_account="gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
+                    ):
+  _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
+  creds = JwtCredentials.from_default_with_subject(
+    email,
+    service_account,
+    _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
+    scopes=SCOPES)
+  return creds
 
 
 def get_workspace_student_email_and_token():
@@ -161,7 +170,7 @@ def create_coursework(course_id,coursework_body):
   # a_creds = service_account.Credentials.from_service_account_info(
   #     CLASSROOM_KEY, scopes=SCOPES)
   # creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-  service = build("classroom", "v1", credentials=creds)
+  service = build("classroom", "v1", credentials=get_credentials())
   body=coursework_body
   coursework = service.courses().courseWork().create(courseId=course_id,
                                                  body=body).execute()
@@ -200,17 +209,21 @@ def create_google_form(title):
 # CLASSROOM_KEY, scopes=SCOPES)
 #   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   discovery_doc = "https://forms.googleapis.com/$discovery/rest?version=v1"
-  service = build("forms", "v1", credentials=creds,
+  service = build("forms", "v1", credentials=get_credentials(),
                   discoveryServiceUrl=discovery_doc,
                     static_discovery=False)
   result = service.forms().create(body=form_body).execute()
   return result
 
 def get_file(file_id):
-  a_creds = service_account.Credentials.from_service_account_info(
-CLASSROOM_KEY, scopes=SCOPES)
-  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-  service = build("drive", "v3", credentials=creds)
+#   a_creds = service_account.Credentials.from_service_account_info(
+# CLASSROOM_KEY, scopes=SCOPES)
+#   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("drive", "v3", credentials=get_credentials())
   response = service.files().get(fileId=file_id,  
     fields="name,webViewLink").execute()
   return response
+
+print("This is get file called")
+result=get_file("12HC0intwEC9TAXl-quS16vjWlLoUXRf81YVFVtmuY2c")
+print("This is result",result)
