@@ -1,6 +1,6 @@
 """Classroom Courses endpoint"""
 import traceback
-from common.utils.errors import  ValidationError
+from common.utils.errors import  ValidationError, ResourceNotFoundException
 from common.utils.http_exceptions import (ClassroomHttpException,
                         InternalServerError,ResourceNotFound,
                                           BadRequest)
@@ -16,9 +16,10 @@ from schemas.classroom_courses import (
                           CourseDetails,
                           EnableNotificationsResponse,
                           CopyCourseResponse,
-                          ClassroomCourseListResponseModel
+                          ClassroomCourseListResponseModel,
+                          ClassroomResponseModel
                           )
-from utils.helper import FEED_TYPES
+from utils.helper import FEED_TYPES,convert_course_dict_to_classroom_model
 # disabling for linting to pass
 # pylint: disable = broad-except
 
@@ -55,8 +56,9 @@ def get_courses(skip: int = 0, limit: int = 10):
     if limit < 1:
       raise ValidationError(
           "Invalid value passed to \"limit\" query parameter")
-    course_list = classroom_crud.get_course_list()
-    return {"data": list(course_list)[skip:limit]}
+    course_list = list(classroom_crud.get_course_list())[skip:limit+skip]
+    data=[convert_course_dict_to_classroom_model(i) for i in course_list]
+    return {"data": data}
   except ValidationError as ve:
     raise BadRequest(str(ve)) from ve
   except HttpError as hte:
@@ -67,6 +69,48 @@ def get_courses(skip: int = 0, limit: int = 10):
     Logger.error(e)
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
+    raise InternalServerError(str(e)) from e
+
+
+@router.get("/{course_id}",response_model=ClassroomResponseModel)
+def get_course(course_id:str):
+  """_summary_
+
+  Args:
+      course_id (str): unique course id
+
+  Raises:
+      BadRequest: _description_
+      ClassroomHttpException: _description_
+      InternalServerError: _description_
+      InternalServerError: _description_
+
+  Returns:
+      ClassroomResponseModel: object which contains course details
+  """
+  try:
+    course=classroom_crud.get_course_by_id(course_id)
+    if course is None:
+      raise ResourceNotFoundException(
+          "Classroom course with id" +
+          f" {course_id} is not found")
+    data=convert_course_dict_to_classroom_model(course)
+    return {
+      "message":f"Successfully fetch course by this {course_id} id",
+      "data":data
+      }
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except HttpError as hte:
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
+  except InternalServerError as ie:
+    raise InternalServerError(str(ie)) from ie
+  except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -91,6 +135,7 @@ def copy_courses(course_details: CourseDetails):
     current_course = classroom_crud.get_course_by_id(course_id)
     if current_course is None:
       return "No course found "
+    current_drive_folder_id = current_course["teacherFolder"]["id"]
     # Create a new course
     new_course = classroom_crud.create_course(current_course["name"],
                                               current_course["description"],
@@ -106,7 +151,7 @@ def copy_courses(course_details: CourseDetails):
     if topics is not None:
       topic_id_map = classroom_crud.create_topics(new_course["id"], topics)
     # Get coursework of current course and create a new course
-    coursework_list = classroom_crud.get_coursework(course_id)
+    coursework_list = classroom_crud.get_coursework_list(course_id)
     final_coursework =[]
     for coursework in coursework_list:
       try:
@@ -123,7 +168,7 @@ def copy_courses(course_details: CourseDetails):
           # a dictionary of view_links as keys and edit likns as
           # values of google form
           url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form()
+            get_edit_url_and_view_url_mapping_of_form(current_drive_folder_id)
           # Loop to check if a material in courssework has
           #  a google form attached to it
           # update the  view link to edit link and attach it as a form
@@ -154,7 +199,7 @@ def copy_courses(course_details: CourseDetails):
     if final_coursework is not None:
       classroom_crud.create_coursework(new_course["id"], final_coursework)
     # Get the list of courseworkMaterial
-    coursework_material_list = classroom_crud.get_coursework_material(
+    coursework_material_list = classroom_crud.get_coursework_material_list(
         course_id)
     final_coursework_material=[]
     for coursework_material in coursework_material_list:

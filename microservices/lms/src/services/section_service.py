@@ -14,7 +14,8 @@ from config import BQ_TABLE_DICT,BQ_DATASET
 # pylint: disable = broad-except
 def copy_course_background_task(course_template_details,
                                 sections_details,
-                                cohort_details,headers,message=""):
+                                cohort_details,template_drive_folder_id,
+                                headers,message=""):
   """Create section  Background Task to copy course and updated database
   for newly created section
   Args:
@@ -57,9 +58,9 @@ def copy_course_background_task(course_template_details,
     # a dictionary of view_links as keys and edit
     #  links/  and file_id as values for all drive files
     url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form()
+            get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
     # Get coursework of current course and create a new course
-    coursework_list = classroom_crud.get_coursework(
+    coursework_list = classroom_crud.get_coursework_list(
         course_template_details.classroom_id)
     final_coursewok=[]
     for coursework in coursework_list:
@@ -88,7 +89,7 @@ def copy_course_background_task(course_template_details,
       classroom_crud.create_coursework(new_course["id"],final_coursewok)
     # Get the list of courseworkMaterial
     final_coursewok_material = []
-    coursework_material_list = classroom_crud.get_coursework_material(
+    coursework_material_list = classroom_crud.get_coursework_material_list(
       course_template_details.classroom_id)
     for coursework_material in coursework_material_list:
       try:
@@ -134,7 +135,6 @@ def copy_course_background_task(course_template_details,
         "last_name": user_profile["name"]["familyName"],
         "email":teacher_email,
         "user_type": "faculty",
-        "user_type_ref": "",
         "user_groups": [],
         "status": "active",
         "is_registered": True,
@@ -247,3 +247,46 @@ def update_coursework_material(materials,url_mapping,target_folder_id):
       updated_material.append({"link":material["link"]})
       material.pop("form")
   return updated_material
+
+def update_grades(all_form_responses,section,coursework_id):
+  """Takes the forms all responses ,section, and coursework_id and
+  updates the grades of student who have responsed to form and
+  submitted the coursework
+  """
+  student_grades = {}
+  count =0
+  Logger.info(f"Student grade update background tasks started\
+              for coursework_id {coursework_id}")
+  for response in all_form_responses["responses"]:
+    try:
+      if "respondentEmail" not in response.keys():
+        raise Exception(f"Respondent Email is not collected in form for\
+        coursework {coursework_id} Update form settings to collect Email")
+      respondent_email = response["respondentEmail"]
+      submissions=classroom_crud.list_coursework_submissions_user(
+                                            section.classroom_id,
+                                            coursework_id,
+                                    response["respondentEmail"])
+      if submissions !=[]:
+        if submissions[0]["state"] == "TURNED_IN":
+          Logger.info(f"Updating grades for {respondent_email}")
+          if "totalScore" not in response.keys():
+            response["totalScore"]=0
+          classroom_crud.patch_student_submission(section.classroom_id,
+                                  coursework_id,submissions[0]["id"],
+                                        response["totalScore"],
+                                        response["totalScore"])
+          count+=1
+          student_grades[
+          response["respondentEmail"]]=response["totalScore"]
+          Logger.info(f"Updated grades for {respondent_email}")
+        else :
+          Logger.info(f"Submission state is not turn in {respondent_email}")
+    except Exception as e:
+      error = traceback.format_exc().replace("\n", " ")
+      Logger.error(error)
+      Logger.error(e)
+      continue
+  Logger.info(f"Student grades updated\
+                for {count} student_data {student_grades}")
+  return count,student_grades

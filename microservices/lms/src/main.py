@@ -25,7 +25,8 @@ from fastapi import FastAPI, Request, Depends
 import config
 from routes import (
   section,student,
-  course_template,cohort,classroom_courses
+  course_template,cohort,
+  classroom_courses,analytics
   # ,user
         )
 from utils.helper import validate_user
@@ -83,7 +84,6 @@ api = FastAPI(title="LMS Service APIs",
               dependencies=[Depends(validate_user)]
               )
 
-
 # api.include_router(user.router)
 api.include_router(section.router)
 api.include_router(student.router)
@@ -92,10 +92,12 @@ api.include_router(student.cohort_student_router)
 api.include_router(course_template.router)
 api.include_router(classroom_courses.router)
 api.include_router(cohort.router)
+api.include_router(analytics.router)
 
 add_exception_handlers(app)
 add_exception_handlers(api)
 app.mount("/lms/api/v1", api)
+
 
 if __name__ == "__main__":
   uvicorn.run("main:app",

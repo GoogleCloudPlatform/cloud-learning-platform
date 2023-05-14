@@ -9,6 +9,8 @@ import { HomeService } from '../service/home.service';
 import { Router, NavigationStart, NavigationEnd, Event as NavigationEvent } from '@angular/router';
 import { InviteStudentModalComponent } from '../invite-student-modal/invite-student-modal.component';
 import { Subscription } from 'rxjs';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+
 
 interface LooseObject {
   [key: string]: any
@@ -27,6 +29,16 @@ export interface student {
   created_time: string;
 }
 
+export interface coursework {
+  courseId: string,
+      courseWorkId: string,
+      title: string,
+      state: string,
+      creationTime: string,
+      materials: [],
+      status:string
+}
+
 @Component({
   selector: 'app-section',
   templateUrl: './section.component.html',
@@ -36,9 +48,11 @@ export class SectionComponent implements OnInit,OnDestroy {
   selectedSection: any
   displayedColumns: string[] = ['email', 'role'];
   studentDisplayedColumns: string[] = ['first name', 'last name', 'email', 'created time','status','action'];
+  courseworkDisplayColumns: string[] = ['title', 'state', 'created time','action']
 
   tableData: staff[] = []
   studentTableData: student[] = []
+  courseworkTable: coursework[] = []
   dataSource = new MatTableDataSource(this.tableData);
 
   cohortDetails: any
@@ -47,8 +61,11 @@ export class SectionComponent implements OnInit,OnDestroy {
   loadCard: boolean = false
   loadSection: boolean = false
   studentTableLoader:boolean=true
+  courseworkTableLoader:boolean=true
   getStudentListSub:Subscription
-  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, public _HomeService: HomeService, 
+  importGradesSub:Subscription
+  disableCourseworkAction:boolean=false
+  constructor(private _liveAnnouncer: LiveAnnouncer, private _snackBar: MatSnackBar, public dialog: MatDialog, public _HomeService: HomeService, 
     public router: Router, private _location: Location) { }
   @ViewChild(MatSort) sort: MatSort;
 
@@ -99,6 +116,26 @@ export class SectionComponent implements OnInit,OnDestroy {
     })
   }
 
+  getCourseworkDetails(){
+    this.courseworkTableLoader=true
+    this._HomeService.getCourseworkDetails(this.selectedSection.id).subscribe((res:any)=>{
+this.transformCourseworkTableData(res.data)
+this.courseworkTableLoader=false
+    },
+    (err:any)=>{
+      this.courseworkTableLoader=false
+    })
+  }
+
+transformCourseworkTableData(data:any){
+  this.courseworkTable=[]
+  for (let x of data){
+    x['status'] = 'import'
+    this.courseworkTable.push(x)
+  }
+  console.log('coursework',this.courseworkTable)
+}
+
   openClassroom() {
     window.open(this.selectedSection.classroom_url
       , '_blank');
@@ -135,8 +172,13 @@ export class SectionComponent implements OnInit,OnDestroy {
 
   createTableData() {
     console.log('selected sec', this.selectedSection)
+    if(this.importGradesSub){
+      this.importGradesSub.unsubscribe();
+    }
+    this.disableCourseworkAction=false
     this.updateUrl(this.selectedSection.id)
     this.getSectionStudents()
+    this.getCourseworkDetails()
     this.tableData = []
     for (let x of this.selectedSection.teachers) {
       let staffObj: staff = { name: '', email: '', role: '' }
@@ -292,9 +334,43 @@ export class SectionComponent implements OnInit,OnDestroy {
       return false
     }
   }
+  callGradeImport(rowNumber:any,courseworkId:string){
+    console.log("row num", rowNumber)
+    this.disableCourseworkAction=true
+    this.courseworkTable[rowNumber]['status'] = 'loading'
+    this.importGradesSub = this._HomeService.gradeImport(this.selectedSection.id,courseworkId).subscribe((res:any)=>{
+  this.courseworkTable[rowNumber]['status'] = 'import_done'
+  this.disableCourseworkAction=false
+  this.openSuccessSnackBar(res.message,'Close')
+},(err:any)=>{
+  this.courseworkTable[rowNumber]['status'] = 'import_error'
+  this.disableCourseworkAction=false
+})
+  }
+  checkMaterialsArray(materials:any[]){
+    let status:boolean=false
+    for (let x of materials){
+      if('form' in x){
+        status = true
+        break
+      }
+    }
+    return status
+  }
+
+  openSuccessSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 6000,
+      panelClass: ['green-snackbar'],
+    });
+  }
+
   ngOnDestroy(): void {
     if(this.getStudentListSub){
       this.getStudentListSub.unsubscribe();
+    }
+    if(this.importGradesSub){
+      this.importGradesSub.unsubscribe();
     }
   }
 

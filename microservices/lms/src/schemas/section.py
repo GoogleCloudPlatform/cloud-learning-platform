@@ -5,7 +5,8 @@ import datetime
 from typing import Optional
 from pydantic import BaseModel, constr
 from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE,\
-  INSERT_SECTION_EXAMPLE,TEMP_USER,ASSIGNMENT_MODEL,STUDENT
+  INSERT_SECTION_EXAMPLE,TEMP_USER,ASSIGNMENT_MODEL,\
+    STUDENT,SHORT_COURSEWORK_MODEL
 
 
 class Sections(BaseModel):
@@ -263,23 +264,33 @@ class AssignmentModel(BaseModel):
     schema_extra = {
         "example": ASSIGNMENT_MODEL
     }
-class ImportGradeResponseModel(BaseModel):
-  """Import grade esponseModel Details Model"""
+class GetCourseWorkList(BaseModel):
+  """Coursework list model"""
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[dict] = {}
+  data: Optional[list] =[]
 
   class Config():
     orm_mode = True
     schema_extra = {
-      "example": {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data":[SHORT_COURSEWORK_MODEL]
+      }
+      }
+class ImportGradeResponseModel(BaseModel):
+  """Import grade esponseModel Details Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success"
+  data: Optional[dict] = None
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
       "success":True,
       "message":"Success",
-      "data":{"count":10,
-      "student_grades" : {
-      "student1@gmail.com":10,
-      "student2@gmail.com":7,
-      "student3@gmail.com":5  }
-              }
+      "data":None
         }
-    }
+      }

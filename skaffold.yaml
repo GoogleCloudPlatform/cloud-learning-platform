@@ -42,6 +42,9 @@ requires:
 - path: ./microservices/classroom_notifications_cronjob
   configs: [classroom-notifications-cronjob]
 
+- path: ./microservices/classroom_code_update_cronjob
+  configs: [classroom-code-update-cronjob]
+
 - path: ./microservices/update_invitations_cronjob
   configs: [update-invitations-cronjob]
 

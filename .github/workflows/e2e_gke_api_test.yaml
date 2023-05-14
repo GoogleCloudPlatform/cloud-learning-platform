@@ -41,6 +41,7 @@ env:
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
+  CLOUD_LOGGING_ENABLED: False
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
 # cookiecutter:raw 
@@ -132,7 +133,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         repository: GPS-Solutions/ailearning-backend
-        ref: 9317c5e71bccd9cc1c52d6036f7b1f8695dedca5
+        ref: df352edb8c4572c87c88896245af3c3db8bcb5cc
         # adding run_id so we can fold in the repo without collision
         path: ${{ format('ailearning-backend_{0}', github.run_id) }}
         token: ${{ secrets.GH_PAT }}

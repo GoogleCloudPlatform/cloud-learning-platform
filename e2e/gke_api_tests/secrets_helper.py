@@ -9,9 +9,11 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from common.utils.jwt_creds import JwtCredentials
 PROJECT_ID = os.getenv("PROJECT_ID", "")
-# CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
-# CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
-CLASSROOM_ADMIN_EMAIL = "lms_admin_teacher@dhodun.altostrat.com"
+CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
+CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
+PROJECT_ID="core-learning-services-dev"
+USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT=bool(
+  os.getenv("USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT","false").lower() in ("true",))
 
 SCOPES = [
   "https://www.googleapis.com/auth/classroom.courses",
@@ -24,10 +26,8 @@ SCOPES = [
   "https://www.googleapis.com/auth/forms.body.readonly",
   "https://www.googleapis.com/auth/classroom.profile.photos",
   "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-  "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+  "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
   ]
-
-
 
 def get_required_emails_from_secret_manager():
   """Get Project user emails for e2e
@@ -36,7 +36,6 @@ def get_required_emails_from_secret_manager():
   Returns:
     return the emails in dict format
     """ ""
-
   client = secretmanager.SecretManagerServiceClient()
   test_user_secret_id = "org-test-user-1-username"
   test_user_2_secret_id = "org-test-user-2-username"
@@ -52,13 +51,7 @@ def get_required_emails_from_secret_manager():
   }
   return data
 
-
-def get_student_email_and_token():
-  """Get student email and token
-
-    Returns:
-        dict: returns a dict which contains student email and token
-    """
+def get_gmail_student_email_and_token():
   student_email_token_name_mapping = {
     "personal-test-user-1-username": "add_student_token",
     "personal-test-user-2-username": "add_student_token_2",
@@ -105,6 +98,24 @@ def get_student_email_and_token():
   print(data)
   return data
 
+def get_student_email_and_token():
+  """Get student email and token
+
+    Returns:
+        dict: returns a dict which contains student email and token
+    """
+  if USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT:
+    return get_gmail_student_email_and_token()
+  workspace_data=get_workspace_student_email_and_token()
+  data={
+    "email": workspace_data["email"],
+    "access_token":workspace_data["access_token"],
+    "invite_student_email":workspace_data["email"],
+    "invite_student_token": workspace_data["access_token"]
+  }
+  print(data)
+  return data
+
 def get_access_token(credential_object):
   credentials_dict = json.loads(
       credential_object.payload.data.decode("UTF-8"))
@@ -135,8 +146,8 @@ def get_workspace_student_email_and_token():
         dict: returns a dict which contains student email and token
     """
   client = secretmanager.SecretManagerServiceClient()
-  student_email_secret_id = "org-test-user-1-username"
-  student_token_secret_id = "enroll_workspace_student"
+  student_email_secret_id = "lms-service-user"
+  student_token_secret_id = "lms_user_student_token"
   student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
   student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
   student_email_response = client.access_secret_version(
@@ -224,6 +235,13 @@ def get_file(file_id):
     fields="name,webViewLink").execute()
   return response
 
-print("This is get file called")
-result=get_file("12HC0intwEC9TAXl-quS16vjWlLoUXRf81YVFVtmuY2c")
-print("This is result",result)
+def insert_file_into_folder(folder_id,file_id):
+
+  a_creds = service_account.Credentials.from_service_account_info(
+CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("drive", "v2", credentials=creds)
+  new_child = {'id': file_id}
+  result= service.children().insert(
+        folderId=folder_id, body=new_child).execute()
+  return result
