@@ -16,7 +16,8 @@ import os
 from google.cloud import pubsub_v1
 from google.api_core.exceptions import AlreadyExists
 from google.oauth2 import service_account
-from common.utils.jwt_creds import JwtCredentials
+# from common.utils.jwt_creds import JwtCredentials
+
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
 PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
   os.getenv("PROJECT_ID")
