@@ -38,27 +38,15 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive.file"
 ]
 def get_credentials(email=CLASSROOM_ADMIN_EMAIL,
-service_account="gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
-  scopes=SCOPES):
-  Logger.info(f"{email} {service_account} {scopes}")
+service_account="gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com"
+ ):
   google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
   creds = JwtCredentials.from_default_with_subject(
     email,
     service_account,
     google_oauth_token_endpoint,
-    scopes=scopes)
+    scopes=SCOPES)
   return creds
-
-# def get_credentials_enable_notifications(email=CLASSROOM_ADMIN_EMAIL,
-#                     service_account="gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
-#                     ):
-#   _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
-#   creds = JwtCredentials.from_default_with_subject(
-#     email,
-#     service_account,
-#     _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
-#     scopes=REGISTER_SCOPES)
-#   return creds
 
 def create_course(name, description, section, owner_id):
   """Create course Function in classroom
@@ -665,8 +653,13 @@ def enable_notifications(course_id, feed_type):
   Returns:
       _type_: _description_
   """
-
-  service = build("classroom", "v1", credentials=get_credentials(scopes==REGISTER_SCOPES))
+  google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
+  creds = JwtCredentials.from_default_with_subject(
+    CLASSROOM_ADMIN_EMAIL,
+    "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
+    google_oauth_token_endpoint,
+    scopes=REGISTER_SCOPES)
+  service = build("classroom", "v1", credentials=creds)
   body = {
       "feed": {
           "feedType": feed_type,
