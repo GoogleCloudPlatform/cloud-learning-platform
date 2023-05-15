@@ -1,0 +1,67 @@
+<h2 mat-dialog-title>
+    <ng-container *ngIf="dialogData.mode == 'Create'">Create New LTI Assignment</ng-container>
+    <ng-container *ngIf="dialogData.mode == 'Update'">Update LTI Assignment</ng-container>
+</h2>
+<div mat-dialog-content style="padding-bottom: 4%;padding-top: 1%;">
+
+
+    <form [formGroup]="toolForm">
+        <div>
+            <mat-form-field appearance="fill" style="width: 100%">
+                <mat-label>Select Tool</mat-label>
+                <mat-select formControlName="tool_id" (selectionChange)="onDropdownChange()">
+                    <mat-option *ngFor="let tool of toolsList" [value]="tool.id">{{tool.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <mat-form-field appearance="fill" style="width: 100%">
+                <mat-label>Start Date</mat-label>
+                <input formControlName="start_date" matInput [matDatepicker]="start_date">
+                <mat-datepicker-toggle matIconSuffix matSuffix [for]="start_date"></mat-datepicker-toggle>
+                <mat-datepicker #start_date></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <mat-form-field appearance="fill" style="width: 100%">
+                <mat-label>End Date</mat-label>
+                <input formControlName="end_date" matInput [matDatepicker]="end_date">
+                <mat-datepicker-toggle matIconSuffix matSuffix [for]="end_date"></mat-datepicker-toggle>
+                <mat-datepicker #end_date></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <mat-form-field appearance="fill" style="width: 100%">
+                <mat-label>Due Date</mat-label>
+                <input formControlName="due_date" matInput [matDatepicker]="due_date">
+                <mat-datepicker-toggle matIconSuffix matSuffix [for]="due_date"></mat-datepicker-toggle>
+                <mat-datepicker #due_date></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <mat-form-field appearance="fill" style="width: 100%">
+                <mat-label>Assignment Title</mat-label>
+                <input formControlName="lti_assignment_title" matInput>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <mat-form-field appearance="fill" style="width: 100%">
+                <mat-label>Max Points</mat-label>
+                <input formControlName="max_points" matInput>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <button mat-flat-button color="primary" (click)="openContentSelector(toolForm)">Select Content</button>
+        </div>
+        <div mat-dialog-actions style="display: flex;justify-content: end;">
+            <button mat-flat-button (click)="onNoClick()">Cancel</button>
+            <button mat-flat-button (click)="onSubmit(toolForm)" color="primary" type="submit">Save</button>
+        </div>
+    </form>
+</div>

@@ -2,7 +2,8 @@
 import traceback
 from copy import deepcopy
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Form, Request
+from fastapi.templating import Jinja2Templates
 from common.models import Tool
 from common.utils.errors import ResourceNotFoundException
 from common.utils.logging_handler import Logger
@@ -17,6 +18,8 @@ from services.line_item_service import create_new_content_item
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
 del ERROR_RESPONSE_DICT[401]
 
+templates = Jinja2Templates(directory="templates")
+
 router = APIRouter(
     tags=["Content Item Return Endpoint"], responses=ERROR_RESPONSE_DICT)
 
@@ -27,7 +30,9 @@ router = APIRouter(
         "model": NotFoundErrorResponseModel
     }},
     name="DeepLinking Response API for Content Item")
-def content_item_return(JWT: str = Form(), context_id: str = None):
+def content_item_return(request: Request,
+                        JWT: str = Form(),
+                        context_id: str = None):
   """
     This endpoint which will be used by tool for sending deep linking response
     for content selection.
@@ -75,11 +80,14 @@ def content_item_return(JWT: str = Form(), context_id: str = None):
                                                     context_id)
       content_item_data["content_item_id"] = content_item_fields.get("id")
 
-    return {
-        "success": True,
-        "message": "Successfully received and decoded content item",
-        "data": content_item_data
-    }
+    return templates.TemplateResponse(
+        "content_item_return.html", {
+            "request": request,
+            "data": {
+                "status": "success",
+                "response": content_item_data
+            }
+        })
 
   except ResourceNotFoundException as e:
     Logger.error(e)
