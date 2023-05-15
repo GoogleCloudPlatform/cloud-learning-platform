@@ -263,7 +263,7 @@ def enroll_student_course(context):
 @fixture
 def enroll_teacher_into_section(context):
   """fixture to enroll teacher to section"""
-  section=use_fixture(create_cohort, context)
+  section=use_fixture(create_section, context)
   temp_user = TempUser.from_dict(TEST_USER)
   instructional_designer_email="teachera@gmail.com"
   temp_user.email = instructional_designer_email
