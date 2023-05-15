@@ -264,7 +264,7 @@ def step_impl_36(context):
     "A user has access to admin portal and needs to retrieve the details teacher with valid section id and teacher_email"
 )
 def step_impl_37(context):
-  context.url = f'{API_URL}/sections/{context.enrollment_mapping.sections.id}/teachers/{context.enrollment_mapping.user.email}'
+  context.url = f'{API_URL}/sections/{context.enrollment_mapping.section.id}/teachers/{context.enrollment_mapping.user.email}'
 
 
 @behave.when(
@@ -307,7 +307,7 @@ def step_impl_41(context):
 )
 def step_impl_42(context):
   assert context.status == 404, "Status 404"
-  assert context.response["status"] is False, "Check Data"
+  assert context.response["success"] is False, "Check Data"
 
 #-----------------------------------Delete teacher from section--------------------------------------
 #---Positive scenario
@@ -316,7 +316,7 @@ def step_impl_42(context):
     "A user has access to admin portal and needs to delete the teacher with valid section id and teacher_email"
 )
 def step_impl_43(context):
-  context.url = f'{API_URL}/sections/{context.enrollment_mapping.sections.id}/teachers/{context.enrollment_mapping.user.email}'
+  context.url = f'{API_URL}/sections/{context.enrollment_mapping.section.id}/teachers/{context.enrollment_mapping.user.email}'
 
 
 @behave.when(
@@ -358,7 +358,7 @@ def step_impl_47(context):
 )
 def step_impl_48(context):
   assert context.status == 404, "Status 404"
-  assert context.response["status"] is False, "Check Data"
+  assert context.response["success"] is False, "Check Data"
 
 #---------------------------------Enroll teacher in a section-------------
 @behave.given(
@@ -382,7 +382,7 @@ def step_impl_50(context):
 )
 def step_impl_51(context):
   assert context.status == 200, "Status 200"
-  assert context.response["status"] is True, "Check Data"
+  assert context.response["success"] is True, "Check Data"
 
 # -----------------------------------Import grade coursework- Positive-------------------------------
 
