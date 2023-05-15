@@ -15,19 +15,34 @@ PROJECT_ID="core-learning-services-dev"
 USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT=bool(
   os.getenv("USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT","false").lower() in ("true",))
 
+# SCOPES = [
+#   "https://www.googleapis.com/auth/classroom.courses",
+#   "https://www.googleapis.com/auth/classroom.courses.readonly",
+#   "https://www.googleapis.com/auth/classroom.coursework.students",
+#   "https://www.googleapis.com/auth/classroom.rosters",
+#   "https://www.googleapis.com/auth/classroom.coursework.me",
+#   "https://www.googleapis.com/auth/classroom.topics",
+#   "https://www.googleapis.com/auth/drive",
+#   "https://www.googleapis.com/auth/forms.body.readonly",
+#   "https://www.googleapis.com/auth/classroom.profile.photos",
+#   "https://www.googleapis.com/auth/classroom.courseworkmaterials",
+#   "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
+#   ]
+
 SCOPES = [
-  "https://www.googleapis.com/auth/classroom.courses",
-  "https://www.googleapis.com/auth/classroom.courses.readonly",
-  "https://www.googleapis.com/auth/classroom.coursework.students",
-  "https://www.googleapis.com/auth/classroom.rosters",
-  "https://www.googleapis.com/auth/classroom.coursework.me",
-  "https://www.googleapis.com/auth/classroom.topics",
-  "https://www.googleapis.com/auth/drive",
-  "https://www.googleapis.com/auth/forms.body.readonly",
-  "https://www.googleapis.com/auth/classroom.profile.photos",
-  "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-  "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
-  ]
+    "https://www.googleapis.com/auth/classroom.courses",
+    "https://www.googleapis.com/auth/classroom.rosters",
+    "https://www.googleapis.com/auth/classroom.topics",
+    "https://www.googleapis.com/auth/classroom.coursework.students",
+    "https://www.googleapis.com/auth/classroom.coursework.me",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/forms.body.readonly",
+    "https://www.googleapis.com/auth/classroom.profile.photos",
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials",
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
+    "https://www.googleapis.com/auth/forms.body",
+    "https://www.googleapis.com/auth/drive.file"
+]
 
 def get_required_emails_from_secret_manager():
   """Get Project user emails for e2e
@@ -128,7 +143,7 @@ def get_access_token(credential_object):
   return credentials_dict
 
 def get_credentials(email=CLASSROOM_ADMIN_EMAIL,
-                    service_account="gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
+service_account="gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
                     ):
   _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
   creds = JwtCredentials.from_default_with_subject(

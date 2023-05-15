@@ -13,7 +13,7 @@ from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL,e
 from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,\
   get_student_email_and_token,\
   get_required_emails_from_secret_manager,create_coursework,create_google_form,\
-get_file,get_gmail_student_email_and_token,insert_file_into_folder
+get_file,get_gmail_student_email_and_token
 
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.user import TEST_USER
@@ -255,7 +255,7 @@ def enroll_student_course(context):
 def import_google_form_grade(context):
   "Fixture for import grade"
   section = use_fixture(create_section, context)
-  folder_id = context.classroom_drive_folder_id
+  # folder_id = context.classroom_drive_folder_id
   # result =insert_file_into_folder(folder_id,e2e_google_form_id)
   # print("Inserted in classroom folder",result)
   coursework_body = {"title": "Test_quize11",
