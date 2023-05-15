@@ -11,7 +11,6 @@ from common.utils.http_exceptions import (ClassroomHttpException,
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.utils.bq_helper import insert_rows_to_bq
-from common.utils.jwt_creds import JwtCredentials
 from fastapi import APIRouter, Request,BackgroundTasks,status
 from googleapiclient.errors import HttpError
 from schemas.classroom_courses import EnableNotificationsResponse
@@ -36,9 +35,6 @@ from utils.helper import (convert_section_to_section_model,
 from config import BQ_TABLE_DICT,BQ_DATASET
 # disabling for linting to pass
 # pylint: disable = broad-except
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-
 
 router = APIRouter(prefix="/sections",
                    tags=["Sections"],
@@ -537,7 +533,7 @@ def import_grade(section_id: str,coursework_id:str,
   try:
     section = Section.find_by_id(section_id)
     classroom_course = classroom_crud.get_course_by_id(section.classroom_id)
-    folder_id = classroom_course["teacherFolder"]["id"]
+    # folder_id = classroom_course["teacherFolder"]["id"]
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
     #Get url mapping of google forms view links and edit ids
@@ -592,33 +588,3 @@ def import_grade(section_id: str,coursework_id:str,
     Logger.error(error)
     raise InternalServerError(str(e)) from e
 
-@router.post("/test_jwt")
-def test_jwt():
-  SCOPES = ['https://www.googleapis.com/auth/drive']
-  _DEFAULT_TOKEN_LIFETIME_SECS = 3600  # 1 hour in seconds
-  _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
-  creds = JwtCredentials.from_default_with_subject(
-    "lms_admin_teacher@dhodun.altostrat.com",
-    "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
-    _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
-    scopes=SCOPES)
-
-
-  service = build('drive', 'v3', credentials=creds)
-  page_token = None
-  while True:
-    response = service.files().list(
-      q=
-      "(name contains \"e2e\") and (mimeType=\"application/vnd.google-apps.folder\")",
-      spaces='drive',
-      fields='nextPageToken, files(id, name)',
-      corpora='allDrives',
-      includeItemsFromAllDrives='true',
-      supportsAllDrives='true',
-      pageToken=page_token).execute()
-    for file in response.get('files', []):
-      print('Found file: %s (%s)' % (file.get('name'), file.get('id')))
-    page_token = response.get('nextPageToken', None)
-    if page_token is None:
-      break
-  return  response

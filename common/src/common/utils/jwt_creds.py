@@ -1,25 +1,14 @@
 from __future__ import print_function
-
-import os.path
-import os
 import datetime
 import json
 import google.auth
-
 from google.oauth2 import service_account
-
 from google.auth import _helpers
-from google.auth import credentials
 from google.auth.transport.requests import AuthorizedSession
-from common.utils.logging_handler import Logger
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
+
 
 _DEFAULT_TOKEN_LIFETIME_SECS = 3600  # 1 hour in seconds
 _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
-
-# ADMIN_TEACHER_EMAIL = "<INSERT_ADMIN_TEACHER_EMAIL>"
-
 class JwtCredentials(service_account.Credentials):
 
   def _make_authorization_grant_assertion(self):
@@ -53,17 +42,16 @@ class JwtCredentials(service_account.Credentials):
 
     default_creds, _ = google.auth.default()
     authed_session = AuthorizedSession(default_creds)
-    iam_url = "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/" + self._service_account_email + ":signJwt"
+    iam_url = "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/"
+    +self._service_account_email + ":signJwt"
     response = authed_session.request("POST",
                                       url=iam_url,
                                       data=json.dumps(iam_payload))
-    print("THis is response of get credential",response)
-    return response.json()['signedJwt']
+    return response.json()["signedJwt"]
 
   @classmethod
   def from_default_with_subject(self, subject, service_account_email,
                                 token_uri, scopes):
-    Logger.info(f"This is default method {subject} {service_account_email} {token_uri}")
     return self(signer=None,
                 service_account_email=service_account_email,
                 token_uri=token_uri,

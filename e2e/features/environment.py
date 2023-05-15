@@ -256,8 +256,8 @@ def import_google_form_grade(context):
   "Fixture for import grade"
   section = use_fixture(create_section, context)
   folder_id = context.classroom_drive_folder_id
-  result =insert_file_into_folder(folder_id,e2e_google_form_id)
-  print("Inserted in classroom folder",result)
+  # result =insert_file_into_folder(folder_id,e2e_google_form_id)
+  # print("Inserted in classroom folder",result)
   coursework_body = {"title": "Test_quize11",
       "description":"test desc",
       "workType": "ASSIGNMENT",

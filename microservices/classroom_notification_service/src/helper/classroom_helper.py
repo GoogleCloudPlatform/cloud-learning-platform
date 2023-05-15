@@ -1,5 +1,5 @@
 """ Hepler functions for classroom crud API """
-from google.oauth2 import service_account
+# from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from config import CLASSROOM_ADMIN_EMAIL
 from common.utils.logging_handler import Logger
@@ -9,9 +9,6 @@ FEED_TYPE_DICT = {
     "COURSE_WORK_CHANGES": "courseWorkChangesInfo",
     "COURSE_ROSTER_CHANGES": "courseRosterChangesInfo"
 }
-# REGISTER_SCOPES = [
-    
-# ]
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.rosters",
     "https://www.googleapis.com/auth/classroom.coursework.students.readonly",
@@ -35,11 +32,11 @@ def get_service():
   #     get_gke_pd_sa_key_from_secret_manager(), scopes=SCOPES)
   # creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   Logger.info(f"This is admin email {CLASSROOM_ADMIN_EMAIL}")
-  _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
+  google_oauth2_token_endpoint = "https://oauth2.googleapis.com/token"
   creds = JwtCredentials.from_default_with_subject(
     CLASSROOM_ADMIN_EMAIL,
     "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
-    _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
+    google_oauth2_token_endpoint,
     scopes=SCOPES)
   return build("classroom", "v1", credentials=creds,num_retries=15)
 

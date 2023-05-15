@@ -58,7 +58,7 @@ def copy_course_background_task(course_template_details,
     # a dictionary of view_links as keys and edit
     #  links/  and file_id as values for all drive files
     # url_mapping = classroom_crud.\
-    #         get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
+    # get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
     url_mapping = classroom_crud.\
             get_edit_url_and_view_url_mapping_of_form()
     # Get coursework of current course and create a new course
