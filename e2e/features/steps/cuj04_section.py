@@ -268,7 +268,7 @@ def step_impl_37(context):
 
 
 @behave.when(
-    "API request is sent which contains valid section id and teacher email"
+    "Get request is sent which contains valid section id and teacher email"
 )
 def step_impl_38(context):
   resp = requests.get(context.url,
@@ -320,7 +320,7 @@ def step_impl_43(context):
 
 
 @behave.when(
-    "API request is sent which contains valid section id and teacher email"
+    "Delete request is sent which contains valid section id and teacher email"
 )
 def step_impl_44(context):
   resp = requests.delete(context.url,
@@ -369,7 +369,7 @@ def step_impl_49(context):
 
 
 @behave.when(
-    "API request is sent which contains valid section id and teacher email"
+    "Post request is sent which contains valid section id and payload which contains valid teacher email"
 )
 def step_impl_50(context):
   resp = requests.post(context.url,
