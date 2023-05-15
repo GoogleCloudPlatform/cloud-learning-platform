@@ -11,7 +11,7 @@ def create_teacher_course_enrollment_mapping(teacher,section):
   """save course enrollment mapping"""
   user=TempUser.find_by_email(teacher.lower())
   if user:
-    if not CourseEnrollmentMapping.find_course_enrollment_record(
+    if not CourseEnrollmentMapping.check_enrollment_exists_section(
       section.key,user.id):
       try:
         course_enrollment_mapping=CourseEnrollmentMapping()
@@ -27,7 +27,7 @@ def create_teacher_course_enrollment_mapping(teacher,section):
       except Exception as e:
         print(str(e))
     else:
-      print("Mapping already exsists for this teacher"+
+      print("Mapping already exsists for this user"+
             f" {teacher} in this section {section.id}")
   else:
     print(f"User not found by this {teacher} email. Section {section.id}")

@@ -1,5 +1,4 @@
 """Student API services"""
-import re
 import requests
 import traceback
 from config import USER_MANAGEMENT_BASE_URL
@@ -31,31 +30,6 @@ def get_section_with_minimum_student(sections):
   return min_sections_count_mapping
 
 
-def get_user_id(user, headers):
-  regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-  if re.fullmatch(regex, user):
-    if classroom_crud.get_user_details_by_email(user_email=user.lower(),
-                                                headers=headers)["data"] != []:
-      return classroom_crud.get_user_details_by_email(
-          user_email=user.lower(), headers=headers)["data"][0]["user_id"]
-    else:
-      raise ResourceNotFoundException(f"user {user} not found")
-  return user
-
-
-def get_user_email(user, headers):
-  regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-  if re.fullmatch(regex, user):
-    result = classroom_crud.get_user_details_by_email(user_email=user.lower(),
-                                                      headers=headers)["data"]
-    if result != []:
-      return user.lower(), result[0]["user_id"]
-    else:
-      raise ResourceNotFoundException(f"user {user} not found")
-  return classroom_crud.get_user_details(
-      user_id=user, headers=headers)["data"]["email"].lower(), user
-
-
 def check_student_can_enroll_in_cohort(email, headers, sections):
   """
     Args:
@@ -78,42 +52,13 @@ def check_student_can_enroll_in_cohort(email, headers, sections):
   if student_details["data"] != []:
     user_id = student_details["data"][0]["user_id"]
     for section in sections:
-      result = CourseEnrollmentMapping.find_course_enrollment_record(
+      result = CourseEnrollmentMapping.check_enrollment_exists_section(
           section_key=section.key, user_id=user_id)
       if result is not None:
         Logger.error(f"Student {email} is present in section_id {section.id}")
         return False
   return True
 
-
-def check_student_can_enroll_in_section(email, headers, section):
-  """
-    Args:
-    section :section objects
-    email : student email
-    headers : Authentication headers
-    Returns: boolean value
-    True : Student can be enroll
-
-  """
-  try:
-    student_details = classroom_crud.get_user_details_by_email(
-        user_email=email, headers=headers)
-  except ResourceNotFoundException as rte:
-    err = traceback.format_exc().replace("\n", " ")
-    Logger.error(err)
-    Logger.error(rte)
-    Logger.info("Student is not present in database")
-    return True
-  # print("Student details____", student_details)
-  if student_details["data"] != []:
-    user_id = student_details["data"][0]["user_id"]
-    result = CourseEnrollmentMapping.find_course_enrollment_record(
-        section_key=section.key, user_id=user_id)
-    if result is not None:
-      Logger.error(f"Student {email} is present in section_id {section.id}")
-      return False
-  return True
 
 
 def invite_student(section, student_email, headers):
@@ -161,13 +106,15 @@ def invite_student(section, student_email, headers):
     else:
       user_id = searched_student[0]["user_id"]
       check_already_invited = CourseEnrollmentMapping.\
-      find_course_enrollment_record(
+        check_enrollment_exists_section(
               section_key=section.key,user_id=user_id)
       if check_already_invited:
         Logger.error(
-            f"Student {student_email} is invide or enrolled in this section")
+            f"User {student_email} is already invited or "
+            + f"enrolled in this section as {check_already_invited.role}")
         raise Conflict(
-            f"Student {student_email} is invide or enrolled in this section")
+            f"User {student_email} is invited or enrolled "
+            + f"in this section as {check_already_invited.role}")
   invitation = classroom_crud.invite_user(course_id=section.classroom_id,
                                           email=student_email,
                                           role="STUDENT")

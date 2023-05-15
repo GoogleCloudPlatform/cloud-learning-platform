@@ -11,9 +11,6 @@ class UpdateSection(BaseModel):
   course_id: str
   section_name: str
   description: str
-  teachers: list[constr(min_length=7, max_length=128,
-    regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
-    to_lower=True)]
 
   class Config():
     orm_mode = True

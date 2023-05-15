@@ -189,20 +189,20 @@ def create_section(context):
   section.save()
   # Create teachers in the DB
   temp_user = TempUser.from_dict(TEST_USER)
-  temp_user.email = TEST_SECTION["teachers"][0]
+  instructional_designer_email=cohort.course_template.instructional_designer
+  temp_user.email = instructional_designer_email
   temp_user.user_type = "faculty"
-  temp_user.first_name = TEST_SECTION["teachers"][0].split("@")[0]
+  temp_user.first_name = instructional_designer_email.split("@")[0]
   temp_user.user_id = ""
   temp_user.save()
   temp_user.user_id = temp_user.id
   temp_user.update()
-  temp_user1 = TempUser.from_dict(TEST_USER)
-  temp_user1.email = TEST_SECTION["teachers"][1].split("@")[0]
-  temp_user1.user_type = "faculty"
-  temp_user1.user_id = ""
-  temp_user1.save()
-  temp_user1.user_id = temp_user.id
-  temp_user1.update()
+  course_enrollment_mapping=CourseEnrollmentMapping()
+  course_enrollment_mapping.section=section
+  course_enrollment_mapping.role="faculty"
+  course_enrollment_mapping.user=User.find_by_user_id(temp_user.user_id)
+  course_enrollment_mapping.status="active"
+  course_enrollment_mapping.save()
   context.sections = section
   context.classroom_drive_folder_id = classroom["teacherFolder"]["id"]
   yield context.sections
@@ -260,6 +260,27 @@ def enroll_student_course(context):
   }
   return context.enroll_student_data
 
+@fixture
+def enroll_teacher_into_section(context):
+  """fixture to enroll teacher to section"""
+  section=use_fixture(create_cohort, context)
+  temp_user = TempUser.from_dict(TEST_USER)
+  instructional_designer_email="teachera@gmail.com"
+  temp_user.email = instructional_designer_email
+  temp_user.user_type = "faculty"
+  temp_user.first_name = instructional_designer_email.split("@")[0]
+  temp_user.user_id = ""
+  temp_user.save()
+  temp_user.user_id = temp_user.id
+  temp_user.update()
+  course_enrollment_mapping=CourseEnrollmentMapping()
+  course_enrollment_mapping.section=section
+  course_enrollment_mapping.role="faculty"
+  course_enrollment_mapping.user=User.find_by_user_id(temp_user.user_id)
+  course_enrollment_mapping.status="active"
+  course_enrollment_mapping.save()
+  context.enrollment_mapping=course_enrollment_mapping
+  return context.enrollment_mapping
 
 @fixture
 def import_google_form_grade(context):
@@ -500,6 +521,7 @@ fixture_registry = {
     "fixture.create.course_template": create_course_templates,
     "fixture.create.cohort": create_cohort,
     "fixture.create.section": create_section,
+    "fixture.enroll.teacher.section": enroll_teacher_into_section,
     "fixture.create.enroll_student_course": enroll_student_course,
     "fixture.get.header": get_header,
     "fixture.create.assignment": create_assignment,

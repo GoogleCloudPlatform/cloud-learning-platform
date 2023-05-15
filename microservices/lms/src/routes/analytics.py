@@ -1,7 +1,7 @@
 """ Student endpoints """
 import traceback
 from fastapi import APIRouter, Request
-from services import student_service
+from utils.user_helper import get_user_email
 from common.utils.logging_handler import Logger
 from common.utils.bq_helper import run_query
 from common.utils.cache_service import set_key, get_key
@@ -52,7 +52,7 @@ def get_student_analytics(student_id: str,request: Request):
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
-    user_email,user_id=student_service.get_user_email(
+    user_email,user_id=get_user_email(
       student_id,headers)
     res_data=get_key(f"analytics::{user_email}::{user_id}::response")
     if res_data:

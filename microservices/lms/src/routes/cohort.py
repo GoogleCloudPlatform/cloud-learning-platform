@@ -316,7 +316,7 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
       for section in result:
         submitted_course_work_list = 0
         record = CourseEnrollmentMapping.\
-          find_enrolled_student_record(section.key,user_id)
+          find_active_enrolled_student_record(section.key,user_id)
         if record is not None:
           course_work_list = len\
             (classroom_crud.get_course_work_list(section.key.split("/")[1]))
@@ -387,7 +387,7 @@ def get_progress_percentage_not_turned_in(\
       for section in result:
         submitted_course_work_list = 0
         record = CourseEnrollmentMapping.\
-          find_enrolled_student_record(section.key,user_id)
+          find_active_enrolled_student_record(section.key,user_id)
         if record is not None:
           course_work_list = len\
             (classroom_crud.get_course_work_list(section.key.split("/")[1]))
@@ -451,7 +451,7 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
     result = Section.fetch_all_by_cohort(cohort_key=cohort.key)
     for section in result:
       record = CourseEnrollmentMapping.\
-          find_enrolled_student_record(section.key,user_id)
+          find_active_enrolled_student_record(section.key,user_id)
       if record is not None:
         course_work_list = classroom_crud.get_coursework(section.classroom_id)
         submitted_course_work = classroom_crud.get_submitted_course_work_list(

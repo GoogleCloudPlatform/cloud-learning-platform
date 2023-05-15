@@ -14,7 +14,7 @@ from testing_objects.token_fixture import get_token,sign_up_user
 
 DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 EMAILS = get_required_emails_from_secret_manager()
-TEACHER_EMAIL = EMAILS["teacher"]
+# TEACHER_EMAIL = EMAILS["teacher"]
 
 
 def create_course(name, description, section, owner_id):
@@ -71,8 +71,7 @@ def test_create_section(get_token):
       "name": "e2e_test_section",
       "description": "string",
       "course_template": fake_data[0].id,
-      "cohort": fake_data[1].id,
-      "teachers": [TEACHER_EMAIL]
+      "cohort": fake_data[1].id
   }
   resp = requests.post(url=url, json=data, headers=get_token)
   resp_json = resp.json()
@@ -101,8 +100,7 @@ def test_create_section_course_template_not_found(get_token):
       "name": "string",
       "description": "string",
       "course_template": "fake_template_id_new",
-      "cohort": fake_data[1].id,
-      "teachers": [TEACHER_EMAIL]
+      "cohort": fake_data[1].id
   }
 
   resp = requests.post(url=url, json=data, headers=get_token)
@@ -159,8 +157,7 @@ def test_update_section(get_token):
       "id": fake_data[2].id,
       "course_id": classroom_id,
       "section_name": "section_updated",
-      "description": "test_description_updated",
-      "teachers": fake_data[2].teachers
+      "description": "test_description_updated"
   }
   resp = requests.patch(url=url, json=data, headers=get_token)
   resp_json = resp.json()
@@ -186,8 +183,7 @@ def test_update_section_course_not_found_in_classroom(get_token):
       "id": fake_data[2].id,
       "course_id": "test1222",
       "section_name": "section_updated",
-      "description": "test_description_updated",
-      "teachers": fake_data[2].teachers
+      "description": "test_description_updated"
   }
   resp = requests.patch(url=url, json=data, headers=get_token)
   assert resp.status_code == 500
