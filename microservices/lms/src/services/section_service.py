@@ -57,8 +57,10 @@ def copy_course_background_task(course_template_details,
     # google form which returns
     # a dictionary of view_links as keys and edit
     #  links/  and file_id as values for all drive files
+    # url_mapping = classroom_crud.\
+    #         get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
     url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
+            get_edit_url_and_view_url_mapping_of_form()
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework_list(
         course_template_details.classroom_id)
@@ -183,7 +185,7 @@ def copy_course_background_task(course_template_details,
     Logger.info(message)
     Logger.info(f"Background Task Completed for section Creation for cohort\
                 {cohort_details.id}")
-    Logger.info(f"Section Details are section id{section_id},\
+    Logger.info(f"Section Details are section id {section_id},\
                 classroom id {classroom_id}")
     return True
   except Exception as e:

@@ -541,8 +541,9 @@ def import_grade(section_id: str,coursework_id:str,
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
     #Get url mapping of google forms view links and edit ids
-    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form(
-      folder_id)
+    # url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form(
+    #   folder_id)
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
     is_google_form_present = False
     if "materials" in result.keys():
       for material in result["materials"]:
