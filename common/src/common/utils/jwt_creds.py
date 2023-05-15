@@ -10,7 +10,7 @@ from google.auth.transport.requests import AuthorizedSession
 _DEFAULT_TOKEN_LIFETIME_SECS = 3600  # 1 hour in seconds
 _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
 class JwtCredentials(service_account.Credentials):
-
+  """ JWT credentials class"""
   def _make_authorization_grant_assertion(self):
     """Create the OAuth 2.0 assertion.
         This assertion is used during the OAuth 2.0 grant to acquire an
@@ -42,8 +42,8 @@ class JwtCredentials(service_account.Credentials):
 
     default_creds, _ = google.auth.default()
     authed_session = AuthorizedSession(default_creds)
-    iam_url = "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/"
-    +self._service_account_email + ":signJwt"
+    iam_url = "https://iamcredentials.googleapis.com/v1/projects/-"\
+    "/serviceAccounts/"+self._service_account_email + ":signJwt"
     response = authed_session.request("POST",
                                       url=iam_url,
                                       data=json.dumps(iam_payload))
@@ -52,6 +52,7 @@ class JwtCredentials(service_account.Credentials):
   @classmethod
   def from_default_with_subject(self, subject, service_account_email,
                                 token_uri, scopes):
+    """returns the JWT credentials object"""
     return self(signer=None,
                 service_account_email=service_account_email,
                 token_uri=token_uri,
