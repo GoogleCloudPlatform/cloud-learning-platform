@@ -1,4 +1,4 @@
-from __future__ import print_function
+"""Generate JWT credentials"""
 import datetime
 import json
 import google.auth
@@ -9,6 +9,9 @@ from google.auth.transport.requests import AuthorizedSession
 
 _DEFAULT_TOKEN_LIFETIME_SECS = 3600  # 1 hour in seconds
 _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
+
+# disabling for linting to pass
+# pylint: disable = bad-classmethod-argument
 class JwtCredentials(service_account.Credentials):
   """ JWT credentials class"""
   def _make_authorization_grant_assertion(self):

@@ -14,7 +14,7 @@ from config import BQ_TABLE_DICT,BQ_DATASET
 # pylint: disable = broad-except
 def copy_course_background_task(course_template_details,
                                 sections_details,
-                                cohort_details,template_drive_folder_id,
+                                cohort_details,
                                 headers,message=""):
   """Create section  Background Task to copy course and updated database
   for newly created section
@@ -57,8 +57,6 @@ def copy_course_background_task(course_template_details,
     # google form which returns
     # a dictionary of view_links as keys and edit
     #  links/  and file_id as values for all drive files
-    # url_mapping = classroom_crud.\
-    # get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
     url_mapping = classroom_crud.\
             get_edit_url_and_view_url_mapping_of_form()
     # Get coursework of current course and create a new course
