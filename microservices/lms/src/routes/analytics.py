@@ -1,6 +1,7 @@
 """ Student endpoints """
 import traceback
 from fastapi import APIRouter, Request
+from utils.helper import convert_query_result_to_analytics_model
 from utils.user_helper import get_user_email
 from common.utils.logging_handler import Logger
 from common.utils.bq_helper import run_query
@@ -15,7 +16,6 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.analytics import AnalyticsResponse
 from config import BQ_DATASET,PROJECT_ID,BQ_TABLE_DICT
-from utils.helper import convert_query_result_to_analytics_model
 
 router = APIRouter(prefix="/analytics",
                    tags=["Students"],

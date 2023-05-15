@@ -61,6 +61,14 @@ def create_fake_data():
 
 @pytest.fixture
 def enroll_teacher_data(create_fake_data):
+  """_summary_
+
+  Args:
+      create_fake_data (_type_): _description_
+
+  Returns:
+      _type_: _description_
+  """
   section=Section.find_by_id(create_fake_data["section"])
   temp_user = User.from_dict(TEMP_USER)
   temp_user.user_id = ""
@@ -265,7 +273,7 @@ def test_update_section(client_with_emulator, create_fake_data):
 
   section = Section.find_by_id(create_fake_data["section"])
   data = {
-      "id": create_fake_data["section"],
+      "id": section.id,
       "course_id": "561822649300",
       "section_name": "tsection",
       "description": "tdescription"
@@ -280,6 +288,8 @@ def test_update_section(client_with_emulator, create_fake_data):
           with mock.patch("routes.section.insert_rows_to_bq"):
             resp = client_with_emulator.patch(url, json=data)
   assert resp.status_code == 200
+  assert resp.json()["data"][
+    "classroom_id"] == section.classroom_id,"Check Data"
 
 
 def test_update_section_section_id_not_found(client_with_emulator):
@@ -351,7 +361,8 @@ def test_enroll_teachers(client_with_emulator,create_fake_data):
   user.user_id=user.id
   user.update()
   with mock.patch(
-    "routes.section.get_user_id"):
+    "routes.section.check_user_can_enroll_in_section",
+    return_value=True):
     with mock.patch(
       "services.section_service.classroom_crud.invite_user"):
       with mock.patch("services.section_service.classroom_crud.acceept_invite"):

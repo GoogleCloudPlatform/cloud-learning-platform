@@ -1,7 +1,7 @@
 """
 Pydantic Model for copy course API's
 """
-from pydantic import BaseModel, constr
+from pydantic import BaseModel
 from schemas.schema_examples import UPDATE_SECTION
 
 

@@ -14,7 +14,7 @@
 """
 Module to add section in Fireo
 """
-from fireo.fields import TextField, ReferenceField, ListField, IDField,NumberField
+from fireo.fields import TextField, ReferenceField, IDField,NumberField
 from common.models import BaseModel, CourseTemplate, Cohort
 
 

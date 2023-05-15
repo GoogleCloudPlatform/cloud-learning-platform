@@ -6,7 +6,7 @@ from typing import Optional
 from pydantic import BaseModel, constr
 from schemas.student import UserModel
 from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE,\
-  INSERT_SECTION_EXAMPLE,TEMP_USER,ASSIGNMENT_MODEL,\
+  INSERT_SECTION_EXAMPLE,ASSIGNMENT_MODEL,\
     STUDENT,SHORT_COURSEWORK_MODEL,COURSE_ENROLLMENT_USER_EXAMPLE
 
 

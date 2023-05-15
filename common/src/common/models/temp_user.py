@@ -28,7 +28,7 @@ PROJECT_ID = os.environ.get("PROJECT_ID", "")
 
 def check_user_type(field_val):
   """validator method for user type field"""
-  user_types = ["learner", "faculty", "other"]
+  user_types = ["learner", "faculty", "admin"]
   if field_val.lower() in user_types:
     return True
   return (False, "User Type must be one of " +

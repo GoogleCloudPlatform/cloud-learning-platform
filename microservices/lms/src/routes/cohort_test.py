@@ -300,7 +300,7 @@ def test_get_overall_percentage(client_with_emulator,create_fake_data):
       "draftGrade": 50,
       "assignedGrade": 50,
   }]
-  with mock.patch("routes.cohort.student_service.get_user_id",\
+  with mock.patch("routes.cohort.get_user_id",\
                   return_value="test@gmail.com"):
     with mock.patch("routes.cohort.classroom_crud.get_coursework",\
                     return_value=course_work_data):

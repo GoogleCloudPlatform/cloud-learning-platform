@@ -24,6 +24,7 @@ from schemas.student import (GetProgressPercentageCohortResponseModel,GetOverall
 from config import BQ_TABLE_DICT,BQ_DATASET
 from utils.helper import (convert_cohort_to_cohort_model,
                           convert_section_to_section_model)
+from utils.user_helper import get_user_id
 
 
 router = APIRouter(prefix="/cohorts",
@@ -446,7 +447,7 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
     overall_grade_response = []
-    user_id = student_service.get_user_id(user=user.strip(), headers=headers)
+    user_id = get_user_id(user=user.strip(), headers=headers)
     cohort = Cohort.find_by_id(cohort_id)
     result = Section.fetch_all_by_cohort(cohort_key=cohort.key)
     for section in result:
