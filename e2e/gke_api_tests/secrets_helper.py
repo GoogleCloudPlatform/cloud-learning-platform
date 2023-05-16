@@ -36,13 +36,11 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.coursework.students",
     "https://www.googleapis.com/auth/classroom.coursework.me",
     "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/forms.body.readonly",
     "https://www.googleapis.com/auth/classroom.profile.photos",
     "https://www.googleapis.com/auth/classroom.courseworkmaterials",
     "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
     "https://www.googleapis.com/auth/forms.body",
-    "https://www.googleapis.com/auth/drive.file"
-]
+    "https://www.googleapis.com/auth/drive.file"]
 
 def get_required_emails_from_secret_manager():
   """Get Project user emails for e2e
@@ -151,6 +149,7 @@ service_account="gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
     service_account,
     _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
     scopes=SCOPES)
+  print("This is get redentials",email,service_account,creds)
   return creds
 
 
@@ -196,6 +195,7 @@ def create_coursework(course_id,coursework_body):
   # a_creds = service_account.Credentials.from_service_account_info(
   #     CLASSROOM_KEY, scopes=SCOPES)
   # creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+
   service = build("classroom", "v1", credentials=get_credentials())
   body=coursework_body
   coursework = service.courses().courseWork().create(courseId=course_id,
