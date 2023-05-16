@@ -58,6 +58,7 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
         input_data_dict.get("lti_assignment_id"))
     lti_assignment_data = lti_assignment.to_dict()
     content_item_id = lti_assignment_data.get("lti_content_item_id")
+    prev_context_id = lti_assignment_data.get("context_id")
 
     content_item_req = requests.get(
         f"http://lti/lti/api/v1/content-item/{content_item_id}",
@@ -96,9 +97,9 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     prev_content_item_ids = lti_assignment_data["prev_content_item_ids"]
 
     if prev_context_ids:
-      prev_context_ids.insert(0, input_data_dict.get("prev_context_id"))
+      prev_context_ids.insert(0, prev_context_id)
     else:
-      prev_context_ids = [input_data_dict.get("prev_context_id")]
+      prev_context_ids = [prev_context_id]
 
     if prev_content_item_ids:
       prev_content_item_ids.insert(0, content_item_id)

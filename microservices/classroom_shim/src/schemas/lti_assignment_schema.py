@@ -42,11 +42,10 @@ class UpdateLTIAssignmentModel(BaseModel):
       BaseModel (_type_): _description_
   """
   context_id: Optional[str]
-  context_type: Literal["section", "course_template"] = "section"
+  context_type: Optional[Literal["section", "course_template"]]
   lti_assignment_title: Optional[str]
   lti_content_item_id: Optional[str]
   tool_id: Optional[str]
-  course_work_id: Optional[str]
   max_points: Optional[float]
   start_date: Optional[datetime.datetime]
   end_date: Optional[datetime.datetime]
@@ -119,7 +118,6 @@ class InputLTIAssignmentModel(BaseModel):
   lti_content_item_id: Optional[str]
   lti_assignment_title: Optional[str]
   tool_id: Optional[str]
-  course_work_id: Optional[str]
   max_points: Optional[float]
   start_date: Optional[datetime.datetime]
   end_date: Optional[datetime.datetime]
@@ -172,7 +170,6 @@ class InputCopyLTIAssignmentModel(BaseModel):
   """
   lti_assignment_id: str
   context_id: str
-  prev_context_id: str
   start_date: Optional[datetime.datetime]
   end_date: Optional[datetime.datetime]
   due_date: Optional[datetime.datetime]

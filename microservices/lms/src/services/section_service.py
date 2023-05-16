@@ -114,7 +114,7 @@ def copy_course_background_task(course_template_details,
     # a dictionary of view_links as keys and edit
     #  links/  and file_id as values for all drive files
     url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
+            get_edit_url_and_view_url_mapping_of_form()
 
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework_list(
@@ -129,7 +129,6 @@ def copy_course_background_task(course_template_details,
 
         lti_assignment_details = {
           "section_id": section_id,
-          "prev_context_id": course_template_details.id,
           "start_date": None,
           "end_date": None,
           "due_date": None
@@ -345,7 +344,6 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
                 json={
                     "lti_assignment_id": lti_assignment_id,
                     "context_id": lti_assignment_details.get("section_id"),
-                    "prev_context_id": lti_assignment_details.get("prev_context_id"),
                     "start_date": lti_assignment_details.get("start_date"),
                     "end_date": lti_assignment_details.get("end_date"),
                     "due_date": lti_assignment_details.get("due_date")
