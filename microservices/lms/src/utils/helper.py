@@ -42,7 +42,6 @@ def convert_section_to_section_model(section):
 def validate_user(token: auth_scheme = Depends()):
   return validate_user_type_and_token(["robot", "faculty","admin"], token)
 
-
 def convert_assignment_to_assignment_model(assignment):
   """Convert assignment dict to assignment object
   Args:
