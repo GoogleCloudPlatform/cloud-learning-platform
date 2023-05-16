@@ -48,5 +48,9 @@ requires:
 - path: ./microservices/update_invitations_cronjob
   configs: [update-invitations-cronjob]
 
+# TODO: Activate when all services from ailearning-backend have been moved
+# - path: ./microservices/user_management
+#   configs: [user-management]
+
 build:
   googleCloudBuild: {}
