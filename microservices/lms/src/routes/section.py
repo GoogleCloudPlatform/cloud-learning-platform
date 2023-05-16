@@ -539,17 +539,6 @@ def import_grade(section_id: str,coursework_id:str,
       for material in result["materials"]:
         if "form" in material.keys():
           is_google_form_present = True
-          # form_details = \
-          #   url_mapping[material["form"]["formUrl"]]
-
-          # form_id = form_details["file_id"]
-          # # Get all responses for the form if no responses of
-          # # the form then return
-          # all_responses_of_form = classroom_crud.\
-          # retrieve_all_form_responses(form_id)
-          # if all_responses_of_form =={}:
-          #   raise ResourceNotFoundException(
-          #     "Responses not available for google form")
           background_tasks.add_task(update_grades,material,
                                     section,coursework_id)
 
