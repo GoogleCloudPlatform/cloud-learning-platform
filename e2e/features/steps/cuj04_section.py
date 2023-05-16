@@ -333,7 +333,7 @@ def step_impl_44(context):
 )
 def step_impl_45(context):
   assert context.status == 200, "Status 200"
-  assert context.json()["success"] is True, "check data"
+  assert context.response["success"] is True, "check data"
 
 #---negative scenario
 
@@ -381,6 +381,8 @@ def step_impl_50(context):
     "The teacher enrolled in classroom and a enrollment mapping is created and return user details with enrollment details"
 )
 def step_impl_51(context):
+  print(f"------------------Status: {context.status}------------------------")
+  print(f"------------------data: {context.response}------------------------")
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check Data"
 
