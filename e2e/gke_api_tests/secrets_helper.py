@@ -140,18 +140,6 @@ def get_access_token(credential_object):
       credentials_dict = json.loads(creds.to_json())
   return credentials_dict
 
-def get_credentials(email=CLASSROOM_ADMIN_EMAIL,
-service_account="gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
-                    ):
-  _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
-  creds = JwtCredentials.from_default_with_subject(
-    email,
-    service_account,
-    _GOOGLE_OAUTH2_TOKEN_ENDPOINT,
-    scopes=SCOPES)
-  print("This is get redentials",email,service_account,creds)
-  return creds
-
 
 def get_workspace_student_email_and_token():
   """Get student workspace email and token
@@ -192,11 +180,10 @@ def get_user_email_and_password_for_e2e():
       "UTF-8"))
 
 def create_coursework(course_id,coursework_body):
-  # a_creds = service_account.Credentials.from_service_account_info(
-  #     CLASSROOM_KEY, scopes=SCOPES)
-  # creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-
-  service = build("classroom", "v1", credentials=get_credentials())
+  a_creds = service_account.Credentials.from_service_account_info(
+      CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("classroom", "v1", credentials=creds)
   body=coursework_body
   coursework = service.courses().courseWork().create(courseId=course_id,
                                                  body=body).execute()
