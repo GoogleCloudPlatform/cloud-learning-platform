@@ -366,6 +366,7 @@ def step_impl_48(context):
 )
 def step_impl_49(context):
   context.url = f'{API_URL}/sections/{context.sections.id}/teachers'
+  context.payload = {"email":emails["teacher"]}
 
 
 @behave.when(
@@ -373,7 +374,7 @@ def step_impl_49(context):
 )
 def step_impl_50(context):
   resp = requests.post(context.url,
-                       headers=context.header,json={"email":emails["teacher"]})
+                       headers=context.header,json=context.payload)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -381,6 +382,7 @@ def step_impl_50(context):
     "The teacher enrolled in classroom and a enrollment mapping is created and return user details with enrollment details"
 )
 def step_impl_51(context):
+  print(f"--------------------json: {context.payload}-----------------------")
   print(f"------------------Status: {context.status}------------------------")
   print(f"------------------data: {context.response}------------------------")
   assert context.status == 200, "Status 200"

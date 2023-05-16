@@ -301,7 +301,7 @@ def add_teacher(headers,section,teacher_email):
       }
     status="active"
     invitation_id=""
-  except HttpError as hte:
+  except Exception as hte:
     Logger.info(hte)
     data={
           "first_name": "first_name",
@@ -320,6 +320,7 @@ def add_teacher(headers,section,teacher_email):
     status="invited"
     invitation_id=invitation_object["id"]
   user_dict=common_service.create_teacher(headers, data)
+  Logger.info(user_dict)
   course_enrollment_mapping=CourseEnrollmentMapping()
   course_enrollment_mapping.section=section
   course_enrollment_mapping.role="faculty"
