@@ -7,7 +7,6 @@ from common.utils.logging_handler import Logger
 from common.models import Section,CourseEnrollmentMapping,User
 from common.utils.http_exceptions import (InternalServerError,
                                           ResourceNotFound)
-from googleapiclient.errors import HttpError
 from services import common_service
 from config import BQ_TABLE_DICT, BQ_DATASET
 
