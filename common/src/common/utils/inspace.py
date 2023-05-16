@@ -11,7 +11,7 @@ from common.utils.config import STAFF_USERS
 from common.utils.logging_handler import Logger
 from common.utils.jwt_token_generator import TokenGenerator
 
-# pylint: disable = broad-exception-raised
+# pylint: disable = broad-exception-raised,broad-exception-caught
 
 
 secrets = secretmanager.SecretManagerServiceClient()
