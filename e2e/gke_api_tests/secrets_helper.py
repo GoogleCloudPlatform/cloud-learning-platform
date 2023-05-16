@@ -15,32 +15,19 @@ PROJECT_ID="core-learning-services-dev"
 USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT=bool(
   os.getenv("USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT","false").lower() in ("true",))
 
-# SCOPES = [
-#   "https://www.googleapis.com/auth/classroom.courses",
-#   "https://www.googleapis.com/auth/classroom.courses.readonly",
-#   "https://www.googleapis.com/auth/classroom.coursework.students",
-#   "https://www.googleapis.com/auth/classroom.rosters",
-#   "https://www.googleapis.com/auth/classroom.coursework.me",
-#   "https://www.googleapis.com/auth/classroom.topics",
-#   "https://www.googleapis.com/auth/drive",
-#   "https://www.googleapis.com/auth/forms.body.readonly",
-#   "https://www.googleapis.com/auth/classroom.profile.photos",
-#   "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-#   "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
-#   ]
-
 SCOPES = [
-    "https://www.googleapis.com/auth/classroom.courses",
-    "https://www.googleapis.com/auth/classroom.rosters",
-    "https://www.googleapis.com/auth/classroom.topics",
-    "https://www.googleapis.com/auth/classroom.coursework.students",
-    "https://www.googleapis.com/auth/classroom.coursework.me",
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/classroom.profile.photos",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
-    "https://www.googleapis.com/auth/forms.body",
-    "https://www.googleapis.com/auth/drive.file"]
+  "https://www.googleapis.com/auth/classroom.courses",
+  "https://www.googleapis.com/auth/classroom.courses.readonly",
+  "https://www.googleapis.com/auth/classroom.coursework.students",
+  "https://www.googleapis.com/auth/classroom.rosters",
+  "https://www.googleapis.com/auth/classroom.coursework.me",
+  "https://www.googleapis.com/auth/classroom.topics",
+  "https://www.googleapis.com/auth/drive",
+  "https://www.googleapis.com/auth/forms.body.readonly",
+  "https://www.googleapis.com/auth/classroom.profile.photos",
+  "https://www.googleapis.com/auth/classroom.courseworkmaterials",
+  "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
+  ]
 
 def get_required_emails_from_secret_manager():
   """Get Project user emails for e2e
@@ -212,27 +199,12 @@ def list_coursework_submission_user(access_token,course_id,coursework_id,user_id
   print("This is result list assignrmt ",result["studentSubmissions"])
   return result["studentSubmissions"]
 
-def create_google_form(title):
-  form_body = {
-    "info": {
-        "title": title,
-    }
-  }
-#   a_creds = service_account.Credentials.from_service_account_info(
-# CLASSROOM_KEY, scopes=SCOPES)
-#   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-  discovery_doc = "https://forms.googleapis.com/$discovery/rest?version=v1"
-  service = build("forms", "v1", credentials=get_credentials(),
-                  discoveryServiceUrl=discovery_doc,
-                    static_discovery=False)
-  result = service.forms().create(body=form_body).execute()
-  return result
 
 def get_file(file_id):
-#   a_creds = service_account.Credentials.from_service_account_info(
-# CLASSROOM_KEY, scopes=SCOPES)
-#   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-  service = build("drive", "v3", credentials=get_credentials())
+  a_creds = service_account.Credentials.from_service_account_info(
+CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("drive", "v3", credentials=creds)
   response = service.files().get(fileId=file_id,  
     fields="name,webViewLink").execute()
   return response
