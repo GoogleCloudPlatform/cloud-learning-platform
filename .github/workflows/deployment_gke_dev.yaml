@@ -15,8 +15,7 @@
 name: GKE - Deploy microservices to dev
 on:
   push:
-    branches:
-      - main
+    branches: [ "main", "migrate-ailearning-services-clp" ]
     paths:
       - 'microservices/**'
       - 'common/**'
