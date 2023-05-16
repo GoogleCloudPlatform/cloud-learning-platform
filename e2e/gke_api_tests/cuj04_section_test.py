@@ -14,7 +14,7 @@ from testing_objects.token_fixture import get_token,sign_up_user
 
 DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 EMAILS = get_required_emails_from_secret_manager()
-# TEACHER_EMAIL = EMAILS["teacher"]
+
 
 
 def create_course(name, description, section, owner_id):

@@ -128,11 +128,6 @@ def invite_user(course_id, email, role):
   Args:
       course_id (str): google classroom unique id
       teacher_email (str): teacher email id
-
-  Raises:
-      CustomHTTPException: custom exception for HTTP exceptions
-      InternalServerError: 500 Internal Server Error if something fails
-
   Returns:
       dict: response from create invitation method
   """
@@ -188,15 +183,17 @@ def create_section(context):
   section.classroom_url = classroom["alternateLink"]
   section.save()
   # Create teachers in the DB
-  temp_user = TempUser.from_dict(TEST_USER)
   instructional_designer_email=cohort.course_template.instructional_designer
-  temp_user.email = instructional_designer_email
-  temp_user.user_type = "faculty"
-  temp_user.first_name = instructional_designer_email.split("@")[0]
-  temp_user.user_id = ""
-  temp_user.save()
-  temp_user.user_id = temp_user.id
-  temp_user.update()
+  temp_user= TempUser.find_by_email(instructional_designer_email)
+  if temp_user is None:
+    temp_user = TempUser.from_dict(TEST_USER)
+    temp_user.email = instructional_designer_email
+    temp_user.user_type = "faculty"
+    temp_user.first_name = instructional_designer_email.split("@")[0]
+    temp_user.user_id = ""
+    temp_user.save()
+    temp_user.user_id = temp_user.id
+    temp_user.update()
   course_enrollment_mapping=CourseEnrollmentMapping()
   course_enrollment_mapping.section=section
   course_enrollment_mapping.role="faculty"
@@ -264,15 +261,40 @@ def enroll_student_course(context):
 def enroll_teacher_into_section(context):
   """fixture to enroll teacher to section"""
   section=use_fixture(create_section, context)
-  temp_user = TempUser.from_dict(TEST_USER)
-  instructional_designer_email="teachera@gmail.com"
-  temp_user.email = instructional_designer_email
-  temp_user.user_type = "faculty"
-  temp_user.first_name = instructional_designer_email.split("@")[0]
-  temp_user.user_id = ""
-  temp_user.save()
-  temp_user.user_id = temp_user.id
-  temp_user.update()
+  teacher_email = TEACHER_EMAIL
+  temp_user=TempUser.find_by_email(teacher_email)
+  invite_obj=invite_user(section.classroom_id,teacher_email,"TEACHER")
+  a_creds = service_account.Credentials.from_service_account_info(
+      CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(teacher_email)
+  accept_invite(creds.token,invite_obj["id"])
+  service = build("classroom", "v1", credentials=creds)
+
+  profile_information = service.userProfiles(\
+    ).get(userId=teacher_email).execute()
+  if not profile_information["photoUrl"].startswith("https:"):
+    profile_information[
+        "photoUrl"] = "https:" + profile_information["photoUrl"]
+  if temp_user is None:
+    data = {
+          "first_name": profile_information["name"]["givenName"],
+          "last_name": profile_information["name"]["familyName"],
+          "email": teacher_email,
+          "user_type": "faculty",
+          "user_type_ref": "",
+          "user_groups": [],
+          "status": "active",
+          "is_registered": True,
+          "failed_login_attempts_count": 0,
+          "access_api_docs": False,
+          "gaia_id": profile_information["id"],
+          "photo_url": profile_information["photoUrl"]
+      }
+    temp_user = TempUser.from_dict(data)
+    temp_user.user_id = ""
+    temp_user.save()
+    temp_user.user_id = temp_user.id
+    temp_user.update()
   course_enrollment_mapping=CourseEnrollmentMapping()
   course_enrollment_mapping.section=section
   course_enrollment_mapping.role="faculty"
@@ -481,16 +503,17 @@ def invite_student(context):
   course_enrollment_mapping.section = section
   course_enrollment_mapping.status = "invited"
   course_enrollment_mapping.invitation_id = invitation_dict["id"]
-  temp_user = TempUser.from_dict(TEST_USER)
-
-  temp_user.user_id = ""
-  temp_user.email = student_data["invite_student_email"]
-  temp_user.gaia_id = ""
-  temp_user.photo_url = ""
-  temp_user.save()
-  temp_user.user_id = temp_user.id
-  temp_user.update()
-  course_enrollment_mapping.user = temp_user.user_id
+  temp_user = TempUser.find_by_email(student_data["invite_student_email"].lower())
+  if temp_user is None:
+    temp_user = TempUser.from_dict(TEST_USER)
+    temp_user.user_id = ""
+    temp_user.email = student_data["invite_student_email"]
+    temp_user.gaia_id = ""
+    temp_user.photo_url = ""
+    temp_user.save()
+    temp_user.user_id = temp_user.id
+    temp_user.update()
+  course_enrollment_mapping.user = User.find_by_user_id(temp_user.user_id)
   course_enrollment_id = course_enrollment_mapping.save().id
   context.invitation_data = {
       "section_id": section.id,

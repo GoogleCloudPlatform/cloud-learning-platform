@@ -5,8 +5,7 @@ from common.models import Cohort, CourseTemplate, Section, CourseEnrollmentMappi
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ClassroomHttpException,
                                           InternalServerError,
-                                          ResourceNotFound, BadRequest,
-                                          CustomHTTPException,Conflict
+                                          ResourceNotFound, BadRequest,Conflict
                                           )
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
@@ -629,10 +628,8 @@ def import_grade(section_id: str,coursework_id:str,
     message = str(hte)
     if hte.resp.status == 404:
       message = "Coursework not found"
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=message,
-                              data=None) from hte
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=message) from hte
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
