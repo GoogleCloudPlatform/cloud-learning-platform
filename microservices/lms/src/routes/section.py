@@ -533,25 +533,24 @@ def import_grade(section_id: str,coursework_id:str,
     section = Section.find_by_id(section_id)
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
-    #Get url mapping of google forms view links and edit ids
-    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+
     is_google_form_present = False
     if "materials" in result.keys():
       for material in result["materials"]:
         if "form" in material.keys():
           is_google_form_present = True
-          form_details = \
-            url_mapping[material["form"]["formUrl"]]
+          # form_details = \
+          #   url_mapping[material["form"]["formUrl"]]
 
-          form_id = form_details["file_id"]
-          # Get all responses for the form if no responses of
-          # the form then return
-          all_responses_of_form = classroom_crud.\
-          retrieve_all_form_responses(form_id)
-          if all_responses_of_form =={}:
-            raise ResourceNotFoundException(
-              "Responses not available for google form")
-          background_tasks.add_task(update_grades,all_responses_of_form,
+          # form_id = form_details["file_id"]
+          # # Get all responses for the form if no responses of
+          # # the form then return
+          # all_responses_of_form = classroom_crud.\
+          # retrieve_all_form_responses(form_id)
+          # if all_responses_of_form =={}:
+          #   raise ResourceNotFoundException(
+          #     "Responses not available for google form")
+          background_tasks.add_task(update_grades,material,
                                     section,coursework_id)
 
       if is_google_form_present:
