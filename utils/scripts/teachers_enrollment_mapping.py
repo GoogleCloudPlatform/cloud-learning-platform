@@ -4,7 +4,7 @@
 
 # disabling for linting to pass
 # pylint: disable = broad-exception-raised, broad-except
-from common.models import CourseEnrollmentMapping,TempUser,Section
+from common.models import CourseEnrollmentMapping,TempUser,Section,User
 from common.utils.errors import ResourceNotFoundException
 
 def create_teacher_course_enrollment_mapping(teacher,section):
@@ -17,7 +17,7 @@ def create_teacher_course_enrollment_mapping(teacher,section):
         course_enrollment_mapping=CourseEnrollmentMapping()
         course_enrollment_mapping.section=section
         course_enrollment_mapping.role=user.user_type
-        course_enrollment_mapping.user=user.id
+        course_enrollment_mapping.user=User.find_by_user_id(user.user_id)
         course_enrollment_mapping.status="active"
         course_enrollment_mapping.save()
         print(f"Teacher {teacher} is enrrolled in {section.id}"+

@@ -107,7 +107,7 @@ def enroll_student_classroom(access_token, course_id, student_email,
   return data
 
 
-def accept_invite(access_token, invitation_id):
+def accept_invite(invitation_id,access_token=None,teacher_email=None):
   """Add student to the classroom using student google auth token
   Args:
     access_token(str): Oauth access token which contains student credentials
@@ -116,7 +116,12 @@ def accept_invite(access_token, invitation_id):
   Return:
     dict: returns a dict which contains student and classroom details
   """
-  creds = Credentials(token=access_token)
+  if access_token:
+    creds = Credentials(token=access_token)
+  else:
+    a_creds = service_account.Credentials.from_service_account_info(
+      CLASSROOM_KEY, scopes=SCOPES)
+    creds = a_creds.with_subject(teacher_email)
   service = build("classroom", "v1", credentials=creds)
   data = service.invitations().accept(id=invitation_id).execute()
   return data
@@ -264,10 +269,10 @@ def enroll_teacher_into_section(context):
   teacher_email = TEACHER_EMAIL
   temp_user=TempUser.find_by_email(teacher_email)
   invite_obj=invite_user(section.classroom_id,teacher_email,"TEACHER")
+  accept_invite(invitation_id=invite_obj["id"],teacher_email=teacher_email)
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(teacher_email)
-  accept_invite(creds.token,invite_obj["id"])
   service = build("classroom", "v1", credentials=creds)
 
   profile_information = service.userProfiles(\
