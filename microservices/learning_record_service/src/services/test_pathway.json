@@ -1,0 +1,207 @@
+{
+    "curriculum_pathways": {
+        "name": "[A1]",
+        "display_name": "Cluster A1",
+        "description": "Program",
+        "achievements": [],
+        "child_nodes": {
+            "curriculum_pathways": [
+                {
+                    "name": "[C1]",
+                    "display_name": "Competency 1",
+                    "description": "HUM102",
+                    "achievements": [],
+                    "child_nodes": {
+                        "curriculum_pathways": [
+                            {
+                                "name": "NODES",
+                                "display_name": "Topics",
+                                "description": "Differentiate the various perspectives of the humanities in relation to a topic",
+                                "achievements": [],
+                                "child_nodes": {
+                                    "learning_experiences": [
+                                        {
+                                            "name": "Topic 1",
+                                            "description": "What are the humanities?",
+                                            "child_nodes": {
+                                                "learning_objects": [
+                                                    {
+                                                        "name": "Learning Object",
+                                                        "description": "What are the humanities? ",
+                                                        "child_nodes": {
+                                                            "learning_resources": [
+                                                                {
+                                                                    "name": "Sequencing 1",
+                                                                    "description": "Overview of the Humanities",
+                                                                    "type": "LR-reading"
+                                                                }
+                                                            ],
+                                                            "assessment_items": [
+                                                                {
+                                                                    "name": "Sequencing 2",
+                                                                    "question_type": "Multiple Choice Quiz",
+                                                                    "context": "Knowledge Check",
+                                                                    "use_type": "Formative assessment"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "name": "Topic 2",
+                                            "description": "Humanities in everyday life",
+                                            "child_nodes": {
+                                                "learning_objects": [
+                                                    {
+                                                        "name": "Learning Object",
+                                                        "description": "Humanities in everyday life",
+                                                        "references": {
+                                                            "skills": [
+                                                                {
+                                                                    "name": "S2",
+                                                                    "description": "Determine the utility of each of the humanities perspectivesd historical humanities"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "child_nodes": {
+                                                            "learning_resources": [
+                                                                {
+                                                                    "name": "Sequencing 1",
+                                                                    "description": "Major Categories and Academic Programs of the Humanities",
+                                                                    "type": "LR-image"
+                                                                }
+                                                            ],
+                                                            "assessment_items": [
+                                                                {
+                                                                    "name": "Sequencing 4",
+                                                                    "question_type": "Multiple Choice Quiz",
+                                                                    "context": "Knowledge Check",
+                                                                    "use_type": "Formative assessment"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "name": "Competency A1 Exam",
+                                            "description": "HUM102 Competency 1 Exam",
+                                            "child_nodes": {
+                                                "assessment_items": [
+                                                    {
+                                                        "name": "Summative Assessment",
+                                                        "question_type": "HUM102 Competency 1 Exam",
+                                                        "use_type": "Summative Assessment",
+                                                        "context": "Submitted Narrative"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "[C2]",
+                    "display_name": "Competency 2",
+                    "description": "HUM102",
+                    "achievements": [],
+                    "child_nodes": {
+                        "curriculum_pathways": [
+                            {
+                                "name": "[T1]",
+                                "display_name": "Topic 1",
+                                "description": "Examine how the humanities influence understanding of one's self-identity",
+                                "achievements": [],
+                                "child_nodes": {
+                                    "learning_experiences": [
+                                        {
+                                            "name": "Topic 1",
+                                            "description": "What is self-identity?",
+                                            "child_nodes": {
+                                                "learning_objects": [
+                                                    {
+                                                        "name": "Learning Object",
+                                                        "description": "What is self-identity?",
+                                                        "references": {
+                                                            "skills": [
+                                                                {
+                                                                    "name": "S1",
+                                                                    "description": "Describe the components that comprise self-identity"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "child_nodes": {
+                                                            "learning_resources": [
+                                                                {
+                                                                    "name": "Sequencing 1",
+                                                                    "description": "Core beliefs and identity",
+                                                                    "type": "LR-reading"
+                                                                }
+                                                            ],
+                                                            "assessment_items": [
+                                                                {
+                                                                    "name": "Sequencing 2",
+                                                                    "question_type": "Multiple Choice Quiz",
+                                                                    "context": "Knowledge Check",
+                                                                    "use_type": "Formative assessment"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "name": "Competency A2 Exam",
+                                            "description": "HUM102 Competency 2 Exam",
+                                            "child_nodes": {
+                                                "assessment_items": [
+                                                    {
+                                                        "name": "Summative Assessment",
+                                                        "question_type": "HUM102 Competency 2 Exam",
+                                                        "references": {
+                                                            "competencies": [
+                                                                {
+                                                                    "name": "C2",
+                                                                    "description": "Examine how the humanities influence understanding of one's self-identity",
+                                                                    "child_nodes": {
+                                                                        "skills": [
+                                                                            {
+                                                                                "name": "S1",
+                                                                                "description": "Describe the components that comprise self-identity"
+                                                                            },
+                                                                            {
+                                                                                "name": "S2",
+                                                                                "description": "Determine the utility of each of the humanities perspectives"
+                                                                            },
+                                                                            {
+                                                                                "name": "S3",
+                                                                                "description": "Determine sources on a topic pertinent to the perspective of the humanities"
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        },
+                                                        "use_type": "Summative Assessment",
+                                                        "context": "Submitted Narrative"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -52,5 +52,8 @@ requires:
 # - path: ./microservices/user_management
 #   configs: [user-management]
 
+# - path: ./microservices/learning_record_service
+#   configs: [learning-record-service]
+
 build:
   googleCloudBuild: {}
