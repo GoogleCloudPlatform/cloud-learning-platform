@@ -180,7 +180,7 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
       Logger.error(
           f"Failed to create assignment (deleted assignment id - {lti_assignment_id}) due to error from classroom API with error - {e}"
       )
-      raise Exception(f"Internal error from classroom - {e}")
+      raise Exception(f"Internal error from classroom - {e}") from e
 
     lti_assignment.course_work_id = classroom_resp["id"]
     lti_assignment.update()
@@ -264,7 +264,7 @@ def update_lti_assignment(
       Logger.error(
           f"Update coursework failed for assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
       )
-      raise Exception(f"Internal error from classroom - {e}")
+      raise Exception(f"Internal error from classroom - {e}") from e
 
     for key in update_lti_assignment_dict:
       if update_lti_assignment_dict[key] is not None:
@@ -321,7 +321,7 @@ def delete_lti_assignment(lti_assignment_id: str):
       Logger.error(
           f"Error deleting assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
       )
-      raise Exception(f"Internal error from classroom - {e}")
+      raise Exception(f"Internal error from classroom - {e}") from e
 
     LTIAssignment.soft_delete_by_id(lti_assignment_id)
     return {

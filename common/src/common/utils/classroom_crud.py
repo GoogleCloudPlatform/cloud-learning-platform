@@ -4,14 +4,13 @@ from asyncio.log import logger
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from common.utils import helper
 from common.utils.errors import InvalidTokenError, UserManagementServiceError, ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
 from common.utils.jwt_creds import JwtCredentials
 from common.models import Section, CourseEnrollmentMapping
 from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL, PUB_SUB_PROJECT_ID, DATABASE_PREFIX
-import requests
+# pylint: disable=line-too-long
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
