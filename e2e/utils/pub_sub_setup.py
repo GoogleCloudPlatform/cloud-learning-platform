@@ -16,14 +16,18 @@ import os
 from google.cloud import pubsub_v1
 from google.api_core.exceptions import AlreadyExists
 from google.oauth2 import service_account
+# from common.utils.jwt_creds import JwtCredentials
+
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
 PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
   os.getenv("PROJECT_ID")
 
 # generate credentials using SA json keys
 GKE_POD_SA_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
+
 CREDENTIALS = service_account.Credentials.from_service_account_info(
     GKE_POD_SA_KEY)
+
 
 try:
   # create publisher client object using credentials

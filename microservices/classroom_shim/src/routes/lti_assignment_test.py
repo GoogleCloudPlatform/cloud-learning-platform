@@ -17,9 +17,10 @@ import mock
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
     side_effect=mock.MagicMock()) as mok:
-  from routes.lti_assignment import router
-  from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE
-  from testing.test_config import API_URL
+  with mock.patch("routes.lti_assignment.Logger"):
+    from routes.lti_assignment import router
+    from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE
+    from testing.test_config import API_URL
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
@@ -59,6 +60,7 @@ def test_get_lti_assignment(create_lti_assignment):
       resp_data.pop("end_date").split("+")[0], "%Y-%m-%dT%H:%M:%S")
   resp_data["due_date"] = datetime.datetime.strptime(
       resp_data.pop("due_date").split("+")[0], "%Y-%m-%dT%H:%M:%S")
+  resp_data.pop("course_work_id")
 
   assert resp_data == input_data, "Incorrect response received"
 

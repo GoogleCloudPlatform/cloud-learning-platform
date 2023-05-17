@@ -30,7 +30,7 @@ router = APIRouter(
 @router.get("/contexts/{context_id}", response_model=ContextResponseModel)
 def get_context_details(context_id: str, context_type: str):
   """Get the details of the context based on the context type and id
-    
+
     Args:
         context_id (str): unique id of the Context
         context_type (str): Type of the Context

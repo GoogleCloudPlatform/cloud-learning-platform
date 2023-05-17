@@ -121,6 +121,7 @@ def main():
 
   auth_client = UserCredentials(LMS_BACKEND_ROBOT_USERNAME,
                                 LMS_BACKEND_ROBOT_PASSWORD)
+  logger.info(f"This is auth client {auth_client}")
   id_token = auth_client.get_id_token()
   skip = 0
   page_size = 20
