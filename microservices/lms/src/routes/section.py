@@ -88,10 +88,11 @@ def create_section(sections_details: SectionDetails,
       raise ResourceNotFoundException(
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
+    template_drive_folder_id = current_course["teacherFolder"]["id"]
     background_tasks.add_task(copy_course_background_task,
                               course_template_details,
                              sections_details,
-                             cohort_details,
+                             cohort_details,template_drive_folder_id,
                              headers,message = "started process")
     Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
@@ -535,15 +536,30 @@ def import_grade(section_id: str,coursework_id:str,
   """
   try:
     section = Section.find_by_id(section_id)
+    classroom_course = classroom_crud.get_course_by_id(section.classroom_id)
+    folder_id = classroom_course["teacherFolder"]["id"]
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
-
+    #Get url mapping of google forms view links and edit ids
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form(
+      folder_id)
     is_google_form_present = False
     if "materials" in result.keys():
       for material in result["materials"]:
         if "form" in material.keys():
           is_google_form_present = True
-          background_tasks.add_task(update_grades,material,
+          form_details = \
+            url_mapping[material["form"]["formUrl"]]
+
+          form_id = form_details["file_id"]
+          # Get all responses for the form if no responses of
+          # the form then return
+          all_responses_of_form = classroom_crud.\
+          retrieve_all_form_responses(form_id)
+          if all_responses_of_form =={}:
+            raise ResourceNotFoundException(
+              "Responses not available for google form")
+          background_tasks.add_task(update_grades,all_responses_of_form,
                                     section,coursework_id)
 
       if is_google_form_present:
@@ -574,4 +590,5 @@ def import_grade(section_id: str,coursework_id:str,
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
     raise InternalServerError(str(e)) from e
+
 
