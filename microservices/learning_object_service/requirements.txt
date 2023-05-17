@@ -1,7 +1,7 @@
 fastapi==0.65.2
 uvicorn==0.14.0
 python-multipart==0.0.5
-fireo==1.4.1
+fireo==1.6.2
 typing
 kubernetes==11.0.0
 absl-py
