@@ -41,7 +41,7 @@ jobs:
         python-version: [3.9]
         target-folder: [
           # TODO: Add all microservice folders below.
-          microservices/learning-object-service,
+          microservices/learning_object_service,
         ]
     steps:
     - uses: actions/checkout@v3
@@ -89,7 +89,7 @@ jobs:
       matrix:
         python-version: [3.9]
         target-folder: [
-          microservices/learning-object-service,
+          microservices/learning_object_service,
         ]
     steps:
     - uses: actions/checkout@v3
