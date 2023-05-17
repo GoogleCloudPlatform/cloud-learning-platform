@@ -54,7 +54,8 @@ def get_lti_assignments_list(context_id: str = None,
       raise ValidationError\
         ("Invalid value passed to \"limit\" query parameter")
 
-    collection_manager = LTIAssignment.collection
+    collection_manager = LTIAssignment.collection.filter(
+        "deleted_at_timestamp", "==", None)
 
     if context_id:
       collection_manager = collection_manager.filter("context_id", "==",

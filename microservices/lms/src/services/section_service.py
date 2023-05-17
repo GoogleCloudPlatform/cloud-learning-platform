@@ -401,9 +401,8 @@ def update_grades(material,section,coursework_id):
   count =0
   Logger.info(f"Student grade update background tasks started\
               for coursework_id {coursework_id}")
-  # Get url mapping of google forms view links and edit ids
-  url_mapping = classroom_crud.\
-    get_edit_url_and_view_url_mapping_of_form()
+  #Get url mapping of google forms view links and edit ids
+  url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
   form_details = url_mapping[material["form"]["formUrl"]]
 
   form_id = form_details["file_id"]
@@ -412,8 +411,7 @@ def update_grades(material,section,coursework_id):
   all_responses_of_form = classroom_crud.\
   retrieve_all_form_responses(form_id)
   if all_responses_of_form =={}:
-    Logger.error(f"Responses not present for form \
-                 in coursework {coursework_id} {section.id}")
+    Logger.error("Responses not available for google form")
   for response in all_responses_of_form["responses"]:
     try:
       if "respondentEmail" not in response.keys():
