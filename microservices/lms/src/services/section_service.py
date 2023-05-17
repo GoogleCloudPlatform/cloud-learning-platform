@@ -7,7 +7,6 @@ from common.models import  Section
 from common.utils.http_exceptions import (
                      InternalServerError,ResourceNotFound)
 from common.utils.bq_helper import insert_rows_to_bq
-from common.utils.errors import ResourceNotFoundException
 from services import common_service
 from config import BQ_TABLE_DICT,BQ_DATASET
 
@@ -268,7 +267,7 @@ def update_grades(material,section,coursework_id):
   all_responses_of_form = classroom_crud.\
   retrieve_all_form_responses(form_id)
   if all_responses_of_form =={}:
-      Logger.error("Responses not available for google form")
+    Logger.error("Responses not available for google form")
   for response in all_responses_of_form["responses"]:
     try:
       if "respondentEmail" not in response.keys():
