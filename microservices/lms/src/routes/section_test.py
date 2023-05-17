@@ -119,7 +119,7 @@ def test_create_section(client_with_emulator, create_fake_data):
         with mock.patch(
           "services.section_service.classroom_crud.create_topics"):
           with mock.patch(
-        "services.section_service.classroom_crud.get_coursework"):
+        "services.section_service.classroom_crud.get_coursework_list"):
             with mock.patch(
                 "services.section_service.classroom_crud.create_coursework"):
               with mock.patch(
@@ -139,7 +139,7 @@ def test_create_section(client_with_emulator, create_fake_data):
                           with mock.patch(
         "services.section_service.classroom_crud.get_coursework_material"):
                             with mock.patch(
-        "services.section_service.classroom_crud.create_coursework_material"):
+      "services.section_service.classroom_crud.get_coursework_material_list"):
                               with mock.patch(
                     "services.section_service.classroom_crud.drive_copy"):
                                 with mock.patch(
@@ -172,7 +172,7 @@ def test_create_section_course_template_not_found(client_with_emulator,
                     return_value=mock_return_course):
       with mock.patch("routes.section.classroom_crud.get_topics"):
         with mock.patch("routes.section.classroom_crud.create_topics"):
-          with mock.patch("routes.section.classroom_crud.get_coursework"):
+          with mock.patch("routes.section.classroom_crud.get_coursework_list"):
             with mock.patch(
                 "routes.section.classroom_crud.create_coursework"):
               with mock.patch("routes.section.classroom_crud.invite_user"):
@@ -184,7 +184,7 @@ def test_create_section_course_template_not_found(client_with_emulator,
                     with mock.patch(
           "routes.section.classroom_crud.get_coursework_material"):
                       with mock.patch(
-          "routes.section.classroom_crud.create_coursework_material"):
+            "routes.section.classroom_crud.get_coursework_material_list"):
                         with mock.patch(
                     "routes.section.classroom_crud.drive_copy"):
                           with mock.patch(
@@ -217,7 +217,7 @@ def test_create_section_cohort_not_found(client_with_emulator,
                     return_value=mock_return_course):
       with mock.patch("routes.section.classroom_crud.get_topics"):
         with mock.patch("routes.section.classroom_crud.create_topics"):
-          with mock.patch("routes.section.classroom_crud.get_coursework"):
+          with mock.patch("routes.section.classroom_crud.get_coursework_list"):
             with mock.patch(
                 "routes.section.classroom_crud.create_coursework"):
               with mock.patch("routes.section.classroom_crud.acceept_invite"):
@@ -229,7 +229,7 @@ def test_create_section_cohort_not_found(client_with_emulator,
                     with mock.patch(
             "routes.section.classroom_crud.get_coursework_material"):
                       with mock.patch(
-              "routes.section.classroom_crud.create_coursework_material"):
+              "routes.section.classroom_crud.get_coursework_material_list"):
                         with mock.patch(
                     "routes.section.classroom_crud.drive_copy"):
                           with mock.patch(

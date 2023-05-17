@@ -245,8 +245,7 @@ def create_topics(course_id, topics):
   Logger.info(f"Topics created for course_id{course_id}")
   return topic_id_map
 
-
-def get_coursework(course_id):
+def get_coursework_list(course_id):
   """Get  list of coursework from classroom
 
   Args: course_id
@@ -313,8 +312,7 @@ def patch_student_submission(course_id, coursework_id, student_submission_id,
       body=student_submission).execute()
   return patch_result
 
-
-def get_coursework_material(course_id):
+def get_coursework_material_list(course_id):
   """Get  list of coursework from classroom
 
   Args: course_id
@@ -557,18 +555,17 @@ def enroll_student(headers, access_token, course_id, student_email,
   gaia_id = profile["metadata"]["sources"][0]["id"]
   # Call user API
   data = {
-      "first_name": profile["names"][0]["givenName"],
-      "last_name": profile["names"][0]["familyName"],
-      "email": student_email,
-      "user_type": "learner",
-      "user_type_ref": "",
-      "user_groups": [],
-      "status": "active",
-      "is_registered": True,
-      "failed_login_attempts_count": 0,
-      "access_api_docs": False,
-      "gaia_id": gaia_id,
-      "photo_url": profile["photos"][0]["url"]
+  "first_name":profile["names"][0]["givenName"],
+  "last_name": profile["names"][0]["familyName"],
+  "email":student_email,
+  "user_type": "learner",
+  "user_groups": [],
+  "status": "active",
+  "is_registered": True,
+  "failed_login_attempts_count": 0,
+  "access_api_docs": False,
+  "gaia_id":gaia_id,
+  "photo_url":profile["photos"][0]["url"]
   }
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user usermanagement API and return user data else

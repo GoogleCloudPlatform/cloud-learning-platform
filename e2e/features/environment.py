@@ -91,18 +91,17 @@ def enroll_student_classroom(access_token, course_id, student_email,
   gaia_id = profile["metadata"]["sources"][0]["id"]
   # Call user API
   data = {
-      "first_name": profile["names"][0]["givenName"],
-      "last_name": profile["names"][0]["familyName"],
-      "email": student_email,
-      "user_type": "learner",
-      "user_type_ref": "",
-      "user_groups": [],
-      "status": "active",
-      "is_registered": True,
-      "failed_login_attempts_count": 0,
-      "access_api_docs": False,
-      "gaia_id": gaia_id,
-      "photo_url": profile["photos"][0]["url"]
+  "first_name": profile["names"][0]["givenName"],
+  "last_name": profile["names"][0]["familyName"],
+  "email":student_email,
+  "user_type": "learner",
+  "user_groups": [],
+  "status": "active",
+  "is_registered": True,
+  "failed_login_attempts_count": 0,
+  "access_api_docs": False,
+  "gaia_id":gaia_id,
+  "photo_url":profile["photos"][0]["url"]
   }
   return data
 
@@ -286,7 +285,6 @@ def enroll_teacher_into_section(context):
           "last_name": profile_information["name"]["familyName"],
           "email": teacher_email,
           "user_type": "faculty",
-          "user_type_ref": "",
           "user_groups": [],
           "status": "active",
           "is_registered": True,
@@ -384,15 +382,16 @@ def create_analytics_data(context):
       headers=header)
   res.raise_for_status()
   student_email_and_token = get_student_email_and_token()
-  res = requests.post(url=f'{API_URL}/cohorts/{section.cohort.id}/students',
-                      json=student_email_and_token,
-                      headers=header)
+  print("In analytics fixturee__ student email and token value",student_email_and_token)
+  res=requests.post(url=f'{API_URL}/cohorts/{section.cohort.id}/students',
+                    json=student_email_and_token,
+                    headers=header)
+  print("Added student for cohort____",res.status_code)
   res.raise_for_status()
   resp = requests.get(
-      headers=header,
-      url=
-      f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_email"]}'
-  )
+    headers=header,
+    url=f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_email"]}')
+  print("Added student for section____",resp.status_code)
   resp.raise_for_status()
   data["student_data"] = resp.json()["data"]
   data["course_details"] = {
@@ -400,6 +399,7 @@ def create_analytics_data(context):
       "name": section.name,
       "section": section.section
   }
+  print("Response of get student in section",data)
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
@@ -416,6 +416,7 @@ def create_analytics_data(context):
                                                  body=body_data).execute()
   data["course_work"] = result
   context.analytics_data = data
+  print("Contex value for analytics data set")
   result_sub = service.courses().courseWork().studentSubmissions().list(
       courseId=result["courseId"],
       courseWorkId=result["id"],
