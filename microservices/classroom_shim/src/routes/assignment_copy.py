@@ -37,7 +37,7 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
   """Copy an LTI Assignment endpoint
 
   Args:
-      input_copy_lti_assignment (InputCopyLTIAssignmentModel): 
+      input_copy_lti_assignment (InputCopyLTIAssignmentModel):
           Details of new LTI Assignment and old one to be copied from
 
   Raises:
@@ -71,7 +71,7 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
       Logger.error(f"Request failed with code 1300 and the status code \
             {content_item_req.status_code} and error: {content_item_req.text}")
       raise Exception(
-          f"Request failed with code 1300, Please contact administrator")
+          "Request failed with code 1300, Please contact administrator")
 
     # create a copy of above content item
     content_item_data["context_id"] = input_data_dict.get("context_id")
@@ -91,7 +91,7 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
             {copy_content_item_req.status_code} and error: {copy_content_item_req.text}"
                   )
       raise Exception(
-          f"Request failed with code 1310, Please contact administrator")
+          "Request failed with code 1310, Please contact administrator")
 
     prev_context_ids = lti_assignment_data["prev_context_ids"]
     prev_content_item_ids = lti_assignment_data["prev_content_item_ids"]

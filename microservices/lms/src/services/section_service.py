@@ -8,7 +8,7 @@ from common.models import  Section
 from common.utils.http_exceptions import (
                      InternalServerError,ResourceNotFound)
 from common.utils.bq_helper import insert_rows_to_bq
-from common.utils.secrets import get_backend_robot_id_token 
+from common.utils.secrets import get_backend_robot_id_token
 from services import common_service
 from config import BQ_TABLE_DICT,BQ_DATASET
 
@@ -349,7 +349,7 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
                     "due_date": lti_assignment_details.get("due_date")
                 },
                 timeout=60)
-          
+
             print("copy_assignment",copy_assignment.status_code)
 
             if copy_assignment.status_code == 200:
