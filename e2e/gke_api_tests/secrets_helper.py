@@ -7,7 +7,7 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
-from common.utils.jwt_creds import JwtCredentials
+
 PROJECT_ID = os.getenv("PROJECT_ID", "")
 CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
@@ -128,6 +128,8 @@ def get_access_token(credential_object):
   return credentials_dict
 
 
+
+
 def get_workspace_student_email_and_token():
   """Get student workspace email and token
 
@@ -199,6 +201,21 @@ def list_coursework_submission_user(access_token,course_id,coursework_id,user_id
   print("This is result list assignrmt ",result["studentSubmissions"])
   return result["studentSubmissions"]
 
+def create_google_form(title):
+  form_body = {
+    "info": {
+        "title": title,
+    }
+  }
+  a_creds = service_account.Credentials.from_service_account_info(
+CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  discovery_doc = "https://forms.googleapis.com/$discovery/rest?version=v1"
+  service = build("forms", "v1", credentials=creds,
+                  discoveryServiceUrl=discovery_doc,
+                    static_discovery=False)
+  result = service.forms().create(body=form_body).execute()
+  return result
 
 def get_file(file_id):
   a_creds = service_account.Credentials.from_service_account_info(

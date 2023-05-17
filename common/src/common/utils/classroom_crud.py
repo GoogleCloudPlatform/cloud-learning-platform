@@ -1,14 +1,17 @@
 """ Hepler functions for classroom crud API """
 from asyncio.log import logger
+from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from common.utils.errors import InvalidTokenError,UserManagementServiceError,ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
-from common.utils.jwt_creds import JwtCredentials
+
 from common.models import Section,CourseEnrollmentMapping
+
 from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
+from common.utils import helper
 import requests
 
 SUCCESS_RESPONSE = {"status": "Success"}
@@ -33,20 +36,31 @@ SCOPES = [
     "https://www.googleapis.com/auth/forms.body.readonly",
     "https://www.googleapis.com/auth/classroom.profile.photos",
     "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
-    "https://www.googleapis.com/auth/forms.body",
-    "https://www.googleapis.com/auth/drive.file"
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
 ]
-def get_credentials(email=CLASSROOM_ADMIN_EMAIL,
-service_account="gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com"
- ):
-  google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
-  creds = JwtCredentials.from_default_with_subject(
-    email,
-    service_account,
-    google_oauth_token_endpoint,
-    scopes=SCOPES)
+
+
+def get_credentials():
+  classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
+  creds = service_account.Credentials.from_service_account_info(classroom_key,
+                                                                scopes=SCOPES)
+  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   return creds
+
+
+def impersonate_teacher_creds(teacher_email):
+  """Impersonate teacher in a classroom
+  Args:
+    teacher_email(str): teacher email which needs to be impersonated
+  Return:
+    creds(dict): returns a dict which credentils
+  """
+  classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
+  creds = service_account.Credentials.from_service_account_info(classroom_key,
+                                                                scopes=SCOPES)
+  creds = creds.with_subject(teacher_email)
+  return creds
+
 
 def create_course(name, description, section, owner_id):
   """Create course Function in classroom
@@ -84,7 +98,6 @@ def get_course_by_id(course_id):
   except HttpError as error:
     logger.error(error)
     return None
-
 def drive_copy(file_id,target_folder_id,name):
   """copy the file in the target_folder 
   Args: 
@@ -552,28 +565,39 @@ f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}\
   else :
     return searched_student[0]
 
-
-def get_edit_url_and_view_url_mapping_of_form():
+def get_edit_url_and_view_url_mapping_of_form(folder_id):
   """  Query google drive api and get all the forms a user owns
       return a dictionary of view link as keys and edit link as values
   """
-  service = build("drive", "v3", credentials=get_credentials())
+  forms = list_folders_children(folder_id,
+            "mimeType=\"application/vnd.google-apps.form\"")
+  view_link_and_edit_link_matching = {}
+  for form in forms:
+    result = get_view_link_from_id(form.get("id"))
+    # Call get file api to get
+    file = get_file(form.get("id"))
+    view_link_and_edit_link_matching[result["responderUri"]] = \
+    {"webViewLink":file.get("webViewLink"),"file_id":form.get("id")}
+  return view_link_and_edit_link_matching
+
+def list_folders_children(folder_id,search_query=""):
+  """
+  List the files or childrens of given folder_id 
+  filters according to search query if given else gets all the 
+  childrens of folder
+  """
+  service = build("drive", "v2", credentials=get_credentials())
   page_token = None
   while True:
-    response = service.files().list(
-        q="mimeType=\"application/vnd.google-apps.form\"",
-        spaces="drive",
-        fields="nextPageToken, "
-        "files(id, name,webViewLink,thumbnailLink)",
-        pageToken=page_token).execute()
-    view_link_and_edit_link_matching = {}
-    for file in response.get("files", []):
-      result = get_view_link_from_id(file.get("id"))
-      view_link_and_edit_link_matching[result["responderUri"]] = \
-      {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
-    if page_token is None:
+    param = {}
+    if page_token:
+      param["pageToken"] = page_token
+    children = service.children().list(
+          folderId=folder_id,q=search_query, **param).execute()
+    page_token = children.get("nextPageToken")
+    if not page_token:
       break
-  return view_link_and_edit_link_matching
+  return children.get("items", [])
 
 
 def get_file(file_id):
@@ -653,12 +677,9 @@ def enable_notifications(course_id, feed_type):
   Returns:
       _type_: _description_
   """
-  google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
-  creds = JwtCredentials.from_default_with_subject(
-    CLASSROOM_ADMIN_EMAIL,
-    "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com",
-    google_oauth_token_endpoint,
-    scopes=REGISTER_SCOPES)
+  creds =service_account.Credentials.from_service_account_info(
+      helper.get_gke_pd_sa_key_from_secret_manager(), scopes=REGISTER_SCOPES)
+  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
   body = {
       "feed": {
@@ -799,7 +820,7 @@ def acceept_invite(invitation_id,email):
       dict: response from create invitation method
   """
   service = build("classroom", "v1", \
-    credentials=get_credentials(email))
+    credentials=impersonate_teacher_creds(email))
   try:
     course = service.invitations().accept(id=invitation_id).execute()
     return course

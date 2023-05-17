@@ -135,7 +135,7 @@ def copy_courses(course_details: CourseDetails):
     current_course = classroom_crud.get_course_by_id(course_id)
     if current_course is None:
       return "No course found "
-    # current_drive_folder_id = current_course["teacherFolder"]["id"]
+    current_drive_folder_id = current_course["teacherFolder"]["id"]
     # Create a new course
     new_course = classroom_crud.create_course(current_course["name"],
                                               current_course["description"],
@@ -167,10 +167,8 @@ def copy_courses(course_details: CourseDetails):
           #  form which returns
           # a dictionary of view_links as keys and edit likns as
           # values of google form
-          # url_mapping = classroom_crud.\
-          #   get_edit_url_and_view_url_mapping_of_form(current_drive_folder_id)
           url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form()
+            get_edit_url_and_view_url_mapping_of_form(current_drive_folder_id)
           # Loop to check if a material in courssework has
           #  a google form attached to it
           # update the  view link to edit link and attach it as a form
