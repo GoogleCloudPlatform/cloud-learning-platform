@@ -520,9 +520,9 @@ return_value={"https://docs.google.com/forms/d/e/1FAIpQL":
                   return_value={}):
           resp = client_with_emulator.patch(url)
   result_json = resp.json()
-  assert resp.status_code == 404, "Status 404"
+  assert resp.status_code == 202, "Status 202"
   assert result_json[
-    "message"] == "Responses not available for google form","message"
+    "message"] == "Grades for coursework will be updated shortly","message"
 
 
 def test_form_grade_import_form_with_response(client_with_emulator,
