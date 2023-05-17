@@ -137,17 +137,15 @@ def test_create_section(client_with_emulator, create_fake_data):
                         with mock.patch(
                 "services.section_service.classroom_crud.acceept_invite"):
                           with mock.patch(
-        "services.section_service.classroom_crud.get_coursework_material"):
+    "services.section_service.classroom_crud.get_coursework_material_list"):
                             with mock.patch(
-      "services.section_service.classroom_crud.get_coursework_material_list"):
+                  "services.section_service.classroom_crud.drive_copy"):
                               with mock.patch(
-                    "services.section_service.classroom_crud.drive_copy"):
+                  "services.section_service.classroom_crud.copy_material"):
                                 with mock.patch(
-                    "services.section_service.classroom_crud.copy_material"):
-                                  with mock.patch(
-                      "services.section_service.insert_rows_to_bq"):
-                                    resp = client_with_emulator.post(url,
-                            json=section_details)
+                    "services.section_service.insert_rows_to_bq"):
+                                  resp = client_with_emulator.post(url,
+                          json=section_details)
   assert resp.status_code == 202
 
 
@@ -182,15 +180,13 @@ def test_create_section_course_template_not_found(client_with_emulator,
                   with mock.patch(
               "routes.section.classroom_crud.acceept_invite"):
                     with mock.patch(
-          "routes.section.classroom_crud.get_coursework_material"):
+          "routes.section.classroom_crud.get_coursework_material_list"):
                       with mock.patch(
-            "routes.section.classroom_crud.get_coursework_material_list"):
+                  "routes.section.classroom_crud.drive_copy"):
                         with mock.patch(
-                    "routes.section.classroom_crud.drive_copy"):
-                          with mock.patch(
-                    "routes.section.classroom_crud.copy_material"):
-                            resp = client_with_emulator.post(url,
-                    json=section_details)
+                  "routes.section.classroom_crud.copy_material"):
+                          resp = client_with_emulator.post(url,
+                  json=section_details)
   assert resp.status_code == 404
 
 
@@ -227,15 +223,13 @@ def test_create_section_cohort_not_found(client_with_emulator,
                   with mock.patch(
         "routes.section.classroom_crud.invite_user"):
                     with mock.patch(
-            "routes.section.classroom_crud.get_coursework_material"):
+            "routes.section.classroom_crud.get_coursework_material_list"):
                       with mock.patch(
-              "routes.section.classroom_crud.get_coursework_material_list"):
+                  "routes.section.classroom_crud.drive_copy"):
                         with mock.patch(
-                    "routes.section.classroom_crud.drive_copy"):
-                          with mock.patch(
-                    "routes.section.classroom_crud.copy_material"):
-                            resp = client_with_emulator.post(url,
-                    json=section_details)
+                  "routes.section.classroom_crud.copy_material"):
+                          resp = client_with_emulator.post(url,
+                  json=section_details)
   assert resp.status_code == 404
 
 
