@@ -4,19 +4,24 @@
 
 # disabling for linting to pass
 # pylint: disable = broad-exception-raised, broad-except
-from common.models import CourseEnrollmentMapping,TempUser,Section,User
+import os
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+from common.models import CourseEnrollmentMapping,Section,User
 from common.utils.errors import ResourceNotFoundException
+DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
 def create_teacher_course_enrollment_mapping(teacher,section):
   """save course enrollment mapping"""
-  user=TempUser.find_by_email(teacher.lower())
+  user=User.find_by_email(teacher.lower())
   if user:
     if not CourseEnrollmentMapping.check_enrollment_exists_section(
       section.key,user.id):
       try:
         course_enrollment_mapping=CourseEnrollmentMapping()
         course_enrollment_mapping.section=section
-        course_enrollment_mapping.role=user.user_type
+        course_enrollment_mapping.role="faculty"
         course_enrollment_mapping.user=User.find_by_user_id(user.user_id)
         course_enrollment_mapping.status="active"
         course_enrollment_mapping.save()
@@ -34,11 +39,24 @@ def create_teacher_course_enrollment_mapping(teacher,section):
 
 def main():
   print("Started Script")
-  sections=Section.fetch_all()
-  for section in sections:
-    for teacher in section.teachers:
-      create_teacher_course_enrollment_mapping(teacher,section)
+# Use a service account.
+  cred = credentials.Certificate("service_creds.json")
+
+  firebase_admin.initialize_app(cred)
+
+  db = firestore.client()
+  collection_name=DATABASE_PREFIX + "sections"
+  enrollment_ref = db.collection(collection_name)
+  docs = enrollment_ref.stream()
+  for doc in docs:
+    section_dict=doc.to_dict()
+    if "teachers" in section_dict.keys():
+      for teacher in section_dict["teachers"]:
+        section=Section.find_by_id(doc.id)
+        create_teacher_course_enrollment_mapping(teacher,section)
 
 if __name__=="__main__":
-  # main()
-  print(CourseEnrollmentMapping.find_by_id("oYmRtuZqwvmhwyt0herC").to_dict())
+  # print(CourseEnrollmentMapping.collection_name)
+  # print(Section.collection_name)
+  main()
+  # print(CourseEnrollmentMapping.find_by_id("oYmRtuZqwvmhwyt0herC").to_dict())
