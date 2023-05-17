@@ -14,7 +14,7 @@ from config import BQ_TABLE_DICT,BQ_DATASET
 # pylint: disable = broad-except
 def copy_course_background_task(course_template_details,
                                 sections_details,
-                                cohort_details,template_drive_folder_id,
+                                cohort_details,
                                 headers,message=""):
   """Create section  Background Task to copy course and updated database
   for newly created section
@@ -58,7 +58,7 @@ def copy_course_background_task(course_template_details,
     # a dictionary of view_links as keys and edit
     #  links/  and file_id as values for all drive files
     url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
+            get_edit_url_and_view_url_mapping_of_form()
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework_list(
         course_template_details.classroom_id)
@@ -248,7 +248,7 @@ def update_coursework_material(materials,url_mapping,target_folder_id):
       material.pop("form")
   return updated_material
 
-def update_grades(all_form_responses,section,coursework_id):
+def update_grades(material,section,coursework_id):
   """Takes the forms all responses ,section, and coursework_id and
   updates the grades of student who have responsed to form and
   submitted the coursework
@@ -257,7 +257,18 @@ def update_grades(all_form_responses,section,coursework_id):
   count =0
   Logger.info(f"Student grade update background tasks started\
               for coursework_id {coursework_id}")
-  for response in all_form_responses["responses"]:
+  #Get url mapping of google forms view links and edit ids
+  url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+  form_details = url_mapping[material["form"]["formUrl"]]
+
+  form_id = form_details["file_id"]
+  # Get all responses for the form if no responses of
+  # the form then return
+  all_responses_of_form = classroom_crud.\
+  retrieve_all_form_responses(form_id)
+  if all_responses_of_form =={}:
+    Logger.error("Responses not available for google form")
+  for response in all_responses_of_form["responses"]:
     try:
       if "respondentEmail" not in response.keys():
         raise Exception(f"Respondent Email is not collected in form for\
