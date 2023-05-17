@@ -90,9 +90,7 @@ def save_course_work_collection(course_id,course_work_id,message_id,event_type):
   Returns:
     _type_: _description_
   """
-  Logger.info("GET COURSEWOK STARTED___-")
   course_work=get_course_work(course_id=course_id,course_work_id=course_work_id)
-  Logger.info("GET COURSEWOK worked")
   course_work["uuid"] = str(uuid.uuid4())
   course_work["message_id"] = message_id
   course_work["assignment"] =convert_to_json(course_work,"assignment")
