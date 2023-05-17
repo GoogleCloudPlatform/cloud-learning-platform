@@ -1,3 +1,4 @@
+<h1 mat-dialog-title style="font-weight: bold;">Tool</h1>
 <form [formGroup]="toolForm" (ngSubmit)="onSubmit(toolForm)">
     <div>
         <mat-form-field appearance="fill" style="width: 100%">
@@ -78,5 +79,5 @@
                 Grade Sync</mat-checkbox>
         </section>
     </div>
-    <button color="primary" type="submit">Save</button>
+    <button mat-flat-button color="primary" style="margin:10px 5px 0" type="submit">Save</button>
 </form>

@@ -25,12 +25,12 @@ export class ToolFormComponent {
         "tool_login_url": ["", Validators.required],
         "public_key_type": ["JWK URL", (Validators.required)],
         "tool_keyset_url": ["", Validators.required],
-        "content_selection_url": ["", Validators.required],
+        "content_selection_url": [""],
         "redirect_uris": ["", Validators.required],
-        "enable_grade_sync": [true, Validators.required],
-        "enable_nrps": ["", Validators.required],
-        "custom_params": ["", Validators.required],
-        "validate_title_for_grade_sync": ["", Validators.required]
+        "enable_grade_sync": [false],
+        "enable_nrps": [false],
+        "custom_params": [""],
+        "validate_title_for_grade_sync": [false]
       });
     } else {
       let redirectUris = this.dialogData.extra_data.redirect_uris
@@ -45,12 +45,12 @@ export class ToolFormComponent {
         "public_key_type": [this.dialogData.extra_data.public_key_type, (Validators.required)],
         "tool_public_key": [this.dialogData.extra_data.tool_public_key, Validators.required],
         "tool_keyset_url": [this.dialogData.extra_data.tool_keyset_url, Validators.required],
-        "content_selection_url": [this.dialogData.extra_data.content_selection_url, Validators.required],
+        "content_selection_url": [this.dialogData.extra_data.content_selection_url],
         "redirect_uris": [redirectUris, Validators.required],
-        "enable_grade_sync": [this.dialogData.extra_data.enable_grade_sync, Validators.required],
-        "enable_nrps": [this.dialogData.extra_data.enable_nrps, Validators.required],
-        "custom_params": [this.dialogData.extra_data.custom_params, Validators.required],
-        "validate_title_for_grade_sync": [this.dialogData.extra_data.validate_title_for_grade_sync, Validators.required]
+        "enable_grade_sync": [this.dialogData.extra_data.enable_grade_sync],
+        "enable_nrps": [this.dialogData.extra_data.enable_nrps],
+        "custom_params": [this.dialogData.extra_data.custom_params],
+        "validate_title_for_grade_sync": [this.dialogData.extra_data.validate_title_for_grade_sync]
       });
     }
   }
