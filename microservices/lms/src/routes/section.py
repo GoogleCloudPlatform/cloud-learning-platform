@@ -88,7 +88,6 @@ def create_section(sections_details: SectionDetails,
       raise ResourceNotFoundException(
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
-    template_drive_folder_id = current_course["teacherFolder"]["id"]
     background_tasks.add_task(copy_course_background_task,
                               course_template_details,
                              sections_details,

@@ -260,7 +260,6 @@ def update_grades(material,section,coursework_id):
               for coursework_id {coursework_id}")
   #Get url mapping of google forms view links and edit ids
   url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
-  Logger.info("Get URL mapping worked")
   form_details = url_mapping[material["form"]["formUrl"]]
 
   form_id = form_details["file_id"]
@@ -268,10 +267,8 @@ def update_grades(material,section,coursework_id):
   # the form then return
   all_responses_of_form = classroom_crud.\
   retrieve_all_form_responses(form_id)
-  Logger.info(all_responses_of_form["responses"])
   if all_responses_of_form =={}:
-    raise ResourceNotFoundException(
-      "Responses not available for google form")
+      Logger.error("Responses not available for google form")
   for response in all_responses_of_form["responses"]:
     try:
       if "respondentEmail" not in response.keys():

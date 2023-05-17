@@ -135,7 +135,6 @@ def copy_courses(course_details: CourseDetails):
     current_course = classroom_crud.get_course_by_id(course_id)
     if current_course is None:
       return "No course found "
-    current_drive_folder_id = current_course["teacherFolder"]["id"]
     # Create a new course
     new_course = classroom_crud.create_course(current_course["name"],
                                               current_course["description"],
