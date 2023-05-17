@@ -1,11 +1,11 @@
 """Base class for Node items"""
 
 import sys
-from common.models import TempBaseModel
+from common.models import BaseModel
 
 
 #pylint:disable=dangerous-default-value
-class NodeItem(TempBaseModel):
+class NodeItem(BaseModel):
   """Node Item Class"""
 
   def __init__(self, **kwargs):

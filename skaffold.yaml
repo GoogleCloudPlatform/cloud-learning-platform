@@ -48,5 +48,8 @@ requires:
 - path: ./microservices/update_invitations_cronjob
   configs: [update-invitations-cronjob]
 
+- path: ./microservices/learning_object_service
+  configs: [learning-object-service]
+
 build:
   googleCloudBuild: {}

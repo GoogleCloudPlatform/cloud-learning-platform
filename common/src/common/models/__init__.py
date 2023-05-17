@@ -26,3 +26,13 @@ from .course_enrollment_mapping import *
 from .temp_user import *
 from .lti_assignment import *
 from .llm import *
+from .node_item import *
+from .custom_fields import *
+from .batch_job import *
+from .skill import *
+from .learner_profile import *
+from .assessment import *
+from .knowledge import *
+from .learning_object import *
+from .learning_record import *
+from .faq import *

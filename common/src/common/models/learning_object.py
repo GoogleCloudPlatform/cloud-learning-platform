@@ -1,6 +1,7 @@
 """Learning Object Service Data Models"""
 
-from fireo.fields import TextField, MapField, NumberField, BooleanField, ListField, DateTime
+from fireo.fields import (TextField, MapField, NumberField, BooleanField,
+                          ListField, DateTime)
 from common.models import NodeItem, BaseModel
 from common.utils.errors import ResourceNotFoundException
 
