@@ -18,7 +18,6 @@ BQ_DATASET = DATABASE_PREFIX + os.getenv("BQ_DATASET", "lms_analytics")
 
 bq_client = bigquery.Client(location=BQ_REGION)
 # Print statements are being used in this file to debug in the Github actions
-#  py bq_setup.py --create-dataset=true
 
 
 def create_bigquery_dataset(dataset):
