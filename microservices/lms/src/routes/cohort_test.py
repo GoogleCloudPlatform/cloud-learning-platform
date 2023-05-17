@@ -302,10 +302,11 @@ def test_get_overall_percentage(client_with_emulator,create_fake_data):
   }]
   with mock.patch("routes.cohort.student_service.get_user_id",\
                   return_value="test@gmail.com"):
-    with mock.patch("routes.cohort.classroom_crud.get_coursework",\
+    with mock.patch("routes.cohort.classroom_crud.get_coursework_list",\
                     return_value=course_work_data):
       with mock.patch\
         ("routes.cohort.classroom_crud.get_submitted_course_work_list",\
                       return_value=submitted_course_work_data):
         resp = client_with_emulator.get(url)
   assert resp.status_code == 200
+

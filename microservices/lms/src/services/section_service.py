@@ -64,7 +64,7 @@ def copy_course_background_task(course_template_details,
     url_mapping = classroom_crud.\
             get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
     # Get coursework of current course and create a new course
-    coursework_list = classroom_crud.get_coursework(
+    coursework_list = classroom_crud.get_coursework_list(
         course_template_details.classroom_id)
     final_coursewok = []
     for coursework in coursework_list:
@@ -93,8 +93,8 @@ def copy_course_background_task(course_template_details,
       classroom_crud.create_coursework(new_course["id"], final_coursewok)
     # Get the list of courseworkMaterial
     final_coursewok_material = []
-    coursework_material_list = classroom_crud.get_coursework_material(
-        course_template_details.classroom_id)
+    coursework_material_list = classroom_crud.get_coursework_material_list(
+      course_template_details.classroom_id)
     for coursework_material in coursework_material_list:
       try:
         #Check if a coursework material is linked to a topic if yes then
@@ -138,20 +138,19 @@ def copy_course_background_task(course_template_details,
           get_user_profile_information(teacher_email)
         # Save the new record of seecion in firestore
         data = {
-            "first_name": user_profile["name"]["givenName"],
-            "last_name": user_profile["name"]["familyName"],
-            "email": teacher_email,
-            "user_type": "faculty",
-            "user_type_ref": "",
-            "user_groups": [],
-            "status": "active",
-            "is_registered": True,
-            "failed_login_attempts_count": 0,
-            "access_api_docs": False,
-            "gaia_id": user_profile["id"],
-            "photo_url": user_profile["photoUrl"]
-        }
-        common_service.create_teacher(headers, data)
+        "first_name":user_profile["name"]["givenName"],
+        "last_name": user_profile["name"]["familyName"],
+        "email":teacher_email,
+        "user_type": "faculty",
+        "user_groups": [],
+        "status": "active",
+        "is_registered": True,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": False,
+        "gaia_id":user_profile["id"],
+        "photo_url" :  user_profile["photoUrl"]
+          }
+        common_service.create_teacher(headers,data)
         final_teachers.append(teacher_email)
       except Exception as error:
         error = traceback.format_exc().replace("\n", " ")

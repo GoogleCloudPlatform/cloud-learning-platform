@@ -91,18 +91,17 @@ def enroll_student_classroom(access_token, course_id, student_email,
   gaia_id = profile["metadata"]["sources"][0]["id"]
   # Call user API
   data = {
-      "first_name": profile["names"][0]["givenName"],
-      "last_name": profile["names"][0]["familyName"],
-      "email": student_email,
-      "user_type": "learner",
-      "user_type_ref": "",
-      "user_groups": [],
-      "status": "active",
-      "is_registered": True,
-      "failed_login_attempts_count": 0,
-      "access_api_docs": False,
-      "gaia_id": gaia_id,
-      "photo_url": profile["photos"][0]["url"]
+  "first_name": profile["names"][0]["givenName"],
+  "last_name": profile["names"][0]["familyName"],
+  "email":student_email,
+  "user_type": "learner",
+  "user_groups": [],
+  "status": "active",
+  "is_registered": True,
+  "failed_login_attempts_count": 0,
+  "access_api_docs": False,
+  "gaia_id":gaia_id,
+  "photo_url":profile["photos"][0]["url"]
   }
   return data
 
@@ -187,24 +186,35 @@ def create_section(context):
   section.classroom_code = classroom["enrollmentCode"]
   section.classroom_url = classroom["alternateLink"]
   section.save()
-  # Create teachers in the DB
-  temp_user = TempUser.from_dict(TEST_USER)
-  temp_user.email = TEST_SECTION["teachers"][0]
-  temp_user.user_type = "faculty"
-  temp_user.first_name = TEST_SECTION["teachers"][0].split("@")[0]
-  temp_user.user_id = ""
-  temp_user.save()
-  temp_user.user_id = temp_user.id
-  temp_user.update()
-  temp_user1 = TempUser.from_dict(TEST_USER)
-  temp_user1.email = TEST_SECTION["teachers"][1].split("@")[0]
-  temp_user1.user_type = "faculty"
-  temp_user1.user_id = ""
-  temp_user1.save()
-  temp_user1.user_id = temp_user.id
-  temp_user1.update()
-  context.sections = section
-  context.classroom_drive_folder_id = classroom["teacherFolder"]["id"]
+  # Create teachers in the DB 
+  temp_user=TempUser.find_by_email(TEST_SECTION["teachers"][0])
+  if temp_user is None:
+    print("Creating new teacher",TEST_SECTION["teachers"][0])
+    temp_user = TempUser.from_dict(TEST_USER)
+    temp_user.user_type = "faculty"
+    temp_user.email =TEST_SECTION["teachers"][0]
+    temp_user.first_name = TEST_SECTION["teachers"][0].split("@")[0]
+    temp_user.user_id = ""
+    temp_user.save()
+    temp_user.user_id = temp_user.id
+    temp_user.update()
+  else:
+    print("Teachera already present in db")
+  temp_user1 = TempUser.find_by_email(TEST_SECTION["teachers"][1])
+  if temp_user1 is None:
+    print("Creating a new teacher",TEST_SECTION["teachers"][1])
+    temp_user1 = TempUser.from_dict(TEST_USER)
+    temp_user1.first_name = TEST_SECTION["teachers"][1].split("@")[0]
+    temp_user1.email = TEST_SECTION["teachers"][1]
+    temp_user1.user_type = "faculty"
+    temp_user1.user_id = ""
+    temp_user1.save()
+    temp_user1.user_id = temp_user.id
+    temp_user1.update()
+  else:
+    print("Tecaher teaherb already present in db")
+  context.sections=section
+  context.classroom_drive_folder_id =classroom["teacherFolder"]["id"]
   yield context.sections
 
 
@@ -336,15 +346,16 @@ def create_analytics_data(context):
       headers=header)
   res.raise_for_status()
   student_email_and_token = get_student_email_and_token()
-  res = requests.post(url=f'{API_URL}/cohorts/{section.cohort.id}/students',
-                      json=student_email_and_token,
-                      headers=header)
+  print("In analytics fixturee__ student email and token value",student_email_and_token)
+  res=requests.post(url=f'{API_URL}/cohorts/{section.cohort.id}/students',
+                    json=student_email_and_token,
+                    headers=header)
+  print("Added student for cohort____",res.status_code)
   res.raise_for_status()
   resp = requests.get(
-      headers=header,
-      url=
-      f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_email"]}'
-  )
+    headers=header,
+    url=f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_email"]}')
+  print("Added student for section____",resp.status_code)
   resp.raise_for_status()
   data["student_data"] = resp.json()["data"]
   data["course_details"] = {
@@ -352,6 +363,7 @@ def create_analytics_data(context):
       "name": section.name,
       "section": section.section
   }
+  print("Response of get student in section",data)
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
@@ -368,6 +380,7 @@ def create_analytics_data(context):
                                                  body=body_data).execute()
   data["course_work"] = result
   context.analytics_data = data
+  print("Contex value for analytics data set")
   result_sub = service.courses().courseWork().studentSubmissions().list(
       courseId=result["courseId"],
       courseWorkId=result["id"],
@@ -458,17 +471,18 @@ def invite_student(context):
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.role = "learner"
   course_enrollment_mapping.section = section
-  course_enrollment_mapping.status = "invited"
-  course_enrollment_mapping.invitation_id = invitation_dict["id"]
-  temp_user = TempUser.from_dict(TEST_USER)
-
-  temp_user.user_id = ""
-  temp_user.email = student_data["invite_student_email"]
-  temp_user.gaia_id = ""
-  temp_user.photo_url = ""
-  temp_user.save()
-  temp_user.user_id = temp_user.id
-  temp_user.update()
+  course_enrollment_mapping.status ="invited"
+  course_enrollment_mapping.invitation_id=invitation_dict["id"]
+  temp_user = TempUser.find_by_email(student_data["invite_student_email"])
+  if temp_user is None:
+    temp_user = TempUser.from_dict(TEST_USER)
+    temp_user.user_id = ""
+    temp_user.email=student_data["invite_student_email"]
+    temp_user.gaia_id = ""
+    temp_user.photo_url = ""
+    temp_user.save()
+    temp_user.user_id = temp_user.id
+    temp_user.update()
   course_enrollment_mapping.user = temp_user.user_id
   course_enrollment_id = course_enrollment_mapping.save().id
   context.invitation_data = {
