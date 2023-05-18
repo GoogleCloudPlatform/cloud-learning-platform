@@ -16,7 +16,6 @@ from urllib.parse import urlparse, urlunparse, urlencode, parse_qsl
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.lti_token import encode_token
 
-
 # pylint: disable=dangerous-default-value
 
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
@@ -85,7 +84,9 @@ def get_resource_launch_init(lti_content_item_id: str,
           "lti_content_item_id":
               lti_content_item_id,
           "context_id":
-              context_id
+              context_id,
+          "context_type":
+              custom_params.get("context_type")
       }
       lti_message_hint = encode_token(final_lti_message_hint_dict)
 
@@ -132,7 +133,8 @@ def get_resource_launch_init(lti_content_item_id: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def content_selection_launch_init(tool_id: str, user_id: str, context_id: str):
+def content_selection_launch_init(tool_id: str, user_id: str, context_id: str,
+                                  context_type: str):
   """The content selection launch init endpoint is used to initiate
   the process to choose the content from the selected external tool
   and then redirect the request to the tool login url.
@@ -166,7 +168,8 @@ def content_selection_launch_init(tool_id: str, user_id: str, context_id: str):
 
       lti_message_hint_dict = {
           "lti_request_type": "deep_link",
-          "context_id": context_id
+          "context_id": context_id,
+          "context_type": context_type
       }
 
       lti_message_hint = encode_token(lti_message_hint_dict)
