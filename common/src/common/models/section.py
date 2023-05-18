@@ -20,7 +20,7 @@ from common.models import BaseModel, CourseTemplate, Cohort
 
 def check_section_status(field_val):
   """validator method for status field"""
-  status = ["PROVISIONING", "FAILED_TO_PROVISION", "PROVISIONED", "ARCHIVE"]
+  status = ["PROVISIONING", "FAILED_TO_PROVISION", "ACTIVE", "ARCHIVED"]
   if field_val.upper() in status:
     return True
   return (False,

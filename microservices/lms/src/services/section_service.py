@@ -204,11 +204,13 @@ def copy_course_background_task(course_template_details,
               timeout=60)
 
           if lti_assignment_req.status_code != 200:
+            error_flag = True
             Logger.error(f"Failed to update assignment {assignment_id} with course work id {coursework_id}")
 
 
       except Exception as error:
         title = coursework["title"]
+        error_flag = True
         Logger.error(f"Get coursework failed for \
               course_id{course_template_details.classroom_id} for {title}")
         error=traceback.format_exc().replace("\n", " ")
@@ -242,6 +244,7 @@ def copy_course_background_task(course_template_details,
         final_coursewok_material.append(coursework_material)
       except Exception as error:
         title = coursework_material["title"]
+        error_flag = True
         Logger.error(f"Get coursework material failed for\
         course_id{course_template_details.classroom_id} for {title}")
         error=traceback.format_exc().replace("\n", " ")
@@ -252,8 +255,11 @@ def copy_course_background_task(course_template_details,
       classroom_crud.create_coursework_material(new_course["id"],
         final_coursewok_material)
 
-    # Classroom copy is successful then the section status is changed to provisioned
-    section.status="PROVISIONED"
+    # Classroom copy is successful then the section status is changed to active
+    if error_flag:
+      section.status="FAILED_TO_PROVISION"
+    else:
+      section.status="ACTIVE"
     section.update()
 
     rows=[{
