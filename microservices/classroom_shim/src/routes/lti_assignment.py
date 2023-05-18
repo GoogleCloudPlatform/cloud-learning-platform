@@ -1,5 +1,6 @@
 '''LTI Assignment Endpoints'''
 import traceback
+import datetime
 from fastapi import APIRouter
 from common.models import LTIAssignment
 from common.utils import classroom_crud
@@ -155,7 +156,14 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
         "state": "PUBLISHED",
     }
 
-    if lti_assignment_dict.get("due_date"):
+    lti_assignment_due_date = lti_assignment_dict.get("due_date")
+    if lti_assignment_due_date:
+      curr_utc_timestamp = datetime.datetime.utcnow()
+
+      if lti_assignment_due_date < curr_utc_timestamp:
+        raise ValidationError(
+            f"Given due date - {lti_assignment_due_date} is in the past")
+
       coursework["dueDate"] = {
           "year": lti_assignment.due_date.year,
           "month": lti_assignment.due_date.month,
@@ -166,7 +174,12 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
           "minutes": lti_assignment.due_date.minute
       }
 
-    if lti_assignment_dict.get("max_points"):
+    lti_assignment_max_points = lti_assignment_dict.get("max_points")
+    if lti_assignment_max_points:
+      if lti_assignment_max_points <= 0:
+        raise ValidationError(
+            f"Given max points - {lti_assignment_due_date} should be greater than zero"
+        )
       coursework["maxPoints"] = lti_assignment_dict.get("max_points")
 
     context_resp = get_context_details(lti_assignment.context_id,
@@ -180,7 +193,9 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
       Logger.error(
           f"Failed to create assignment (deleted assignment id - {lti_assignment_id}) due to error from classroom API with error - {e}"
       )
-      raise Exception(f"Internal error from classroom - {e}") from e
+      raise Exception(
+          f"Internal error from classroom - {e} for assigment - {lti_assignment_id}"
+      ) from e
 
     lti_assignment.course_work_id = classroom_resp["id"]
     lti_assignment.update()
@@ -188,6 +203,8 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
 
     return {"data": lti_assignment_data}
 
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
   except ResourceNotFoundException as e:
     Logger.error(e)
     raise ResourceNotFound(str(e)) from e
@@ -257,15 +274,18 @@ def update_lti_assignment(
 
     update_mask = ",".join(update_mask_list)
 
-    try:
-      classroom_crud.update_course_work(course_id,
-                                        lti_assignment_details.course_work_id,
-                                        update_mask, coursework_body)
-    except Exception as e:
-      Logger.error(
-          f"Update coursework failed for assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
-      )
-      raise Exception(f"Internal error from classroom - {e}") from e
+    if update_mask:
+      try:
+        classroom_crud.update_course_work(course_id,
+                                          lti_assignment_details.course_work_id,
+                                          update_mask, coursework_body)
+      except Exception as e:
+        Logger.error(
+            f"Update coursework failed for assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
+        )
+        raise Exception(
+            f"Internal error from classroom - {e} for assignment - {lti_assignment_id}"
+        ) from e
 
     for key in update_lti_assignment_dict:
       if update_lti_assignment_dict[key] is not None:
@@ -322,7 +342,9 @@ def delete_lti_assignment(lti_assignment_id: str):
       Logger.error(
           f"Error deleting assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
       )
-      raise Exception(f"Internal error from classroom - {e}") from e
+      raise Exception(
+          f"Internal error from classroom - {e} for assignment - {lti_assignment_id}"
+      ) from e
 
     LTIAssignment.soft_delete_by_id(lti_assignment_id)
     return {
