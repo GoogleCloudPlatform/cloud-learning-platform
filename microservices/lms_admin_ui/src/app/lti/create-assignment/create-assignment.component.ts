@@ -16,6 +16,7 @@ interface LooseObject {
 export class CreateAssignmentComponent {
   toolForm: FormGroup;
   toolsList = []
+  selectedTool:any
   constructor(
     public dialogRef: MatDialogRef<CreateAssignmentComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -27,12 +28,13 @@ export class CreateAssignmentComponent {
     if (this.dialogData.mode == "Create") {
       this.toolForm = this.fb.group({
         "tool_id": [null, Validators.required],
-        "start_date": [null, Validators.required],
-        "end_date": [null, Validators.required],
-        "due_date": [null, Validators.required],
+        "start_date": [null],
+        "end_date": [null],
+        "due_date": [null],
         "lti_assignment_title": [null, Validators.required],
-        "max_points": [55, Validators.required],
-        "content_item_id": [null]
+        "max_points": [null],
+        "content_item_id":[null]
+        // "content_item_id": [null]
       });
     } else {
       this.toolForm = this.fb.group({
@@ -49,6 +51,7 @@ export class CreateAssignmentComponent {
 
   onDropdownChange() {
     console.log(this.toolForm.value)
+
   }
 
   processFormInputs(values) {
@@ -66,7 +69,7 @@ export class CreateAssignmentComponent {
     const data = toolForm.value
     console.log(data)
     if (this.dialogData.mode == "Create") {
-      this.homeService.postLtiAssignments({ ...data, section_id: this.dialogData.extra_data.courseTemplateId }).subscribe(response => {
+      this.homeService.postLtiAssignments({ ...data, context_type:"course_template",context_id: this.dialogData.extra_data.courseTemplateId }).subscribe(response => {
         console.log("response", response)
         this.dialogRef.close({ data: 'success' })
       })

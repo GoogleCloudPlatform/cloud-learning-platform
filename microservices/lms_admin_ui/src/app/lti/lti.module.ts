@@ -9,13 +9,17 @@ import { MaterialSharedModule } from '../shared/material-shared.module';
 import { LtiRoutingModule } from './lti-routing.module';
 import { CreateAssignmentComponent } from './create-assignment/create-assignment.component';
 import { ContentSelectorComponent } from './content-selector/content-selector.component';
+import { ViewLtiDialog } from './tools-list/tools-list.component';
+import { DeleteLtiDialog } from './tools-list/tools-list.component';
 
 @NgModule({
   declarations: [
     ToolsListComponent,
     ToolFormComponent,
     CreateAssignmentComponent,
-    ContentSelectorComponent
+    ContentSelectorComponent,
+    ViewLtiDialog,
+    DeleteLtiDialog
   ],
   imports: [
     CommonModule,

@@ -57,8 +57,15 @@
         </div>
 
         <div>
-            <button mat-flat-button color="primary" (click)="openContentSelector(toolForm)">Select Content</button>
+            <mat-form-field appearance="fill" style="width: 100%">
+                <mat-label>Content item id</mat-label>
+                <input formControlName="content_item_id" matInput>
+            </mat-form-field>
         </div>
+
+        <!-- <div>
+            <button mat-flat-button color="primary" (click)="openContentSelector(toolForm)">Select Content</button>
+        </div> -->
         <div mat-dialog-actions style="display: flex;justify-content: end;">
             <button mat-flat-button (click)="onNoClick()">Cancel</button>
             <button mat-flat-button (click)="onSubmit(toolForm)" color="primary" type="submit">Save</button>

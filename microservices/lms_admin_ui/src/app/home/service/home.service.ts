@@ -63,7 +63,7 @@ export class HomeService {
     return this.http.patch(`${environment.apiurl}sections/${sectionId}/coursework/${courseworkId}`, null)
   }
   getLtiAssignments(contextId: string) {
-    return this.http.get(`${environment.classroomShimUrl}lti-assignments?skip=75&limit=10`)
+    return this.http.get(`${environment.classroomShimUrl}lti-assignments?skip=0&limit=100&context_id=${contextId}`)
   }
   postLtiAssignments(data: any) {
     return this.http.post(`${environment.classroomShimUrl}lti-assignment`, data)
