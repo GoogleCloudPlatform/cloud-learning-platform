@@ -247,7 +247,7 @@ def delete_section(section_id: str):
     section_details = Section.find_by_id(section_id)
     classroom_crud.update_course_state(section_details.classroom_id,\
       "ARCHIVED")
-    section_details.status = "ARCHIVE"
+    section_details.status = "ARCHIVED"
     section_details.enrollment_status="CLOSED"
     section_details.update()
     Section.soft_delete_by_id(section_id)

@@ -141,7 +141,6 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
     lti_assignment_dict = {**input_lti_assignment.dict()}
     lti_assignment = LTIAssignment.from_dict(lti_assignment_dict)
     lti_assignment.save()
-    lti_assignment_data = lti_assignment.to_dict()
     lti_assignment_id = lti_assignment.id
 
     coursework = {
@@ -185,6 +184,7 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
 
     lti_assignment.course_work_id = classroom_resp["id"]
     lti_assignment.update()
+    lti_assignment_data = lti_assignment.to_dict()
 
     return {"data": lti_assignment_data}
 
