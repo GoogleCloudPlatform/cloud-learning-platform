@@ -3,7 +3,7 @@ import traceback
 import datetime
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
-from common.models import  Section
+from common.models import  Section, BatchJob
 from common.utils.http_exceptions import (
                      InternalServerError,ResourceNotFound)
 from common.utils.bq_helper import insert_rows_to_bq
@@ -15,6 +15,7 @@ from config import BQ_TABLE_DICT,BQ_DATASET
 def copy_course_background_task(course_template_details,
                                 sections_details,
                                 cohort_details,
+                                batch_job_id,
                                 headers,message=""):
   """Create section  Background Task to copy course and updated database
   for newly created section
@@ -36,11 +37,17 @@ def copy_course_background_task(course_template_details,
     Logger.info(f"Background Task started for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} \
                 with section name{sections_details.name}")
+    batch_job = BatchJob.find_by_id(batch_job_id)
+    logs = {"errors": [], "info": []}
     new_course = classroom_crud.create_course(course_template_details.name,
                                               sections_details.description,
                                               sections_details.name, "me")
+    batch_job.classroom_id = new_course["id"]
+    batch_job.update()
 
     target_folder_id = new_course["teacherFolder"]["id"]
+    logs["info"].append(
+      f"ID of target drive folder for section {target_folder_id}")
     Logger.info(f"ID of target drive folder for section {target_folder_id}")
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)

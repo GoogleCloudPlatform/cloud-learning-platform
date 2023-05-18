@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Flatten import namespace for models
 """
@@ -26,3 +25,4 @@ from .course_enrollment_mapping import *
 from .temp_user import *
 from .lti_assignment import *
 from .llm import *
+from .batch_job import *

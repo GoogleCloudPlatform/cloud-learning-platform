@@ -1,7 +1,7 @@
 """ Section endpoints """
 import traceback
 import datetime
-from common.models import Cohort, CourseTemplate, Section
+from common.models import Cohort, CourseTemplate, Section, BatchJob
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ClassroomHttpException,
                                           InternalServerError,
@@ -86,12 +86,25 @@ def create_section(sections_details: SectionDetails,
         course_template_details.classroom_id)
     if current_course is None:
       raise ResourceNotFoundException(
-          "classroom  with id" +
+          "classroom with id" +
           f" {course_template_details.classroom_id} is not found")
+  
+    batch_job_input = {
+        "type": "course_copy",
+        "status": "ready",
+        "input_data": {
+            "sections_details": sections_details
+        }
+    }
+
+    batch_job = BatchJob.from_dict(batch_job_input)
+    batch_job.save()
+
     background_tasks.add_task(copy_course_background_task,
                               course_template_details,
                              sections_details,
                              cohort_details,
+                             batch_job.id,
                              headers,message = "started process")
     Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
