@@ -14,8 +14,26 @@
 """
 Module to add section in Fireo
 """
-from fireo.fields import TextField, ReferenceField, IDField,NumberField
+from fireo.fields import TextField, ReferenceField, ListField, IDField, NumberField
 from common.models import BaseModel, CourseTemplate, Cohort
+
+
+def check_section_status(field_val):
+  """validator method for status field"""
+  status = ["PROVISIONING", "FAILED_TO_PROVISION", "ACTIVE", "ARCHIVED"]
+  if field_val.upper() in status:
+    return True
+  return (False, "Status must be one of " + ",".join("'" + i + "'"
+                                                     for i in status))
+
+
+def check_enrollment_status(field_val):
+  """validator method for status field"""
+  status = ["OPEN", "CLOSED"]
+  if field_val.upper() in status:
+    return True
+  return (False, "Status must be one of " + ",".join("'" + i + "'"
+                                                     for i in status))
 
 
 class Section(BaseModel):
@@ -30,7 +48,12 @@ class Section(BaseModel):
   classroom_url = TextField(required=True)
   course_template = ReferenceField(CourseTemplate, required=True)
   cohort = ReferenceField(Cohort, required=True)
-  enrolled_students_count =  NumberField( default=0)
+  status = TextField(required=True,
+                     default="PROVISIONING",
+                     validator=check_section_status)
+  enrollment_status = TextField(default="CLOSED",
+                                validator=check_enrollment_status)
+  enrolled_students_count = NumberField(default=0)
 
   class Meta:
     ignore_none_field = False

@@ -1,0 +1,136 @@
+@use '@angular/material' as mat;
+$my-palette: mat.define-palette(mat.$grey-palette);
+
+$primary-color : #8c1d40;
+
+.cohort-title {
+    display: flex;
+    padding: 0% 1%;
+    margin-bottom: 1.2%;
+    align-items: center;
+
+    .name {
+        font-size: 1.2rem;
+        margin-right: 2%;
+        color: $primary-color;
+        font-weight: 800;
+        text-decoration: none;
+    }
+}
+
+.object-details {
+    background-color: white;
+    padding: 0% 1%;
+    padding-top: 1%;
+    display: flex;
+
+    .heading {
+        font-size: 1.2rem;
+        margin-bottom: 2%;
+    }
+
+    .element {
+        margin-bottom: 3.5%;
+        display: flex;
+        align-items: center;
+
+        .element-heading {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: $primary-color;
+        }
+
+        .element-content {
+            font-size: 0.9rem;
+            margin-left: 1%;
+        }
+
+        .date-element-heading {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: $primary-color;
+            display: flex;
+            align-items: center;
+
+            .title {
+                margin-left: 5px;
+            }
+        }
+
+        .date-element-content {
+            font-size: 0.9rem;
+            margin-left: 1%;
+
+            .to {
+                padding: 0px 5px;
+            }
+        }
+    }
+}
+
+.section-select {
+    .heading {
+        font-weight: 600;
+        margin-bottom: 2%;
+        font-size: 1rem;
+    }
+
+    .body {
+        display: flex;
+        align-items: center;
+    }
+}
+
+.section-management {
+    display: flex;
+    justify-content: space-between;
+    margin: 1.5% 0%;
+    background-color: #ebebeb;
+    padding: 1%;
+    align-items: center;
+
+    .heading {
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+}
+
+.no-section {
+    text-align: center;
+    margin-top: 5%;
+    font-size: 1.3rem;
+}
+
+.disabledRow {
+    background-color: #eeeeee;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+:host ::ng-deep .active-chip {
+    background-color: #a2ea8c;
+    color: rgb(7 96 26 / 87%);
+    font-size: 0.7rem;
+    font-weight: 700;
+    /* padding: 3%; */
+    padding: 4px 9px;
+}
+
+:host ::ng-deep .deactive-chip {
+    background-color: #ea8c8c;
+    color: rgba(96, 7, 7, 0.87);
+    font-size: 0.7rem;
+    font-weight: 700;
+    /* padding: 3%; */
+    padding: 4px 9px;
+}
+
+.button-content-outer {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+
+    .text {
+        margin-left: 5px;
+    }
+}

@@ -26,6 +26,7 @@ class Sections(BaseModel):
   #     to_lower=True)]
   course_template: str
   cohort: str
+  status: Optional[str]
   enrolled_students_count: int
 
   class Config():
@@ -58,6 +59,7 @@ class SectionDetails(BaseModel):
   description: str
   course_template: str
   cohort: str
+
   # teachers: list[constr(
   #     min_length=7,
   #     max_length=128,
@@ -119,18 +121,18 @@ class GetTeacherResponseModel(BaseModel):
         }
     }
 
+
 class EnrollTeacherSection(BaseModel):
   """Enroll Teacher in a section Model"""
-  email:constr(
-      min_length=7,
-      max_length=128,
-      regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
-      to_lower=True)
+  email: constr(min_length=7,
+                max_length=128,
+                regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+                to_lower=True)
+
   class Config():
     orm_mode = True
-    schema_extra = {
-      "email":"teacher@gmail.com"
-    }
+    schema_extra = {"email": "teacher@gmail.com"}
+
 
 class CreateSectiontResponseModel(BaseModel):
   """Create Section Response Model"""
@@ -230,6 +232,8 @@ class DeleteSectionResponseModel(BaseModel):
             "data": None
         }
     }
+
+
 class DeleteTeacherFromSectionResponseModel(BaseModel):
   """Delete Teacher from section Model"""
   success: Optional[bool] = True
@@ -245,6 +249,7 @@ class DeleteTeacherFromSectionResponseModel(BaseModel):
             "data": None
         }
     }
+
 
 class DeleteStudentFromSectionResponseModel(BaseModel):
   """Delete student from section Model"""
