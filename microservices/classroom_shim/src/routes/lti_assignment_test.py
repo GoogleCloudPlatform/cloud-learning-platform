@@ -101,7 +101,12 @@ def test_get_lti_assignments_negative():
   assert json_response.get("success") is False, "Response is incorrect"
 
 
-def test_post_lti_assignment():
+@mock.patch("routes.lti_assignment.get_context_details")
+@mock.patch("routes.lti_assignment.classroom_crud.create_coursework")
+def test_post_lti_assignment(mock_classroom_post_coursework, mock_context):
+  mock_context.return_value = {"data": {"classroom_id": "2v1boyeui"}}
+  mock_classroom_post_coursework.return_value = {"id": "8v7tcaw"}
+
   input_lti_assignment = deepcopy(INSERT_LTI_ASSIGNMENT_EXAMPLE)
   url = f"{api_url}"
 
@@ -132,7 +137,13 @@ def test_post_lti_assignment():
   assert get_json_response.get("data") == post_json_response.get("data")
 
 
-def test_update_lti_assignment(create_lti_assignment):
+@mock.patch("routes.lti_assignment.get_context_details")
+@mock.patch("routes.lti_assignment.classroom_crud.update_course_work")
+def test_update_lti_assignment(mock_classroom_update_coursework, mock_context,
+                               create_lti_assignment):
+  mock_context.return_value = {"data": {"classroom_id": "2v1boyeui"}}
+  mock_classroom_update_coursework.return_value = {"id": "8v7tcaw"}
+
   lti_assignment = create_lti_assignment
 
   url = f"{api_url}/{lti_assignment.id}"
@@ -160,7 +171,13 @@ def test_update_lti_assignment_negative():
   assert json_response.get("success") is False, "Response is incorrect"
 
 
-def test_delete_lti_assignment(create_lti_assignment):
+@mock.patch("routes.lti_assignment.get_context_details")
+@mock.patch("routes.lti_assignment.classroom_crud.delete_course_work")
+def test_delete_lti_assignment(mock_classroom_delete_coursework, mock_context,
+                               create_lti_assignment):
+  mock_context.return_value = {"data": {"classroom_id": "2v1boyeui"}}
+  mock_classroom_delete_coursework.return_value = {"id": "8v7tcaw"}
+
   lti_assignment = create_lti_assignment
 
   url = f"{api_url}/{lti_assignment.id}"
