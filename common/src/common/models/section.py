@@ -14,7 +14,7 @@
 """
 Module to add section in Fireo
 """
-from fireo.fields import TextField, ReferenceField, ListField, IDField,NumberField
+from fireo.fields import TextField, ReferenceField, IDField,NumberField
 from common.models import BaseModel, CourseTemplate, Cohort
 
 
@@ -30,7 +30,6 @@ class Section(BaseModel):
   classroom_url = TextField(required=True)
   course_template = ReferenceField(CourseTemplate, required=True)
   cohort = ReferenceField(Cohort, required=True)
-  teachers = ListField(required=True)
   enrolled_students_count =  NumberField( default=0)
 
   class Meta:

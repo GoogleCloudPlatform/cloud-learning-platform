@@ -6,8 +6,8 @@ from typing import Optional
 from pydantic import BaseModel, constr
 from schemas.student import UserModel
 from schemas.schema_examples import CREDENTIAL_JSON, SECTION_EXAMPLE,\
-  INSERT_SECTION_EXAMPLE,TEMP_USER,ASSIGNMENT_MODEL,\
-    STUDENT,SHORT_COURSEWORK_MODEL
+  INSERT_SECTION_EXAMPLE,ASSIGNMENT_MODEL,\
+    STUDENT,SHORT_COURSEWORK_MODEL,COURSE_ENROLLMENT_USER_EXAMPLE
 
 
 class Sections(BaseModel):
@@ -19,11 +19,11 @@ class Sections(BaseModel):
   classroom_id: str
   classroom_code: str
   classroom_url: str
-  teachers: list[constr(
-      min_length=7,
-      max_length=128,
-      regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
-      to_lower=True)]
+  # teachers: list[constr(
+  #     min_length=7,
+  #     max_length=128,
+  #     regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+  #     to_lower=True)]
   course_template: str
   cohort: str
   enrolled_students_count: int
@@ -58,11 +58,11 @@ class SectionDetails(BaseModel):
   description: str
   course_template: str
   cohort: str
-  teachers: list[constr(
-      min_length=7,
-      max_length=128,
-      regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
-      to_lower=True)]
+  # teachers: list[constr(
+  #     min_length=7,
+  #     max_length=128,
+  #     regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+  #     to_lower=True)]
 
   class Config():
     orm_mode = True
@@ -90,7 +90,7 @@ class TeachersListResponseModel(BaseModel):
   """Get a list of Teachers"""
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[list[TempUsers]] = []
+  data: Optional[list[UserModel]] = []
 
   class Config():
     orm_mode = True
@@ -98,7 +98,7 @@ class TeachersListResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Success",
-            "data": [TEMP_USER]
+            "data": [COURSE_ENROLLMENT_USER_EXAMPLE]
         }
     }
 
@@ -107,7 +107,7 @@ class GetTeacherResponseModel(BaseModel):
   """Get a Teacher """
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[TempUsers] = None
+  data: Optional[UserModel] = None
 
   class Config():
     orm_mode = True
@@ -115,10 +115,22 @@ class GetTeacherResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Success",
-            "data": TEMP_USER
+            "data": COURSE_ENROLLMENT_USER_EXAMPLE
         }
     }
 
+class EnrollTeacherSection(BaseModel):
+  """Enroll Teacher in a section Model"""
+  email:constr(
+      min_length=7,
+      max_length=128,
+      regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+      to_lower=True)
+  class Config():
+    orm_mode = True
+    schema_extra = {
+      "email":"teacher@gmail.com"
+    }
 
 class CreateSectiontResponseModel(BaseModel):
   """Create Section Response Model"""
@@ -218,7 +230,21 @@ class DeleteSectionResponseModel(BaseModel):
             "data": None
         }
     }
+class DeleteTeacherFromSectionResponseModel(BaseModel):
+  """Delete Teacher from section Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully deleted the student from section"
+  data: Optional[str] = None
 
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully deleted teacher from section",
+            "data": None
+        }
+    }
 
 class DeleteStudentFromSectionResponseModel(BaseModel):
   """Delete student from section Model"""

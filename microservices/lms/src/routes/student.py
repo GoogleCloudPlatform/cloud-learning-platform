@@ -3,7 +3,9 @@ import traceback
 from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
 from services import student_service
-from utils.student_helper import convert_course_enrollment_course_enrollment_model
+from utils.user_helper import (
+  course_enrollment_user_model,get_user_id,
+  check_user_can_enroll_in_section)
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  InvalidTokenError)
@@ -19,8 +21,8 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import(StudentListResponseModel,\
    DeleteStudentFromSectionResponseModel)
-from schemas.student import(AddStudentResponseModel,\
-  AddStudentModel,GetStudentDetailsResponseModel,\
+from schemas.student import(AddStudentResponseModel,
+  AddStudentModel,GetStudentDetailsResponseModel,
     GetProgressPercentageResponseModel,InviteStudentToSectionResponseModel,
     UpdateInviteResponseModel)
 
@@ -101,7 +103,7 @@ def get_progress_percentage(section_id: str, user: str, request: Request):
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
-    user_id = student_service.get_user_id(user=user, headers=headers)
+    user_id = get_user_id(user=user, headers=headers)
     submitted_course_work_list = 0
     course_work_list = len(classroom_crud.get_course_work_list(section_id))
     submitted_course_work = classroom_crud.get_submitted_course_work_list(
@@ -140,19 +142,19 @@ def get_student_in_section(section_id: str, user: str, request: Request):
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
-    user_id = student_service.get_user_id(user=user, headers=headers)
+    user_id = get_user_id(user=user, headers=headers)
     section = Section.find_by_id(section_id)
     result=CourseEnrollmentMapping.\
-    find_course_enrollment_record(section.key,user_id)
+    find_course_enrollment_record(section.key,user_id,"learner")
     if result is None:
       raise ResourceNotFoundException(
-          f"User not found in this section {section_id}")
+          f"Student not found in this section {section_id}")
     # users = classroom_crud.\
     #   if_user_exists_in_section\
     #     (section_id=section_id,user_id=user_id,headers=headers)
     return {
         "message": f"Successfully get student details by {user}",
-        "data": convert_course_enrollment_course_enrollment_model(result)
+        "data": course_enrollment_user_model(result)
     }
   except ResourceNotFoundException as err:
     Logger.error(err)
@@ -183,28 +185,18 @@ def get_student_in_cohort(cohort_id: str, user: str, request: Request):
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
-    user_id = student_service.get_user_id(user=user, headers=headers)
+    user_id = get_user_id(user=user, headers=headers)
     cohort = Cohort.find_by_id(cohort_id)
     course_mapping = None
     list_section = Section.collection.filter("cohort", "==",
                                              cohort.key).fetch()
     for section in list_section:
       course_mapping = CourseEnrollmentMapping.find_course_enrollment_record(
-          section_key=section.key, user_id=user_id)
+          section_key=section.key, user_id=user_id,role="learner")
       if course_mapping:
-        # result = classroom_crud.get_user_details(user_id=user_id,
-        #                                          headers=headers)
-        # result = result["data"]
-        # result["classroom_id"] = section.classroom_id
-        # result["course_enrollment_id"] = course_mapping.id
-        # result["enrollment_status"] = course_mapping.status
-        # result["section_id"] = section.id
-        # result["classroom_url"] = section.classroom_url
-        # result["cohort_id"] = cohort_id
-        # result["invitation_id"] = course_mapping.invitation_id
         return {
             "data":
-            convert_course_enrollment_course_enrollment_model(course_mapping)
+            course_enrollment_user_model(course_mapping)
         }
     if not course_mapping:
       raise ResourceNotFoundException(
@@ -241,7 +233,7 @@ def list_students_in_section(section_id: str):
     results=CourseEnrollmentMapping.\
     fetch_all_by_section(section.key,"learner")
     data = [
-        convert_course_enrollment_course_enrollment_model(i) for i in results
+        course_enrollment_user_model(i) for i in results
     ]
     Logger.info(data)
     return {"data": data}
@@ -276,9 +268,9 @@ def delete_student(section_id: str, user: str, request: Request):
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
     section_details = Section.find_by_id(section_id)
-    user_id = student_service.get_user_id(user=user, headers=headers)
+    user_id = get_user_id(user=user, headers=headers)
     result = CourseEnrollmentMapping.\
-      find_enrolled_student_record(section_details.key,user_id)
+      find_active_enrolled_student_record(section_details.key,user_id)
     if result is None:
       raise ResourceNotFoundException\
       (
@@ -350,7 +342,7 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
          does not have any sections")
     if not student_service.check_student_can_enroll_in_cohort(
         email=input_data.email, headers=headers, sections=sections):
-      raise Conflict(f"User {input_data.email} is already\
+      raise Conflict(f"Student {input_data.email} is already\
                       enrolled for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
     Logger.info(f"Section with minimum student is {section.id},\
@@ -440,7 +432,7 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
-    if not student_service.check_student_can_enroll_in_section(
+    if not check_user_can_enroll_in_section(
         email=input_data.email, headers=headers, section=section):
       raise Conflict(f"User {input_data.email} is already\
                       enrolled for section {section_id}")
@@ -640,7 +632,7 @@ def update_invites():
         try:
           result = classroom_crud.get_invite(course_record.invitation_id)
           Logger.info(
-              f"Invitation {result} found for User id {course_record.user},\
+              f"Invitation {result} found for User id {course_record.user.id},\
           course_enrollment_id {course_record.id} database will be updated\
           once invite is accepted.")
         except HttpError as ae:
