@@ -55,8 +55,9 @@ export class SingleTemplateComponent implements OnInit {
     let courseTemplateId = this.router.url.split('/')[this.router.url.split('/').length - 1]
     let ltiModalData = {}
     ltiModalData['mode'] = 'Create'
+    ltiModalData['page'] = 'course_template'
     ltiModalData['init_data'] = ''
-    ltiModalData['extra_data'] = { courseTemplateId }
+    ltiModalData['extra_data'] = { "contextId": courseTemplateId }
 
     const dialogRef = this.dialog.open(CreateAssignmentComponent, {
       width: '80vw',
@@ -151,6 +152,7 @@ export class ViewLtiAssignmentDialog {
   }
 
 }
+
 @Component({
   selector: 'delete-lti-assignment-dialog',
   templateUrl: 'delete-lti-assignment-dialog.html',

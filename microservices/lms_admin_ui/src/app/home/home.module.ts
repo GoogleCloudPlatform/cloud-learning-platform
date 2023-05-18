@@ -25,6 +25,8 @@ import { InviteStudentModalComponent } from './invite-student-modal/invite-stude
 import { SingleTemplateComponent } from './single-template/single-template.component';
 import { ViewLtiAssignmentDialog } from './single-template/single-template.component';
 import { DeleteLtiDialog } from './single-template/single-template.component';
+import { ViewSectionLtiAssignmentDialog } from './section/section.component';
+import { DeleteSectionLtiDialog } from './section/section.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +46,9 @@ import { DeleteLtiDialog } from './single-template/single-template.component';
     InviteStudentModalComponent,
     SingleTemplateComponent,
     ViewLtiAssignmentDialog,
-    DeleteLtiDialog
+    DeleteLtiDialog,
+    ViewSectionLtiAssignmentDialog,
+    DeleteSectionLtiDialog
   ],
   // entryComponents: [CreateCohortModalComponent],
   imports: [
