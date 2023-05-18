@@ -22,8 +22,7 @@ TEST_USER = {
     "last_name": "last_name",
     "email": email,
     "status": "active",
-    "user_type": "other",
-    "user_type_ref": "",
+    "user_type": "robot",
     "user_groups": [],
     "is_registered": True,
     "failed_login_attempts_count": 0
