@@ -293,8 +293,8 @@ def delete_teacher(section_id: str,teacher_email:str,request: Request):
     headers = {"Authorization": request.headers.get("Authorization")}
     user_id = get_user_id(user=teacher_email, headers=headers)
     section = Section.find_by_id(section_id)
-    result=CourseEnrollmentMapping.\
-    find_course_enrollment_record(section.key,user_id,"faculty")
+    result=CourseEnrollmentMapping.find_active_enrolled_teacher_record(
+     section_key = section.key,user_id = user_id)
     if result is None:
       raise ResourceNotFoundException(
           f"Teacher not found in this section {section_id}")
