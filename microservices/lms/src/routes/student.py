@@ -194,16 +194,6 @@ def get_student_in_cohort(cohort_id: str, user: str, request: Request):
       course_mapping = CourseEnrollmentMapping.find_course_enrollment_record(
           section_key=section.key, user_id=user_id,role="learner")
       if course_mapping:
-        # result = classroom_crud.get_user_details(user_id=user_id,
-        #                                          headers=headers)
-        # result = result["data"]
-        # result["classroom_id"] = section.classroom_id
-        # result["course_enrollment_id"] = course_mapping.id
-        # result["enrollment_status"] = course_mapping.status
-        # result["section_id"] = section.id
-        # result["classroom_url"] = section.classroom_url
-        # result["cohort_id"] = cohort_id
-        # result["invitation_id"] = course_mapping.invitation_id
         return {
             "data":
             course_enrollment_user_model(course_mapping)
@@ -642,7 +632,7 @@ def update_invites():
         try:
           result = classroom_crud.get_invite(course_record.invitation_id)
           Logger.info(
-              f"Invitation {result} found for User id {course_record.user},\
+              f"Invitation {result} found for User id {course_record.user.id},\
           course_enrollment_id {course_record.id} database will be updated\
           once invite is accepted.")
         except HttpError as ae:
