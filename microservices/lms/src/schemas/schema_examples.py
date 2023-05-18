@@ -69,7 +69,6 @@ SECTION_EXAMPLE = {
     "classroom_id": "123456789100",
     "classroom_code": "abcdef",
     "classroom_url": "https://classroom.google.com",
-    "teachers": ["test_user_1@gmail.com"],
     "course_template": "course_templates/7d2zTApD-id",
     "cohort": "cohorts/1j-id",
     "enrolled_students_count": 2
@@ -78,8 +77,7 @@ INSERT_SECTION_EXAMPLE = {
     "name": "section c",
     "description": "This is updated create section test",
     "course_template": "course_template-id",
-    "cohort": "cohort-id",
-    "teachers": ["test_user@gmail.com"]
+    "cohort": "cohort-id"
 }
 
 CREDENTIAL_JSON = {
@@ -134,8 +132,7 @@ UPDATE_SECTION = {
     "id": "string",
     "course_id": "string",
     "section_name": "string",
-    "description": "string",
-    "teachers": ["test_user_1@gmail.com"]
+    "description": "string"
 }
 
 ASSIGNMENT_MODEL = {

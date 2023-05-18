@@ -2,11 +2,11 @@
 import traceback
 import datetime
 from common.utils import classroom_crud
+from common.utils.bq_helper import insert_rows_to_bq
 from common.utils.logging_handler import Logger
-from common.models import Section
+from common.models import Section,CourseEnrollmentMapping,User
 from common.utils.http_exceptions import (InternalServerError,
                                           ResourceNotFound)
-from common.utils.bq_helper import insert_rows_to_bq
 from services import common_service
 from config import BQ_TABLE_DICT, BQ_DATASET
 
@@ -123,41 +123,6 @@ def copy_course_background_task(course_template_details,
     if final_coursewok_material is not None:
       classroom_crud.create_coursework_material(new_course["id"],
                                                 final_coursewok_material)
-    # add Instructional designer
-    sections_details.teachers.append(
-        course_template_details.instructional_designer)
-    final_teachers = []
-    for teacher_email in set(sections_details.teachers):
-      try:
-        invitation_object = classroom_crud.invite_user(new_course["id"],
-                                                       teacher_email,
-                                                       "TEACHER")
-        # Storing classroom details
-        classroom_crud.acceept_invite(invitation_object["id"], teacher_email)
-        user_profile = classroom_crud.\
-          get_user_profile_information(teacher_email)
-        # Save the new record of seecion in firestore
-        data = {
-        "first_name":user_profile["name"]["givenName"],
-        "last_name": user_profile["name"]["familyName"],
-        "email":teacher_email,
-        "user_type": "faculty",
-        "user_groups": [],
-        "status": "active",
-        "is_registered": True,
-        "failed_login_attempts_count": 0,
-        "access_api_docs": False,
-        "gaia_id":user_profile["id"],
-        "photo_url" :  user_profile["photoUrl"]
-          }
-        common_service.create_teacher(headers,data)
-        final_teachers.append(teacher_email)
-      except Exception as error:
-        error = traceback.format_exc().replace("\n", " ")
-        Logger.error(f"Create teacher failed for \
-            for {teacher_email}")
-        Logger.error(error)
-        continue
     section = Section()
     section.name = course_template_details.name
     section.section = sections_details.name
@@ -168,10 +133,18 @@ def copy_course_background_task(course_template_details,
     section.classroom_id = new_course["id"]
     section.classroom_code = new_course["enrollmentCode"]
     section.classroom_url = new_course["alternateLink"]
-    section.teachers = list(set(final_teachers))
     section.enrolled_students_count = 0
     section_id = section.save().id
     classroom_id = new_course["id"]
+    try:
+      add_teacher(headers,section,
+                course_template_details.instructional_designer)
+    except Exception as error:
+      error = traceback.format_exc().replace("\n", " ")
+      Logger.error(f"Create teacher failed for \
+          for {course_template_details.instructional_designer}")
+      Logger.error(error)
+
     rows=[{
       "sectionId":section_id,\
       "courseId":new_course["id"],\
@@ -294,3 +267,62 @@ def update_grades(all_form_responses, section, coursework_id):
   Logger.info(f"Student grades updated\
                 for {count} student_data {student_grades}")
   return count,student_grades
+
+def add_teacher(headers,section,teacher_email):
+  """_summary_
+
+  Args:
+      headers (_type_): _description_
+      course_id (_type_): _description_
+      teacher_email (_type_): _description_
+  """
+  invitation_object = classroom_crud.invite_user(section.classroom_id,
+                                                    teacher_email,
+                                                    "TEACHER")
+  try:
+    classroom_crud.acceept_invite(invitation_object["id"], teacher_email)
+    user_profile = classroom_crud.\
+        get_user_profile_information(teacher_email)
+
+    data = {
+          "first_name": user_profile["name"]["givenName"],
+          "last_name": user_profile["name"]["familyName"],
+          "email": teacher_email,
+          "user_type": "faculty",
+          "user_groups": [],
+          "status": "active",
+          "is_registered": True,
+          "failed_login_attempts_count": 0,
+          "access_api_docs": False,
+          "gaia_id": user_profile["id"],
+          "photo_url": user_profile["photoUrl"]
+      }
+    status="active"
+    invitation_id=""
+  except Exception as hte:
+    Logger.info(hte)
+    data={
+          "first_name": "first_name",
+          "last_name": "last_name",
+          "email": teacher_email,
+          "user_type": "faculty",
+          "user_groups": [],
+          "status": "active",
+          "is_registered": True,
+          "failed_login_attempts_count": 0,
+          "access_api_docs": False,
+          "gaia_id": "",
+          "photo_url": ""
+      }
+    status="invited"
+    invitation_id=invitation_object["id"]
+  user_dict=common_service.create_teacher(headers, data)
+  Logger.info(user_dict)
+  course_enrollment_mapping=CourseEnrollmentMapping()
+  course_enrollment_mapping.section=section
+  course_enrollment_mapping.role="faculty"
+  course_enrollment_mapping.user=User.find_by_user_id(user_dict["user_id"])
+  course_enrollment_mapping.status=status
+  course_enrollment_mapping.invitation_id=invitation_id
+  course_enrollment_mapping.save()
+  return course_enrollment_mapping

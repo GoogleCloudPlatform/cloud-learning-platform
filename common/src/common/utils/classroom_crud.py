@@ -5,7 +5,7 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from common.utils.errors import InvalidTokenError, UserManagementServiceError, ResourceNotFoundException
-from common.utils.http_exceptions import InternalServerError, CustomHTTPException
+from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
 from common.models import Section
 
@@ -651,23 +651,13 @@ def invite_user(course_id, email, role):
       course_id (str): google classroom unique id
       teacher_email (str): teacher email id
 
-  Raises:
-      CustomHTTPException: custom exception for HTTP exceptions
-      InternalServerError: 500 Internal Server Error if something fails
-
   Returns:
       dict: response from create invitation method
   """
   service = build("classroom", "v1", credentials=get_credentials())
   body = {"courseId": course_id, "role": role, "userId": email}
-  try:
-    invitation = service.invitations().create(body=body).execute()
-    return invitation
-  except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+  invitation = service.invitations().create(body=body).execute()
+  return invitation
 
 
 def get_invite(invitation_id):
@@ -676,10 +666,6 @@ def get_invite(invitation_id):
   Args:
       course_id (str): google classroom unique id
       teacher_email (str): teacher email id
-
-  Raises:
-      CustomHTTPException: custom exception for HTTP exceptions
-      InternalServerError: 500 Internal Server Error if something fails
 
   Returns:
       dict: response from create invitation method
@@ -778,23 +764,14 @@ def delete_student(course_id, student_email):
   Args:
       course_id (str): google classroom unique id
       teacher_email (str): teacher email id
-  Raises:
-      CustomHTTPException: custom exception for HTTP exceptions
-      InternalServerError: 500 Internal Server Error if something fails
   Returns:
       dict: response from create invitation method
   """
   service = build("classroom", "v1", credentials=get_credentials())
   student = {"userId": student_email}
-  try:
-    student = service.courses().students().delete(
-        courseId=course_id, userId=student_email).execute()
-    return student
-  except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
+  student = service.courses().students().delete(
+      courseId=course_id, userId=student_email).execute()
+  return student
 
 
 def get_user_details(user_id, headers):
@@ -842,25 +819,13 @@ def acceept_invite(invitation_id, email):
       user response
       email (str): user email id
 
-  Raises:
-      CustomHTTPException: custom exception for HTTP exceptions
-      InternalServerError: 500 Internal Server Error if something fails
-
   Returns:
       dict: response from create invitation method
   """
   service = build("classroom", "v1", \
     credentials=impersonate_teacher_creds(email))
-  try:
-    course = service.invitations().accept(id=invitation_id).execute()
-    return course
-  except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
-  except Exception as e:
-    raise InternalServerError(str(e)) from e
+  course = service.invitations().accept(id=invitation_id).execute()
+  return course
 
 
 def get_user_profile_information(user_email):
@@ -872,20 +837,12 @@ def get_user_profile_information(user_email):
   """
   service = build("classroom", "v1", credentials=get_credentials())
 
-  try:
-    profile_information = service.userProfiles(\
-      ).get(userId=user_email).execute()
-    if not profile_information["photoUrl"].startswith("https:"):
-      profile_information[
-          "photoUrl"] = "https:" + profile_information["photoUrl"]
-    return profile_information
-  except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
-  except Exception as e:
-    raise InternalServerError(str(e)) from e
+  profile_information = service.userProfiles(\
+    ).get(userId=user_email).execute()
+  if not profile_information["photoUrl"].startswith("https:"):
+    profile_information[
+        "photoUrl"] = "https:" + profile_information["photoUrl"]
+  return profile_information
 
 
 def get_course_work(course_id, course_work_id):
@@ -918,31 +875,22 @@ def post_grade_of_the_user(section_id: str,
   """
   service = build("classroom", "v1", credentials=get_credentials())
 
-  try:
-    section_details = Section.find_by_id(section_id)
-    course_id = section_details.classroom_id
+  section_details = Section.find_by_id(section_id)
+  course_id = section_details.classroom_id
 
-    student_submission = {}
+  student_submission = {}
 
-    if assigned_grade is not None:
-      student_submission["assignedGrade"] = assigned_grade
+  if assigned_grade is not None:
+    student_submission["assignedGrade"] = assigned_grade
 
-    if draft_grade is not None:
-      student_submission["draftGrade"] = draft_grade
+  if draft_grade is not None:
+    student_submission["draftGrade"] = draft_grade
 
-    output = service.courses().courseWork().studentSubmissions().patch(
-        courseId=course_id,
-        courseWorkId=course_work_id,
-        id=submission_id,
-        updateMask="assignedGrade,draftGrade",
-        body=student_submission).execute()
+  output = service.courses().courseWork().studentSubmissions().patch(
+      courseId=course_id,
+      courseWorkId=course_work_id,
+      id=submission_id,
+      updateMask="assignedGrade,draftGrade",
+      body=student_submission).execute()
 
-    return output
-
-  except HttpError as ae:
-    raise CustomHTTPException(status_code=ae.resp.status,
-                              success=False,
-                              message=str(ae),
-                              data=None) from ae
-  except Exception as e:
-    raise InternalServerError(str(e)) from e
+  return output
