@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Tool Name: {{toolData["name"]}}</h2>
+<div mat-dialog-content style="padding-bottom: 4%;padding-top: 1%;">
+    <div>
+        <p><b>Client ID:</b> {{toolData["client_id"]}}</p>
+        <p><b>Tool ID:</b> {{toolData["id"]}}</p>
+        <p><b>Tool Name:</b> {{toolData["name"]}}</p>
+        <p><b>Tool Description:</b> {{toolData["description"]}}</p>
+        <p><b>Tool URL:</b> {{toolData["tool_url"]}}</p>
+        <p><b>Tool Login URL:</b> {{toolData["tool_login_url"]}}</p>
+        <p><b>Public Key Type:</b> {{toolData["public_key_type"]}}</p>
+        <p><b>Tool Keyset URL:</b> {{toolData["tool_keyset_url"]}}</p>
+        <p><b>Redirect URLS:</b> {{toolData["redirect_uris"]}}</p>
+        <p><b>Content Selection URL:</b> {{toolData["content_selection_url"]}}</p>
+        <p><b>Custom Params:</b> {{toolData["custom_params"]? toolData["custom_params"]: 'null'}}</p>
+        <p><b>Grade Sync Enabled:</b> {{toolData["enable_grade_sync"] ? toolData["enable_grade_sync"] : false}}</p>
+        <p><b>NRPS Enabled:</b> {{toolData["enable_nrps"] ? toolData["enable_nrps"] : false}}</p>
+        <p><b>Validate Title for Grade Sync:</b> {{toolData["validate_title_for_grade_sync"] ?
+            toolData["validate_title_for_grade_sync"] : false}}</p>
+        <p><b>Deployment ID:</b> {{toolData["deployment_id"]}}</p>
+        <p><b>Issuer:</b> {{toolData["issuer"]}}</p>
+        <p><b>Platform Auth URL:</b> {{toolData["platform_auth_url"]}}</p>
+        <p><b>Platform Token URL:</b> {{toolData["platform_token_url"]}}</p>
+        <p><b>Platform Keyset URL:</b> {{toolData["platform_keyset_url"]}}</p>
+    </div>
+</div>
+<div mat-dialog-actions style="display: flex;justify-content: end;">
+    <button mat-flat-button (click)="onNoClick()">Close</button>
+</div>

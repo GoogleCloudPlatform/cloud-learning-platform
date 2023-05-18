@@ -55,7 +55,9 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
   }
 
   context_id = lti_message_hint.get("context_id")
-  get_context_url = f"http://lms/lms/api/v1/sections/{context_id}"
+  context_type = lti_message_hint.get("context_type")
+
+  get_context_url = f"http://classroom-shim/classroom-shim/api/v1/contexts/{context_id}?context_type={context_type}"
   context_res = get_method(url=get_context_url, use_bot_account=True)
 
   if context_res.status_code == 200:

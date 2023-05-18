@@ -2,6 +2,7 @@ import { CreateCourseTemplateModalComponent } from './../create-course-template-
 import { Component, OnInit, Input } from '@angular/core';
 import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { CourseTemplateDetailsDialog } from '../home.component';
+import { Router } from '@angular/router';
 interface LooseObject {
   [key: string]: any
 }
@@ -12,10 +13,16 @@ interface LooseObject {
 })
 export class CourseTemplateComponent implements OnInit {
   @Input() courseTemplateList: any[]
-  constructor(public dialog: MatDialog,) { }
+  constructor(public dialog: MatDialog, public router: Router) { }
   selectedCourseTemplate: any
   ngOnInit(): void {
   }
+
+  reRoute(courseTemplate: any) {
+    this.router.navigate(['/home/course-template/' + courseTemplate.id])
+  }
+
+
   setSelected(courseTemplate: any) {
     this.selectedCourseTemplate = courseTemplate
   }
@@ -41,12 +48,12 @@ export class CourseTemplateComponent implements OnInit {
       , '_blank');
   }
 
-openDetailsDialogue(data:any){
-  const CourseTemplateDetailsDialogRef = this.dialog.open(CourseTemplateDetailsDialog, {
-    width: '600px',
-    data: data
-  });
-}
+  openDetailsDialogue(data: any) {
+    const CourseTemplateDetailsDialogRef = this.dialog.open(CourseTemplateDetailsDialog, {
+      width: '600px',
+      data: data
+    });
+  }
 
 
 }
