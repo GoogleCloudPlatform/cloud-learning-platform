@@ -245,6 +245,7 @@ def create_topics(course_id, topics):
   Logger.info(f"Topics created for course_id{course_id}")
   return topic_id_map
 
+
 def get_coursework_list(course_id):
   """Get  list of coursework from classroom
 
@@ -311,6 +312,7 @@ def patch_student_submission(course_id, coursework_id, student_submission_id,
       updateMask="assignedGrade,draftGrade",
       body=student_submission).execute()
   return patch_result
+
 
 def get_coursework_material_list(course_id):
   """Get  list of coursework from classroom
@@ -528,8 +530,8 @@ def enroll_student(headers, access_token, course_id, student_email,
   """
   # Call search by email usermanagement API to get the student data
   response = requests.get(
-    f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",
-    headers=headers)
+      f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",
+      headers=headers)
   # If the response is success check if student is inactive i.e  raise error
   searched_student = []
   if response.status_code == 200:
@@ -555,17 +557,17 @@ def enroll_student(headers, access_token, course_id, student_email,
   gaia_id = profile["metadata"]["sources"][0]["id"]
   # Call user API
   data = {
-  "first_name":profile["names"][0]["givenName"],
-  "last_name": profile["names"][0]["familyName"],
-  "email":student_email,
-  "user_type": "learner",
-  "user_groups": [],
-  "status": "active",
-  "is_registered": True,
-  "failed_login_attempts_count": 0,
-  "access_api_docs": False,
-  "gaia_id":gaia_id,
-  "photo_url":profile["photos"][0]["url"]
+      "first_name": profile["names"][0]["givenName"],
+      "last_name": profile["names"][0]["familyName"],
+      "email": student_email,
+      "user_type": "learner",
+      "user_groups": [],
+      "status": "active",
+      "is_registered": True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id": gaia_id,
+      "photo_url": profile["photos"][0]["url"]
   }
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user usermanagement API and return user data else
@@ -581,41 +583,27 @@ def enroll_student(headers, access_token, course_id, student_email,
     return searched_student[0]
 
 
-def get_edit_url_and_view_url_mapping_of_form(folder_id):
+def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns
       return a dictionary of view link as keys and edit link as values
   """
-  forms = list_folders_children(
-      folder_id, "mimeType=\"application/vnd.google-apps.form\"")
-  view_link_and_edit_link_matching = {}
-  for form in forms:
-    result = get_view_link_from_id(form.get("id"))
-    # Call get file api to get
-    file = get_file(form.get("id"))
-    view_link_and_edit_link_matching[result["responderUri"]] = \
-    {"webViewLink":file.get("webViewLink"),"file_id":form.get("id")}
-  return view_link_and_edit_link_matching
-
-
-def list_folders_children(folder_id, search_query=""):
-  """
-  List the files or childrens of given folder_id 
-  filters according to search query if given else gets all the 
-  childrens of folder
-  """
-  service = build("drive", "v2", credentials=get_credentials())
+  service = build("drive", "v3", credentials=get_credentials())
   page_token = None
   while True:
-    param = {}
-    if page_token:
-      param["pageToken"] = page_token
-    children = service.children().list(folderId=folder_id,
-                                       q=search_query,
-                                       **param).execute()
-    page_token = children.get("nextPageToken")
-    if not page_token:
+    response = service.files().list(
+        q="mimeType=\"application/vnd.google-apps.form\"",
+        spaces="drive",
+        fields="nextPageToken, "
+        "files(id, name,webViewLink,thumbnailLink)",
+        pageToken=page_token).execute()
+    view_link_and_edit_link_matching = {}
+    for file in response.get("files", []):
+      result = get_view_link_from_id(file.get("id"))
+      view_link_and_edit_link_matching[result["responderUri"]] = \
+      {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
+    if page_token is None:
       break
-  return children.get("items", [])
+  return view_link_and_edit_link_matching
 
 
 def get_file(file_id):

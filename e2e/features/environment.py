@@ -91,22 +91,22 @@ def enroll_student_classroom(access_token, course_id, student_email,
   gaia_id = profile["metadata"]["sources"][0]["id"]
   # Call user API
   data = {
-  "first_name": profile["names"][0]["givenName"],
-  "last_name": profile["names"][0]["familyName"],
-  "email":student_email,
-  "user_type": "learner",
-  "user_groups": [],
-  "status": "active",
-  "is_registered": True,
-  "failed_login_attempts_count": 0,
-  "access_api_docs": False,
-  "gaia_id":gaia_id,
-  "photo_url":profile["photos"][0]["url"]
+      "first_name": profile["names"][0]["givenName"],
+      "last_name": profile["names"][0]["familyName"],
+      "email": student_email,
+      "user_type": "learner",
+      "user_groups": [],
+      "status": "active",
+      "is_registered": True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id": gaia_id,
+      "photo_url": profile["photos"][0]["url"]
   }
   return data
 
 
-def accept_invite(invitation_id,access_token=None,teacher_email=None):
+def accept_invite(invitation_id, access_token=None, teacher_email=None):
   """Add student to the classroom using student google auth token
   Args:
     access_token(str): Oauth access token which contains student credentials
@@ -119,7 +119,7 @@ def accept_invite(invitation_id,access_token=None,teacher_email=None):
     creds = Credentials(token=access_token)
   else:
     a_creds = service_account.Credentials.from_service_account_info(
-      CLASSROOM_KEY, scopes=SCOPES)
+        CLASSROOM_KEY, scopes=SCOPES)
     creds = a_creds.with_subject(teacher_email)
   service = build("classroom", "v1", credentials=creds)
   data = service.invitations().accept(id=invitation_id).execute()
@@ -187,8 +187,8 @@ def create_section(context):
   section.classroom_url = classroom["alternateLink"]
   section.save()
   # Create teachers in the DB
-  instructional_designer_email=cohort.course_template.instructional_designer
-  temp_user= TempUser.find_by_email(instructional_designer_email)
+  instructional_designer_email = cohort.course_template.instructional_designer
+  temp_user = TempUser.find_by_email(instructional_designer_email)
   if temp_user is None:
     temp_user = TempUser.from_dict(TEST_USER)
     temp_user.email = instructional_designer_email
@@ -198,11 +198,11 @@ def create_section(context):
     temp_user.save()
     temp_user.user_id = temp_user.id
     temp_user.update()
-  course_enrollment_mapping=CourseEnrollmentMapping()
-  course_enrollment_mapping.section=section
-  course_enrollment_mapping.role="faculty"
-  course_enrollment_mapping.user=User.find_by_user_id(temp_user.user_id)
-  course_enrollment_mapping.status="active"
+  course_enrollment_mapping = CourseEnrollmentMapping()
+  course_enrollment_mapping.section = section
+  course_enrollment_mapping.role = "faculty"
+  course_enrollment_mapping.user = User.find_by_user_id(temp_user.user_id)
+  course_enrollment_mapping.status = "active"
   course_enrollment_mapping.save()
   context.sections = section
   context.classroom_drive_folder_id = classroom["teacherFolder"]["id"]
@@ -261,14 +261,15 @@ def enroll_student_course(context):
   }
   return context.enroll_student_data
 
+
 @fixture
 def enroll_teacher_into_section(context):
   """fixture to enroll teacher to section"""
-  section=use_fixture(create_section, context)
+  section = use_fixture(create_section, context)
   teacher_email = TEACHER_EMAIL
-  temp_user=TempUser.find_by_email(teacher_email)
-  invite_obj=invite_user(section.classroom_id,teacher_email,"TEACHER")
-  accept_invite(invitation_id=invite_obj["id"],teacher_email=teacher_email)
+  temp_user = TempUser.find_by_email(teacher_email)
+  invite_obj = invite_user(section.classroom_id, teacher_email, "TEACHER")
+  accept_invite(invitation_id=invite_obj["id"], teacher_email=teacher_email)
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(teacher_email)
@@ -281,39 +282,40 @@ def enroll_teacher_into_section(context):
         "photoUrl"] = "https:" + profile_information["photoUrl"]
   if temp_user is None:
     data = {
-          "first_name": profile_information["name"]["givenName"],
-          "last_name": profile_information["name"]["familyName"],
-          "email": teacher_email,
-          "user_type": "faculty",
-          "user_groups": [],
-          "status": "active",
-          "is_registered": True,
-          "failed_login_attempts_count": 0,
-          "access_api_docs": False,
-          "gaia_id": profile_information["id"],
-          "photo_url": profile_information["photoUrl"]
-      }
+        "first_name": profile_information["name"]["givenName"],
+        "last_name": profile_information["name"]["familyName"],
+        "email": teacher_email,
+        "user_type": "faculty",
+        "user_groups": [],
+        "status": "active",
+        "is_registered": True,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": False,
+        "gaia_id": profile_information["id"],
+        "photo_url": profile_information["photoUrl"]
+    }
     temp_user = TempUser.from_dict(data)
     temp_user.user_id = ""
     temp_user.save()
     temp_user.user_id = temp_user.id
     temp_user.update()
-  course_enrollment_mapping=CourseEnrollmentMapping()
-  course_enrollment_mapping.section=section
-  course_enrollment_mapping.role="faculty"
-  course_enrollment_mapping.user=User.find_by_user_id(temp_user.user_id)
-  course_enrollment_mapping.status="active"
+  course_enrollment_mapping = CourseEnrollmentMapping()
+  course_enrollment_mapping.section = section
+  course_enrollment_mapping.role = "faculty"
+  course_enrollment_mapping.user = User.find_by_user_id(temp_user.user_id)
+  course_enrollment_mapping.status = "active"
   course_enrollment_mapping.save()
-  context.enrollment_mapping=course_enrollment_mapping
+  context.enrollment_mapping = course_enrollment_mapping
   return context.enrollment_mapping
+
 
 @fixture
 def import_google_form_grade(context):
   "Fixture for import grade"
   section = use_fixture(create_section, context)
-  folder_id = context.classroom_drive_folder_id
-  result = insert_file_into_folder(folder_id, e2e_google_form_id)
-  print("Inserted in classroom folder", result)
+  # folder_id = context.classroom_drive_folder_id
+  # result =insert_file_into_folder(folder_id,e2e_google_form_id)
+  # print("Inserted in classroom folder",result)
   coursework_body = {
       "title":
       "Test_quize11",
@@ -382,16 +384,19 @@ def create_analytics_data(context):
       headers=header)
   res.raise_for_status()
   student_email_and_token = get_student_email_and_token()
-  print("In analytics fixturee__ student email and token value",student_email_and_token)
-  res=requests.post(url=f'{API_URL}/cohorts/{section.cohort.id}/students',
-                    json=student_email_and_token,
-                    headers=header)
-  print("Added student for cohort____",res.status_code)
+  print("In analytics fixturee__ student email and token value",
+        student_email_and_token)
+  res = requests.post(url=f'{API_URL}/cohorts/{section.cohort.id}/students',
+                      json=student_email_and_token,
+                      headers=header)
+  print("Added student for cohort____", res.status_code)
   res.raise_for_status()
   resp = requests.get(
-    headers=header,
-    url=f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_email"]}')
-  print("Added student for section____",resp.status_code)
+      headers=header,
+      url=
+      f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_email"]}'
+  )
+  print("Added student for section____", resp.status_code)
   resp.raise_for_status()
   data["student_data"] = resp.json()["data"]
   data["course_details"] = {
@@ -399,7 +404,7 @@ def create_analytics_data(context):
       "name": section.name,
       "section": section.section
   }
-  print("Response of get student in section",data)
+  print("Response of get student in section", data)
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
@@ -509,7 +514,8 @@ def invite_student(context):
   course_enrollment_mapping.section = section
   course_enrollment_mapping.status = "invited"
   course_enrollment_mapping.invitation_id = invitation_dict["id"]
-  temp_user = TempUser.find_by_email(student_data["invite_student_email"].lower())
+  temp_user = TempUser.find_by_email(
+      student_data["invite_student_email"].lower())
   if temp_user is None:
     temp_user = TempUser.from_dict(TEST_USER)
     temp_user.user_id = ""

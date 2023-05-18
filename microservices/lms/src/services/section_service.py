@@ -4,7 +4,7 @@ import datetime
 from common.utils import classroom_crud
 from common.utils.bq_helper import insert_rows_to_bq
 from common.utils.logging_handler import Logger
-from common.models import Section,CourseEnrollmentMapping,User
+from common.models import Section, CourseEnrollmentMapping, User
 from common.utils.http_exceptions import (InternalServerError,
                                           ResourceNotFound)
 from services import common_service
@@ -16,7 +16,6 @@ from config import BQ_TABLE_DICT, BQ_DATASET
 def copy_course_background_task(course_template_details,
                                 sections_details,
                                 cohort_details,
-                                template_drive_folder_id,
                                 headers,
                                 message=""):
   """Create section  Background Task to copy course and updated database
@@ -62,7 +61,7 @@ def copy_course_background_task(course_template_details,
     # a dictionary of view_links as keys and edit
     #  links/  and file_id as values for all drive files
     url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form(template_drive_folder_id)
+            get_edit_url_and_view_url_mapping_of_form()
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework_list(
         course_template_details.classroom_id)
@@ -94,7 +93,7 @@ def copy_course_background_task(course_template_details,
     # Get the list of courseworkMaterial
     final_coursewok_material = []
     coursework_material_list = classroom_crud.get_coursework_material_list(
-      course_template_details.classroom_id)
+        course_template_details.classroom_id)
     for coursework_material in coursework_material_list:
       try:
         #Check if a coursework material is linked to a topic if yes then
@@ -137,8 +136,8 @@ def copy_course_background_task(course_template_details,
     section_id = section.save().id
     classroom_id = new_course["id"]
     try:
-      add_teacher(headers,section,
-                course_template_details.instructional_designer)
+      add_teacher(headers, section,
+                  course_template_details.instructional_designer)
     except Exception as error:
       error = traceback.format_exc().replace("\n", " ")
       Logger.error(f"Create teacher failed for \
@@ -227,7 +226,7 @@ def update_coursework_material(materials, url_mapping, target_folder_id):
   return updated_material
 
 
-def update_grades(all_form_responses, section, coursework_id):
+def update_grades(material, section, coursework_id):
   """Takes the forms all responses ,section, and coursework_id and
   updates the grades of student who have responsed to form and
   submitted the coursework
@@ -236,7 +235,18 @@ def update_grades(all_form_responses, section, coursework_id):
   count = 0
   Logger.info(f"Student grade update background tasks started\
               for coursework_id {coursework_id}")
-  for response in all_form_responses["responses"]:
+  #Get url mapping of google forms view links and edit ids
+  url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+  form_details = url_mapping[material["form"]["formUrl"]]
+
+  form_id = form_details["file_id"]
+  # Get all responses for the form if no responses of
+  # the form then return
+  all_responses_of_form = classroom_crud.\
+  retrieve_all_form_responses(form_id)
+  if all_responses_of_form == {}:
+    Logger.error("Responses not available for google form")
+  for response in all_responses_of_form["responses"]:
     try:
       if "respondentEmail" not in response.keys():
         raise Exception(f"Respondent Email is not collected in form for\
@@ -266,9 +276,10 @@ def update_grades(all_form_responses, section, coursework_id):
       continue
   Logger.info(f"Student grades updated\
                 for {count} student_data {student_grades}")
-  return count,student_grades
+  return count, student_grades
 
-def add_teacher(headers,section,teacher_email):
+
+def add_teacher(headers, section, teacher_email):
   """_summary_
 
   Args:
@@ -277,52 +288,51 @@ def add_teacher(headers,section,teacher_email):
       teacher_email (_type_): _description_
   """
   invitation_object = classroom_crud.invite_user(section.classroom_id,
-                                                    teacher_email,
-                                                    "TEACHER")
+                                                 teacher_email, "TEACHER")
   try:
     classroom_crud.acceept_invite(invitation_object["id"], teacher_email)
     user_profile = classroom_crud.\
         get_user_profile_information(teacher_email)
 
     data = {
-          "first_name": user_profile["name"]["givenName"],
-          "last_name": user_profile["name"]["familyName"],
-          "email": teacher_email,
-          "user_type": "faculty",
-          "user_groups": [],
-          "status": "active",
-          "is_registered": True,
-          "failed_login_attempts_count": 0,
-          "access_api_docs": False,
-          "gaia_id": user_profile["id"],
-          "photo_url": user_profile["photoUrl"]
-      }
-    status="active"
-    invitation_id=""
+        "first_name": user_profile["name"]["givenName"],
+        "last_name": user_profile["name"]["familyName"],
+        "email": teacher_email,
+        "user_type": "faculty",
+        "user_groups": [],
+        "status": "active",
+        "is_registered": True,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": False,
+        "gaia_id": user_profile["id"],
+        "photo_url": user_profile["photoUrl"]
+    }
+    status = "active"
+    invitation_id = ""
   except Exception as hte:
     Logger.info(hte)
-    data={
-          "first_name": "first_name",
-          "last_name": "last_name",
-          "email": teacher_email,
-          "user_type": "faculty",
-          "user_groups": [],
-          "status": "active",
-          "is_registered": True,
-          "failed_login_attempts_count": 0,
-          "access_api_docs": False,
-          "gaia_id": "",
-          "photo_url": ""
-      }
-    status="invited"
-    invitation_id=invitation_object["id"]
-  user_dict=common_service.create_teacher(headers, data)
+    data = {
+        "first_name": "first_name",
+        "last_name": "last_name",
+        "email": teacher_email,
+        "user_type": "faculty",
+        "user_groups": [],
+        "status": "active",
+        "is_registered": True,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": False,
+        "gaia_id": "",
+        "photo_url": ""
+    }
+    status = "invited"
+    invitation_id = invitation_object["id"]
+  user_dict = common_service.create_teacher(headers, data)
   Logger.info(user_dict)
-  course_enrollment_mapping=CourseEnrollmentMapping()
-  course_enrollment_mapping.section=section
-  course_enrollment_mapping.role="faculty"
-  course_enrollment_mapping.user=User.find_by_user_id(user_dict["user_id"])
-  course_enrollment_mapping.status=status
-  course_enrollment_mapping.invitation_id=invitation_id
+  course_enrollment_mapping = CourseEnrollmentMapping()
+  course_enrollment_mapping.section = section
+  course_enrollment_mapping.role = "faculty"
+  course_enrollment_mapping.user = User.find_by_user_id(user_dict["user_id"])
+  course_enrollment_mapping.status = status
+  course_enrollment_mapping.invitation_id = invitation_id
   course_enrollment_mapping.save()
   return course_enrollment_mapping
