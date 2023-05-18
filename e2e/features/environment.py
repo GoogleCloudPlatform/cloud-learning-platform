@@ -9,15 +9,15 @@ from common.testing.example_objects import TEST_SECTION,TEST_COHORT
 from common.utils.bq_helper import insert_rows_to_bq
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL,e2e_google_form_id
+from e2e.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL,e2e_google_form_id
 from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,\
   get_student_email_and_token,\
   get_required_emails_from_secret_manager,create_coursework\
   ,get_gmail_student_email_and_token
 
-from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
-from testing_objects.user import TEST_USER
-from testing_objects.bq_helper import BQ_DATASET,BQ_TABLE_DICT
+from e2e.utils.course_template import COURSE_TEMPLATE_INPUT_DATA
+from e2e.utils.user import TEST_USER
+from e2e.utils.bq_helper import BQ_DATASET,BQ_TABLE_DICT
 from google.oauth2.credentials import Credentials
 import logging
 
