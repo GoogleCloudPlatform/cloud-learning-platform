@@ -1,0 +1,20 @@
+<h2 mat-dialog-title style="font-weight: bold;">LTI Assignment - {{ltiAssignmentData["id"]}}</h2>
+<div mat-dialog-content style="padding-bottom: 1%;padding-top: 1%;">
+    <div>
+        <p><b>ID : </b> {{ltiAssignmentData["id"]}}</p>
+        <p><b>LTI Assignment Title : </b> {{ltiAssignmentData["lti_assignment_title"]}}</p>
+        <p><b>Context Id : </b> {{ltiAssignmentData["context_id"]}}</p>
+        <p><b>Context Type : </b> {{ltiAssignmentData["context_type"]}}</p>
+        <p><b>Course Work Id : </b> {{ltiAssignmentData["course_work_id"]}}</p>
+        <p><b>Tool Id : </b> {{ltiAssignmentData["tool_id"]}}</p>
+        <p><b>LTI Content Item Id : </b> {{ltiAssignmentData["lti_content_item_id"] ?
+            ltiAssignmentData["lti_content_item_id"] : 'null'}}</p>
+        <p><b>Start Date : </b> {{ltiAssignmentData["start_date"] ? ltiAssignmentData["start_date"] : 'null'}}</p>
+        <p><b>End Date : </b> {{ltiAssignmentData["end_date"] ? ltiAssignmentData["end_date"] : 'null'}}</p>
+        <p><b>Due Date : </b> {{ltiAssignmentData["due_date"] ? ltiAssignmentData["due_date"] : 'null'}}</p>
+        <p><b>Max Points : </b> {{ltiAssignmentData["max_points"] ? ltiAssignmentData["max_points"] : 'null'}}</p>
+    </div>
+</div>
+<div mat-dialog-actions style="display: flex;justify-content: end;">
+    <button mat-flat-button (click)="onNoClick()">Close</button>
+</div>

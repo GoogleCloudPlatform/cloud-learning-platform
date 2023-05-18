@@ -111,8 +111,46 @@ export class SingleTemplateComponent implements OnInit {
     console.log(id)
   }
 
+  openViewAssignmentsDialog(id, data): void {
+    console.log("id", id)
+    let ltiModalData = {}
+    ltiModalData['mode'] = 'View'
+    ltiModalData['init_data'] = ''
+    ltiModalData['extra_data'] = { id, ...data }
+
+    const dialogRef = this.dialog.open(ViewLtiAssignmentDialog, {
+      width: '80vw',
+      maxWidth: '750px',
+      maxHeight: "90vh",
+      data: ltiModalData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log("result", result)
+    });
+  }
+
 }
 
+@Component({
+  selector: 'view-lti-assignment-dialog',
+  templateUrl: 'view-lti-assignment-dialog.html',
+})
+export class ViewLtiAssignmentDialog {
+  ltiAssignmentData: any;
+  objectKeys = Object.keys
+  constructor(
+    public dialogRef: MatDialogRef<ViewLtiAssignmentDialog>,
+    @Inject(MAT_DIALOG_DATA) public viewDialogData: any, public homeService: HomeService
+  ) {
+    this.ltiAssignmentData = viewDialogData.extra_data
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close({ data: 'closed' });
+  }
+
+}
 @Component({
   selector: 'delete-lti-assignment-dialog',
   templateUrl: 'delete-lti-assignment-dialog.html',
