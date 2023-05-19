@@ -78,14 +78,11 @@ def content_item_return(JWT: str = Form(), context_id: str = None):
                                                     context_id)
       content_item_data["content_item_id"] = content_item_fields.get("id")
 
-    return templates.TemplateResponse(
-        "content_item_return.html", {
-            "request": request,
-            "data": {
-                "status": "success",
-                "response": content_item_data
-            }
-        })
+    return {
+        "success": True,
+        "message": "Successfully received and decoded content item",
+        "data": content_item_data
+    }
 
   except ResourceNotFoundException as e:
     Logger.error(e)
