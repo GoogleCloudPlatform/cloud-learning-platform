@@ -61,6 +61,7 @@ def copy_course_background_task(course_template_details,
     section_id = section.save().id
     classroom_id = new_course["id"]
 
+    error_flag = False
     target_folder_id = new_course["teacherFolder"]["id"]
     Logger.info(f"ID of target drive folder for section {target_folder_id}")
 
@@ -125,27 +126,26 @@ def copy_course_background_task(course_template_details,
               cohort_details.start_date).strftime("%Y-%m-%dT%H:%M:%S%z")
 
           if coursework_due_datetime < curr_utc_timestamp:
-            coursework["dueDate"] = {
-                "year": cohort_details.end_date.year,
-                "month": cohort_details.end_date.month,
-                "day": cohort_details.end_date.day
-            }
-            coursework["dueTime"] = {
-                "hours": cohort_details.end_date.hour,
-                "minutes": cohort_details.end_date.minute
-            }
+            # Commented for now as the due dates are supposed to be updated by the user before
+            # starting the copy course process
 
-            lti_assignment_details["due_date"] = (
-                cohort_details.end_date).strftime("%Y-%m-%dT%H:%M:%S%z")
-            lti_assignment_details["end_date"] = (
-                cohort_details.end_date).strftime("%Y-%m-%dT%H:%M:%S%z")
+            # coursework["dueDate"] = {
+            #   "year": cohort_details.end_date.year,
+            #   "month": cohort_details.end_date.month,
+            #   "day": cohort_details.end_date.day
+            # }
+            # coursework["dueTime"] = {
+            #   "hours": cohort_details.end_date.hour,
+            #   "minutes": cohort_details.end_date.minute
+            # }
+
+            lti_assignment_details["end_date"] = lti_assignment_details[
+                "due_date"] = (
+                    cohort_details.end_date).strftime("%Y-%m-%dT%H:%M:%S%z")
 
           else:
-            lti_assignment_details[
+            lti_assignment_details["end_date"] = lti_assignment_details[
                 "due_date"] = coursework_due_datetime.strftime(
-                    "%Y-%m-%dT%H:%M:%S%z")
-            lti_assignment_details[
-                "end_date"] = coursework_due_datetime.strftime(
                     "%Y-%m-%dT%H:%M:%S%z")
 
         if "topicId" in coursework.keys():
@@ -163,24 +163,12 @@ def copy_course_background_task(course_template_details,
               coursework_update_output["lti_assignment_ids"])
         # final_coursewok.append(coursework)
 
-        print("Input coursework", coursework)
-        Logger.info(f"Input coursework -{coursework}")
         coursework_data = classroom_crud.create_coursework(
             new_course["id"], coursework)
+
         for assignment_id in coursework_lti_assignment_ids:
           coursework_id = coursework_data.get("id")
-          # # get lti assignment
-          # lti_assignment = requests.get(
-          #     f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
-          #     headers={
-          #         "Authorization": f"Bearer {get_backend_robot_id_token()}"
-          #     },
-          #     timeout=60)
-          # lti_assignment["data"]["coursework_id"] = coursework_id
-          Logger.info(
-              f"Updated the course work id for new LTI assignment - {assignment_id}"
-          )
-          input_json = {"course_work_id": coursework_id}
+          input_json = {"course_work_id":coursework_id}
           # update assignment with new coursework id
           lti_assignment_req = requests.patch(
               f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
@@ -193,8 +181,10 @@ def copy_course_background_task(course_template_details,
           if lti_assignment_req.status_code != 200:
             error_flag = True
             Logger.error(
-                f"Failed to update assignment {assignment_id} with course work id {coursework_id}"
+                f"Failed to update assignment {assignment_id} with course work id {coursework_id} due to error - {lti_assignment_req.text} with status code - {lti_assignment_req.status_code}"
             )
+
+          Logger.info(f"Updated the course work id for new LTI assignment - {assignment_id}")
 
       except Exception as error:
         title = coursework["title"]
@@ -327,15 +317,11 @@ def update_coursework_material(materials,
 
         if coursework_type == "coursework":
           # Update lti assignment with the course work details
-          Logger.info(f"In lti course work link material - {link}")
           if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
             split_url = link["url"].split(
                 "/classroom-shim/api/v1/launch?lti_assignment_id=")
             lti_assignment_id = split_url[-1]
-            Logger.info(
-                f"LTI Course copy started for assignment - {lti_assignment_id}"
-            )
-            print(f"lti_assignment_details -> {lti_assignment_details}")
+            Logger.info(f"LTI Course copy started for assignment - {lti_assignment_id}")
             copy_assignment = requests.post(
                 "http://classroom-shim/classroom-shim/api/v1/lti-assignment/copy",
                 headers={
@@ -350,23 +336,15 @@ def update_coursework_material(materials,
                 },
                 timeout=60)
 
-            print("copy_assignment", copy_assignment.status_code)
-
             if copy_assignment.status_code == 200:
-              print(f"copy_assignment - {copy_assignment.status_code}")
-              print(f"copy_assignment JSON - {copy_assignment.json()}")
-              new_lti_assignment_id = copy_assignment.json().get("data").get(
-                  "id")
+              new_lti_assignment_id = copy_assignment.json().get("data").get("id")
               updated_material_link_url = link["url"].replace(
                   lti_assignment_id, new_lti_assignment_id)
               lti_assignment_ids.append(new_lti_assignment_id)
 
-              updated_material.append(
-                  {"link": {
-                      "url": updated_material_link_url
-                  }})
-              Logger.info(
-                  f"LTI link updated for assignment - {lti_assignment_id}")
+              updated_material.append({"link": {"url": updated_material_link_url}})
+              Logger.info(f"LTI link updated for new assignment - {new_lti_assignment_id}")
+              Logger.info(f"LTI Course copy completed for assignment - {lti_assignment_id}")
             else:
               Logger.error(
                   f"Copying an LTI Assignment failed for {lti_assignment_id}\
@@ -377,8 +355,12 @@ def update_coursework_material(materials,
             updated_material.append({"link": material["link"]})
 
         else:
-          if "/classroom-shim/api/v1/launch?lti_assignment_id=" not in link[
-              "url"]:
+          if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
+            split_url = link["url"].split(
+                "/classroom-shim/api/v1/launch?lti_assignment_id=")
+            lti_assignment_id = split_url[-1]
+            Logger.info(f"LTI link removed in course work material with assignment ID - {lti_assignment_id}")
+          else:
             updated_material.append({"link": material["link"]})
 
         link_urls.append(material["link"]["url"])
@@ -395,6 +377,7 @@ def update_coursework_material(materials,
       }
       updated_material.append({"link": material["link"]})
       material.pop("form")
+
   return {
       "material": updated_material,
       "lti_assignment_ids": lti_assignment_ids
