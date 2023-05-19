@@ -109,7 +109,8 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     lti_assignment_due_date = lti_assignment_data.get("due_date")
 
     curr_utc_timestamp = datetime.datetime.utcnow()
-    if lti_assignment_due_date < curr_utc_timestamp:
+    lti_assignment_datetime = datetime.datetime.fromtimestamp(lti_assignment_due_date.timestamp())
+    if lti_assignment_due_date and (lti_assignment_datetime < curr_utc_timestamp):
       raise ValidationError(
           f"Due date of the LTI assignment {lti_assignment.id} can not be in the past"
       )

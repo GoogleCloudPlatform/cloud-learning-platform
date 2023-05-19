@@ -94,7 +94,8 @@ def copy_course_background_task(course_template_details,
     section.status="PROVISIONING"
     section_id =section.save().id
     classroom_id = new_course["id"]
-
+    
+    error_flag = False
     target_folder_id = new_course["teacherFolder"]["id"]
     Logger.info(f"ID of target drive folder for section {target_folder_id}")
 
@@ -147,15 +148,18 @@ def copy_course_background_task(course_template_details,
           lti_assignment_details["start_date"] = (cohort_details.start_date).strftime("%Y-%m-%dT%H:%M:%S%z")
 
           if coursework_due_datetime < curr_utc_timestamp:
-            coursework["dueDate"] = {
-              "year": cohort_details.end_date.year,
-              "month": cohort_details.end_date.month,
-              "day": cohort_details.end_date.day
-            }
-            coursework["dueTime"] = {
-              "hours": cohort_details.end_date.hour,
-              "minutes": cohort_details.end_date.minute
-            }
+            # Commented for now as the due dates are supposed to be updated by the user before
+            # starting the copy course process
+
+            # coursework["dueDate"] = {
+            #   "year": cohort_details.end_date.year,
+            #   "month": cohort_details.end_date.month,
+            #   "day": cohort_details.end_date.day
+            # }
+            # coursework["dueTime"] = {
+            #   "hours": cohort_details.end_date.hour,
+            #   "minutes": cohort_details.end_date.minute
+            # }
 
             lti_assignment_details["end_date"] = lti_assignment_details[
                 "due_date"] = (
