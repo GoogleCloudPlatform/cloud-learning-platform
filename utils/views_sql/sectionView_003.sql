@@ -14,6 +14,7 @@ courseTemplate.name AS courseTemplateName,
 section.classroomUrl AS classroomUrl,
 section.courseTemplateId AS courseTemplateId,
 section.cohortId AS cohortId,
+section.status AS sectionStatus,
 section.timestamp AS timestamp
 FROM section
 JOIN `lms_analytics.courseTemplateView` as courseTemplate ON section.courseTemplateId = courseTemplate.courseTemplateId 
