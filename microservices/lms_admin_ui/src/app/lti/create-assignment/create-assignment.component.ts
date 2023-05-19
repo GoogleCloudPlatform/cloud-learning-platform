@@ -66,9 +66,11 @@ export class CreateAssignmentComponent {
   onSubmit(ltiAssignmentForm) {
     console.log(ltiAssignmentForm.value)
     const data = ltiAssignmentForm.value
+    let context_type = this.dialogData.page
     console.log(data)
+    console.log("Extra dataaaaa",this.dialogData.extra_data)
     if (this.dialogData.mode == "Create") {
-      this.homeService.postLtiAssignments({ ...data, context_type: "course_template", context_id: this.dialogData.extra_data.courseTemplateId }).subscribe(response => {
+      this.homeService.postLtiAssignments({ ...data, context_type: context_type, context_id: this.dialogData.extra_data.contextId }).subscribe(response => {
         console.log("response", response)
         this.dialogRef.close({ data: 'success' })
       })
