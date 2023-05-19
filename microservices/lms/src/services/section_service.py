@@ -94,7 +94,7 @@ def copy_course_background_task(course_template_details,
     section.status="PROVISIONING"
     section_id =section.save().id
     classroom_id = new_course["id"]
-    
+
     error_flag = False
     target_folder_id = new_course["teacherFolder"]["id"]
     Logger.info(f"ID of target drive folder for section {target_folder_id}")
