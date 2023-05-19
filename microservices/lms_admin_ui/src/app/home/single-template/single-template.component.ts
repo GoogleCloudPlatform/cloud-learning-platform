@@ -55,8 +55,9 @@ export class SingleTemplateComponent implements OnInit {
     let courseTemplateId = this.router.url.split('/')[this.router.url.split('/').length - 1]
     let ltiModalData = {}
     ltiModalData['mode'] = 'Create'
+    ltiModalData['page'] = 'course_template'
     ltiModalData['init_data'] = ''
-    ltiModalData['extra_data'] = { courseTemplateId }
+    ltiModalData['extra_data'] = { "contextId": courseTemplateId }
 
     const dialogRef = this.dialog.open(CreateAssignmentComponent, {
       width: '80vw',
@@ -109,6 +110,45 @@ export class SingleTemplateComponent implements OnInit {
       console.log("result", result)
     });
     console.log(id)
+  }
+
+  openViewAssignmentsDialog(id, data): void {
+    console.log("id", id)
+    let ltiModalData = {}
+    ltiModalData['mode'] = 'View'
+    ltiModalData['init_data'] = ''
+    ltiModalData['extra_data'] = { id, ...data }
+
+    const dialogRef = this.dialog.open(ViewLtiAssignmentDialog, {
+      width: '80vw',
+      maxWidth: '750px',
+      maxHeight: "90vh",
+      data: ltiModalData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log("result", result)
+    });
+  }
+
+}
+
+@Component({
+  selector: 'view-lti-assignment-dialog',
+  templateUrl: 'view-lti-assignment-dialog.html',
+})
+export class ViewLtiAssignmentDialog {
+  ltiAssignmentData: any;
+  objectKeys = Object.keys
+  constructor(
+    public dialogRef: MatDialogRef<ViewLtiAssignmentDialog>,
+    @Inject(MAT_DIALOG_DATA) public viewDialogData: any, public homeService: HomeService
+  ) {
+    this.ltiAssignmentData = viewDialogData.extra_data
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close({ data: 'closed' });
   }
 
 }
