@@ -154,15 +154,18 @@
 
             <div class="section-management">
                 <span class="heading">{{selectedSection.section}} management</span>
-                
-                <button mat-flat-button color="primary" (click)="openAddLtiAssignmentDialog()"><span
-                        class="material-symbols-rounded">
-                        add
-                    </span> Add LTI Assignment</button>
-                <button mat-flat-button color="primary" (click)="openEditSelectionDialog()"><span
-                        class="material-symbols-rounded">
-                        add
-                    </span> Add Staff</button>
+
+                <div style="display: flex; width: 30%; justify-content: space-around;">
+                    <button mat-flat-button color="primary" (click)="openAddLtiAssignmentDialog()"><span
+                            class="material-symbols-rounded">
+                            add
+                        </span> Add LTI Assignment</button>
+                    <button mat-flat-button color="primary" (click)="openEditSelectionDialog()"><span
+                            class="material-symbols-rounded">
+                            add
+                        </span> Add Staff</button>
+                </div>
+
             </div>
 
             <ng-container>

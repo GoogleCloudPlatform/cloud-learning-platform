@@ -16,6 +16,7 @@ interface LooseObject {
 export class CreateAssignmentComponent {
   ltiAssignmentForm: FormGroup;
   toolsList = []
+  showProgressSpinner: boolean = false
   selectedTool: any
   constructor(
     public dialogRef: MatDialogRef<CreateAssignmentComponent>,
@@ -64,20 +65,23 @@ export class CreateAssignmentComponent {
   }
 
   onSubmit(ltiAssignmentForm) {
+    this.showProgressSpinner = true
     console.log(ltiAssignmentForm.value)
     const data = ltiAssignmentForm.value
     let context_type = this.dialogData.page
     console.log(data)
-    console.log("Extra dataaaaa",this.dialogData.extra_data)
+    console.log("Extra dataaaaa", this.dialogData.extra_data)
     if (this.dialogData.mode == "Create") {
       this.homeService.postLtiAssignments({ ...data, context_type: context_type, context_id: this.dialogData.extra_data.contextId }).subscribe(response => {
         console.log("response", response)
+        this.showProgressSpinner = false
         this.dialogRef.close({ data: 'success' })
       })
     } else {
       console.log("this.dialogData.extra_data", this.dialogData.extra_data)
       this.homeService.updateLtiAssignments(this.dialogData.extra_data.assignment.id, data).subscribe(response => {
         console.log("response", response)
+        this.showProgressSpinner = false
         this.dialogRef.close({ data: 'success' })
       })
     }
