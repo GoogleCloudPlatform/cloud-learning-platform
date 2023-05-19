@@ -33,8 +33,8 @@ export class CreateAssignmentComponent {
         "due_date": [null],
         "lti_assignment_title": [null, Validators.required],
         "max_points": [null],
-        "content_item_id":[null]
-        // "content_item_id": [null]
+        "lti_content_item_id":[null]
+        // "lti_content_item_id": [null]
       });
     } else {
       this.toolForm = this.fb.group({
@@ -44,7 +44,7 @@ export class CreateAssignmentComponent {
         "due_date": [this.dialogData.extra_data.assignment.due_date],
         "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title],
         "max_points": [this.dialogData.extra_data.assignment.max_points],
-        "content_item_id": [this.dialogData.extra_data.assignment.content_item_id]
+        "lti_content_item_id": [this.dialogData.extra_data.assignment.lti_content_item_id]
       });
     }
   }
@@ -109,7 +109,7 @@ export class CreateAssignmentComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result.data.status == "success") {
-        this.toolForm.get("content_item_id").setValue(result.data.response[0].content_item_id)
+        this.toolForm.get("lti_content_item_id").setValue(result.data.response[0].lti_content_item_id)
       }
       console.log("result", result)
     });
