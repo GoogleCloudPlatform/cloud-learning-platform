@@ -60,15 +60,6 @@ def copy_course_background_task(course_template_details,
     section.status = "PROVISIONING"
     section_id = section.save().id
     classroom_id = new_course["id"]
-    # add instructional designer
-    try:
-      add_teacher(headers, section,
-                  course_template_details.instructional_designer)
-    except Exception as error:
-      error = traceback.format_exc().replace("\n", " ")
-      Logger.error(f"Create teacher failed for \
-          for {course_template_details.instructional_designer}")
-      Logger.error(error)
 
     target_folder_id = new_course["teacherFolder"]["id"]
     Logger.info(f"ID of target drive folder for section {target_folder_id}")
@@ -80,6 +71,16 @@ def copy_course_background_task(course_template_details,
                                         "COURSE_WORK_CHANGES")
     classroom_crud.enable_notifications(new_course["id"],
                                         "COURSE_ROSTER_CHANGES")
+    # add instructional designer
+    try:
+      add_teacher(headers, section,
+                  course_template_details.instructional_designer)
+    except Exception as error:
+      error = traceback.format_exc().replace("\n", " ")
+      Logger.error(f"Create teacher failed for \
+          for {course_template_details.instructional_designer}")
+      Logger.error(error)
+
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
     if topics is not None:

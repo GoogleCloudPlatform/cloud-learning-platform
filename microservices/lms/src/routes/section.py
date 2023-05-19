@@ -230,26 +230,24 @@ def enroll_teacher(section_id: str,request: Request,
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-@router.get("/{section_id}/teachers/{teacher_email}",
+@router.get("/{section_id}/teachers/{teacher}",
 response_model=GetTeacherResponseModel)
-def get_teacher(section_id: str,teacher_email:str,request: Request):
+def get_teacher(section_id: str,teacher:str,request: Request):
   """Get teacher for a section .If teacher is present in given section
     get teacher details else throw
   Args:
       section_id (str): section_id in firestore
-      teacher_email(str): teachers email Id
+      teacher(str): teachers email or Id
   Raises:
       HTTPException: 500 Internal Server Error if something fails
       HTTPException: 404 Section with section id is not found
       HTTPException: 404 Teacher with teacher email is not found
   Returns:
-    {"status":"Success","data":}: Returns section details from  db,
-    {'status': 'False'} if raises an exception
+    GetTeacherResponseModel: object which contains user details
   """
   try:
-    teacher_email=teacher_email.lower()
     headers = {"Authorization": request.headers.get("Authorization")}
-    user_id = get_user_id(user=teacher_email, headers=headers)
+    user_id = get_user_id(user=teacher, headers=headers)
     section = Section.find_by_id(section_id)
     result=CourseEnrollmentMapping.\
     find_course_enrollment_record(section.key,user_id,"faculty")
@@ -257,7 +255,7 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
       raise ResourceNotFoundException(
           f"Teacher not found in this section {section_id}")
     return {
-        "message": f"Successfully get teacher details by {teacher_email}",
+        "message": f"Successfully get teacher details by {teacher}",
         "data": course_enrollment_user_model(result)
     }
   except ResourceNotFoundException as err:
@@ -273,13 +271,13 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-@router.delete("/{section_id}/teachers/{teacher_email}",
+@router.delete("/{section_id}/teachers/{teacher}",
 response_model=DeleteTeacherFromSectionResponseModel)
-def delete_teacher(section_id: str,teacher_email:str,request: Request):
+def delete_teacher(section_id: str,teacher:str,request: Request):
   """Delete teacher for a section
   Args:
       section_id (str): section_id in firestore
-      teacher_email(str): teachers email Id
+      teacher(str): teachers email or Id
   Raises:
       HTTPException: 500 Internal Server Error if something fails
       HTTPException: 404 Section with section id is not found
@@ -288,21 +286,20 @@ def delete_teacher(section_id: str,teacher_email:str,request: Request):
       DeleteTeacherFromSectionResponseModel: response
   """
   try:
-    teacher_email=teacher_email.lower()
     headers = {"Authorization": request.headers.get("Authorization")}
-    user_id = get_user_id(user=teacher_email, headers=headers)
+    user_id = get_user_id(user=teacher, headers=headers)
     section = Section.find_by_id(section_id)
     result=CourseEnrollmentMapping.find_active_enrolled_teacher_record(
      section_key = section.key,user_id = user_id)
     if result is None:
       raise ResourceNotFoundException(
           f"Teacher not found in this section {section_id}")
-    classroom_crud.delete_teacher(section.classroom_id,teacher_email)
+    classroom_crud.delete_teacher(section.classroom_id,result.user.email)
     result.status="inactive"
     result.update()
     return {
-        "message": ("Successfully delete teacher from section"
-        + f" {section_id} using {teacher_email}")
+        "message": ("Successfully deleted the teacher from the section"
+        + f" {section_id} using {teacher}")
     }
   except ResourceNotFoundException as err:
     Logger.error(err)
