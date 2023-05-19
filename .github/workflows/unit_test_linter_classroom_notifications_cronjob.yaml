@@ -20,7 +20,6 @@ on:
   pull_request:
     branches:
       - main
-      - feature
     paths:
       # TODO: Add all microservice folders below.
       - 'microservices/classroom_notifications_cronjob'

@@ -701,57 +701,6 @@ def enable_notifications(course_id, feed_type):
   return service.registrations().create(body=body).execute()
 
 
-# def if_user_exists_in_section(section_id, user_id, headers):
-#   """Check if student exists in a given section
-#   Args:
-#       section_id (str): firestore section id
-#       user_id (str): firestore user id
-#   Returns:
-#       dict: user details
-#   """
-#   section_details = []
-#   section_details = Section.find_by_id(section_id)
-#   result = CourseEnrollmentMapping.\
-#     find_course_enrollment_record(section_details.key,user_id)
-#   if result is not None:
-#     response = requests.\
-#       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-#     user = response.json()["data"]
-#     user["invitation_id"] = result.invitation_id
-#     user["enrollment_status"] = result.status
-#     user["section_id"] = section_details.id
-#     user["cohort_id"] = section_details.cohort.id
-#     user["classroom_url"] = section_details.classroom_url
-#     user["course_enrollment_id"] = result.id
-#     user["classroom_id"] = section_details.classroom_id
-#     return user
-#   else:
-#     raise ResourceNotFoundException("User not found")
-
-# def list_student_section(section_id, headers):
-#   """List  student of section given firestore section id
-
-#   Args:
-#       section_id (str): firestore section id
-#   Returns:
-#       dict: list of students of section
-#   """
-#   section_details = []
-#   section_details = Section.find_by_id(section_id)
-#   result = CourseEnrollmentMapping.\
-#     fetch_all_by_section(section_details.key,"learner")
-#   users = []
-#   for record in result:
-#     user_id = record.user
-#     response = requests.\
-#       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-#     user_record = response.json()["data"]
-#     user_record["invitation_id"] = record.invitation_id
-#     user_record["enrollment_status"] = record.status
-#     users.append(user_record)
-#   return users
-
-
 def delete_student(course_id, student_email):
   """Delete student from google classroom using course id and email
   Args:

@@ -21,7 +21,6 @@ on:
     types: [submitted]
     branches:
       - main
-      - feature
     paths:
       - 'microservices/**'
       - 'common/**'
