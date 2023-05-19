@@ -17,6 +17,7 @@ import mock
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
     side_effect=mock.MagicMock()) as mok:
+  with mock.patch("routes.lti_assignment.Logger"):
     from routes.lti_assignment import router
     from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE
     from testing.test_config import API_URL
@@ -116,8 +117,8 @@ def test_post_lti_assignment(mock_classroom_post_coursework, mock_context):
   input_lti_assignment["due_date"] = datetime.datetime.strftime(
       input_lti_assignment.pop("due_date"), "%Y-%m-%dT%H:%M:%S")
 
-  with mock.patch("routes.lti_assignment.Logger"):
-    post_resp = client_with_emulator.post(url, json=input_lti_assignment)
+  post_resp = client_with_emulator.post(url, json=input_lti_assignment)
+
   assert post_resp.status_code == 200, "Status should be 200"
 
   post_resp_json = post_resp.json()

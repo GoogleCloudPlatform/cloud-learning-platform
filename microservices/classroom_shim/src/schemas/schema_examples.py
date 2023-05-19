@@ -11,7 +11,7 @@ INSERT_LTI_ASSIGNMENT_EXAMPLE = {
     "max_points": 100,
     "start_date": datetime.datetime(year=2023, month=1, day=14),
     "end_date": datetime.datetime(year=2023, month=3, day=18),
-    "due_date": datetime.datetime(year=2023, month=2, day=20)
+    "due_date": datetime.datetime(year=2043, month=2, day=20)
 }
 
 LTI_ASSIGNMENT_EXAMPLE = {
