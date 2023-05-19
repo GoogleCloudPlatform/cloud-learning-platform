@@ -14,9 +14,9 @@ interface LooseObject {
   styleUrls: ['./create-assignment.component.scss']
 })
 export class CreateAssignmentComponent {
-  toolForm: FormGroup;
+  ltiAssignmentForm: FormGroup;
   toolsList = []
-  selectedTool:any
+  selectedTool: any
   constructor(
     public dialogRef: MatDialogRef<CreateAssignmentComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -26,31 +26,30 @@ export class CreateAssignmentComponent {
   ngOnInit() {
     this.getAllTools()
     if (this.dialogData.mode == "Create") {
-      this.toolForm = this.fb.group({
+      this.ltiAssignmentForm = this.fb.group({
         "tool_id": [null, Validators.required],
+        "lti_assignment_title": [null, Validators.required],
+        "lti_content_item_id": [null],
         "start_date": [null],
         "end_date": [null],
         "due_date": [null],
-        "lti_assignment_title": [null, Validators.required],
-        "max_points": [null],
-        "lti_content_item_id":[null]
-        // "lti_content_item_id": [null]
+        "max_points": [null]
       });
     } else {
-      this.toolForm = this.fb.group({
+      this.ltiAssignmentForm = this.fb.group({
         "tool_id": [this.dialogData.extra_data.assignment.tool_id, Validators.required],
+        "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title, Validators.required],
+        "lti_content_item_id": [this.dialogData.extra_data.assignment.lti_content_item_id],
         "start_date": [this.dialogData.extra_data.assignment.start_date],
         "end_date": [this.dialogData.extra_data.assignment.end_date],
         "due_date": [this.dialogData.extra_data.assignment.due_date],
-        "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title],
-        "max_points": [this.dialogData.extra_data.assignment.max_points],
-        "lti_content_item_id": [this.dialogData.extra_data.assignment.lti_content_item_id]
+        "max_points": [this.dialogData.extra_data.assignment.max_points]
       });
     }
   }
 
   onDropdownChange() {
-    console.log(this.toolForm.value)
+    console.log(this.ltiAssignmentForm.value)
 
   }
 
@@ -64,12 +63,12 @@ export class CreateAssignmentComponent {
     return finalValues
   }
 
-  onSubmit(toolForm) {
-    console.log(toolForm.value)
-    const data = toolForm.value
+  onSubmit(ltiAssignmentForm) {
+    console.log(ltiAssignmentForm.value)
+    const data = ltiAssignmentForm.value
     console.log(data)
     if (this.dialogData.mode == "Create") {
-      this.homeService.postLtiAssignments({ ...data, context_type:"course_template",context_id: this.dialogData.extra_data.courseTemplateId }).subscribe(response => {
+      this.homeService.postLtiAssignments({ ...data, context_type: "course_template", context_id: this.dialogData.extra_data.courseTemplateId }).subscribe(response => {
         console.log("response", response)
         this.dialogRef.close({ data: 'success' })
       })
@@ -88,15 +87,15 @@ export class CreateAssignmentComponent {
     })
   }
 
-  openContentSelector(toolForm) {
-    console.log(toolForm.value)
+  openContentSelector(ltiAssignmentForm) {
+    console.log(ltiAssignmentForm.value)
     let ltiModalData: LooseObject = {}
     ltiModalData['mode'] = 'Open'
     ltiModalData['init_data'] = ''
     ltiModalData['extra_data'] = {
       contextId: this.dialogData.extra_data.courseTemplateId,
       contextType: "course_template",
-      toolId: toolForm.value.tool_id,
+      toolId: ltiAssignmentForm.value.tool_id,
       userId: "vcmt4ZemmyFm59rDzl1U"
     }
 
@@ -109,7 +108,7 @@ export class CreateAssignmentComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result.data.status == "success") {
-        this.toolForm.get("lti_content_item_id").setValue(result.data.response[0].lti_content_item_id)
+        this.ltiAssignmentForm.get("lti_content_item_id").setValue(result.data.response[0].lti_content_item_id)
       }
       console.log("result", result)
     });
