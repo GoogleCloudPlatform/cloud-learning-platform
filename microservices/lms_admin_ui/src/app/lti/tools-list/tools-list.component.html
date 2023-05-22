@@ -1,0 +1,70 @@
+<div class="custom-outer-container">
+
+    <div>
+        <h2 style="float: left;">Manage LTI Tools</h2>
+        <button mat-flat-button color="primary" style="float: right;" (click)="openCreateToolDialog()">
+            <span class="material-symbols-rounded">
+                add
+            </span>Add tool</button>
+    </div>
+
+    <ngx-skeleton-loader *ngIf="isLoadingData" count="3"
+        [theme]="{'height': '40px','margin-top':'15px','background-color': '#EAEAEA'}">
+    </ngx-skeleton-loader>
+
+    <table *ngIf="!isLoadingData" mat-table [dataSource]="ltiToolsData" class="mat-elevation-z8" style="width: 100%;">
+
+        <ng-container matColumnDef="client_id">
+            <th mat-header-cell *matHeaderCellDef>
+                Client ID
+            </th>
+            <td mat-cell *matCellDef="let element"> {{element.client_id}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>
+                Name
+            </th>
+            <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>
+                Description
+            </th>
+            <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>
+                Action
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <span class="material-symbols-rounded" style="cursor: pointer; margin-right: 8px;"
+                    (click)="openViewToolDialog(element.id, element)">
+                    visibility
+                </span>
+                <span class="material-symbols-rounded" style="cursor: pointer; margin-right: 8px;"
+                    (click)="openUpdateToolDialog(element.id, element)">
+                    edit
+                </span>
+                <span class="material-symbols-rounded" style="cursor: pointer;"
+                    (click)="openDeleteDialog(element.id, element.name)">
+                    Delete
+                </span>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="empty-row">
+            <mat-cell *matCellDef="let element">No Data</mat-cell>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="ltiDisplayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: ltiDisplayedColumns;"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="4">No data found</td>
+        </tr>
+
+    </table>
+</div>

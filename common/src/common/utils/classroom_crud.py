@@ -1,4 +1,5 @@
-""" Hepler functions for classroom crud API """
+""" Helper functions for classroom crud API """
+import requests
 from asyncio.log import logger
 from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
@@ -11,7 +12,7 @@ from common.models import Section
 
 from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL, PUB_SUB_PROJECT_ID, DATABASE_PREFIX
 from common.utils import helper
-import requests
+# pylint: disable=line-too-long
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
@@ -19,12 +20,13 @@ FEED_TYPE_DICT = {
     "COURSE_WORK_CHANGES": "courseWorkChangesInfo",
     "COURSE_ROSTER_CHANGES": "courseRosterChangesInfo"
 }
+
 REGISTER_SCOPES = [
     "https://www.googleapis.com/auth/classroom.push-notifications",
-    "https://www.googleapis.com/auth/" +
-    "classroom.student-submissions.students.readonly",
+    "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
     "https://www.googleapis.com/auth/classroom.rosters.readonly"
 ]
+
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.rosters",
@@ -64,10 +66,10 @@ def impersonate_teacher_creds(teacher_email):
 def create_course(name, description, section, owner_id):
   """Create course Function in classroom
 
-  Args: course_name ,description of course, section,owner_id of course
+  Args: course_name, description of course, section, owner_id of course
   Returns:
     new created course details
-    """ ""
+  """
 
   service = build("classroom", "v1", credentials=get_credentials())
   new_course = {}
@@ -86,7 +88,7 @@ def get_course_by_id(course_id):
     Args: course_id
   Returns:
         course details
-    """ ""
+  """
 
   try:
     service = build("classroom", "v1", credentials=get_credentials())
@@ -102,13 +104,13 @@ def get_course_by_id(course_id):
 def drive_copy(file_id, target_folder_id, name):
   """copy the file in the target_folder 
   Args: 
-  file_id : (str)  google drive file _id
+  file_id : (str) google drive file _id
   target_folder_id:(str) folder_id of destination folder
   name:(str) file name of the copied file
   Returns:
     new created file details dictionary with name,mimeType,WebViewLink
     id of file 
-    """ ""
+  """
 
   copied_file = {"name": name, "parents": [target_folder_id]}
   service = build("drive", "v3", credentials=get_credentials())
@@ -121,12 +123,12 @@ def drive_copy(file_id, target_folder_id, name):
 def copy_material(drive_file_dict, target_folder_id):
   """copy the file in the target_folder 
   Args: 
-  drive_file_dict : (str)  drive file details dictionary given by get
+  drive_file_dict : (str) drive file details dictionary given by get
       coursework API 
   target_folder_id:(str) folder_id of destination folder 
   Returns:
     new created drive_file_dict with new copied file id in target folder 
-  """ ""
+  """
   file_id = drive_file_dict["driveFile"]["driveFile"]["id"]
   if "title" not in drive_file_dict["driveFile"]["driveFile"].keys():
     raise ResourceNotFoundException(f"File with id {file_id} not found")
@@ -145,10 +147,10 @@ def copy_material(drive_file_dict, target_folder_id):
 def update_course(course_id, section_name, description, course_name=None):
   """Update course Function in classroom
 
-  Args: section_name ,description of course, section,owner_id of course
+  Args: section_name, description of course, section, owner_id of course
   Returns:
     new created course details
-    """ ""
+  """
 
   service = build("classroom", "v1", credentials=get_credentials())
   try:
@@ -173,7 +175,7 @@ def update_course_state(course_id, course_state):
   Args: course_id ,course_state
   Returns:
     new created course details
-    """
+  """
   service = build("classroom", "v1", credentials=get_credentials())
   course = service.courses().get(id=course_id).execute()
   course["course_state"] = course_state
@@ -188,7 +190,7 @@ def get_course_list():
   Args:
   Returns:
     list of courses in classroom
-    """ ""
+  """
 
   service = build("classroom", "v1", credentials=get_credentials())
   results = service.courses().list().execute()
@@ -197,12 +199,12 @@ def get_course_list():
 
 
 def get_topics(course_id):
-  """Get  list of topics from classroom
+  """Get list of topics from classroom
 
   Args:course_id
   Returns:
     returns list of topics of given course in classroom
-    """ ""
+  """
 
   service = build("classroom", "v1", credentials=get_credentials())
   try:
@@ -231,7 +233,7 @@ def create_topics(course_id, topics):
   topics : list of dictionary of topics to be created
   Returns:
     returns success
-    """ ""
+  """
 
   service = build("classroom", "v1", credentials=get_credentials())
   topic_id_map = {}
@@ -239,11 +241,12 @@ def create_topics(course_id, topics):
     old_topic_id = topic["topicId"]
     topic_name = topic["name"]
     topic = {"name": topic_name}
-    response = service.courses().topics().\
-      create(courseId=course_id, body=topic).execute()
+    response = service.courses().topics().create(courseId=course_id,
+                                                 body=topic).execute()
     topic_id_map[old_topic_id] = response["topicId"]
   Logger.info(f"Topics created for course_id{course_id}")
   return topic_id_map
+
 
 def get_coursework_list(course_id):
   """Get  list of coursework from classroom
@@ -251,7 +254,7 @@ def get_coursework_list(course_id):
   Args: course_id
   Returns:
     returns list of coursework of given course in classroom
-    """ ""
+  """
 
   service = build("classroom", "v1", credentials=get_credentials())
   try:
@@ -312,13 +315,14 @@ def patch_student_submission(course_id, coursework_id, student_submission_id,
       body=student_submission).execute()
   return patch_result
 
+
 def get_coursework_material_list(course_id):
   """Get  list of coursework from classroom
 
   Args: course_id
   Returns:
     returns list of coursework of given course in classroom
-    """ ""
+  """
 
   service = build("classroom", "v1", credentials=get_credentials())
   try:
@@ -332,7 +336,7 @@ def get_coursework_material_list(course_id):
     return None
 
 
-def create_coursework(course_id, coursework_list):
+def create_coursework(course_id, coursework):
   """create coursework in a classroom course
 
   Args:
@@ -340,14 +344,13 @@ def create_coursework(course_id, coursework_list):
     coursework : list of dictionary of coursework to be created
   Returns:
     returns success
-    """ ""
+  """
 
   service = build("classroom", "v1", credentials=get_credentials())
-  for coursework_item in coursework_list:
-    _ = service.courses().courseWork().create(courseId=course_id,
-                                              body=coursework_item).execute()
+  data = service.courses().courseWork().create(courseId=course_id,
+                                               body=coursework).execute()
   Logger.info("Create coursework method worked")
-  return "success"
+  return data
 
 
 def create_coursework_material(course_id, coursework_material_list):
@@ -358,7 +361,7 @@ def create_coursework_material(course_id, coursework_material_list):
     coursework : list of dictionary of coursework to be created
   Returns:
     returns success
-    """ ""
+  """
   Logger.info("In Create coursework Material")
   service = build("classroom", "v1", credentials=get_credentials())
   for coursework_item in coursework_material_list:
@@ -374,7 +377,7 @@ def delete_course_by_id(course_id):
   Args: course_id
   Returns:
     []
-    """ ""
+  """
 
   service = build("classroom", "v1", credentials=get_credentials())
   course = service.courses().delete(id=course_id).execute()
@@ -390,7 +393,7 @@ def get_course_work_list(section_id):
         be fetched
     Returns:
       returns success
-      """ ""
+  """
 
   section_details = Section.find_by_id(section_id)
   service = build("classroom", "v1", credentials=get_credentials())
@@ -417,11 +420,12 @@ def get_submitted_course_work_list(section_id,
         to be fetched
     Returns:
       returns success
-      """ ""
+  """
 
   section_details = Section.find_by_id(section_id)
-  response = requests.\
-      get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+  response = requests.get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",
+                          headers=headers,
+                          timeout=60)
   user_email = response.json()["data"]["email"]
   service = build("classroom", "v1", credentials=get_credentials())
 
@@ -474,8 +478,9 @@ def create_student_in_course(access_token, student_email, course_id,
   Return:
     enrolled student object
   """
-  service = build("classroom", "v1",\
-     credentials=get_oauth_credentials(access_token))
+  service = build("classroom",
+                  "v1",
+                  credentials=get_oauth_credentials(access_token))
   student = {"userId": student_email}
   result = service.courses().students().create(
       courseId=course_id, body=student, enrollmentCode=course_code).execute()
@@ -526,54 +531,57 @@ def enroll_student(headers, access_token, course_id, student_email,
   Return:
     dict: returns a dict which contains student and classroom details
   """
-  # Call search by email usermanagement API to get the student data
+  # Call search by email user-management API to get the student data
   response = requests.get(
-    f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",
-    headers=headers)
+      f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={student_email}",
+      headers=headers,
+      timeout=60)
   # If the response is success check if student is inactive i.e  raise error
   searched_student = []
   if response.status_code == 200:
     searched_student = response.json()["data"]
     if searched_student != []:
       if searched_student[0]["status"] == "inactive":
-        raise InternalServerError("Student inactive in \
-          database is trying to enroll.Please update\
-             the student status")
+        raise InternalServerError(
+            "Student inactive in database is trying to enroll.Please update the student status"
+        )
 
   # Given student is active then call create
   # student in classroom course function
 
   access_token_details = requests.get(
-      f"https://oauth2.googleapis.com/tokeninfo?access_token={access_token}")
+      f"https://oauth2.googleapis.com/tokeninfo?access_token={access_token}",
+      timeout=60)
   Logger.info(
-      f"Enroll{student_email},classroom_id {course_id},classroom_code" +
-      f" {course_code} {access_token_details.json()}")
+      f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}{access_token_details.json()}"
+  )
   create_student_in_course(access_token, student_email, course_id, course_code)
-  # Get the gaia ID , first name ,last_name of the student
+  # Get the gaia ID, first name, last_name of the student
   # Call_people api function
   profile = get_person_information(access_token)
   gaia_id = profile["metadata"]["sources"][0]["id"]
   # Call user API
   data = {
-  "first_name":profile["names"][0]["givenName"],
-  "last_name": profile["names"][0]["familyName"],
-  "email":student_email,
-  "user_type": "learner",
-  "user_groups": [],
-  "status": "active",
-  "is_registered": True,
-  "failed_login_attempts_count": 0,
-  "access_api_docs": False,
-  "gaia_id":gaia_id,
-  "photo_url":profile["photos"][0]["url"]
+      "first_name": profile["names"][0]["givenName"],
+      "last_name": profile["names"][0]["familyName"],
+      "email": student_email,
+      "user_type": "learner",
+      "user_groups": [],
+      "status": "active",
+      "is_registered": True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id": gaia_id,
+      "photo_url": profile["photos"][0]["url"]
   }
   # Check if searched user is [] ,i.e student is enrolling for first time
-  # then call create user usermanagement API and return user data else
+  # then call create user user-management API and return user data else
   # return searched user data
   if searched_student == []:
     response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
                              json=data,
-                             headers=headers)
+                             headers=headers,
+                             timeout=60)
     if response.status_code != 200:
       raise UserManagementServiceError(response.json()["message"])
     return response.json()["data"]
@@ -581,41 +589,27 @@ def enroll_student(headers, access_token, course_id, student_email,
     return searched_student[0]
 
 
-def get_edit_url_and_view_url_mapping_of_form(folder_id):
+def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns
       return a dictionary of view link as keys and edit link as values
   """
-  forms = list_folders_children(
-      folder_id, "mimeType=\"application/vnd.google-apps.form\"")
-  view_link_and_edit_link_matching = {}
-  for form in forms:
-    result = get_view_link_from_id(form.get("id"))
-    # Call get file api to get
-    file = get_file(form.get("id"))
-    view_link_and_edit_link_matching[result["responderUri"]] = \
-    {"webViewLink":file.get("webViewLink"),"file_id":form.get("id")}
-  return view_link_and_edit_link_matching
-
-
-def list_folders_children(folder_id, search_query=""):
-  """
-  List the files or childrens of given folder_id 
-  filters according to search query if given else gets all the 
-  childrens of folder
-  """
-  service = build("drive", "v2", credentials=get_credentials())
+  service = build("drive", "v3", credentials=get_credentials())
   page_token = None
   while True:
-    param = {}
-    if page_token:
-      param["pageToken"] = page_token
-    children = service.children().list(folderId=folder_id,
-                                       q=search_query,
-                                       **param).execute()
-    page_token = children.get("nextPageToken")
-    if not page_token:
+    response = service.files().list(
+        q="mimeType=\"application/vnd.google-apps.form\"",
+        spaces="drive",
+        fields="nextPageToken, "
+        "files(id, name,webViewLink,thumbnailLink)",
+        pageToken=page_token).execute()
+    view_link_and_edit_link_matching = {}
+    for file in response.get("files", []):
+      result = get_view_link_from_id(file.get("id"))
+      view_link_and_edit_link_matching[result["responderUri"]] = \
+      {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
+    if page_token is None:
       break
-  return children.get("items", [])
+  return view_link_and_edit_link_matching
 
 
 def get_file(file_id):
@@ -625,7 +619,7 @@ def get_file(file_id):
 
 
 def get_view_link_from_id(form_id):
-  "Query google forms api  using form id and get view url of  google form"
+  """Query google forms api using form id and get view url of google form"""
 
   service = build("forms", "v1", credentials=get_credentials())
   result = service.forms().get(formId=form_id).execute()
@@ -701,66 +695,14 @@ def enable_notifications(course_id, feed_type):
       },
       "cloudPubsubTopic": {
           "topicName":
-          "projects/" + f"{PUB_SUB_PROJECT_ID}/topics/" +
-          f"{DATABASE_PREFIX}classroom-notifications"
+          f"projects/{PUB_SUB_PROJECT_ID}/topics/{DATABASE_PREFIX}classroom-notifications"
       }
   }
   return service.registrations().create(body=body).execute()
 
 
-# def if_user_exists_in_section(section_id, user_id, headers):
-#   """Check if student exists in a given section
-#   Args:
-#       section_id (str): firestore section id
-#       user_id (str): firestore user id
-#   Returns:
-#       dict: user details
-#   """
-#   section_details = []
-#   section_details = Section.find_by_id(section_id)
-#   result = CourseEnrollmentMapping.\
-#     find_course_enrollment_record(section_details.key,user_id)
-#   if result is not None:
-#     response = requests.\
-#       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-#     user = response.json()["data"]
-#     user["invitation_id"] = result.invitation_id
-#     user["enrollment_status"] = result.status
-#     user["section_id"] = section_details.id
-#     user["cohort_id"] = section_details.cohort.id
-#     user["classroom_url"] = section_details.classroom_url
-#     user["course_enrollment_id"] = result.id
-#     user["classroom_id"] = section_details.classroom_id
-#     return user
-#   else:
-#     raise ResourceNotFoundException("User not found")
-
-# def list_student_section(section_id, headers):
-#   """List  student of section given firestore section id
-
-#   Args:
-#       section_id (str): firestore section id
-#   Returns:
-#       dict: list of students of section
-#   """
-#   section_details = []
-#   section_details = Section.find_by_id(section_id)
-#   result = CourseEnrollmentMapping.\
-#     fetch_all_by_section(section_details.key,"learner")
-#   users = []
-#   for record in result:
-#     user_id = record.user
-#     response = requests.\
-#       get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
-#     user_record = response.json()["data"]
-#     user_record["invitation_id"] = record.invitation_id
-#     user_record["enrollment_status"] = record.status
-#     users.append(user_record)
-#   return users
-
-
 def delete_student(course_id, student_email):
-  """Delete  student from google classroom using course id and email
+  """Delete student from google classroom using course id and email
   Args:
       course_id (str): google classroom unique id
       teacher_email (str): teacher email id
@@ -778,17 +720,18 @@ def get_user_details(user_id, headers):
   """Get user from user collection
   Args:
       user_id (str): user_id from user collection
-      headers : Auth headers
+      headers: Auth headers
 
   Returns:
       dict: response from user API
   """
 
-  response_get_student = requests.get\
-      (f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",headers=headers)
+  response_get_student = requests.get(
+      f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",
+      headers=headers,
+      timeout=60)
   if response_get_student.status_code == 404:
-    raise \
-        ResourceNotFoundException(response_get_student.json()["message"])
+    raise ResourceNotFoundException(response_get_student.json()["message"])
   return response_get_student.json()
 
 
@@ -804,10 +747,10 @@ def get_user_details_by_email(user_email, headers):
 
   response_get_student = requests.get(
       f"{USER_MANAGEMENT_BASE_URL}/user/search/email?email={user_email}",
-      headers=headers)
+      headers=headers,
+      timeout=60)
   if response_get_student.status_code == 404:
-    raise \
-        ResourceNotFoundException(response_get_student.json()["message"])
+    raise ResourceNotFoundException(response_get_student.json()["message"])
   return response_get_student.json()
 
 
@@ -837,8 +780,7 @@ def get_user_profile_information(user_email):
   """
   service = build("classroom", "v1", credentials=get_credentials())
 
-  profile_information = service.userProfiles(\
-    ).get(userId=user_email).execute()
+  profile_information = service.userProfiles().get(userId=user_email).execute()
   if not profile_information["photoUrl"].startswith("https:"):
     profile_information[
         "photoUrl"] = "https:" + profile_information["photoUrl"]
@@ -856,6 +798,43 @@ def get_course_work(course_id, course_work_id):
   service = service = build("classroom", "v1", credentials=get_credentials())
   return service.courses().courseWork().get(courseId=course_id,
                                             id=course_work_id).execute()
+
+
+def delete_course_work(course_id, course_work_id):
+  """delete course work by course id and course work id
+  Args:
+    course_id (str): Id of the course
+    course_work_id (str): Id of the course work to be deleted
+  Returns:
+    dict: empty dict if success
+  """
+  service = service = build("classroom", "v1", credentials=get_credentials())
+  data = service.courses().courseWork().delete(courseId=course_id,
+                                               id=course_work_id).execute()
+  Logger.info(
+      f"Deleted course work - {course_work_id} in course - {course_id}")
+  return data
+
+
+def update_course_work(course_id, course_work_id, update_mask, updated_body):
+  """update course work by course id and course work id
+  Args:
+    course_id (str): Id of the course
+    course_work_id (str): Id of the course work to be deleted
+    update_mask (str): Fields(Concat multiple fields if any) to be updated in the coursework
+    updated_body(dict): Updated field object data
+  Returns:
+    dict: empty dict if success
+  """
+  service = service = build("classroom", "v1", credentials=get_credentials())
+  data = service.courses().courseWork().patch(
+      courseId=course_id,
+      id=course_work_id,
+      body=updated_body,
+      updateMask=update_mask).execute()
+  Logger.info(
+      f"Updated course work - {course_work_id} in course - {course_id}")
+  return data
 
 
 def post_grade_of_the_user(section_id: str,

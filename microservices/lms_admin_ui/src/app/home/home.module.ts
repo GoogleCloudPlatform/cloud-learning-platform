@@ -22,6 +22,7 @@ import { DeleteOverviewDialog } from './section/section.component';
 import { SuccessOverviewDialog } from './home.component';
 import { CourseTemplateDetailsDialog } from './home.component';
 import { InviteStudentModalComponent } from './invite-student-modal/invite-student-modal.component';
+import { SingleTemplateComponent } from './single-template/single-template.component';
 @NgModule({
   declarations: [
     HomeComponent,
@@ -37,7 +38,8 @@ import { InviteStudentModalComponent } from './invite-student-modal/invite-stude
     DeleteOverviewDialog,
     SuccessOverviewDialog,
     CourseTemplateDetailsDialog,
-    InviteStudentModalComponent
+    InviteStudentModalComponent,
+    SingleTemplateComponent
 
   ],
   // entryComponents: [CreateCohortModalComponent],

@@ -111,7 +111,7 @@ class CourseEnrollmentMapping(BaseModel):
   def find_active_enrolled_student_record(
       cls,
       section_key,
-      user_id,
+      user_id
   ):
     """_summary_
 
@@ -125,6 +125,26 @@ class CourseEnrollmentMapping(BaseModel):
     user_key = f"{User.collection_name}/{user_id}"
     return CourseEnrollmentMapping.collection.filter("user","==",user_key).\
     filter("status", "==","active").filter("role","==","learner").\
+      filter("section","==",section_key).get()
+
+  @classmethod
+  def find_active_enrolled_teacher_record(
+      cls,
+      section_key,
+      user_id
+  ):
+    """_summary_
+
+    Args:
+        section_key (str): section unique key to filter data
+        user_id(str, optional): user_id from user collection
+
+    Returns:
+        course_enrollment object
+    """
+    user_key = f"{User.collection_name}/{user_id}"
+    return CourseEnrollmentMapping.collection.filter("user","==",user_key).\
+    filter("status", "==","active").filter("role","==","faculty").\
       filter("section","==",section_key).get()
 
   @classmethod
