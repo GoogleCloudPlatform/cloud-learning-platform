@@ -1,7 +1,8 @@
 import behave
 import requests
 from testing_objects.test_config import API_URL
-from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA,DATABASE_PREFIX,emails
+from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA, DATABASE_PREFIX, emails
+
 
 # -------------------------------CREATE Course Template-------------------------------------
 # ----Positive Scenario-----
@@ -17,7 +18,9 @@ def step_impl_1(context):
     "API request is sent to create Course Template Record with correct request payload"
 )
 def step_impl_2(context):
-  resp = requests.post(url=context.url, json=context.payload,headers=context.header)
+  resp = requests.post(url=context.url,
+                       json=context.payload,
+                       headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -44,14 +47,16 @@ def step_impl_3(context):
 )
 def step_impl_4(context):
   context.url = f'{API_URL}/course_templates'
-  context.payload = {"name": "e2e_test_cases", "description": "description"}
+  context.payload = {"name": "e2e_test_cases"}
 
 
 @behave.when(
     "API request is sent to create Course Template Record with incorrect request payload"
 )
 def step_impl_5(context):
-  resp = requests.post(context.url, json=context.payload,headers=context.header)
+  resp = requests.post(context.url,
+                       json=context.payload,
+                       headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -86,7 +91,7 @@ def setp_impl_7(context):
     "API request is sent to retrieve Course Template Record by providing correct id"
 )
 def step_impl_8(context):
-  resp = requests.get(context.url,headers=context.header)
+  resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -113,7 +118,7 @@ def setp_impl_10(context):
     "API request is sent to retrieve Course Template Record by providing invalid id"
 )
 def step_impl_11(context):
-  resp = requests.get(context.url,headers=context.header)
+  resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -125,22 +130,29 @@ def step_impl_12(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
 
+
 # -------------------------------Update Course Template-------------------------------------
 # ----Positive Scenario-----
 
 
-@behave.given("A user has access privileges and needs to update a Course Template Record")
+@behave.given(
+    "A user has access privileges and needs to update a Course Template Record"
+)
 def setp_impl_13(context):
   context.url = f'{API_URL}/course_templates/{context.course_template.id}'
-  context.payload={"name":f"{DATABASE_PREFIX}test_course_updated_name","description":"updated_description"}
-
+  context.payload = {
+      "name": f"{DATABASE_PREFIX}test_course_updated_name",
+      "description": "updated_description"
+  }
 
 
 @behave.when(
     "API request is sent to update Course Template Record by providing correct id and request payload"
 )
 def step_impl_14(context):
-  resp = requests.patch(context.url,json=context.payload,headers=context.header)
+  resp = requests.patch(context.url,
+                        json=context.payload,
+                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -149,25 +161,33 @@ def step_impl_14(context):
 def step_impl_15(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
-  assert context.response["course_template"]["name"]==context.payload["name"], "Check updated data"
-  assert context.response["course_template"]["description"]==context.payload["description"], "Check updated data"
+  assert context.response["course_template"]["name"] == context.payload[
+      "name"], "Check updated data"
+  assert context.response["course_template"]["description"] == context.payload[
+      "description"], "Check updated data"
+
 
 # ----Negative Scenario-----
+
 
 @behave.given(
     "A user has access to admin portal and wants to update a Course Template Record"
 )
 def setp_impl_16(context):
   context.url = f'{API_URL}/course_templates/fake_non_exist_id'
-  context.payload = {"name": "updated_name",
-                     "description": "updated_description"}
+  context.payload = {
+      "name": "updated_name",
+      "description": "updated_description"
+  }
 
 
 @behave.when(
     "API request is sent to delete Course Template Record by providing invalid id and valid payload"
 )
 def step_impl_17(context):
-  resp = requests.patch(context.url, json=context.payload,headers=context.header)
+  resp = requests.patch(context.url,
+                        json=context.payload,
+                        headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -178,6 +198,7 @@ def step_impl_17(context):
 def step_impl_18(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
+
 
 # -------------------------------Delete Course Template-------------------------------------
 # ----Positive Scenario-----
@@ -192,7 +213,7 @@ def setp_impl_19(context):
     "API request is sent to delete Course Template Record by providing correct id"
 )
 def step_impl_20(context):
-  resp = requests.delete(context.url,headers=context.header)
+  resp = requests.delete(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -217,7 +238,7 @@ def setp_impl_22(context):
     "API request is sent to delete Course Template Record by providing invalid id"
 )
 def step_impl_23(context):
-  resp = requests.delete(context.url,headers=context.header)
+  resp = requests.delete(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -242,7 +263,7 @@ def step_impl_25(context):
 
 @behave.when("API request is sent to fetch all Course Template Records")
 def step_impl_26(context):
-  resp = requests.get(context.url,headers=context.header)
+  resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -270,7 +291,7 @@ def step_impl_28(context):
     "API request is sent to fetch all Cohorts Records by providing Course template valid id"
 )
 def step_impl_29(context):
-  resp = requests.get(context.url,headers=context.header)
+  resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -281,6 +302,7 @@ def step_impl_29(context):
 def step_impl_30(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
+
 
 # ----Negative Scenario-----
 
@@ -296,7 +318,7 @@ def setp_impl_31(context):
     "API request is sent to fetch all Cohorts Records by providing Course template invalid id"
 )
 def step_impl_32(context):
-  resp = requests.delete(context.url,headers=context.header)
+  resp = requests.delete(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -327,7 +349,8 @@ def step_impl_35(context):
   context.response = resp.json()
 
 
-@behave.then("Set inactive instructional designer from enrollment mapping collection")
+@behave.then(
+    "Set inactive instructional designer from enrollment mapping collection")
 def step_impl_36(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "check data"

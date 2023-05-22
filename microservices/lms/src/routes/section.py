@@ -57,7 +57,7 @@ FAILED_RESPONSE = {"status": "Failed"}
 
 
 @router.post("", status_code=status.HTTP_202_ACCEPTED)
-def create_section(sections_details: SectionDetails, request: Request,
+def create_section(sections_details: SectionDetails,
                    background_tasks: BackgroundTasks):
   """Create section API
   Args:

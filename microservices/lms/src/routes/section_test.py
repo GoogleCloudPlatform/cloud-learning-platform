@@ -87,8 +87,8 @@ def enroll_teacher_data(create_fake_data):
       _type_: _description_
   """
   section = Section.find_by_id(create_fake_data["section"])
-  course_template_enrollment_mapping = CourseTemplateEnrollmentMapping.find_by_id(
-      create_fake_data["course_template_enrollment_id"])
+  course_template_enrollment_mapping = CourseTemplateEnrollmentMapping\
+    .find_by_id(create_fake_data["course_template_enrollment_id"])
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.role = "faculty"
   course_enrollment_mapping.user = course_template_enrollment_mapping.user
