@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-management
+spec:
+  replicas: 3
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: user-management
+        image: user-management
+        imagePullPolicy: Always

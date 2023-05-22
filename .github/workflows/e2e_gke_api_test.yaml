@@ -18,8 +18,7 @@
 name: E2E API Tests on GKE Microservices
 on:
   pull_request:
-    branches:
-      - main
+    branches: [ "main", "migrate-ailearning-services-clp" ]
     paths:
       - 'microservices/**'
       - 'common/**'

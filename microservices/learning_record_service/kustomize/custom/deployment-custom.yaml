@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learning-record-service
+spec:
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: learning-record-service
+        image: learning-record-service
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "500Mi"
