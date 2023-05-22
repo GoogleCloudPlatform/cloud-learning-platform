@@ -495,6 +495,7 @@ def create_analytics_data(context):
       "classroomUrl": section.classroom_url,
       "name": section.section,
       "description": section.description,
+      "status":section.status,
       "cohortId": section.cohort.id,
       "courseTemplateId": section.course_template.id,
       "timestamp": datetime.datetime.utcnow()
@@ -512,6 +513,8 @@ def create_analytics_data(context):
       "timestamp":datetime.datetime.utcnow()
     }]
   course_template = section.course_template
+  instructional_designer=CourseTemplateEnrollmentMapping\
+    .fetch_all_by_course_template(course_template.key)[0].user.email
   course_template_rows = [{
       "courseTemplateId":
       course_template.id,
@@ -524,7 +527,7 @@ def create_analytics_data(context):
       "timestamp":
       datetime.datetime.utcnow(),
       "instructionalDesigners":
-      [course_template.instructional_designer]
+      [instructional_designer]
   }]
   insert_rows_to_bq(rows=course_template_rows,
                     dataset=BQ_DATASET,

@@ -373,7 +373,7 @@ def step_impl_37(context):
     "API request is sent which contains valid course template id and invalid user id to delete instructional designer"
 )
 def step_impl_38(context):
-  resp = requests.get(context.url, headers=context.header)
+  resp = requests.delete(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
