@@ -3,7 +3,8 @@ Pydantic Model for Course template API's
 """
 from typing import Optional
 from pydantic import BaseModel, constr
-from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE, INSERT_COURSE_TEMPLATE_EXAMPLE, UPDATE_COURSE_TEMPLATE_EXAMPLE
+from schemas.schema_examples import (COURSE_TEMPLATE_EXAMPLE, INSERT_COURSE_TEMPLATE_EXAMPLE,
+                                     UPDATE_COURSE_TEMPLATE_EXAMPLE,INSTRUCTIONAL_DESIGNER_USER_EXAMPLE)
 
 
 class CourseTemplateModel(BaseModel):
@@ -20,6 +21,47 @@ class CourseTemplateModel(BaseModel):
     orm_mode = True
     schema_extra = {"example": COURSE_TEMPLATE_EXAMPLE}
 
+class InstructionalDesignerModel(BaseModel):
+  """Instructional Designer Response Model"""
+  user_id: str
+  first_name: str
+  last_name: str
+  email: constr(min_length=7,
+                max_length=128,
+                regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+                to_lower=True)
+  user_type: str
+  status: str
+  gaia_id: Optional[str] = ""
+  photo_url: Optional[str] = ""
+  course_template_enrollment_id: str
+  invitation_id: Optional[str] = ""
+  course_template_id: str
+  classroom_id: str
+  enrollment_status: str
+  classroom_url: str
+
+  class Config():
+    orm_mode = True
+    schema_extra = {"example": INSTRUCTIONAL_DESIGNER_USER_EXAMPLE}
+
+class DeleteInstructionalDesignerResponseModel(BaseModel):
+  """Delete Instructional Designer from Course Template Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully deleted the Instructional "\
+    + "Designer from Course Template"
+  data: Optional[str] = None
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully deleted the Instructional "\
+    + "Designer from Course Template",
+            "data": None
+        }
+    }
 
 class UpdateCourseTemplateModel(BaseModel):
   """Update Course Template Pydantic Model"""
@@ -124,20 +166,14 @@ class EnrollmentResponseModel(BaseModel):
   """Enrollment Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully enrolled instructional designer"
-  data: Optional[dict] = {}
-  
+  data: Optional[InstructionalDesignerModel] = None
+
   class Config():
     orm_mode=True
     schema_extra ={
       "example":{
         "success": True,
         "message": "Successfully enrolled instructional designer",
-        "data":{
-        "enrollment_id": "12345678",
-        "email": "xcvb@gmail.com",
-        "course_template_id": "234red3fr32",
-        "classroom_id": "234r21we123",
-        "classroom_url": "https://classroom.google.com"
-    }
+        "data": INSTRUCTIONAL_DESIGNER_USER_EXAMPLE
       }
     }

@@ -4,7 +4,8 @@ import json
 import time
 import requests
 from behave import fixture, use_fixture
-from common.models import CourseTemplate, Cohort, Section, TempUser, CourseEnrollmentMapping, User
+from common.models import (CourseTemplate, Cohort, Section, TempUser,
+                           CourseEnrollmentMapping, User,CourseTemplateEnrollmentMapping)
 from common.testing.example_objects import TEST_SECTION, TEST_COHORT
 from common.utils.bq_helper import insert_rows_to_bq
 from google.oauth2 import service_account
@@ -155,8 +156,67 @@ def create_course_templates(context):
   course_template.classroom_code = classroom["enrollmentCode"]
   course_template.classroom_url = classroom["alternateLink"]
   course_template.save()
+  instructional_designer_email = EMAILS["instructional_designer"]
+  profile_information = enroll_teacher_in_classroom(
+    course_template.classroom_id,
+    instructional_designer_email)
+  temp_user= TempUser.find_by_email(instructional_designer_email)
+  if temp_user is None:
+    data = {
+          "first_name": profile_information["name"]["givenName"],
+          "last_name": profile_information["name"]["familyName"],
+          "email": instructional_designer_email,
+          "user_type": "faculty",
+          "user_groups": [],
+          "status": "active",
+          "is_registered": True,
+          "failed_login_attempts_count": 0,
+          "access_api_docs": False,
+          "gaia_id": profile_information["id"],
+          "photo_url": profile_information["photoUrl"]
+      }
+    temp_user = TempUser.from_dict(data)
+    temp_user.user_id = ""
+    temp_user.save()
+    temp_user.user_id = temp_user.id
+    temp_user.update()
+  course_enrollment_mapping=CourseTemplateEnrollmentMapping()
+  course_enrollment_mapping.course_template=course_template
+  course_enrollment_mapping.role="faculty"
+  course_enrollment_mapping.user=User.find_by_user_id(temp_user.user_id)
+  course_enrollment_mapping.status="active"
+  course_enrollment_mapping.save()
   context.course_template = course_template
   yield context.course_template
+
+def enroll_teacher_in_classroom(classroom_id,teacher_email):
+  """enroll teacher in classroom"""
+  invite_obj=invite_user(classroom_id,
+                         teacher_email,
+                         "TEACHER")
+  # accept invite
+  accept_invite(invitation_id=invite_obj["id"],teacher_email=teacher_email)
+  a_creds = service_account.Credentials.from_service_account_info(
+    CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(teacher_email)
+  service = build("classroom", "v1", credentials=creds)
+  profile_information = service.userProfiles(\
+  ).get(userId=teacher_email).execute()
+  if not profile_information["photoUrl"].startswith("https:"):
+    profile_information[
+      "photoUrl"] = "https:" + profile_information["photoUrl"]
+  return profile_information
+
+@fixture
+def enroll_instructional_designer(context):
+  course_template = use_fixture(create_course_templates, context)
+  user=User.find_by_email(EMAILS["instructional_designer"])
+  enrollment_mapping=CourseTemplateEnrollmentMapping\
+    .find_course_enrollment_record(
+    course_template.key,
+    user.user_id)
+  context.enrollment_mapping=enrollment_mapping
+  yield context.enrollment_mapping
 
 
 @fixture
@@ -187,7 +247,8 @@ def create_section(context):
   section.classroom_url = classroom["alternateLink"]
   section.save()
   # Create teachers in the DB
-  instructional_designer_email=cohort.course_template.instructional_designer
+  instructional_designer_email=CourseTemplateEnrollmentMapping.\
+    fetch_all_by_course_template(cohort.course_template.key)[0].user.email
   temp_user= TempUser.find_by_email(instructional_designer_email)
   if temp_user is None:
     temp_user = TempUser.from_dict(TEST_USER)
@@ -267,18 +328,8 @@ def enroll_teacher_into_section(context):
   section=use_fixture(create_section, context)
   teacher_email = TEACHER_EMAIL
   temp_user=TempUser.find_by_email(teacher_email)
-  invite_obj=invite_user(section.classroom_id,teacher_email,"TEACHER")
-  accept_invite(invitation_id=invite_obj["id"],teacher_email=teacher_email)
-  a_creds = service_account.Credentials.from_service_account_info(
-      CLASSROOM_KEY, scopes=SCOPES)
-  creds = a_creds.with_subject(teacher_email)
-  service = build("classroom", "v1", credentials=creds)
-
-  profile_information = service.userProfiles(\
-    ).get(userId=teacher_email).execute()
-  if not profile_information["photoUrl"].startswith("https:"):
-    profile_information[
-        "photoUrl"] = "https:" + profile_information["photoUrl"]
+  profile_information = enroll_teacher_in_classroom(
+    section.classroom_id,teacher_email)
   if temp_user is None:
     data = {
           "first_name": profile_information["name"]["givenName"],
@@ -551,6 +602,8 @@ fixture_registry = {
     "fixture.create.cohort": create_cohort,
     "fixture.create.section": create_section,
     "fixture.enroll.teacher.section": enroll_teacher_into_section,
+    "fixture.enroll.instructional_designer.course_template":
+      enroll_instructional_designer,
     "fixture.create.enroll_student_course": enroll_student_course,
     "fixture.get.header": get_header,
     "fixture.create.assignment": create_assignment,

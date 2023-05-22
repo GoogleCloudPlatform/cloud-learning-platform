@@ -1,26 +1,35 @@
 '''Course Template Endpoint'''
 from fastapi import APIRouter, Request
 import datetime
+import traceback
 from googleapiclient.errors import HttpError
 from common.models import CourseTemplate, Cohort, CourseTemplateEnrollmentMapping, User
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
-from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest, ClassroomHttpException
+from common.utils.http_exceptions import (ResourceNotFound,
+                                          InternalServerError, BadRequest,
+                                          ClassroomHttpException, Conflict)
 from common.utils import classroom_crud
 from common.utils.bq_helper import insert_rows_to_bq
-from config import (CLASSROOM_ADMIN_EMAIL,BQ_TABLE_DICT,BQ_DATASET)
+from config import (CLASSROOM_ADMIN_EMAIL, BQ_TABLE_DICT, BQ_DATASET)
 from utils.helper import (convert_cohort_to_cohort_model)
+from utils.user_helper import (
+    course_template_enrollment_instructional_designer_model,
+    check_instructional_designer_can_enroll, get_user_id)
 from services import common_service
 from schemas.cohort import CohortListResponseModel
 from schemas.course_template import (
-  CourseTemplateModel, CourseTemplateListModel,
-  CreateCourseTemplateResponseModel, InputCourseTemplateModel,
-  DeleteCourseTemplateModel, UpdateCourseTemplateModel,
-  UpdateCourseTemplateResponseModel,AddInstructionalDesigner)
+    CourseTemplateModel, CourseTemplateListModel,
+    CreateCourseTemplateResponseModel, InputCourseTemplateModel,
+    DeleteCourseTemplateModel, UpdateCourseTemplateModel,
+    UpdateCourseTemplateResponseModel, AddInstructionalDesigner,
+    EnrollmentResponseModel, DeleteInstructionalDesignerResponseModel)
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
+# disabling for linting to pass
+# pylint: disable = broad-except
 
 router = APIRouter(prefix="/course_templates",
                    tags=["CourseTemplates"],
@@ -155,8 +164,8 @@ def get_cohort_list_by_course_template_id(course_template_id: str,
 
 @router.post("", response_model=CreateCourseTemplateResponseModel)
 def create_course_template(input_course_template: InputCourseTemplateModel
-  # ,request: Request
-  ):
+                           # ,request: Request
+                           ):
   """Create a Course Template endpoint
 
     Args:
@@ -182,57 +191,27 @@ def create_course_template(input_course_template: InputCourseTemplateModel
         section="template",
         description=course_template_dict["description"],
         owner_id="me")
-    # Adding instructional designer in the course on classroom
-    # invitation_object = classroom_crud.invite_user(classroom.get("id"),
-    #               instructional_designer,"TEACHER")
-    # Storing classroom details
-    # classroom_crud.acceept_invite(invitation_object["id"],\
-    #   course_template_dict["instructional_designer"])
-    # user_profile = classroom_crud.get_user_profile_information(\
-    #   course_template_dict["instructional_designer"])
-    # gaia_id = user_profile["id"]
-    # data = {
-    #   "first_name":user_profile["name"]["givenName"],
-    #   "last_name": user_profile["name"]["familyName"],
-    #   "email":course_template_dict["instructional_designer"],
-    #   "user_type": "faculty",
-    #   "user_type_ref": "",
-    #   "user_groups": [],
-    #   "status": "active",
-    #   "is_registered": True,
-    #   "failed_login_attempts_count": 0,
-    #   "access_api_docs": False,
-    #   "gaia_id":gaia_id,
-    #   "photo_url" :  user_profile["photoUrl"]
-    #     }
-    # user=common_service.create_teacher(headers,data)
-    # course_template_enrollment=CourseTemplateEnrollmentMapping()
-    # course_template_enrollment.course_template=course_template
-    # course_template_enrollment.user=User.find_by_user_id(user["user_id"])
-    # course_template_enrollment.status="active"
-    # Storing classroom details
     course_template.classroom_id = classroom.get("id")
     course_template.classroom_code = classroom.get("enrollmentCode")
     course_template.classroom_url = classroom.get("alternateLink")
-    course_template.admin=CLASSROOM_ADMIN_EMAIL
+    course_template.admin = CLASSROOM_ADMIN_EMAIL
     course_template_id = course_template.save().id
-    rows=[{
-      "courseTemplateId":course_template_id,\
-      "classroomId":course_template.classroom_id,\
-        "name":course_template.name,"description":course_template.description,\
-        "timestamp":datetime.datetime.utcnow(),\
-        # "instructionalDesigner":course_template.instructional_designer
+    rows = [{
+        "courseTemplateId": course_template_id,
+        "classroomId": course_template.classroom_id,
+        "name": course_template.name,
+        "description": course_template.description,
+        "timestamp": datetime.datetime.utcnow(),
+        "instructionalDesigners": []
     }]
-    insert_rows_to_bq(
-      rows=rows,
-      dataset=BQ_DATASET,
-      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"]
-      )
+    insert_rows_to_bq(rows=rows,
+                      dataset=BQ_DATASET,
+                      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
     return {"course_template": course_template}
   except HttpError as hte:
     Logger.error(hte)
     raise ClassroomHttpException(status_code=hte.resp.status,
-                              message=str(hte)) from hte
+                                 message=str(hte)) from hte
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -244,7 +223,7 @@ def update_course_template(
     course_template_id: str,
     update_course_template_model: UpdateCourseTemplateModel
     # ,request: Request
-    ):
+):
   """Update Course Template Api
 
   Args:
@@ -276,53 +255,24 @@ def update_course_template(
     for key in update_course_template_dict:
       if update_course_template_dict[key] is not None:
         setattr(course_template, key, update_course_template_dict.get(key))
-    # update instructional designer
-    # if course_template.instructional_designer != instructional_designer:
-    #   classroom_crud.delete_teacher(
-    #       course_template.classroom_id,
-    #       instructional_designer)
-    #   invitation_object = classroom_crud.invite_user(
-    #     course_template.classroom_id,
-    #                 course_template.instructional_designer,"TEACHER")
-    #   # Storing classroom details
-    #   classroom_crud.acceept_invite(invitation_object["id"],
-    #   course_template.instructional_designer)
-    #   user_profile = classroom_crud.get_user_profile_information(
-    #  course_template.instructional_designer)
-    #   gaia_id = user_profile["id"]
-    #   data = {
-    #     "first_name":user_profile["name"]["givenName"],
-    #     "last_name": user_profile["name"]["familyName"],
-    #     "email":course_template.instructional_designer,
-    #     "user_type": "faculty",
-    #     "user_type_ref": "",
-    #     "user_groups": [],
-    #     "status": "active",
-    #     "is_registered": True,
-    #     "failed_login_attempts_count": 0,
-    #     "access_api_docs": False,
-    #     "gaia_id":gaia_id,
-    #     "photo_url" : user_profile["photoUrl"]
-    #     }
-    #   common_service.create_teacher(headers,data)
-    # update classroom
-    classroom_crud.update_course(
-        course_id=course_template.classroom_id, section_name="template",
-        description=course_template.description,
-        course_name=course_template.name)
+    classroom_crud.update_course(course_id=course_template.classroom_id,
+                                 section_name="template",
+                                 description=course_template.description,
+                                 course_name=course_template.name)
     course_template.update()
-    rows=[{
-      "courseTemplateId":course_template_id,\
-      "classroomId":course_template.classroom_id,\
-        "name":course_template.name,"description":course_template.description,\
-        "timestamp":datetime.datetime.utcnow(),\
-        # "instructionalDesigner":course_template.instructional_designer
+    list_instructional_designers=CourseTemplateEnrollmentMapping\
+      .fetch_all_by_course_template(course_template.key)
+    rows = [{
+        "courseTemplateId": course_template_id,
+        "classroomId": course_template.classroom_id,
+        "name": course_template.name,
+        "description": course_template.description,
+        "timestamp": datetime.datetime.utcnow(),
+        "instructionalDesigners": [list_instructional_designers]
     }]
-    insert_rows_to_bq(
-      rows=rows,
-      dataset=BQ_DATASET,
-      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"]
-      )
+    insert_rows_to_bq(rows=rows,
+                      dataset=BQ_DATASET,
+                      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
     return {
         "message": "Successfully Updated the " +
         f"Course Template with id {course_template_id}",
@@ -333,7 +283,7 @@ def update_course_template(
   except HttpError as hte:
     Logger.error(hte)
     raise ClassroomHttpException(status_code=hte.resp.status,
-                              message=str(hte)) from hte
+                                 message=str(hte)) from hte
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:
@@ -371,9 +321,12 @@ def delete_course_template(course_template_id: str):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-@router.post("/{course_template_id}/instructional-designers")
-def add_instructional_designer(course_template_id: str,request: Request,
-                               instructional_designer:AddInstructionalDesigner):
+
+@router.post("/{course_template_id}/instructional_designers",
+             response_model=EnrollmentResponseModel)
+def add_instructional_designer(
+    course_template_id: str, request: Request,
+    instructional_designer: AddInstructionalDesigner):
   """_summary_
 
   Args:
@@ -386,49 +339,158 @@ def add_instructional_designer(course_template_id: str,request: Request,
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
-    course_template=CourseTemplate.find_by_id(course_template_id)
-    instructional_designer=instructional_designer.email
-    invitation_object = classroom_crud.invite_user(course_template.classroom_id,
-                  instructional_designer,"TEACHER")
-    # Storing classroom details
-    classroom_crud.acceept_invite(invitation_object["id"],
-     instructional_designer)
-    user_profile = classroom_crud.get_user_profile_information(
-      instructional_designer)
-    gaia_id = user_profile["id"]
-    data = {
-      "first_name":user_profile["name"]["givenName"],
-      "last_name": user_profile["name"]["familyName"],
-      "email":instructional_designer,
-      "user_type": "faculty",
-      "user_type_ref": "",
-      "user_groups": [],
-      "status": "active",
-      "is_registered": True,
-      "failed_login_attempts_count": 0,
-      "access_api_docs": False,
-      "gaia_id":gaia_id,
-      "photo_url" :  user_profile["photoUrl"]
-        }
-    user=common_service.create_teacher(headers,data)
-    course_template_enrollment=CourseTemplateEnrollmentMapping()
-    course_template_enrollment.course_template=course_template
-    course_template_enrollment.user=User.find_by_user_id(user["user_id"])
-    course_template_enrollment.status="active"
-    course_template_enrollment.role="faculty"
+    course_template = CourseTemplate.find_by_id(course_template_id)
+    instructional_designer = instructional_designer.email
+    if not check_instructional_designer_can_enroll(instructional_designer,
+                                                   headers, course_template):
+      raise Conflict(
+          f"Instructional Designer {instructional_designer} is already" +
+          f" exists in this Course template {course_template.id}")
+    invitation_object = classroom_crud.invite_user(
+        course_template.classroom_id, instructional_designer, "TEACHER")
+    try:
+      classroom_crud.acceept_invite(invitation_object["id"],
+                                    instructional_designer)
+      user_profile = classroom_crud.\
+          get_user_profile_information(instructional_designer)
+
+      data = {
+          "first_name": user_profile["name"]["givenName"],
+          "last_name": user_profile["name"]["familyName"],
+          "email": instructional_designer,
+          "user_type": "faculty",
+          "user_groups": [],
+          "status": "active",
+          "is_registered": True,
+          "failed_login_attempts_count": 0,
+          "access_api_docs": False,
+          "gaia_id": user_profile["id"],
+          "photo_url": user_profile["photoUrl"]
+      }
+      status = "active"
+      invitation_id = ""
+    except Exception as hte:
+      Logger.info(hte)
+      data = {
+          "first_name": "first_name",
+          "last_name": "last_name",
+          "email": instructional_designer,
+          "user_type": "faculty",
+          "user_groups": [],
+          "status": "active",
+          "is_registered": True,
+          "failed_login_attempts_count": 0,
+          "access_api_docs": False,
+          "gaia_id": "",
+          "photo_url": ""
+      }
+      status = "invited"
+      invitation_id = invitation_object["id"]
+    user_dict = common_service.create_teacher(headers, data)
+    course_template_enrollment = CourseTemplateEnrollmentMapping()
+    course_template_enrollment.course_template = course_template
+    course_template_enrollment.user = User.find_by_user_id(
+        user_dict["user_id"])
+    course_template_enrollment.status = status
+    course_template_enrollment.invitation_id = invitation_id
+    course_template_enrollment.role = "faculty"
     course_template_enrollment.save()
+    list_instructional_designers=CourseTemplateEnrollmentMapping\
+      .fetch_all_by_course_template(course_template.key)
+    rows = [{
+        "courseTemplateId": course_template_id,
+        "classroomId": course_template.classroom_id,
+        "name": course_template.name,
+        "description": course_template.description,
+        "timestamp": datetime.datetime.utcnow(),
+        "instructionalDesigners": [list_instructional_designers]
+    }]
+    insert_rows_to_bq(rows=rows,
+                      dataset=BQ_DATASET,
+                      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
     return {
-      "message":
-      ("Successfully Added the Instructional "
-       +f"Designer with email {instructional_designer}"),
-      "data":{
-        "enrollment_id": course_template_enrollment.id,
-        "email": instructional_designer,
-        "course_template_id": course_template.id,
-        "classroom_id": course_template.classroom_id,
-        "classroom_url": course_template.classroom_url
+        "message": ("Successfully Added the Instructional " +
+                    f"Designer with email {instructional_designer}"),
+        "data":
+        course_template_enrollment_instructional_designer_model(
+            course_template_enrollment)
     }
+  except HttpError as hte:
+    Logger.error(hte)
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                                 message=str(hte)) from hte
+  except Conflict as conflict:
+    Logger.error(conflict)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise Conflict(str(conflict)) from conflict
+  except ResourceNotFoundException as re:
+    raise ResourceNotFound(str(re)) from re
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.delete(
+    "/{course_template_id}/instructional_designers/{instructional_designer}",
+    response_model=DeleteInstructionalDesignerResponseModel)
+def delete_instructional_designer(course_template_id: str,
+                                  instructional_designer: str,
+                                  request: Request):
+  """_summary_
+
+  Args:
+      course_template_id (str): _description_
+      request (Request): _description_
+      instructional_designer (str): _description_
+
+  Raises:
+      ResourceNotFoundException: _description_
+      ClassroomHttpException: _description_
+      Conflict: _description_
+      ResourceNotFound: _description_
+      InternalServerError: _description_
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    course_template = CourseTemplate.find_by_id(course_template_id)
+    user_id = get_user_id(instructional_designer, headers)
+    result = CourseTemplateEnrollmentMapping.find_enrolled_active_record(
+        course_template.key, user_id)
+    if result is None:
+      raise ResourceNotFoundException(
+          "Instructional Designer not found in this" +
+          f" Course Template {course_template_id}")
+    classroom_crud.delete_teacher(course_template.classroom_id,
+                                  result.user.email)
+    result.status = "inactive"
+    result.update()
+    list_instructional_designers=CourseTemplateEnrollmentMapping\
+      .fetch_all_by_course_template(course_template.key)
+    rows = [{
+        "courseTemplateId": course_template_id,
+        "classroomId": course_template.classroom_id,
+        "name": course_template.name,
+        "description": course_template.description,
+        "timestamp": datetime.datetime.utcnow(),
+        "instructionalDesigners": [list_instructional_designers]
+    }]
+    insert_rows_to_bq(rows=rows,
+                      dataset=BQ_DATASET,
+                      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
+    return {
+        "message": ("Successfully delete teacher from section" +
+                    f" {course_template_id} using {instructional_designer}")
     }
+  except HttpError as hte:
+    Logger.error(hte)
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                                 message=str(hte)) from hte
+  except Conflict as conflict:
+    Logger.error(conflict)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise Conflict(str(conflict)) from conflict
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
   except Exception as e:

@@ -1,7 +1,7 @@
 import behave
 import requests
 from testing_objects.test_config import API_URL
-from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA,DATABASE_PREFIX
+from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA,DATABASE_PREFIX,emails
 
 # -------------------------------CREATE Course Template-------------------------------------
 # ----Positive Scenario-----
@@ -133,7 +133,7 @@ def step_impl_12(context):
 def setp_impl_13(context):
   context.url = f'{API_URL}/course_templates/{context.course_template.id}'
   context.payload={"name":f"{DATABASE_PREFIX}test_course_updated_name","description":"updated_description"}
-  
+
 
 
 @behave.when(
@@ -306,3 +306,84 @@ def step_impl_32(context):
 def step_impl_33(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
+
+
+#-----------------------------------Delete teacher from section--------------------------------------
+#---Positive scenario
+
+
+@behave.given(
+    "A user has access to admin portal and needs to delete the instructional designer with valid course template id and email"
+)
+def step_impl_34(context):
+  context.url = f'{API_URL}/course_templates/{context.enrollment_mapping.course_template.id}/instructional_designers/{context.enrollment_mapping.user.email}'
+
+
+@behave.when(
+    "Delete request is sent which contains valid course template id and email")
+def step_impl_35(context):
+  resp = requests.delete(context.url, headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then("Set inactive instructional designer from enrollment mapping collection")
+def step_impl_36(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "check data"
+
+
+#---negative scenario
+
+
+@behave.given(
+    "A user has access privileges wants to delete instructional designer with valid course template id and invalid indtructional designer id"
+)
+def step_impl_37(context):
+  context.url = f'{API_URL}/course_templates/{context.course_template.id}/instructional_designers/12345678'
+
+
+@behave.when(
+    "API request is sent which contains valid course template id and invalid user id to delete instructional designer"
+)
+def step_impl_38(context):
+  resp = requests.get(context.url, headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then("Delete instructional designer API throw user not found error")
+def step_impl_39(context):
+  assert context.status == 404, "Status 404"
+  assert context.response["success"] is False, "Check Data"
+
+
+#---------------------------------Enroll teacher in a section-------------
+@behave.given(
+    "A user has access privileges wants to enroll the instructional designer using valid section id and email"
+)
+def step_impl_40(context):
+  context.url = f'{API_URL}/course_templates/{context.course_templates.id}/instructional_designers'
+  context.payload = {"email": emails["teacher"]}
+
+
+@behave.when(
+    "Post request is sent which contains valid course template id and payload which contains valid email"
+)
+def step_impl_41(context):
+  resp = requests.post(context.url,
+                       headers=context.header,
+                       json=context.payload)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "The instruction designer enrolled in classroom and a enrollment mapping is created and return user details with enrollment details"
+)
+def step_impl_42(context):
+  print(f"--------------------json: {context.payload}-----------------------")
+  print(f"------------------Status: {context.status}------------------------")
+  print(f"------------------data: {context.response}------------------------")
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "Check Data"

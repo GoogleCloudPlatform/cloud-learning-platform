@@ -128,6 +128,23 @@ COURSE_ENROLLMENT_USER_EXAMPLE = {
     "classroom_url": "https://classroom.google.com/c/NTYzMhjhjr"
 }
 
+INSTRUCTIONAL_DESIGNER_USER_EXAMPLE = {
+    "user_id": "kh5FoIBOx5qDsfh4ZRuv",
+    "first_name": "",
+    "last_name": "",
+    "email": "clplmstestuser1@gmail.com",
+    "user_type": "learner",
+    "status": "active",
+    "gaia_id": "1234577657333",
+    "photo_url": "https://lh3.googleusercontent.com/a/AEd",
+    "course_template_enrollment_id": "2xBnBjqm2X3eRgVxE6Bv",
+    "invitation_id": "2xBnBjqm2X3eRgVxE6Bv",
+    "course_template_id": "fake-course-template-id",
+    "classroom_id": "123453333",
+    "enrollment_status": "active",
+    "classroom_url": "https://classroom.google.com/c/NTYzMhjhjr"
+}
+
 UPDATE_SECTION = {
     "id": "string",
     "course_id": "string",

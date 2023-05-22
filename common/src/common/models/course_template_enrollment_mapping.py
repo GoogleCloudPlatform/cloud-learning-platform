@@ -67,8 +67,7 @@ class CourseTemplateEnrollmentMapping(BaseModel):
   @classmethod
   def fetch_all_by_course_template(
       cls,
-      course_template,
-      role,
+      course_template
   ):
     """find all records by course template.
 
@@ -81,14 +80,14 @@ class CourseTemplateEnrollmentMapping(BaseModel):
     """
     objects = CourseTemplateEnrollmentMapping.collection.\
       filter("course_template", "==", course_template).filter(
-        "status", "in",["active","invited"]).filter("role", "==",role).fetch()
+        "status", "in",["active","invited"]).fetch()
     return list(objects)
 
   @classmethod
   def find_course_enrollment_record(
       cls,
       course_template_key,
-      user_id,
+      user_id
   ):
     """
     find course template enrollment record by user id and course template key.

@@ -21,7 +21,7 @@ on:
     types: [submitted]
     branches:
       - main
-      - feature
+      - course_template_enrollment_feature
     paths:
       - 'microservices/**'
       - 'common/**'

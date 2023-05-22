@@ -4,7 +4,8 @@ import datetime
 from common.utils import classroom_crud
 from common.utils.bq_helper import insert_rows_to_bq
 from common.utils.logging_handler import Logger
-from common.models import Section,CourseEnrollmentMapping,User
+from common.models import (Section, CourseEnrollmentMapping,
+                           CourseTemplateEnrollmentMapping, User)
 from common.utils.http_exceptions import (InternalServerError,
                                           ResourceNotFound)
 from services import common_service
@@ -94,7 +95,7 @@ def copy_course_background_task(course_template_details,
     # Get the list of courseworkMaterial
     final_coursewok_material = []
     coursework_material_list = classroom_crud.get_coursework_material_list(
-      course_template_details.classroom_id)
+        course_template_details.classroom_id)
     for coursework_material in coursework_material_list:
       try:
         #Check if a coursework material is linked to a topic if yes then
@@ -136,14 +137,18 @@ def copy_course_background_task(course_template_details,
     section.enrolled_students_count = 0
     section_id = section.save().id
     classroom_id = new_course["id"]
-    try:
-      add_teacher(headers,section,
-                course_template_details.instructional_designer)
-    except Exception as error:
-      error = traceback.format_exc().replace("\n", " ")
-      Logger.error(f"Create teacher failed for \
-          for {course_template_details.instructional_designer}")
-      Logger.error(error)
+    list_course_template_enrollment_mapping = CourseTemplateEnrollmentMapping\
+      .fetch_all_by_course_template(course_template_details.key)
+    if list_course_template_enrollment_mapping:
+      for course_template_mapping in list_course_template_enrollment_mapping:
+        try:
+          add_instructional_designer_into_section(section,
+                                                  course_template_mapping)
+        except Exception as error:
+          error = traceback.format_exc().replace("\n", " ")
+          Logger.error(f"Create teacher failed for \
+              for {course_template_details.instructional_designer}")
+          Logger.error(error)
 
     rows=[{
       "sectionId":section_id,\
@@ -266,9 +271,10 @@ def update_grades(all_form_responses, section, coursework_id):
       continue
   Logger.info(f"Student grades updated\
                 for {count} student_data {student_grades}")
-  return count,student_grades
+  return count, student_grades
 
-def add_teacher(headers,section,teacher_email):
+
+def add_teacher(headers, section, teacher_email):
   """_summary_
 
   Args:
@@ -277,52 +283,94 @@ def add_teacher(headers,section,teacher_email):
       teacher_email (_type_): _description_
   """
   invitation_object = classroom_crud.invite_user(section.classroom_id,
-                                                    teacher_email,
-                                                    "TEACHER")
+                                                 teacher_email, "TEACHER")
   try:
     classroom_crud.acceept_invite(invitation_object["id"], teacher_email)
     user_profile = classroom_crud.\
         get_user_profile_information(teacher_email)
 
     data = {
-          "first_name": user_profile["name"]["givenName"],
-          "last_name": user_profile["name"]["familyName"],
-          "email": teacher_email,
-          "user_type": "faculty",
-          "user_groups": [],
-          "status": "active",
-          "is_registered": True,
-          "failed_login_attempts_count": 0,
-          "access_api_docs": False,
-          "gaia_id": user_profile["id"],
-          "photo_url": user_profile["photoUrl"]
-      }
-    status="active"
-    invitation_id=""
+        "first_name": user_profile["name"]["givenName"],
+        "last_name": user_profile["name"]["familyName"],
+        "email": teacher_email,
+        "user_type": "faculty",
+        "user_groups": [],
+        "status": "active",
+        "is_registered": True,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": False,
+        "gaia_id": user_profile["id"],
+        "photo_url": user_profile["photoUrl"]
+    }
+    status = "active"
+    invitation_id = ""
   except Exception as hte:
     Logger.info(hte)
-    data={
-          "first_name": "first_name",
-          "last_name": "last_name",
-          "email": teacher_email,
-          "user_type": "faculty",
-          "user_groups": [],
-          "status": "active",
-          "is_registered": True,
-          "failed_login_attempts_count": 0,
-          "access_api_docs": False,
-          "gaia_id": "",
-          "photo_url": ""
-      }
-    status="invited"
-    invitation_id=invitation_object["id"]
-  user_dict=common_service.create_teacher(headers, data)
-  Logger.info(user_dict)
-  course_enrollment_mapping=CourseEnrollmentMapping()
-  course_enrollment_mapping.section=section
-  course_enrollment_mapping.role="faculty"
-  course_enrollment_mapping.user=User.find_by_user_id(user_dict["user_id"])
-  course_enrollment_mapping.status=status
-  course_enrollment_mapping.invitation_id=invitation_id
+    data = {
+        "first_name": "first_name",
+        "last_name": "last_name",
+        "email": teacher_email,
+        "user_type": "faculty",
+        "user_groups": [],
+        "status": "active",
+        "is_registered": True,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": False,
+        "gaia_id": "",
+        "photo_url": ""
+    }
+    status = "invited"
+    invitation_id = invitation_object["id"]
+  user_dict = common_service.create_teacher(headers, data)
+  course_enrollment_mapping = CourseEnrollmentMapping()
+  course_enrollment_mapping.section = section
+  course_enrollment_mapping.role = "faculty"
+  course_enrollment_mapping.user = User.find_by_user_id(user_dict["user_id"])
+  course_enrollment_mapping.status = status
+  course_enrollment_mapping.invitation_id = invitation_id
+  course_enrollment_mapping.save()
+  return course_enrollment_mapping
+
+
+def add_instructional_designer_into_section(section, course_template_mapping):
+  """Add instructional designer into section
+
+  Args:
+      section (Section): section object
+      course_template_mapping (CourseTemplateMapping):
+      course template enrollment mapping object
+
+  Returns:
+      CourseEnrollmentMapping: enrollment mapping
+  """
+  invitation_object = classroom_crud.invite_user(
+      section.classroom_id, course_template_mapping.user.email, "TEACHER")
+  try:
+    classroom_crud.acceept_invite(invitation_object["id"],
+                                  course_template_mapping.user.email)
+    if course_template_mapping.status == "invited":
+      user_profile = classroom_crud.\
+          get_user_profile_information(course_template_mapping.user.email)
+      user = User.find_by_id(course_template_mapping.user.id)
+      user.first_name = user_profile["name"]["givenName"]
+      user.last_name = user_profile["name"]["familyName"]
+      user.gaia_id = user_profile["id"]
+      user.photo_url = user_profile["photoUrl"]
+      user.update()
+      course_template_mapping.status = "active"
+      course_template_mapping.invitation_id = ""
+      course_template_mapping.update()
+      status = "active"
+      invitation_id = ""
+  except Exception as hte:
+    Logger.info(hte)
+    status = "invited"
+    invitation_id = invitation_object["id"]
+  course_enrollment_mapping = CourseEnrollmentMapping()
+  course_enrollment_mapping.section = section
+  course_enrollment_mapping.role = "faculty"
+  course_enrollment_mapping.user = course_template_mapping.user
+  course_enrollment_mapping.status = status
+  course_enrollment_mapping.invitation_id = invitation_id
   course_enrollment_mapping.save()
   return course_enrollment_mapping
