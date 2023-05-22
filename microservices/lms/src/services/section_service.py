@@ -441,8 +441,6 @@ def update_grades(material, section, coursework_id):
                 for {count} student_data {student_grades}")
   return count, student_grades
 
-  return count, student_grades
-
 
 def add_teacher(headers, section, teacher_email):
   """_summary_
@@ -460,20 +458,6 @@ def add_teacher(headers, section, teacher_email):
         get_user_profile_information(teacher_email)
 
     data = {
-        "first_name": user_profile["name"]["givenName"],
-        "last_name": user_profile["name"]["familyName"],
-        "email": teacher_email,
-        "user_type": "faculty",
-        "user_groups": [],
-        "status": "active",
-        "is_registered": True,
-        "failed_login_attempts_count": 0,
-        "access_api_docs": False,
-        "gaia_id": user_profile["id"],
-        "photo_url": user_profile["photoUrl"]
-    }
-    status = "active"
-    invitation_id = ""
         "first_name": user_profile["name"]["givenName"],
         "last_name": user_profile["name"]["familyName"],
         "email": teacher_email,
