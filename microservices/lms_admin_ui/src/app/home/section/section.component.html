@@ -7,88 +7,91 @@
 
     <mat-card *ngIf="!loadCard" style="margin-top:2%;margin-bottom: 3%;">
         <mat-card-content>
-<div class="cohort-title"><span class="name">{{cohortDetails.name}}</span>
+            <div class="cohort-title"><span class="name">{{cohortDetails.name}}</span>
 
-    <div class="status-chip">
-        <mat-chip-list *ngIf="ifUpcoming(cohortDetails.start_date); else active">
-            <mat-chip class="active-chip">Upcoming</mat-chip>
-        </mat-chip-list>
+                <div class="status-chip">
+                    <mat-chip-list *ngIf="ifUpcoming(cohortDetails.start_date); else active">
+                        <mat-chip class="active-chip">Upcoming</mat-chip>
+                    </mat-chip-list>
 
-        <ng-template #active>
-            <mat-chip-list>
-                <mat-chip *ngIf="checkIfActive(cohortDetails.start_date,cohortDetails.end_date); else elseChip"
-                    class="active-chip">Active</mat-chip>
-                <ng-template #elseChip>
-                    <mat-chip class="deactive-chip">Expired</mat-chip>
-                </ng-template>
-            </mat-chip-list>
-        </ng-template>
-    </div>
+                    <ng-template #active>
+                        <mat-chip-list>
+                            <mat-chip
+                                *ngIf="checkIfActive(cohortDetails.start_date,cohortDetails.end_date); else elseChip"
+                                class="active-chip">Active</mat-chip>
+                            <ng-template #elseChip>
+                                <mat-chip class="deactive-chip">Expired</mat-chip>
+                            </ng-template>
+                        </mat-chip-list>
+                    </ng-template>
+                </div>
 
-</div>
+            </div>
             <div class="object-details">
                 <div style="width:50%;">
-                <div class="element"><span class="element-heading">Cohort Description : </span> <span
-                        class="element-content">{{cohortDetails.description}}</span></div>
-                <div class="element"><span class="element-heading">Instructional Designer : </span> <span
-                        class="element-content">{{courseTemplateDetails.instructional_designer}}</span></div>
-                <div class="element"><span class="element-heading">Course Admin : </span> <span
-                        class="element-content">{{courseTemplateDetails.admin}}</span></div>
-                        <div class="element"><span class="element-heading">Course Template : </span> <span
+                    <div class="element"><span class="element-heading">Cohort Description : </span> <span
+                            class="element-content">{{cohortDetails.description}}</span></div>
+                    <div class="element"><span class="element-heading">Instructional Designer : </span> <span
+                            class="element-content">{{courseTemplateDetails.instructional_designer}}</span></div>
+                    <div class="element"><span class="element-heading">Course Admin : </span> <span
+                            class="element-content">{{courseTemplateDetails.admin}}</span></div>
+                    <div class="element"><span class="element-heading">Course Template : </span> <span
                             class="element-content">{{courseTemplateDetails.name}}</span></div>
-                    </div>
+                </div>
 
-                    <div style="width: 50%;">
+                <div style="width: 50%;">
 
-                        <div class="element">
-                            <div class="date-element-heading">
+                    <div class="element">
+                        <div class="date-element-heading">
                             <span class="material-symbols-rounded">
-                            date_range
-                        </span>
+                                date_range
+                            </span>
                             <span class="title">Cohort duration :
                             </span>
                         </div>
 
-                        <div class="date-element-content">    
-                        <span class="content">{{cohortDetails.start_date | date: 'EEEE, MMM d, y'}}</span>
+                        <div class="date-element-content">
+                            <span class="content">{{cohortDetails.start_date | date: 'EEEE, MMM d, y'}}</span>
                             <span class="to">to</span>
                             <span class="content">{{cohortDetails.end_date | date: 'EEEE, MMM d, y'}}</span>
                         </div>
-                        </div>
+                    </div>
 
 
-                        <div class="element">
-                            <div class="date-element-heading">
+                    <div class="element">
+                        <div class="date-element-heading">
                             <span class="material-symbols-rounded">
-                            date_range
-                        </span>
+                                date_range
+                            </span>
                             <span class="title">Registration window :
                             </span>
                         </div>
 
-                        <div class="date-element-content">    
-                        <span class="content">{{cohortDetails.registration_start_date | date: 'EEEE, MMM d, y'}}</span>
+                        <div class="date-element-content">
+                            <span class="content">{{cohortDetails.registration_start_date | date: 'EEEE, MMM d,
+                                y'}}</span>
                             <span class="to">to</span>
-                            <span class="content">{{cohortDetails.registration_end_date | date: 'EEEE, MMM d, y'}}</span>
+                            <span class="content">{{cohortDetails.registration_end_date | date: 'EEEE, MMM d,
+                                y'}}</span>
                         </div>
-                        </div>
+                    </div>
 
-                        <div class="element">
-                            <div class="date-element-heading">
+                    <div class="element">
+                        <div class="date-element-heading">
                             <span class="material-symbols-rounded">
-                            person
-                        </span>
+                                person
+                            </span>
                             <span class="title">Enrollment count :
                             </span>
                         </div>
 
-                        <div class="date-element-content">    
-                        <span>{{cohortDetails.enrolled_students_count}}</span>
+                        <div class="date-element-content">
+                            <span>{{cohortDetails.enrolled_students_count}}</span>
                         </div>
-                        </div>
-
-
                     </div>
+
+
+                </div>
             </div>
 
         </mat-card-content>
@@ -136,7 +139,8 @@
                             edit
                         </span> View / Edit info</button>
 
-                        <button mat-button (click)="openInviteStudentDialog()"><span class="material-symbols-rounded" style="padding-right: 3px;">
+                    <button mat-button (click)="openInviteStudentDialog()"><span class="material-symbols-rounded"
+                            style="padding-right: 3px;">
                             person_add
                         </span> Invite student</button>
 
@@ -151,10 +155,17 @@
             <div class="section-management">
                 <span class="heading">{{selectedSection.section}} management</span>
 
-                <button mat-flat-button color="primary" (click)="openEditSelectionDialog()"><span
-                        class="material-symbols-rounded">
-                        add
-                    </span> Add Staff</button>
+                <div style="display: flex; width: 30%; justify-content: space-around;">
+                    <button mat-flat-button color="primary" (click)="openAddLtiAssignmentDialog()"><span
+                            class="material-symbols-rounded">
+                            add
+                        </span> Add LTI Assignment</button>
+                    <button mat-flat-button color="primary" (click)="openEditSelectionDialog()"><span
+                            class="material-symbols-rounded">
+                            add
+                        </span> Add Staff</button>
+                </div>
+
             </div>
 
             <ng-container>
@@ -200,11 +211,12 @@
                     <mat-tab label="Student Management">
 
                         <ngx-skeleton-loader *ngIf="studentTableLoader" count="3"
-                        [theme]="{'height': '40px','margin-top':'15px','background-color': '#EAEAEA'}">
-                    </ngx-skeleton-loader>
+                            [theme]="{'height': '40px','margin-top':'15px','background-color': '#EAEAEA'}">
+                        </ngx-skeleton-loader>
 
 
-                        <table *ngIf="!studentTableLoader" mat-table [dataSource]="studentTableData" class="mat-elevation-z8" style="width: 100%;">
+                        <table *ngIf="!studentTableLoader" mat-table [dataSource]="studentTableData"
+                            class="mat-elevation-z8" style="width: 100%;">
 
                             <!-- First Name Column -->
                             <ng-container matColumnDef="first name">
@@ -237,9 +249,9 @@
                                 </th>
                                 <td mat-cell *matCellDef="let element"> {{element.created_time | date:'short'}} </td>
                             </ng-container>
-                            
-                             <!-- Status  Column -->
-                             <ng-container matColumnDef="status">
+
+                            <!-- Status  Column -->
+                            <ng-container matColumnDef="status">
                                 <th mat-header-cell *matHeaderCellDef>
                                     Status
                                 </th>
@@ -261,15 +273,15 @@
 
                             <ng-container matColumnDef="empty-row">
                                 <mat-cell *matCellDef="let element">No Data</mat-cell>
-                              </ng-container>
+                            </ng-container>
 
                             <tr mat-header-row *matHeaderRowDef="studentDisplayedColumns"></tr>
                             <tr mat-row *matRowDef="let row; columns: studentDisplayedColumns;"
-                            [ngClass]="{'disabledRow': row.enrollment_status == 'invited'}"></tr>
+                                [ngClass]="{'disabledRow': row.enrollment_status == 'invited'}"></tr>
 
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="4">No data found</td>
-                              </tr>
+                            </tr>
 
                         </table>
                     </mat-tab>
@@ -277,11 +289,12 @@
                     <mat-tab label="Coursework Management">
 
                         <ngx-skeleton-loader *ngIf="courseworkTableLoader" count="3"
-                        [theme]="{'height': '40px','margin-top':'15px','background-color': '#EAEAEA'}">
-                    </ngx-skeleton-loader>
+                            [theme]="{'height': '40px','margin-top':'15px','background-color': '#EAEAEA'}">
+                        </ngx-skeleton-loader>
 
 
-                        <table *ngIf="!courseworkTableLoader" mat-table [dataSource]="courseworkTable" class="mat-elevation-z8" style="width: 100%;">
+                        <table *ngIf="!courseworkTableLoader" mat-table [dataSource]="courseworkTable"
+                            class="mat-elevation-z8" style="width: 100%;">
 
                             <!-- First Name Column -->
                             <ng-container matColumnDef="title">
@@ -313,11 +326,24 @@
                                     Action
                                 </th>
                                 <td mat-cell *matCellDef="let element;let i = index">
-                                    <button mat-flat-button [disabled]="disableCourseworkAction" style="background-color: #f2f2f2;" *ngIf="checkMaterialsArray(element.materials)" mat-button (click)="callGradeImport(i,element.courseWorkId)">
-                                        <span *ngIf="element.status == 'import'" class="button-content-outer"><span class="material-symbols-rounded">download</span><span class="text">Import Grades</span></span>
-                                        <span *ngIf="element.status == 'loading'" class="button-content-outer"><mat-spinner diameter="20" style="margin-right:5px;"></mat-spinner><span class="text">Importing</span></span>
-                                        <span *ngIf="element.status == 'import_done'" class="button-content-outer"><span class="material-symbols-rounded" style="color: green;">check</span><span class="text">Import Grades</span></span>
-                                        <span *ngIf="element.status == 'import_error'" class="button-content-outer"><span class="material-symbols-rounded" style="color:red;">close</span><span class="text">Retry Import</span></span>
+                                    <button mat-flat-button [disabled]="disableCourseworkAction"
+                                        style="background-color: #f2f2f2;"
+                                        *ngIf="checkMaterialsArray(element.materials)" mat-button
+                                        (click)="callGradeImport(i,element.courseWorkId)">
+                                        <span *ngIf="element.status == 'import'" class="button-content-outer"><span
+                                                class="material-symbols-rounded">download</span><span
+                                                class="text">Import Grades</span></span>
+                                        <span *ngIf="element.status == 'loading'"
+                                            class="button-content-outer"><mat-spinner diameter="20"
+                                                style="margin-right:5px;"></mat-spinner><span
+                                                class="text">Importing</span></span>
+                                        <span *ngIf="element.status == 'import_done'" class="button-content-outer"><span
+                                                class="material-symbols-rounded" style="color: green;">check</span><span
+                                                class="text">Import Grades</span></span>
+                                        <span *ngIf="element.status == 'import_error'"
+                                            class="button-content-outer"><span class="material-symbols-rounded"
+                                                style="color:red;">close</span><span class="text">Retry
+                                                Import</span></span>
                                     </button>
                                 </td>
                             </ng-container>
@@ -327,10 +353,85 @@
 
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="4">No data found</td>
-                              </tr>
+                            </tr>
 
                         </table>
                     </mat-tab>
+                    <mat-tab label="LTI Assignment">
+
+                        <ngx-skeleton-loader *ngIf="ltiAssignmentTableLoader" count="3"
+                            [theme]="{'height': '40px','margin-top':'15px','background-color': '#EAEAEA'}">
+                        </ngx-skeleton-loader>
+
+
+                        <table *ngIf="!ltiAssignmentTableLoader" mat-table [dataSource]="ltiAssignmentsTableData"
+                            class="mat-elevation-z8" style="width: 100%;">
+
+                            <ng-container matColumnDef="id">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Assignment ID
+                                </th>
+                                <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="lti_assignment_title">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Title
+                                </th>
+                                <td mat-cell *matCellDef="let element"> {{element.lti_assignment_title}} </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="start_date">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Start Date
+                                </th>
+                                <td mat-cell *matCellDef="let element"> {{element.start_date | date:'short'}} </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="end_date">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    End Date
+                                </th>
+                                <td mat-cell *matCellDef="let element"> {{element.end_date | date:'short'}} </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="due_date">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Due Date
+                                </th>
+                                <td mat-cell *matCellDef="let element"> {{element.due_date | date:'short'}} </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="action">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Action
+                                </th>
+                                <td mat-cell *matCellDef="let element;let i = index">
+                                    <span class="material-symbols-rounded" style="cursor: pointer; margin-right: 8px;"
+                                        (click)="openViewLtiAssignmentDialog(element.id, element)">
+                                        visibility
+                                    </span>
+                                    <span class="material-symbols-rounded" style="cursor: pointer; margin-right: 8px;"
+                                        (click)="openUpdateLtiAssignmentDialog(element.id, element)">
+                                        edit
+                                    </span>
+                                    <span class="material-symbols-rounded" style="cursor: pointer;"
+                                        (click)="openDeleteLtiAssignmentDialog(element.id, element.name)">
+                                        Delete
+                                    </span>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="ltiAssignmentsDisplayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: ltiAssignmentsDisplayedColumns;"></tr>
+
+                            <tr class="mat-row" *matNoDataRow>
+                                <td class="mat-cell" colspan="4">No data found</td>
+                            </tr>
+
+                        </table>
+                    </mat-tab>
+
                 </mat-tab-group>
             </ng-container>
 
