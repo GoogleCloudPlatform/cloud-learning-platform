@@ -74,7 +74,6 @@ def create_section(sections_details: SectionDetails, request: Request,
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    headers = {"Authorization": request.headers.get("Authorization")}
     course_template_details = CourseTemplate.find_by_id(
         sections_details.course_template)
     cohort_details = Cohort.find_by_id(sections_details.cohort)
@@ -86,10 +85,10 @@ def create_section(sections_details: SectionDetails, request: Request,
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
     background_tasks.add_task(copy_course_background_task,
-                              course_template_details,
-                             sections_details,
-                             cohort_details,
-                             headers,message = "started process")
+                              course_template_details=course_template_details,
+                              sections_details=sections_details,
+                              cohort_details=cohort_details,
+                              message="started process")
     Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
                  section name{sections_details.name}")
@@ -224,9 +223,10 @@ def enroll_teacher(section_id: str, request: Request,
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
 @router.get("/{section_id}/teachers/{teacher}",
-response_model=GetTeacherResponseModel)
-def get_teacher(section_id: str,teacher:str,request: Request):
+            response_model=GetTeacherResponseModel)
+def get_teacher(section_id: str, teacher: str, request: Request):
   """Get teacher for a section .If teacher is present in given section
     get teacher details else throw
   Args:
@@ -265,9 +265,10 @@ def get_teacher(section_id: str,teacher:str,request: Request):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
 @router.delete("/{section_id}/teachers/{teacher}",
-response_model=DeleteTeacherFromSectionResponseModel)
-def delete_teacher(section_id: str,teacher:str,request: Request):
+               response_model=DeleteTeacherFromSectionResponseModel)
+def delete_teacher(section_id: str, teacher: str, request: Request):
   """Delete teacher for a section
   Args:
       section_id (str): section_id in firestore
@@ -283,17 +284,17 @@ def delete_teacher(section_id: str,teacher:str,request: Request):
     headers = {"Authorization": request.headers.get("Authorization")}
     user_id = get_user_id(user=teacher, headers=headers)
     section = Section.find_by_id(section_id)
-    result=CourseEnrollmentMapping.find_active_enrolled_teacher_record(
-     section_key = section.key,user_id = user_id)
+    result = CourseEnrollmentMapping.find_active_enrolled_teacher_record(
+        section_key=section.key, user_id=user_id)
     if result is None:
       raise ResourceNotFoundException(
           f"Teacher not found in this section {section_id}")
-    classroom_crud.delete_teacher(section.classroom_id,result.user.email)
-    result.status="inactive"
+    classroom_crud.delete_teacher(section.classroom_id, result.user.email)
+    result.status = "inactive"
     result.update()
     return {
-        "message": ("Successfully deleted the teacher from the section"
-        + f" {section_id} using {teacher}")
+        "message": ("Successfully deleted the teacher from the section" +
+                    f" {section_id} using {teacher}")
     }
   except ResourceNotFoundException as err:
     Logger.error(err)
@@ -326,7 +327,7 @@ def delete_section(section_id: str):
     classroom_crud.update_course_state(section_details.classroom_id,\
       "ARCHIVED")
     section_details.status = "ARCHIVED"
-    section_details.enrollment_status="CLOSED"
+    section_details.enrollment_status = "CLOSED"
     section_details.update()
     Section.soft_delete_by_id(section_id)
     return {
@@ -588,16 +589,16 @@ def import_grade(section_id: str, coursework_id: str,
   """
   try:
     section = Section.find_by_id(section_id)
-    result = classroom_crud.get_course_work(
-    section.classroom_id,coursework_id)
+    result = classroom_crud.get_course_work(section.classroom_id,
+                                            coursework_id)
     #Get url mapping of google forms view links and edit ids
     is_google_form_present = False
     if "materials" in result.keys():
       for material in result["materials"]:
         if "form" in material.keys():
           is_google_form_present = True
-          background_tasks.add_task(update_grades,material,
-                                    section,coursework_id)
+          background_tasks.add_task(update_grades, material, section,
+                                    coursework_id)
 
       if is_google_form_present:
         return {"message": "Grades for coursework will be updated shortly"}

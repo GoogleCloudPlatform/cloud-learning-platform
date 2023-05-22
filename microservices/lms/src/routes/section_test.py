@@ -8,7 +8,9 @@ import datetime
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from common.models.section import Section
-from common.models import CourseTemplate, Cohort, User, CourseEnrollmentMapping
+from common.models import (CourseTemplate, Cohort, User,
+                           CourseEnrollmentMapping,
+                           CourseTemplateEnrollmentMapping)
 from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 from testing.test_config import (BASE_URL, LIST_COURSEWORK_SUBMISSION_USER,
@@ -36,6 +38,19 @@ def create_fake_data():
   """
   course_template = CourseTemplate.from_dict(COURSE_TEMPLATE_EXAMPLE)
   course_template.save()
+  temp_user = User.from_dict(TEMP_USER)
+  temp_user.user_id = ""
+  temp_user.user_type = "faculty"
+  temp_user.save()
+  temp_user.user_id = temp_user.id
+  temp_user.update()
+
+  course_template_enrollment_mapping = CourseTemplateEnrollmentMapping()
+  course_template_enrollment_mapping.role = "faculty"
+  course_template_enrollment_mapping.user = temp_user
+  course_template_enrollment_mapping.course_template = course_template
+  course_template_enrollment_mapping.status = "active"
+  course_template_enrollment_mapping.save()
   COHORT_EXAMPLE["course_template"] = course_template
   cohort = Cohort.from_dict(COHORT_EXAMPLE)
   cohort.save()
@@ -56,7 +71,8 @@ def create_fake_data():
   return {
       "cohort": cohort.id,
       "course_template": course_template.id,
-      "section": section.id
+      "section": section.id,
+      "course_template_enrollment_id": course_template_enrollment_mapping.id
   }
 
 
@@ -71,20 +87,18 @@ def enroll_teacher_data(create_fake_data):
       _type_: _description_
   """
   section = Section.find_by_id(create_fake_data["section"])
-  temp_user = User.from_dict(TEMP_USER)
-  temp_user.user_id = ""
-  temp_user.user_type = "faculty"
-  temp_user.save()
-  temp_user.user_id = temp_user.id
-  temp_user.update()
-
+  course_template_enrollment_mapping = CourseTemplateEnrollmentMapping.find_by_id(
+      create_fake_data["course_template_enrollment_id"])
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.role = "faculty"
-  course_enrollment_mapping.user = temp_user
+  course_enrollment_mapping.user = course_template_enrollment_mapping.user
   course_enrollment_mapping.section = section
   course_enrollment_mapping.status = "active"
   course_enrollment_mapping.save()
-  return {"user": temp_user, "enrollment_mapping": course_enrollment_mapping}
+  return {
+      "user": course_enrollment_mapping.user,
+      "enrollment_mapping": course_enrollment_mapping
+  }
 
 
 mocked_value = {
@@ -131,35 +145,33 @@ def test_create_section(client_with_emulator, create_fake_data):
             with mock.patch(
                 "services.section_service.classroom_crud.create_coursework"):
               with mock.patch(
-                  "services.section_service.classroom_crud.add_teacher"):
-                with mock.patch(
-                    "services.section_service.classroom_crud.delete_teacher"):
-                  with mock.patch("services.section_service.classroom_crud" +
-                                  ".enable_notifications"):
+                  "services.section_service.classroom_crud.delete_teacher"):
+                with mock.patch("services.section_service.classroom_crud" +
+                                ".enable_notifications"):
+                  with mock.patch(
+                      "services.section_service.classroom_crud.invite_user",
+                      return_value={"id": "12wewew"}):
                     with mock.patch(
-                        "services.section_service.classroom_crud.invite_user",
-                        return_value={"id": "12wewew"}):
+                        ("services.section_service.classroom_crud" +
+                         ".get_user_profile_information"),
+                        return_value=mocked_value):
                       with mock.patch(
-                          ("services.section_service.classroom_crud" +
-                           ".get_user_profile_information"),
-                          return_value=mocked_value):
+                          "services.section_service.classroom_crud" +
+                          ".acceept_invite"):
                         with mock.patch(
                             "services.section_service.classroom_crud" +
-                            ".acceept_invite"):
+                            ".get_coursework_material_list"):
                           with mock.patch(
                               "services.section_service.classroom_crud" +
-                              ".get_coursework_material_list"):
+                              ".drive_copy"):
                             with mock.patch(
                                 "services.section_service.classroom_crud" +
-                                ".drive_copy"):
+                                ".copy_material"):
                               with mock.patch(
-                                  "services.section_service.classroom_crud" +
-                                  ".copy_material"):
-                                with mock.patch(
-                                    "services.section_service.insert_rows_to_bq"
-                                ):
-                                  resp = client_with_emulator.post(
-                                      url, json=section_details)
+                                  "services.section_service.insert_rows_to_bq"
+                              ):
+                                resp = client_with_emulator.post(
+                                    url, json=section_details)
   assert resp.status_code == 202
 
 
@@ -611,7 +623,7 @@ def test_form_grade_import_form_with_no_response(client_with_emulator,
   result_json = resp.json()
   assert resp.status_code == 202, "Status 202"
   assert result_json[
-    "message"] == "Grades for coursework will be updated shortly","message"
+      "message"] == "Grades for coursework will be updated shortly", "message"
 
 
 def test_form_grade_import_form_with_response(client_with_emulator,

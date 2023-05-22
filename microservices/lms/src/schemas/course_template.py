@@ -3,8 +3,10 @@ Pydantic Model for Course template API's
 """
 from typing import Optional
 from pydantic import BaseModel, constr
-from schemas.schema_examples import (COURSE_TEMPLATE_EXAMPLE, INSERT_COURSE_TEMPLATE_EXAMPLE,
-                                     UPDATE_COURSE_TEMPLATE_EXAMPLE,INSTRUCTIONAL_DESIGNER_USER_EXAMPLE)
+from schemas.schema_examples import (COURSE_TEMPLATE_EXAMPLE,
+                                     INSERT_COURSE_TEMPLATE_EXAMPLE,
+                                     UPDATE_COURSE_TEMPLATE_EXAMPLE,
+                                     INSTRUCTIONAL_DESIGNER_USER_EXAMPLE)
 
 
 class CourseTemplateModel(BaseModel):
@@ -20,6 +22,7 @@ class CourseTemplateModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {"example": COURSE_TEMPLATE_EXAMPLE}
+
 
 class InstructionalDesignerModel(BaseModel):
   """Instructional Designer Response Model"""
@@ -45,6 +48,7 @@ class InstructionalDesignerModel(BaseModel):
     orm_mode = True
     schema_extra = {"example": INSTRUCTIONAL_DESIGNER_USER_EXAMPLE}
 
+
 class DeleteInstructionalDesignerResponseModel(BaseModel):
   """Delete Instructional Designer from Course Template Model"""
   success: Optional[bool] = True
@@ -62,6 +66,7 @@ class DeleteInstructionalDesignerResponseModel(BaseModel):
             "data": None
         }
     }
+
 
 class UpdateCourseTemplateModel(BaseModel):
   """Update Course Template Pydantic Model"""
@@ -150,17 +155,17 @@ class UpdateCourseTemplateResponseModel(BaseModel):
         }
     }
 
+
 class AddInstructionalDesigner(BaseModel):
-  email: constr(min_length=7, max_length=128,
-          regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
-          to_lower=True)
+  email: constr(min_length=7,
+                max_length=128,
+                regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+                to_lower=True)
+
   class Config():
     orm_mode = True
-    schema_extra = {
-      "example": {
-        "email":"xyz@gmail.com"
-      }
-    }
+    schema_extra = {"example": {"email": "xyz@gmail.com"}}
+
 
 class EnrollmentResponseModel(BaseModel):
   """Enrollment Response Pydantic Model"""
@@ -169,11 +174,11 @@ class EnrollmentResponseModel(BaseModel):
   data: Optional[InstructionalDesignerModel] = None
 
   class Config():
-    orm_mode=True
-    schema_extra ={
-      "example":{
-        "success": True,
-        "message": "Successfully enrolled instructional designer",
-        "data": INSTRUCTIONAL_DESIGNER_USER_EXAMPLE
-      }
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully enrolled instructional designer",
+            "data": INSTRUCTIONAL_DESIGNER_USER_EXAMPLE
+        }
     }
