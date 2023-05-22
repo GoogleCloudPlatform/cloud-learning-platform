@@ -65,15 +65,11 @@ class CourseTemplateEnrollmentMapping(BaseModel):
     return list(result)
 
   @classmethod
-  def fetch_all_by_course_template(
-      cls,
-      course_template
-  ):
+  def fetch_all_by_course_template(cls, course_template):
     """find all records by course template.
 
     Args:
         course_template (str): Course template key.
-        role (str): role of the user.
 
     Returns:
         List of CourseTemplateEnrollmentMapping: list of object
@@ -84,11 +80,7 @@ class CourseTemplateEnrollmentMapping(BaseModel):
     return list(objects)
 
   @classmethod
-  def find_course_enrollment_record(
-      cls,
-      course_template_key,
-      user_id
-  ):
+  def find_course_enrollment_record(cls, course_template_key, user_id):
     """
     find course template enrollment record by user id and course template key.
 

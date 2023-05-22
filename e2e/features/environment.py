@@ -523,8 +523,8 @@ def create_analytics_data(context):
       course_template.description,
       "timestamp":
       datetime.datetime.utcnow(),
-      "instructionalDesigner":
-      course_template.instructional_designer
+      "instructionalDesigners":
+      [course_template.instructional_designer]
   }]
   insert_rows_to_bq(rows=course_template_rows,
                     dataset=BQ_DATASET,

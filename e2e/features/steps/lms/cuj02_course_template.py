@@ -352,6 +352,9 @@ def step_impl_35(context):
 @behave.then(
     "Set inactive instructional designer from enrollment mapping collection")
 def step_impl_36(context):
+  print(f"--------------------url: {context.url}-----------------------")
+  print(f"------------------Status: {context.status}------------------------")
+  print(f"------------------data: {context.response}------------------------")
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "check data"
 
@@ -377,6 +380,9 @@ def step_impl_38(context):
 
 @behave.then("Delete instructional designer API throw user not found error")
 def step_impl_39(context):
+  print(f"--------------------url: {context.url}-----------------------")
+  print(f"------------------Status: {context.status}------------------------")
+  print(f"------------------data: {context.response}------------------------")
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check Data"
 
@@ -386,7 +392,7 @@ def step_impl_39(context):
     "A user has access privileges wants to enroll the instructional designer using valid section id and email"
 )
 def step_impl_40(context):
-  context.url = f'{API_URL}/course_templates/{context.course_templates.id}/instructional_designers'
+  context.url = f'{API_URL}/course_templates/{context.course_template.id}/instructional_designers'
   context.payload = {"email": emails["teacher"]}
 
 
