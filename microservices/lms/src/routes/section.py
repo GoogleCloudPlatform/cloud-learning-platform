@@ -576,3 +576,51 @@ def import_grade(section_id: str,coursework_id:str,
     raise InternalServerError(str(e)) from e
 
 
+
+@router.post("/delete_section_cronjob")
+def failed_to_provision():
+  """Get a section details from db and archive record
+  from section collection and
+  google classroom course
+
+  Args:
+      section_id (str): section_id in firestore
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      ResourceNotFound: 404 Section with section id is not found
+  Returns:
+    {"message": "Successfully deleted section"}
+  """
+  try:
+    sections = Section.get_section_by_status("FAILED_TO_PROVISION")
+    count=0
+    for section in sections:
+      try :
+        # delete_course
+        classroom_course = classroom_crud.get_course_by_id(section.classroom_id)
+        # Delete drive folder of classroom
+        folder_id = classroom_course["teacherFolder"]["id"]
+        Logger.info(f"{folder_id} {section.name}")
+        # Update state of course
+        classroom_crud.update_course_state(section.classroom_id,"ARCHIVED")
+        Logger.info(f"Delete_drive folder {type(classroom_course)}")
+        drive_folder = classroom_crud.delete_drive_folder(classroom_course["teacherFolder"]["id"])
+        Logger.info(f"{drive_folder}")
+        classroom_crud.delete_course_by_id(section.classroom_id)
+        Section.delete_by_id(section.id)
+        count=count+1
+      except HttpError as ae:
+        Logger.error(ae)
+        Logger.error(f"Delete course failed for section_id {section.id} \
+                    {section.classroom_id}")
+        
+    return {
+        "message": f"Successfully archived the Section with id {count}"
+    }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
