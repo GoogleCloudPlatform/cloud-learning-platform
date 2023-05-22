@@ -88,12 +88,14 @@ def create_section(sections_details: SectionDetails,
       raise ResourceNotFoundException(
           "classroom with id" +
           f" {course_template_details.classroom_id} is not found")
-  
+
     batch_job_input = {
         "type": "course_copy",
         "status": "ready",
-        "input_data": {
-            "sections_details": sections_details
+        "input_data": {**sections_details.dict()},
+        "logs": {
+            "info": [],
+            "errors": []
         }
     }
 
@@ -106,11 +108,16 @@ def create_section(sections_details: SectionDetails,
                              cohort_details,
                              batch_job.id,
                              headers,message = "started process")
-    Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
+    info_msg = f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
-                 section name{sections_details.name}")
+                 section name {sections_details.name}"
+    Logger.info(info_msg)
+
+    batch_job.logs["info"].append(info_msg)
+    batch_job.update()
+
     return { "success": True,
-            "message": "Section will be created shortly",
+            "message": f"Section will be created shortly, use this job id - {batch_job.id} for more info",
             "data": None}
   except ResourceNotFoundException as err:
     Logger.error(err)
@@ -550,6 +557,22 @@ def import_grade(section_id: str,coursework_id:str,
     section = Section.find_by_id(section_id)
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
+    batch_job_input = {
+        "type": "grade_import",
+        "status": "ready",
+        "input_data": {
+            "section_id": section_id,
+            "coursework_id":coursework_id
+        },
+        "logs": {
+            "info": [],
+            "errors": []
+        }
+    }
+
+    batch_job = BatchJob.from_dict(batch_job_input)
+    batch_job.save()
+
     #Get url mapping of google forms view links and edit ids
     is_google_form_present = False
     if "materials" in result.keys():
@@ -557,11 +580,11 @@ def import_grade(section_id: str,coursework_id:str,
         if "form" in material.keys():
           is_google_form_present = True
           background_tasks.add_task(update_grades,material,
-                                    section,coursework_id)
+                                    section,coursework_id,batch_job.id)
 
       if is_google_form_present:
         return {
-           "message":"Grades for coursework will be updated shortly"}
+           "message":f"Grades for coursework will be updated shortly, use this job id {batch_job.id} for more info"}
       else:
         raise ResourceNotFoundException(
           f"Form is not present for coursework_id {coursework_id}"

@@ -32,5 +32,5 @@ class BatchJob(BaseModel):
 
 
 # type -> Batch job type would be couse_copy/grade_import/cron_job(specific)
-# status -> ready, running, failed, completed
+# status -> ready, running, failed, success
 # logs -> {"errors": ["error1","error2"], "info": ["info1","info2"]}

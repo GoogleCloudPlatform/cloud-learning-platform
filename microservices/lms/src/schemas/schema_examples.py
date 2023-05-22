@@ -311,3 +311,18 @@ COURSE_EXAMPLE={
     "display_setting": "HIDE_OVERALL_GRADE"
   }
 }
+
+BATCH_JOB_EXAMPLE = {
+    "id": "vbt1o7bp0n91e",
+    "type": "copy_course",
+    "status": "success",
+    "logs": {
+        "errors": ["error1", "error2"],
+        "info": ["info1", "info2"]
+    },
+    "input_data": {
+        "test_input": "test_input_data"
+    },
+    "section_id": "a5vNi2H9v8b34",
+    "classroom_id": "912406891",
+}

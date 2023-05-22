@@ -34,17 +34,21 @@ def copy_course_background_task(course_template_details,
   Returns:
     True : (bool) on success
   """
+  batch_job = BatchJob.find_by_id(batch_job_id)
+  logs = batch_job.logs
   try:
     # Create a new course
-    Logger.info(f"Background Task started for the cohort id {cohort_details.id}\
+
+    info_msg = f"Background Task started for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} \
-                with section name{sections_details.name}")
-    batch_job = BatchJob.find_by_id(batch_job_id)
-    logs = {"errors": [], "info": []}
+                with section name{sections_details.name}"
+    logs["info"].append(info_msg)
+    Logger.info(info_msg)
     new_course = classroom_crud.create_course(course_template_details.name,
                                               sections_details.description,
                                               sections_details.name, "me")
     batch_job.classroom_id = new_course["id"]
+    batch_job.status = "running"
     batch_job.update()
 
     # Create section with the required fields
@@ -79,6 +83,8 @@ def copy_course_background_task(course_template_details,
         final_teachers.append(teacher_email)
       except Exception as error:
         error=traceback.format_exc().replace("\n", " ")
+        logs["errors"].append(f"Create teacher failed for \
+            for {teacher_email}")
         Logger.error(f"Create teacher failed for \
             for {teacher_email}")
         Logger.error(error)
@@ -100,8 +106,12 @@ def copy_course_background_task(course_template_details,
     section_id =section.save().id
     classroom_id = new_course["id"]
 
+    batch_job.section_id = section_id
+    batch_job.update()
+
     error_flag = False
     target_folder_id = new_course["teacherFolder"]["id"]
+    logs["info"].append(f"ID of target drive folder for section {target_folder_id}")
     Logger.info(f"ID of target drive folder for section {target_folder_id}")
 
     # Get topics of current course
@@ -184,7 +194,8 @@ def copy_course_background_task(course_template_details,
                           url_mapping=url_mapping,
                           target_folder_id=target_folder_id,
                           coursework_type="coursework",
-                          lti_assignment_details=lti_assignment_details)
+                          lti_assignment_details=lti_assignment_details,
+                          logs=logs)
           coursework["materials"]= coursework_update_output["material"]
           coursework_lti_assignment_ids.extend(coursework_update_output["lti_assignment_ids"])
         # final_coursewok.append(coursework)
@@ -206,17 +217,22 @@ def copy_course_background_task(course_template_details,
 
           if lti_assignment_req.status_code != 200:
             error_flag = True
-            Logger.error(
-                f"Failed to update assignment {assignment_id} with course work id {coursework_id} due to error - {lti_assignment_req.text} with status code - {lti_assignment_req.status_code}"
-            )
+            error_msg = f"Failed to update assignment {assignment_id} with course work id \
+                          {coursework_id} due to error - {lti_assignment_req.text} with \
+                            status code - {lti_assignment_req.status_code}"
+            logs["errors"].append(error_msg)
+            Logger.error(error_msg)
 
+          logs["info"].append(error_msg)
           Logger.info(f"Updated the course work id for new LTI assignment - {assignment_id}")
 
       except Exception as error:
         title = coursework["title"]
         error_flag = True
+        logs["errors"].append(f"Get coursework failed for \
+              course_id {course_template_details.classroom_id} for {title}")
         Logger.error(f"Get coursework failed for \
-              course_id{course_template_details.classroom_id} for {title}")
+              course_id {course_template_details.classroom_id} for {title}")
         error=traceback.format_exc().replace("\n", " ")
         Logger.error(error)
         continue
@@ -241,7 +257,7 @@ def copy_course_background_task(course_template_details,
 
           coursework_material_update_output = update_coursework_material(
           materials=coursework_material["materials"],url_mapping=url_mapping,
-          target_folder_id=target_folder_id)
+          target_folder_id=target_folder_id,logs=logs)
 
           coursework_material["materials"]= coursework_material_update_output["material"]
           print("Updated coursework material attached")
@@ -249,8 +265,10 @@ def copy_course_background_task(course_template_details,
       except Exception as error:
         title = coursework_material["title"]
         error_flag = True
+        logs["errors"].append(f"Get coursework material failed for\
+        course_id {course_template_details.classroom_id} for {title}")
         Logger.error(f"Get coursework material failed for\
-        course_id{course_template_details.classroom_id} for {title}")
+        course_id {course_template_details.classroom_id} for {title}")
         error=traceback.format_exc().replace("\n", " ")
         Logger.error(error)
         continue
@@ -283,18 +301,34 @@ def copy_course_background_task(course_template_details,
       table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"]
       )
     Logger.info(message)
+    logs["info"].append(f"Background Task Completed for section Creation for cohort\
+                {cohort_details.id}")
     Logger.info(f"Background Task Completed for section Creation for cohort\
                 {cohort_details.id}")
+    logs["info"].append(f"Section Details are section id {section_id},\
+                classroom id {classroom_id}")
     Logger.info(f"Section Details are section id {section_id},\
                 classroom id {classroom_id}")
+
+    batch_job.logs = logs
+    if error_flag:
+      batch_job.status = "failed"
+    else:
+      batch_job.status = "success"
+    batch_job.update()
+
     return True
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")
+    logs["errors"].append(e)
     Logger.error(error)
     Logger.error(e)
+    batch_job.logs = logs
+    batch_job.status = "failed"
+    batch_job.update()
     raise InternalServerError(str(e)) from e
 
-def update_coursework_material(materials,url_mapping,target_folder_id,coursework_type=None,lti_assignment_details=None):
+def update_coursework_material(materials,url_mapping,target_folder_id,coursework_type=None,lti_assignment_details=None,logs=None):
   """Takes the material attached to any type of cursework and copy it in the
     target folder Id also removes duplicates from material list
   Args:
@@ -343,6 +377,7 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
             split_url = link["url"].split(
                 "/classroom-shim/api/v1/launch?lti_assignment_id=")
             lti_assignment_id = split_url[-1]
+            logs["info"].append(f"LTI Course copy started for assignment - {lti_assignment_id}")
             Logger.info(f"LTI Course copy started for assignment - {lti_assignment_id}")
             copy_assignment = requests.post(
                 "http://classroom-shim/classroom-shim/api/v1/lti-assignment/copy",
@@ -365,12 +400,17 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
               lti_assignment_ids.append(new_lti_assignment_id)
 
               updated_material.append({"link": {"url": updated_material_link_url}})
+              logs["info"].append(f"LTI link updated for new assignment - {new_lti_assignment_id}")
               Logger.info(f"LTI link updated for new assignment - {new_lti_assignment_id}")
+              logs["info"].append(f"LTI Course copy completed for assignment - {lti_assignment_id}")
               Logger.info(f"LTI Course copy completed for assignment - {lti_assignment_id}")
             else:
-              Logger.error(f"Copying an LTI Assignment failed for {lti_assignment_id}\
+              logs["info"](f"LTI Course copy failed for assignment - {lti_assignment_id}")
+              error_msg = f"Copying an LTI Assignment failed for {lti_assignment_id}\
                            in the new section {lti_assignment_details.get('section_id')} with status code: \
-                           {copy_assignment.status_code} and error msg: {copy_assignment.text}")
+                           {copy_assignment.status_code} and error msg: {copy_assignment.text}"
+              logs["errors"].append(error_msg)
+              Logger.error(error_msg)
           else:
             updated_material.append({"link": material["link"]})
 
@@ -379,6 +419,7 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
             split_url = link["url"].split(
                 "/classroom-shim/api/v1/launch?lti_assignment_id=")
             lti_assignment_id = split_url[-1]
+            logs["info"].append(f"LTI link removed in course work material with assignment ID - {lti_assignment_id}")
             Logger.info(f"LTI link removed in course work material with assignment ID - {lti_assignment_id}")
           else:
             updated_material.append({"link": material["link"]})
@@ -403,15 +444,22 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
     "lti_assignment_ids": lti_assignment_ids
   }
 
-def update_grades(material,section,coursework_id):
+def update_grades(material,section,coursework_id,batch_job_id):
   """Takes the forms all responses ,section, and coursework_id and
   updates the grades of student who have responsed to form and
   submitted the coursework
   """
+  batch_job = BatchJob.find_by_id(batch_job_id)
+  logs = batch_job.logs
+
   student_grades = {}
   count =0
-  Logger.info(f"Student grade update background tasks started\
-              for coursework_id {coursework_id}")
+
+  info_msg = f"Student grade update background tasks started\
+              for coursework_id {coursework_id}"
+  logs["info"].append(info_msg)
+  Logger.info(info_msg)
+
   #Get url mapping of google forms view links and edit ids
   url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
   form_details = url_mapping[material["form"]["formUrl"]]
@@ -422,12 +470,16 @@ def update_grades(material,section,coursework_id):
   all_responses_of_form = classroom_crud.\
   retrieve_all_form_responses(form_id)
   if all_responses_of_form =={}:
+    logs["errors"].append("Responses not available for google form")
     Logger.error("Responses not available for google form")
   for response in all_responses_of_form["responses"]:
     try:
       if "respondentEmail" not in response.keys():
-        raise Exception(f"Respondent Email is not collected in form for\
-        coursework {coursework_id} Update form settings to collect Email")
+        error_msg = f"Respondent Email is not collected in form for\
+        coursework {coursework_id} Update form settings to collect Email"
+        logs["errors"].append(error_msg)
+        raise Exception(error_msg)
+
       respondent_email = response["respondentEmail"]
       submissions=classroom_crud.list_coursework_submissions_user(
                                             section.classroom_id,
@@ -435,6 +487,7 @@ def update_grades(material,section,coursework_id):
                                     response["respondentEmail"])
       if submissions !=[]:
         if submissions[0]["state"] == "TURNED_IN":
+          logs["info"].append(f"Updating grades for {respondent_email}")
           Logger.info(f"Updating grades for {respondent_email}")
           if "totalScore" not in response.keys():
             response["totalScore"]=0
@@ -445,14 +498,22 @@ def update_grades(material,section,coursework_id):
           count+=1
           student_grades[
           response["respondentEmail"]]=response["totalScore"]
+          logs["info"].append(f"Updated grades for {respondent_email}")
           Logger.info(f"Updated grades for {respondent_email}")
         else :
+          logs["info"].append(f"Submission state is not turn in {respondent_email}")
           Logger.info(f"Submission state is not turn in {respondent_email}")
     except Exception as e:
       error = traceback.format_exc().replace("\n", " ")
       Logger.error(error)
+      logs["errors"].append(error)
       Logger.error(e)
       continue
+  logs["info"].append(f"Student grades updated\
+                for {count} student_data {student_grades}")
   Logger.info(f"Student grades updated\
                 for {count} student_data {student_grades}")
+  batch_job.logs = logs
+  batch_job.status = "success"
+  batch_job.update()
   return count,student_grades
