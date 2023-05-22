@@ -193,3 +193,13 @@ class PayloadTooLarge(CustomHTTPException):
                      success=False,
                      data=None)
 
+
+class ConnectionTimeout(CustomHTTPException):
+  """Exception raised for connection timeout error.
+
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "Connection Timed-out"):
+    super().__init__(status_code=408, message=message, success=False, data=None)

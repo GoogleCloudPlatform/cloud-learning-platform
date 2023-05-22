@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learning-record-service
+spec:
+  replicas: 1
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: learning-record-service
+        image: gcr.io/core-learning-services-dev/learning-record-service
+        imagePullPolicy: Always
