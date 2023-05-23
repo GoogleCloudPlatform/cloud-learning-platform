@@ -552,7 +552,7 @@ return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
     "message"] == "Grades for coursework will be updated shortly","message"
 
 def test_delete_section_cronjob(client_with_emulator,create_fake_data):
-  section = Section.find_by_id(create_fake_data['section'])
+  section = Section.find_by_id(create_fake_data["section"])
   section.status = "FAILED_TO_PROVISION"
   section.update()
   url = BASE_URL + "/sections/delete_section_cronjob"
