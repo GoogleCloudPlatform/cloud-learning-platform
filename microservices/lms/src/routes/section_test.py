@@ -528,6 +528,7 @@ return_value={"https://docs.google.com/forms/d/e/1FAIpQL":
 def test_form_grade_import_form_with_response(client_with_emulator,
                                                  create_fake_data):
   url = BASE_URL + \
+                                                 create_fake_data):
       f"/sections/{create_fake_data['section']}/coursework/5789246900"
   with mock.patch(
         "routes.section.classroom_crud.get_course_by_id",
@@ -553,6 +554,9 @@ return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
 
 def test_delete_section_cronjob(client_with_emulator,
                                                  create_fake_data):
+  section = Section.find_by_id(create_fake_data['section'])
+  section.status = "FAILED_TO_PROVISION"
+  section.update()
   url = BASE_URL + "/sections/delete_section_cronjob"
   with mock.patch(
         "routes.section.classroom_crud.get_course_by_id",
