@@ -244,9 +244,7 @@ def update_course_template(
           If the update course template raises an exception
   """
   try:
-    # headers = {"Authorization": request.headers.get("Authorization")}
     course_template = CourseTemplate.find_by_id(course_template_id)
-    # instructional_designer = course_template.instructional_designer
     update_course_template_dict = {**update_course_template_model.dict()}
     if not any(update_course_template_dict.values()):
       raise ValidationError(
@@ -473,7 +471,9 @@ def delete_instructional_designer(course_template_id: str,
     result.update()
     list_enrollment_mapping=CourseTemplateEnrollmentMapping\
       .fetch_all_by_course_template(course_template.key)
-    list_instructional_designers=[i.user.email for i in list_enrollment_mapping]
+    list_instructional_designers = [
+        i.user.email for i in list_enrollment_mapping
+    ]
     rows = [{
         "courseTemplateId": course_template_id,
         "classroomId": course_template.classroom_id,

@@ -49,7 +49,6 @@ TEST_COURSE_TEMPLATE2 = {
     "name": "test-name",
     "description": "test-description",
     "admin": "test-admin@gmail.com",
-    "instructional_designer": "IDesiner@gmail.com",
     "classroom_id": "fake_classroom_id",
     "classroom_code": "fake-classroom_code",
     "classroom_url": "https://classroom.google.com"
