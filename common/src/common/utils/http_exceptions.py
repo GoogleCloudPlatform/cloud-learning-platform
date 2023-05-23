@@ -210,6 +210,7 @@ class ConnectionTimeout(CustomHTTPException):
     super().__init__(status_code=408, message=message, success=False, data=None)
 
 
+
 class APINotImplemented(CustomHTTPException):
   """Exception raised for not implemented methods.
 
