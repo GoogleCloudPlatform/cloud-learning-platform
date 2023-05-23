@@ -1,0 +1,91 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: student-learner-profile
+requires:
+  - path: ../../common
+    configs: [common]
+    activeProfiles:
+    - name: custom
+      activatedBy: [custom]
+    - name: dev
+      activatedBy: [dev]
+    - name: prod
+      activatedBy: [prod]
+
+build:
+  tagPolicy:
+    gitCommit:
+      ignoreChanges: true
+  local:
+    concurrency: 0
+  artifacts:
+  - image: student-learner-profile
+    requires:
+      - image: common
+        alias: BASE_IMG
+    sync:
+      infer:
+        - '**/*.py'
+        - '**/*.json'
+
+portForward:
+- resourceType: service
+  resourceName: student-learner-profile
+  port: 80
+  localPort: 8888
+deploy:
+  kustomize:
+    paths:
+    - ./kustomize/minikube
+
+profiles:
+- name: custom
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: student-learner-profile
+      docker:
+        cacheFrom:
+          - student-learner-profile:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/custom
+- name: dev
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: gcr.io/aitutor-dev/student-learner-profile
+      docker:
+        cacheFrom:
+          - gcr.io/aitutor-dev/student-learner-profile:latest
+      requires:
+        - image: gcr.io/aitutor-dev/common
+          alias: BASE_IMG
+      sync:
+        infer:
+          - '**/*.py'
+          - '**/*.json'
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/dev
+- name: prod
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: student-learner-profile
+      docker:
+        cacheFrom:
+          - student-learner-profile:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
