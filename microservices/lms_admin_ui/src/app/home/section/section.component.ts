@@ -9,6 +9,9 @@ import { HomeService } from '../service/home.service';
 import { Router, NavigationStart, NavigationEnd, Event as NavigationEvent } from '@angular/router';
 import { InviteStudentModalComponent } from '../invite-student-modal/invite-student-modal.component';
 import { Subscription } from 'rxjs';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { CreateAssignmentComponent } from 'src/app/lti/create-assignment/create-assignment.component';
+
 
 interface LooseObject {
   [key: string]: any
@@ -37,6 +40,14 @@ export interface coursework {
       status:string
 }
 
+export interface ltiAssignment {
+  assignmentId: string,
+  title: string,
+  startDate: string,
+  endDate: string,
+  dueDate: string,
+}
+
 @Component({
   selector: 'app-section',
   templateUrl: './section.component.html',
@@ -47,10 +58,11 @@ export class SectionComponent implements OnInit,OnDestroy {
   displayedColumns: string[] = ['email', 'role'];
   studentDisplayedColumns: string[] = ['first name', 'last name', 'email', 'created time','status','action'];
   courseworkDisplayColumns: string[] = ['title', 'state', 'created time','action']
-
+  ltiAssignmentsDisplayedColumns: string[] = ["id", "lti_assignment_title", "start_date", "end_date", "due_date", "action"];
   tableData: staff[] = []
   studentTableData: student[] = []
   courseworkTable: coursework[] = []
+  ltiAssignmentsTableData: ltiAssignment[] = []
   dataSource = new MatTableDataSource(this.tableData);
 
   cohortDetails: any
@@ -60,9 +72,11 @@ export class SectionComponent implements OnInit,OnDestroy {
   loadSection: boolean = false
   studentTableLoader:boolean=true
   courseworkTableLoader:boolean=true
+  ltiAssignmentTableLoader:boolean=true
   getStudentListSub:Subscription
+  importGradesSub:Subscription
   disableCourseworkAction:boolean=false
-  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, public _HomeService: HomeService, 
+  constructor(private _liveAnnouncer: LiveAnnouncer, private _snackBar: MatSnackBar, public dialog: MatDialog, public _HomeService: HomeService, 
     public router: Router, private _location: Location) { }
   @ViewChild(MatSort) sort: MatSort;
 
@@ -93,6 +107,7 @@ export class SectionComponent implements OnInit,OnDestroy {
     })
   }
 
+  
   getSectionList(cohortid: any) {
     this.loadSection = true
     this._HomeService.getSectionList(cohortid).subscribe((res: any) => {
@@ -112,17 +127,32 @@ export class SectionComponent implements OnInit,OnDestroy {
       // console.log('section', this.sectionDetails)
     })
   }
-
+  
   getCourseworkDetails(){
     this.courseworkTableLoader=true
     this._HomeService.getCourseworkDetails(this.selectedSection.id).subscribe((res:any)=>{
-this.transformCourseworkTableData(res.data)
-this.courseworkTableLoader=false
+      this.transformCourseworkTableData(res.data)
+      this.courseworkTableLoader=false
     },
     (err:any)=>{
       this.courseworkTableLoader=false
     })
   }
+  
+  getLtiAssignmentsDetails(){
+    this.ltiAssignmentTableLoader=true
+    console.log("URL for lti ",this._HomeService.getLtiAssignments)
+    this._HomeService.getLtiAssignments(this.selectedSection.id).subscribe((res:any)=>{
+      console.log("Resi;t ->",res.data)
+      this.ltiAssignmentsTableData = res.data
+      console.log("ltiAssignmentData ->",this.ltiAssignmentsTableData)
+      this.ltiAssignmentTableLoader=false
+    },
+    (err:any)=>{
+      this.ltiAssignmentTableLoader=false
+    })
+  }
+
 
 transformCourseworkTableData(data:any){
   this.courseworkTable=[]
@@ -131,10 +161,6 @@ transformCourseworkTableData(data:any){
     this.courseworkTable.push(x)
   }
   console.log('coursework',this.courseworkTable)
-// for (let i=0;i<=data.length;i++){
-// data[i]['status'] = 'import'
-// }
-// this.courseworkTable = data
 }
 
   openClassroom() {
@@ -173,9 +199,14 @@ transformCourseworkTableData(data:any){
 
   createTableData() {
     console.log('selected sec', this.selectedSection)
+    if(this.importGradesSub){
+      this.importGradesSub.unsubscribe();
+    }
+    this.disableCourseworkAction=false
     this.updateUrl(this.selectedSection.id)
     this.getSectionStudents()
     this.getCourseworkDetails()
+    this.getLtiAssignmentsDetails()
     this.tableData = []
     for (let x of this.selectedSection.teachers) {
       let staffObj: staff = { name: '', email: '', role: '' }
@@ -309,6 +340,86 @@ transformCourseworkTableData(data:any){
     });
   }
 
+  openUpdateLtiAssignmentDialog(id, data) {
+    let sectionId = this.selectedSection.id
+    let ltiModalData = {}
+    ltiModalData['mode'] = 'Update'
+    ltiModalData['init_data'] = ''
+    ltiModalData['extra_data'] = { sectionId, assignment: data }
+
+    const dialogRef = this.dialog.open(CreateAssignmentComponent, {
+      width: '80vw',
+      maxWidth: '750px',
+      maxHeight: "90vh",
+      data: ltiModalData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log("result", result)
+      if (result?.data == "success") {
+        this.getLtiAssignmentsDetails()
+      }
+    });
+  }
+
+  openDeleteLtiAssignmentDialog(id, name) {
+    let courseTemplateId = this.router.url.split('/')[this.router.url.split('/').length - 1]
+    const dialogRef = this.dialog.open(DeleteSectionLtiDialog, {
+      width: '500px',
+      data: { id, name }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.data == "success") {
+        this.getLtiAssignmentsDetails()
+      }
+      console.log("result", result)
+    });
+    console.log(id)
+  }
+
+  openViewLtiAssignmentDialog(id, data): void {
+    console.log("id", id)
+    let ltiModalData = {}
+    ltiModalData['mode'] = 'View'
+    ltiModalData['init_data'] = ''
+    ltiModalData['extra_data'] = { id, ...data }
+
+    const dialogRef = this.dialog.open(ViewSectionLtiAssignmentDialog, {
+      width: '80vw',
+      maxWidth: '750px',
+      maxHeight: "90vh",
+      data: ltiModalData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log("result", result)
+    });
+  }
+
+  openAddLtiAssignmentDialog() {
+    let ltiModalData = {}
+    let sectionId = this.selectedSection.id
+    ltiModalData['mode'] = 'Create'
+    ltiModalData['page'] = 'section'
+    ltiModalData['init_data'] = ''
+    ltiModalData['extra_data'] = { "contextId": sectionId}
+
+    const dialogRef = this.dialog.open(CreateAssignmentComponent, {
+      width: '80vw',
+      maxWidth: '750px',
+      maxHeight: "90vh",
+      data: ltiModalData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log("result", result)
+      if (result?.data == "success") {
+        this.getLtiAssignmentsDetails()
+      }
+    });
+  }
+
   checkIfActive(start: string, end: string): boolean {
     let startDate = Date.parse(start)
     let endDate = Date.parse(end)
@@ -335,9 +446,10 @@ transformCourseworkTableData(data:any){
     console.log("row num", rowNumber)
     this.disableCourseworkAction=true
     this.courseworkTable[rowNumber]['status'] = 'loading'
-this._HomeService.gradeImport(this.selectedSection.id,courseworkId).subscribe((res:any)=>{
+    this.importGradesSub = this._HomeService.gradeImport(this.selectedSection.id,courseworkId).subscribe((res:any)=>{
   this.courseworkTable[rowNumber]['status'] = 'import_done'
   this.disableCourseworkAction=false
+  this.openSuccessSnackBar(res.message,'Close')
 },(err:any)=>{
   this.courseworkTable[rowNumber]['status'] = 'import_error'
   this.disableCourseworkAction=false
@@ -353,10 +465,42 @@ this._HomeService.gradeImport(this.selectedSection.id,courseworkId).subscribe((r
     }
     return status
   }
+
+  openSuccessSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 6000,
+      panelClass: ['green-snackbar'],
+    });
+  }
+
   ngOnDestroy(): void {
     if(this.getStudentListSub){
       this.getStudentListSub.unsubscribe();
     }
+    if(this.importGradesSub){
+      this.importGradesSub.unsubscribe();
+    }
+  }
+
+}
+
+
+@Component({
+  selector: 'view-lti-assignment-dialog',
+  templateUrl: 'view-lti-assignment-dialog.html',
+})
+export class ViewSectionLtiAssignmentDialog {
+  ltiAssignmentData: any;
+  objectKeys = Object.keys
+  constructor(
+    public dialogRef: MatDialogRef<ViewSectionLtiAssignmentDialog>,
+    @Inject(MAT_DIALOG_DATA) public viewDialogData: any, public homeService: HomeService
+  ) {
+    this.ltiAssignmentData = viewDialogData.extra_data
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close({ data: 'closed' });
   }
 
 }
@@ -373,6 +517,30 @@ export class DeleteOverviewDialog {
 
   deleteStudent() {
     this._HomeService.deleteStudent(this.deleteDialogData.user_id, this.deleteDialogData.section_id).subscribe((res: any) => {
+      if (res.success == true) {
+        this.dialogRef.close({ data: 'success' });
+      }
+    })
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close({ data: 'closed' });
+  }
+
+}
+
+@Component({
+  selector: 'delete-lti-assignment-dialog',
+  templateUrl: 'delete-lti-assignment-dialog.html',
+})
+export class DeleteSectionLtiDialog {
+  constructor(
+    public dialogRef: MatDialogRef<DeleteSectionLtiDialog>,
+    @Inject(MAT_DIALOG_DATA) public deleteDialogData: any, public homeService: HomeService
+  ) { }
+
+  deleteAssignment() {
+    this.homeService.deleteLtiAssignments(this.deleteDialogData.id).subscribe((res: any) => {
       if (res.success == true) {
         this.dialogRef.close({ data: 'success' });
       }

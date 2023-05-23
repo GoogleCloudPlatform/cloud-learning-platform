@@ -11,10 +11,9 @@ from google.auth.transport.requests import Request
 PROJECT_ID = os.getenv("PROJECT_ID", "")
 CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
+PROJECT_ID="core-learning-services-dev"
 USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT=bool(
   os.getenv("USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT","false").lower() in ("true",))
-# CLASSROOM_KEY = "lms"
-# CLASSROOM_ADMIN_EMAIL = "lms"
 
 SCOPES = [
   "https://www.googleapis.com/auth/classroom.courses",
@@ -27,10 +26,8 @@ SCOPES = [
   "https://www.googleapis.com/auth/forms.body.readonly",
   "https://www.googleapis.com/auth/classroom.profile.photos",
   "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-  "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+  "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
   ]
-
-
 
 def get_required_emails_from_secret_manager():
   """Get Project user emails for e2e
@@ -39,7 +36,6 @@ def get_required_emails_from_secret_manager():
   Returns:
     return the emails in dict format
     """ ""
-
   client = secretmanager.SecretManagerServiceClient()
   test_user_secret_id = "org-test-user-1-username"
   test_user_2_secret_id = "org-test-user-2-username"
@@ -229,3 +225,14 @@ CLASSROOM_KEY, scopes=SCOPES)
   response = service.files().get(fileId=file_id,  
     fields="name,webViewLink").execute()
   return response
+
+def insert_file_into_folder(folder_id,file_id):
+
+  a_creds = service_account.Credentials.from_service_account_info(
+CLASSROOM_KEY, scopes=SCOPES)
+  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service = build("drive", "v2", credentials=creds)
+  new_child = {'id': file_id}
+  result= service.children().insert(
+        folderId=folder_id, body=new_child).execute()
+  return result

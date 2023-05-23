@@ -3,6 +3,7 @@ import traceback
 from copy import deepcopy
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from fastapi import APIRouter, Form
+from fastapi.templating import Jinja2Templates
 from common.models import Tool
 from common.utils.errors import ResourceNotFoundException
 from common.utils.logging_handler import Logger
@@ -16,6 +17,8 @@ from services.line_item_service import create_new_content_item
 
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
 del ERROR_RESPONSE_DICT[401]
+
+templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(
     tags=["Content Item Return Endpoint"], responses=ERROR_RESPONSE_DICT)

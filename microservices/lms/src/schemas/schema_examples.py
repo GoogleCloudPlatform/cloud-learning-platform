@@ -72,6 +72,7 @@ SECTION_EXAMPLE = {
     "classroom_id": "123456789100",
     "classroom_code": "abcdef",
     "classroom_url": "https://classroom.google.com",
+    "status": "provisioned",
     "teachers": ["test_user_1@gmail.com"],
     "course_template": "course_templates/7d2zTApD-id",
     "cohort": "cohorts/1j-id",
@@ -100,8 +101,6 @@ TEMP_USER = {
   "last_name": "",
   "email":"clplmstestuser1@gmail.com",
   "user_type": "learner",
-  "user_type_ref": "",
-  "user_groups": [],
   "status": "active",
   "is_registered": True,
   "failed_login_attempts_count": 0,
@@ -281,4 +280,34 @@ ANALYTICS_COURSE_EXAMPLE={
     "cohort_end_date": "2023-05-19T18:30:00+00:00",
     "cohort_max_students": 0,
     "course_work_list": [ANALYTICS_COURSE_WORK_EXAMPLE]
+}
+
+COURSE_EXAMPLE={
+  "id": "456789",
+  "name": "course_name",
+  "section": "section",
+  "description": "desc",
+  "description_heading": "desc_heading",
+  "room": "room",
+  "owner_id": "1234567888887654",
+  "creation_time": "2023-04-20T10:44:05.896Z",
+  "update_time": "2023-04-20T10:44:05.896Z",
+  "enrollment_code": "ry7ui2z",
+  "course_state": "ACTIVE",
+  "alternate_link": "https://classroom.google.com/c/xcvbn",
+  "teacher_group_email": "course_name_section_teachers_678fg@google.com",
+  "course_group_email": "course_name_section_hj678@google.com",
+  "teacher_folder": {
+    "id": "234567xdcfgyhu345678",
+    "title": "course name section",
+    "alternate_link":
+      "https://drive.google.com/drive/folders/234567xdcfgyhu345678"
+  },
+  "course_material_sets":[{"drive_file":"ewrty"}],
+  "guardians_enabled": False,
+  "calendar_id": "dfghj56789@group.calendar.google.com",
+  "gradebook_settings": {
+    "calculation_type": "TOTAL_POINTS",
+    "display_setting": "HIDE_OVERALL_GRADE"
+  }
 }

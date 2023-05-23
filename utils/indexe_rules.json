@@ -120,6 +120,48 @@
         ]
     },
     {
+        "collection_group": "lti_assignments",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "context_id",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
+        "collection_group": "lti_content_items",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "context_id",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
+        "collection_group": "lti_content_items",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "tool_id",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
         "collection_group": "line_items",
         "query_scope": "COLLECTION",
         "fields": [
@@ -189,5 +231,4 @@
             }
         ]
     }
-    
 ]

@@ -88,11 +88,10 @@ def create_section(sections_details: SectionDetails,
       raise ResourceNotFoundException(
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
-    template_drive_folder_id = current_course["teacherFolder"]["id"]
     background_tasks.add_task(copy_course_background_task,
                               course_template_details,
                              sections_details,
-                             cohort_details,template_drive_folder_id,
+                             cohort_details,
                              headers,message = "started process")
     Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
@@ -179,6 +178,8 @@ def get_teachers_list(section_id: str, request: Request):
                               message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -223,6 +224,8 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
                               message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -244,6 +247,9 @@ def delete_section(section_id: str):
     section_details = Section.find_by_id(section_id)
     classroom_crud.update_course_state(section_details.classroom_id,\
       "ARCHIVED")
+    section_details.status = "ARCHIVED"
+    section_details.enrollment_status="CLOSED"
+    section_details.update()
     Section.soft_delete_by_id(section_id)
     return {
         "message": f"Successfully archived the Section with id {section_id}"
@@ -332,7 +338,6 @@ def update_section(sections_details: UpdateSection,request: Request):
       "last_name": user_profile["name"]["familyName"],
       "email":i,
       "user_type": "faculty",
-      "user_type_ref": "",
       "user_groups": [],
       "status": "active",
       "is_registered": True,
@@ -359,6 +364,7 @@ def update_section(sections_details: UpdateSection,request: Request):
         "description":sections_details.description,\
           "cohortId":updated_section["cohort"].split("/")[1],\
           "courseTemplateId":updated_section["course_template"].split("/")[1],\
+            "status":section.status,
           "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(
@@ -398,6 +404,10 @@ def update_section_classroom_code(section_id:str):
   try:
     section=Section.find_by_id(section_id)
     course=classroom_crud.get_course_by_id(section.classroom_id)
+    if course is None:
+      raise ResourceNotFoundException(
+          "Classroom with section id" +
+          f" {section_id} is not found")
     section.classroom_code=course["enrollmentCode"]
     section.update()
     return {
@@ -525,37 +535,20 @@ def import_grade(section_id: str,coursework_id:str,
   """
   try:
     section = Section.find_by_id(section_id)
-    classroom_course = classroom_crud.get_course_by_id(section.classroom_id)
-    folder_id = classroom_course["teacherFolder"]["id"]
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
     #Get url mapping of google forms view links and edit ids
-    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form(
-      folder_id)
-    count =0
-    student_grades = {}
     is_google_form_present = False
     if "materials" in result.keys():
       for material in result["materials"]:
         if "form" in material.keys():
           is_google_form_present = True
-          form_details = \
-            url_mapping[material["form"]["formUrl"]]
-
-          form_id = form_details["file_id"]
-          # Get all responses for the form if no responses of
-          # the form then return
-          all_responses_of_form = classroom_crud.\
-          retrive_all_form_responses(form_id)
-          if all_responses_of_form =={}:
-            raise ResourceNotFoundException(
-              "Responses not available for google form")
-          background_tasks.add_task(update_grades,all_responses_of_form,
+          background_tasks.add_task(update_grades,material,
                                     section,coursework_id)
 
       if is_google_form_present:
-        return {"data":{"count":count,"student_grades":student_grades},
-                "message":"Grades for coursework will be updated shortly"}
+        return {
+           "message":"Grades for coursework will be updated shortly"}
       else:
         raise ResourceNotFoundException(
           f"Form is not present for coursework_id {coursework_id}"

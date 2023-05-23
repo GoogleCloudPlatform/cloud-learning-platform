@@ -1,5 +1,5 @@
 @fixture.get.header
-Feature: Create, Read, Retive all and delete APIs for Course Template
+Feature: Create, Read, Retrieve all and delete APIs for Course Template
 
   Scenario: Create Course Template with correct request payload
     Given A user has access privileges and needs to create a Course Template Record
@@ -50,7 +50,7 @@ Feature: Create, Read, Retive all and delete APIs for Course Template
     Then Course Template API will return all existing Course Template Records successfully
 
   @fixture.create.cohort
-  Scenario: Retive all Cohort Records by giving valid Course Template id
+  Scenario: Retrieve all Cohort Records by giving valid Course Template id
     Given A user has access privileges and needs to fetch all Cohort Records using course template
     When API request is sent to fetch all Cohorts Records by providing Course template valid id
     Then Course Template list Cohort API will return all existing Cohort Records successfully

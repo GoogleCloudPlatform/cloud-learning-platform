@@ -1,0 +1,8 @@
+<h2 mat-dialog-title>Confirm ?</h2>
+<div mat-dialog-content style="padding-bottom: 4%;padding-top: 1%;">
+    Tool with name <b>{{deleteDialogData.name}}</b> will be removed.
+</div>
+<div mat-dialog-actions style="display: flex;justify-content: end;">
+    <button mat-flat-button (click)="onNoClick()">No</button>
+    <button mat-flat-button color="primary" (click)="deleteTool()">Yes</button>
+</div>
