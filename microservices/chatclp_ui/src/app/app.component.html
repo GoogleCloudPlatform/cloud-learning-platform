@@ -1,0 +1,27 @@
+<div class="app">
+  <div class="left-panel">
+    <div class="profile">
+      <h2>User Profile</h2>
+      <!-- Add user profile details and settings here -->
+    </div>
+    <div class="chat-history">
+      <h2>Prior Chats</h2>
+      <p *ngFor="let chat of chat">{{ chat.message }}</p>
+    </div>
+  </div>
+  <div class="chat-area">
+    <div class="model-selector">
+      <label>Select Model: </label>
+      <select [(ngModel)]="selectedModel">
+        <option *ngFor="let model of models">{{ model }}</option>
+      </select>
+    </div>
+    <div class="chat-display">
+      <!-- Display chat messages here -->
+    </div>
+    <div class="chat-input">
+      <input [(ngModel)]="message" />
+      <button (click)="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
