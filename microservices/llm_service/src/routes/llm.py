@@ -18,7 +18,7 @@
 import traceback
 from typing import Optional
 from fastapi import APIRouter
-from common.models import UserLLM
+from common.models import UserChat
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
                                  PayloadTooLargeError)
@@ -86,13 +86,14 @@ async def generate(gen_config: LLMGenerateModel):
     raise InternalServerError(str(e)) from e
 
 
-@router.post("/{userid}/generate", response_model=LLMGenerateResponse)
-async def generate_user(userid: str, gen_config: UserLLMModel):
+@router.post("/user/{userid}/generate", response_model=LLMGenerateResponse)
+async def generate_user(userid: str, gen_config: LLMGenerateModel):
   """
   Generate text and create new chat for user
 
   Args:
       prompt(str): Input prompt for model
+      llm_type(str): LLM type
 
   Returns:
       LLMUserGenerateResponse
@@ -100,7 +101,6 @@ async def generate_user(userid: str, gen_config: UserLLMModel):
   genconfig_dict = {**gen_config.dict()}
 
   result = []
-  user_llm = None
 
   prompt = genconfig_dict.get("prompt")
   if prompt is None or prompt == "":
@@ -108,12 +108,58 @@ async def generate_user(userid: str, gen_config: UserLLMModel):
 
   llm_type = genconfig_dict.get("llm_type")
 
-  user_llm = UserLLM.find_by_userid(userid, llm_type)
-  if user_llm is None:
-    raise ResourceNotFoundException(f"LLM not found for {userid}")
+  try:
+    # generate text from prompt
+    result = await llm_generate(prompt, llm_type)
+
+    # create new chat for user
+    user_chat = UserChat(userid=userid, llm_type=llm_type)
+    user_chat.history = [result]
+    user_chat.save()
+
+    return {
+        "success": True,
+        "message": "Successfully generated text",
+        "content": result,
+        "chatid": user_chat.id
+    }
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+
+@router.post("/chat/{chatid}/generate", response_model=LLMGenerateResponse)
+async def generate_chat(chatid: str, gen_config: LLMGenerateModel):
+  """
+  Generate text based on context of user chat
+
+  Args:
+      prompt(str): Input prompt for model
+      llm_type(str): LLM type
+
+  Returns:
+      LLMUserGenerateResponse
+  """
+  genconfig_dict = {**gen_config.dict()}
+
+  result = []
+
+  prompt = genconfig_dict.get("prompt")
+  if prompt is None or prompt == "":
+    return BadRequest("Missing or invalid payload parameters")
+
+  llm_type = genconfig_dict.get("llm_type")
+
+  # fetch user chat
+  user_chat = UserChat.find_by_id(chatid)
+  if user_chat is None:
+    raise ResourceNotFoundException(f"Chat {chatid} not found ")
 
   try:
-    result = await llm_generate(prompt, llm_type, user_llm)
+    result = await llm_generate(prompt, llm_type, user_chat)
+
+    # save chat history
+    user_chat.history.append(result)
+    user_chat.save()
 
     return {
         "success": True,

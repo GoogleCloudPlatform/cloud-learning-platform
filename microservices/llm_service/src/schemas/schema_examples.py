@@ -8,15 +8,3 @@ LLM_GENERATE_EXAMPLE = {
   "context": "",
   "primer":  "",
 }
-
-
-### User LLM Model ###
-USER_LLM_MODEL_EXAMPLE = {
-  "prompt": "",
-  "llm_type": "",
-  "context": "",
-  "primer":  "",
-  "history": [],
-  "memory": ""
-}
-

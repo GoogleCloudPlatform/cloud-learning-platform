@@ -14,7 +14,7 @@
 
 """ LLM Generation Service """
 
-from common.models import UserLLM
+from common.models import UserChat
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
@@ -27,7 +27,7 @@ from config import (LANGCHAIN_LLM, GOOGLE_LLM,
 from config import load_google_access_token
 
 async def llm_generate(prompt: str, llm_type: str,
-                       user_llm: Optional[UserLLM] = None):
+                       user_chat: Optional[UserChat] = None):
   """
   Generate text with an LLM given a prompt.  This is
     always done asychronously, and so must be used in a route defined with
@@ -38,7 +38,7 @@ async def llm_generate(prompt: str, llm_type: str,
 
     llm_type: the type of LLM to use (default to openai)
 
-    llm (optional): an user llm model
+    user_chat (optional): a user chat to use for context
 
   Returns:
     the text result.
@@ -50,7 +50,7 @@ async def llm_generate(prompt: str, llm_type: str,
   Logger.info(f"generating text with llm_type {llm_type}")
   try:
     if llm_type in LANGCHAIN_LLM.keys():
-      result = await langchain_llm_generate(prompt, llm_type, user_llm)
+      result = await langchain_llm_generate(prompt, llm_type, user_chat)
     elif llm_type in GOOGLE_LLM.keys():
       google_llm = GOOGLE_LLM.get(llm_type)
       result = await google_llm_predict(prompt, google_llm)

@@ -16,7 +16,7 @@ Pydantic Model for Grade API's
 """
 from typing import Optional
 from pydantic import BaseModel
-from schemas.schema_examples import LLM_GENERATE_EXAMPLE, USER_LLM_MODEL_EXAMPLE
+from schemas.schema_examples import LLM_GENERATE_EXAMPLE
 
 class LLMGetResponse(BaseModel):
   """LLM Get list model"""
@@ -48,19 +48,6 @@ class LLMGenerateModel(BaseModel):
     }
 
 
-class UserLLMModel(BaseModel):
-  """User LLM model"""
-  prompt: str
-  llm_type: Optional[str] = ""
-  context: Optional[str] = ""
-  primer: Optional[list[str]] = []
-
-  class Config():
-    orm_mode = True
-    schema_extra = {
-        "example": USER_LLM_MODEL_EXAMPLE
-    }
-
 class LLMGenerateResponse(BaseModel):
   """LLM Generate Response model"""
   success: Optional[bool] = True
@@ -79,7 +66,7 @@ class LLMGenerateResponse(BaseModel):
 
 class LLMUserGenerateResponse(BaseModel):
   """LLM User Generate Response model"""
-  chat_id: str
+  chatid: str
   success: Optional[bool] = True
   message: Optional[str] = "Successfully generated text"
   content: Optional[str] = ""
@@ -90,6 +77,7 @@ class LLMUserGenerateResponse(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully generated text",
-            "content": None
+            "content": None,
+            "chatid": None
         }
     }
