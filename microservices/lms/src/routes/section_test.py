@@ -550,3 +550,22 @@ return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
   assert resp.status_code == 202, "Status 202"
   assert resp_json[
     "message"] == "Grades for coursework will be updated shortly","message"
+
+def test_delete_section_cronjob(client_with_emulator,
+                                                 create_fake_data):
+  url = BASE_URL + \
+      f"/sections/delete_section_cronjob"
+  with mock.patch(
+        "routes.section.classroom_crud.get_course_by_id",
+                return_value={"teacherFolder":{"id":"123344"}}):
+    with mock.patch("routes.section.classroom_crud.update_course_state"
+    ):
+      with mock.patch(
+"routes.section.classroom_crud.delete_drive_folder"):
+        with mock.patch(
+        "routes.section.classroom_crud.delete_course_by_id"):
+          resp = client_with_emulator.patch(url)
+  resp_json = resp.json()
+  assert resp.status_code == 200, "Status 200"
+  assert resp_json[
+    "message"] == "Successfully archived the Section with id 1","message"

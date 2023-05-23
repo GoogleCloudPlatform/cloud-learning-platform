@@ -98,5 +98,6 @@ class Section(BaseModel):
     Returns:
         list: list of sections
     """
-    objects = cls.collection.filter("status", "==", status).offset(skip).fetch(limit)
+    objects = cls.collection.filter("status", "==", status).order(
+      order_by).offset(skip).fetch(limit)
     return list(objects)
