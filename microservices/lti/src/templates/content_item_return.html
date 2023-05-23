@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <script>
+        function init() {
+            console.log("data", '{{data | tojson}}')
+            console.log("data type", typeof('{{data}}'))
+            console.log("data type json", typeof('{{data | tojson}}'))
+            window.parent.postMessage('{{data | tojson}}', '*');
+        }
+    </script>
+</head>
+
+<body onload="init()">
+</body>
+
+</html>

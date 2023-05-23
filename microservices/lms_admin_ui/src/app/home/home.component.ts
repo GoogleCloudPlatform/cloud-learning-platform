@@ -132,6 +132,7 @@ export class HomeComponent implements OnInit {
       }
     })
   }
+
   getCohortList() {
     this.cohortLoader = true
     this.cohortList = []
@@ -153,7 +154,6 @@ export class HomeComponent implements OnInit {
       }
     })
   }
-
 
   openDialog(): void {
     let cohortModalData: LooseObject = {}
@@ -186,17 +186,11 @@ export class HomeComponent implements OnInit {
       console.log(result)
       if (result.data == 'success') {
         this.getCourseTemplateList()
-
-        
-
-
       }
     });
   }
 
 }
-
-
 
 @Component({
   selector: 'success-overview-dialog',
