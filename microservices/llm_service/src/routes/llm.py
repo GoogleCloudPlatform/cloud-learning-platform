@@ -25,7 +25,8 @@ from common.utils.errors import (ResourceNotFoundException,
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, PayloadTooLarge)
 from schemas.llm_schema import (LLMGenerateModel, UserLLMModel,
-                                LLMGetResponse, LLMGenerateResponse)
+                                LLMGetResponse, LLMGenerateResponse,
+                                LLMUserGenerateResponse)
 from services.llm_generate import llm_generate
 from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, LLM_TYPES
 
@@ -88,13 +89,13 @@ async def generate(gen_config: LLMGenerateModel):
 @router.post("/{userid}/generate", response_model=LLMGenerateResponse)
 async def generate_user(userid: str, gen_config: UserLLMModel):
   """
-  Generate text and track history for user
+  Generate text and create new chat for user
 
   Args:
       prompt(str): Input prompt for model
 
   Returns:
-      LLMGenerateResponse
+      LLMUserGenerateResponse
   """
   genconfig_dict = {**gen_config.dict()}
 

@@ -14,21 +14,22 @@
 """
 Module to add cohort in Fireo
 """
-from fireo.fields import TextField, IDField, ReferenceField
+from fireo.fields import TextField, ListField, IDField, ReferenceField
 from common.models import BaseModel, User
 
 # pylint: disable=unused-argument
 
-class UserLLM(BaseModel):
-  """UserLLM ORM class
+class UserChat(BaseModel):
+  """UserChat ORM class
   """
   id = IDField()
   user = ReferenceField(User, required=True)
   llm_type = TextField(required=True)
-
+  history = ListField(default=[])
+  
   class Meta:
     ignore_none_field = False
-    collection_name = BaseModel.DATABASE_PREFIX + "user_llms"
+    collection_name = BaseModel.DATABASE_PREFIX + "user_chats"
 
   @classmethod
   def find_by_user(cls,

@@ -54,8 +54,6 @@ class UserLLMModel(BaseModel):
   llm_type: Optional[str] = ""
   context: Optional[str] = ""
   primer: Optional[list[str]] = []
-  history: Optional[list[str]] = []
-  memory: Optional[str] = ""
 
   class Config():
     orm_mode = True
@@ -65,6 +63,23 @@ class UserLLMModel(BaseModel):
 
 class LLMGenerateResponse(BaseModel):
   """LLM Generate Response model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully generated text"
+  content: Optional[str] = ""
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully generated text",
+            "content": None
+        }
+    }
+
+class LLMUserGenerateResponse(BaseModel):
+  """LLM User Generate Response model"""
+  chat_id: str
   success: Optional[bool] = True
   message: Optional[str] = "Successfully generated text"
   content: Optional[str] = ""
