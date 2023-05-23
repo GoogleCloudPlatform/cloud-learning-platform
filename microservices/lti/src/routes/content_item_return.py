@@ -30,7 +30,8 @@ router = APIRouter(
         "model": NotFoundErrorResponseModel
     }},
     name="DeepLinking Response API for Content Item")
-def content_item_return(request:Request,JWT: str = Form(), context_id: str = None):
+def content_item_return(request:Request,
+      JWT: str = Form(), context_id: str = None):
   """
     This endpoint which will be used by tool for sending deep linking response
     for content selection.
