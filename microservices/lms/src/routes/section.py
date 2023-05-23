@@ -604,7 +604,8 @@ def failed_to_provision():
         # Update state of course
         classroom_crud.update_course_state(section.classroom_id,"ARCHIVED")
         Logger.info(f"Delete_drive folder {type(classroom_course)}")
-        drive_folder = classroom_crud.delete_drive_folder(classroom_course["teacherFolder"]["id"])
+        drive_folder = classroom_crud.delete_drive_folder(
+          classroom_course["teacherFolder"]["id"])
         classroom_crud.delete_course_by_id(section.classroom_id)
         Section.delete_by_id(section.id)
         Logger.info(f"Deleted section with id \
@@ -613,8 +614,7 @@ def failed_to_provision():
       except HttpError as ae:
         Logger.error(ae)
         Logger.error(f"Delete course failed for section_id {section.id} \
-                    {section.classroom_id} {drive_folder}")
-   
+                    {section.classroom_id}") 
     return {
         "message": f"Successfully archived the Section with id {count}"
     }

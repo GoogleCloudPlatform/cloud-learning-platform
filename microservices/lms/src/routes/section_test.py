@@ -553,8 +553,7 @@ return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
 
 def test_delete_section_cronjob(client_with_emulator,
                                                  create_fake_data):
-  url = BASE_URL + \
-      f"/sections/delete_section_cronjob"
+  url = BASE_URL + "/sections/delete_section_cronjob"
   with mock.patch(
         "routes.section.classroom_crud.get_course_by_id",
                 return_value={"teacherFolder":{"id":"123344"}}):
@@ -564,7 +563,7 @@ def test_delete_section_cronjob(client_with_emulator,
 "routes.section.classroom_crud.delete_drive_folder"):
         with mock.patch(
         "routes.section.classroom_crud.delete_course_by_id"):
-          resp = client_with_emulator.patch(url)
+          resp = client_with_emulator.post(url)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
   assert resp_json[

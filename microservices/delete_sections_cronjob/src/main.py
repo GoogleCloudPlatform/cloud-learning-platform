@@ -61,7 +61,7 @@ def main():
   id_token = auth_client.get_id_token()
   api_endpoint = "http://lms/lms/api/v1/sections/delete_section_cronjob"
 
-  res = requests.patch(
+  res = requests.post(
       url=api_endpoint,
       headers={
           "Content-Type": "application/json",
