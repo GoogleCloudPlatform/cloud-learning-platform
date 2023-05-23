@@ -35,15 +35,15 @@ app.include_router(router, prefix="/llm-service/api/v1")
 client_with_emulator = TestClient(app)
 
 
-def test_get_llm_list(clean_firestore):
-  pass
+# def test_get_llm_list(clean_firestore):
+#   pass
 
-def test_llm_generate(clean_firestore):
-  params = {
-    "llm_type": "LLM Test",
-    "prompt": "test"
-  }
-  url = f"{api_url}/generate"
+# def test_llm_generate(clean_firestore):
+#   params = {
+#     "llm_type": "LLM Test",
+#     "prompt": "test"
+#   }
+#   url = f"{api_url}/generate"
   #with mock.patch("routes.llm.Logger"):
   #  with mock.patch("routes.llm.llm_generate"):
   #    resp = client_with_emulator.post(url, params=params)
