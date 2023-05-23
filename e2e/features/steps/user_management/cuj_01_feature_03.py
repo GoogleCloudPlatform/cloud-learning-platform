@@ -7,12 +7,12 @@ from copy import deepcopy
 from uuid import uuid4
 
 sys.path.append("../")
-from test_object_schemas import TEST_USER
+from e2e.test_object_schemas import TEST_USER
 from environment import TEST_USER_MANAGEMENT_PATH
-from test_config import (API_URL_USER_MANAGEMENT,
+from e2e.test_config import (API_URL_USER_MANAGEMENT,
                         API_URL_LEARNER_PROFILE_SERVICE,
                         API_URL_LEARNING_RECORD_SERVICE)
-from setup import post_method, get_method, delete_method, put_method
+from e2e.setup import post_method, get_method, delete_method, put_method
 
 UM_API_URL = API_URL_USER_MANAGEMENT
 LRS_API_URL = API_URL_LEARNING_RECORD_SERVICE

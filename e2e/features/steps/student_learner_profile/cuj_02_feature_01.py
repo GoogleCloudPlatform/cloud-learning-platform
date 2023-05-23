@@ -1,15 +1,15 @@
 """Behave Test for Feature: Student Experience Staff can
   access a specific learner's personal information and academic records"""
 
-from setup import post_method, get_method, delete_method
+from e2e.setup import post_method, get_method, delete_method
 import behave
 import uuid
 import sys
 
 sys.path.append("../")
 from copy import copy
-from test_object_schemas import LEARNER_OBJECT_TEMPLATE, ACHIEVEMENT_OBJECT_TEMPLATE, LEARNER_PROFILE_TEMPLATE
-from test_config import API_URL_LEARNER_PROFILE_SERVICE
+from e2e.test_object_schemas import LEARNER_OBJECT_TEMPLATE, ACHIEVEMENT_OBJECT_TEMPLATE, LEARNER_PROFILE_TEMPLATE
+from e2e.test_config import API_URL_LEARNER_PROFILE_SERVICE
 
 API_URL = API_URL_LEARNER_PROFILE_SERVICE
 

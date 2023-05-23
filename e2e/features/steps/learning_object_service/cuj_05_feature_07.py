@@ -6,8 +6,8 @@ import sys
 import json
 
 sys.path.append("../")
-from setup import post_method, get_method, delete_method
-from test_config import (API_URL_LEARNING_OBJECT_SERVICE, DEL_KEYS,
+from e2e.setup import post_method, get_method, delete_method
+from e2e.test_config import (API_URL_LEARNING_OBJECT_SERVICE, DEL_KEYS,
                         API_URL_LEARNER_PROFILE_SERVICE)
 from environment import (TEST_LEARNING_HIERARCHY_PATH)
 

@@ -9,12 +9,12 @@ from copy import deepcopy
 import sys
 
 sys.path.append("../")
-from test_config import (API_URL_AUTHENTICATION_SERVICE,
+from e2e.test_config import (API_URL_AUTHENTICATION_SERVICE,
                         API_URL_USER_MANAGEMENT)
-from test_object_schemas import (TEST_SIGN_UP, TEST_USER)
+from e2e.test_object_schemas import (TEST_SIGN_UP, TEST_USER)
 from common.models import User
 from common.utils.inspace import delete_inspace_user_helper
-from setup import post_method, get_method, get_cache, set_cache
+from e2e.setup import post_method, get_method, get_cache, set_cache
 
 API_URL = API_URL_AUTHENTICATION_SERVICE
 UM_API_URL = API_URL_USER_MANAGEMENT

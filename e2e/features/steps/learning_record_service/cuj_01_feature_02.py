@@ -5,10 +5,10 @@ import behave
 import sys
 import os
 sys.path.append("../")
-from setup import post_method, get_method, put_method, delete_method, set_cache, get_cache
+from e2e.setup import post_method, get_method, put_method, delete_method, set_cache, get_cache
 from copy import deepcopy
-from test_object_schemas import TEST_VERB
-from test_config import API_URL_LEARNING_RECORD_SERVICE, TESTING_OBJECTS_PATH
+from e2e.test_object_schemas import TEST_VERB
+from e2e.test_config import API_URL_LEARNING_RECORD_SERVICE, TESTING_OBJECTS_PATH
 
 
 #-------------------------------CREATE VERB-------------------------------------

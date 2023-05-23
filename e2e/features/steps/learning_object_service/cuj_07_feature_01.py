@@ -8,10 +8,10 @@ from common.utils.gcs_adapter import GcsCrudService
 from common.models import FAQContent
 
 sys.path.append("../")
-from setup import get_method, post_method, CONTENT_SERVING_BUCKET, set_cache, get_cache, put_method, delete_method, CONTENT_SERVING_BUCKET
+from e2e.setup import get_method, post_method, CONTENT_SERVING_BUCKET, set_cache, get_cache, put_method, delete_method, CONTENT_SERVING_BUCKET
 from environment import TEST_CONTENT_SERVING_PATH, TEST_CONTENT_SERVING_ZIP_PATH
-from test_config import API_URL_LEARNING_OBJECT_SERVICE, DEL_KEYS
-from test_object_schemas import (TEST_BASIC_FAQ, TEST_CURRICULUM_PATHWAY)
+from e2e.test_config import API_URL_LEARNING_OBJECT_SERVICE, DEL_KEYS
+from e2e.test_object_schemas import (TEST_BASIC_FAQ, TEST_CURRICULUM_PATHWAY)
 
 API_URL = API_URL_LEARNING_OBJECT_SERVICE
 

@@ -8,11 +8,11 @@ from uuid import uuid4
 from copy import deepcopy
 
 sys.path.append("../")
-from setup import post_method, get_method, put_method, set_cache, get_cache
+from e2e.setup import post_method, get_method, put_method, set_cache, get_cache
 
-from test_config import API_URL_LEARNER_PROFILE_SERVICE, \
+from e2e.test_config import API_URL_LEARNER_PROFILE_SERVICE, \
   API_URL_LEARNING_OBJECT_SERVICE, DEL_KEYS
-from test_object_schemas import (TEST_LEARNER, TEST_LEARNER_PROFILE,
+from e2e.test_object_schemas import (TEST_LEARNER, TEST_LEARNER_PROFILE,
                                  TEST_CURRICULUM_PATHWAY_2,
                                  TEST_LEARNER_PROFILE_PROGRESS_UPDATE,
                                  TEST_PROGRESS,

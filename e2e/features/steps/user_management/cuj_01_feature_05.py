@@ -7,11 +7,11 @@ from copy import deepcopy
 from uuid import uuid4
 
 sys.path.append("../")
-from test_object_schemas import TEST_USER
-from test_config import API_URL_USER_MANAGEMENT as UM_API_URL
+from e2e.test_object_schemas import TEST_USER
+from e2e.test_config import API_URL_USER_MANAGEMENT as UM_API_URL
 from common.models import User
 from common.utils.inspace import (get_inspace_user_helper,delete_inspace_user_helper)
-from setup import post_method, put_method, delete_method, set_cache, get_cache
+from e2e.setup import post_method, put_method, delete_method, set_cache, get_cache
 
 # -----------------------------------------------------
 # Scenario 1: An Inspace User account is to be created alongwith backend user

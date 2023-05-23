@@ -6,10 +6,10 @@ import behave
 import sys
 from uuid import uuid4
 sys.path.append("../")
-from setup import get_method
+from e2e.setup import get_method
 from common.models import User, CurriculumPathway, Staff, Learner, AssociationGroup
-from test_config import API_URL_LEARNER_PROFILE_SERVICE, DEL_KEYS
-from test_object_schemas import (TEST_USER, TEST_CURRICULUM_PATHWAY, TEST_STAFF, TEST_LEARNER,
+from e2e.test_config import API_URL_LEARNER_PROFILE_SERVICE, DEL_KEYS
+from e2e.test_object_schemas import (TEST_USER, TEST_CURRICULUM_PATHWAY, TEST_STAFF, TEST_LEARNER,
                               TEST_ASSOCIATION_GROUP)
 
 

@@ -1,3 +1,4 @@
+import os
 from e2e.gke_api_tests.endpoint_proxy import get_baseurl
 from common.utils.errors import ResourceNotFoundException
 base_url = get_baseurl("lms")
@@ -6,6 +7,8 @@ user_management_url = get_baseurl("user-management")
 lrs_url = get_baseurl("learning-record-service")
 los_url = get_baseurl("learning-object-service")
 slp_url = get_baseurl("student-learner-profile")
+
+TESTING_OBJECTS_PATH = os.path.join(os.getcwd(), "e2e.testing_objects")
 
 if not base_url:
   raise ResourceNotFoundException("Unable to locate the service URL for lms")

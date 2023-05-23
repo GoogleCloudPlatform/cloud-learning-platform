@@ -6,9 +6,9 @@ import sys
 from uuid import uuid4
 
 sys.path.append("../")
-from test_object_schemas import TEST_APPLICATION, TEST_MODULE, TEST_USER, TEST_USER_GROUP, TEST_ACTION, TEST_PERMISSION
-from test_config import (API_URL_USER_MANAGEMENT as UM_API_URL)
-from setup import post_method, get_method, put_method
+from e2e.test_object_schemas import TEST_APPLICATION, TEST_MODULE, TEST_USER, TEST_USER_GROUP, TEST_ACTION, TEST_PERMISSION
+from e2e.test_config import (API_URL_USER_MANAGEMENT as UM_API_URL)
+from e2e.setup import post_method, get_method, put_method
 '''
 Scenario: Update permissions related to an assigned application for a UserGroup
 '''

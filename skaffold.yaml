@@ -49,11 +49,11 @@ requires:
   configs: [update-invitations-cronjob]
 
 # TODO: Activate when all services from ailearning-backend have been moved
-# - path: ./microservices/user_management
-#   configs: [user-management]
+- path: ./microservices/user_management
+  configs: [user-management]
 
-# - path: ./microservices/learning_record_service
-#   configs: [learning-record-service]
+- path: ./microservices/learning_record_service
+  configs: [learning-record-service]
 
 build:
   googleCloudBuild: {}

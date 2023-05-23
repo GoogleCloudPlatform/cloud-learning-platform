@@ -7,13 +7,13 @@ import sys
 sys.path.append("../")
 from common.utils.collection_references import collection_references
 from common.models import LearningExperience, LearningObject, LearningResource
-from setup import post_method, get_method
+from e2e.setup import post_method, get_method
 from environment import (TEST_LEARNING_HIERARCHY_FOR_SRL, 
                             TEST_CONTENT_SERVING_SRL_V1_PATH,
                             TEST_CONTENT_SERVING_SRL_V2_PATH,
                             TEST_CONTENT_SERVING_SRL_V3_PATH,
                             TEST_CONTENT_SERVING_MADCAP_V1_PATH)
-from test_config import API_URL_LEARNING_OBJECT_SERVICE
+from e2e.test_config import API_URL_LEARNING_OBJECT_SERVICE
 API_URL = API_URL_LEARNING_OBJECT_SERVICE
 LEARNING_RESOURCE_UUID=""
 

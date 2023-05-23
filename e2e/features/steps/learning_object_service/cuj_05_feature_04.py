@@ -7,9 +7,9 @@ import uuid
 from copy import deepcopy
 
 sys.path.append("../")
-from setup import post_method, get_method, put_method
-from test_config import API_URL_LEARNING_OBJECT_SERVICE
-from test_object_schemas import TEST_CURRICULUM_PATHWAY, TEST_LEARNING_EXPERIENCE
+from e2e.setup import post_method, get_method, put_method
+from e2e.test_config import API_URL_LEARNING_OBJECT_SERVICE
+from e2e.test_object_schemas import TEST_CURRICULUM_PATHWAY, TEST_LEARNING_EXPERIENCE
 
 API_URL = API_URL_LEARNING_OBJECT_SERVICE
 

@@ -8,9 +8,9 @@ from copy import copy
 
 import sys 
 sys.path.append("../")
-from setup import get_method, post_method
-from test_config import API_URL_LEARNING_OBJECT_SERVICE, DEL_KEYS
-from test_object_schemas import TEST_CURRICULUM_PATHWAY
+from e2e.setup import get_method, post_method
+from e2e.test_config import API_URL_LEARNING_OBJECT_SERVICE, DEL_KEYS
+from e2e.test_object_schemas import TEST_CURRICULUM_PATHWAY
 
 API_URL = API_URL_LEARNING_OBJECT_SERVICE
 

@@ -1,9 +1,7 @@
 """sample feature to test environment.py"""
 
-import sys
 import behave
-sys.path.append("../")
-from setup import delete_user_from_db, delete_user
+from e2e.setup import delete_user_from_db, delete_user
 
 # 1. This checks if everything is implemented correctly in environment.py
 # 2. It also cleans up the User data from Firestore that was created for Authentication

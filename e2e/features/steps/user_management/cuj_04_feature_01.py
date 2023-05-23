@@ -7,9 +7,9 @@ import sys
 from copy import copy
 from uuid import uuid4
 sys.path.append("../")
-from setup import post_method, get_method, put_method, set_cache, get_cache
-from test_config import API_URL_USER_MANAGEMENT
-from test_object_schemas import (BASIC_SESSION_DATA, TEST_USER)
+from e2e.setup import post_method, get_method, put_method, set_cache, get_cache
+from e2e.test_config import API_URL_USER_MANAGEMENT
+from e2e.test_object_schemas import (BASIC_SESSION_DATA, TEST_USER)
 
 # Create Session for a valid User with the correct request payload
 @behave.given("A User has access to User Management and wants to create a Session with the correct request payload")

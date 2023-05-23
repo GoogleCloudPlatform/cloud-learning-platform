@@ -7,9 +7,9 @@ import os
 import behave
 sys.path.append("../")
 from common.models import ActivityState
-from setup import post_method, get_method, put_method, delete_method
-from test_object_schemas import TEST_ACTIVITY_STATE
-from test_config import API_URL_LEARNING_RECORD_SERVICE, TESTING_OBJECTS_PATH
+from e2e.setup import post_method, get_method, put_method, delete_method
+from e2e.test_object_schemas import TEST_ACTIVITY_STATE
+from e2e.test_config import API_URL_LEARNING_RECORD_SERVICE, TESTING_OBJECTS_PATH
 
 API_URL = API_URL_LEARNING_RECORD_SERVICE
 

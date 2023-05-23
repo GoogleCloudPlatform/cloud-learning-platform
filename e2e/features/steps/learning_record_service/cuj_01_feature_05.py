@@ -5,11 +5,11 @@ import behave
 import sys
 sys.path.append("../")
 from uuid import uuid4
-from setup import post_method, get_method, set_cache, get_cache, setup_rules_engine_data
+from e2e.setup import post_method, get_method, set_cache, get_cache, setup_rules_engine_data
 from copy import deepcopy
 from endpoint_proxy import get_baseurl
-from test_object_schemas import TEST_ACTIVITY, TEST_AGENT, TEST_LEARNING_EXPERIENCE, TEST_VERB, TEST_XAPI_STATEMENT_1, TEST_XAPI_STATEMENT_2, TEST_SESSION
-from test_config import API_URL_LEARNING_RECORD_SERVICE, API_URL_LEARNING_OBJECT_SERVICE, API_URL_USER_MANAGEMENT, DEL_KEYS
+from e2e.test_object_schemas import TEST_ACTIVITY, TEST_AGENT, TEST_LEARNING_EXPERIENCE, TEST_VERB, TEST_XAPI_STATEMENT_1, TEST_XAPI_STATEMENT_2, TEST_SESSION
+from e2e.test_config import API_URL_LEARNING_RECORD_SERVICE, API_URL_LEARNING_OBJECT_SERVICE, API_URL_USER_MANAGEMENT, DEL_KEYS
 
 
 #-------------------------------CREATE STATEMENT-------------------------------

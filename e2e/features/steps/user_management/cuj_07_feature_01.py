@@ -9,9 +9,9 @@ from behave.runner import Context
 from uuid import uuid4
 
 sys.path.append("../")
-from test_object_schemas import TEST_ACTION
-from test_config import API_URL_USER_MANAGEMENT as UM_API_URL
-from setup import post_method, get_method, put_method, delete_method
+from e2e.test_object_schemas import TEST_ACTION
+from e2e.test_config import API_URL_USER_MANAGEMENT as UM_API_URL
+from e2e.setup import post_method, get_method, put_method, delete_method
 
 
 @given("user wants to create action in user management with correct "

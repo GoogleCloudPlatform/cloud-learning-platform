@@ -1,17 +1,17 @@
 """Behave Test for Learner achievements are updated
   as the user progresses through a learning pathway"""
 
-from setup import post_method, get_method, delete_method, put_method
+from e2e.setup import post_method, get_method, delete_method, put_method
 import behave
 import sys
 from uuid import uuid4
 from copy import copy
 sys.path.append("../")
-from test_object_schemas import (LEARNER_OBJECT_TEMPLATE,
+from e2e.test_object_schemas import (LEARNER_OBJECT_TEMPLATE,
                                 ACHIEVEMENT_OBJECT_TEMPLATE,
                                 LEARNER_PROFILE_TEMPLATE)
 
-from test_config import (API_URL_LEARNER_PROFILE_SERVICE,
+from e2e.test_config import (API_URL_LEARNER_PROFILE_SERVICE,
                           API_URL_LEARNING_OBJECT_SERVICE)
 from environment import (TEST_LEARNING_HIERARCHY_PATH)
 

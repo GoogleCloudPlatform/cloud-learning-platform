@@ -5,8 +5,8 @@ import behave
 import sys
 
 sys.path.append("../")
-from setup import get_method
-from test_config import API_URL_LEARNING_OBJECT_SERVICE
+from e2e.setup import get_method
+from e2e.test_config import API_URL_LEARNING_OBJECT_SERVICE
 
 API_URL = API_URL_LEARNING_OBJECT_SERVICE
 LEARNING_RESOURCE_UUID=""

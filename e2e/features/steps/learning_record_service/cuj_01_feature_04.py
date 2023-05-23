@@ -6,11 +6,11 @@ import sys
 import os
 from uuid import uuid4
 sys.path.append("../")
-from setup import post_method, get_method, put_method, delete_method, set_cache, get_cache
+from e2e.setup import post_method, get_method, put_method, delete_method, set_cache, get_cache
 from copy import deepcopy
 from common.models import User
-from test_object_schemas import TEST_AGENT, TEST_USER
-from test_config import API_URL_LEARNING_RECORD_SERVICE, API_URL_USER_MANAGEMENT, TESTING_OBJECTS_PATH
+from e2e.test_object_schemas import TEST_AGENT, TEST_USER
+from e2e.test_config import API_URL_LEARNING_RECORD_SERVICE, API_URL_USER_MANAGEMENT, TESTING_OBJECTS_PATH
 
 #-------------------------------CREATE AGENT-------------------------------------
 # --- Positive Scenario ---

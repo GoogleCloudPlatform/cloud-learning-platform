@@ -46,9 +46,9 @@ def health_check():
 api = FastAPI(
     title="Learning Record Service API",
     version="latest",
-    docs_url=None,
-    redoc_url=None,
-    dependencies=[Depends(validate_token)]
+    # docs_url=None,
+    # redoc_url=None,
+    # dependencies=[Depends(validate_token)]
     )
 
 api.include_router(statement.router)

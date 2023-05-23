@@ -8,10 +8,10 @@ from uuid import uuid4
 
 sys.path.append("../")
 from common.models import AssociationGroup, User, CurriculumPathway
-from test_object_schemas import (TEST_ASSOCIATION_GROUP, TEST_USER,
+from e2e.test_object_schemas import (TEST_ASSOCIATION_GROUP, TEST_USER,
                                 TEST_CURRICULUM_PATHWAY, TEST_CURRICULUM_PATHWAY_2)
-from test_config import (API_URL_USER_MANAGEMENT, DEL_KEYS)
-from setup import create_immutable_user_groups, post_method, get_method, put_method, delete_method
+from e2e.test_config import (API_URL_USER_MANAGEMENT, DEL_KEYS)
+from e2e.setup import create_immutable_user_groups, post_method, get_method, put_method, delete_method
 
 UM_API_URL = f"{API_URL_USER_MANAGEMENT}/association-groups"
 

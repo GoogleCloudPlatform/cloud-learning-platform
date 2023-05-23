@@ -6,8 +6,8 @@ import sys
 import json
 
 sys.path.append("../")
-from setup import post_method, get_method
-from test_config import API_URL_LEARNING_OBJECT_SERVICE
+from e2e.setup import post_method, get_method
+from e2e.test_config import API_URL_LEARNING_OBJECT_SERVICE
 from environment import (TEST_LEARNING_HIERARCHY_PATH, TEST_INVALID_LEARNING_HIERARCHY_PATH)
 
 API_URL = API_URL_LEARNING_OBJECT_SERVICE

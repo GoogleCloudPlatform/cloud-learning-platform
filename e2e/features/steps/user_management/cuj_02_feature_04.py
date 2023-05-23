@@ -6,9 +6,9 @@ import sys
 from uuid import uuid4
 
 sys.path.append("../")
-from test_object_schemas import TEST_USER, TEST_USER_GROUP
-from test_config import (API_URL_USER_MANAGEMENT as UM_API_URL)
-from setup import post_method, put_method, delete_method, get_method, create_immutable_user_groups
+from e2e.test_object_schemas import TEST_USER, TEST_USER_GROUP
+from e2e.test_config import (API_URL_USER_MANAGEMENT as UM_API_URL)
+from e2e.setup import post_method, put_method, delete_method, get_method, create_immutable_user_groups
 '''
 Scenario: Update name of a Immutable UserGroup with correct request payload
 '''

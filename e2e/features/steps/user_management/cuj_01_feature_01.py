@@ -8,12 +8,12 @@ from uuid import uuid4
 from behave.runner import Context
 
 sys.path.append("../")
-from test_object_schemas import TEST_USER
+from e2e.test_object_schemas import TEST_USER
 from environment import TEST_USER_MANAGEMENT_PATH
-from test_config import (API_URL_USER_MANAGEMENT as UM_API_URL,
+from e2e.test_config import (API_URL_USER_MANAGEMENT as UM_API_URL,
                         API_URL_LEARNER_PROFILE_SERVICE as SLP_API_URL,
                         API_URL_LEARNING_RECORD_SERVICE as LRS_API_URL)
-from setup import post_method, get_method
+from e2e.setup import post_method, get_method
 
 '''
 Scenario: A user wants to be registered with correct account details 

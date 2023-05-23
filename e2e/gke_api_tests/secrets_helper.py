@@ -9,7 +9,7 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from common.utils.jwt_creds import JwtCredentials
 PROJECT_ID = os.getenv("PROJECT_ID", "")
-CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
+CLASSROOM_KEY = os.environ.get("GKE_POD_SA_KEY")
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
 PROJECT_ID="core-learning-services-dev"
 USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT=bool(

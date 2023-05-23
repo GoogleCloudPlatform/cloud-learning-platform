@@ -8,9 +8,9 @@ from uuid import uuid4
 
 sys.path.append("../")
 from common.models import CurriculumPathway, User, AssociationGroup
-from test_object_schemas import TEST_ASSOCIATION_GROUP, TEST_CURRICULUM_PATHWAY, TEST_USER
-from test_config import API_URL_USER_MANAGEMENT
-from setup import post_method, get_method, put_method, delete_method
+from e2e.test_object_schemas import TEST_ASSOCIATION_GROUP, TEST_CURRICULUM_PATHWAY, TEST_USER
+from e2e.test_config import API_URL_USER_MANAGEMENT
+from e2e.setup import post_method, get_method, put_method, delete_method
 
 UM_API_URL = f"{API_URL_USER_MANAGEMENT}/association-groups"
 

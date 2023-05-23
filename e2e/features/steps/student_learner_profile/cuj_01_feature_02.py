@@ -2,15 +2,15 @@
 Ingest skill graph from Credential Engine via API, break out skills and organize them in skill graph
 """
 
-from setup import post_method, get_method, put_method, delete_method
+from e2e.setup import post_method, get_method, put_method, delete_method
 from common.models import Learner
-from test_object_schemas import LEARNER_OBJECT_TEMPLATE
+from e2e.test_object_schemas import LEARNER_OBJECT_TEMPLATE
 import behave
 import sys
 
 sys.path.append("../")
 
-from test_config import API_URL_LEARNER_PROFILE_SERVICE
+from e2e.test_config import API_URL_LEARNER_PROFILE_SERVICE
 
 API_URL = API_URL_LEARNER_PROFILE_SERVICE
 

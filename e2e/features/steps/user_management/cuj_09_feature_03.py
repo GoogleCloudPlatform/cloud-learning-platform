@@ -7,9 +7,9 @@ from copy import deepcopy
 from uuid import uuid4
 
 sys.path.append("../")
-from test_object_schemas import TEST_USER, TEST_USER_GROUP, TEST_ASSOCIATION_GROUP
-from test_config import API_URL_USER_MANAGEMENT
-from setup import post_method, get_method
+from e2e.test_object_schemas import TEST_USER, TEST_USER_GROUP, TEST_ASSOCIATION_GROUP
+from e2e.test_config import API_URL_USER_MANAGEMENT
+from e2e.setup import post_method, get_method
 
 UM_API_URL = f"{API_URL_USER_MANAGEMENT}/association-groups"
 

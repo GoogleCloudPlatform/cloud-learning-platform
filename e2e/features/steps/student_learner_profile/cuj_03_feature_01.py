@@ -4,8 +4,8 @@ Feature 01 - Import achievement, and learner account data from json files
 
 import behave
 import os
-from setup import post_method, get_method
-from test_config import API_URL_LEARNER_PROFILE_SERVICE, TESTING_OBJECTS_PATH
+from e2e.setup import post_method, get_method
+from e2e.test_config import API_URL_LEARNER_PROFILE_SERVICE, TESTING_OBJECTS_PATH
 from common.models import Learner, Achievement
 
 

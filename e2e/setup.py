@@ -7,10 +7,10 @@ import requests
 import os
 import uuid
 from copy import deepcopy
-from test_object_schemas import (TEST_USER, TEST_LRS_COMPLETED_EVENT,
+from e2e.test_object_schemas import (TEST_USER, TEST_LRS_COMPLETED_EVENT,
                                  TEST_LRS_STARTED_EVENT, TEST_VERB,
                                  VALID_VERBS, TEST_USER_GROUP)
-from test_config import (API_URL_LEARNING_RECORD_SERVICE,
+from e2e.test_config import (API_URL_LEARNING_RECORD_SERVICE,
                          API_URL_USER_MANAGEMENT,
                          API_URL_AUTHENTICATION_SERVICE)
 from common.models import User, Verb, Agent, UserGroup

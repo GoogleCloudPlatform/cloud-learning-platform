@@ -7,9 +7,9 @@ from uuid import uuid4
 import sys
 from copy import deepcopy
 sys.path.append("../")
-from setup import post_method, get_method, put_method, delete_method
-from test_config import API_URL_LEARNER_PROFILE_SERVICE
-from test_object_schemas import (LEARNER_OBJECT_TEMPLATE, GOAL_OBJECT_TEMPLATE,
+from e2e.setup import post_method, get_method, put_method, delete_method
+from e2e.test_config import API_URL_LEARNER_PROFILE_SERVICE
+from e2e.test_object_schemas import (LEARNER_OBJECT_TEMPLATE, GOAL_OBJECT_TEMPLATE,
                                 ACHIEVEMENT_OBJECT_TEMPLATE, LEARNER_PROFILE_TEMPLATE)
 
 # ------------------------------ Scenario 01 -----------------------------------

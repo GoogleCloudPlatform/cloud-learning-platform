@@ -9,13 +9,13 @@ from uuid import uuid4
 
 sys.path.append("../")
 from common.models import User, AssociationGroup, CurriculumPathway
-from test_object_schemas import (TEST_ASSOCIATION_GROUP, TEST_USER,
+from e2e.test_object_schemas import (TEST_ASSOCIATION_GROUP, TEST_USER,
                                  TEST_ADD_INSTRUCTOR, TEST_REMOVE_INSTRUCTOR,
                                  TEST_CURRICULUM_PATHWAY,
                                  TEST_LEARNER_ASSOCIATION_GROUP)
-from test_config import API_URL_USER_MANAGEMENT, API_URL_LEARNING_OBJECT_SERVICE
+from e2e.test_config import API_URL_USER_MANAGEMENT, API_URL_LEARNING_OBJECT_SERVICE
 from environment import TEST_LEARNING_HIERARCHY_PATH
-from setup import post_method, get_method, put_method, delete_method
+from e2e.setup import post_method, get_method, put_method, delete_method
 
 UM_API_URL = f"{API_URL_USER_MANAGEMENT}/association-groups"
 

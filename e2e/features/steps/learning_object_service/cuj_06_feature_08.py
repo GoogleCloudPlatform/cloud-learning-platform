@@ -6,10 +6,10 @@ import sys
 from copy import copy
 
 sys.path.append("../")
-from setup import post_method, get_method, get_cache, set_cache
+from e2e.setup import post_method, get_method, get_cache, set_cache
 from environment import TEST_CONTENT_SERVING_ZIP_PATH, TEST_CONTENT_SERVING_MADCAP_V1_PATH, TEST_CONTENT_SERVING_MADCAP_V2_PATH
-from test_config import API_URL_LEARNING_OBJECT_SERVICE, DEL_KEYS
-from test_object_schemas import (TEST_LEARNING_OBJECT, TEST_LEARNING_EXPERIENCE, TEST_LEARNING_RESOURCE)
+from e2e.test_config import API_URL_LEARNING_OBJECT_SERVICE, DEL_KEYS
+from e2e.test_object_schemas import (TEST_LEARNING_OBJECT, TEST_LEARNING_EXPERIENCE, TEST_LEARNING_RESOURCE)
 
 API_URL = API_URL_LEARNING_OBJECT_SERVICE
 LEARNING_RESOURCE_UUID=""

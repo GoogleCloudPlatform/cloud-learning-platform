@@ -7,12 +7,12 @@ import behave
 import sys
 from uuid import uuid4
 sys.path.append("../")
-from setup import post_method, get_method, put_method, delete_method
+from e2e.setup import post_method, get_method, put_method, delete_method
 from copy import deepcopy
-from test_config import API_URL_LEARNING_RECORD_SERVICE
+from e2e.test_config import API_URL_LEARNING_RECORD_SERVICE
 
-from test_object_schemas import TEST_ACTIVITY
-from test_config import API_URL_LEARNING_RECORD_SERVICE, TESTING_OBJECTS_PATH
+from e2e.test_object_schemas import TEST_ACTIVITY
+from e2e.test_config import API_URL_LEARNING_RECORD_SERVICE, TESTING_OBJECTS_PATH
 
 #-----------------------------------------CREATE ACTIVITY----------------------------------------------------------
 # --- Positive Scenario ---

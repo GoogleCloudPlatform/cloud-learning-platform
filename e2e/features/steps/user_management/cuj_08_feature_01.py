@@ -10,9 +10,9 @@ from uuid import uuid4
 
 sys.path.append("../")
 from common.models import Action
-from test_object_schemas import TEST_MODULE, TEST_ACTION
-from test_config import API_URL_USER_MANAGEMENT as UM_API_URL
-from setup import post_method, get_method, put_method, delete_method
+from e2e.test_object_schemas import TEST_MODULE, TEST_ACTION
+from e2e.test_config import API_URL_USER_MANAGEMENT as UM_API_URL
+from e2e.setup import post_method, get_method, put_method, delete_method
 
 
 @given("user wants to create module in user management with correct "

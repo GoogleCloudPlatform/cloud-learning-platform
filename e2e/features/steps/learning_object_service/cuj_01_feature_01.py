@@ -9,9 +9,9 @@ from copy import copy
 from common.models import LearningExperience, LearningObject, LearningResource
 import sys
 sys.path.append("../")
-from setup import post_method, get_method, put_method, delete_method
-from test_config import API_URL_LEARNING_OBJECT_SERVICE, TESTING_OBJECTS_PATH, DEL_KEYS
-from test_object_schemas import (TEST_LEARNING_OBJECT, TEST_LEARNING_EXPERIENCE, TEST_LEARNING_RESOURCE)
+from e2e.setup import post_method, get_method, put_method, delete_method
+from e2e.test_config import API_URL_LEARNING_OBJECT_SERVICE, TESTING_OBJECTS_PATH, DEL_KEYS
+from e2e.test_object_schemas import (TEST_LEARNING_OBJECT, TEST_LEARNING_EXPERIENCE, TEST_LEARNING_RESOURCE)
 
 
 API_URL = API_URL_LEARNING_OBJECT_SERVICE

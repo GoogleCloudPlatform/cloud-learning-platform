@@ -8,10 +8,10 @@ from uuid import uuid4
 
 sys.path.append("../")
 from common.models import AssociationGroup
-from test_object_schemas import TEST_USER, TEST_ASSOCIATION_GROUP, TEST_CURRICULUM_PATHWAY
+from e2e.test_object_schemas import TEST_USER, TEST_ASSOCIATION_GROUP, TEST_CURRICULUM_PATHWAY
 from environment import TEST_USER_MANAGEMENT_PATH
-from test_config import (API_URL_USER_MANAGEMENT as UM_API_URL, API_URL_LEARNING_OBJECT_SERVICE as LOS_API_URL)
-from setup import post_method, get_method, put_method
+from e2e.test_config import (API_URL_USER_MANAGEMENT as UM_API_URL, API_URL_LEARNING_OBJECT_SERVICE as LOS_API_URL)
+from e2e.setup import post_method, get_method, put_method
 
 # -----------------------------------------------------
 # Scenario 1: User wants to upload a learning content file with sync api

@@ -10,10 +10,10 @@ from uuid import uuid4
 from copy import deepcopy
 
 sys.path.append("../")
-from test_object_schemas import TEST_PERMISSION, TEST_ACTION, TEST_MODULE, \
+from e2e.test_object_schemas import TEST_PERMISSION, TEST_ACTION, TEST_MODULE, \
   TEST_APPLICATION, TEST_USER_GROUP
-from test_config import API_URL_USER_MANAGEMENT as UM_API_URL
-from setup import post_method, get_method, put_method, delete_method
+from e2e.test_config import API_URL_USER_MANAGEMENT as UM_API_URL
+from e2e.setup import post_method, get_method, put_method, delete_method
 
 group_name = uuid4()
 

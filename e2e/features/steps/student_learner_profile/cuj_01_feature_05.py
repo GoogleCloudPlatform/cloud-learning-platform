@@ -2,10 +2,10 @@
 For the given learner get the curriculum pathway
 """
 
-from setup import post_method, get_method, delete_method, put_method
+from e2e.setup import post_method, get_method, delete_method, put_method
 from copy import copy, deepcopy
-from test_config import DEL_KEYS, API_URL_LEARNER_PROFILE_SERVICE, API_URL_LEARNING_OBJECT_SERVICE, API_URL_USER_MANAGEMENT as UM_API_URL
-from test_object_schemas import (TEST_USER, TEST_CURRICULUM_PATHWAY,
+from e2e.test_config import DEL_KEYS, API_URL_LEARNER_PROFILE_SERVICE, API_URL_LEARNING_OBJECT_SERVICE, API_URL_USER_MANAGEMENT as UM_API_URL
+from e2e.test_object_schemas import (TEST_USER, TEST_CURRICULUM_PATHWAY,
                                  TEST_ASSOCIATION_GROUP)
 import behave
 import sys

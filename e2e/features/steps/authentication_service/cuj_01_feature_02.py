@@ -9,10 +9,10 @@ from copy import deepcopy
 import sys
 
 sys.path.append("../")
-from setup import post_method, set_cache, get_cache
-from test_config import (API_URL_AUTHENTICATION_SERVICE,
+from e2e.setup import post_method, set_cache, get_cache
+from e2e.test_config import (API_URL_AUTHENTICATION_SERVICE,
                          API_URL_USER_MANAGEMENT)
-from test_object_schemas import (TEST_SIGN_UP, TEST_USER)
+from e2e.test_object_schemas import (TEST_SIGN_UP, TEST_USER)
 
 API_URL = API_URL_AUTHENTICATION_SERVICE
 
