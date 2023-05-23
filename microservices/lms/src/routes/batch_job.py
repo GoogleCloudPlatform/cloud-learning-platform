@@ -11,7 +11,7 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 
 router = APIRouter(
-    prefix="/batch_jobs",
+    prefix="/batch-jobs",
     tags=["Batch Jobs"],
     responses={
         500: {
@@ -36,7 +36,7 @@ def get_batch_jobs_list(skip: int = 0, limit: int = 10):
         HTTPException: 500 Internal Server Error if something fails.
 
     Returns:
-        BatchJobsListResponseModel: object which contains list of Batch jobs object.
+        BatchJobsListResponseModel: list of Batch jobs objects.
         InternalServerErrorResponseModel:
             if the get batch jobs list raises an exception.
     """

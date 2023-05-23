@@ -1,0 +1,54 @@
+<h3 mat-dialog-title style="font-size: 25px;"><b>Logs</b></h3>
+<div mat-dialog-content style="padding-bottom: 4%;padding-top: 1%;">
+    <div>
+        <div>
+            <p style="display: flex;color: red;font-size: 20px;">
+                <span class="material-symbols-rounded" style="padding-right: 10px;font-size: 25px;">
+                    error
+                </span>
+                <b>
+                    Errors
+                </b>
+            </p>
+            <ul>
+                <div *ngIf="logData.errors?.length > 0;then listErrorMsgs else listNoErrorsMsg">here is ignored</div>
+                <ng-template #listErrorMsgs>
+                    <li class="log-list-items" *ngFor="let item of logData.errors">
+                        {{item}}
+                    </li>
+                </ng-template>
+                <ng-template #listNoErrorsMsg>
+                    <li class="log-list-items">
+                        No Errors
+                    </li>
+                </ng-template>
+            </ul>
+        </div>
+        <div>
+            <p style="display: flex;color: rgb(104, 92, 216);font-size: 20px">
+                <span class="material-symbols-rounded" style="padding-right: 10px;font-size: 25px">
+                    info
+                </span>
+                <b>
+                    Info
+                </b>
+            </p>
+            <ul>
+                <div *ngIf="logData.info?.length > 0;then listInfoMsgs else listNoInfoMsg">here is ignored</div>
+                <ng-template #listInfoMsgs>
+                    <li class="log-list-items" *ngFor="let item of logData.info">
+                        {{item}}
+                    </li>
+                </ng-template>
+                <ng-template #listNoInfoMsg>
+                    <li class="log-list-items">
+                        No Info msgs logged
+                    </li>
+                </ng-template>
+            </ul>
+        </div>
+    </div>
+</div>
+<div mat-dialog-actions style="display: flex;justify-content: end;">
+    <button mat-flat-button (click)="onNoClick()">Close</button>
+</div>

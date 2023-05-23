@@ -223,7 +223,7 @@ def copy_course_background_task(course_template_details,
             logs["errors"].append(error_msg)
             Logger.error(error_msg)
 
-          logs["info"].append(error_msg)
+          logs["info"].append(f"Updated the course work id for new LTI assignment - {assignment_id}")
           Logger.info(f"Updated the course work id for new LTI assignment - {assignment_id}")
 
       except Exception as error:
@@ -405,7 +405,7 @@ def update_coursework_material(materials,url_mapping,target_folder_id,coursework
               logs["info"].append(f"LTI Course copy completed for assignment - {lti_assignment_id}")
               Logger.info(f"LTI Course copy completed for assignment - {lti_assignment_id}")
             else:
-              logs["info"](f"LTI Course copy failed for assignment - {lti_assignment_id}")
+              logs["info"].append(f"LTI Course copy failed for assignment - {lti_assignment_id}")
               error_msg = f"Copying an LTI Assignment failed for {lti_assignment_id}\
                            in the new section {lti_assignment_details.get('section_id')} with status code: \
                            {copy_assignment.status_code} and error msg: {copy_assignment.text}"

@@ -136,7 +136,7 @@ export class CreateSectionComponent implements OnInit {
           this.dialogRef.close({ data: 'success' });
           const successOverviewDialogRef = this.dialog.open(SuccessOverviewDialog, {
             width: '500px',
-            data: "Section creation in progress"
+            data: res.message
           });
         }
         else {

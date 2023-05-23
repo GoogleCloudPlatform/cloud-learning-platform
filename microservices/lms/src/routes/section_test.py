@@ -521,8 +521,8 @@ return_value={"https://docs.google.com/forms/d/e/1FAIpQL":
           resp = client_with_emulator.patch(url)
   result_json = resp.json()
   assert resp.status_code == 202, "Status 202"
-  assert result_json[
-    "message"] == "Grades for coursework will be updated shortly","message"
+  assert "Grades for coursework will be updated shortly" in result_json[
+    "message"] ,"message"
 
 
 def test_form_grade_import_form_with_response(client_with_emulator,
@@ -548,5 +548,5 @@ return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
               resp = client_with_emulator.patch(url)
   resp_json = resp.json()
   assert resp.status_code == 202, "Status 202"
-  assert resp_json[
-    "message"] == "Grades for coursework will be updated shortly","message"
+  assert "Grades for coursework will be updated shortly" in resp_json[
+    "message"] ,"message"

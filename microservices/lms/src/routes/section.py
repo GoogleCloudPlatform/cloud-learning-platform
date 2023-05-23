@@ -116,9 +116,12 @@ def create_section(sections_details: SectionDetails,
     batch_job.logs["info"].append(info_msg)
     batch_job.update()
 
-    return { "success": True,
-            "message": f"Section will be created shortly, use this job id - {batch_job.id} for more info",
-            "data": None}
+    return {
+        "success": True,
+        "message": "Section will be created shortly, " +
+                    f"use this job id - '{batch_job.id}' for more info",
+        "data": None
+    }
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -584,7 +587,10 @@ def import_grade(section_id: str,coursework_id:str,
 
       if is_google_form_present:
         return {
-           "message":f"Grades for coursework will be updated shortly, use this job id {batch_job.id} for more info"}
+            "message":
+                "Grades for coursework will be updated shortly, " +
+                f"use this job id {batch_job.id} for more info"
+        }
       else:
         raise ResourceNotFoundException(
           f"Form is not present for coursework_id {coursework_id}"
