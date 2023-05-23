@@ -30,6 +30,7 @@ requires:
 - path: ./microservices/lti
   configs: [lti]
 
+# Commenting llm service due to deployment error in Longchain package
 # - path: ./microservices/llm_service
 #   configs: [llm-service]
 
