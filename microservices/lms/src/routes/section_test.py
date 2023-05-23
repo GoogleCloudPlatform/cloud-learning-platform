@@ -565,6 +565,7 @@ def test_delete_section_cronjob(client_with_emulator,
         "routes.section.classroom_crud.delete_course_by_id"):
           resp = client_with_emulator.post(url)
   resp_json = resp.json()
+  print(f"This is response json {resp_json}")
   assert resp.status_code == 200, "Status 200"
   assert resp_json[
     "message"] == "Successfully archived the Section with id 1","message"
