@@ -61,6 +61,8 @@ def step_impl_5(context):
     "Existing course details will be fetch and using that details new course will be created and Copy course will send the details of new course"
 )
 def step_impl_6(context):
+  print(f'_________________Status:{context.status}________________')
+  print(f'_________________Response:{context.response}________________')
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 

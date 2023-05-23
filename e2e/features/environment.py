@@ -12,8 +12,8 @@ from googleapiclient.discovery import build
 from e2e.test_config import API_URL_AUTHENTICATION_SERVICE,API_URL,e2e_google_form_id
 from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,\
   get_student_email_and_token,\
-  get_required_emails_from_secret_manager,create_coursework\
-  ,get_gmail_student_email_and_token
+  get_required_emails_from_secret_manager,create_coursework,create_google_form,\
+get_file,get_gmail_student_email_and_token,insert_file_into_folder
 
 from e2e.utils.course_template import COURSE_TEMPLATE_INPUT_DATA
 from e2e.utils.user import TEST_USER

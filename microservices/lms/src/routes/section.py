@@ -247,6 +247,9 @@ def delete_section(section_id: str):
     section_details = Section.find_by_id(section_id)
     classroom_crud.update_course_state(section_details.classroom_id,\
       "ARCHIVED")
+    section_details.status = "ARCHIVED"
+    section_details.enrollment_status="CLOSED"
+    section_details.update()
     Section.soft_delete_by_id(section_id)
     return {
         "message": f"Successfully archived the Section with id {section_id}"
@@ -361,6 +364,7 @@ def update_section(sections_details: UpdateSection,request: Request):
         "description":sections_details.description,\
           "cohortId":updated_section["cohort"].split("/")[1],\
           "courseTemplateId":updated_section["course_template"].split("/")[1],\
+            "status":section.status,
           "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(
@@ -533,7 +537,7 @@ def import_grade(section_id: str,coursework_id:str,
     section = Section.find_by_id(section_id)
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
-
+    #Get url mapping of google forms view links and edit ids
     is_google_form_present = False
     if "materials" in result.keys():
       for material in result["materials"]:
@@ -570,4 +574,5 @@ def import_grade(section_id: str,coursework_id:str,
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
     raise InternalServerError(str(e)) from e
+
 
