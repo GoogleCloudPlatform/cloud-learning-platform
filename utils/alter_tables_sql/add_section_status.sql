@@ -1,0 +1,1 @@
+ALTER TABLE section ADD COLUMN IF NOT EXISTS `status` STRING OPTIONS(description = "Status of the section");

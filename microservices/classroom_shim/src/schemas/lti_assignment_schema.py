@@ -46,6 +46,7 @@ class UpdateLTIAssignmentModel(BaseModel):
   lti_assignment_title: Optional[str]
   lti_content_item_id: Optional[str]
   tool_id: Optional[str]
+  course_work_id: Optional[str]
   max_points: Optional[float]
   start_date: Optional[datetime.datetime]
   end_date: Optional[datetime.datetime]

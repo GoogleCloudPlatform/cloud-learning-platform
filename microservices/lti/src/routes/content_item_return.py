@@ -2,7 +2,7 @@
 import traceback
 from copy import deepcopy
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, Form
 from fastapi.templating import Jinja2Templates
 from common.models import Tool
 from common.utils.errors import ResourceNotFoundException
@@ -30,9 +30,7 @@ router = APIRouter(
         "model": NotFoundErrorResponseModel
     }},
     name="DeepLinking Response API for Content Item")
-def content_item_return(request: Request,
-                        JWT: str = Form(),
-                        context_id: str = None):
+def content_item_return(JWT: str = Form(), context_id: str = None):
   """
     This endpoint which will be used by tool for sending deep linking response
     for content selection.
