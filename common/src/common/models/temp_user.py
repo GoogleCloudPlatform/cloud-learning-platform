@@ -19,7 +19,8 @@ import os
 from datetime import datetime
 import fireo
 from fireo.models import Model
-from fireo.fields import DateTime, TextField, NumberField, ListField, BooleanField
+from fireo.fields import DateTime, TextField, NumberField, ListField, \
+  BooleanField,MapField
 from common.utils.errors import ResourceNotFoundException
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
@@ -28,7 +29,9 @@ PROJECT_ID = os.environ.get("PROJECT_ID", "")
 
 def check_user_type(field_val):
   """validator method for user type field"""
-  user_types = ["learner", "faculty", "other"]
+  user_types = ["learner", "faculty", "robot",
+            "assessor", "admin", "coach", "instructor",
+              "lxe", "curriculum_designer"]
   if field_val.lower() in user_types:
     return True
   return (False, "User Type must be one of " +
@@ -173,7 +176,7 @@ class TempUser(TempBaseModel):
   last_name = TextField(required=True)
   email = TextField(required=True)
   user_type = TextField(required=True, validator=check_user_type)
-  user_type_ref = TextField()
+  user_type_ref = TextField(default="")
   user_groups = ListField()
   status = TextField(validator=check_status)
   is_registered = BooleanField()
@@ -181,6 +184,9 @@ class TempUser(TempBaseModel):
   access_api_docs = BooleanField(default=False)
   gaia_id = TextField()
   photo_url = TextField()
+  is_deleted = BooleanField(default=False)
+  inspace_user = MapField(default={})
+
   class Meta:
     collection_name = TempBaseModel.DATABASE_PREFIX + "users"
     ignore_none_field = False

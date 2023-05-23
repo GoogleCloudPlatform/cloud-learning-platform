@@ -7,14 +7,17 @@ const routes: Routes = [
   {
     path: 'login',
     loadChildren: () => import('./login/login.module').then(m => m.LoginModule),
-
   },
   {
     path: 'home',
     canActivate: [AuthGuard],
     loadChildren: () => import('./home/home.module').then(m => m.HomeModule),
-
   },
+  {
+    path: 'lti',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./lti/lti.module').then(m => m.LtiModule),
+  }
 ];
 
 @NgModule({

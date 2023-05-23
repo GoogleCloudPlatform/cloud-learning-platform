@@ -95,7 +95,7 @@ def test_create_section(client_with_emulator, create_fake_data):
         with mock.patch(
           "services.section_service.classroom_crud.create_topics"):
           with mock.patch(
-        "services.section_service.classroom_crud.get_coursework"):
+        "services.section_service.classroom_crud.get_coursework_list"):
             with mock.patch(
                 "services.section_service.classroom_crud.create_coursework"):
               with mock.patch(
@@ -115,7 +115,7 @@ def test_create_section(client_with_emulator, create_fake_data):
                           with mock.patch(
                       "services.section_service.common_service.create_teacher"):
                             with mock.patch(
-          "services.section_service.classroom_crud.get_coursework_material"):
+      "services.section_service.classroom_crud.get_coursework_material_list"):
                               with mock.patch(
           "services.section_service.classroom_crud.create_coursework_material"):
                                 with mock.patch(
@@ -151,7 +151,7 @@ def test_create_section_course_template_not_found(client_with_emulator,
                     return_value=mock_return_course):
       with mock.patch("routes.section.classroom_crud.get_topics"):
         with mock.patch("routes.section.classroom_crud.create_topics"):
-          with mock.patch("routes.section.classroom_crud.get_coursework"):
+          with mock.patch("routes.section.classroom_crud.get_coursework_list"):
             with mock.patch(
                 "routes.section.classroom_crud.create_coursework"):
               with mock.patch("routes.section.classroom_crud.invite_user"):
@@ -163,7 +163,7 @@ def test_create_section_course_template_not_found(client_with_emulator,
                     with mock.patch(
             "routes.section.common_service.create_teacher"):
                       with mock.patch(
-            "routes.section.classroom_crud.get_coursework_material"):
+            "routes.section.classroom_crud.get_coursework_material_list"):
                         with mock.patch(
             "routes.section.classroom_crud.create_coursework_material"):
                           with mock.patch(
@@ -199,7 +199,7 @@ def test_create_section_cohort_not_found(client_with_emulator,
                     return_value=mock_return_course):
       with mock.patch("routes.section.classroom_crud.get_topics"):
         with mock.patch("routes.section.classroom_crud.create_topics"):
-          with mock.patch("routes.section.classroom_crud.get_coursework"):
+          with mock.patch("routes.section.classroom_crud.get_coursework_list"):
             with mock.patch(
                 "routes.section.classroom_crud.create_coursework"):
               with mock.patch("routes.section.classroom_crud.acceept_invite"):
@@ -211,7 +211,7 @@ def test_create_section_cohort_not_found(client_with_emulator,
                     with mock.patch(
         "routes.section.common_service.create_teacher"):
                       with mock.patch(
-              "routes.section.classroom_crud.get_coursework_material"):
+              "routes.section.classroom_crud.get_coursework_material_list"):
                         with mock.patch(
                 "routes.section.classroom_crud.create_coursework_material"):
                           with mock.patch(
@@ -520,9 +520,9 @@ return_value={"https://docs.google.com/forms/d/e/1FAIpQL":
                   return_value={}):
           resp = client_with_emulator.patch(url)
   result_json = resp.json()
-  assert resp.status_code == 404, "Status 404"
+  assert resp.status_code == 202, "Status 202"
   assert result_json[
-    "message"] == "Responses not available for google form","message"
+    "message"] == "Grades for coursework will be updated shortly","message"
 
 
 def test_form_grade_import_form_with_response(client_with_emulator,

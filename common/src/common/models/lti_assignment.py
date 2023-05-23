@@ -14,16 +14,29 @@
 """
 Module to add lti assignment in FireO
 """
-from fireo.fields import TextField, DateTime, NumberField, IDField
+from fireo.fields import TextField, DateTime, NumberField, IDField, ListField
 from common.models import BaseModel
+
+
+def check_context_type(field_val):
+  """validator method for context type field"""
+  context_types = ["section", "course_template"]
+  if field_val.lower() in context_types:
+    return True
+  return (False, "Context Type must be one of " +
+          ",".join("'" + i + "'" for i in context_types))
 
 
 class LTIAssignment(BaseModel):
   """LTI Assignment Data Model"""
   id = IDField()
-  section_id = TextField(required=True)
   lti_assignment_title = TextField()
+  context_type = TextField(
+      required=True, default="section", validator=check_context_type)
+  context_id = TextField(required=True)
+  prev_context_ids = ListField(default=[])
   lti_content_item_id = TextField()
+  prev_content_item_ids = ListField(default=[])
   tool_id = TextField()
   course_work_id = TextField()
   max_points = NumberField()
