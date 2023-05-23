@@ -111,7 +111,7 @@ export class CreateAssignmentComponent {
     ltiModalData['init_data'] = ''
     ltiModalData['extra_data'] = {
       contextId: this.dialogData.extra_data.contextId,
-      contextType: "course_template",
+      contextType: this.dialogData.page,
       toolId: this.ltiAssignmentForm.value['tool_id'],
       userId: "vcmt4ZemmyFm59rDzl1U"
     }
