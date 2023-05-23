@@ -5,6 +5,7 @@ import { LtiService } from '../service/lti.service';
 import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { ContentSelectorComponent } from '../content-selector/content-selector.component';
 import { HomeService } from 'src/app/home/service/home.service';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 interface LooseObject {
   [key: string]: any
 }
@@ -19,6 +20,7 @@ export class CreateAssignmentComponent {
   showProgressSpinner: boolean = false
   selectedTool: any
   constructor(
+    private _snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<CreateAssignmentComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     public dialog: MatDialog,
@@ -26,6 +28,7 @@ export class CreateAssignmentComponent {
 
   ngOnInit() {
     this.getAllTools()
+    console.log('dialog data',this.dialogData)
     if (this.dialogData.mode == "Create") {
       this.ltiAssignmentForm = this.fb.group({
         "tool_id": [null, Validators.required],
@@ -50,7 +53,8 @@ export class CreateAssignmentComponent {
   }
 
   onDropdownChange() {
-    console.log(this.ltiAssignmentForm.value)
+    console.log(this.ltiAssignmentForm.value['tool_id'])
+    // this.selectedTool = tool
 
   }
 
@@ -93,31 +97,43 @@ export class CreateAssignmentComponent {
     })
   }
 
-  openContentSelector(ltiAssignmentForm) {
-    console.log(ltiAssignmentForm.value)
+  openFailureSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 6000,
+      panelClass: ['red-snackbar'],
+    });
+  }
+
+  openContentSelector() {
+    if(this.ltiAssignmentForm.value['tool_id'] != null){
     let ltiModalData: LooseObject = {}
     ltiModalData['mode'] = 'Open'
     ltiModalData['init_data'] = ''
     ltiModalData['extra_data'] = {
-      contextId: this.dialogData.extra_data.courseTemplateId,
+      contextId: this.dialogData.extra_data.contextId,
       contextType: "course_template",
-      toolId: ltiAssignmentForm.value.tool_id,
+      toolId: this.ltiAssignmentForm.value['tool_id'],
       userId: "vcmt4ZemmyFm59rDzl1U"
     }
 
     const dialogRef = this.dialog.open(ContentSelectorComponent, {
-      width: '80vw',
       maxWidth: '750px',
-      maxHeight: "90vh",
       data: ltiModalData
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result.data.status == "success") {
-        this.ltiAssignmentForm.get("lti_content_item_id").setValue(result.data.response[0].lti_content_item_id)
+      if (result.data) {
+        this.ltiAssignmentForm.get("lti_content_item_id").setValue(result.data)
+        if(localStorage.getItem("contentItemId")){
+          localStorage.removeItem('contentItemId')
+        }
       }
       console.log("result", result)
     });
+  }
+  else{
+    this.openFailureSnackBar('please select a tool','Error')
+  }
   }
 
   getAllTools() {

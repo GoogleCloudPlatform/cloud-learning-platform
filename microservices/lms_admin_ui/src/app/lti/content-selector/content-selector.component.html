@@ -1,8 +1,9 @@
-<p>content-selector works!</p>
 <div *ngIf="loadingIframe">
     <ngx-skeleton-loader count="1" [theme]="{'height': '500px','margin-bottom':'30px', 'background-color': '#EAEAEA'}">
     </ngx-skeleton-loader>
 </div>
 <div *ngIf="!loadingIframe">
-    <iframe [src]="getUrl(iframeUrl)" frameborder="0" width="500px" height="500px"></iframe>
+    <iframe id="ltiIframe" [src]="getUrl(iframeUrl)" frameborder="0" width="500px" height="500px"></iframe>
+    <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/HiwrwQ8tPtc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> -->
 </div>
+<button id="getContentButton" mat-flat-button color="primary" [disabled]="isContentItemId" (click)="get_content_item_id()">Copy content item id</button>

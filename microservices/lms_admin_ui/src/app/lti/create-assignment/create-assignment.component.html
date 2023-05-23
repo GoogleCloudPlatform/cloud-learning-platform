@@ -25,7 +25,10 @@
         <div>
             <mat-form-field appearance="fill" style="width: 100%">
                 <mat-label>LTI Content item id</mat-label>
-                <input formControlName="lti_content_item_id" matInput>
+                <div class="contentItemIdRow">
+                    <input style="width: 80%;" formControlName="lti_content_item_id" matInput>
+                <button mat-flat-button color="primary" (click)="openContentSelector()">Select Content</button>
+            </div>
             </mat-form-field>
         </div>
 
@@ -68,7 +71,7 @@
         </ngx-skeleton-loader> -->
 
         <!-- <div>
-            <button mat-flat-button color="primary" (click)="openContentSelector(ltiAssignmentForm)">Select Content</button>
+            <button mat-flat-button color="primary" (click)="openContentSelector()">Select Content</button>
         </div> -->
         <div mat-dialog-actions style="display: flex;justify-content: end;">
             <button mat-flat-button (click)="onNoClick()">Cancel</button>
