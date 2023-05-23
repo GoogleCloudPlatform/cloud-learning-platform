@@ -260,8 +260,11 @@ def update_course_template(
                                  description=course_template.description,
                                  course_name=course_template.name)
     course_template.update()
-    list_instructional_designers=CourseTemplateEnrollmentMapping\
+    list_enrollment_mapping=CourseTemplateEnrollmentMapping\
       .fetch_all_by_course_template(course_template.key)
+    list_instructional_designers = [
+        i.user.email for i in list_enrollment_mapping
+    ]
     rows = [{
         "courseTemplateId": course_template_id,
         "classroomId": course_template.classroom_id,
@@ -395,8 +398,11 @@ def add_instructional_designer(
     course_template_enrollment.invitation_id = invitation_id
     course_template_enrollment.role = "faculty"
     course_template_enrollment.save()
-    list_instructional_designers=CourseTemplateEnrollmentMapping\
+    list_enrollment_mapping=CourseTemplateEnrollmentMapping\
       .fetch_all_by_course_template(course_template.key)
+    list_instructional_designers = [
+        i.user.email for i in list_enrollment_mapping
+    ]
     rows = [{
         "courseTemplateId": course_template_id,
         "classroomId": course_template.classroom_id,
@@ -465,8 +471,9 @@ def delete_instructional_designer(course_template_id: str,
                                   result.user.email)
     result.status = "inactive"
     result.update()
-    list_instructional_designers=CourseTemplateEnrollmentMapping\
+    list_enrollment_mapping=CourseTemplateEnrollmentMapping\
       .fetch_all_by_course_template(course_template.key)
+    list_instructional_designers=[i.user.email for i in list_enrollment_mapping]
     rows = [{
         "courseTemplateId": course_template_id,
         "classroomId": course_template.classroom_id,
