@@ -15,8 +15,7 @@
 name: GKE - Deploy microservices to dev
 on:
   push:
-    branches:
-      - main
+    branches: [ "main"]
     paths:
       - 'microservices/**'
       - 'common/**'
