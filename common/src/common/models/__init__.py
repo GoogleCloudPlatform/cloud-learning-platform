@@ -33,3 +33,6 @@ from .learning_object import *
 from .staff import *
 from .learning_record import *
 from .learner_profile import *
+from .assessment import *
+from .knowledge import *
+from .skill import *
