@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learning-record-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: learning-record-service
+  template:
+    metadata:
+      labels:
+        app: learning-record-service
+    spec:
+      containers:
+      - name: learning-record-service
+        image: learning-record-service
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1000Mi"
+          limits:
+            memory: "5000Mi"
+            cpu: "2000m"
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60

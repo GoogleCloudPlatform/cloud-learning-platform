@@ -1,20 +1,21 @@
 """Session Data Model"""
 
-from fireo.fields import (TextField, MapField)
-from common.models import TempBaseModel
+from fireo.fields import (TextField, MapField, BooleanField)
+from common.models import BaseModel
 from common.utils.errors import ResourceNotFoundException
 
 
-class Session(TempBaseModel):
+class Session(BaseModel):
   """Data model class for Learner Profile"""
   # schema for object
   session_id = TextField(required=True)
   user_id = TextField(required=True)
   parent_session_id = TextField(default=None)
   session_data = MapField(default=None)
+  is_expired = BooleanField(default=False)
 
   class Meta:
-    collection_name = TempBaseModel.DATABASE_PREFIX + "v3_sessions"
+    collection_name = BaseModel.DATABASE_PREFIX + "v3_sessions"
     ignore_none_field = False
 
   @classmethod

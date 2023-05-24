@@ -7,18 +7,15 @@ from google.cloud import secretmanager
 from datetime import datetime, timedelta
 
 from common.models.user import User
+from common.utils.config import STAFF_USERS
 from common.utils.logging_handler import Logger
 from common.utils.jwt_token_generator import TokenGenerator
 
-# pylint: disable=broad-except
-# pylint: disable = broad-exception-raised
-
-STAFF_USERS = ["assessor", "instructor", "coach"]
+# pylint: disable = broad-exception-raised,broad-exception-caught
 
 secrets = secretmanager.SecretManagerServiceClient()
 
 GCP_PROJECT = os.environ.get("PROJECT_ID")
-
 INSPACE_BASE_URL = os.getenv("INSPACE_BASE_URL", default=None)
 
 if INSPACE_BASE_URL is not None:
