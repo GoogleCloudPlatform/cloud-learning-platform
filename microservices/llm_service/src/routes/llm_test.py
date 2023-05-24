@@ -23,7 +23,7 @@ os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 os.environ["OPENAI_API_KEY"] = "fake-key"
 os.environ["COHERE_API_KEY"] = "fake-key"
 
-# Commenting these imports and unit test since some packages 
+# Commenting these imports and unit test since some packages
 # have breaking changes which are causing unit test failures
 
 # with mock.patch(
