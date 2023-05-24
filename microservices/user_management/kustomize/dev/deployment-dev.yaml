@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-management
+spec:
+  replicas: 1
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: user-management
+        image: gcr.io/core-learning-services-dev/user-management
+        imagePullPolicy: Always

@@ -21,6 +21,7 @@ LOS_LITERALS = {
 
 
 def check_type(level):
+  """Function to check type"""
   allowed_types = LOS_LITERALS[level + "_TYPES"]
 
   def _check_type(field_val):
@@ -34,6 +35,7 @@ def check_type(level):
 
 
 def check_alias(level):
+  """Function to check alias"""
   allowed_aliases = LOS_LITERALS[level + "_ALIASES"]
 
   def _check_alias(field_val):

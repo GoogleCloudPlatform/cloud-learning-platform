@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-learner-profile
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: student-learner-profile
+        image: gcr.io/aitutor-dev/student-learner-profile
+        imagePullPolicy: Always
+        env:
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX

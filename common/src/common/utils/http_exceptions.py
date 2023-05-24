@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 
+
 # pylint: disable=unused-argument
 
 
@@ -36,23 +37,25 @@ def add_exception_handlers(app: FastAPI):
   @app.exception_handler(CustomHTTPException)
   async def generic_exception_handler(req: Request, exc: CustomHTTPException):
     return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "success": False,
-            "message": exc.message,
-            "data": exc.data
-        })
+      status_code=exc.status_code,
+      content={
+        "success": False,
+        "message": exc.message,
+        "data": exc.data
+      })
 
   @app.exception_handler(RequestValidationError)
   async def pydantic_exception_handler(req: Request,
                                        exc: RequestValidationError):
     return JSONResponse(
-        status_code=422,
-        content={
-            "success": False,
-            "message": "Validation Failed",
-            "data": exc.errors()
-        })
+      status_code=422,
+      content={
+        "success": False,
+        "message": "Validation Failed",
+        "data": exc.errors()
+      })
+
+
 
 
 class ClassroomHttpException(CustomHTTPException):
@@ -203,3 +206,14 @@ class ServiceUnavailable(CustomHTTPException):
   def __init__(self, message: str = "Connection Error"):
     super().__init__(status_code=503, message=message, success=False, data=None)
 
+
+class APINotImplemented(CustomHTTPException):
+  """Exception raised for not implemented methods.
+  API method not implemented on the server.
+
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "API Not Implemented"):
+    super().__init__(status_code=501, message=message, success=False, data=None)

@@ -6,13 +6,15 @@ from common.models import (
     KnowledgeServiceLearningObjective, KnowledgeServiceLearningUnit, Skill,
     SkillServiceCompetency, Category, Domain, SubDomain, Achievement,
     Assessment, SubmittedAssessment, User, UserGroup, Action, Permission,
-    Module, Application, Activity, Agent)
+    Module, Application, Activity, Agent, Rubric,RubricCriterion)
 
 collection_references = {
     # Assessment Service
     "assessment_items": AssessmentItem,
     "assessments": Assessment,
     "submitted_assessments": SubmittedAssessment,
+    "rubric_criteria": RubricCriterion,
+    "rubrics": Rubric,
     # Learning Object Service
     "learning_resources": LearningResource,
     "learning_objects": LearningObject,

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-learner-profile
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: student-learner-profile
+        image: student-learner-profile
+        imagePullPolicy: Always
+        env:
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: EXTERNAL_DATA_GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: EXTERNAL_DATA_GCP_PROJECT

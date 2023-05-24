@@ -88,6 +88,10 @@
                         </th>
                         <td mat-cell *matCellDef="let element;let i = index">
                             <span class="material-symbols-rounded" style="cursor: pointer; margin-right: 8px;"
+                                (click)="openViewAssignmentsDialog(element.id, element)">
+                                visibility
+                            </span>
+                            <span class="material-symbols-rounded" style="cursor: pointer; margin-right: 8px;"
                                 (click)="openUpdateDialog(element.id, element)">
                                 edit
                             </span>

@@ -88,3 +88,10 @@ class InternalServerError(Exception):
   def __init__(self, message="Internal Server Error"):
     self.message = message
     super().__init__(self.message)
+
+class InvalidCredentialsError(Exception):
+  """Error class to be raised when invalid/incorrect credentials are passed"""
+
+  def __init__(self, message="Invalid credentials"):
+    self.message = message
+    super().__init__(self.message)

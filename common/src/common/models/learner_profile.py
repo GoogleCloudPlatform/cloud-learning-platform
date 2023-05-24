@@ -240,6 +240,7 @@ class LearnerProfile(NodeItem):
 
   @classmethod
   def create_object(cls, input_learner_profile_dict):
+    """Function to create learner object"""
     new_learner_profile = cls()
     learner = Learner.collection.filter(
         "uuid", "==", input_learner_profile_dict["learner_id"]).get()
@@ -343,6 +344,7 @@ class Achievement(NodeItem):
 
   @classmethod
   def create_object(cls, input_achievement_dict):
+    """Function to create new achievement object"""
     new_achievement = cls()
     new_achievement = new_achievement.from_dict(input_achievement_dict)
     new_achievement.uuid = ""

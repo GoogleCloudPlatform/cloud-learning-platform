@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-learner-profile
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: student-learner-profile
+  template:
+    metadata:
+      labels:
+        app: student-learner-profile
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: student-learner-profile
+        image: student-learner-profile
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1000Mi"
+          limits:
+            memory: "5000Mi"
+            cpu: "2000m"
+        env:
+        # Define the environment variable
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60

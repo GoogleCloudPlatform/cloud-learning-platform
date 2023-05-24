@@ -151,6 +151,7 @@ class ParentChildNodesHandler():
 
   @classmethod
   def recent_child_node(cls, nodes, parent_node):
+    """Function to fetch recent child node"""
     attempted_nodes = []
     unattempted_nodes = []
     for node in nodes:
