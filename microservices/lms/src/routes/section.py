@@ -251,6 +251,20 @@ def delete_section(section_id: str):
     section_details.enrollment_status="CLOSED"
     section_details.update()
     Section.soft_delete_by_id(section_id)
+    rows=[{
+      "sectionId":section_details.id,
+      "courseId":section_details.course_id,
+      "classroomUrl":section_details.classroom_url,
+      "name":section_details.section,
+      "description":section_details.description,
+      "cohortId":section_details.cohort.id,
+      "courseTemplateId":section_details.course_template.id,
+      "status":section_details.status,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+    insert_rows_to_bq(rows=rows,
+                      dataset=BQ_DATASET,
+                      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
     return {
         "message": f"Successfully archived the Section with id {section_id}"
     }
