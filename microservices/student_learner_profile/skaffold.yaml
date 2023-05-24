@@ -5,18 +5,9 @@ metadata:
 requires:
   - path: ../../common
     configs: [common]
-    activeProfiles:
-    - name: custom
-      activatedBy: [custom]
-    - name: dev
-      activatedBy: [dev]
-    - name: prod
-      activatedBy: [prod]
-
 build:
   tagPolicy:
-    gitCommit:
-      ignoreChanges: true
+    gitCommit: {}
   local:
     concurrency: 0
   artifacts:
@@ -28,17 +19,15 @@ build:
       infer:
         - '**/*.py'
         - '**/*.json'
-
 portForward:
 - resourceType: service
   resourceName: student-learner-profile
   port: 80
-  localPort: 8888
+  localPort: 9011
 deploy:
   kustomize:
     paths:
     - ./kustomize/minikube
-
 profiles:
 - name: custom
   build:
@@ -47,6 +36,7 @@ profiles:
     - image: student-learner-profile
       docker:
         cacheFrom:
+          - student-learner-profile
           - student-learner-profile:latest
       requires:
         - image: common
@@ -55,16 +45,24 @@ profiles:
     kustomize:
       paths:
       - ./kustomize/custom
+- name: prod_non_cloudbuild
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
 - name: dev
+  activation:
+  - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: gcr.io/aitutor-dev/student-learner-profile
+    - image: gcr.io/core-learning-services-dev/student-learner-profile
       docker:
         cacheFrom:
-          - gcr.io/aitutor-dev/student-learner-profile:latest
+          - gcr.io/core-learning-services-dev/student-learner-profile
+          - gcr.io/core-learning-services-dev/student-learner-profile:latest
       requires:
-        - image: gcr.io/aitutor-dev/common
+        - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG
       sync:
         infer:
@@ -81,6 +79,7 @@ profiles:
     - image: student-learner-profile
       docker:
         cacheFrom:
+          - student-learner-profile
           - student-learner-profile:latest
       requires:
         - image: common

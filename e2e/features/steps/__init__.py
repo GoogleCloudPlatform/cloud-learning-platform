@@ -24,11 +24,11 @@ cuj04_section,cuj05_01_student,cuj05_02_student,cuj06_analytics
 #   cuj_06_feature_01, cuj_06_feature_02, cuj_06_feature_03, cuj_06_feature_04, \
 #   cuj_06_feature_05, cuj_06_feature_06, cuj_06_feature_07, cuj_06_feature_08, \
 #   cuj_06_feature_09, cuj_06_feature_10, cuj_07_feature_01
-# from student_learner_profile import cuj_01_feature_01, cuj_01_feature_02, \
-#   cuj_01_feature_03, cuj_01_feature_04, cuj_01_feature_05, cuj_02_feature_01, \
-#   cuj_02_feature_02, \
-#   cuj_02_feature_03, cuj_03_feature_01, cuj_03_feature_02, cuj_03_feature_03, \
-#   cuj_05_feature_01, cuj_06_feature_01, cuj_06_feature_02
+from student_learner_profile import cuj_01_feature_01, cuj_01_feature_02, \
+  cuj_01_feature_03, cuj_01_feature_04, cuj_01_feature_05, cuj_02_feature_01, \
+  cuj_02_feature_02, \
+  cuj_02_feature_03, cuj_03_feature_01, cuj_03_feature_02, cuj_03_feature_03, \
+  cuj_05_feature_01, cuj_06_feature_01, cuj_06_feature_02
 from learning_record_service import cuj_01_feature_01, cuj_01_feature_02, \
   cuj_01_feature_03, cuj_01_feature_04, cuj_01_feature_05
 from user_management import cuj_01_feature_01, cuj_01_feature_02, \

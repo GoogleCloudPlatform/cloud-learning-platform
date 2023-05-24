@@ -58,9 +58,9 @@ def health_check():
 api = FastAPI(
   title="Student Learner Profile Service API",
   version="latest",
-  docs_url=None,
-  redoc_url=None,
-  dependencies=[Depends(validate_token)]
+  # docs_url=None,
+  # redoc_url=None,
+  # dependencies=[Depends(validate_token)]
 )
 
 api.include_router(learner.router)

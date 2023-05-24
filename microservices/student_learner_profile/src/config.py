@@ -10,9 +10,9 @@ from schemas.error_schema import (UnauthorizedResponseModel,
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
 
-GCP_PROJECT = os.environ.get("GCP_PROJECT", "")
+PROJECT_ID = os.environ.get("PROJECT_ID", "")
 
-os.environ["GOOGLE_CLOUD_PROJECT"] = GCP_PROJECT
+os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
