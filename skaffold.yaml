@@ -21,8 +21,8 @@ requires:
 - path: ./common
   configs: [common]
 
-- path: ./microservices/redis
-  configs: [redis]
+- path: ./microservices/authentication
+  configs: [authentication]
 
 - path: ./microservices/lms
   configs: [lms]
