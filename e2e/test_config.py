@@ -8,7 +8,7 @@ lrs_url = get_baseurl("learning-record-service")
 los_url = get_baseurl("learning-object-service")
 slp_url = get_baseurl("student-learner-profile")
 
-TESTING_OBJECTS_PATH = os.path.join(os.getcwd(), "e2e.testing_objects")
+TESTING_OBJECTS_PATH = os.path.join(os.getcwd(), "e2e/testing_objects")
 
 if not base_url:
   raise ResourceNotFoundException("Unable to locate the service URL for lms")

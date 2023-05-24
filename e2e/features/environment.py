@@ -118,7 +118,7 @@ def create_course(name,section,description):
   Returns:
     new created course details
     """""
-  a_creds = service_account.Credentials.from_service_account_file(
+  a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
@@ -198,7 +198,7 @@ def invite_user(course_id, email,role):
   Returns:
       dict: response from create invitation method
   """
-  a_creds = service_account.Credentials.from_service_account_file(
+  a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
@@ -358,7 +358,7 @@ def import_google_form_grade(context):
 def create_assignment(context):
   """Create assignment fixture"""
   section = use_fixture(create_section, context)
-  a_creds = service_account.Credentials.from_service_account_file(
+  a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
@@ -399,7 +399,7 @@ url=f'{API_URL}/sections/{section.id}/students/{res.json()["data"]["student_emai
     "section":section.section
     }
   print("REsponse of get student in section",data)
-  a_creds = service_account.Credentials.from_service_account_file(
+  a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)

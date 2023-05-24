@@ -14,6 +14,11 @@ spec:
           requests:
             memory: "500Mi"
         env:
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX
         - name: INSPACE_BASE_URL
           valueFrom:
             configMapKeyRef:
