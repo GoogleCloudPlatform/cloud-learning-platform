@@ -13,12 +13,12 @@ from schemas.error_schema import (UnauthorizedResponseModel,
                                   ValidationErrorResponseModel)
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
-GCP_PROJECT = os.environ.get("GCP_PROJECT", "")
-os.environ["GOOGLE_CLOUD_PROJECT"] = GCP_PROJECT
+PROJECT_ID = os.environ.get("PROJECT_ID", "")
+os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
 CONTENT_SERVING_BUCKET = os.environ.get("CONTENT_SERVING_BUCKET", "")
-SIGNURL_SA_KEY_PATH = f"./keys/{GCP_PROJECT}-signurl-sa-key.json"
+SIGNURL_SA_KEY_PATH = f"./keys/{PROJECT_ID}-signurl-sa-key.json"
 
 try:
   with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r",

@@ -13,17 +13,17 @@ spec:
         app: learning-object-service
     spec:
       serviceAccountName: ksa
-      volumes:
-        - name: signurl-sa-key
-          secret:
-            secretName: signurl-sa-key
+      # volumes:
+      #   - name: signurl-sa-key
+      #     secret:
+      #       secretName: signurl-sa-key
       containers:
       - name: learning-object-service
         image: learning-object-service
-        volumeMounts:
-          - mountPath: /opt/keys
-            name: signurl-sa-key
-            readOnly: true
+        # volumeMounts:
+        #   - mountPath: /opt/keys
+        #     name: signurl-sa-key
+        #     readOnly: true
         imagePullPolicy: IfNotPresent
         resources:
           requests:
@@ -34,11 +34,11 @@ spec:
             cpu: "2000m"
         env:
         # Define the environment variable
-        - name: GCP_PROJECT
+        - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: GCP_PROJECT
+              key: PROJECT_ID
         - name: API_BASE_URL
           # Required format: api/version
           value: api/v1
