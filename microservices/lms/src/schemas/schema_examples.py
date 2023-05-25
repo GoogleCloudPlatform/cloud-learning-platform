@@ -134,7 +134,7 @@ INSTRUCTIONAL_DESIGNER_USER_EXAMPLE = {
     "first_name": "",
     "last_name": "",
     "email": "clplmstestuser1@gmail.com",
-    "user_type": "learner",
+    "user_type": "faculty",
     "status": "active",
     "gaia_id": "1234577657333",
     "photo_url": "https://lh3.googleusercontent.com/a/AEd",

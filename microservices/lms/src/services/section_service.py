@@ -529,20 +529,20 @@ def add_instructional_designer_into_section(section, course_template_mapping):
   try:
     classroom_crud.acceept_invite(invitation_object["id"],
                                   course_template_mapping.user.email)
-    if course_template_mapping.status == "invited":
-      user_profile = classroom_crud.\
-          get_user_profile_information(course_template_mapping.user.email)
-      user = User.find_by_id(course_template_mapping.user.id)
-      user.first_name = user_profile["name"]["givenName"]
-      user.last_name = user_profile["name"]["familyName"]
-      user.gaia_id = user_profile["id"]
-      user.photo_url = user_profile["photoUrl"]
-      user.update()
-      course_template_mapping.status = "active"
-      course_template_mapping.invitation_id = ""
-      course_template_mapping.update()
-      status = "active"
-      invitation_id = ""
+    # if course_template_mapping.status == "invited":
+    #   user_profile = classroom_crud.\
+    #       get_user_profile_information(course_template_mapping.user.email)
+    #   user = User.find_by_id(course_template_mapping.user.id)
+    #   user.first_name = user_profile["name"]["givenName"]
+    #   user.last_name = user_profile["name"]["familyName"]
+    #   user.gaia_id = user_profile["id"]
+    #   user.photo_url = user_profile["photoUrl"]
+    #   user.update()
+    #   course_template_mapping.status = "active"
+    #   course_template_mapping.invitation_id = ""
+    #   course_template_mapping.update()
+    status = "active"
+    invitation_id = ""
   except Exception as hte:
     Logger.info(hte)
     status = "invited"
