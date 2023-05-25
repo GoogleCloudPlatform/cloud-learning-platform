@@ -126,7 +126,7 @@ def get_signed_url(uuid: str, is_faq: bool = False, redirect: bool = False):
       resource_type = "faq_html"
       resource_path = faq_resource["resource_path"]
     else:
-      learning_resource = LearningResource.find_by_id(uuid)
+      learning_resource = LearningResource.find_by_uuid(uuid)
       learning_resource = learning_resource.get_fields(reformat_datetime=True)
       BASE_PATH = RESOURCE_BASE_PATH
       resource_type = learning_resource["type"]
@@ -447,7 +447,7 @@ async def publish_content_handler(uuid: str, target_version_uuid: str = None):
 
   try:
 
-    _ = LearningResource.find_by_id(uuid)
+    _ = LearningResource.find_by_uuid(uuid)
 
     published_doc_dict = handle_publish_event(uuid, target_version_uuid)
 
@@ -527,7 +527,7 @@ async def upload_madcap_export(le_uuid: str,
       raise PayloadTooLargeError(
           f"File size is too large: {content_file.filename}")
 
-    learning_experience = LearningExperience.find_by_id(le_uuid)
+    learning_experience = LearningExperience.find_by_uuid(le_uuid)
 
     # check if the valid content type header is set
     if content_file.content_type not in ["application/zip","application/x-zip-compressed"]:

@@ -183,7 +183,7 @@ def get_learning_resource(uuid: str, fetch_tree: Optional[bool] = False):
       GetLearningResourceModelResponse: Learning Resource Object
   """
   try:
-    learning_resource = LearningResource.find_by_id(uuid)
+    learning_resource = LearningResource.find_by_uuid(uuid)
     learning_resource = learning_resource.get_fields(reformat_datetime=True)
 
     if fetch_tree:
@@ -349,7 +349,7 @@ def delete_learning_resource(uuid: str):
       JSON: Success/Fail Message
   """
   try:
-    learning_resource = LearningResource.find_by_id(uuid)
+    learning_resource = LearningResource.find_by_uuid(uuid)
     learning_resource_fields = learning_resource.get_fields(
         reformat_datetime=True)
 

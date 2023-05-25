@@ -202,7 +202,7 @@ def get_learning_experience(uuid: str, fetch_tree: Optional[bool] = False):
   Learning Experience: `LearningExperienceResponseModel`
   """
   try:
-    learning_experience = LearningExperience.find_by_id(uuid)
+    learning_experience = LearningExperience.find_by_uuid(uuid)
     learning_experience = learning_experience.get_fields(reformat_datetime=True)
 
     if fetch_tree:
@@ -368,7 +368,7 @@ def delete_learning_experience(uuid: str):
   Success/Fail Message: `JSON`
   """
   try:
-    learning_experience = LearningExperience.find_by_id(uuid)
+    learning_experience = LearningExperience.find_by_uuid(uuid)
     learning_experience_fields = learning_experience.get_fields(
         reformat_datetime=True)
 

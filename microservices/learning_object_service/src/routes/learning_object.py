@@ -210,7 +210,7 @@ def get_learning_object(uuid: str, fetch_tree: Optional[bool] = False):
   Learning Object: `LearningObjectResponseModel`
   """
   try:
-    learning_object = LearningObject.find_by_id(uuid)
+    learning_object = LearningObject.find_by_uuid(uuid)
     learning_object = learning_object.get_fields(reformat_datetime=True)
 
     if fetch_tree:
@@ -378,7 +378,7 @@ def delete_learning_object(uuid: str):
   Success/Fail Message: `JSON`
   """
   try:
-    learning_object = LearningObject.find_by_id(uuid)
+    learning_object = LearningObject.find_by_uuid(uuid)
     learning_object_fields = learning_object.get_fields(reformat_datetime=True)
 
     ParentChildNodesHandler.validate_parent_child_nodes_references(

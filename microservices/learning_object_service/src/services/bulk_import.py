@@ -28,7 +28,7 @@ def get_all_nodes_for_project(uuid: str, level: str, nodes: list):
   Returns:
     nodes (list): List of nodes of alias=module and type=project
   """
-  node = collection_references[level].find_by_id(uuid)
+  node = collection_references[level].find_by_uuid(uuid)
   if node.type == "project" and node.alias == "module":
     nodes.append(node)
     return
@@ -47,7 +47,7 @@ def module_assessment_prerequisite_handler(uuid):
   for learning_object in learning_object_project:
     if learning_object.child_nodes.get("assessments"):
       for assessment_id in learning_object.child_nodes.get("assessments"):
-        assessment = collection_references["assessments"].find_by_id(
+        assessment = collection_references["assessments"].find_by_uuid(
             assessment_id)
         assessment.prerequisites[
             "learning_objects"] = learning_object.prerequisites[
@@ -78,7 +78,7 @@ def add_data_to_db_handler(content, new_content_obj, collection_name):
       raise Exception("Post Request to Assessment service Fail with"\
                       f" status code {assessment.status_code}")
     content = assessment.json()["data"]
-    new_content_obj = new_content_obj.find_by_id(content["uuid"])
+    new_content_obj = new_content_obj.find_by_uuid(content["uuid"])
   else:
     new_content_obj = new_content_obj.from_dict(content)
     new_content_obj.uuid = ""
@@ -136,7 +136,7 @@ def add_data_to_db(content, new_content_obj, collection_name):
 
       if new_content_srl_object.type == "srl":
         if SRL_COLLECTIONS.get(content["name"]):
-          trigger_srl = new_content_obj.find_by_id(
+          trigger_srl = new_content_obj.find_by_uuid(
               SRL_COLLECTIONS.get(content["name"]))
           trigger_srl.parent_nodes["learning_experiences"].extend(
               new_content_srl_object.parent_nodes["learning_experiences"])
@@ -459,7 +459,7 @@ def find_redundent_id(content):
 
   for key, vals in content.items():
     for val in vals:
-      redundent_object = collection_references[key].find_by_id(val)
+      redundent_object = collection_references[key].find_by_uuid(val)
       input_dict[key].append(
           redundent_object.get_fields(reformat_datetime=True))
 
@@ -488,7 +488,7 @@ def srl_redundency_cleaner():
       if len(val) > 0:
         for ids in val:
           learning_object.child_nodes[key].remove(ids)
-          delete_object = collection_references[key].find_by_id(ids)
+          delete_object = collection_references[key].find_by_uuid(ids)
           collection_references[key].collection.delete(delete_object.key)
 
     learning_object.update()
@@ -572,7 +572,7 @@ def delete_hierarchy_handler(node_id: str,
   Returns:
       None
   """
-  node = collection_references[node_type].find_by_id(node_id)
+  node = collection_references[node_type].find_by_uuid(node_id)
   node_data = node.get_fields()
   node_name = node_data["name"]
   collection_references[node_type].delete_by_uuid(node_id)

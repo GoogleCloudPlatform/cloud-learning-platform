@@ -282,7 +282,7 @@ def link_content_and_create_version_positive(clean_firestore, mocker):
   new_resource_uuid = res_json["data"]["resource_uuid"]
   assert new_resource_uuid != learning_resource.uuid
 
-  learning_resource = LearningResource.find_by_id(new_resource_uuid)
+  learning_resource = LearningResource.find_by_uuid(new_resource_uuid)
   assert learning_resource.resource_path == sample_resource_path
   assert learning_resource.status == "draft"
   assert learning_resource.parent_version_uuid == parent_uuid
@@ -304,7 +304,7 @@ def link_content_and_create_version_positive(clean_firestore, mocker):
   new_resource_uuid_2 = res_json["data"]["resource_uuid"]
   assert new_resource_uuid_2 != new_resource_uuid
 
-  learning_resource = LearningResource.find_by_id(new_resource_uuid_2)
+  learning_resource = LearningResource.find_by_uuid(new_resource_uuid_2)
   assert learning_resource.resource_path == sample_resource_path
   assert learning_resource.status == "draft"
   assert learning_resource.parent_version_uuid == new_resource_uuid
@@ -677,10 +677,10 @@ def handle_publish_event_positive(clean_firestore, mocker):
   assert res_json["success"] is True
   assert res_json["message"] == "Successfully published content"
 
-  old_lr = LearningResource.find_by_id(new_content_version_uuid)
+  old_lr = LearningResource.find_by_uuid(new_content_version_uuid)
   assert old_lr.status == "unpublished"
 
-  new_lr = LearningResource.find_by_id(new_resource_uuid_1)
+  new_lr = LearningResource.find_by_uuid(new_resource_uuid_1)
   assert new_lr.status == "published"
 
   # 3. Republish Scenario
@@ -696,12 +696,12 @@ def handle_publish_event_positive(clean_firestore, mocker):
   assert res_json["data"]["resource_uuid"] != old_lr.uuid
   assert res_json["data"]["resource_uuid"] != new_lr.uuid
 
-  new_lr_2 = LearningResource.find_by_id(res_json["data"]["resource_uuid"])
+  new_lr_2 = LearningResource.find_by_uuid(res_json["data"]["resource_uuid"])
   assert new_lr_2.parent_version_uuid == old_lr.uuid
   assert new_lr_2.status == "published"
 
-  old_lr = LearningResource.find_by_id(new_content_version_uuid)
-  new_lr = LearningResource.find_by_id(new_resource_uuid_1)
+  old_lr = LearningResource.find_by_uuid(new_content_version_uuid)
+  new_lr = LearningResource.find_by_uuid(new_resource_uuid_1)
 
   assert old_lr.status == "unpublished"
   assert new_lr.status == "unpublished"
@@ -1020,7 +1020,7 @@ def test_upload_madcap_positive(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le = LearningExperience.find_by_id(learning_experience.uuid)
+  le = LearningExperience.find_by_uuid(learning_experience.uuid)
   assert le.resource_path == "learning-resources/dummy_madcap/"
 
 
@@ -1076,7 +1076,7 @@ def test_upload_madcap_negative(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le = LearningExperience.find_by_id(learning_experience.uuid)
+  le = LearningExperience.find_by_uuid(learning_experience.uuid)
   assert le.resource_path == "learning-resources/dummy_madcap/"
 
   #-------------------------------------------------------------
@@ -1179,7 +1179,7 @@ def test_link_madcap_to_lr_positive(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le = LearningExperience.find_by_id(learning_experience.uuid)
+  le = LearningExperience.find_by_uuid(learning_experience.uuid)
   assert le.resource_path == "learning-resources/dummy_madcap/"
 
   learning_object_dict = copy.deepcopy(BASIC_LEARNING_OBJECT_EXAMPLE)
@@ -1228,7 +1228,7 @@ def test_link_madcap_to_lr_positive(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le = LearningExperience.find_by_id(learning_experience.uuid)
+  le = LearningExperience.find_by_uuid(learning_experience.uuid)
   assert le.resource_path == "learning-resources/dummy_madcap/"
   #-------------------------------------------------------------
   # Setup Steps End
@@ -1248,7 +1248,7 @@ def test_link_madcap_to_lr_positive(clean_firestore, mocker):
   assert resp_json[
       "message"] == f"Successfully linked content to Learning Resource with uuid {learning_resource.uuid}"
 
-  lr = LearningResource.find_by_id(learning_resource.uuid)
+  lr = LearningResource.find_by_uuid(learning_resource.uuid)
   assert lr.resource_path == "def"
   assert lr.type == "html"
 
@@ -1308,7 +1308,7 @@ def test_link_madcap_to_lr_negative(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le = LearningExperience.find_by_id(learning_experience.uuid)
+  le = LearningExperience.find_by_uuid(learning_experience.uuid)
   assert le.resource_path == "learning-resources/dummy_madcap/"
 
   learning_object_dict = copy.deepcopy(BASIC_LEARNING_OBJECT_EXAMPLE)
@@ -1357,7 +1357,7 @@ def test_link_madcap_to_lr_negative(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le = LearningExperience.find_by_id(learning_experience.uuid)
+  le = LearningExperience.find_by_uuid(learning_experience.uuid)
   assert le.resource_path == "learning-resources/dummy_madcap/"
   #-------------------------------------------------------------
   # Setup Steps End
@@ -1436,7 +1436,7 @@ def test_link_madcap_to_lr_negative(clean_firestore, mocker):
       "message"] == "Cannot link Learning Resource with a file that does not belong to the folder given by Learning Experience.Required file path prefix: learning-resources/dummy_madcap/"
 
   # 5. LE does not have a resource_path
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience.uuid)
   learning_experience.resource_path = ""
   learning_experience.update()
@@ -1527,14 +1527,14 @@ def test_link_madcap_srl_to_le_positive(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le_1 = LearningExperience.find_by_id(le_1_uuid)
-  le_2 = LearningExperience.find_by_id(le_2_uuid)
+  le_1 = LearningExperience.find_by_uuid(le_1_uuid)
+  le_2 = LearningExperience.find_by_uuid(le_2_uuid)
   assert le_1.srl_resource_path == "learning-resources/SRL_Dummy/"
   assert le_2.srl_resource_path == "learning-resources/SRL_Dummy/"
 
-  lo_1 = LearningObject.find_by_id(le_1.child_nodes["learning_objects"][0])
+  lo_1 = LearningObject.find_by_uuid(le_1.child_nodes["learning_objects"][0])
 
-  lr_1 = LearningResource.find_by_id(
+  lr_1 = LearningResource.find_by_uuid(
       lo_1.child_nodes["learning_resources"][0])
 
   resp = client_with_emulator.post(
@@ -1552,7 +1552,7 @@ def test_link_madcap_srl_to_le_positive(clean_firestore, mocker):
   assert resp_json[
       "message"] == f"Successfully linked content to Learning Resource with uuid {lr_1.uuid}"
 
-  lr_1 = LearningResource.find_by_id(lr_1.uuid)
+  lr_1 = LearningResource.find_by_uuid(lr_1.uuid)
   assert lr_1.resource_path == "abc"
   assert lr_1.type == "html"
 
@@ -1576,14 +1576,14 @@ def test_link_madcap_srl_to_le_positive(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le_1 = LearningExperience.find_by_id(le_1_uuid)
-  le_2 = LearningExperience.find_by_id(le_2_uuid)
+  le_1 = LearningExperience.find_by_uuid(le_1_uuid)
+  le_2 = LearningExperience.find_by_uuid(le_2_uuid)
   assert le_1.srl_resource_path == "learning-resources/SRL_Dummy_v2/"
   assert le_2.srl_resource_path == "learning-resources/SRL_Dummy_v2/"
 
-  lo_1 = LearningObject.find_by_id(le_1.child_nodes["learning_objects"][0])
+  lo_1 = LearningObject.find_by_uuid(le_1.child_nodes["learning_objects"][0])
 
-  lr_1 = LearningResource.find_by_id(
+  lr_1 = LearningResource.find_by_uuid(
       lo_1.child_nodes["learning_resources"][0])
 
   assert lr_1.resource_path == "abc"

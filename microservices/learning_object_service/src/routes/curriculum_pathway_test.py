@@ -142,7 +142,7 @@ def test_post_curriculum_pathway(clean_firestore, create_learning_experience):
   assert get_json_response.get("data") == post_json_response.get("data")
 
   # now check and confirm it is properly in the databse
-  loaded_curriculum_pathway = CurriculumPathway.find_by_id(uuid)
+  loaded_curriculum_pathway = CurriculumPathway.find_by_uuid(uuid)
   loaded_curriculum_pathway_dict = loaded_curriculum_pathway.to_dict()
 
   for key in DEL_KEYS:
@@ -155,7 +155,7 @@ def test_post_curriculum_pathway(clean_firestore, create_learning_experience):
 
   # assert the curriculum pathway has reference of learning experience in it's
   # parent nodes field
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("parent_nodes").get(
@@ -208,20 +208,20 @@ def test_update_curriculum_pathway(clean_firestore):
 
   # assert the parent curriculum pathway has reference of child
   # curriculum pathway in its child nodes
-  parent_curriculum_pathway = CurriculumPathway.find_by_id(uuid)
+  parent_curriculum_pathway = CurriculumPathway.find_by_uuid(uuid)
   parent_curriculum_pathway_dict = parent_curriculum_pathway.to_dict()
   assert child_cp_uuid in parent_curriculum_pathway_dict.get("child_nodes").get(
       "curriculum_pathways")
 
   # assert the learning experience has reference of curriculum pathway in it's
   # parent nodes field
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience_1.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("parent_nodes").get(
       "curriculum_pathways")
 
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience_2.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("parent_nodes").get(
@@ -253,19 +253,19 @@ def test_update_curriculum_pathway(clean_firestore):
   # Test to verify the child learning experience references are updated
   # assert the learning experience has reference of curriculum
   # pathway in it's parent nodes field
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience_1.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid not in learning_experience_dict.get("parent_nodes").get(
       "curriculum_pathways")
 
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience_2.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("parent_nodes").get(
       "curriculum_pathways")
 
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience_3.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("parent_nodes").get(
@@ -365,7 +365,7 @@ def test_delete_curriculum_pathway(clean_firestore, create_learning_experience):
 
   # assert the learning experience has reference of curriculum pathway in it's
   # parent nodes field
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("parent_nodes").get(
@@ -384,7 +384,7 @@ def test_delete_curriculum_pathway(clean_firestore, create_learning_experience):
 
   # assert the learning experience do not have the reference of curriculum
   # pathway in it's parent nodes field
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid not in learning_experience_dict.get("parent_nodes").get(
@@ -392,7 +392,7 @@ def test_delete_curriculum_pathway(clean_firestore, create_learning_experience):
 
   # assert that the curriculum pathway exists in the database and is soft
   # deleted
-  curriculum_pathway = CurriculumPathway.find_by_id(uuid, is_deleted=True)
+  curriculum_pathway = CurriculumPathway.find_by_uuid(uuid, is_deleted=True)
   assert curriculum_pathway
 
 

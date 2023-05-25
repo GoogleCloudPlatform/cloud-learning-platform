@@ -61,7 +61,7 @@ def filter_faq(skip: int = Query(0, ge=0, le=2000),
     collection_manager = FAQContent.collection.filter("is_deleted", "==", False)
     if curriculum_pathway_id is not None:
 
-      _ = CurriculumPathway.find_by_id(curriculum_pathway_id)
+      _ = CurriculumPathway.find_by_uuid(curriculum_pathway_id)
       collection_manager = collection_manager.filter("curriculum_pathway_id", "==",
                                                       curriculum_pathway_id)
 
@@ -105,7 +105,7 @@ def create_faq(input_faq: FAQModel):
     input_faq_dict = input_faq.dict()
 
     if input_faq.dict().get("curriculum_pathway_id") is not None:
-      curriculum_pathway = CurriculumPathway.find_by_id(input_faq_dict["curriculum_pathway_id"])
+      curriculum_pathway = CurriculumPathway.find_by_uuid(input_faq_dict["curriculum_pathway_id"])
       if curriculum_pathway.alias != "program":
         raise ValidationError("The curriculum_pathway_id is not of alias type program")
 
@@ -192,7 +192,7 @@ def update_faq(faq_uuid: str, input_faq: FAQModel):
     if input_faq_dict.get("curriculum_pathway_id") is not None:
 
       # check if new Curriculum Pathway id is Valid
-      curriculum_pathway = CurriculumPathway.find_by_id(input_faq_dict["curriculum_pathway_id"])
+      curriculum_pathway = CurriculumPathway.find_by_uuid(input_faq_dict["curriculum_pathway_id"])
       if curriculum_pathway.alias != "program":
         raise ValidationError("The curriculum_pathway_id is not of alias type program")
 

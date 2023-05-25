@@ -30,7 +30,7 @@ def link_content_to_le(le_uuid, prefix_path):
         2. prefix_path:
                 a valid prefix path to be linked with LE
     """
-  required_le = LearningExperience.find_by_id(le_uuid)
+  required_le = LearningExperience.find_by_uuid(le_uuid)
 
   _, _, files_list = get_file_and_folder_list(
       prefix_path, list_madcap_contents=True)
@@ -60,8 +60,8 @@ def link_content_to_lr(le_uuid, lr_uuid, resource_path, resource_type, is_srl):
         4. resource_type:
                 a field representing the type of learning resource
     """
-  required_le = LearningExperience.find_by_id(le_uuid)
-  required_lr = LearningResource.find_by_id(lr_uuid)
+  required_le = LearningExperience.find_by_uuid(le_uuid)
+  required_lr = LearningResource.find_by_uuid(lr_uuid)
 
   if is_srl is False:
     if required_le.resource_path in ["", None]:
@@ -121,7 +121,7 @@ def link_content_to_lr(le_uuid, lr_uuid, resource_path, resource_type, is_srl):
 def get_parent_node_list(node_id, collection):
   """Get the list of parent nodes"""
   parent_list = []
-  node_doc = collection.find_by_id(node_id)
+  node_doc = collection.find_by_uuid(node_id)
   parent_nodes = node_doc.parent_nodes
   for key, value in parent_nodes.items():
     node_item = {
@@ -134,7 +134,7 @@ def get_parent_node_list(node_id, collection):
 
 
 def is_hierarchy_root(node_uuid, node_type):
-  current_node = collection_references[node_type].find_by_id(node_uuid)
+  current_node = collection_references[node_type].find_by_uuid(node_uuid)
 
   if current_node.alias == "program" and \
       current_node.parent_nodes.get("learning_opportunities") == [] and \
@@ -179,7 +179,7 @@ def get_hierarchy_root(node_uuid, node_type):
       break
 
     # Get required LOS document
-    node_doc = collection_references[node_obj["node_type"]].find_by_id(
+    node_doc = collection_references[node_obj["node_type"]].find_by_uuid(
         node_obj["node_uuid"])
 
     # Explore Parent Nodes if they are not visited Previously
@@ -215,7 +215,7 @@ def get_all_sibling_le(le_uuid):
   """
   sibling_le_list = []
 
-  _ = LearningExperience.find_by_id(le_uuid)
+  _ = LearningExperience.find_by_uuid(le_uuid)
 
   program_uuid = get_hierarchy_root(le_uuid, "learning_experiences")
 
@@ -244,7 +244,7 @@ def link_srl_to_all_le(le_uuid, srl_resource_path):
 
   for le in le_sibling_list:
     if le["uuid"] != le_uuid:
-      le_doc = LearningExperience.find_by_id(le["uuid"])
+      le_doc = LearningExperience.find_by_uuid(le["uuid"])
       le_doc.srl_resource_path = srl_resource_path
       le_doc.update()
 
@@ -268,7 +268,7 @@ def get_all_lr_for_le(le_uuid):
     """
   lr_list = []
 
-  start_le = LearningExperience.find_by_id(le_uuid)
+  start_le = LearningExperience.find_by_uuid(le_uuid)
 
   queue = []
 
@@ -281,7 +281,7 @@ def get_all_lr_for_le(le_uuid):
     node_obj = queue.pop(0)
 
     if node_obj["node_type"] == "learning_objects":
-      lo_obj = LearningObject.find_by_id(node_obj["node_uuid"])
+      lo_obj = LearningObject.find_by_uuid(node_obj["node_uuid"])
 
       if lo_obj.child_nodes.get("learning_objects") is not None:
         if len(lo_obj.child_nodes.get("learning_objects")) > 0:

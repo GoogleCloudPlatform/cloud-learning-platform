@@ -135,7 +135,7 @@ def test_post_learning_object(clean_firestore, create_learning_experience):
   assert get_json_response.get("data") == post_json_response.get("data")
 
   # now check and confirm it is properly in the database
-  loaded_learning_object = LearningObject.find_by_id(uuid)
+  loaded_learning_object = LearningObject.find_by_uuid(uuid)
   loaded_learning_object_dict = loaded_learning_object.to_dict()
 
   # popping id and key for equivalency test
@@ -151,7 +151,7 @@ def test_post_learning_object(clean_firestore, create_learning_experience):
 
   # assert the learning experience has reference of learning object in it's
   # child nodes field
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("child_nodes").get(
@@ -189,13 +189,13 @@ def test_update_learning_object(clean_firestore):
 
   # assert the learning object has reference of learning experience in it's
   # parent nodes field
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience_1.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("child_nodes").get(
       "learning_objects")
 
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience_2.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("child_nodes").get(
@@ -225,19 +225,19 @@ def test_update_learning_object(clean_firestore):
   # Test to verify the parent learning experience references are updated
   # assert the learning experience has reference of learning object in it's
   # child nodes field
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience_1.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid not in learning_experience_dict.get("child_nodes").get(
       "learning_objects")
 
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience_2.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("child_nodes").get(
       "learning_objects")
 
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience_3.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("child_nodes").get(
@@ -330,7 +330,7 @@ def test_delete_learning_object(clean_firestore, create_learning_experience):
 
   # assert the learning experience has reference of learning object in it's
   # child nodes field
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid in learning_experience_dict.get("child_nodes").get(
@@ -349,19 +349,19 @@ def test_delete_learning_object(clean_firestore, create_learning_experience):
 
   # assert the learning experience do not have the reference of learning object
   # in it's child nodes field
-  learning_experience = LearningExperience.find_by_id(
+  learning_experience = LearningExperience.find_by_uuid(
       learning_experience.uuid)
   learning_experience_dict = learning_experience.to_dict()
   assert uuid not in learning_experience_dict.get("child_nodes").get(
       "learning_objects")
 
   # check if deleted LO was removed from other LO's prerequisites
-  lo_2 = LearningObject.find_by_id(lo_2_uuid)
+  lo_2 = LearningObject.find_by_uuid(lo_2_uuid)
   assert uuid not in lo_2.prerequisites["learning_objects"]
 
   # assert that the learning object exists in the database and is soft
   # deleted
-  learning_object = LearningObject.find_by_id(uuid, is_deleted=True)
+  learning_object = LearningObject.find_by_uuid(uuid, is_deleted=True)
   assert learning_object
 
 

@@ -93,7 +93,7 @@ def get_all_nodes_for_alias(uuid: str,
   Returns:
     nodes (list): List of nodes of alias=final_alias
   """
-  node = collection_references[level].find_by_id(uuid)
+  node = collection_references[level].find_by_uuid(uuid)
   node = node.get_fields(reformat_datetime=True)
   if node.get("alias", "") == final_alias:
     nodes.append(node)

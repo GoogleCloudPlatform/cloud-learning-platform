@@ -53,7 +53,7 @@ def link_content_and_create_version(parent_uuid, resource_path, resource_type):
   try:
 
     # Validate LR uuid
-    _ = LearningResource.find_by_id(parent_uuid)
+    _ = LearningResource.find_by_uuid(parent_uuid)
 
     # Validate Resource Type
     if resource_type not in LR_TYPES_LIST:
@@ -72,7 +72,7 @@ def link_content_and_create_version(parent_uuid, resource_path, resource_type):
     new_lr_dict = new_lr.dict()
     new_document = CommonAPIHandler.create_versioned_document(
         LearningResource, parent_uuid, new_lr_dict)
-    new_document_obj = LearningResource.find_by_id(new_document["uuid"])
+    new_document_obj = LearningResource.find_by_uuid(new_document["uuid"])
     new_document_obj.status = "draft"
     new_document_obj.is_implicit = True
     new_document_obj.update()
@@ -88,8 +88,8 @@ def link_content_and_create_version(parent_uuid, resource_path, resource_type):
 
 def lazy_sync(content_version_uuid, linked_version_uuid):
   """Lazy-sync of content version with linked version"""
-  current_content_data = LearningResource.find_by_id(content_version_uuid)
-  linked_content_data = LearningResource.find_by_id(linked_version_uuid)
+  current_content_data = LearningResource.find_by_uuid(content_version_uuid)
+  linked_content_data = LearningResource.find_by_uuid(linked_version_uuid)
   linked_content_dict = linked_content_data.get_fields()
 
   for key, value in linked_content_dict.items():
@@ -112,13 +112,13 @@ def update_hierarchy_references(existing_document_dict, input_document_dict,
   ParentChildNodesHandler.update_parent_references(input_document_dict,
                                                    collection, "add")
 
-  updated_doc = collection.find_by_id(input_document_dict["uuid"])
+  updated_doc = collection.find_by_uuid(input_document_dict["uuid"])
   return updated_doc.get_fields(reformat_datetime=True)
 
 
 def unpublish_other_versions(content_version_uuid):
   """Unpublish other versions"""
-  content_dict = LearningResource.find_by_id(content_version_uuid)
+  content_dict = LearningResource.find_by_uuid(content_version_uuid)
   root_version_uuid = content_dict.root_version_uuid
 
   # Fetch all content version documents
@@ -166,7 +166,7 @@ def handle_publish_event(linked_lr_uuid, content_version_uuid):
     """
   try:
 
-    connected_lr = LearningResource.find_by_id(linked_lr_uuid)
+    connected_lr = LearningResource.find_by_uuid(linked_lr_uuid)
     connected_lr_dict = connected_lr.get_fields(reformat_datetime=True)
 
     # verify connected_lr
@@ -174,7 +174,7 @@ def handle_publish_event(linked_lr_uuid, content_version_uuid):
                     .get("learning_objects")
     if parent_nodes is not None:
       for node_id in parent_nodes:
-        parent_node = LearningObject.find_by_id(node_id).get_fields(
+        parent_node = LearningObject.find_by_uuid(node_id).get_fields(
             reformat_datetime=True)
         child_nodes = parent_node.get("child_nodes").get("learning_resources")
         if child_nodes is not None:
@@ -208,7 +208,7 @@ def handle_publish_event(linked_lr_uuid, content_version_uuid):
 
       return connected_lr.get_fields(reformat_datetime=True)
     else:
-      lr_doc = LearningResource.find_by_id(content_version_uuid)
+      lr_doc = LearningResource.find_by_uuid(content_version_uuid)
 
       if lr_doc.status == "initial" and \
         lr_doc.resource_path == "":
@@ -239,7 +239,7 @@ def handle_publish_event(linked_lr_uuid, content_version_uuid):
         new_lr_dict = new_lr.dict()
         new_document = CommonAPIHandler.create_versioned_document(
             LearningResource, parent_uuid, new_lr_dict)
-        new_document_obj = LearningResource.find_by_id(new_document["uuid"])
+        new_document_obj = LearningResource.find_by_uuid(new_document["uuid"])
         new_document_obj.status = "published"
         new_document_obj.is_implicit = True
         new_document_obj.last_published_on = publish_timestamp
@@ -317,7 +317,7 @@ def get_content_versions(lr_uuid, status, skip, limit):
     if limit < 1:
       raise ValidationError("Invalid value passed to \"limit\" query parameter")
 
-    lr_doc = LearningResource.find_by_id(lr_uuid)
+    lr_doc = LearningResource.find_by_uuid(lr_uuid)
 
     root_version_uuid = lr_doc.root_version_uuid
 
@@ -366,7 +366,7 @@ def update_lr_resource_path(le_uuid,new_file_paths):
 
   lr_doc_list = []
   for lr in lr_list:
-    lr_doc_list.append(LearningResource.find_by_id(lr))
+    lr_doc_list.append(LearningResource.find_by_uuid(lr))
 
   for i in range(len(lr_doc_list)):
     file_name = lr_doc_list[i].resource_path
