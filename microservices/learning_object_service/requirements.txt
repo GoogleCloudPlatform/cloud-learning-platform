@@ -10,3 +10,4 @@ typing-extensions==4.4.0
 firebase-admin==4.5.2
 protobuf==3.19.5
 gcsfs==2022.5.0
+kubernetes==11.0.0
