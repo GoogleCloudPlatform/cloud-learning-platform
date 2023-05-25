@@ -1,3 +1,4 @@
+@inspace
 Feature: CRUD on Inspace User alongwith backend user
     Scenario: An Inspace User account is to be created alongwith backend user
         Given A user has access to the application and enters valid details for user creation

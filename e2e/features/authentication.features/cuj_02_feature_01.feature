@@ -1,3 +1,4 @@
+@inspace
 Feature: To fetch Inspace token
 
     Scenario: Fetch inpsace token for extisting inspace user

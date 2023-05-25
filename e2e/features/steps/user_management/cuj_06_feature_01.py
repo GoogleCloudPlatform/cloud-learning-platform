@@ -161,8 +161,7 @@ def step_impl_1(context: Context) -> None:
   data = get_method(url=fetch_url, query_params=query_params)
   if data.status_code == 200:
     delete_url = f"{UM_API_URL}/permission"
-    [delete_method(url=f"{delete_url}/{i['uuid']}") for i in data.json()[
-      "data"]["records"]
+    [delete_method(url=f"{delete_url}/{i['uuid']}") for i in data.json()["data"]
      if i["application_id"] == "1212122ed3d33d" or i["module_id"] == "wewewewedn3211"]
   context.url = f"{UM_API_URL}/permission/search"
   context.query_params = {"search_query": "create"}
@@ -180,6 +179,8 @@ def step_impl_2(context: Context) -> None:
   None
   """
   context.res = get_method(url=context.url, query_params=context.query_params)
+  print(context.res)
+  print(context.res.json())
 
 
 @then("the permissions is failed to fetch for action name")
@@ -196,7 +197,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.status_code == 200
   assert context.res.json()["success"] is True
   assert context.res.json()["message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]["records"]) is list
+  assert type(context.res.json()["data"]) is list
 
 
 @given("fetch all the permissions for module name")
@@ -244,7 +245,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.json()["success"] is True
   assert context.res.json()[
     "message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]["records"]) is list
+  assert type(context.res.json()["data"]) is list
 
 
 @given("fetch all the permissions for application name")
@@ -294,7 +295,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.json()["success"] is True
   assert context.res.json()[
     "message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]["records"]) is list
+  assert type(context.res.json()["data"]) is list
 
 
 @given("fetch all the permissions for permission name")
@@ -344,7 +345,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.json()["success"] is True
   assert context.res.json()[
     "message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]["records"]) is list
+  assert type(context.res.json()["data"]) is list
 
 
 @given("fetch all the permissions for group name")
@@ -392,7 +393,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.json()["success"] is True
   assert context.res.json()[
     "message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]["records"]) is list
+  assert type(context.res.json()["data"]) is list
 
 
 @given("fetch all the permissions for incorrect search query")
@@ -441,7 +442,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.json()["success"] is True
   assert context.res.json()[
     "message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]["records"]) is list
+  assert type(context.res.json()["data"]) is list
 
 
 @given("user want to update their permission with correct permission ID")
@@ -743,7 +744,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.status_code == 200
   assert context.res.json()["success"] is True
   assert context.res.json()["message"] == "Data fetched successfully"
-  assert type(context.res.json()["data"]["records"]) is list
+  assert type(context.res.json()["data"]) is list
 
 
 @given("fetch all the permissions from the datastore for a given application_id")
@@ -826,7 +827,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.status_code == 200
   assert context.res.json()["success"] is True
   assert context.res.json()["message"] == "Data fetched successfully"
-  assert context.res.json()["data"]["records"][0][
+  assert context.res.json()["data"][0][
     "application_id"] == context.permission_dict["application_id"]
 
 @given("fetch all the permissions for incorrect query params")
@@ -1008,7 +1009,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]["records"]) == 1
+  assert len(context.res_data["data"]) == 1
 
 
 # --- Positive Scenario 2 ---
@@ -1112,7 +1113,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]["records"]) == 1
+  assert len(context.res_data["data"]) == 1
 
 
 # --- Positive Scenario 3 ---
@@ -1228,7 +1229,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]["records"]) == 2
+  assert len(context.res_data["data"]) == 2
 
 
 # --- Negative Scenario 1 ---
@@ -1333,7 +1334,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]["records"]) == 0
+  assert len(context.res_data["data"]) == 0
 
 
 # --- Negative Scenario 2 ---
@@ -1414,7 +1415,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]["records"]) == 0
+  assert len(context.res_data["data"]) == 0
 
 
 # --- Negative Scenario 3 ---
@@ -1485,7 +1486,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]["records"]) == 0
+  assert len(context.res_data["data"]) == 0
 
 @given("Retrieve all unique applications, modules, actions and user groups")
 def step_impl_1(context):

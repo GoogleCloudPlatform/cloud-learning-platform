@@ -9,9 +9,9 @@ from e2e.test_config import API_URL_LEARNER_PROFILE_SERVICE, TESTING_OBJECTS_PAT
 from common.models import Learner, Achievement
 
 
-INVALID_JSON_FILE_PATH = os.path.join("testing_objects", "invalid_json_file.json")
+INVALID_JSON_FILE_PATH = os.path.join("e2e/testing_objects", "invalid_json_file.json")
 
-SAMPLE_CSV_FILE_PATH = os.path.join("testing_objects", "sample_csv_file.csv")
+SAMPLE_CSV_FILE_PATH = os.path.join("e2e/testing_objects", "sample_csv_file.csv")
 
 
 # ------------------------------Scenario 1-----------------------------------
@@ -48,7 +48,7 @@ def step_impl_3(context):
   resp = get_method(api_url, query_params=params)
   resp_data = resp.json()
   assert resp.status_code == 200, f"Status {resp.status_code}"
-  learner_names = [i.get("first_name") for i in resp_data.get("data")["records"]]
+  learner_names = [i.get("first_name") for i in resp_data.get("data")]
   for name in inserted_learner_names:
     assert name in learner_names
 
@@ -160,7 +160,7 @@ def step_impl_3(context):
   resp = get_method(api_url, query_params=params)
   resp_data = resp.json()
   assert resp.status_code == 200, f"Status {resp.status_code}"
-  achievement_names = [i.get("name") for i in resp_data.get("data")["records"]]
+  achievement_names = [i.get("name") for i in resp_data.get("data")]
   for name in inserted_achievement_names:
     assert name in achievement_names
 

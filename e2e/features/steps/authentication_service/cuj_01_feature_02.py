@@ -267,5 +267,5 @@ def step_7_2(context):
 @behave.then(
     "the Authentication service returns an error response invalid token")
 def step_7_3(context):
-  assert context.res.status_code == 401
+  assert context.res.status_code == 498
   assert context.res_data["success"] is False

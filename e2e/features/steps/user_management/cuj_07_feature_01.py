@@ -435,7 +435,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.status_code == 200
   assert context.res.json()["success"] is True
   assert context.res.json()["message"] == "Data fetched successfully"
-  assert type(context.res.json()["data"]["records"]) is list
+  assert type(context.res.json()["data"]) is list
 
 
 @given("fetch all the actions for incorrect query params")

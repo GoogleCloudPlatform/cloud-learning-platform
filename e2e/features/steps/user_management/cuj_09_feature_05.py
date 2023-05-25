@@ -74,7 +74,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Successfully fetched the association group"
-  assert context.res_data["data"]["records"] == []
+  assert context.res_data["data"] == []
 
 
 # --- Fetch Association Groups from User management by searching with empty search_query--
