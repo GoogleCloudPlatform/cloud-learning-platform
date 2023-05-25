@@ -331,7 +331,7 @@ class LearningResource(NodeItem):
         "uuid", "==", uuid).filter("is_deleted", "==", is_deleted).get()
     if learning_resource is None:
       raise ResourceNotFoundException(
-          f"Learning Resource with uuid {id} not found")
+          f"Learning Resource with uuid {uuid} not found")
     return learning_resource
 
   @classmethod

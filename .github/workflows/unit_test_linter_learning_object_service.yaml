@@ -79,6 +79,7 @@ jobs:
       run: |
         BASE_DIR=$(pwd)
         cd ${{ matrix.target-folder }}/src
+        mkdir zip_extraction_folder
         PYTEST_ADDOPTS="--cache-clear --cov . " PYTHONPATH=$BASE_DIR/common/src python -m pytest
 
   linter:
