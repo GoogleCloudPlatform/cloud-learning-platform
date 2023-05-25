@@ -24,6 +24,7 @@ from common.utils.config import (JOB_TYPES_WITH_PREDETERMINED_TITLES,
 #pylint: disable=consider-using-f-string
 #pylint: disable=logging-format-interpolation
 #pylint: disable=broad-exception-raised
+#pylint: disable=invalid-name
 # Set logging
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 

@@ -6,6 +6,7 @@ from zipfile import ZipFile
 from common.utils.errors import (ValidationError)
 
 # pylint: disable = line-too-long
+# pylint: disable = invalid-name
 FOLDER_NAMES_TO_EXCLUDE = ["Templates", "Resources"]
 
 ALLOWED_CONTENT_TYPES = [

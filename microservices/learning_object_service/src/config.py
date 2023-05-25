@@ -1,7 +1,8 @@
 """
   Learning Object Service config file
 """
-# pylint: disable=unspecified-encoding, invalid-name
+# pylint: disable=unspecified-encoding
+# pylint: disable = invalid-name
 import os
 import json
 from typing_extensions import Literal
