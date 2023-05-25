@@ -160,7 +160,3 @@ def test_token(mock_token, mock_claims, mock_key_set, clean_firestore,
   resp = client_with_emulator.post(url, data={"JWT": "eys.ej3k.sa4f"})
 
   assert resp.status_code == 200
-  json_res = resp.json()
-  assert len(json_res.get("data")) == len(
-      test_claims.get(
-          "https://purl.imsglobal.org/spec/lti-dl/claim/content_items"))

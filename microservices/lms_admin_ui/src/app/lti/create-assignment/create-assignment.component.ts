@@ -76,17 +76,27 @@ export class CreateAssignmentComponent {
     console.log(data)
     console.log("Extra dataaaaa", this.dialogData.extra_data)
     if (this.dialogData.mode == "Create") {
-      this.homeService.postLtiAssignments({ ...data, context_type: context_type, context_id: this.dialogData.extra_data.contextId }).subscribe(response => {
-        console.log("response", response)
+      this.homeService.postLtiAssignments({ ...data, context_type: context_type, context_id: this.dialogData.extra_data.contextId }).subscribe((response: any) => {
+        if (response.success == true) {
+          console.log("response", response)
+          this.dialogRef.close({ data: 'success' })
+        }
+        else{
+          this.openFailureSnackBar(response?.message, 'FAILED')
+        }
         this.showProgressSpinner = false
-        this.dialogRef.close({ data: 'success' })
       })
     } else {
       console.log("this.dialogData.extra_data", this.dialogData.extra_data)
-      this.homeService.updateLtiAssignments(this.dialogData.extra_data.assignment.id, data).subscribe(response => {
+      this.homeService.updateLtiAssignments(this.dialogData.extra_data.assignment.id, data).subscribe((response: any) => {
         console.log("response", response)
+        if (response.success == true) {
+          this.dialogRef.close({ data: 'success' })
+        }
+        else{
+          this.openFailureSnackBar(response?.message, 'FAILED')
+        }
         this.showProgressSpinner = false
-        this.dialogRef.close({ data: 'success' })
       })
     }
   }
@@ -132,7 +142,7 @@ export class CreateAssignmentComponent {
     });
   }
   else{
-    this.openFailureSnackBar('please select a tool','Error')
+    this.openFailureSnackBar('Please select a tool','Error')
   }
   }
 

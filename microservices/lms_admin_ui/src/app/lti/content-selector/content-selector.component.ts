@@ -47,11 +47,11 @@ export class ContentSelectorComponent {
   }
   get_content_item_id(){
     if(localStorage.getItem('contentItemId')){
-      this.openSuccessSnackBar('content item id copied to create assignment form','Success')
+      this.openSuccessSnackBar('Content item id copied to create assignment form','Success')
       this.dialogRef.close({ data: localStorage.getItem('contentItemId') });
     }
     else{
-      this.openFailureSnackBar('content item if not available', 'Error')
+      this.openFailureSnackBar('content item is not available', 'Error')
     }
   //  this.dialogRef.close({ data: 'abc' });
   }
