@@ -33,12 +33,13 @@ def main(argv):
     if JOB_NAMESPACE == "default":
       kube_delete_job(FLAGS.container_name, JOB_NAMESPACE)
   except Exception as e:
-    Logger.info("Job failed. Error: %s" % str(e))
+    Logger.info(f"Job failed. Error: {str(e)}")
     job = BatchJobModel.find_by_uuid(FLAGS.container_name)
     job.status = "failed"
     job.errors = {"error_message": str(e)}
     job.update()
-    Logger.info("Namespace: %s" % JOB_NAMESPACE)
+    Logger.info(f"Namespace: {JOB_NAMESPACE}")
+
     raise e
 
 

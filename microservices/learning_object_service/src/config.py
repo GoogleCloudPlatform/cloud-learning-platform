@@ -18,7 +18,7 @@ os.environ["GOOGLE_CLOUD_PROJECT"] = GCP_PROJECT
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
 CONTENT_SERVING_BUCKET = os.environ.get("CONTENT_SERVING_BUCKET", "")
-SIGNURL_SA_KEY_PATH = "./keys/{}-signurl-sa-key.json".format(GCP_PROJECT)
+SIGNURL_SA_KEY_PATH = f"./keys/{GCP_PROJECT}-signurl-sa-key.json"
 
 try:
   with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r",
