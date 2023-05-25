@@ -5,6 +5,7 @@ from fireo.fields import (TextField, MapField, NumberField, BooleanField,
 from common.models import NodeItem, BaseModel
 from common.utils.errors import ResourceNotFoundException
 
+# pylint: disable = arguments-renamed
 LOS_LITERALS = {
   "CP_TYPES" : ["pathway"],
   "LE_TYPES" : ["learning_experience"],
@@ -95,6 +96,16 @@ class CurriculumPathway(NodeItem):
     collection_name = BaseModel.DATABASE_PREFIX + "curriculum_pathways"
     ignore_none_field = False
 
+  #TODO: Remove this and use from base model
+  @classmethod
+  def find_by_id(cls, uuid, is_deleted=False):
+    curriculum_pathway = CurriculumPathway.collection.filter(
+        "uuid", "==", uuid).filter("is_deleted", "==", is_deleted).get()
+    if curriculum_pathway is None:
+      raise ResourceNotFoundException(
+          f"Curriculum Pathway with uuid {uuid} not found")
+    return curriculum_pathway
+
   @classmethod
   def find_by_uuid(cls, uuid, is_deleted=False):
     curriculum_pathway = CurriculumPathway.collection.filter(
@@ -164,6 +175,16 @@ class LearningExperience(NodeItem):
     collection_name = BaseModel.DATABASE_PREFIX + "learning_experiences"
     ignore_none_field = False
 
+  #TODO: Remove this and use from base model
+  @classmethod
+  def find_by_id(cls, uuid, is_deleted=False):
+    learning_experience = LearningExperience.collection.filter(
+        "uuid", "==", uuid).filter("is_deleted", "==", is_deleted).get()
+    if learning_experience is None:
+      raise ResourceNotFoundException(
+          f"Learning Experience with uuid {uuid} not found")
+    return learning_experience
+
   @classmethod
   def find_by_uuid(cls, uuid, is_deleted=False):
     learning_experience = LearningExperience.collection.filter(
@@ -216,6 +237,16 @@ class LearningObject(NodeItem):
   class Meta:
     collection_name = BaseModel.DATABASE_PREFIX + "learning_objects"
     ignore_none_field = False
+
+  #TODO: Remove this and use from base model
+  @classmethod
+  def find_by_id(cls, uuid, is_deleted=False):
+    learning_object = LearningObject.collection.filter(
+        "uuid", "==", uuid).filter("is_deleted", "==", is_deleted).get()
+    if learning_object is None:
+      raise ResourceNotFoundException(
+          f"Learning Object with uuid {uuid} not found")
+    return learning_object
 
   @classmethod
   def find_by_uuid(cls, uuid, is_deleted=False):
@@ -292,6 +323,16 @@ class LearningResource(NodeItem):
       fields["last_modified_time"] = str(fields["last_modified_time"])
       fields["last_published_on"] = str(fields["last_published_on"])
     return fields
+
+  #TODO: Remove this and use from base model
+  @classmethod
+  def find_by_id(cls, uuid, is_deleted=False):
+    learning_resource = LearningResource.collection.filter(
+        "uuid", "==", uuid).filter("is_deleted", "==", is_deleted).get()
+    if learning_resource is None:
+      raise ResourceNotFoundException(
+          f"Learning Resource with id {id} not found")
+    return learning_resource
 
   @classmethod
   def find_by_uuid(cls, uuid, is_deleted=False):
