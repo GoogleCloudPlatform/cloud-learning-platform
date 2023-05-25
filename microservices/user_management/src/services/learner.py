@@ -1,8 +1,6 @@
 """service file to create learner and learner profile"""
 #pylint: disable=broad-exception-raised,redefined-builtin,unused-argument
 from common.utils.rest_method import post_method, delete_method, put_method
-from common.utils.errors import ValidationError, ConflictError
-from common.models import Learner, LearnerProfile, Achievement
 from config import SLP_BASE_URL
 #pylint: disable=broad-exception-raised
 

@@ -1,7 +1,5 @@
 """service file to create agent"""
 #pylint: disable=broad-exception-raised,redefined-builtin,unused-argument
-from common.models import Agent, User
-from common.utils.common_api_handler import CommonAPIHandler
 from common.utils.rest_method import (post_method, delete_method, put_method,
                            get_method)
 from config import LRS_BASE_URL
