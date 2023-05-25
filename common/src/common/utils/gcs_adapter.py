@@ -327,6 +327,7 @@ def upload_file_to_bucket(bucket_name, prefix, file_name, file):
 
 
 def upload_folder(bucket_name, src_path, dest_base_path):
+  """Upload a folder"""
   storage_client = storage.Client()
   bucket = storage_client.bucket(bucket_name)
   for source_file in glob.glob(src_path+"/**",recursive=True):
@@ -384,8 +385,7 @@ def move_file_within_bucket(bucket_name, src_path, dest_path):
     Input:
       bucket_name `str`: Bucket to upload files
       src_path `str`: Current path of the file on the bucket
-      dest_path `str`: Destination path of the file
-                        on the bucket
+      dest_path `str`: Destination path of the file on the bucket
     -------------------------------------------------------
     Output:
       blob_name `str`: Final path of the file on the bucket

@@ -10,7 +10,8 @@ from schemas.schema_examples import (
   UPDATE_LEARNER_PROFILE_EXAMPLE,
   EDUCATION_TAB_DROPDOWN_VALUES
 )
-# pylint: disable=no-self-argument, invalid-name
+# pylint: disable=no-self-argument
+# pylint: disable = invalid-name
 STATUS = Literal["in_progress", "not_attempted", "completed",
                 "evaluation_pending", "evaluated", "non_evaluated", "skipped"]
 EMPLOYMENT_STATUS = Literal["Full-time","Part-time","Seeking work",

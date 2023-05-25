@@ -1,0 +1,106 @@
+{
+  "curriculum_pathways": {
+    "name": "Level Up Program",
+    "display_name": "Level Up Program",
+    "description": "Level Up Program Pathway",
+    "alias": "program",
+    "child_nodes": {
+      "curriculum_pathways": [
+        {
+          "name": "Level 1",
+          "display_name": "Level 1",
+          "description": "",
+          "order": 1,
+          "alias": "level",
+          "achievements": [
+            {
+              "type": "level",
+              "name": "Level 1",
+              "description": "Level 1",
+              "metadata": {
+                "design_config": {
+                  "shape": "",
+                  "theme": "",
+                  "illustration": ""
+                }
+              }
+            }
+          ],
+          "child_nodes": {
+            "curriculum_pathways": [
+              {
+                "name": "Humanities",
+                "display_name": "Humanities",
+                "description": "Understanding Your World",
+                "order": 1,
+                "alias": "discipline",
+                "achievements": [
+                  {
+                    "type": "course equate",
+                    "name": "Humanities",
+                    "description": "Understanding Your World",
+                    "metadata": {
+                      "design_config": {
+                        "shape": "",
+                        "theme": "",
+                        "illustration": ""
+                      }
+                    }
+                  }
+                ],
+                "child_nodes": {
+                  "curriculum_pathways": [
+                    {
+                      "name": "HUM-13507",
+                      "display_name": "HUM-13507",
+                      "description": "Unit 1:HUM-13507",
+                      "alias": "unit",
+                      "order": 1,
+                      "metadata": {
+                        "design_config": {
+                          "illustration": "L1_U2",
+                          "theme": "red-primary-light"
+                        }
+                      },
+                      "achievements": [
+                        {
+                          "type": "competency",
+                          "name": "Humanities, Self & Society",
+                          "description": "Humanities, Self & Society",
+                          "metadata": {
+                            "design_config": {
+                              "shape": "circle",
+                              "theme": "",
+                              "illustration": "L1_A2"
+                            }
+                          }
+                        }
+                      ],
+                      "child_nodes": {
+                        "learning_experiences": [
+                          {
+                            "description": "",
+                            "display_name": "Humanities, Self & Society",
+                            "name": "Humanities, Self & Society",
+                            "order": 1,
+                            "alias": "learning_experience",
+                            "metadata": {
+                              "design_config": {
+                                "illustration": "L1_U2",
+                                "theme": "red-primary-light"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

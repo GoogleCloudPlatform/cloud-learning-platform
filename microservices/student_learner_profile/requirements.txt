@@ -7,7 +7,7 @@ regex==2022.10.31
 kubernetes==11.0.0
 firebase-admin==4.5.2
 python-multipart==0.0.5
-typing-extensions==4.0.1
+typing-extensions==4.4.0
 google-cloud-core==1.7.3
 google-cloud-logging==3.1.2
 google-cloud-storage==2.0.0
