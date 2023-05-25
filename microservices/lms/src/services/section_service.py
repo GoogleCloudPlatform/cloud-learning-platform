@@ -48,6 +48,7 @@ def copy_course_background_task(course_template_details,
                                               sections_details.description,
                                               sections_details.name, "me")
     batch_job.classroom_id = new_course["id"]
+    batch_job.start_time = datetime.datetime.utcnow()
     batch_job.status = "running"
     batch_job.update()
 
@@ -315,15 +316,18 @@ def copy_course_background_task(course_template_details,
       batch_job.status = "failed"
     else:
       batch_job.status = "success"
+    batch_job.end_time = datetime.datetime.utcnow()
     batch_job.update()
 
     return True
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")
-    logs["errors"].append(e)
     Logger.error(error)
     Logger.error(e)
+
+    logs["errors"].append(str(e))
     batch_job.logs = logs
+    batch_job.end_time = datetime.datetime.utcnow()
     batch_job.status = "failed"
     batch_job.update()
     raise InternalServerError(str(e)) from e
@@ -452,68 +456,88 @@ def update_grades(material,section,coursework_id,batch_job_id):
   batch_job = BatchJob.find_by_id(batch_job_id)
   logs = batch_job.logs
 
-  student_grades = {}
-  count =0
+  try:
+    student_grades = {}
+    count =0
 
-  info_msg = f"Student grade update background tasks started\
-              for coursework_id {coursework_id}"
-  logs["info"].append(info_msg)
-  Logger.info(info_msg)
+    info_msg = f"Student grade update background tasks started\
+                for coursework_id {coursework_id}"
+    logs["info"].append(info_msg)
+    Logger.info(info_msg)
+    batch_job.start_time = datetime.datetime.utcnow()
+    batch_job.status = "running"
+    batch_job.update()
 
-  #Get url mapping of google forms view links and edit ids
-  url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
-  form_details = url_mapping[material["form"]["formUrl"]]
+    #Get url mapping of google forms view links and edit ids
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+    form_details = url_mapping[material["form"]["formUrl"]]
 
-  form_id = form_details["file_id"]
-  # Get all responses for the form if no responses of
-  # the form then return
-  all_responses_of_form = classroom_crud.\
-  retrieve_all_form_responses(form_id)
-  if all_responses_of_form =={}:
-    logs["errors"].append("Responses not available for google form")
-    Logger.error("Responses not available for google form")
-  for response in all_responses_of_form["responses"]:
-    try:
-      if "respondentEmail" not in response.keys():
-        error_msg = f"Respondent Email is not collected in form for\
-        coursework {coursework_id} Update form settings to collect Email"
-        logs["errors"].append(error_msg)
-        raise Exception(error_msg)
+    form_id = form_details["file_id"]
+    # Get all responses for the form if no responses of
+    # the form then return
+    all_responses_of_form = classroom_crud.\
+    retrieve_all_form_responses(form_id)
+    if all_responses_of_form =={}:
+      logs["errors"].append("Responses not available for google form")
+      Logger.error("Responses not available for google form")
 
-      respondent_email = response["respondentEmail"]
-      submissions=classroom_crud.list_coursework_submissions_user(
-                                            section.classroom_id,
-                                            coursework_id,
-                                    response["respondentEmail"])
-      if submissions !=[]:
-        if submissions[0]["state"] == "TURNED_IN":
-          logs["info"].append(f"Updating grades for {respondent_email}")
-          Logger.info(f"Updating grades for {respondent_email}")
-          if "totalScore" not in response.keys():
-            response["totalScore"]=0
-          classroom_crud.patch_student_submission(section.classroom_id,
-                                  coursework_id,submissions[0]["id"],
-                                        response["totalScore"],
-                                        response["totalScore"])
-          count+=1
-          student_grades[
-          response["respondentEmail"]]=response["totalScore"]
-          logs["info"].append(f"Updated grades for {respondent_email}")
-          Logger.info(f"Updated grades for {respondent_email}")
-        else :
-          logs["info"].append(f"Submission state is not turn in {respondent_email}")
-          Logger.info(f"Submission state is not turn in {respondent_email}")
-    except Exception as e:
-      error = traceback.format_exc().replace("\n", " ")
-      Logger.error(error)
-      logs["errors"].append(error)
-      Logger.error(e)
-      continue
-  logs["info"].append(f"Student grades updated\
-                for {count} student_data {student_grades}")
-  Logger.info(f"Student grades updated\
-                for {count} student_data {student_grades}")
-  batch_job.logs = logs
-  batch_job.status = "success"
-  batch_job.update()
-  return count,student_grades
+    for response in all_responses_of_form.get("responses",[]):
+      try:
+        if "respondentEmail" not in response.keys():
+          error_msg = f"Respondent Email is not collected in form for\
+          coursework {coursework_id} Update form settings to collect Email"
+          logs["errors"].append(error_msg)
+          raise Exception(error_msg)
+
+        respondent_email = response["respondentEmail"]
+        submissions=classroom_crud.list_coursework_submissions_user(
+                                              section.classroom_id,
+                                              coursework_id,
+                                      response["respondentEmail"])
+        if submissions !=[]:
+          if submissions[0]["state"] == "TURNED_IN":
+            logs["info"].append(f"Updating grades for {respondent_email}")
+            Logger.info(f"Updating grades for {respondent_email}")
+            if "totalScore" not in response.keys():
+              response["totalScore"]=0
+            classroom_crud.patch_student_submission(section.classroom_id,
+                                    coursework_id,submissions[0]["id"],
+                                          response["totalScore"],
+                                          response["totalScore"])
+            count+=1
+            student_grades[
+            response["respondentEmail"]]=response["totalScore"]
+            logs["info"].append(f"Updated grades for {respondent_email}")
+            Logger.info(f"Updated grades for {respondent_email}")
+          else :
+            logs["info"].append(f"Submission state is not turn in {respondent_email}")
+            Logger.info(f"Submission state is not turn in {respondent_email}")
+      except Exception as e:
+        error = traceback.format_exc().replace("\n", " ")
+        Logger.error(error)
+        logs["errors"].append(error)
+        Logger.error(e)
+        continue
+    Logger.info(f"Student grades updated\
+                  for {count} student_data {student_grades}")
+
+    logs["info"].append(f"Student grades updated\
+                  for {count} student_data {student_grades}")
+    batch_job.logs = logs
+    batch_job.end_time = datetime.datetime.utcnow()
+    batch_job.status = "success"
+    batch_job.update()
+    return count,student_grades
+
+  except Exception as e:
+    Logger.error(f"Grade import failed due to error - {str(e)}")
+    error = traceback.format_exc().replace("\n", " ")
+    Logger.error(f"Traceback - {error}")
+
+    logs["errors"].append(f"Grade import failed due to error - {str(e)}")
+    batch_job.end_time = datetime.datetime.utcnow()
+    batch_job.logs = logs
+    batch_job.status = "failed"
+    batch_job.update()
+
+    raise InternalServerError(str(e)) from e

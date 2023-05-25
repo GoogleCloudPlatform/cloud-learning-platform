@@ -12,19 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module to add jobs in FireO"""
-from fireo.fields import TextField, MapField, IDField
+from fireo.fields import TextField, MapField, IDField, DateTime
 from common.models import BaseModel
 
 
 class BatchJob(BaseModel):
   """Batch job Data Model"""
   id = IDField()
-  type = TextField()
+  job_type = TextField()
   status = TextField()
   logs = MapField(default={})
   input_data = MapField(default={})
   section_id = TextField()
   classroom_id = TextField()
+  start_time = DateTime()
+  end_time = DateTime()
 
   class Meta:
     ignore_none_field = False

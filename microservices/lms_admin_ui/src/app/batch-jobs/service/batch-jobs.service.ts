@@ -10,7 +10,7 @@ export class JobsService {
   constructor(private http: HttpClient) { }
 
   getJobsList(skip: any, limit: any) {
-    return this.http.get(`${environment.apiurl}batch-jobs?skip=0&limit=100`)
+    return this.http.get(`${environment.apiurl}batch-jobs?skip=${skip}&limit=${limit}`)
   }
 
 }

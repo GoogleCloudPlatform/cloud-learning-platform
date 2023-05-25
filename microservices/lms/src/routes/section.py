@@ -560,12 +560,15 @@ def import_grade(section_id: str,coursework_id:str,
     section = Section.find_by_id(section_id)
     result = classroom_crud.get_course_work(
     section.classroom_id,coursework_id)
+
     batch_job_input = {
         "type": "grade_import",
         "status": "ready",
+        "section_id": section_id,
+        "classroom_id": section.classroom_id,
         "input_data": {
             "section_id": section_id,
-            "coursework_id":coursework_id
+            "coursework_id": coursework_id
         },
         "logs": {
             "info": [],
@@ -589,13 +592,19 @@ def import_grade(section_id: str,coursework_id:str,
         return {
             "message":
                 "Grades for coursework will be updated shortly, " +
-                f"use this job id {batch_job.id} for more info"
+                f"use this job id - '{batch_job.id}' for more info"
         }
       else:
+        batch_job.logs["errors"].append(
+            f"Form is not present for coursework_id {coursework_id}")
+        batch_job.update()
         raise ResourceNotFoundException(
           f"Form is not present for coursework_id {coursework_id}"
           )
     else:
+      batch_job.logs["errors"].append(
+            f"Form is not present for coursework_id {coursework_id}")
+      batch_job.update()
       raise ResourceNotFoundException(
           f"Form is not present for coursework_id {coursework_id}"
           )
