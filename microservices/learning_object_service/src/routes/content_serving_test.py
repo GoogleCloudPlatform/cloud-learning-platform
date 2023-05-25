@@ -1004,7 +1004,7 @@ def test_upload_madcap_positive(clean_firestore, mocker):
   learning_experience_dict["uuid"] = learning_experience.id
 
   file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
-
+  print(file_path)
   resp = client_with_emulator.post(
       f"{api_url}/upload/madcap/{learning_experience.uuid}",
       files={
