@@ -9,7 +9,7 @@ from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError, ResourceNotFound
 from schemas.error_schema import NotFoundErrorResponseModel
 from config import ERROR_RESPONSES
-# pylint: disable = broad-except
+# pylint: disable = broad-except, invalid-name
 
 router = APIRouter(
     prefix="/jobs",

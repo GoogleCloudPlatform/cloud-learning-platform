@@ -35,7 +35,7 @@ from config import (SIGNURL_SA_KEY_PATH, RESOURCE_BASE_PATH,
                     VALIDATE_AND_UPLOAD_ZIP, CONTENT_FILE_SIZE,
                     ZIP_EXTRACTION_FOLDER, FAQ_BASE_PATH)
 
-# pylint: disable = line-too-long
+# pylint: disable = line-too-long, invalid-name
 # pylint: disable = broad-except
 router = APIRouter(tags=["Content Serving"], responses=ERROR_RESPONSES)
 
