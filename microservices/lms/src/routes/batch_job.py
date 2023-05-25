@@ -64,12 +64,12 @@ def get_batch_jobs_list(skip: int = 0, limit: int = 10):
 
 @router.get("/{batch_job_id}", response_model=BatchJobResponseModel)
 def get_batch_job(batch_job_id: str):
-  """Get a list of Batch jobs endpoint
+  """Get a Batch jobs using the batch job id endpoint
     Raises:
         HTTPException: 500 Internal Server Error if something fails.
 
     Returns:
-        BatchJobsListResponseModel: list of Batch jobs objects.
+        BatchJobResponseModel: details of the given Batch job.
         InternalServerErrorResponseModel:
             if the get batch jobs list raises an exception.
     """
