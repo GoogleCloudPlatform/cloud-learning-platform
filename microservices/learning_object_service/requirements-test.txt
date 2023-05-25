@@ -12,3 +12,4 @@ pytest-cov==4.0.0
 pytest-custom_exit_code==0.3.0
 pytest-mock==3.10.0
 pytz==2020.1
+kubernetes==11.0.0
