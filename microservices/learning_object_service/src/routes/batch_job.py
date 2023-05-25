@@ -25,6 +25,7 @@ JOB_TYPES = Literal["validate_and_upload_zip"]
         "model": NotFoundErrorResponseModel
     }})
 def get_batch_job_status(job_type: JOB_TYPES, job_name: str):
+  """Get the status of a batch job"""
   try:
     if job_name:
       data = get_job_status(job_type, job_name)
@@ -44,6 +45,7 @@ def get_batch_job_status(job_type: JOB_TYPES, job_name: str):
 
 @router.get("/{job_type}")
 def get_all_job_status(job_type: JOB_TYPES):
+  """Get the status of all batch jobs"""
   try:
     data = get_all_jobs(job_type)
     response = {
@@ -67,6 +69,7 @@ def get_all_job_status(job_type: JOB_TYPES):
         "model": NotFoundErrorResponseModel
     }})
 def delete_batch_job_status(job_type: JOB_TYPES, job_name: str):
+  """Delete the status of the batch job"""
   try:
     delete_batch_job(job_type, job_name)
     response = {
@@ -90,6 +93,7 @@ def delete_batch_job_status(job_type: JOB_TYPES, job_name: str):
         "model": NotFoundErrorResponseModel
     }})
 def update_batch_job_status(job_type: JOB_TYPES, job_name: str):
+  """Update the status of the batch job"""
   try:
     return remove_job_and_update_status(job_type, job_name)
   except ResourceNotFoundException as e:

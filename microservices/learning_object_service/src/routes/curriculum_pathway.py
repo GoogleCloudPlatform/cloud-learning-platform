@@ -624,6 +624,7 @@ def copy_curriculum_pathway(uuid: str):
         "model": PayloadTooLargeResponseModel
     }})
 async def bulk_import_pathway(req: Request, json_file: UploadFile = File(...)):
+  """Import a pathway from the JSON file"""
   try:
     if len(await json_file.read()) > PAYLOAD_FILE_SIZE:
       raise PayloadTooLargeError(

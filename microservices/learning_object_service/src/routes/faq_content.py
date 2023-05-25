@@ -26,6 +26,7 @@ router = APIRouter(tags=["FAQ Content"], responses=ERROR_RESPONSES)
         "model": NotFoundErrorResponseModel
     }})
 def get_faq_by_uuid(uuid: str):
+  """Get FAQ by UUID"""
   try:
     faq_content = FAQContent.find_by_uuid(uuid)
     faq_content_dict = faq_content.get_fields(reformat_datetime=True)
@@ -55,6 +56,7 @@ def get_faq_by_uuid(uuid: str):
 def filter_faq(skip: int = Query(0, ge=0, le=2000),
                limit: int = Query(10, ge=1, le=100),
                curriculum_pathway_id: str = None):
+  """Get all FAQs"""
   try:
     collection_manager = FAQContent.collection.filter("is_deleted", "==", False)
     if curriculum_pathway_id is not None:

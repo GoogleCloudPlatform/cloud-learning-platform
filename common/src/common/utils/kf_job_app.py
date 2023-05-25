@@ -245,7 +245,7 @@ def get_cloud_link(microservice_name):
   return url
 
 def kube_create_job(job_specs ,namespace="default", env_vars={}):
-  # check for pending/active duplicate job
+  """check for pending/active duplicate job"""
   job_logs = {}
   logging.info("Type of request body")
   logging.info(job_specs["input_data"])

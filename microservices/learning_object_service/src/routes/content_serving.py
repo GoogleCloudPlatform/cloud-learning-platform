@@ -57,6 +57,7 @@ fileHandler = FileUtils()
     }})
 def list_all_files(prefix: Optional[str] = None,
                    list_madcap_contents: Optional[bool] = False):
+  """List all files and folders at a given prefix"""
   try:
 
     prefix, folders_list, files_list = get_file_and_folder_list(
@@ -518,7 +519,7 @@ def list_content_versions(uuid: str,
 async def upload_madcap_export(le_uuid: str,
                                is_srl: bool = False,
                                content_file: UploadFile = File(...)):
-
+  """Upload a madcap export"""
   try:
 
     # check file size
@@ -675,6 +676,7 @@ async def link_madcap_to_lr(
     input_json: ContentLinkInputModel,
     is_srl: bool = False,
 ):
+  """Link Madcap Content to Learning Resource"""
   try:
     input_dict = input_json.dict()
     resource_path = input_dict["resource_path"]

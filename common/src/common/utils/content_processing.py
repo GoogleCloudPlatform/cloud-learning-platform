@@ -58,6 +58,7 @@ class ContentValidator:
     return os.path.exists(f"{src_path}/{relative_entry_point}")
 
   def checkResourceTypeAndExtension(self, resource_type, extension):
+    """Validate the resource type and extension"""
     file_extensions = ["pdf", "image", "html", "video", "docx"]
     if resource_type in file_extensions:
       if resource_type == "pdf" and extension in ["pdf", "PDF"]:
@@ -76,6 +77,7 @@ class ContentValidator:
     return False
 
   def checkExtensionAndContentHeader(self, content_header, extension):
+    """Validate the extension and content header"""
     if content_header.split("/")[-1] == extension.lower():
       return True
     elif content_header == "text/html" and extension.lower() in ["htm","html"]:
@@ -153,6 +155,7 @@ class FileUtils:
     print(f"File at path {filepath} does not exist")
 
   def deleteFolder(self, dir_name):
+    """Delete a folder in the given directory"""
     if os.path.exists(dir_name):
       folder = pathlib.Path(dir_name)
       all_children = list(folder.rglob("*"))
@@ -168,6 +171,7 @@ class FileUtils:
       print(f"Folder at path {dir_name} was not found")
 
   def getContentFolderFiles(self, dir_name):
+    """Retreive the content of a folder"""
     if os.path.exists(dir_name):
       content_folder_htm_files = []
 

@@ -6,6 +6,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, constr
 from schemas.schema_examples import BASIC_FAQ_CONTENT_EXAMPLE, FULL_FAQ_CONTENT_EXAMPLE
 
+# pylint: disable = invalid-name
 ALLOWED_FAQ_TYPES = Literal["faq_item", "faq_group"]
 
 

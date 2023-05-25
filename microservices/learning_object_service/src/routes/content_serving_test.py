@@ -10,6 +10,7 @@ import copy
 # pylint: disable = unspecified-encoding
 # pylint: disable = consider-using-with
 # pylint: disable = line-too-long
+# pylint: disable = invalid-name
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient

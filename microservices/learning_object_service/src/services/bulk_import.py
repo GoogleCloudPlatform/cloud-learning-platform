@@ -12,6 +12,7 @@ from config import ASSESSMENT_SERVICE_BASE_URL
 from pydantic.error_wrappers import ValidationError as PydanticValidationError
 from schemas.upload_pathway import UploadPathwayModel
 
+# pylint: disable = global-variable-not-assigned
 # creating global variable of SRL to insert its again directly
 SRL_COLLECTIONS = {}
 header = None
@@ -40,6 +41,7 @@ def get_all_nodes_for_project(uuid: str, level: str, nodes: list):
 
 
 def module_assessment_prerequisite_handler(uuid):
+  """Module assessment prerequisite handler"""
   learning_object_project = get_all_nodes_for_project(uuid,
                                                       "curriculum_pathways", [])
   for learning_object in learning_object_project:
@@ -66,6 +68,7 @@ def skill_update_handler(content, new_content_obj):
 
 
 def add_data_to_db_handler(content, new_content_obj, collection_name):
+  """Add data to the database handler"""
   if collection_name == "assessments":
     global header
     url = ASSESSMENT_SERVICE_BASE_URL+"/assessment"
@@ -449,6 +452,7 @@ def upload_handler(key, content, uuid):
 
 
 def find_redundent_id(content):
+  """Find the redundent ID"""
 
   result = {"learning_resources": [], "assessments": []}
   input_dict = {"learning_resources": [], "assessments": []}
@@ -474,6 +478,7 @@ def find_redundent_id(content):
 
 
 def srl_redundency_cleaner():
+  """SRL Redundency Cleaner"""
   learning_objects = collection_references["learning_objects"].find_by_type(
       "srl")
   for learning_object in learning_objects:

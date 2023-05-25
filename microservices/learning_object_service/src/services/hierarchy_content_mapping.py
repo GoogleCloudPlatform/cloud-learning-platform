@@ -119,6 +119,7 @@ def link_content_to_lr(le_uuid, lr_uuid, resource_path, resource_type, is_srl):
 
 
 def get_parent_node_list(node_id, collection):
+  """Get the list of parent nodes"""
   parent_list = []
   node_doc = collection.find_by_id(node_id)
   parent_nodes = node_doc.parent_nodes
@@ -296,6 +297,7 @@ def get_all_lr_for_le(le_uuid):
 
 
 def get_file_and_folder_list(prefix, list_madcap_contents=False):
+  """Get the file and folder list for a given prefix"""
   if prefix is None:
     prefix = ""
   else:
