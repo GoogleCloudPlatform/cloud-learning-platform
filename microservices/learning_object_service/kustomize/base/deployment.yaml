@@ -13,6 +13,8 @@ spec:
         app: learning-object-service
     spec:
       serviceAccountName: ksa
+      # TODO: un-comment the below steps while updating workflows
+      # if signurl is created
       # volumes:
       #   - name: signurl-sa-key
       #     secret:

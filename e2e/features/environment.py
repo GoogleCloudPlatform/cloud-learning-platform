@@ -571,4 +571,3 @@ def sign_up_user():
 
 def before_all(context):
   sign_up_user()
-  pass

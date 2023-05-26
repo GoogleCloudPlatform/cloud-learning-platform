@@ -10,6 +10,7 @@ Feature: Learner achievements are updated as the user progresses through a learn
             When Achievements are completed and incorrect achievement is tried to be updated in learner profile
             Then SLP will throw a resource not found error as incorrect achievement was given
     
+    @filter-api
     Scenario: Learner can view all achievements associated for a Program along with the status
         Given The learner with an existing learner profile enrolled into a valid curriculum pathway program 
             When Learner fetches achievements for a valid program
