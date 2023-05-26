@@ -138,11 +138,17 @@ def copy_course_background_task(course_template_details,
         # Update the due date of the course work if exists
         if coursework.get("dueDate"):
           coursework_due_date = coursework.get("dueDate")
-          coursework_due_time = coursework.get("dueTime")
-          coursework_due_datetime = datetime.datetime(
-              coursework_due_date.get("year"), coursework_due_date.get("month"),
-              coursework_due_date.get("day"), coursework_due_time.get("hours"),
-              coursework_due_time.get("minutes"))
+
+          if coursework.get("dueTime"):
+            coursework_due_time = coursework.get("dueTime")
+            coursework_due_datetime = datetime.datetime(
+                coursework_due_date.get("year"), coursework_due_date.get("month"),
+                coursework_due_date.get("day"), coursework_due_time.get("hours", 0),
+                coursework_due_time.get("minutes", 0))
+          else:
+            coursework_due_datetime = datetime.datetime(
+                coursework_due_date.get("year"), coursework_due_date.get("month"),
+                coursework_due_date.get("day"))
 
           curr_utc_timestamp = datetime.datetime.utcnow()
           lti_assignment_details["start_date"] = (cohort_details.start_date).strftime("%Y-%m-%dT%H:%M:%S%z")
