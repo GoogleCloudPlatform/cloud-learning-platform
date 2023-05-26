@@ -1,4 +1,4 @@
-"""Behave Test for Feature: SNHU Reigstrar can view and maintain a learner's academic record"""
+"""Behave Test for Feature: Reigstrar can view and maintain a learner's academic record"""
 
 import sys
 from e2e.setup import post_method, get_method, delete_method
@@ -14,7 +14,7 @@ from e2e.test_config import API_URL_LEARNER_PROFILE_SERVICE
 API_URL = API_URL_LEARNER_PROFILE_SERVICE
 
 # Scenario 1
-"""SNHU Registrar can access learner academic records"""
+"""Registrar can access learner academic records"""
 
 
 @behave.given("A learner is having some academic records")
@@ -47,7 +47,7 @@ def step_impl_1(context):
 
 
 @behave.when(
-    "SNHU Registrar wants to access academic records of a particular learner")
+    "Registrar wants to access academic records of a particular learner")
 def step_impl_2(context):
   """Fetching academic records of a learner"""
   context.learner_profile_get_res = get_method(url=context.learner_profile_url)
@@ -55,7 +55,7 @@ def step_impl_2(context):
 
 
 @behave.then(
-    "SLP should return the academic records of the particular learner to SNHU Reigstrar"
+    "SLP should return the academic records of the particular learner to Reigstrar"
 )
 def step_impl_3(context):
   """fetching a learner profile"""
@@ -99,7 +99,7 @@ def step_impl_1(context):
 
 
 @behave.when(
-    "SNHU Registrar wants to access academic records of a learner with invalid ID")
+    "Registrar wants to access academic records of a learner with invalid ID")
 def step_impl_2(context):
   """Fetching academic records of a learner"""
   invalid_learner_id = "random_learner_id"
@@ -109,7 +109,7 @@ def step_impl_2(context):
 
 
 @behave.then(
-    "SLP should return error message to SNHU Registrar"
+    "SLP should return error message to Registrar"
 )
 def step_impl_3(context):
   """fetching a learner profile"""

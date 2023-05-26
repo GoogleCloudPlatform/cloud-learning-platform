@@ -31,7 +31,7 @@ def step_impl_2(context):
 
 
 @behave.then(
-    "the employer information (name, address, and contact info) is ingested into the SLP from the SNHU admin Salesforce record of the learner account"
+    "the employer information (name, address, and contact info) is ingested into the SLP from the admin Salesforce record of the learner account"
 )
 def step_impl_3(context):
   """Validating the employer information when the learner account is created"""
@@ -90,7 +90,7 @@ def step_impl_2(context):
 
 
 @behave.then(
-    "the employer information (name, address, and contact info) is not ingested into the SLP from the SNHU admin Salesforce record of the learner account"
+    "the employer information (name, address, and contact info) is not ingested into the SLP from the admin Salesforce record of the learner account"
 )
 def step_impl_3(context):
   """Validating the employer information when the learner account is created"""

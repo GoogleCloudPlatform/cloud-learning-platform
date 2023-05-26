@@ -20,7 +20,7 @@ TEST_GOAL_PATH = os.path.join(TESTING_OBJECTS_PATH, "goals.json")
 API_URL = API_URL_LEARNER_PROFILE_SERVICE
 
 #SLP Postive --------------------------------------------------------
-@behave.given("SNHU Administrator has access to SLP service with the correct filter payloads")
+@behave.given("Administrator has access to SLP service with the correct filter payloads")
 def step_impl_1(context):
     fileObject = open(TEST_LP_PATH, "r")
     jsonContent = fileObject.read()
@@ -31,7 +31,7 @@ def step_impl_1(context):
     }
     context.url= f"{API_URL}/learner-profile?skip=0&limit=10"
 
-@behave.when("SNHU Administrator wants to filter learner profiles based on correct filter payloads")
+@behave.when("Administrator wants to filter learner profiles based on correct filter payloads")
 def step_impl_2(context):
     context.res = get_method(url= context.url, query_params = context.payload)
     context.res_data = context.res.json()
@@ -46,7 +46,7 @@ def step_impl_3(context):
         assert context.res_data["data"][0]["uuid"] == context.lp["uuid"] , "UUID mismatch"
 
 #SLP Negative --------------------------------------------------------
-@behave.given("SNHU Administrator has access to SLP service with the correct filter payloads for more than one list filters")
+@behave.given("Administrator has access to SLP service with the correct filter payloads for more than one list filters")
 def step_impl_1(context):
     context.payload ={
         "learning_goal": "Develop Communication Skills",
@@ -54,18 +54,18 @@ def step_impl_1(context):
     }
     context.url= f"{API_URL}/learner-profile?skip=0&limit=10"
 
-@behave.when("SNHU Administrator wants to filter learner profiles based on correct filter payloads for more than one list filters")
+@behave.when("Administrator wants to filter learner profiles based on correct filter payloads for more than one list filters")
 def step_impl_2(context):
     context.res = get_method(url= context.url, query_params = context.payload)
     context.res_data = context.res.json()
 
-@behave.then("the SNHU administrator gets the right error message")
+@behave.then("the administrator gets the right error message")
 def step_impl_3(context):
     assert context.res_data["success"] == False , "Succesfully fetched the right learner profiles based on filter payload"
     assert context.res_data["message"] == "Please use only one of the following fields for filter at a time - learning_goal, learning_pathway, learning_experience"
 
 #LEARNER ACHIEVEMENT Positive ---------------------------------------------------------------
-@behave.given("SNHU Administrator has access to SLP service with the correct learner specific achievements filter payloads")
+@behave.given("Administrator has access to SLP service with the correct learner specific achievements filter payloads")
 def step_impl_1(context):
     context.payload ={
         "credential_id": "c1",
@@ -79,7 +79,7 @@ def step_impl_1(context):
     context.learner_id = context.achv["learner_id"]
     context.url= f"{API_URL}/learner/{context.learner_id}/achievements?skip=0&limit=10"
 
-@behave.when("SNHU Administrator wants to filter learner specific achievements based on correct filter payloads")
+@behave.when("Administrator wants to filter learner specific achievements based on correct filter payloads")
 def step_impl_2(context):
     context.res = get_method(url= context.url, query_params = context.payload)
     context.res_data = context.res.json()
@@ -95,7 +95,7 @@ def step_impl_3(context):
         assert context.res_data["data"][0]["type"] == context.achv["type"], "Type of achievement mismatched"
 
 #LEARNER  ACHIEVEMENT Negative ---------------------------------------------------------------
-@behave.given("SNHU Administrator has access to SLP service with the incorrect learner id")
+@behave.given("Administrator has access to SLP service with the incorrect learner id")
 def step_impl_1(context):
     context.payload ={
         "competency_id": "cd1",
@@ -104,7 +104,7 @@ def step_impl_1(context):
     context.learner_id = "Learner three"
     context.url= f"{API_URL}/learner/{context.learner_id}/achievements?skip=0&limit=10"
 
-@behave.when("SNHU Administrator wants to filter learner specific achievements based on incorrect learner id")
+@behave.when("Administrator wants to filter learner specific achievements based on incorrect learner id")
 def step_impl_2(context):
     context.res = get_method(url= context.url, query_params = context.payload)
     context.res_data = context.res.json()
@@ -115,7 +115,7 @@ def step_impl_3(context):
     assert context.res_data["message"] == "Learner with uuid Learner three not found"
 
 #ACHIEVEMENT Positive ---------------------------------------------------------------
-@behave.given("SNHU Administrator has access to SLP service with the correct achievements filter payloads")
+@behave.given("Administrator has access to SLP service with the correct achievements filter payloads")
 def step_impl_1(context):
     context.payload ={
         "credential_id": "c1",
@@ -128,7 +128,7 @@ def step_impl_1(context):
     context.achv = acList[0]
     context.url= f"{API_URL}/achievements?skip=0&limit=10"
 
-@behave.when("SNHU Administrator wants to filter achievements based on correct filter payloads")
+@behave.when("Administrator wants to filter achievements based on correct filter payloads")
 def step_impl_2(context):
     context.res = get_method(url= context.url, query_params = context.payload)
     context.res_data = context.res.json()
@@ -144,7 +144,7 @@ def step_impl_3(context):
         assert context.res_data["data"][0]["type"] == context.achv["type"], "Achievement type mismatch for the fetched achievements"
 
 #ACHIEVEMENT Negative ---------------------------------------------------------------
-@behave.given("SNHU Administrator has access to SLP service with the incorrect achievements filter payloads")
+@behave.given("Administrator has access to SLP service with the incorrect achievements filter payloads")
 def step_impl_1(context):
     context.payload ={
         "competency_id": "cd1",
@@ -152,7 +152,7 @@ def step_impl_1(context):
     }
     context.url= f"{API_URL}/achievements?skip=0&limit=10"
 
-@behave.when("SNHU Administrator wants to filter achievements based on incorrect achievements filter payloads")
+@behave.when("Administrator wants to filter achievements based on incorrect achievements filter payloads")
 def step_impl_2(context):
     context.res = get_method(url= context.url, query_params = context.payload)
     context.res_data = context.res.json()
@@ -164,7 +164,7 @@ def step_impl_3(context):
     assert context.res_data["message"] == "Please use only one of the following fields for filter at a time - skill_id, competency_id"
 
 #GOAL Positive ---------------------------------------------------------------
-@behave.given("SNHU Administrator has access to SLP service with the correct Goals filter payloads")
+@behave.given("Administrator has access to SLP service with the correct Goals filter payloads")
 def step_impl_1(context):
     context.payload ={
         "goal_type": "Long-term"
@@ -175,7 +175,7 @@ def step_impl_1(context):
     context.goal = glist[0]
     context.url= f"{API_URL}/goal?skip=0&limit=10"
 
-@behave.when("SNHU Administrator wants to filter Goals based on correct filter payloads")
+@behave.when("Administrator wants to filter Goals based on correct filter payloads")
 def step_impl_2(context):
     context.res = get_method(url= context.url, query_params = context.payload)
     context.res_data = context.res.json()
@@ -190,14 +190,14 @@ def step_impl_3(context):
         assert context.res_data["data"][0]["type"] == context.goal["type"]
 
 #GOAL Negative ---------------------------------------------------------------
-@behave.given("SNHU Administrator has access to SLP service with the incorrect Goals filter payloads")
+@behave.given("Administrator has access to SLP service with the incorrect Goals filter payloads")
 def step_impl_1(context):
     context.payload ={
         "goal_type": 1
     }
     context.url= f"{API_URL}/goal?skip=0&limit=10"
 
-@behave.when("SNHU Administrator wants to filter Goals based on incorrect filter payloads")
+@behave.when("Administrator wants to filter Goals based on incorrect filter payloads")
 def step_impl_2(context):
     context.res = get_method(url= context.url, query_params = context.payload)
     context.res_data = context.res.json()
@@ -230,7 +230,7 @@ def step_impl_1(context):
         url=context.item_url, request_body={"is_archived": True})
 
 @behave.when(
-    "SNHU Administrator fetches the archived Learner with correct request payload")
+    "Administrator fetches the archived Learner with correct request payload")
 def step_impl_2(context):
     # Fetch an archived learner
     url = f"{context.learner_url}s"
@@ -277,7 +277,7 @@ def step_impl_1(context):
     context.item_url = f"{context.learner_url}/{context.learner_id}"
 
 @behave.when(
-    "SNHU Administrator fetches the un-archived Learner with correct request payload")
+    "Administrator fetches the un-archived Learner with correct request payload")
 def step_impl_2(context):
     # Fetch an un-archived learner
     url = f"{context.learner_url}s"
@@ -342,7 +342,7 @@ def step_impl_1(context):
     context.item_url_2 = f"{context.learner_url}/{context.learner_id_2}"
 
 @behave.when(
-    "SNHU Administrator fetches the Learner with correct request payload")
+    "Administrator fetches the Learner with correct request payload")
 def step_impl_2(context):
     # Fetch learners
     url = f"{context.learner_url}s"
@@ -409,7 +409,7 @@ def step_impl_1(context):
         url=url, request_body={"is_archived": True})
 
 @behave.when(
-    "SNHU Administrator fetches the archived Learner Profile with correct request payload")
+    "Administrator fetches the archived Learner Profile with correct request payload")
 def step_impl_2(context):
     # Fetch all learner_profile
     url = f"{API_URL}/learner-profile"
@@ -476,7 +476,7 @@ def step_impl_1(context):
     context.item_url = f"{context.learner_profile_url}/{context.learner_profile_id}"
 
 @behave.when(
-    "SNHU Administrator fetches the un-archived Learner Profile with correct request payload")
+    "Administrator fetches the un-archived Learner Profile with correct request payload")
 def step_impl_2(context):
     # Fetch all learner_profile
     url = f"{API_URL}/learner-profile"
@@ -542,7 +542,7 @@ def step_impl_1(context):
         url=context.item_url, request_body={"is_archived": True})
 
 @behave.when(
-    "SNHU Administrator fetches the archived Achievement with correct request payload")
+    "Administrator fetches the archived Achievement with correct request payload")
 def step_impl_2(context):
     # Fetch an archived achievement
     url = f"{context.achievement_url}s"
@@ -626,7 +626,7 @@ def step_impl_1(context):
     context.item_url = f"{context.achievement_url}/{context.achievement_id}"
 
 @behave.when(
-    "SNHU Administrator fetches the un-archived Achievement with correct request payload")
+    "Administrator fetches the un-archived Achievement with correct request payload")
 def step_impl_2(context):
     # Fetch an archived achievement
     url = f"{context.achievement_url}s"
@@ -726,7 +726,7 @@ def step_impl_1(context):
         
 
 @behave.when(
-    "SNHU Administrator fetches the Achievement with correct request payload")
+    "Administrator fetches the Achievement with correct request payload")
 def step_impl_2(context):
     # Fetch an archived achievement
     url = f"{context.achievement_url}s"
@@ -794,7 +794,7 @@ def step_impl_1(context):
         url=context.item_url, request_body={"is_archived": True})
 
 @behave.when(
-    "SNHU Administrator fetches the archived Goal with correct request payload")
+    "Administrator fetches the archived Goal with correct request payload")
 def step_impl_2(context):
     # Fetch an archived goal
     url = f"{context.goal_url}"
@@ -839,7 +839,7 @@ def step_impl_1(context):
     context.item_url = f"{context.goal_url}/{context.goal_id}"
 
 @behave.when(
-    "SNHU Administrator fetches the un-archived Goal with correct request payload")
+    "Administrator fetches the un-archived Goal with correct request payload")
 def step_impl_2(context):
     # Fetch an archived goal
     url = f"{context.goal_url}"
@@ -901,7 +901,7 @@ def step_impl_1(context):
     context.item_url_2 = f"{context.goal_url}/{context.goal_id_2}"
 
 @behave.when(
-    "SNHU Administrator fetches the Goal with correct request payload")
+    "Administrator fetches the Goal with correct request payload")
 def step_impl_2(context):
     # Fetch an archived goal
     url = f"{context.goal_url}"
