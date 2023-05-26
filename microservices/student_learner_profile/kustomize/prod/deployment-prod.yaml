@@ -6,16 +6,17 @@ spec:
   replicas: 3
   template:
     spec:
+      serviceAccountName: ksa
       containers:
       - name: student-learner-profile
         image: student-learner-profile
         imagePullPolicy: Always
         env:
-        - name: GCP_PROJECT
+        - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: GCP_PROJECT
+              key: PROJECT_ID
         - name: EXTERNAL_DATA_GCP_PROJECT
           valueFrom:
             configMapKeyRef:

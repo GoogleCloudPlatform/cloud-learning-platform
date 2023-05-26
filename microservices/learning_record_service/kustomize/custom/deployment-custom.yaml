@@ -13,3 +13,9 @@ spec:
         resources:
           requests:
             memory: "500Mi"
+        env:
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX

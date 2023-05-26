@@ -57,6 +57,7 @@ def add_exception_handlers(app: FastAPI):
 
 
 
+
 class ClassroomHttpException(CustomHTTPException):
   """Exception raised for any google HTTP errors.
   Attributes:
@@ -70,7 +71,6 @@ class ClassroomHttpException(CustomHTTPException):
     else:
       super().__init__(
           status_code=status_code, success=False, message=message, data=None)
-
 
 
 class InvalidToken(CustomHTTPException):
@@ -195,7 +195,6 @@ class ConnectionTimeout(CustomHTTPException):
 
   def __init__(self, message: str = "Connection Timed-out"):
     super().__init__(status_code=408, message=message, success=False, data=None)
-
 
 
 class ServiceUnavailable(CustomHTTPException):

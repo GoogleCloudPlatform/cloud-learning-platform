@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""User Data Model"""
+"""
+User object in the ORM
+"""
 import regex
-from common.models import NodeItem, LearningUnit, BaseModel
+from common.models import BaseModel, NodeItem, LearningUnit
 from common.utils.errors import ResourceNotFoundException
 from fireo.fields import (ReferenceField, TextField, NumberField, MapField,
                           ListField, BooleanField)

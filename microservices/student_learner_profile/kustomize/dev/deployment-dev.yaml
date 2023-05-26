@@ -6,16 +6,17 @@ spec:
   replicas: 1
   template:
     spec:
+      serviceAccountName: ksa
       containers:
       - name: student-learner-profile
-        image: gcr.io/aitutor-dev/student-learner-profile
+        image: gcr.io/core-learning-services-dev/student-learner-profile
         imagePullPolicy: Always
         env:
-        - name: GCP_PROJECT
+        - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: GCP_PROJECT
+              key: PROJECT_ID
         - name: DATABASE_PREFIX
           valueFrom:
             configMapKeyRef:

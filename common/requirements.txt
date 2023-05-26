@@ -14,3 +14,4 @@ ttl-cache==1.6
 redis==4.5.4
 PyJWT==2.6.0
 regex==2022.10.31
+pytz==2020.1

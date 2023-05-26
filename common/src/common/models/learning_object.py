@@ -1,9 +1,11 @@
 """Learning Object Service Data Models"""
 
-from fireo.fields import TextField, MapField, NumberField, BooleanField, ListField, DateTime
+from fireo.fields import (TextField, MapField, NumberField, BooleanField,
+                          ListField, DateTime)
 from common.models import NodeItem, BaseModel
 from common.utils.errors import ResourceNotFoundException
 
+# pylint: disable = arguments-renamed
 LOS_LITERALS = {
   "CP_TYPES" : ["pathway"],
   "LE_TYPES" : ["learning_experience"],

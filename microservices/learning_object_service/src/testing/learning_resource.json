@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Text Books",
+        "description": "Testing description",
+        "type": "pdf",
+        "resource_path": "test.pdf",
+        "lti_content_item_id": "",
+        "course_category": [
+            "Biology"
+        ],
+        "alignments": {
+            "competency_alignments": [],
+            "skill_alignments": []
+        },
+        "parent_nodes": {
+            "learning_objects": [
+                "LO_parent_test"
+            ]
+        },
+        "child_nodes": {
+            "concepts": [
+                "Concept_child_test"
+            ]
+        },
+        "metadata": {
+            "design_config":{
+                "theme": "blue",
+                "illustration": "U1C1"
+            }
+        }
+    }
+]

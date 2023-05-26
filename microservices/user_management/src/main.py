@@ -46,9 +46,9 @@ add_exception_handlers(app)
 
 api = FastAPI(title="User Access Management Service APIs",
               version="latest",
-              docs_url=None,
-              redoc_url=None,
-              dependencies=[Depends(validate_token)]
+              # docs_url=None,
+              # redoc_url=None,
+              # dependencies=[Depends(validate_token)]
               )
 
 api.include_router(user.router)
@@ -68,7 +68,8 @@ api_v2 = FastAPI(title="User Access Management Service APIs",
                  version="latest",
                  docs_url=None,
                  redoc_url=None,
-                 dependencies=[Depends(validate_token)])
+                 dependencies=[Depends(validate_token)]
+                 )
 
 api_v2.include_router(user.router)
 api_v2.include_router(user_event.router)

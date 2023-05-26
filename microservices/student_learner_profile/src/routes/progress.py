@@ -66,7 +66,7 @@ def get_learner_progress(learner_id: str, node_id: str,
                         CurriculumPathwayProgressResponse]
   """
   try:
-    root_node = collection_references[node_type].find_by_id(node_id)
+    root_node = collection_references[node_type].find_by_uuid(node_id)
     root_node = root_node.get_fields(reformat_datetime=True)
     learner_profile = None
     if learner_id:
