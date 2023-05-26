@@ -646,8 +646,7 @@ def update_invites():
           # Logger.info(f"User record found for User {user_details}")
           user_profile = classroom_crud.get_user_profile_information(
               course_record.user.email)
-          user_rec = User.collection.filter("user_id", "==",
-                                            course_record.user.id).get()
+          user_rec = User.find_by_user_id(course_record.user.user_id).get()
 
           # Check if gaia_id is "" if yes so update personal deatils
           if user_rec.gaia_id == "":
