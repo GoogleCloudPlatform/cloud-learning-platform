@@ -1,12 +1,11 @@
 """ Section endpoints """
 import traceback
 import datetime
-from common.models import Cohort, CourseTemplate, Section, BatchJob
+from common.models import Cohort, CourseTemplate, Section, BatchJob, CourseEnrollmentMapping
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ClassroomHttpException,
                                           InternalServerError,
-                                          ResourceNotFound, BadRequest,
-                                          CustomHTTPException
+                                          ResourceNotFound, BadRequest,Conflict
                                           )
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
@@ -23,15 +22,17 @@ from schemas.section import (
     GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
     UpdateSectionResponseModel,TeachersListResponseModel,
     GetTeacherResponseModel,AssignmentModel,GetCourseWorkList,
-    ImportGradeResponseModel)
+    ImportGradeResponseModel,
+    EnrollTeacherSection,DeleteTeacherFromSectionResponseModel)
 from schemas.update_section import UpdateSection
-from services import common_service
 from services.section_service import copy_course_background_task,\
-update_grades
+update_grades,add_teacher
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model,
                           FEED_TYPES,
                     convert_coursework_to_short_coursework_model)
+from utils.user_helper import (course_enrollment_user_model,
+                               get_user_id,check_user_can_enroll_in_section)
 from config import BQ_TABLE_DICT,BQ_DATASET
 # disabling for linting to pass
 # pylint: disable = broad-except
@@ -167,7 +168,7 @@ def get_section(section_id: str):
     raise InternalServerError(str(e)) from e
 
 @router.get("/{section_id}/teachers",response_model=TeachersListResponseModel)
-def get_teachers_list(section_id: str, request: Request):
+def get_teachers_list(section_id: str):
   """Get a list of teachers for a section details from db
 
   Args:
@@ -180,18 +181,14 @@ def get_teachers_list(section_id: str, request: Request):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    teacher_details = []
-    headers = {"Authorization": request.headers.get("Authorization")}
+    # headers = {"Authorization": request.headers.get("Authorization")}
     section_details = Section.find_by_id(section_id)
-    teachers= section_details.teachers
-    if teachers == []:
-      return{"data":teacher_details}
-    for teacher in teachers:
-      result = common_service.call_search_user_api(headers=headers,
-      email=teacher)
-      if result.json()["data"] !=[]:
-        teacher_details.append(result.json()["data"][0])
-    return {"data": teacher_details}
+    teacher_list=CourseEnrollmentMapping.fetch_all_by_section(
+      section_details.key,"faculty")
+    data = [
+        course_enrollment_user_model(i) for i in teacher_list
+    ]
+    return {"data": data}
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -205,39 +202,85 @@ def get_teachers_list(section_id: str, request: Request):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-
-@router.get("/{section_id}/teachers/{teacher_email}",
+@router.post("/{section_id}/teachers",
 response_model=GetTeacherResponseModel)
-def get_teacher(section_id: str,teacher_email:str,request: Request):
+def enroll_teacher(section_id: str,request: Request,
+                   teacher_details: EnrollTeacherSection):
+  """_summary_
+
+  Args:
+      section_id (str): _description_
+      request (Request): _description_
+      teacher_details (EnrollTeacherSection): _description_
+
+  Raises:
+      Conflict: _description_
+      ResourceNotFound: _description_
+      Conflict: _description_
+      ClassroomHttpException: _description_
+      InternalServerError: _description_
+
+  Returns:
+      _type_: _description_
+  """
+  try:
+    teacher_email = teacher_details.email
+    headers = {"Authorization": request.headers.get("Authorization")}
+    section = Section.find_by_id(section_id)
+    if not check_user_can_enroll_in_section(teacher_email,headers,section):
+      raise Conflict(f"User {teacher_email} is already"
+                     +f" in this section {section.id} as a leaner or faculty")
+
+    result=add_teacher(headers,section,teacher_email)
+    message=f"Successfully enrolled the teacher using {teacher_email}"
+    return {
+        "message": message,
+        "data": course_enrollment_user_model(result)
+    }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    Logger.error(conflict)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    Logger.error(ae)
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+@router.get("/{section_id}/teachers/{teacher}",
+response_model=GetTeacherResponseModel)
+def get_teacher(section_id: str,teacher:str,request: Request):
   """Get teacher for a section .If teacher is present in given section
     get teacher details else throw
   Args:
       section_id (str): section_id in firestore
-      teacher_email(str): teachers email Id
+      teacher(str): teachers email or Id
   Raises:
       HTTPException: 500 Internal Server Error if something fails
       HTTPException: 404 Section with section id is not found
       HTTPException: 404 Teacher with teacher email is not found
   Returns:
-    {"status":"Success","data":}: Returns section details from  db,
-    {'status': 'False'} if raises an exception
+    GetTeacherResponseModel: object which contains user details
   """
   try:
-    teacher_email=teacher_email.lower()
     headers = {"Authorization": request.headers.get("Authorization")}
-    section_details = Section.find_by_id(section_id)
-    teachers= section_details.teachers
-    if teacher_email in teachers:
-      result = common_service.call_search_user_api(headers=headers,
-      email=teacher_email)
-      if result.json()["data"] == [] or result.json()["data"] is None :
-        raise ResourceNotFoundException(
-          f"{teacher_email} not found in Users data")
-      else :
-        return {"data": result.json()["data"][0]}
-    else:
-      raise ResourceNotFoundException(f"{teacher_email}\
-        not found in teachers list of the section")
+    user_id = get_user_id(user=teacher, headers=headers)
+    section = Section.find_by_id(section_id)
+    result=CourseEnrollmentMapping.\
+    find_course_enrollment_record(section.key,user_id,"faculty")
+    if result is None:
+      raise ResourceNotFoundException(
+          f"Teacher not found in this section {section_id}")
+    return {
+        "message": f"Successfully get teacher details by {teacher}",
+        "data": course_enrollment_user_model(result)
+    }
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -251,6 +294,46 @@ def get_teacher(section_id: str,teacher_email:str,request: Request):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+@router.delete("/{section_id}/teachers/{teacher}",
+response_model=DeleteTeacherFromSectionResponseModel)
+def delete_teacher(section_id: str,teacher:str,request: Request):
+  """Delete teacher for a section
+  Args:
+      section_id (str): section_id in firestore
+      teacher(str): teachers email or Id
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      HTTPException: 404 Section with section id is not found
+      HTTPException: 404 Teacher with teacher email is not found
+  Returns:
+      DeleteTeacherFromSectionResponseModel: response
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    user_id = get_user_id(user=teacher, headers=headers)
+    section = Section.find_by_id(section_id)
+    result=CourseEnrollmentMapping.find_active_enrolled_teacher_record(
+     section_key = section.key,user_id = user_id)
+    if result is None:
+      raise ResourceNotFoundException(
+          f"Teacher not found in this section {section_id}")
+    classroom_crud.delete_teacher(section.classroom_id,result.user.email)
+    result.status="inactive"
+    result.update()
+    return {
+        "message": ("Successfully deleted the teacher from the section"
+        + f" {section_id} using {teacher}")
+    }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except HttpError as ae:
+    Logger.error(ae)
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                              message=str(ae)) from ae
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
 
 @router.delete("/{section_id}", response_model=DeleteSectionResponseModel)
 def delete_section(section_id: str):
@@ -321,7 +404,7 @@ def section_list(skip: int = 0, limit: int = 10):
 
 
 @router.patch("", response_model=UpdateSectionResponseModel)
-def update_section(sections_details: UpdateSection,request: Request):
+def update_section(sections_details: UpdateSection):
   """Update section API
 
   Args:
@@ -339,7 +422,6 @@ def update_section(sections_details: UpdateSection,request: Request):
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    headers = {"Authorization": request.headers.get("Authorization")}
     section = Section.find_by_id(sections_details.id)
     new_course = classroom_crud.update_course(sections_details.course_id,
                                               sections_details.section_name,
@@ -348,35 +430,8 @@ def update_section(sections_details: UpdateSection,request: Request):
       raise ResourceNotFoundException(
           "Course with Course_id"
           f" {sections_details.course_id} is not found in classroom")
-    add_teacher_list = list(
-        set(sections_details.teachers) - set(section.teachers))
-    for i in add_teacher_list:
-      invitation_object = classroom_crud.invite_user(
-                            sections_details.course_id,i,"TEACHER")
-      # Storing classroom details
-      classroom_crud.acceept_invite(invitation_object["id"],i)
-      user_profile = classroom_crud.get_user_profile_information(i)
-      data = {
-      "first_name":user_profile["name"]["givenName"],
-      "last_name": user_profile["name"]["familyName"],
-      "email":i,
-      "user_type": "faculty",
-      "user_groups": [],
-      "status": "active",
-      "is_registered": True,
-      "failed_login_attempts_count": 0,
-      "access_api_docs": False,
-      "gaia_id":user_profile["id"],
-      "photo_url" :  user_profile["photoUrl"]
-        }
-      common_service.create_teacher(headers,data)
-    remove_teacher_list = list(
-        set(section.teachers) - set(sections_details.teachers))
-    for i in remove_teacher_list:
-      classroom_crud.delete_teacher(sections_details.course_id, i)
     section.section = sections_details.section_name
     section.description = sections_details.description
-    section.teachers = sections_details.teachers
     section.update()
     updated_section = convert_section_to_section_model(section)
     rows=[{
@@ -613,10 +668,8 @@ def import_grade(section_id: str,coursework_id:str,
     message = str(hte)
     if hte.resp.status == 404:
       message = "Coursework not found"
-    raise CustomHTTPException(status_code=hte.resp.status,
-                              success=False,
-                              message=message,
-                              data=None) from hte
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=message) from hte
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
