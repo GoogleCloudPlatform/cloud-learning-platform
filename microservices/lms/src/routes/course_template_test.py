@@ -336,7 +336,7 @@ def test_get_instructional_designer(client_with_emulator,
                                        enroll_instructional_designer_data):
   course_template = enroll_instructional_designer_data[
       "enrollment_mapping"].course_template
-  email = enroll_instructional_designer_data["enrollment_mapping"].user.email
+  email = enroll_instructional_designer_data["user"].email
   url = (BASE_URL + f"/course_templates/{course_template.id}/" +
          f"instructional_designers/{email}")
   with mock.patch(
@@ -352,7 +352,7 @@ def test_get_instructional_designer_by_user_id(client_with_emulator,
                                        enroll_instructional_designer_data):
   course_template = enroll_instructional_designer_data[
       "enrollment_mapping"].course_template
-  email = enroll_instructional_designer_data["enrollment_mapping"].user.user_id
+  email = enroll_instructional_designer_data["user"].user_id
   url = (BASE_URL + f"/course_templates/{course_template.id}/" +
          f"instructional_designers/{email}")
   with mock.patch(
@@ -383,7 +383,7 @@ def test_list_instructional_designers(client_with_emulator,
                                        enroll_instructional_designer_data):
   course_template = enroll_instructional_designer_data[
       "enrollment_mapping"].course_template
-  email = enroll_instructional_designer_data["enrollment_mapping"].user.user_id
+  email = enroll_instructional_designer_data["user"].email
   url = (BASE_URL + f"/course_templates/{course_template.id}/" +
          f"instructional_designers")
   resp = client_with_emulator.get(url)
