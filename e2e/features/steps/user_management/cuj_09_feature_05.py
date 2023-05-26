@@ -45,7 +45,7 @@ def step_impl_3(context):
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Successfully fetched the association group"
   assert context.res_data[
-     "data"]["records"][0]["name"] == context.name
+     "data"][0]["name"] == context.name
 
 
 # --- Negative Scenario---
