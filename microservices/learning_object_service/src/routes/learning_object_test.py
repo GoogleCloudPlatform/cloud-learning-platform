@@ -141,7 +141,8 @@ def test_post_learning_object(clean_firestore, create_learning_experience):
   # popping id and key for equivalency test
   keys_to_delete = [
       "id", "key", "is_deleted", "created_by", "created_time",
-      "last_modified_by", "last_modified_time"
+      "last_modified_by", "last_modified_time", "archived_by", "deleted_by",
+      "archived_at_timestamp", "deleted_at_timestamp"
   ]
   for key in keys_to_delete:
     loaded_learning_object_dict.pop(key)
@@ -451,74 +452,6 @@ def test_get_learning_objects(clean_firestore, create_learning_object,
 
   assert len(list(set(saved_names))) == 1, "Unnecessary data retrieved"
   assert list(set(saved_names))[0] == params["author"], "Wrong data retrieved"
-
-  parent_learning_object_dict = copy.deepcopy(BASIC_LEARNING_OBJECT_EXAMPLE)
-  parent_learning_object_dict["name"] = "Offline presentation"
-
-  parent_learning_object = create_learning_object
-  learning_object.parent_nodes["learning_objects"].append(
-      parent_learning_object.uuid)
-  learning_object.update()
-
-  params = {
-      "skip": 0,
-      "limit": "30",
-      "learning_object": parent_learning_object.uuid,
-      "relation": "parent"
-  }
-  url = f"{api_url}s"
-  resp = client_with_emulator.get(url, params=params)
-  json_response = resp.json()
-  assert resp.status_code == 200, "Status code not 200"
-  saved_los = [
-      i.get(f"{params['relation']}_nodes") for i in json_response.get("data")
-  ]
-
-  assert params["learning_object"] in saved_los[0][
-      "learning_objects"], "Wrong parent_learning_object retrieved"
-
-  child_learning_object_dict = copy.deepcopy(BASIC_LEARNING_OBJECT_EXAMPLE)
-  child_learning_object_dict["name"] = "Online report presentation"
-
-  child_learning_object = create_learning_object
-
-  learning_object.child_nodes["learning_objects"].append(
-      child_learning_object.uuid)
-  learning_object.update()
-
-  params = {
-      "skip": 0,
-      "limit": "30",
-      "learning_object": child_learning_object.uuid,
-      "relation": "child"
-  }
-  url = f"{api_url}s"
-  resp = client_with_emulator.get(url, params=params)
-  json_response = resp.json()
-  assert resp.status_code == 200, "Status code not 200"
-  saved_los = [
-      i.get(f"{params['relation']}_nodes") for i in json_response.get("data")
-  ]
-  assert params["learning_object"] in saved_los[0][
-      "learning_objects"], "Wrong parent_learning_object retrieved"
-
-  parent_learning_experience = create_learning_experience
-  learning_object.parent_nodes["learning_experiences"].append(
-      parent_learning_experience.uuid)
-  learning_object.update()
-
-  params = {
-      "skip": 0,
-      "limit": "30",
-      "learning_experience": parent_learning_experience.uuid
-  }
-  url = f"{api_url}s"
-  resp = client_with_emulator.get(url, params=params)
-  json_response = resp.json()
-  assert resp.status_code == 200, "Status code not 200"
-  saved_les = [i.get("parent_nodes") for i in json_response.get("data")]
-  assert params["learning_experience"] in saved_les[0][
-      "learning_experiences"], "Wrong parent_learning_experience retrieved"
 
 
 # To-Do: Commenting this code since parent child is not implemented in

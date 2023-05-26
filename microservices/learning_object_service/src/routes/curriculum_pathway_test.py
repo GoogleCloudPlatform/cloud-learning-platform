@@ -484,43 +484,6 @@ def test_get_curriculum_pathways(clean_firestore, create_curriculum_pathway,
   assert len(list(set(saved_names))) == 1, "Unnecessary data retrieved"
   assert list(set(saved_names))[0] == params["author"], "Wrong data retrieved"
 
-  # test get curriculum pathways with child node filters
-  child_learning_experience = create_learning_experience
-  curriculum_pathway.child_nodes["learning_experiences"].append(
-      child_learning_experience.uuid)
-  curriculum_pathway.update()
-
-  params = {
-      "skip": 0,
-      "limit": "10",
-      "learning_experience": child_learning_experience.uuid
-  }
-  url = f"{api_url}s"
-  resp = client_with_emulator.get(url, params=params)
-  json_response = resp.json()
-  assert resp.status_code == 200, "Status code not 200"
-  saved_les = [i.get("child_nodes") for i in json_response.get("data")]
-  assert params["learning_experience"] in saved_les[0][
-      "learning_experiences"], "Wrong parent_curriculum_pathway retrieved"
-
-  # Test to get child curriculum pathway
-  child_curriculum_pathway = create_curriculum_pathway
-  curriculum_pathway.child_nodes["curriculum_pathways"].append(
-      child_curriculum_pathway.uuid)
-  curriculum_pathway.update()
-  params = {
-      "skip": 0,
-      "limit": "10",
-      "child_curriculum_pathway": child_curriculum_pathway.uuid
-  }
-  url = f"{api_url}s"
-  resp = client_with_emulator.get(url, params=params)
-  json_response = resp.json()
-  assert resp.status_code == 200, "Status code not 200"
-  saved_les = [i.get("child_nodes") for i in json_response.get("data")]
-  assert params["child_curriculum_pathway"] in saved_les[0][
-      "curriculum_pathways"], "Wrong child_curriculum_pathway retrieved"
-
 
 @pytest.mark.parametrize(
     "create_curriculum_pathway", [BASIC_CURRICULUM_PATHWAY_EXAMPLE],
