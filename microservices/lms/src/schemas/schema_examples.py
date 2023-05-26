@@ -325,6 +325,7 @@ BATCH_JOB_EXAMPLE = {
     },
     "section_id": "a5vNi2H9v8b34",
     "classroom_id": "912406891",
+    "created_time": "2023-01-24 17:37:15",
     "start_time": "2023-01-24 17:38:32",
     "end_time": "2023-01-24 17:53:17"
 }

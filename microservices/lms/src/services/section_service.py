@@ -236,6 +236,7 @@ def copy_course_background_task(course_template_details,
       except Exception as error:
         title = coursework["title"]
         error_flag = True
+        logs["errors"].append(f"Error - {error}")
         logs["errors"].append(f"Get coursework failed for \
               course_id {course_template_details.classroom_id} for {title}")
         Logger.error(f"Get coursework failed for \
@@ -272,6 +273,7 @@ def copy_course_background_task(course_template_details,
       except Exception as error:
         title = coursework_material["title"]
         error_flag = True
+        logs["errors"].append(f"Error - {error}")
         logs["errors"].append(f"Get coursework material failed for\
         course_id {course_template_details.classroom_id} for {title}")
         Logger.error(f"Get coursework material failed for\

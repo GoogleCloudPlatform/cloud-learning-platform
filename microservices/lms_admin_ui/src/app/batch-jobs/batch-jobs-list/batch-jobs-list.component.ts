@@ -24,7 +24,7 @@ export class BatchJobsListComponent {
 
   dataSource = new MatTableDataSource(this.batchJobsData);
 
-  batchJobDisplayedColumns: string[] = ['id', 'job_type', 'section_id', 'classroom_id', 'start_time', 'end_time', 'status', 'input_data', 'logs'];
+  batchJobDisplayedColumns: string[] = ['id', 'job_type', 'section_id', 'classroom_id', 'created_time', 'start_time', 'end_time', 'status', 'input_data', 'logs'];
 
   constructor(public dialog: MatDialog, private JobsService: JobsService) { }
   @ViewChild(MatSort) sort: MatSort;
@@ -34,10 +34,10 @@ export class BatchJobsListComponent {
     this.fetchJobs()
   }
 
-  handleBatchJobPageEvent(e: PageEvent){
+  handleBatchJobPageEvent(e: PageEvent) {
     this.paginator = e;
 
-    if (this.paginator.pageSize != this.jobPageSize ){
+    if (this.paginator.pageSize != this.jobPageSize) {
       this.jobSkip = 0
       this.jobLimit = this.paginator.pageSize
       this.jobPageSize = this.paginator.pageSize
@@ -62,11 +62,11 @@ export class BatchJobsListComponent {
       setTimeout(() => {
         this.isLoadingData = false
       }, 100);
-      if (response.success == true){
+      if (response.success == true) {
         this.batchJobsData = response.data
         console.log("batchJobsData", this.batchJobsData)
       }
-      else{
+      else {
         console.log("response", response?.message)
       }
     })

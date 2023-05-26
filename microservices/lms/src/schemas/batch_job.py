@@ -20,6 +20,7 @@ class BatchJobModel(BaseModel):
   input_data: dict
   section_id: Optional[str]
   classroom_id: Optional[str]
+  created_time: Optional[datetime.datetime]
   start_time: Optional[datetime.datetime]
   end_time: Optional[datetime.datetime]
 
