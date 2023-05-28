@@ -337,12 +337,13 @@ def test_get_instructional_designer(client_with_emulator,
   course_template = enroll_instructional_designer_data[
       "enrollment_mapping"].course_template
   email = enroll_instructional_designer_data["user"].email
+  user = enroll_instructional_designer_data["enrollment_mapping"].user
+  print("This is emaiil and user object",email,user)
   url = (BASE_URL + f"/course_templates/{course_template.id}/" +
          f"instructional_designers/{email}")
   with mock.patch(
       "routes.course_template.get_user_id",
-      return_value=enroll_instructional_designer_data["enrollment_mapping"].
-      user.user_id):
+      return_value=user.user_id):
     resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True, "check status"
@@ -369,13 +370,14 @@ def test_get_instructional_designer_negative(client_with_emulator,
   course_template = enroll_instructional_designer_data[
       "enrollment_mapping"].course_template
   # email = enroll_instructional_designer_data["enrollment_mapping"].user.user_id
+  user_id = enroll_instructional_designer_data["enrollment_mapping"].user.user_id
   url = (BASE_URL + f"/course_templates/{course_template.id}/" +
-         "instructional_designers/test_1@gmail.com")
+         "instructional_designers/test_email_1@gmail.com")
   with mock.patch(
       "routes.course_template.get_user_id",
-      return_value=enroll_instructional_designer_data["enrollment_mapping"].
-      user.user_id):
+      return_value=user_id):
     resp = client_with_emulator.get(url)
+    print("This is response json",resp.json())
   assert resp.status_code == 404, "Status 404"
   assert resp.json()["success"] is False, "check status"
 

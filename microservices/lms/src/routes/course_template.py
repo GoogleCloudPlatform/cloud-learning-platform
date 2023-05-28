@@ -52,7 +52,7 @@ router = APIRouter(prefix="/course_templates",
 
 @router.get("", response_model=CourseTemplateListModel)
 def get_course_template_list(skip: int = 0, limit: int = 10):
-	"""Get a list of Course Template endpoint
+  """Get a list of Course Template endpoint
 		Raises:
 				HTTPException: 500 Internal Server Error if something fails.
 
@@ -62,8 +62,8 @@ def get_course_template_list(skip: int = 0, limit: int = 10):
 				InternalServerErrorResponseModel:
 						if the get Course Template list raises an exception.
 		"""
-	try:
-		if skip < 0:
+  try:
+    if skip < 0:
 			raise ValidationError(
 						"Invalid value passed to \"skip\" query parameter")
 		if limit < 1:
@@ -78,10 +78,10 @@ def get_course_template_list(skip: int = 0, limit: int = 10):
 				}
 		return {"course_template_list": list(course_template_list)}
 	except ValidationError as ve:
-			raise BadRequest(str(ve)) from ve
+		raise BadRequest(str(ve)) from ve
 	except Exception as e:
-			Logger.error(e)
-			raise InternalServerError(str(e)) from e
+		Logger.error(e)
+		raise InternalServerError(str(e)) from e
 
 
 @router.get("/{course_template_id}", response_model=CourseTemplateModel)
@@ -517,7 +517,6 @@ def get_instructional_designer(course_template_id: str,
 			course_template_id (str): _description_
 			request (Request): _description_
 			instructional_designer (str): _description_
-
 	Raises:
 			ResourceNotFoundException: _description_
 			ClassroomHttpException: _description_
@@ -556,14 +555,12 @@ def get_instructional_designer(course_template_id: str,
 @router.get(
     "/{course_template_id}/instructional_designers",
     response_model=ListInstructionalDesigner)
-def list_template_instructional_designer(course_template_id: str,
-                                  request: Request):
+def list_template_instructional_designer(course_template_id: str):
 	"""_summary_
 
 	Args:
 			course_template_id (str): _description_
 			request (Request): _description_
-			instructional_designer (str): _description_
 
 	Raises:
 			ResourceNotFoundException: _description_
