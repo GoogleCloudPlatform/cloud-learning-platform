@@ -82,7 +82,8 @@ def test_llm_generate(clean_firestore):
 
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  assert json_response.get("content") == FAKE_GENERATE_RESPONSE, "returned generated text"
+  assert json_response.get("content") == FAKE_GENERATE_RESPONSE, \
+    "returned generated text"
 
 
 def test_create_chat(clean_firestore):
@@ -95,7 +96,8 @@ def test_create_chat(clean_firestore):
 
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  assert json_response.get("content") == FAKE_GENERATE_RESPONSE, "returned generated text"
+  assert json_response.get("content") == FAKE_GENERATE_RESPONSE, \
+    "returned generated text"
 
   user_chats = UserChat.find_by_user(userid)
   assert len(user_chats) == 1, "retreieved new user chat"
@@ -123,8 +125,9 @@ def test_chat_generate(clean_firestore):
   assert resp.status_code == 200, "Status 200"
 
   user_chat = UserChat.find_by_id(chatid)
-  assert user_chat != None, "retrieved user chat"
-  assert len(user_chat.history) == len(chat.history) + 2, "user chat history updated"
+  assert user_chat is not None, "retrieved user chat"
+  assert len(user_chat.history) == len(chat.history) + 2, \
+    "user chat history updated"
   assert user_chat.history[-2:][0] == FAKE_GENERATE_PARAMS["prompt"], \
     "retrieved user chat prompt"
   assert user_chat.history[-1:][0] == FAKE_GENERATE_RESPONSE, \
@@ -141,7 +144,7 @@ def test_get_chats(clean_firestore):
   url = f"{api_url}/user/{userid}/chat"
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
-  
+
   assert resp.status_code == 200, "Status 200"
   saved_ids = [i.get("id") for i in json_response.get("data")]
   assert chat_dict["id"] in saved_ids, "all data not retrieved"
