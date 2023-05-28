@@ -18,13 +18,13 @@ from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
 from typing import Optional
-from common.models import UserLLM
+from common.models import UserChat
 from langchain.schema import HumanMessage
 
 from config import LANGCHAIN_LLM, CHAT_LLM_TYPES, COHERE_LLM_TYPES
 
 async def langchain_llm_generate(prompt: str, llm_type: str,
-                                 user_llm: Optional[UserLLM] = None):
+                                 user_chat: Optional[UserChat] = None):
   """
   Use langchain to generate text with an LLM given a prompt.  This is
     always done asychronously, and so must be used in a route defined with
@@ -35,8 +35,7 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
 
     llm_type: the type of LLM to use (default to openai)
 
-    llm (optional): a langchain llm object to use, perhaps specific to
-      a user
+    user_chat (optional): a user chat to use for context
 
   Returns:
     the text result.

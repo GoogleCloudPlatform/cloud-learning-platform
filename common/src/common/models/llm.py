@@ -14,7 +14,7 @@
 """
 Module to add cohort in Fireo
 """
-from fireo.fields import TextField, ListField, IDField, ReferenceField
+from fireo.fields import TextField, ListField, IDField
 from common.models import BaseModel, User
 
 # pylint: disable=unused-argument
@@ -23,7 +23,8 @@ class UserChat(BaseModel):
   """UserChat ORM class
   """
   id = IDField()
-  user = ReferenceField(User, required=True)
+  user_id = TextField(required=True)
+  title = TextField(required=False)
   llm_type = TextField(required=True)
   history = ListField(default=[])
 
@@ -50,7 +51,7 @@ class UserChat(BaseModel):
         _type_: _description_
     """
     objects = cls.collection.filter(
-        "user", "==", userid).filter(
+        "user_id", "==", userid).filter(
             "deleted_at_timestamp", "==",
             None).order(order_by).offset(skip).fetch(limit)
     return list(objects)

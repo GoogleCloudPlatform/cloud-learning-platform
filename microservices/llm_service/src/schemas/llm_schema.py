@@ -20,13 +20,14 @@ from schemas.schema_examples import LLM_GENERATE_EXAMPLE
 
 class ChatModel(BaseModel):
   id: str
+  user_id: str
   llm_type: str
   history: List[str] = []
   created_time: str
   last_modified_time: str
 
-class LLMGetResponse(BaseModel):
-  """LLM Get list model"""
+class LLMGetTypesResponse(BaseModel):
+  """LLM Get types model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully retrieved llm types"
   data: Optional[list[str]] = []
@@ -36,7 +37,7 @@ class LLMGetResponse(BaseModel):
     schema_extra = {
         "example": {
             "success": True,
-            "message": "Successfully generated text",
+            "message": "Successfully retrieved llm types",
             "data": []
         }
     }
@@ -71,8 +72,8 @@ class LLMGenerateResponse(BaseModel):
         }
     }
 
-class LLMUserGenerateResponse(BaseModel):
-  """LLM User Generate Response model"""
+class LLMUserChatResponse(BaseModel):
+  """LLM User Create Chat Response model"""
   chatid: str
   success: Optional[bool] = True
   message: Optional[str] = "Successfully generated text"
@@ -89,8 +90,8 @@ class LLMUserGenerateResponse(BaseModel):
         }
     }
 
-class LLMUserChatResponse(BaseModel):
-  """LLM User Generate Response model"""
+class LLMUserAllChatsResponse(BaseModel):
+  """LLM Get User All Chats Response model"""
   data: List[ChatModel] = []
   success: Optional[bool] = True
   message: Optional[str] = "Successfully retrieved user chats"

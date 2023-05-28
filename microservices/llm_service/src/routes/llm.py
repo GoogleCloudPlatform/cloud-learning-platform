@@ -25,10 +25,10 @@ from common.utils.errors import (ResourceNotFoundException,
                                  PayloadTooLargeError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, PayloadTooLarge)
-from schemas.llm_schema import (LLMGenerateModel, UserLLMModel,
-                                LLMGetResponse, LLMGenerateResponse,
-                                LLMUserGenerateResponse,
-                                LLMGetUserChatResponse)
+from schemas.llm_schema import (LLMGenerateModel, LLMGetTypesResponse,
+                                LLMGenerateResponse,
+                                LLMUserChatResponse,
+                                LLMUserAllChatsResponse)
 from services.llm_generate import llm_generate
 from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, LLM_TYPES
 
@@ -38,7 +38,7 @@ router = APIRouter(prefix="/llm", tags=["LLMs"], responses=ERROR_RESPONSES)
 @router.get(
     "",
     name="Get all LLM types",
-    response_model=LLMGetResponse)
+    response_model=LLMGetTypesResponse)
 def get_llm_list():
   """
   Get available LLMs
@@ -59,7 +59,7 @@ def get_llm_list():
 @router.get(
     "/user/{userid}/chat",
     name="Get all user chats",
-    response_model=LLMGetUserChatResponse)
+    response_model=LLMUserAllChatsResponse)
 def get_chat_list(userid: str, skip: int = 0, limit: int = 20):
   """
   Get user chats
@@ -71,7 +71,7 @@ def get_chat_list(userid: str, skip: int = 0, limit: int = 20):
       Size of tools array to be returned <br/>
 
   Returns:
-      LLMGetUserChatResponse
+      LLMUserAllChatsResponse
   """
   try:
     if skip < 0:
@@ -142,7 +142,7 @@ async def generate(gen_config: LLMGenerateModel):
 @router.post(
     "/user/{userid}/chat",
     name="Create new chat",
-    response_model=LLMGenerateResponse)
+    response_model=LLMUserChatResponse)
 async def create_user_chat(userid: str, gen_config: LLMGenerateModel):
   """
   Create new chat for user with text response
@@ -152,7 +152,7 @@ async def create_user_chat(userid: str, gen_config: LLMGenerateModel):
       llm_type(str): LLM type
 
   Returns:
-      LLMUserGenerateResponse
+      LLMUserChatResponse
   """
   genconfig_dict = {**gen_config.dict()}
 
