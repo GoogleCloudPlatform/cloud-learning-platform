@@ -12,11 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Pydantic Model for Grade API's
+Pydantic Model for LLM API's
 """
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel
 from schemas.schema_examples import LLM_GENERATE_EXAMPLE
+
+class ChatModel(BaseModel):
+  id: str
+  llm_type: str
+  history: List[str] = []
+  created_time: str
+  last_modified_time: str
 
 class LLMGetResponse(BaseModel):
   """LLM Get list model"""
@@ -79,5 +86,21 @@ class LLMUserGenerateResponse(BaseModel):
             "message": "Successfully generated text",
             "content": None,
             "chatid": None
+        }
+    }
+
+class LLMUserChatResponse(BaseModel):
+  """LLM User Generate Response model"""
+  data: List[ChatModel] = []
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully retrieved user chats"
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully generated text",
+            "data": None
         }
     }

@@ -21,19 +21,24 @@ from fastapi import APIRouter
 from common.models import UserChat
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
+                                 ValidationError,
                                  PayloadTooLargeError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, PayloadTooLarge)
 from schemas.llm_schema import (LLMGenerateModel, UserLLMModel,
                                 LLMGetResponse, LLMGenerateResponse,
-                                LLMUserGenerateResponse)
+                                LLMUserGenerateResponse,
+                                LLMGetUserChatResponse)
 from services.llm_generate import llm_generate
 from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, LLM_TYPES
 
 router = APIRouter(prefix="/llm", tags=["LLMs"], responses=ERROR_RESPONSES)
 
 
-@router.get("", response_model=LLMGetResponse)
+@router.get(
+    "",
+    name="Get all LLM types",
+    response_model=LLMGetResponse)
 def get_llm_list():
   """
   Get available LLMs
@@ -51,7 +56,55 @@ def get_llm_list():
     raise InternalServerError(str(e)) from e
 
 
-@router.post("/generate", response_model=LLMGenerateResponse)
+@router.get(
+    "/user/{userid}/chat",
+    name="Get all user chats",
+    response_model=LLMGetUserChatResponse)
+def get_chat_list(userid: str, skip: int = 0, limit: int = 20):
+  """
+  Get user chats
+
+  Args:
+    skip: `int`
+      Number of tools to be skipped <br/>
+    limit: `int`
+      Size of tools array to be returned <br/>
+
+  Returns:
+      LLMGetUserChatResponse
+  """
+  try:
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+
+    if limit < 1:
+      raise ValidationError("Invalid value passed to \"limit\" query parameter")
+
+    user_chats = UserChat.find_by_user(userid)
+
+    chat_list = []
+    for i in user_chats:
+      chat_data = i.get_fields(reformat_datetime=True)
+      chat_data["id"] = i.id
+      chat_list.append(chat_data)
+
+    return {
+      "success": True,
+      "message": f"Successfully retrieved user chats for user {userid}",
+      "data": chat_list
+    }
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
+  except ResourceNotFoundException as e:
+    raise ResourceNotFound(str(e)) from e
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+
+@router.post(
+    "/generate",
+    name="Generate text from LLM",
+    response_model=LLMGenerateResponse)
 async def generate(gen_config: LLMGenerateModel):
   """
   Generate text with an LLM
@@ -86,10 +139,13 @@ async def generate(gen_config: LLMGenerateModel):
     raise InternalServerError(str(e)) from e
 
 
-@router.post("/user/{userid}/generate", response_model=LLMGenerateResponse)
-async def generate_user(userid: str, gen_config: LLMGenerateModel):
+@router.post(
+    "/user/{userid}/chat",
+    name="Create new chat",
+    response_model=LLMGenerateResponse)
+async def create_user_chat(userid: str, gen_config: LLMGenerateModel):
   """
-  Generate text and create new chat for user
+  Create new chat for user with text response
 
   Args:
       prompt(str): Input prompt for model
@@ -127,10 +183,13 @@ async def generate_user(userid: str, gen_config: LLMGenerateModel):
     raise InternalServerError(str(e)) from e
 
 
-@router.post("/chat/{chatid}/generate", response_model=LLMGenerateResponse)
-async def generate_chat(chatid: str, gen_config: LLMGenerateModel):
+@router.post(
+    "/chat/{chatid}/generate",
+    name="Generate new chat response",
+    response_model=LLMGenerateResponse)
+async def user_chat_generate(chatid: str, gen_config: LLMGenerateModel):
   """
-  Generate text based on context of user chat
+  Continue chat based on context of user chat
 
   Args:
       prompt(str): Input prompt for model
