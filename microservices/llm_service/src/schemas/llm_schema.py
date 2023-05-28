@@ -76,7 +76,7 @@ class LLMUserChatResponse(BaseModel):
   """LLM User Create Chat Response model"""
   chatid: str
   success: Optional[bool] = True
-  message: Optional[str] = "Successfully generated text"
+  message: Optional[str] = "Successfully created chat"
   content: Optional[str] = ""
 
   class Config():
@@ -84,7 +84,7 @@ class LLMUserChatResponse(BaseModel):
     schema_extra = {
         "example": {
             "success": True,
-            "message": "Successfully generated text",
+            "message": "Successfully created chat",
             "content": None,
             "chatid": None
         }

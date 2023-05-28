@@ -14,6 +14,13 @@ from common.models import UserChat
 from common.utils.http_exceptions import add_exception_handlers
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
+with mock.patch(
+    "google.cloud.secretmanager.SecretManagerServiceClient",
+    side_effect=mock.MagicMock()) as mok:
+  with mock.patch("langchain.chat_models.ChatOpenAI"):
+    with mock.patch("langchain.llms.Cohere"):
+      from config import LLM_TYPES
+
 # assigning url
 api_url = f"{API_URL}/llm"
 LLM_TESTDATA_FILENAME = os.path.join(TESTING_FOLDER_PATH,
@@ -36,20 +43,78 @@ app.include_router(router, prefix="/llm-service/api/v1")
 client_with_emulator = TestClient(app)
 
 
+FAKE_GENERATE_PARAMS = {
+    "llm_type": "LLM Test",
+    "prompt": "test prompt"
+  }
+
+FAKE_GENERATE_RESPONSE = "test generation"
+
+
 def test_get_llm_list(clean_firestore):
-  pass
+  url = f"{api_url}"
+  resp = client_with_emulator.get(url)
+  json_response = resp.json()
+  assert resp.status_code == 200, "Status 200"
+  assert json_response.get("data") == LLM_TYPES
 
 
 def test_llm_generate(clean_firestore):
-  params = {
-    "llm_type": "LLM Test",
-    "prompt": "test"
-  }
   url = f"{api_url}/generate"
-  #with mock.patch("routes.llm.Logger"):
-  #  with mock.patch("routes.llm.llm_generate"):
-  #    resp = client_with_emulator.post(url, params=params)
-  #assert resp.status_code == 200, "Status is not 200"
+
+  with mock.patch("routes.llm.llm_generate",
+                  return_value = FAKE_GENERATE_RESPONSE):
+    resp = client_with_emulator.post(url, json=FAKE_GENERATE_PARAMS)
+
+  json_response = resp.json()
+  assert resp.status_code == 200, "Status 200"
+  assert json_response.get("content") == FAKE_GENERATE_RESPONSE, "returned generated text"
+
+
+def test_create_chat(clean_firestore):
+  userid = CHAT_EXAMPLE["user_id"]
+  url = f"{api_url}/user/{userid}/chat"
+
+  with mock.patch("routes.llm.llm_generate",
+                  return_value = FAKE_GENERATE_RESPONSE):
+    resp = client_with_emulator.post(url, json=FAKE_GENERATE_PARAMS)
+
+  json_response = resp.json()
+  assert resp.status_code == 200, "Status 200"
+  assert json_response.get("content") == FAKE_GENERATE_RESPONSE, "returned generated text"
+
+  user_chats = UserChat.find_by_user(userid)
+  assert len(user_chats) == 1, "retreieved new user chat"
+  user_chat = user_chats[0]
+  assert user_chat.history[0] == FAKE_GENERATE_PARAMS["prompt"], \
+    "retrieved user chat prompt"
+  assert user_chat.history[1] == FAKE_GENERATE_RESPONSE, \
+    "retrieved user chat response"
+
+
+def test_chat_generate(clean_firestore):
+  chat_dict = {**CHAT_EXAMPLE}
+  chat = UserChat.from_dict(chat_dict)
+  chat.save()
+
+  chatid = chat.id
+
+  url = f"{api_url}/chat/{chatid}/generate"
+
+  with mock.patch("routes.llm.llm_generate",
+                  return_value = FAKE_GENERATE_RESPONSE):
+    resp = client_with_emulator.post(url, json=FAKE_GENERATE_PARAMS)
+
+  json_response = resp.json()
+  assert resp.status_code == 200, "Status 200"
+
+  user_chat = UserChat.find_by_id(chatid)
+  assert user_chat != None, "retrieved user chat"
+  assert len(user_chat.history) == len(chat.history) + 2, "user chat history updated"
+  assert user_chat.history[-2:][0] == FAKE_GENERATE_PARAMS["prompt"], \
+    "retrieved user chat prompt"
+  assert user_chat.history[-1:][0] == FAKE_GENERATE_RESPONSE, \
+    "retrieved user chat response"
 
 
 def test_get_chats(clean_firestore):
@@ -65,4 +130,4 @@ def test_get_chats(clean_firestore):
   
   assert resp.status_code == 200, "Status 200"
   saved_ids = [i.get("id") for i in json_response.get("data")]
-  assert chat_dict["id"] in saved_ids, "all data not retrived"
+  assert chat_dict["id"] in saved_ids, "all data not retrieved"

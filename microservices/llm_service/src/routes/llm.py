@@ -169,13 +169,13 @@ async def create_user_chat(userid: str, gen_config: LLMGenerateModel):
     result = await llm_generate(prompt, llm_type)
 
     # create new chat for user
-    user_chat = UserChat(userid=userid, llm_type=llm_type)
-    user_chat.history = [result]
+    user_chat = UserChat(user_id=userid, llm_type=llm_type)
+    user_chat.history = [prompt, result]
     user_chat.save()
 
     return {
         "success": True,
-        "message": "Successfully generated text",
+        "message": "Successfully created chat",
         "content": result,
         "chatid": user_chat.id
     }
@@ -217,6 +217,7 @@ async def user_chat_generate(chatid: str, gen_config: LLMGenerateModel):
     result = await llm_generate(prompt, llm_type, user_chat)
 
     # save chat history
+    user_chat.history.append(prompt)
     user_chat.history.append(result)
     user_chat.save()
 
