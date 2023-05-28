@@ -19,7 +19,7 @@ from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
 from typing import Optional
 from common.models import UserChat
-from langchain.schema import HumanMessage
+from langchain.schema import HumanMessage, AIMessage
 
 from config import LANGCHAIN_LLM, CHAT_LLM_TYPES, COHERE_LLM_TYPES
 
@@ -42,8 +42,7 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
   """
   Logger.info(f"generating text with langchain llm_type {llm_type}")
   try:
-    if user_llm is not None:
-      pass
+    # get LLM object
     llm = LANGCHAIN_LLM.get(llm_type)
     if llm is None:
       raise ResourceNotFoundException(f"Cannot find llm type '{llm_type}'")
@@ -51,18 +50,34 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
     result_text = ""
     if llm_type in CHAT_LLM_TYPES:
       # use langchain chat interface for openai
-      msg = [HumanMessage(content=prompt)]
+
+      # create msg history for user chat if it exists
+      msg = []
+      if user_chat is not None:
+        history = user_chat.history
+        for i in range(len(history)):
+          msg.append(HumanMessage(content=history[i]))
+          msg.append(AIMessage(content=history[i+1]))
+          i = i + 1
+
+      msg.append(HumanMessage(content=prompt))
+
       Logger.info(f"generating text for [{prompt}]")
       result = await llm.agenerate([msg])
       result_text = result.generations[0][0].message.content
       Logger.info(f"result {result.generations[0][0].message.content}")
-    elif llm_type in COHERE_LLM_TYPES:
-      result = llm.generate([prompt])
-      result_text = result.generations[0][0].text
     else:
-      # we always use await for LLM calls if we can
-      result = await llm.agenerate([prompt])
-      result_text = result.generations[0][0].message.content
+      msg = []
+      if user_chat is not None:
+        msg = user_chat.history
+      msg.append(prompt)
+      if llm_type in COHERE_LLM_TYPES:
+        result = llm.generate(msg)
+        result_text = result.generations[0][0].text
+      else:
+        # we always use await for LLM calls if we can
+        result = await llm.agenerate(msg)
+        result_text = result.generations[0][0].message.content
 
     return result_text
   except Exception as e:
