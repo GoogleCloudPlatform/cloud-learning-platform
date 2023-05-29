@@ -244,7 +244,7 @@ jobs:
     - name: Run behave
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m behave e2e/features/ --tags=~@test --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode
+        PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m behave e2e/features/ --tags=~@test --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode --tags=~@inspace
 
   dataset-cleanup:
     runs-on: ubuntu-latest
