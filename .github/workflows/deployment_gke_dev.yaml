@@ -44,7 +44,10 @@ env:
   LTI_PLATFORM_UNIQUE_ID: e0fc690f-7fb9-4fb2-a5a6-68466f0181a4
   LTI_PLATFORM_NAME: CLP LTI Service
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
-  
+  FIREBASE_AUTH_DOMAIN: core-learning-services-dev.firebaseapp.com
+  FIREBASE_STORAGE_BUCKET: core-learning-services-dev.appspot.com
+  WHITELIST_DOMAINS: google.com
+
   # For Scalability in Dev env using Prod config
   BQ_DATASET: lms_analytics
   BQ_REGION: US
@@ -95,6 +98,17 @@ jobs:
       - name: Download Skaffold cache if exists
         run: |
           gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
+
+      - name: Setup nodejs 16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: Build documentation
+        run: |
+          cd documentation/api_docs
+          npm install
+          npm run build
 
       - name: Add BQ Tables
         run: |
