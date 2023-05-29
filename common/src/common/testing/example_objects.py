@@ -5,9 +5,14 @@ from common.models.section import Section
 from common.models.course_template import CourseTemplate
 
 TEST_USER = {
-    "auth_id": "fake-user-auth-id",
-    "email": "user@gmail.com",
-    "role": "Admin"
+    "user_id": "kh5FoIBOx5qDsfh4ZRuv",
+    "first_name": "first",
+    "last_name": "last",
+    "email": "xyz@gmail.com",
+    "user_type": "learner",
+    "status": "active",
+    "gaia_id": "1234577657333",
+    "photo_url": "https://lh3.googleusercontent.com/a/AEd"
 }
 
 TEST_COURSE_TEMPLATE = {
@@ -38,8 +43,7 @@ TEST_SECTION = {
     "classroom_id": "cl_id",
     "classroom_code": "cl_code",
     "classroom_url": "https://classroom.google.com",
-    "teachers": ["teachera@gmail.com", "teacherb@gmail.com"],
-    "enrolled_students_count":0
+    "enrolled_students_count": 0
 }
 
 TEST_COURSE_TEMPLATE2 = {
@@ -73,8 +77,7 @@ TEST_SECTION2 = {
     "classroom_url": "https://classroom.google.com",
     "course_template": "fake_template_id",
     "cohort": "fake_cohort_id",
-    "teachers": ["fake_email_id@gmail.com"],
-    "enrolled_students_count":0
+    "enrolled_students_count": 0
 }
 
 
