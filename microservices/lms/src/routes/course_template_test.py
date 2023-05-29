@@ -387,7 +387,7 @@ def test_list_instructional_designers(client_with_emulator,
       "enrollment_mapping"].course_template
   email = enroll_instructional_designer_data["user"].email
   url = (BASE_URL + f"/course_templates/{course_template.id}/" +
-         f"instructional_designers")
+         "instructional_designers")
   resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True, "check status"
