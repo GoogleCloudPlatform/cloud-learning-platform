@@ -504,3 +504,88 @@ def delete_instructional_designer(course_template_id: str,
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
+@router.get(
+    "/{course_template_id}/instructional_designers/{instructional_designer}",
+    response_model=GetInstructionalDesigner)
+def get_instructional_designer(course_template_id: str,
+                                  instructional_designer: str,
+                                  request: Request):
+	"""_summary_
+
+	Args:
+			course_template_id (str): _description_
+			request (Request): _description_
+			instructional_designer (str): _description_
+	Raises:
+			ResourceNotFoundException: _description_
+			ClassroomHttpException: _description_
+			Conflict: _description_
+			ResourceNotFound: _description_
+			InternalServerError: _description_
+	"""
+	try:
+		headers = {"Authorization": request.headers.get("Authorization")}
+		course_template = CourseTemplate.find_by_id(course_template_id)
+		user_id = get_user_id(instructional_designer, headers)
+		result = CourseTemplateEnrollmentMapping.find_enrolled_active_record(
+				course_template.key, user_id)
+		if result is None:
+			raise ResourceNotFoundException(
+					"Instructional Designer not found in this" +
+					f" Course Template {course_template_id}")
+		data = course_template_enrollment_instructional_designer_model(
+				result)
+		return {"data": data}
+	except HttpError as hte:
+		Logger.error(hte)
+		raise ClassroomHttpException(status_code=hte.resp.status,
+																	message=str(hte)) from hte
+	except ResourceNotFoundException as re:
+		raise ResourceNotFound(str(re)) from re
+	except Exception as e:
+		Logger.error(e)
+		raise InternalServerError(str(e)) from e
+
+@router.get(
+    "/{course_template_id}/instructional_designers",
+    response_model=ListInstructionalDesigner)
+def list_template_instructional_designer(course_template_id: str):
+	"""_summary_
+
+	Args:
+			course_template_id (str): _description_
+			request (Request): _description_
+
+	Raises:
+			ResourceNotFoundException: _description_
+			ClassroomHttpException: _description_
+			Conflict: _description_
+			ResourceNotFound: _description_
+			InternalServerError: _description_
+	"""
+	try:
+		course_template = CourseTemplate.find_by_id(course_template_id)
+		instructional_designers = CourseTemplateEnrollmentMapping.fetch_all_by_course_template(
+				course_template.key)
+		if instructional_designers is None:
+			raise ResourceNotFoundException(
+					"Instructional Designer not found in this" +
+					f" Course Template {course_template_id}")
+		data = [course_template_enrollment_instructional_designer_model(i) for i in
+						instructional_designers]
+		return {"data": data}
+	except HttpError as hte:
+		Logger.error(hte)
+		raise ClassroomHttpException(status_code=hte.resp.status,
+																	message=str(hte)) from hte
+	except Conflict as conflict:
+		Logger.error(conflict)
+		err = traceback.format_exc().replace("\n", " ")
+		Logger.error(err)
+		raise Conflict(str(conflict)) from conflict
+	except ResourceNotFoundException as re:
+		raise ResourceNotFound(str(re)) from re
+	except Exception as e:
+		Logger.error(e)
+		raise InternalServerError(str(e)) from e
