@@ -203,6 +203,17 @@ jobs:
         NAMESPACE=e2e-pr-$PR_NUMBER
         python e2e/utils/port_forward.py --namespace $NAMESPACE
 
+    - name: Setup redis
+      uses: supercharge/redis-github-action@1.2.0
+      with:
+        redis-version: 6
+
+    - name: Install redis cli
+      run: sudo apt-get install -y redis-tools
+
+    - name: Verify that redis is up
+      run: redis-cli ping
+
     - name: Cleaning up database
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
