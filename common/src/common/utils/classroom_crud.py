@@ -6,11 +6,11 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from common.utils.errors import InvalidTokenError, UserManagementServiceError, ResourceNotFoundException
-from common.utils.http_exceptions import InternalServerError
+from common.utils.http_exceptions import InternalServerError, CustomHTTPException
 from common.utils.logging_handler import Logger
-from common.models import Section
+from common.models import Section,CourseEnrollmentMapping
 
-from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL, PUB_SUB_PROJECT_ID, DATABASE_PREFIX
+from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,PUB_SUB_PROJECT_ID,DATABASE_PREFIX
 from common.utils import helper
 # pylint: disable=line-too-long
 
@@ -99,9 +99,7 @@ def get_course_by_id(course_id):
   except HttpError as error:
     logger.error(error)
     return None
-
-
-def drive_copy(file_id, target_folder_id, name):
+def drive_copy(file_id,target_folder_id,name):
   """copy the file in the target_folder 
   Args: 
   file_id : (str) google drive file _id
@@ -114,9 +112,9 @@ def drive_copy(file_id, target_folder_id, name):
 
   copied_file = {"name": name, "parents": [target_folder_id]}
   service = build("drive", "v3", credentials=get_credentials())
-  form_copy = service.files().copy(fileId=file_id,
-                                   fields="webViewLink,name,mimeType,id",
-                                   body=copied_file).execute()
+  form_copy = service.files().copy(
+      fileId=file_id, fields="webViewLink,name,mimeType,id",
+      body=copied_file).execute()
   return form_copy
 
 
@@ -133,9 +131,8 @@ def copy_material(drive_file_dict, target_folder_id):
   if "title" not in drive_file_dict["driveFile"]["driveFile"].keys():
     raise ResourceNotFoundException(f"File with id {file_id} not found")
   name = drive_file_dict["driveFile"]["driveFile"]["title"]
-  result = drive_copy(file_id=file_id,
-                      target_folder_id=target_folder_id,
-                      name=name)
+  result = drive_copy(
+      file_id=file_id, target_folder_id=target_folder_id, name=name)
   new_id = result["id"]
   drive_file_dict["driveFile"]["driveFile"]["id"] = new_id
   drive_file_dict["driveFile"]["driveFile"].pop("alternateLink")
@@ -211,8 +208,8 @@ def get_topics(course_id):
     topics = []
     page_token = None
     while True:
-      response = service.courses().topics().list(pageToken=page_token,
-                                                 courseId=course_id).execute()
+      response = service.courses().topics().list(
+          pageToken=page_token, courseId=course_id).execute()
       topics = topics.extend(response.get("topic", []))
       page_token = response.get("nextPageToken", None)
       if not page_token:
@@ -241,8 +238,8 @@ def create_topics(course_id, topics):
     old_topic_id = topic["topicId"]
     topic_name = topic["name"]
     topic = {"name": topic_name}
-    response = service.courses().topics().create(courseId=course_id,
-                                                 body=topic).execute()
+    response = service.courses().topics().create(
+        courseId=course_id, body=topic).execute()
     topic_id_map[old_topic_id] = response["topicId"]
   Logger.info(f"Topics created for course_id{course_id}")
   return topic_id_map
@@ -283,10 +280,11 @@ def list_coursework_submissions_user(course_id, coursework_id, user_id):
   page_token = None
   while True:
     coursework = service.courses().courseWork()
-    response = coursework.studentSubmissions().list(pageToken=page_token,
-                                                    courseId=course_id,
-                                                    courseWorkId=coursework_id,
-                                                    userId=user_id).execute()
+    response = coursework.studentSubmissions().list(
+        pageToken=page_token,
+        courseId=course_id,
+        courseWorkId=coursework_id,
+        userId=user_id).execute()
     submissions.extend(response.get("studentSubmissions", []))
     page_token = response.get("nextPageToken", None)
     if not page_token:
@@ -347,8 +345,8 @@ def create_coursework(course_id, coursework):
   """
 
   service = build("classroom", "v1", credentials=get_credentials())
-  data = service.courses().courseWork().create(courseId=course_id,
-                                               body=coursework).execute()
+  data = service.courses().courseWork().create(
+      courseId=course_id, body=coursework).execute()
   Logger.info("Create coursework method worked")
   return data
 
@@ -423,16 +421,16 @@ def get_submitted_course_work_list(section_id,
   """
 
   section_details = Section.find_by_id(section_id)
-  response = requests.get(f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",
-                          headers=headers,
-                          timeout=60)
+  response = requests.get(
+      f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}", headers=headers, timeout=60)
   user_email = response.json()["data"]["email"]
   service = build("classroom", "v1", credentials=get_credentials())
 
   submitted_course_work_list = service.courses().courseWork(
-  ).studentSubmissions().list(courseId=section_details.classroom_id,
-                              courseWorkId=course_work_id,
-                              userId=user_email).execute()
+  ).studentSubmissions().list(
+      courseId=section_details.classroom_id,
+      courseWorkId=course_work_id,
+      userId=user_email).execute()
   if submitted_course_work_list:
     submitted_course_work_list = submitted_course_work_list[
         "studentSubmissions"]
@@ -450,8 +448,8 @@ def add_teacher(course_id, teacher_email):
 
   service = build("classroom", "v1", credentials=get_credentials())
   teacher = {"userId": teacher_email}
-  course = service.courses().teachers().create(courseId=course_id,
-                                               body=teacher).execute()
+  course = service.courses().teachers().create(
+      courseId=course_id, body=teacher).execute()
   return course
 
 
@@ -465,8 +463,8 @@ def delete_teacher(course_id, teacher_email):
   """
 
   service = build("classroom", "v1", credentials=get_credentials())
-  course = service.courses().teachers().delete(courseId=course_id,
-                                               userId=teacher_email).execute()
+  course = service.courses().teachers().delete(
+      courseId=course_id, userId=teacher_email).execute()
   return course
 
 
@@ -478,9 +476,8 @@ def create_student_in_course(access_token, student_email, course_id,
   Return:
     enrolled student object
   """
-  service = build("classroom",
-                  "v1",
-                  credentials=get_oauth_credentials(access_token))
+  service = build(
+      "classroom", "v1", credentials=get_oauth_credentials(access_token))
   student = {"userId": student_email}
   result = service.courses().students().create(
       courseId=course_id, body=student, enrollmentCode=course_code).execute()
@@ -495,11 +492,10 @@ def get_person_information(access_token):
   Return:
     profile: dictionary of users personal information
   """
-  people_service = build("people", "v1",\
-     credentials=get_oauth_credentials(access_token))
+  people_service = build(
+      "people", "v1", credentials=get_oauth_credentials(access_token))
   profile = people_service.people().get(
-      resourceName="people/me",
-      personFields="metadata,photos,names").execute()
+      resourceName="people/me", personFields="metadata,photos,names").execute()
   return profile
 
 
@@ -512,8 +508,7 @@ def get_oauth_credentials(access_token):
   """
   creds = Credentials(token=access_token)
   if not creds or not creds.valid:
-    raise InvalidTokenError(
-        "Invalid access_token please provide a valid token")
+    raise InvalidTokenError("Invalid access_token please provide a valid token")
   return creds
 
 
@@ -578,10 +573,11 @@ def enroll_student(headers, access_token, course_id, student_email,
   # then call create user user-management API and return user data else
   # return searched user data
   if searched_student == []:
-    response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
-                             json=data,
-                             headers=headers,
-                             timeout=60)
+    response = requests.post(
+        f"{USER_MANAGEMENT_BASE_URL}/user",
+        json=data,
+        headers=headers,
+        timeout=60)
     if response.status_code != 200:
       raise UserManagementServiceError(response.json()["message"])
     return response.json()["data"]
@@ -611,7 +607,6 @@ def get_edit_url_and_view_url_mapping_of_form():
       break
   return view_link_and_edit_link_matching
 
-
 def get_file(file_id):
   service = build("drive", "v3", credentials=get_credentials())
   response = service.files().get(fileId=file_id, fields="*").execute()
@@ -629,11 +624,12 @@ def get_view_link_from_id(form_id):
 def retrieve_all_form_responses(form_id):
   "Query google forms api  using form id and get view url of  google form"
   discovery_doc = "https://forms.googleapis.com/$discovery/rest?version=v1"
-  service = build("forms",
-                  "v1",
-                  credentials=get_credentials(),
-                  discoveryServiceUrl=discovery_doc,
-                  static_discovery=False)
+  service = build(
+      "forms",
+      "v1",
+      credentials=get_credentials(),
+      discoveryServiceUrl=discovery_doc,
+      static_discovery=False)
   result = service.forms().responses().list(formId=form_id).execute()
   return result
 
@@ -645,13 +641,22 @@ def invite_user(course_id, email, role):
       course_id (str): google classroom unique id
       teacher_email (str): teacher email id
 
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
+
   Returns:
       dict: response from create invitation method
   """
   service = build("classroom", "v1", credentials=get_credentials())
   body = {"courseId": course_id, "role": role, "userId": email}
-  invitation = service.invitations().create(body=body).execute()
-  return invitation
+  try:
+    invitation = service.invitations().create(body=body).execute()
+    return invitation
+  except HttpError as ae:
+    raise CustomHTTPException(
+        status_code=ae.resp.status, success=False, message=str(ae),
+        data=None) from ae
 
 
 def get_invite(invitation_id):
@@ -660,6 +665,10 @@ def get_invite(invitation_id):
   Args:
       course_id (str): google classroom unique id
       teacher_email (str): teacher email id
+
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
 
   Returns:
       dict: response from create invitation method
@@ -682,7 +691,7 @@ def enable_notifications(course_id, feed_type):
   Returns:
       _type_: _description_
   """
-  creds = service_account.Credentials.from_service_account_info(
+  creds =service_account.Credentials.from_service_account_info(
       helper.get_gke_pd_sa_key_from_secret_manager(), scopes=REGISTER_SCOPES)
   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
@@ -695,10 +704,66 @@ def enable_notifications(course_id, feed_type):
       },
       "cloudPubsubTopic": {
           "topicName":
-          f"projects/{PUB_SUB_PROJECT_ID}/topics/{DATABASE_PREFIX}classroom-notifications"
+              f"projects/{PUB_SUB_PROJECT_ID}/topics/{DATABASE_PREFIX}classroom-notifications"
       }
   }
   return service.registrations().create(body=body).execute()
+
+
+def if_user_exists_in_section(section_id, user_id, headers):
+  """Check if student exists in a given section
+  Args:
+      section_id (str): firestore section id
+      user_id (str): firestore user id
+  Returns:
+      dict: user details
+  """
+  section_details = []
+  section_details = Section.find_by_id(section_id)
+  result = CourseEnrollmentMapping.find_course_enrollment_record(
+      section_details.key, user_id)
+  if result is not None:
+    response = requests.get(
+        f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",
+        headers=headers,
+        timeout=60)
+    user = response.json()["data"]
+    user["invitation_id"] = result.invitation_id
+    user["enrollment_status"] = result.status
+    user["section_id"] = section_details.id
+    user["cohort_id"] = section_details.cohort.id
+    user["classroom_url"] = section_details.classroom_url
+    user["course_enrollment_id"] = result.id
+    user["classroom_id"] = section_details.classroom_id
+    return user
+  else:
+    raise ResourceNotFoundException("User not found")
+
+
+def list_student_section(section_id, headers):
+  """List student of section given firestore section id
+
+  Args:
+      section_id (str): firestore section id
+  Returns:
+      dict: list of students of section
+  """
+  section_details = []
+  section_details = Section.find_by_id(section_id)
+  result = CourseEnrollmentMapping.fetch_all_by_section(section_details.key,
+                                                        "learner")
+  users = []
+  for record in result:
+    user_id = record.user
+    response = requests.get(
+        f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",
+        headers=headers,
+        timeout=60)
+    user_record = response.json()["data"]
+    user_record["invitation_id"] = record.invitation_id
+    user_record["enrollment_status"] = record.status
+    users.append(user_record)
+  return users
 
 
 def delete_student(course_id, student_email):
@@ -706,14 +771,22 @@ def delete_student(course_id, student_email):
   Args:
       course_id (str): google classroom unique id
       teacher_email (str): teacher email id
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
   Returns:
       dict: response from create invitation method
   """
   service = build("classroom", "v1", credentials=get_credentials())
   student = {"userId": student_email}
-  student = service.courses().students().delete(
-      courseId=course_id, userId=student_email).execute()
-  return student
+  try:
+    student = service.courses().students().delete(
+        courseId=course_id, userId=student_email).execute()
+    return student
+  except HttpError as ae:
+    raise CustomHTTPException(
+        status_code=ae.resp.status, success=False, message=str(ae),
+        data=None) from ae
 
 
 def get_user_details(user_id, headers):
@@ -727,9 +800,7 @@ def get_user_details(user_id, headers):
   """
 
   response_get_student = requests.get(
-      f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}",
-      headers=headers,
-      timeout=60)
+      f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}", headers=headers, timeout=60)
   if response_get_student.status_code == 404:
     raise ResourceNotFoundException(response_get_student.json()["message"])
   return response_get_student.json()
@@ -762,13 +833,24 @@ def acceept_invite(invitation_id, email):
       user response
       email (str): user email id
 
+  Raises:
+      CustomHTTPException: custom exception for HTTP exceptions
+      InternalServerError: 500 Internal Server Error if something fails
+
   Returns:
       dict: response from create invitation method
   """
   service = build("classroom", "v1", \
     credentials=impersonate_teacher_creds(email))
-  course = service.invitations().accept(id=invitation_id).execute()
-  return course
+  try:
+    course = service.invitations().accept(id=invitation_id).execute()
+    return course
+  except HttpError as ae:
+    raise CustomHTTPException(
+        status_code=ae.resp.status, success=False, message=str(ae),
+        data=None) from ae
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
 
 
 def get_user_profile_information(user_email):
@@ -780,11 +862,19 @@ def get_user_profile_information(user_email):
   """
   service = build("classroom", "v1", credentials=get_credentials())
 
-  profile_information = service.userProfiles().get(userId=user_email).execute()
-  if not profile_information["photoUrl"].startswith("https:"):
-    profile_information[
-        "photoUrl"] = "https:" + profile_information["photoUrl"]
-  return profile_information
+  try:
+    profile_information = service.userProfiles().get(
+        userId=user_email).execute()
+    if not profile_information["photoUrl"].startswith("https:"):
+      profile_information[
+          "photoUrl"] = "https:" + profile_information["photoUrl"]
+    return profile_information
+  except HttpError as ae:
+    raise CustomHTTPException(
+        status_code=ae.resp.status, success=False, message=str(ae),
+        data=None) from ae
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
 
 
 def get_course_work(course_id, course_work_id):
@@ -796,8 +886,8 @@ def get_course_work(course_id, course_work_id):
     dict: _description_
   """
   service = service = build("classroom", "v1", credentials=get_credentials())
-  return service.courses().courseWork().get(courseId=course_id,
-                                            id=course_work_id).execute()
+  return service.courses().courseWork().get(
+      courseId=course_id, id=course_work_id).execute()
 
 
 def delete_course_work(course_id, course_work_id):
@@ -809,10 +899,9 @@ def delete_course_work(course_id, course_work_id):
     dict: empty dict if success
   """
   service = service = build("classroom", "v1", credentials=get_credentials())
-  data = service.courses().courseWork().delete(courseId=course_id,
-                                               id=course_work_id).execute()
-  Logger.info(
-      f"Deleted course work - {course_work_id} in course - {course_id}")
+  data = service.courses().courseWork().delete(
+      courseId=course_id, id=course_work_id).execute()
+  Logger.info(f"Deleted course work - {course_work_id} in course - {course_id}")
   return data
 
 
@@ -832,8 +921,7 @@ def update_course_work(course_id, course_work_id, update_mask, updated_body):
       id=course_work_id,
       body=updated_body,
       updateMask=update_mask).execute()
-  Logger.info(
-      f"Updated course work - {course_work_id} in course - {course_id}")
+  Logger.info(f"Updated course work - {course_work_id} in course - {course_id}")
   return data
 
 
@@ -854,22 +942,30 @@ def post_grade_of_the_user(section_id: str,
   """
   service = build("classroom", "v1", credentials=get_credentials())
 
-  section_details = Section.find_by_id(section_id)
-  course_id = section_details.classroom_id
+  try:
+    section_details = Section.find_by_id(section_id)
+    course_id = section_details.classroom_id
 
-  student_submission = {}
+    student_submission = {}
 
-  if assigned_grade is not None:
-    student_submission["assignedGrade"] = assigned_grade
+    if assigned_grade is not None:
+      student_submission["assignedGrade"] = assigned_grade
 
-  if draft_grade is not None:
-    student_submission["draftGrade"] = draft_grade
+    if draft_grade is not None:
+      student_submission["draftGrade"] = draft_grade
 
-  output = service.courses().courseWork().studentSubmissions().patch(
-      courseId=course_id,
-      courseWorkId=course_work_id,
-      id=submission_id,
-      updateMask="assignedGrade,draftGrade",
-      body=student_submission).execute()
+    output = service.courses().courseWork().studentSubmissions().patch(
+        courseId=course_id,
+        courseWorkId=course_work_id,
+        id=submission_id,
+        updateMask="assignedGrade,draftGrade",
+        body=student_submission).execute()
 
-  return output
+    return output
+
+  except HttpError as ae:
+    raise CustomHTTPException(
+        status_code=ae.resp.status, success=False, message=str(ae),
+        data=None) from ae
+  except Exception as e:
+    raise InternalServerError(str(e)) from e

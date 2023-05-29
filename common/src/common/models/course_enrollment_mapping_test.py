@@ -18,11 +18,9 @@ Unit test for course enrollment.py
 # pylint: disable=unused-import
 # pylint: disable=unused-argument,redefined-outer-name
 import pytest
-from common.models import (Section, CourseTemplate, Cohort,
-                           CourseEnrollmentMapping, User)
+from common.models import Section, CourseTemplate, Cohort, CourseEnrollmentMapping
 from common.utils.errors import ResourceNotFoundException
-from common.testing.example_objects import (TEST_SECTION, TEST_COURSE_TEMPLATE,
-                                            TEST_COHORT, TEST_USER)
+from common.testing.example_objects import TEST_SECTION, TEST_COURSE_TEMPLATE, TEST_COHORT
 from common.testing.firestore_emulator import clean_firestore, firestore_emulator
 
 
@@ -40,15 +38,10 @@ def test_course_enrollment(clean_firestore):
   section = Section.find_by_id(new_section.id)
   course_enrollment = CourseEnrollmentMapping()
   course_enrollment.section = section
+  course_enrollment.user ="test_user_id"
   course_enrollment.role = "learner"
   course_enrollment.status = "active"
-  new_user = User.from_dict(TEST_USER)
-  new_user.save()
-  new_user.user_id = new_user.id
-  new_user.update()
-  user = User.find_by_user_id(new_user.id)
-  course_enrollment.user = user
   course_enrollment.save()
-  course_enrollment = CourseEnrollmentMapping.find_by_user(user.user_id)
+  course_enrollment = CourseEnrollmentMapping.find_by_user("test_user_id")
   for i in list(course_enrollment):
-    assert i.user.user_id == user.id
+    assert i.user == "test_user_id"
