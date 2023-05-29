@@ -44,13 +44,14 @@ def create_teacher(headers,body):
   if response.status_code == 200:
     searched_teacher = response.json()["data"]
     Logger.info(f"Searched  teacher value {searched_teacher}")
-    if searched_teacher == []:
+    if not searched_teacher:
       create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
       json=body,headers=headers)
       Logger.info(
         f"User created with email{body},{create_user_response.status_code}")
       if create_user_response.status_code != 200:
         raise UserManagementServiceError(response.json()["message"])
-      return response.json()["data"]
+      return create_user_response.json()["data"]
+    return searched_teacher[0]
   else :
     raise UserManagementServiceError(response.json()["message"])
