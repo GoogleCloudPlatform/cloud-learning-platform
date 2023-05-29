@@ -37,7 +37,7 @@ export class CreateSectionComponent implements OnInit {
         course_template: this.fb.control({ value: this.requiredDetails.extra_data.course_template_name, disabled: true }, [Validators.required]),
         instructional_designer: this.fb.control({ value: this.requiredDetails.extra_data.instructional_desiner, disabled: true }, [Validators.required]),
         admin: this.fb.control({ value: this.requiredDetails.extra_data.admin, disabled: true }, [Validators.required]),
-        teachers: this.fb.control('')
+        // teachers: this.fb.control('')
       });
     }
     else {
@@ -48,33 +48,33 @@ export class CreateSectionComponent implements OnInit {
         course_template: this.fb.control({ value: this.requiredDetails.init_data.course_template_name, disabled: true }, [Validators.required]),
         instructional_designer: this.fb.control({ value: this.requiredDetails.init_data.instructional_desiner, disabled: true }, [Validators.required]),
         admin: this.fb.control({ value: this.requiredDetails.init_data.admin, disabled: true }, [Validators.required]),
-        teachers: this.fb.control('')
+        // teachers: this.fb.control('')
       });
-      this.teachingStaff = this.requiredDetails.init_data.teachers
+      // this.teachingStaff = this.requiredDetails.init_data.teachers
     }
   }
 
 
-  add(event: MatChipInputEvent): void {
-    const value = (event.value || '').trim();
+  // add(event: MatChipInputEvent): void {
+  //   const value = (event.value || '').trim();
 
-    // Add our fruit
-    if (value) {
-      console.log(value)
-      this.teachingStaff.push(value);
-    }
+  //   // Add our fruit
+  //   if (value) {
+  //     console.log(value)
+  //     this.teachingStaff.push(value);
+  //   }
 
-    // Clear the input value
-    event.chipInput!.clear();
-  }
+  //   // Clear the input value
+  //   event.chipInput!.clear();
+  // }
 
-  remove(teachingStaff: any): void {
-    const index = this.teachingStaff.indexOf(teachingStaff);
+  // remove(teachingStaff: any): void {
+  //   const index = this.teachingStaff.indexOf(teachingStaff);
 
-    if (index >= 0) {
-      this.teachingStaff.splice(index, 1);
-    }
-  }
+  //   if (index >= 0) {
+  //     this.teachingStaff.splice(index, 1);
+  //   }
+  // }
 
 
   openSuccessSnackBar(message: string, action: string) {
@@ -93,21 +93,19 @@ export class CreateSectionComponent implements OnInit {
     this.dialogRef.close({ data: 'close' });
   }
   createSection() {
-    // console.log(this.teachingStaff)
-    // console.log(this.addSectionForm.value)
     this.showProgressSpinner = true
-    let tempTeacherList = []
+    // let tempTeacherList = []
     let sectionObj: LooseObject = {}
     sectionObj['description'] = this.addSectionForm.value.section_description.trim()
     sectionObj['cohort'] = this.requiredDetails.extra_data.cohort_id ? this.requiredDetails.extra_data.cohort_id : this.requiredDetails.init_data.cohort_id
-    for (let x of this.teachingStaff) {
-      tempTeacherList.push(x)
-    }
-    sectionObj['teachers'] = tempTeacherList
+    // for (let x of this.teachingStaff) {
+    //   tempTeacherList.push(x)
+    // }
+    // sectionObj['teachers'] = tempTeacherList
 
     if (this.requiredDetails.mode == 'Edit') {
       console.log('sec obj', sectionObj)
-      this.requiredDetails.extra_data.instructional_desiner ? tempTeacherList.push(this.requiredDetails.extra_data.instructional_desiner) : tempTeacherList.push(this.requiredDetails.init_data.instructional_desiner)
+      // this.requiredDetails.extra_data.instructional_desiner ? tempTeacherList.push(this.requiredDetails.extra_data.instructional_desiner) : tempTeacherList.push(this.requiredDetails.init_data.instructional_desiner)
       sectionObj['section_name'] = this.addSectionForm.value.section_name.trim()
       sectionObj['id'] = this.requiredDetails.init_data.section_id
       sectionObj['course_id'] = this.requiredDetails.init_data.classroom_id

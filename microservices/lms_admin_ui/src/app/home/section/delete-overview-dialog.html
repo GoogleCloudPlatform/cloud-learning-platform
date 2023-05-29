@@ -1,9 +1,17 @@
 <h2 mat-dialog-title>Confirm ?</h2>
 <div mat-dialog-content style="padding-bottom: 4%;padding-top: 1%;">
-    <b>{{deleteDialogData.first_name}} {{deleteDialogData.last_name}}</b> will be removed from
+    <ng-container *ngIf="deleteDialogData.type == 'student';else deleteTeacher">
+    <b>{{deleteDialogData.first_name}} {{deleteDialogData.last_deleteTeachername}}</b> will be removed from
     <b>{{deleteDialogData.section}}</b>
+</ng-container>
+<ng-template #deleteTeacher>
+    <ng-container>
+        <b>{{deleteDialogData.name}}</b> will be removed from
+    <b>{{deleteDialogData.section_name}}</b>
+    </ng-container>
+</ng-template>
 </div>
 <div mat-dialog-actions style="display: flex;justify-content: end;">
     <button mat-flat-button (click)="onNoClick()">No</button>
-    <button mat-flat-button color="primary" (click)="deleteStudent()">Yes</button>
+    <button mat-flat-button color="primary" (click)="delete()">Yes</button>
 </div>
