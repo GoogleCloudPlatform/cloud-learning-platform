@@ -1,9 +1,8 @@
-import uuid
 import behave
 import requests
 import time
 from e2e.test_config import API_URL,e2e_google_form_id,e2e_drive_folder_id
-from e2e.utils.course_template import COURSE_TEMPLATE_INPUT_DATA 
+from e2e.utils.course_template import COURSE_TEMPLATE_INPUT_DATA, emails
 from e2e.utils.user import TEST_USER
 from e2e.gke_api_tests.secrets_helper import get_student_email_and_token,\
   get_workspace_student_email_and_token,create_coursework_submission,\
@@ -262,14 +261,14 @@ def step_impl_36(context):
 # ----Positive Scenario-----
 
 @behave.given(
-    "A user has access to admin portal and needs to retrieve the details teacher with vailid section id and teacher_email"
+    "A user has access to admin portal and needs to retrieve the details teacher with valid section id and teacher_email"
 )
 def step_impl_37(context):
-  context.url = f'{API_URL}/sections/{context.sections.id}/teachers/teachera@gmail.com'
+  context.url = f'{API_URL}/sections/{context.enrollment_mapping.section.id}/teachers/{context.enrollment_mapping.user.email}'
 
 
 @behave.when(
-    "API request is sent which contains valid section id and teacher email"
+    "Get request is sent which contains valid section id and teacher email"
 )
 def step_impl_38(context):
   resp = requests.get(context.url,
@@ -282,20 +281,126 @@ def step_impl_38(context):
 )
 def step_impl_39(context):
   assert context.status == 200, "Status 200"
+  assert context.response["data"]["email"] == context.enrollment_mapping.user.email,"Check data"
+  assert context.response["data"]["user_id"] == context.enrollment_mapping.user.user_id,"Check data"
+
+#---negative scenario
+
+@behave.given(
+    "A user has access privileges wants to retrieve the details teacher with valid section id and invalid teacher_email"
+)
+def step_impl_40(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/teachers/12345678'
+
+
+@behave.when(
+    "API request is sent which contains valid section id and invalid teacher email"
+)
+def step_impl_41(context):
+  resp = requests.get(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+@behave.then(
+    "Get teacher API will throw teacher not found error"
+)
+def step_impl_42(context):
+  assert context.status == 404, "Status 404"
+  assert context.response["success"] is False, "Check Data"
+
+#-----------------------------------Delete teacher from section--------------------------------------
+#---Positive scenario
+
+@behave.given(
+    "A user has access to admin portal and needs to delete the teacher with valid section id and teacher_email"
+)
+def step_impl_43(context):
+  context.url = f'{API_URL}/sections/{context.enrollment_mapping.section.id}/teachers/{context.enrollment_mapping.user.email}'
+
+
+@behave.when(
+    "Delete request is sent which contains valid section id and teacher email"
+)
+def step_impl_44(context):
+  resp = requests.delete(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+@behave.then(
+    "Set inactive teacher from enrollment mapping collection"
+)
+def step_impl_45(context):
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "check data"
+
+#---negative scenario
+
+@behave.given(
+    "A user has access privileges wants to delete teacher with valid section id and invalid teacher id"
+)
+def step_impl_46(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/teachers/12345678'
+
+
+@behave.when(
+    "API request is sent which contains valid section id and invalid teacher id to delete teacher"
+)
+def step_impl_47(context):
+  resp = requests.get(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+@behave.then(
+    "Delete teacher API throw teacher not found error"
+)
+def step_impl_48(context):
+  assert context.status == 404, "Status 404"
+  assert context.response["success"] is False, "Check Data"
+
+#---------------------------------Enroll teacher in a section-------------
+@behave.given(
+    "A user has access privileges wants to enroll the teacher using valid section id and teacher_email"
+)
+def step_impl_49(context):
+  context.url = f'{API_URL}/sections/{context.sections.id}/teachers'
+  context.payload = {"email":emails["teacher"]}
+
+
+@behave.when(
+    "Post request is sent which contains valid section id and payload which contains valid teacher email"
+)
+def step_impl_50(context):
+  resp = requests.post(context.url,
+                       headers=context.header,json=context.payload)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+@behave.then(
+    "The teacher enrolled in classroom and a enrollment mapping is created and return user details with enrollment details"
+)
+def step_impl_51(context):
+  print(f"--------------------json: {context.payload}-----------------------")
+  print(f"------------------Status: {context.status}------------------------")
+  print(f"------------------data: {context.response}------------------------")
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "Check Data"
 
 # -----------------------------------Import grade coursework- Positive-------------------------------
 
 @behave.given(
     "A teacher has access to portal and wants to  update grades of student for a coursework with form quize of a section"
 )
-def step_impl_40(context):
+def step_impl_52(context):
   context.url = f'{API_URL}/sections/{context.sections.id}/coursework/{context.coursework_id}'
   print("CONTEXT URL for import grade",context.url)
 
 @behave.when(
     "API request is sent which has valid section_id and coursework_id"
 )
-def step_impl_41(context):
+def step_impl_53(context):
   resp = requests.patch(context.url,
                        headers=context.header)
   context.status = resp.status_code
@@ -305,7 +410,7 @@ def step_impl_41(context):
 @behave.then(
     "Student grades are not updated in classroom"
 )
-def step_impl_42(context):
+def step_impl_54(context):
   time.sleep(6)
   assert context.status == 202, "Status 202"
   result = list_coursework_submission_user(context.access_token,
@@ -319,14 +424,14 @@ def step_impl_42(context):
 @behave.given(
     "A teacher wants to update grades of student for a coursework with for turnIn  assignment with google form"
 )
-def step_impl_43(context):
+def step_impl_55(context):
   context.url = f'{API_URL}/sections/{context.sections.id}/coursework/{context.coursework_id}'
   print("CONTEXT URL for import grade",context.url)
 
 @behave.when(
     "API request is sent which has valid input"
 )
-def step_impl_44(context):
+def step_impl_56(context):
   submission =list_coursework_submission_user(context.access_token,
                                               context.classroom_id,
                                               context.coursework["id"],"me")
@@ -344,7 +449,7 @@ def step_impl_44(context):
 @behave.then(
     "Student grades are  updated in classroom ans student_email is present in api response"
 )
-def step_impl_45(context):
+def step_impl_57(context):
   time.sleep(15)
   insert_file_into_folder(e2e_drive_folder_id,e2e_google_form_id)
   print("After inser to origin folder")
@@ -361,13 +466,13 @@ def step_impl_45(context):
 @behave.given(
     "A user has access privileges and wants to update classroom code for a section"
 )
-def step_impl_46(context):
+def step_impl_58(context):
   context.url = f'{API_URL}/sections/{context.sections.id}/update_classroom_code'
 
 @behave.when(
     "API request is sent to update classroom code for a section using valid section id"
 )
-def step_impl_47(context):
+def step_impl_59(context):
   resp = requests.patch(context.url,
                        headers=context.header)
   context.status = resp.status_code
@@ -377,7 +482,7 @@ def step_impl_47(context):
 @behave.then(
     "Code will be updated using unique section id and a response model object will be return"
 )
-def step_impl_48(context):
+def step_impl_60(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 
@@ -386,13 +491,13 @@ def step_impl_48(context):
 @behave.given(
     "A user has access to portal and needs to update classroom code for a section"
 )
-def step_impl_49(context):
+def step_impl_61(context):
   context.url = f'{API_URL}/sections/fake_section_id/update_classroom_code'
 
 @behave.when(
     "API request is sent to update classroom code for a section using invalid section id"
 )
-def step_impl_50(context):
+def step_impl_62(context):
   resp = requests.patch(context.url,
                        headers=context.header)
   context.status = resp.status_code
@@ -402,6 +507,6 @@ def step_impl_50(context):
 @behave.then(
     "Code will not be updated and API will throw a resource not found error"
 )
-def step_impl_51(context):
+def step_impl_63(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"

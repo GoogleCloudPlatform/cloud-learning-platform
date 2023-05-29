@@ -42,7 +42,7 @@ def create_fake_data_list(client_with_emulator):
 def test_get_analytics(client_with_emulator,create_fake_data_list):
   url = (BASE_URL + "/analytics/students/"
          +f"{create_fake_data_list['user_email_address']}")
-  with mock.patch("routes.analytics.student_service.get_user_email",
+  with mock.patch("routes.analytics.get_user_email",
    return_value=(create_fake_data_list["user_email_address"],"user_id")):
     with mock.patch("routes.analytics.get_key",return_value=None):
       with mock.patch("routes.analytics.set_key"):
@@ -59,7 +59,7 @@ def test_get_analytics(client_with_emulator,create_fake_data_list):
 
 def test_get_analytics_negative(client_with_emulator):
   url= BASE_URL + "/analytics/students/xyz@gmail.com"
-  with mock.patch("routes.analytics.student_service.get_user_email",
+  with mock.patch("routes.analytics.get_user_email",
                   return_value=("xyz@gmail.com","user_id")):
     with mock.patch("routes.analytics.get_key",return_value=None):
       with mock.patch("routes.analytics.set_key"):
