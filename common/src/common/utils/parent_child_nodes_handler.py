@@ -517,7 +517,7 @@ class ParentChildNodesHandler():
 
       # FIXME: this is done to add ungate flag for first LR in project
       # this flags specifies whether cognitive wrapper is unlocked
-      # https://collectiveshift.atlassian.net/browse/SNHUT-4928
+      # Ticket 4928
       if collection_type == "learning_resources" and node_dict["order"] == 1:
         node = collection_references["learning_resources"].find_by_id(doc_id)
         module = collection_references["learning_objects"]\

@@ -15,7 +15,7 @@ from e2e.test_object_schemas import (LEARNER_OBJECT_TEMPLATE, GOAL_OBJECT_TEMPLA
 
 # ----------------------------- Scenario 01 ---------------------------------
 
-@behave.given("SNHU Administrator has access to SLP service to search learner by first name")
+@behave.given("Administrator has access to SLP service to search learner by first name")
 def step_impl_1(context):
   learner_dict = copy(LEARNER_OBJECT_TEMPLATE)
   learner_dict["email_address"] = f"{uuid4()}_test_cuj3_feature2_scenario01@gmail.com"
@@ -42,7 +42,7 @@ def step_impl_1(context):
   context.url = f"{api_url}/search"
 
 
-@behave.when("SNHU Administrator wants to search learner based on correct first name")
+@behave.when("Administrator wants to search learner based on correct first name")
 def step_impl_2(context):
   context.get_res = get_method(url=context.url, query_params=context.params)
   context.get_res_data = context.get_res.json()
@@ -61,7 +61,7 @@ def step_impl_3(context):
 
 # ----------------------------- Scenario 02 ---------------------------------
 
-@behave.given("SNHU Administrator has privilege to access SLP service to search learner by first name")
+@behave.given("Administrator has privilege to access SLP service to search learner by first name")
 def step_impl_1(context):
   context.params ={
       "first_name": "Random Name xyz123123"
@@ -69,7 +69,7 @@ def step_impl_1(context):
   context.url = f"{API_URL_LEARNER_PROFILE_SERVICE}/learner/search"
 
 
-@behave.when("SNHU Administrator wants to search learner based on incorrect first name")
+@behave.when("Administrator wants to search learner based on incorrect first name")
 def step_impl_2(context):
   context.get_res = get_method(url=context.url, query_params=context.params)
   context.get_res_data = context.get_res.json()
@@ -86,7 +86,7 @@ def step_impl_3(context):
 
 # ----------------------------- Scenario 03 ---------------------------------
 
-@behave.given("SNHU Administrator has access to SLP service to search learner by email address")
+@behave.given("Administrator has access to SLP service to search learner by email address")
 def step_impl_1(context):
   learner_dict = copy(LEARNER_OBJECT_TEMPLATE)
   learner_dict["email_address"] = f"{uuid4()}_test_cuj3_feature2_scenario03@gmail.com"
@@ -113,7 +113,7 @@ def step_impl_1(context):
   context.url = f"{api_url}/search"
 
 
-@behave.when("SNHU Administrator wants to search learner based on correct email address")
+@behave.when("Administrator wants to search learner based on correct email address")
 def step_impl_2(context):
   context.get_res = get_method(url=context.url, query_params=context.params)
   context.get_res_data = context.get_res.json()
@@ -129,7 +129,7 @@ def step_impl_3(context):
   assert search_result.get("email_address") == context.learner_email_address, "Wrong response received"
 
 
-@behave.given("SNHU Administrator has access to SLP service to search learner "
+@behave.given("Administrator has access to SLP service to search learner "
               "by incorrect email address format")
 def step_impl_1(context):
   api_url = f"{API_URL_LEARNER_PROFILE_SERVICE}/learner"
@@ -137,7 +137,7 @@ def step_impl_1(context):
   context.url = f"{api_url}/search"
 
 
-@behave.when("SNHU Administrator wants to search learner based on incorrect "
+@behave.when("Administrator wants to search learner based on incorrect "
              "email address format")
 def step_impl_2(context):
   context.get_res = get_method(url=context.url, query_params=context.params)
@@ -154,7 +154,7 @@ def step_impl_3(context):
 
 # ----------------------------- Scenario 04 ---------------------------------
 
-@behave.given("SNHU Administrator has privilege to access SLP service to search learner by email address")
+@behave.given("Administrator has privilege to access SLP service to search learner by email address")
 def step_impl_1(context):
   context.params ={
       "email_address": "Random@Email.com"
@@ -162,7 +162,7 @@ def step_impl_1(context):
   context.url = f"{API_URL_LEARNER_PROFILE_SERVICE}/learner/search"
 
 
-@behave.when("SNHU Administrator wants to search learner based on incorrect email address")
+@behave.when("Administrator wants to search learner based on incorrect email address")
 def step_impl_2(context):
   context.get_res = get_method(url=context.url, query_params=context.params)
   context.get_res_data = context.get_res.json()
@@ -178,7 +178,7 @@ def step_impl_3(context):
 
 
 # ----------------------------- Scenario 05 ---------------------------------
-@behave.given("SNHU Administrator has access to SLP service to search goal by goal name")
+@behave.given("Administrator has access to SLP service to search goal by goal name")
 def step_impl_1(context):
   goal_dict = copy(GOAL_OBJECT_TEMPLATE)
   goal_dict["name"] = "A Unique Goal"
@@ -201,7 +201,7 @@ def step_impl_1(context):
   context.url = f"{api_url}/search"
 
 
-@behave.when("SNHU Administrator wants to search goal based on correct goal name")
+@behave.when("Administrator wants to search goal based on correct goal name")
 def step_impl_2(context):
   context.get_res = get_method(url=context.url, query_params=context.params)
   context.get_res_data = context.get_res.json()
@@ -220,7 +220,7 @@ def step_impl_3(context):
 
 # ----------------------------- Scenario 06 ---------------------------------
 
-@behave.given("SNHU Administrator has privilege to access SLP service to search goal by goal name")
+@behave.given("Administrator has privilege to access SLP service to search goal by goal name")
 def step_impl_1(context):
   context.params ={
       "name": "Random Name xyz123123"
@@ -228,7 +228,7 @@ def step_impl_1(context):
   context.url = f"{API_URL_LEARNER_PROFILE_SERVICE}/goal/search"
 
 
-@behave.when("SNHU Administrator wants to search goal by providing an incorrect goal name")
+@behave.when("Administrator wants to search goal by providing an incorrect goal name")
 def step_impl_2(context):
   context.get_res = get_method(url=context.url, query_params=context.params)
   context.get_res_data = context.get_res.json()
@@ -243,7 +243,7 @@ def step_impl_3(context):
 
 
 # ----------------------------- Scenario 07 ---------------------------------
-@behave.given("SNHU Administrator has access to SLP service to search achievements by achievement type")
+@behave.given("Administrator has access to SLP service to search achievements by achievement type")
 def step_impl_1(context):
   # Create achievement using post request:
   achievement_dict = copy(ACHIEVEMENT_OBJECT_TEMPLATE)
@@ -264,7 +264,7 @@ def step_impl_1(context):
   context.url = f"{API_URL_LEARNER_PROFILE_SERVICE}/achievement/search"
 
 
-@behave.when("SNHU Administrator wants to search achievements based on correct achievement type")
+@behave.when("Administrator wants to search achievements based on correct achievement type")
 def step_impl_2(context):
   context.get_res = get_method(url=context.url, query_params=context.params)
   context.get_res_data = context.get_res.json()
@@ -283,7 +283,7 @@ def step_impl_3(context):
 
 # ----------------------------- Scenario 08 ---------------------------------
 
-@behave.given("SNHU Administrator has access to SLP service to search learner profile by learner_id")
+@behave.given("Administrator has access to SLP service to search learner profile by learner_id")
 def step_impl_1(context):
   learner_profile_dict = copy(LEARNER_PROFILE_TEMPLATE)
   context.learning_goals = learner_profile_dict["learning_goals"]
@@ -315,7 +315,7 @@ def step_impl_1(context):
   context.url = f"{API_URL_LEARNER_PROFILE_SERVICE}/learner-profile/search"
 
 
-@behave.when("SNHU Administrator wants to search learner profile based on correct learner_id")
+@behave.when("Administrator wants to search learner profile based on correct learner_id")
 def step_impl_2(context):
   context.get_res = get_method(url=context.url, query_params=context.params)
   context.get_res_data = context.get_res.json()
@@ -333,7 +333,7 @@ def step_impl_3(context):
 
 # ----------------------------- Scenario 09 ---------------------------------
 
-@behave.given("SNHU Administrator has privilege to access SLP service to search learner profile by learner_id")
+@behave.given("Administrator has privilege to access SLP service to search learner profile by learner_id")
 def step_impl_1(context):
   context.params ={
       "learner_id": "Random_ID"
@@ -341,7 +341,7 @@ def step_impl_1(context):
   context.url = f"{API_URL_LEARNER_PROFILE_SERVICE}/learner-profile/search"
 
 
-@behave.when("SNHU Administrator wants to search learner profile by providing an incorrect learner_id")
+@behave.when("Administrator wants to search learner profile by providing an incorrect learner_id")
 def step_impl_2(context):
   context.get_res = get_method(url=context.url, query_params=context.params)
   context.get_res_data = context.get_res.json()
