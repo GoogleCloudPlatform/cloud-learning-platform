@@ -50,27 +50,62 @@ $primary-color : #8c1d40;
 
     }
 
+    // .block-metadata {
+    //     border-top: 1px solid mat.get-color-from-palette($my-palette, 400);
+    //     padding: 1.5%;
+
+    //     .metadata {
+    //         display: flex;
+
+    //         .id-block,
+    //         .admin-block {
+    //             display: flex;
+    //             align-items: center;
+    //             color: mat.get-color-from-palette($my-palette, 700);
+    //             margin-right: 2%;
+
+    //             .heading {
+    //                 margin: 0px 10px;
+    //                 font-weight: 700;
+    //             }
+
+    //             .body {
+    //                 font-size: 0.9rem;
+    //             }
+    //         }
+    //     }
+    // }
     .block-metadata {
         border-top: 1px solid mat.get-color-from-palette($my-palette, 400);
         padding: 1.5%;
 
         .metadata {
             display: flex;
+            width: 100%;
 
-            .id-block,
-            .admin-block {
+            .date-block {
                 display: flex;
                 align-items: center;
                 color: mat.get-color-from-palette($my-palette, 700);
-                margin-right: 2%;
+                width: 100%;
 
-                .heading {
-                    margin: 0px 10px;
-                    font-weight: 700;
-                }
+                .date-body {
+                    padding-left: 1%;
+                    font-size: 0.8rem;
 
-                .body {
-                    font-size: 0.9rem;
+                    .title {
+                        font-weight: 600;
+                        margin-right: 5px;
+                    }
+
+                    .content {
+                        font-size: 0.75rem;
+                    }
+
+                    .to {
+                        padding: 0 6px;
+                    }
+
                 }
             }
         }

@@ -30,7 +30,7 @@
 
         </div>
 
-        <div class="block-metadata">
+        <!-- <div class="block-metadata">
             <div class="metadata">
 
                 <div class="id-block">
@@ -51,7 +51,31 @@
 
 
             </div>
+        </div> -->
+
+        <div class="block-metadata">
+            <div class="metadata">
+                <!-- <div class="date-block"><span class="material-symbols-rounded">
+                    history_edu
+                    </span> <span class="date-body">
+                        <span class="title">ID : 
+                        </span>
+                        
+                        <span class="content">{{courseTemplate.instructional_designer[0]['email']}}</span>
+                    </span></div> -->
+
+                <div class="date-block"><span class="material-symbols-rounded">
+                    admin_panel_settings
+                    </span>
+                    <span class="date-body"><span class="title">Admin :
+                        </span>
+                        <span class="content">{{courseTemplate.admin}}</span>
+                    </span>
+                </div>
+            </div>
         </div>
+
+
 
 
     </div>
@@ -63,6 +87,10 @@
 
 <mat-menu #subMenu="matMenu" yPosition="below">
     <div class="edit-menu">
+        <button mat-menu-item class="button" (click)="openAddOrEditIdTemplate()"><span class="material-symbols-rounded"
+            style="padding-right: 10px;">
+            person_add
+        </span>Add / Edit Instructional Designer</button>
         <button mat-menu-item class="button" (click)="openEditCourseTemplate()"><span class="material-symbols-rounded"
                 style="padding-right: 10px;">
                 edit
