@@ -508,7 +508,7 @@ def update_grades(material, section, coursework_id, batch_job_id):
       logs["errors"].append("Responses not available for google form")
       Logger.error("Responses not available for google form")
 
-    for response in all_responses_of_form["responses"]:
+    for response in all_responses_of_form.get("responses", []):
       try:
         if "respondentEmail" not in response.keys():
           error_msg = f"Respondent Email is not collected in form for\
