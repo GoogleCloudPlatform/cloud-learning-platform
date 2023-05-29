@@ -1,0 +1,66 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: api-docs
+build:
+  tagPolicy:
+    gitCommit: {}
+  artifacts:
+  - image: api-docs
+    sync:
+      infer:
+        - "**/*.js"
+        - "**/*.json"
+portForward:
+- resourceType: service
+  resourceName: api-docs
+  port: 80
+deploy:
+  kustomize:
+    paths:
+    - ./kustomize/minikube
+  statusCheckDeadlineSeconds: 1200
+profiles:
+- name: custom
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: api-docs
+      docker:
+        cacheFrom:
+          - api-docs:latest
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/custom
+    statusCheckDeadlineSeconds: 1200
+- name: dev
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: gcr.io/aitutor-dev/api-docs
+      docker:
+        cacheFrom:
+          - gcr.io/aitutor-dev/api-docs:latest
+      sync:
+        infer:
+          - "**/*.js"
+          - "**/*.json"
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/dev
+    statusCheckDeadlineSeconds: 1200
+- name: prod
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: api-docs
+      docker:
+        cacheFrom:
+          - api-docs:latest
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
+    statusCheckDeadlineSeconds: 1200

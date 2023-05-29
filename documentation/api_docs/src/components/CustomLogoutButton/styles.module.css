@@ -1,0 +1,27 @@
+.logout_button {
+    border: none;
+    background-color: transparent;
+    color: var(--ifm-font-color-base);
+    font: var(--ifm-font-size-base) / var(--ifm-line-height-base) var(--ifm-font-family-base);
+    color: var(--ifm-navbar-link-color);
+    font-weight: var(--ifm-font-weight-semibold);
+    cursor: pointer;
+}
+
+.logout_button:hover {
+    transition: 0.2s;
+    color: var(--ifm-navbar-link-hover-color);
+}
+
+.logout_div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logout_div p {
+    margin-bottom: 0 !important;
+    font-size: 12px;
+    margin-right: 15px;
+    padding-top: 2.5px;
+}
