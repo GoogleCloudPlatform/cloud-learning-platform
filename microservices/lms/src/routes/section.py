@@ -91,7 +91,7 @@ def create_section(sections_details: SectionDetails,
           f" {course_template_details.classroom_id} is not found")
 
     batch_job_input = {
-        "type": "course_copy",
+        "job_type": "course_copy",
         "status": "ready",
         "input_data": {**sections_details.dict()},
         "logs": {
@@ -617,7 +617,7 @@ def import_grade(section_id: str,coursework_id:str,
     section.classroom_id,coursework_id)
 
     batch_job_input = {
-        "type": "grade_import",
+        "job_type": "grade_import",
         "status": "ready",
         "section_id": section_id,
         "classroom_id": section.classroom_id,
