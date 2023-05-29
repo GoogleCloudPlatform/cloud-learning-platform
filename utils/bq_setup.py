@@ -58,8 +58,8 @@ def create_tables(dataset):
   """Create tables in the bigquery"""
   print("dataset", dataset)
   sql_file_list = []
-
-  file_path = "tables_sql/"
+  bq_dataset_name = os.getenv("BQ_DATASET")
+  file_path = f"tables_sql/{bq_dataset_name}/"
   sql_files = listdir(file_path)
   sql_file_list = [file_path + i for i in sql_files]
 

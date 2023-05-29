@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """
-User Data Model
+User object in the ORM
 """
 import regex
 from common.models import BaseModel, NodeItem, LearningUnit
@@ -57,7 +58,7 @@ def check_association_type(field_val):
 
 
 class User(BaseModel):
-  """User Class for course enrollment mapping"""
+  """User Class"""
   user_id = TextField(required=True)
   first_name = TextField(required=True, validator=validate_name)
   last_name = TextField(required=True, validator=validate_name)

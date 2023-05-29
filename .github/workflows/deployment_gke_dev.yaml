@@ -115,6 +115,7 @@ jobs:
           cd utils/
           python -m pip install -r requirements.txt
           BQ_DATASET=lms_analytics python bq_setup.py
+          BQ_DATASET=lrs python bq_setup.py
 
       - name: Build and deploy to cluster
         run: |

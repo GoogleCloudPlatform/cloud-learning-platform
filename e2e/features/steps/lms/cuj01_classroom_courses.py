@@ -9,12 +9,15 @@ from environment import create_course
 
 
 @behave.given(
-    "A user has access privileges and needs to fetch all Courses Records")
+    "A user has access privileges and needs to fetch all Courses Records"
+)
 def step_impl_01(context):
   context.url = f'{API_URL}/classroom_courses'
 
 
-@behave.when("API request is sent to fetch all Courses Records")
+@behave.when(
+    "API request is sent to fetch all Courses Records"
+)
 def step_impl_02(context):
   resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
@@ -35,17 +38,21 @@ def step_impl_03(context):
     "A user has access privileges and wants to create a Copy of existing Classroom Course"
 )
 def step_impl_4(context):
-  course = create_course(COURSE_TEMPLATE_INPUT_DATA["name"], "testing_section",
-                         COURSE_TEMPLATE_INPUT_DATA["description"])
+  course = create_course(
+      COURSE_TEMPLATE_INPUT_DATA["name"], "testing_section",
+      COURSE_TEMPLATE_INPUT_DATA["description"])
   context.url = f'{API_URL}/classroom_courses/copy_course'
-  context.payload = {"course_id": course["id"]}
+  context.payload = {
+      "course_id": course["id"]
+  }
 
 
-@behave.when("API request is sent to Copy Course with correct request payload")
+@behave.when(
+    "API request is sent to Copy Course with correct request payload"
+)
 def step_impl_5(context):
-  resp = requests.post(url=context.url,
-                       json=context.payload,
-                       headers=context.header)
+  resp = requests.post(
+      url=context.url, json=context.payload, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -59,25 +66,26 @@ def step_impl_6(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 
-
 # -------------------------------enable notification to a course-------------------------------------
 # ----Positive Scenario-----
-
 
 @behave.given(
     "A user has access privileges and wants to enable notifications for a course"
 )
 def step_impl_7(context):
-  course = create_course(COURSE_TEMPLATE_INPUT_DATA["name"], "testing_section",
-                         COURSE_TEMPLATE_INPUT_DATA["description"])
+  course = create_course(
+      COURSE_TEMPLATE_INPUT_DATA["name"], "testing_section",
+      COURSE_TEMPLATE_INPUT_DATA["description"])
   context.url = f'{API_URL}/classroom_courses/{course["id"]}/enable_notifications'
+  
 
 
 @behave.when(
     "API request is sent to enable notifications for a course using valid course id"
 )
 def step_impl_8(context):
-  resp = requests.post(context.url, headers=context.header)
+  resp = requests.post(context.url,
+                       headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -92,7 +100,6 @@ def step_impl_9(context):
 
 # ----negative Scenario-----
 
-
 @behave.given(
     "A user has access to portal and needs to enable notifications for a course"
 )
@@ -104,7 +111,8 @@ def step_impl_10(context):
     "API request is sent to enable notifications for a section using invalid course id"
 )
 def step_impl_11(context):
-  resp = requests.post(context.url, headers=context.header)
+  resp = requests.post(context.url,
+                      headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -116,20 +124,23 @@ def step_impl_12(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
 
-
 # -------------------------------Fetch Course by id-------------------------------------
 # ----Positive Scenario-----
 
 
-@behave.given("A user has access privileges and needs to fetch Course Record")
+@behave.given(
+    "A user has access privileges and needs to fetch Course Record"
+)
 def step_impl_13(context):
-  context.course = create_course(COURSE_TEMPLATE_INPUT_DATA["name"],
-                                 "retrieve section",
-                                 COURSE_TEMPLATE_INPUT_DATA["description"])
+  context.course = create_course(
+      COURSE_TEMPLATE_INPUT_DATA["name"], "retrieve section",
+      COURSE_TEMPLATE_INPUT_DATA["description"])
   context.url = f'{API_URL}/classroom_courses/{context.course["id"]}'
 
 
-@behave.when("API request is sent to fetch Course Record using valid id")
+@behave.when(
+    "API request is sent to fetch Course Record using valid id"
+)
 def step_impl_14(context):
   resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
@@ -142,28 +153,31 @@ def step_impl_14(context):
 def step_impl_15(context):
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
-  assert context.response["data"]["id"] == context.course[
-      "id"], "Check course id"
-  assert context.response["data"]["name"] == context.course[
-      "name"], "Check course name"
-
+  assert context.response["data"]["id"] == context.course["id"], "Check course id"
+  assert context.response["data"]["name"] == context.course["name"], "Check course name"
 
 # ----Negative Scenario-----
 
 
-@behave.given("A user has access privileges and wants to fetch Course Record")
+@behave.given(
+    "A user has access privileges and wants to fetch Course Record"
+)
 def step_impl_16(context):
   context.url = f'{API_URL}/classroom_courses/12345678'
 
 
-@behave.when("API request is sent to fetch Course Record using invalid id")
+@behave.when(
+    "API request is sent to fetch Course Record using invalid id"
+)
 def step_impl_17(context):
   resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
 
-@behave.then("Classroom Courses API will throw an error course not found")
+@behave.then(
+    "Classroom Courses API will throw an error course not found"
+)
 def step_impl_18(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
