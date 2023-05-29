@@ -59,7 +59,7 @@ def create_tables(dataset):
   print("dataset", dataset)
   sql_file_list = []
 
-  file_path = "tables_sql/"
+  file_path = f"tables_sql/{dataset}/"
   sql_files = listdir(file_path)
   sql_file_list = [file_path + i for i in sql_files]
 
