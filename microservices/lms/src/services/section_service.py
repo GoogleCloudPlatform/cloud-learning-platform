@@ -256,6 +256,7 @@ def copy_course_background_task(course_template_details,
           "cohortId":cohort_details.id,\
         "courseTemplateId":course_template_details.id,\
           "status":section.status,\
+        "enrollmentStatus": section.enrollment_status,
           "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(rows=rows,
