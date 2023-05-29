@@ -99,7 +99,7 @@ jobs:
         export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
         cd utils/
         python -m pip install -r requirements.txt
-        PYTHONPATH=../common/src python firestore_indexing.py
+        PYTHONPATH=../common/src python firestore_e2e_indexing.py
 
     - name: Initialize Pub/Sub
       run: |
@@ -115,6 +115,7 @@ jobs:
         cd utils/
         python -m pip install -r requirements.txt
         BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
+        BQ_DATASET=lrs DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
 
     - name: Build and deploy to cluster
       run: |
