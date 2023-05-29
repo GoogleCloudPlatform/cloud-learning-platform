@@ -99,7 +99,7 @@ jobs:
         export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
         cd utils/
         python -m pip install -r requirements.txt
-        PYTHONPATH=../common/src python firestore_indexing.py
+        PYTHONPATH=../common/src python firestore_e2e_indexing_setup.py
 
     - name: Initialize Pub/Sub
       run: |
@@ -115,6 +115,7 @@ jobs:
         cd utils/
         python -m pip install -r requirements.txt
         BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
+        BQ_DATASET=lrs DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
 
     - name: Build and deploy to cluster
       run: |
@@ -202,6 +203,17 @@ jobs:
         NAMESPACE=e2e-pr-$PR_NUMBER
         python e2e/utils/port_forward.py --namespace $NAMESPACE
 
+    - name: Setup redis
+      uses: supercharge/redis-github-action@1.2.0
+      with:
+        redis-version: 6
+
+    - name: Install redis cli
+      run: sudo apt-get install -y redis-tools
+
+    - name: Verify that redis is up
+      run: redis-cli ping
+
     - name: Cleaning up database
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
@@ -232,7 +244,7 @@ jobs:
     - name: Run behave
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m behave e2e/features/ --tags=~@test --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode
+        PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m behave e2e/features/ --tags=~@test --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode --tags=~@inspace
 
   dataset-cleanup:
     runs-on: ubuntu-latest
@@ -349,5 +361,6 @@ jobs:
         cd utils/
         python -m pip install -r requirements.txt
         BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_cleanup.py  
+        BQ_DATASET=lrs DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_cleanup.py  
 
 # cookiecutter:endraw 
