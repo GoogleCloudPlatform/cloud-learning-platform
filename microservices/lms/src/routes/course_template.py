@@ -221,76 +221,79 @@ def create_course_template(input_course_template: InputCourseTemplateModel
 
 @router.patch("/{course_template_id}",
               response_model=UpdateCourseTemplateResponseModel)
-def update_course_template(course_template_id: str,
-          update_course_template_model: UpdateCourseTemplateModel
-    ,request: Request):
-	"""Update Course Template Api
+def update_course_template(
+    course_template_id: str,
+    update_course_template_model: UpdateCourseTemplateModel
+    # ,request: Request
+):
+  """Update Course Template Api
 
-	Args:
-			course_template_id (str): Unique id of course template
-			update_course_template_model (UpdateCourseTemplateModel):
-				pydantic model object which contains update details
+  Args:
+      course_template_id (str): Unique id of course template
+      update_course_template_model (UpdateCourseTemplateModel):
+        pydantic model object which contains update details
 
-	Raises:
-			ResourceNotFoundException: If the Course Template does not exist
-			InternalServerError: Internal Server Error if something went wrong
+  Raises:
+      ResourceNotFoundException: If the Course Template does not exist
+      InternalServerError: Internal Server Error if something went wrong
 
-	Returns:
-			UpdateCourseTemplateResponseModel:
-					object which contains update success, message
-						and updated course template record.
-			NotFoundErrorResponseModel: if the Course Template not found,
-			InternalServerErrorResponseModel:
-					If the update course template raises an exception
-	"""
-	try:
-		course_template = CourseTemplate.find_by_id(course_template_id)
-		update_course_template_dict = {**update_course_template_model.dict()}
-		if not any(update_course_template_dict.values()):
-				raise ValidationError(
-						"Invalid request please provide some " +
-						f"data to update the Course Template with id {course_template_id}")
-		for key in update_course_template_dict:
-				if update_course_template_dict[key] is not None:
-						setattr(course_template, key,
-										update_course_template_dict.get(key))
-		classroom_crud.update_course(course_id=course_template.classroom_id,
-																	section_name="template",
-																	description=course_template.description,
-																	course_name=course_template.name)
-		course_template.update()
-		list_enrollment_mapping = CourseTemplateEnrollmentMapping\
-				.fetch_all_by_course_template(course_template.key)
-		list_instructional_designers = [
-				i.user.email for i in list_enrollment_mapping
-		]
-		rows = [{
-				"courseTemplateId": course_template_id,
-				"classroomId": course_template.classroom_id,
-				"name": course_template.name,
-				"description": course_template.description,
-				"timestamp": datetime.datetime.utcnow(),
-				"instructionalDesigners": [list_instructional_designers]
-		}]
-		insert_rows_to_bq(rows=rows,
-											dataset=BQ_DATASET,
-											table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
-		return {
-				"message": "Successfully Updated the " +
-				f"Course Template with id {course_template_id}",
-				"course_template": course_template
-		}
-	except ValidationError as ve:
-		raise BadRequest(str(ve)) from ve
-	except HttpError as hte:
-		Logger.error(hte)
-		raise ClassroomHttpException(status_code=hte.resp.status,
-																	message=str(hte)) from hte
-	except ResourceNotFoundException as re:
-		raise ResourceNotFound(str(re)) from re
-	except Exception as e:
-		Logger.error(e)
-		raise InternalServerError(str(e)) from e
+  Returns:
+      UpdateCourseTemplateResponseModel:
+          object which contains update success, message
+            and updated course template record.
+      NotFoundErrorResponseModel: if the Course Template not found,
+      InternalServerErrorResponseModel:
+          If the update course template raises an exception
+  """
+  try:
+    # headers = {"Authorization": request.headers.get("Authorization")}
+    course_template = CourseTemplate.find_by_id(course_template_id)
+    # instructional_designer = course_template.instructional_designer
+    update_course_template_dict = {**update_course_template_model.dict()}
+    if not any(update_course_template_dict.values()):
+      raise ValidationError(
+          "Invalid request please provide some " +
+          f"data to update the Course Template with id {course_template_id}")
+    for key in update_course_template_dict:
+      if update_course_template_dict[key] is not None:
+        setattr(course_template, key, update_course_template_dict.get(key))
+    classroom_crud.update_course(course_id=course_template.classroom_id,
+                                 section_name="template",
+                                 description=course_template.description,
+                                 course_name=course_template.name)
+    course_template.update()
+    list_enrollment_mapping=CourseTemplateEnrollmentMapping\
+      .fetch_all_by_course_template(course_template.key)
+    list_instructional_designers = [
+        i.user.email for i in list_enrollment_mapping
+    ]
+    rows = [{
+        "courseTemplateId": course_template_id,
+        "classroomId": course_template.classroom_id,
+        "name": course_template.name,
+        "description": course_template.description,
+        "timestamp": datetime.datetime.utcnow(),
+        "instructionalDesigners": [list_instructional_designers]
+    }]
+    insert_rows_to_bq(rows=rows,
+                      dataset=BQ_DATASET,
+                      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
+    return {
+        "message": "Successfully Updated the " +
+        f"Course Template with id {course_template_id}",
+        "course_template": course_template
+    }
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
+  except HttpError as hte:
+    Logger.error(hte)
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                                 message=str(hte)) from hte
+  except ResourceNotFoundException as re:
+    raise ResourceNotFound(str(re)) from re
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
 
 
 @router.delete("/{course_template_id}",
@@ -442,155 +445,63 @@ def add_instructional_designer(
 def delete_instructional_designer(course_template_id: str,
                                   instructional_designer: str,
                                   request: Request):
-	"""_summary_
+  """_summary_
 
-	Args:
-			course_template_id (str): _description_
-			request (Request): _description_
-			instructional_designer (str): _description_
+  Args:
+      course_template_id (str): _description_
+      request (Request): _description_
+      instructional_designer (str): _description_
 
-	Raises:
-			ResourceNotFoundException: _description_
-			ClassroomHttpException: _description_
-			Conflict: _description_
-			ResourceNotFound: _description_
-			InternalServerError: _description_
-	"""
-	try:
-		headers = {"Authorization": request.headers.get("Authorization")}
-		course_template = CourseTemplate.find_by_id(course_template_id)
-		user_id = get_user_id(instructional_designer, headers)
-		result = CourseTemplateEnrollmentMapping.find_enrolled_active_record(
-				course_template.key, user_id)
-		if result is None:
-			raise ResourceNotFoundException(
-					"Instructional Designer not found in this" +
-					f" Course Template {course_template_id}")
-		classroom_crud.delete_teacher(course_template.classroom_id,
-																	result.user.email)
-		result.status = "inactive"
-		result.update()
-		list_enrollment_mapping = CourseTemplateEnrollmentMapping\
-				.fetch_all_by_course_template(course_template.key)
-		list_instructional_designers = [
-				i.user.email for i in list_enrollment_mapping
-		]
-		rows = [{
-				"courseTemplateId": course_template_id,
-				"classroomId": course_template.classroom_id,
-				"name": course_template.name,
-				"description": course_template.description,
-				"timestamp": datetime.datetime.utcnow(),
-				"instructionalDesigners": [list_instructional_designers]
-		}]
-		insert_rows_to_bq(rows=rows,
-											dataset=BQ_DATASET,
-											table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
-		return {
-				"message": ("Successfully delete teacher from section" +
-										f" {course_template_id} using {instructional_designer}")
-		}
-	except HttpError as hte:
-		Logger.error(hte)
-		raise ClassroomHttpException(status_code=hte.resp.status,
-																	message=str(hte)) from hte
-	except Conflict as conflict:
-		Logger.error(conflict)
-		err = traceback.format_exc().replace("\n", " ")
-		Logger.error(err)
-		raise Conflict(str(conflict)) from conflict
-	except ResourceNotFoundException as re:
-		raise ResourceNotFound(str(re)) from re
-	except Exception as e:
-		Logger.error(e)
-		raise InternalServerError(str(e)) from e
-
-@router.get(
-    "/{course_template_id}/instructional_designers/{instructional_designer}",
-    response_model=GetInstructionalDesigner)
-def get_instructional_designer(course_template_id: str,
-                                  instructional_designer: str,
-                                  request: Request):
-	"""_summary_
-
-	Args:
-			course_template_id (str): _description_
-			request (Request): _description_
-			instructional_designer (str): _description_
-	Raises:
-			ResourceNotFoundException: _description_
-			ClassroomHttpException: _description_
-			Conflict: _description_
-			ResourceNotFound: _description_
-			InternalServerError: _description_
-	"""
-	try:
-		headers = {"Authorization": request.headers.get("Authorization")}
-		course_template = CourseTemplate.find_by_id(course_template_id)
-		user_id = get_user_id(instructional_designer, headers)
-		result = CourseTemplateEnrollmentMapping.find_enrolled_active_record(
-				course_template.key, user_id)
-		if result is None:
-			raise ResourceNotFoundException(
-					"Instructional Designer not found in this" +
-					f" Course Template {course_template_id}")
-		data = course_template_enrollment_instructional_designer_model(
-				result)
-		return {"data": data}
-	except HttpError as hte:
-		Logger.error(hte)
-		raise ClassroomHttpException(status_code=hte.resp.status,
-																	message=str(hte)) from hte
-	except Conflict as conflict:
-		Logger.error(conflict)
-		err = traceback.format_exc().replace("\n", " ")
-		Logger.error(err)
-		raise Conflict(str(conflict)) from conflict
-	except ResourceNotFoundException as re:
-		raise ResourceNotFound(str(re)) from re
-	except Exception as e:
-		Logger.error(e)
-		raise InternalServerError(str(e)) from e
-
-@router.get(
-    "/{course_template_id}/instructional_designers",
-    response_model=ListInstructionalDesigner)
-def list_template_instructional_designer(course_template_id: str):
-	"""_summary_
-
-	Args:
-			course_template_id (str): _description_
-			request (Request): _description_
-
-	Raises:
-			ResourceNotFoundException: _description_
-			ClassroomHttpException: _description_
-			Conflict: _description_
-			ResourceNotFound: _description_
-			InternalServerError: _description_
-	"""
-	try:
-		course_template = CourseTemplate.find_by_id(course_template_id)
-		instructional_designers = CourseTemplateEnrollmentMapping.fetch_all_by_course_template(
-				course_template.key)
-		if instructional_designers is None:
-			raise ResourceNotFoundException(
-					"Instructional Designer not found in this" +
-					f" Course Template {course_template_id}")
-		data = [course_template_enrollment_instructional_designer_model(i) for i in
-						instructional_designers]
-		return {"data": data}
-	except HttpError as hte:
-		Logger.error(hte)
-		raise ClassroomHttpException(status_code=hte.resp.status,
-																	message=str(hte)) from hte
-	except Conflict as conflict:
-		Logger.error(conflict)
-		err = traceback.format_exc().replace("\n", " ")
-		Logger.error(err)
-		raise Conflict(str(conflict)) from conflict
-	except ResourceNotFoundException as re:
-		raise ResourceNotFound(str(re)) from re
-	except Exception as e:
-		Logger.error(e)
-		raise InternalServerError(str(e)) from e
+  Raises:
+      ResourceNotFoundException: _description_
+      ClassroomHttpException: _description_
+      Conflict: _description_
+      ResourceNotFound: _description_
+      InternalServerError: _description_
+  """
+  try:
+    headers = {"Authorization": request.headers.get("Authorization")}
+    course_template = CourseTemplate.find_by_id(course_template_id)
+    user_id = get_user_id(instructional_designer, headers)
+    result = CourseTemplateEnrollmentMapping.find_enrolled_active_record(
+        course_template.key, user_id)
+    if result is None:
+      raise ResourceNotFoundException(
+          "Instructional Designer not found in this" +
+          f" Course Template {course_template_id}")
+    classroom_crud.delete_teacher(course_template.classroom_id,
+                                  result.user.email)
+    result.status = "inactive"
+    result.update()
+    list_enrollment_mapping=CourseTemplateEnrollmentMapping\
+      .fetch_all_by_course_template(course_template.key)
+    list_instructional_designers=[i.user.email for i in list_enrollment_mapping]
+    rows = [{
+        "courseTemplateId": course_template_id,
+        "classroomId": course_template.classroom_id,
+        "name": course_template.name,
+        "description": course_template.description,
+        "timestamp": datetime.datetime.utcnow(),
+        "instructionalDesigners": [list_instructional_designers]
+    }]
+    insert_rows_to_bq(rows=rows,
+                      dataset=BQ_DATASET,
+                      table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
+    return {
+        "message": ("Successfully delete teacher from section" +
+                    f" {course_template_id} using {instructional_designer}")
+    }
+  except HttpError as hte:
+    Logger.error(hte)
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                                 message=str(hte)) from hte
+  except Conflict as conflict:
+    Logger.error(conflict)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise Conflict(str(conflict)) from conflict
+  except ResourceNotFoundException as re:
+    raise ResourceNotFound(str(re)) from re
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e

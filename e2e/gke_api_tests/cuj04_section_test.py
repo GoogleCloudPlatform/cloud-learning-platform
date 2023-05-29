@@ -10,10 +10,11 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from common.testing.example_objects import create_fake_data, TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2
 from testing_objects.test_config import API_URL
-from testing_objects.token_fixture import get_token, sign_up_user
+from testing_objects.token_fixture import get_token,sign_up_user
 
 DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 EMAILS = get_required_emails_from_secret_manager()
+
 
 
 def create_course(name, description, section, owner_id):
@@ -61,6 +62,7 @@ def test_create_section(get_token):
   classroom_id = course["id"]
   test_course_template_dict = TEST_COURSE_TEMPLATE2
   test_course_template_dict["name"] = DATABASE_PREFIX + "test_course"
+  test_course_template_dict["instructional_designer"] = EMAILS["instructional_designer"]
   fake_data = create_fake_data(test_course_template_dict, TEST_COHORT2,
                                TEST_SECTION2, classroom_id)
   url = f"{API_URL}/sections"
@@ -73,7 +75,7 @@ def test_create_section(get_token):
   }
   resp = requests.post(url=url, json=data, headers=get_token)
   resp_json = resp.json()
-  print("_______***********create section  response ****_________", resp_json)
+  print("_______***********create section  response ****_________",resp_json)
   assert resp.status_code == 202, "Status 202"
 
 
