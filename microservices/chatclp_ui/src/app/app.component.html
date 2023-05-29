@@ -1,27 +1,35 @@
 <div class="app">
-  <div class="left-panel">
-    <div class="profile">
-      <h2>User Profile</h2>
-      <!-- Add user profile details and settings here -->
-    </div>
-    <div class="chat-history">
-      <h2>Prior Chats</h2>
-      <p *ngFor="let chat of chat">{{ chat.message }}</p>
-    </div>
-  </div>
-  <div class="chat-area">
-    <div class="model-selector">
-      <label>Select Model: </label>
-      <select [(ngModel)]="selectedModel">
-        <option *ngFor="let model of models">{{ model }}</option>
-      </select>
-    </div>
-    <div class="chat-display">
-      <!-- Display chat messages here -->
-    </div>
-    <div class="chat-input">
-      <input [(ngModel)]="message" />
-      <button (click)="sendMessage()">Send</button>
-    </div>
-  </div>
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav mode="side" opened>
+      <div class="profile">
+        <h2>User Profile</h2>
+        <!-- Add user profile details and settings here -->
+      </div>
+      <div class="chat-history">
+        <h2>Prior Chats</h2>
+        <p *ngFor="let chat of chats">{{ chat.message }}</p>
+      </div>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <div class="chat-area">
+        <mat-form-field appearance="fill">
+          <mat-label>Select Model</mat-label>
+          <mat-select [(value)]="selectedModel">
+            <mat-option *ngFor="let model of models" [value]="model">
+              {{ model }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="chat-display">
+          <!-- Display chat messages here -->
+        </div>
+        <div class="chat-input">
+          <mat-form-field class="message-field">
+            <input matInput [(ngModel)]="message" placeholder="Enter your message" />
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="sendMessage()">Send</button>
+        </div>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 </div>

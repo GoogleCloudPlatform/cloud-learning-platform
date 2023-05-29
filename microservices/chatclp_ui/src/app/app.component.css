@@ -1,13 +1,9 @@
 .app {
-  display: flex;
   height: 100vh;
 }
 
-.left-panel {
-  width: 25%;
-  border-right: 1px solid #ccc;
-  padding: 20px;
-  overflow: auto;
+.sidenav-container {
+  height: 100%;
 }
 
 .profile {
@@ -19,19 +15,13 @@
 }
 
 .chat-history p {
-  border-bottom: 1px solid #ccc;
   padding: 10px 0;
 }
 
 .chat-area {
-  width: 75%;
   padding: 20px;
   display: flex;
   flex-direction: column;
-}
-
-.model-selector {
-  margin-bottom: 20px;
 }
 
 .chat-display {
@@ -44,10 +34,10 @@
 
 .chat-input {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
 }
 
-.chat-input input {
+.message-field {
   flex: 1;
   margin-right: 10px;
 }
