@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-docs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-docs
+  template:
+    metadata:
+      labels:
+        app: api-docs
+    spec:
+      containers:
+      - name: api-docs
+        image: api-docs
+        imagePullPolicy: IfNotPresent
+        env:
+        # Define the environment variable
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: FIREBASE_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: FIREBASE_API_KEY
+        - name: FIREBASE_AUTH_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: FIREBASE_AUTH_DOMAIN
+        - name: FIREBASE_STORAGE_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: FIREBASE_STORAGE_BUCKET
+        - name: API_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: API_DOMAIN
+        - name: SHOW_ALL_SERVICES_IN_DOCS
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: SHOW_ALL_SERVICES_IN_DOCS
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "200Mi"
+          limits:
+            memory: "500Mi"
+            cpu: "200m" 
+        ports:
+        - containerPort: 80
