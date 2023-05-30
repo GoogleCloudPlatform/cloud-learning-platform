@@ -52,7 +52,7 @@ router = APIRouter(prefix="/course_templates",
 
 @router.get("", response_model=CourseTemplateListModel)
 def get_course_template_list(skip: int = 0, limit: int = 10):
-	"""Get a list of Course Template endpoint
+  """Get a list of Course Template endpoint
 		Raises:
 				HTTPException: 500 Internal Server Error if something fails.
 
@@ -61,9 +61,9 @@ def get_course_template_list(skip: int = 0, limit: int = 10):
 						object which contains list of course template object.
 				InternalServerErrorResponseModel:
 						if the get Course Template list raises an exception.
-		"""
-	try:
-		if skip < 0:
+	"""
+  try:
+    if skip < 0:
 			raise ValidationError("Invalid value passed to \"skip\" query parameter")
 		if limit < 1:
 			raise ValidationError(
@@ -81,7 +81,6 @@ def get_course_template_list(skip: int = 0, limit: int = 10):
 	except Exception as e:
 		Logger.error(e)
 		raise InternalServerError(str(e)) from e
-
 
 @router.get("/{course_template_id}", response_model=CourseTemplateModel)
 def get_course_template(course_template_id: str):
