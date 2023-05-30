@@ -11,7 +11,7 @@ import { InviteStudentModalComponent } from '../invite-student-modal/invite-stud
 import { Subscription } from 'rxjs';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { CreateAssignmentComponent } from 'src/app/lti/create-assignment/create-assignment.component';
-
+import { FormControl, UntypedFormGroup, UntypedFormBuilder, Validators, Form } from '@angular/forms';
 
 interface LooseObject {
   [key: string]: any
@@ -21,6 +21,7 @@ export interface staff {
   name: string;
   email: string;
   role: string;
+  status:string;
 }
 
 export interface student {
@@ -55,15 +56,15 @@ export interface ltiAssignment {
 })
 export class SectionComponent implements OnInit,OnDestroy {
   selectedSection: any
-  displayedColumns: string[] = ['email', 'role'];
+  displayedColumns: string[] = ['name','email','role','status','action'];
   studentDisplayedColumns: string[] = ['first name', 'last name', 'email', 'created time','status','action'];
   courseworkDisplayColumns: string[] = ['title', 'state', 'created time','action']
   ltiAssignmentsDisplayedColumns: string[] = ["id", "lti_assignment_title", "start_date", "end_date", "due_date", "action"];
-  tableData: staff[] = []
+  teacherTableData: staff[] = []
   studentTableData: student[] = []
   courseworkTable: coursework[] = []
   ltiAssignmentsTableData: ltiAssignment[] = []
-  dataSource = new MatTableDataSource(this.tableData);
+  // dataSource = new MatTableDataSource(this.tableData);
 
   cohortDetails: any
   courseTemplateDetails: any
@@ -71,9 +72,11 @@ export class SectionComponent implements OnInit,OnDestroy {
   loadCard: boolean = false
   loadSection: boolean = false
   studentTableLoader:boolean=true
+  teacherTableLoader:boolean=true
   courseworkTableLoader:boolean=true
   ltiAssignmentTableLoader:boolean=true
   getStudentListSub:Subscription
+  getTeacherListSub:Subscription
   importGradesSub:Subscription
   disableCourseworkAction:boolean=false
   constructor(private _liveAnnouncer: LiveAnnouncer, private _snackBar: MatSnackBar, public dialog: MatDialog, public _HomeService: HomeService, 
@@ -82,7 +85,6 @@ export class SectionComponent implements OnInit,OnDestroy {
 
 
   ngOnInit(): void {
-    this.dataSource.sort = this.sort;
     let id
     console.log(this.router.url)
     id = this.router.url.split('/')[2]
@@ -184,6 +186,31 @@ transformCourseworkTableData(data:any){
     )
   }
 
+  getSectionTeachers(){
+    this.teacherTableLoader = true
+    if(this.getTeacherListSub){
+      this.getTeacherListSub.unsubscribe();
+    }
+    this.getTeacherListSub=this._HomeService.getTeachersInSection(this.selectedSection.id).subscribe((res: any) => {
+      this.teacherTableData = []
+      for (let x of res.data) {
+      let staffObj: staff = { name: '', email: '', role: '', status:'' }
+      staffObj.name = x.first_name+' '+x.last_name
+      staffObj.email = x.email
+      staffObj.role = 'Teaching Staff'
+      staffObj.status = x.status
+      this.teacherTableData.push(staffObj)
+    }
+
+      console.log('teacher data', this.teacherTableData)
+      this.teacherTableLoader = false
+    },
+    (err:any)=>{
+      this.teacherTableLoader = false
+    }
+    )
+  }
+
   updateUrl(url: string) {
     console.log('path',location.pathname)
     let pathArr = location.pathname.split('/')
@@ -205,25 +232,9 @@ transformCourseworkTableData(data:any){
     this.disableCourseworkAction=false
     this.updateUrl(this.selectedSection.id)
     this.getSectionStudents()
+    this.getSectionTeachers()
     this.getCourseworkDetails()
     this.getLtiAssignmentsDetails()
-    this.tableData = []
-    for (let x of this.selectedSection.teachers) {
-      let staffObj: staff = { name: '', email: '', role: '' }
-      staffObj.name = 'TBD'
-      staffObj.email = x
-      if (x == this.courseTemplateDetails.admin) {
-        staffObj.role = 'Admin'
-      }
-      else if (x == this.courseTemplateDetails.instructional_designer) {
-        staffObj.role = 'Instructional Designer'
-      }
-      else {
-        staffObj.role = 'Teaching Staff'
-      }
-      this.tableData.push(staffObj)
-    }
-    console.log('table data', this.tableData)
 
   }
 
@@ -274,12 +285,12 @@ transformCourseworkTableData(data:any){
     tempObj['section'] = this.selectedSection.section
     tempObj['description'] = this.selectedSection.description
     tempObj['classroom_id'] = this.selectedSection.classroom_id
-    tempObj['teachers'] = []
-    for (let x of this.selectedSection.teachers) {
-      if (x != this.courseTemplateDetails.admin && x != this.courseTemplateDetails.instructional_designer) {
-        tempObj['teachers'].push(x)
-      }
-    }
+    // tempObj['teachers'] = []
+    // for (let x of this.selectedSection.teachers) {
+    //   if (x != this.courseTemplateDetails.admin && x != this.courseTemplateDetails.instructional_designer) {
+    //     tempObj['teachers'].push(x)
+    //   }
+    // }
 
     let sectionModalData: LooseObject = {}
     sectionModalData['mode'] = 'Edit'
@@ -305,6 +316,7 @@ transformCourseworkTableData(data:any){
     deleteDialogData['section'] = this.selectedSection.section
     deleteDialogData['user_id'] = userId
     deleteDialogData['section_id'] = this.selectedSection.id
+    deleteDialogData['type'] = 'student'
     const dialogRef = this.dialog.open(DeleteOverviewDialog, {
       width: '500px',
       data: deleteDialogData
@@ -313,6 +325,25 @@ transformCourseworkTableData(data:any){
     dialogRef.afterClosed().subscribe(result => {
       if (result.data == 'success') {
         this.getSectionStudents()
+      }
+    });
+  }
+
+  openTeacherDeleteDialog(name:any,email:any){
+    let deleteDialogData: LooseObject = {}
+    deleteDialogData['name'] = name
+    deleteDialogData['email'] = email
+    deleteDialogData['section_name'] = this.selectedSection.section
+    deleteDialogData['id'] = this.selectedSection.id
+    deleteDialogData['type'] = 'teacher'
+    const dialogRef = this.dialog.open(DeleteOverviewDialog, {
+      width: '500px',
+      data: deleteDialogData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.data == 'success') {
+        this.getSectionTeachers()
       }
     });
   }
@@ -472,6 +503,16 @@ transformCourseworkTableData(data:any){
       panelClass: ['green-snackbar'],
     });
   }
+  openAddTeacherDialog(){
+    let sectionTemp:LooseObject={}
+    sectionTemp['name'] = this.selectedSection.section
+    sectionTemp['id'] = this.selectedSection.id
+    console.log('data sent',sectionTemp)
+    const dialogRef = this.dialog.open(addTeacherDialog, {
+      width: '500px',
+      data: sectionTemp
+    });
+  }
 
   ngOnDestroy(): void {
     if(this.getStudentListSub){
@@ -484,6 +525,56 @@ transformCourseworkTableData(data:any){
 
 }
 
+
+@Component({
+  selector: 'add-teacher-dialog',
+  templateUrl: 'add-teacher-dialog.html',
+})
+export class addTeacherDialog {
+  addTeacherForm:UntypedFormGroup
+  showProgressSpinner:boolean=false
+  constructor(
+    public dialogRef: MatDialogRef<addTeacherDialog>,
+    @Inject(MAT_DIALOG_DATA) public addTeacherDialogData: any,
+    private fb: UntypedFormBuilder,
+    public homeService: HomeService,
+    private _snackBar: MatSnackBar
+  ) 
+  {
+  }
+  ngOnInit():void{
+    this.addTeacherForm = this.fb.group({
+      email: this.fb.control('', [Validators.required, Validators.email])
+    })
+
+  }
+
+  addTeacher(){
+    console.log(this.addTeacherForm.value)
+    this.showProgressSpinner=true
+this.homeService.addTeacher(this.addTeacherDialogData.id,this.addTeacherForm.value).subscribe((res:any)=>{
+this.showProgressSpinner=false
+if(res.success == true){
+this.openSuccessSnackBar(res.message,'Success')
+}
+this.addTeacherForm.reset()
+},(err:any)=>{
+  this.showProgressSpinner=false
+})
+  }
+
+  openSuccessSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 6000,
+      panelClass: ['green-snackbar'],
+    });
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close({ data: 'closed' });
+  }
+
+}
 
 @Component({
   selector: 'view-lti-assignment-dialog',
@@ -514,13 +605,22 @@ export class DeleteOverviewDialog {
     public dialogRef: MatDialogRef<DeleteOverviewDialog>,
     @Inject(MAT_DIALOG_DATA) public deleteDialogData: any, public _HomeService: HomeService
   ) { }
-
-  deleteStudent() {
-    this._HomeService.deleteStudent(this.deleteDialogData.user_id, this.deleteDialogData.section_id).subscribe((res: any) => {
-      if (res.success == true) {
-        this.dialogRef.close({ data: 'success' });
-      }
-    })
+  
+  delete(){
+    if(this.deleteDialogData.type == 'student'){
+      this._HomeService.deleteStudent(this.deleteDialogData.user_id, this.deleteDialogData.section_id).subscribe((res: any) => {
+        if (res.success == true) {
+          this.dialogRef.close({ data: 'success' });
+        }
+      }) 
+    }
+    else{
+      this._HomeService.deleteTeacher(this.deleteDialogData.id,this.deleteDialogData.email).subscribe((res:any)=>{
+        if (res.success == true) {
+          this.dialogRef.close({ data: 'success' });
+        }
+      }) 
+    }
   }
 
   onNoClick(): void {
