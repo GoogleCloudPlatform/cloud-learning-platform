@@ -11,7 +11,7 @@ DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 project_id = os.getenv("PROJECT_ID", "core-learning-services-dev")
 
 client = firestore_admin_v1.FirestoreAdminClient()
-# pylint: disable=broad-exception-raised
+# pylint: disable=broad-exception-caught
 
 def create_index(index_data):
   """Create all the indexes"""
