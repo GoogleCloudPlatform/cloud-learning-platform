@@ -18,7 +18,7 @@
 name: Unit test & lint for student-learner-profile
 on:
   pull_request:
-    branches: [ "main", "migrate-ailearning-services-clp" ]
+    branches: [ "main" ]
 
     paths:
       - 'microservices/**'

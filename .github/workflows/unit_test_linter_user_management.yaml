@@ -18,7 +18,7 @@
 name: Unit test & lint for user-management service
 on:
   pull_request:
-    branches: [ "main", "migrate-ailearning-services-clp" ]
+    branches: [ "main" ]
     paths:
       - 'microservices/**'
       - 'common/**'
