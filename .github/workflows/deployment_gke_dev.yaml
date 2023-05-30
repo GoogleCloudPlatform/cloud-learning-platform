@@ -111,6 +111,8 @@ jobs:
           skaffold run \
           --profile custom \
           --namespace $NAMESPACE \
+          --module lms,lms-admin-ui,lti,classroom-notification-service,classroom-shim,classroom-notifications-cronjob,update-invitations-cronjob,classroom-code-update-cronjob, \
+          authentication,redis,user-management,student-learner-profile,learning-record-service \
           -l commit=$GITHUB_SHA \
           --tag latest 
 
