@@ -3,23 +3,20 @@ kind: Deployment
 metadata:
   name: api-docs
 spec:
+  replicas: 1
   template:
     spec:
+      serviceAccountName: ksa
       containers:
       - name: api-docs
-        image: gcr.io/aitutor-dev/api-docs
+        image: gcr.io/core-learning-services-dev/api-docs
         imagePullPolicy: Always
         env:
-        # Define the environment variable
-        - name: SERVER_DESCRIPTION
-          value: Development Server
-        - name: SERVER
-          value: https://aitutor-dev-api.cloudpssolutions.com
-        - name: GCP_PROJECT
+        - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: GCP_PROJECT
+              key: PROJECT_ID
         - name: FIREBASE_API_KEY
           valueFrom:
             configMapKeyRef:
@@ -40,8 +37,3 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: API_DOMAIN
-        - name: SHOW_ALL_SERVICES_IN_DOCS
-          valueFrom:
-            configMapKeyRef:
-              name: env-vars
-              key: SHOW_ALL_SERVICES_IN_DOCS

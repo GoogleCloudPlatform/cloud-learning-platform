@@ -3,12 +3,14 @@ kind: Deployment
 metadata:
   name: api-docs
 spec:
+  replicas: 3
   template:
     spec:
+      serviceAccountName: ksa
       containers:
       - name: api-docs
         image: api-docs
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         # Define the environment variable 
         - name: RELEASE_VERSION
@@ -16,11 +18,11 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: RELEASE_VERSION
-        - name: GCP_PROJECT
+        - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: GCP_PROJECT
+              key: PROJECT_ID
         - name: FIREBASE_API_KEY
           valueFrom:
             configMapKeyRef:
@@ -41,8 +43,3 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: API_DOMAIN
-        - name: SHOW_ALL_SERVICES_IN_DOCS
-          valueFrom:
-            configMapKeyRef:
-              name: env-vars
-              key: SHOW_ALL_SERVICES_IN_DOCS

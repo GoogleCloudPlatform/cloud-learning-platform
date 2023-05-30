@@ -16,13 +16,20 @@ spec:
       - name: api-docs
         image: api-docs
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "100Mi"
+          limits:
+            memory: "2000Mi"
+            cpu: "2000m"
         env:
         # Define the environment variable
-        - name: GCP_PROJECT
+        - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: GCP_PROJECT
+              key: PROJECT_ID
         - name: FIREBASE_API_KEY
           valueFrom:
             configMapKeyRef:
@@ -43,17 +50,27 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: API_DOMAIN
-        - name: SHOW_ALL_SERVICES_IN_DOCS
-          valueFrom:
-            configMapKeyRef:
-              name: env-vars
-              key: SHOW_ALL_SERVICES_IN_DOCS
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "200Mi"
-          limits:
-            memory: "500Mi"
-            cpu: "200m" 
+        - name: API_BASE_URL
+          value: api/v1
+        - name: SERVICE_NAME
+          value: api-docs
         ports:
         - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10

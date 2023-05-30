@@ -8,7 +8,7 @@ spec:
     kind: Deployment
     name: api-docs
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 3
   metrics:
   - type: Resource
     #resource:
@@ -16,4 +16,4 @@ spec:
     #  targetAverageValue: 500Mi
     resource:
       name: cpu
-      targetAverageUtilization: 75
+      targetAverageUtilization: 60
