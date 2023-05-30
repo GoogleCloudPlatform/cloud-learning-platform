@@ -513,6 +513,15 @@ transformCourseworkTableData(data:any){
       data: sectionTemp
     });
   }
+  getStatusName(status:any){
+    return status.replace(/_/g,' ')
+  }
+  getChipClass(status:any){
+return 'section-'+status+'-chip'
+  }
+  onChipClick(){
+    console.log('chip click')
+  }
 
   ngOnDestroy(): void {
     if(this.getStudentListSub){

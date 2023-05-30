@@ -20,4 +20,13 @@ export class SectionListComponent implements OnInit {
     window.open(link
       , '_blank');
   }
+  getStatusName(status:any){
+    return status.replace(/_/g,' ')
+  }
+  getChipClass(status:any){
+return 'section-'+status+'-chip'
+  }
+  onChipClick(){
+    console.log('chip click')
+  }
 }
