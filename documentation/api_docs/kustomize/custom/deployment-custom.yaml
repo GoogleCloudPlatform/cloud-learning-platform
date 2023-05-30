@@ -5,10 +5,14 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccountName: ksa
       containers:
       - name: api-docs
         image: api-docs
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "500Mi"
         env:
         # Define the environment variable 
         - name: RELEASE_VERSION
@@ -41,8 +45,3 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: API_DOMAIN
-        - name: SHOW_ALL_SERVICES_IN_DOCS
-          valueFrom:
-            configMapKeyRef:
-              name: env-vars
-              key: SHOW_ALL_SERVICES_IN_DOCS
