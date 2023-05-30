@@ -91,7 +91,8 @@ $primary-color : #8c1d40;
 
                 .date-body {
                     padding-left: 1%;
-                    font-size: 0.8rem;
+                    font-size: 0.9rem;
+                    display: flex;
 
                     .title {
                         font-weight: 600;
@@ -99,7 +100,12 @@ $primary-color : #8c1d40;
                     }
 
                     .content {
-                        font-size: 0.75rem;
+                        font-size: 0.9rem;
+                        padding-right: 6px;
+                        cursor:pointer
+                    }
+                    .content:hover{
+                        text-decoration: underline;
                     }
 
                     .to {

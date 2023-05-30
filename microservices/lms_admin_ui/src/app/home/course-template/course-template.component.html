@@ -1,4 +1,3 @@
-<ng-container>
     <div *ngFor="let courseTemplate of courseTemplateList" class="data-obj-card">
         <div class="block-header">
             <div class="title">
@@ -30,39 +29,29 @@
 
         </div>
 
-        <!-- <div class="block-metadata">
-            <div class="metadata">
-
-                <div class="id-block">
-                    <span class="material-symbols-rounded">
-                        history_edu
-                    </span>
-                    <span class="heading">ID : </span>
-                    <span class="body">{{courseTemplate.instructional_designer}}</span>
-                </div>
-
-                <div class="admin-block">
-                    <span class="material-symbols-rounded">
-                        admin_panel_settings
-                    </span>
-                    <span class="heading">Admin : </span>
-                    <span class="body">{{courseTemplate.admin}}</span>
-                </div>
-
-
-            </div>
-        </div> -->
-
         <div class="block-metadata">
             <div class="metadata">
-                <!-- <div class="date-block"><span class="material-symbols-rounded">
+
+                <div class="date-block" *ngIf="courseTemplate.instructional_designer == ''"><ngx-skeleton-loader count="1"
+                    [theme]="{'height': '30px','width': '200px','background-color': '#EAEAEA'}">
+                </ngx-skeleton-loader></div>
+           
+
+                <div *ngIf="courseTemplate.instructional_designer != ''" class="date-block"><span class="material-symbols-rounded">
                     history_edu
-                    </span> <span class="date-body">
-                        <span class="title">ID : 
-                        </span>
+                    </span>
+                    <div class="date-body">
+                        <div class="title">Instructional Designer :</div>
                         
-                        <span class="content">{{courseTemplate.instructional_designer[0]['email']}}</span>
-                    </span></div> -->
+
+                        <div *ngIf="courseTemplate.instructional_designer != 'null'"  [matBadge]="getIdTotal(courseTemplate.instructional_designer)" 
+                        [matBadgeHidden]="checkIfBadgeHidden(courseTemplate.instructional_designer)" (click)="setSelected(courseTemplate);openAddOrEditIdTemplate()" matBadgeOverlap="false" matBadgeSize="medium" class="content">
+                    {{courseTemplate.instructional_designer[0] ? courseTemplate.instructional_designer[0]['email'] : ''}}
+                        </div>
+
+            </div>
+
+                </div>
 
                 <div class="date-block"><span class="material-symbols-rounded">
                     admin_panel_settings
@@ -79,7 +68,6 @@
 
 
     </div>
-</ng-container>
 
 <!-- <ng-template #noResult>
     <div class="no-data-inner-comp">No Data Found</div>
