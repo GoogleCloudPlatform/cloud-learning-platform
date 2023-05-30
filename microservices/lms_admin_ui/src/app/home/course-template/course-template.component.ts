@@ -16,17 +16,44 @@ interface LooseObject {
 })
 export class CourseTemplateComponent implements OnInit {
   apiCall:number = 0
-  @Input() courseTemplateList: any[]
-  constructor(public dialog: MatDialog, public router: Router,public _HomeService: HomeService) { }
+  @Input() courseTemplateList
+  constructor(public dialog: MatDialog, public router: Router,public _HomeService: HomeService) { 
+    
+  }
   selectedCourseTemplate: any
   ngOnInit(): void {
-    // for(let x=0;x<=this.courseTemplateList.length;x++){
-    //       this._HomeService.getInstructionalDesigner(this.courseTemplateList[x].id).subscribe((res:any)=>{
-    //         this.courseTemplateList[x]['instructional_designer']=res.data
-    // })
-
-    // }
+    console.log('list', this.courseTemplateList)
+this.callToGetId()
   }
+
+  callToGetId(){
+    for(let x=0;x<=this.courseTemplateList.length;x++){
+      this._HomeService.getInstructionalDesigner(this.courseTemplateList[x].id).subscribe((res:any)=>{
+        if(res.data.length > 0){
+          this.courseTemplateList[x]['instructional_designer']=res.data
+        }
+        else{
+          this.courseTemplateList[x]['instructional_designer']='null'
+        }
+        
+})
+
+}
+  }
+
+
+  getIdTotal(id:any){
+  return '+'+(id.length-1)
+  }
+  checkIfBadgeHidden(id:any){
+    if(id.length == 1){
+      return true
+    }
+    else{
+      return false
+    }
+  }
+
 
   reRoute(courseTemplate: any) {
     this.router.navigate(['/home/course-template/' + courseTemplate.id])
