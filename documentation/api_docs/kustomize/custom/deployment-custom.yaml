@@ -20,11 +20,11 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: RELEASE_VERSION
-        - name: GCP_PROJECT
+        - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: GCP_PROJECT
+              key: PROJECT_ID
         - name: FIREBASE_API_KEY
           valueFrom:
             configMapKeyRef:
