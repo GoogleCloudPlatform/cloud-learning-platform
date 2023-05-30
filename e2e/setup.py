@@ -16,9 +16,9 @@ from e2e.test_config import (API_URL_LEARNING_RECORD_SERVICE,
 from common.models import User, Verb, Agent, UserGroup
 from common.utils.collection_references import collection_references
 
-GCP_BUCKET = os.environ.get("GCP_PROJECT", "aitutor-dev")
+GCP_BUCKET = os.environ.get("GCP_PROJECT")
 CONTENT_SERVING_BUCKET = os.environ.get("CONTENT_SERVING_BUCKET",
-                                        "aitutor-dev-content-serving")
+                                        "content-serving-bucket")
 
 UUID = uuid.uuid4()
 
