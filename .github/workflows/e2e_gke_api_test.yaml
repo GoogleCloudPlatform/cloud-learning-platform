@@ -125,8 +125,7 @@ jobs:
         skaffold run \
         --profile dev \
         --namespace $NAMESPACE \
-        --module lms,lms-admin-ui,lti,classroom-notification-service,classroom-shim,classroom-notifications-cronjob,update-invitations-cronjob,classroom-code-update-cronjob, \
-        authentication,redis,user-management,student-learner-profile,learning-record-service \
+        --module backends
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }}
 
