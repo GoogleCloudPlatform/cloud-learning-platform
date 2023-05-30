@@ -50,3 +50,13 @@ requires:
 
 build:
   googleCloudBuild: {}
+
+---
+# Master Skaffold for API Docs
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: api_docs
+requires:
+- path: ./documentation/api_docs
+  configs: [api-docs]

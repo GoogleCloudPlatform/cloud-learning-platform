@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-docs
+spec:
+  replicas: 1
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: api-docs
+        image: gcr.io/core-learning-services-dev/api-docs
+        imagePullPolicy: Always
+        env:
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID
+        - name: FIREBASE_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: FIREBASE_API_KEY
+        - name: FIREBASE_AUTH_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: FIREBASE_AUTH_DOMAIN
+        - name: FIREBASE_STORAGE_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: FIREBASE_STORAGE_BUCKET
+        - name: API_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: API_DOMAIN
