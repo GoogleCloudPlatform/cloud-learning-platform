@@ -11,12 +11,16 @@ DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 project_id = os.getenv("PROJECT_ID", "core-learning-services-dev")
 
 client = firestore_admin_v1.FirestoreAdminClient()
-
+# pylint: disable=broad-exception-raised
 
 def create_index(index_data):
+  """Create all the indexes"""
   collection_group = DATABASE_PREFIX + index_data.get("collection_group")
-  project = "projects/{}/databases/(default)/collectionGroups/{}".format(
-      project_id, collection_group)
+  project = (
+      f"projects/{project_id}/databases/(default)/"
+      f"collectionGroups/{collection_group}"
+  )
+
   del index_data["collection_group"]
   request = firestore_admin_v1.CreateIndexRequest(
       parent=project, index=index_data)
