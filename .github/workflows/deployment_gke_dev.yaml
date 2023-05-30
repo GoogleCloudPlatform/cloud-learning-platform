@@ -111,31 +111,9 @@ jobs:
           skaffold run \
           --profile custom \
           --namespace $NAMESPACE \
-          --module backends \
+          --module lms,lms-admin-ui,lti,classroom-notification-service,classroom-shim,classroom-notifications-cronjob,update-invitations-cronjob,classroom-code-update-cronjob,authentication,redis,user-management,student-learner-profile,learning-record-service \
           -l commit=$GITHUB_SHA \
-          --tag latest 
-
-      - name: Checkout external repo
-        id: checkout_external_repo
-        uses: actions/checkout@v3
-        with:
-          repository: GPS-Solutions/ailearning-backend
-          ref: df352edb8c4572c87c88896245af3c3db8bcb5cc
-          # adding run_id so we can fold in the repo without collision
-          path: ${{ format('ailearning-backend_{0}', github.run_id) }}
-          token: ${{ secrets.GH_PAT }}
-
-      - name: Build and deploy external services to cluster
-        run: |
-          pushd ${{ format('ailearning-backend_{0}', github.run_id) }}
-          export GCP_PROJECT=$PROJECT_ID
-          skaffold run \
-          -p custom \
-          --namespace $NAMESPACE \
-          --module authentication,redis,user-management,student-learner-profile,learning-record-service \
-          -l commit=$GITHUB_SHA \
-          --tag PR${{ github.event.pull_request.number }}
-          popd
+          --tag latest
 
       - name: Upload Skaffold cache
         if: always()
