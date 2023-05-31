@@ -18,7 +18,9 @@ export class CreateAssignmentComponent {
   ltiAssignmentForm: FormGroup;
   toolsList = []
   showProgressSpinner: boolean = false
+  toolSelectDisabled: boolean = false
   selectedTool: any
+  toolName: any
   constructor(
     private _snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<CreateAssignmentComponent>,
@@ -28,7 +30,7 @@ export class CreateAssignmentComponent {
 
   ngOnInit() {
     this.getAllTools()
-    console.log('dialog data',this.dialogData)
+    console.log('dialog data', this.dialogData)
     if (this.dialogData.mode == "Create") {
       this.ltiAssignmentForm = this.fb.group({
         "tool_id": [null, Validators.required],
@@ -49,13 +51,15 @@ export class CreateAssignmentComponent {
         "due_date": [this.dialogData.extra_data.assignment.due_date],
         "max_points": [this.dialogData.extra_data.assignment.max_points]
       });
+      this.toolSelectDisabled = true
+      // console.log({...this.ltiAssignmentForm.value})
+      // this.ltiAssignmentForm.get("tool_id").disable()
+      // console.log({...this.ltiAssignmentForm.value})
     }
   }
 
   onDropdownChange() {
     console.log(this.ltiAssignmentForm.value['tool_id'])
-    // this.selectedTool = tool
-
   }
 
   processFormInputs(values) {
@@ -81,7 +85,7 @@ export class CreateAssignmentComponent {
           console.log("response", response)
           this.dialogRef.close({ data: 'success' })
         }
-        else{
+        else {
           this.openFailureSnackBar(response?.message, 'FAILED')
         }
         this.showProgressSpinner = false
@@ -93,7 +97,7 @@ export class CreateAssignmentComponent {
         if (response.success == true) {
           this.dialogRef.close({ data: 'success' })
         }
-        else{
+        else {
           this.openFailureSnackBar(response?.message, 'FAILED')
         }
         this.showProgressSpinner = false
@@ -115,40 +119,49 @@ export class CreateAssignmentComponent {
   }
 
   openContentSelector() {
-    if(this.ltiAssignmentForm.value['tool_id'] != null){
-    let ltiModalData: LooseObject = {}
-    ltiModalData['mode'] = 'Open'
-    ltiModalData['init_data'] = ''
-    ltiModalData['extra_data'] = {
-      contextId: this.dialogData.extra_data.contextId,
-      contextType: this.dialogData.page,
-      toolId: this.ltiAssignmentForm.value['tool_id'],
-      userId: "vcmt4ZemmyFm59rDzl1U"
-    }
-
-    const dialogRef = this.dialog.open(ContentSelectorComponent, {
-      maxWidth: '750px',
-      data: ltiModalData
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result.data) {
-        this.ltiAssignmentForm.get("lti_content_item_id").setValue(result.data)
-        if(localStorage.getItem("contentItemId")){
-          localStorage.removeItem('contentItemId')
-        }
+    console.log("this.ltiAssignmentForm.value", this.ltiAssignmentForm.value)
+    if (this.ltiAssignmentForm.value['tool_id'] != null) {
+      let ltiModalData: LooseObject = {}
+      ltiModalData['mode'] = 'Open'
+      ltiModalData['init_data'] = ''
+      ltiModalData['extra_data'] = {
+        contextId: this.dialogData.extra_data.contextId,
+        contextType: this.dialogData.page,
+        toolId: this.ltiAssignmentForm.value['tool_id'],
+        userId: "vcmt4ZemmyFm59rDzl1U"
       }
-      console.log("result", result)
-    });
-  }
-  else{
-    this.openFailureSnackBar('Please select a tool','Error')
-  }
+
+      const dialogRef = this.dialog.open(ContentSelectorComponent, {
+        minWidth: '750px',
+        data: ltiModalData
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result.data) {
+          this.ltiAssignmentForm.get("lti_content_item_id").setValue(result.data.response[0].content_item_id)
+          if (localStorage.getItem("contentItemId")) {
+            localStorage.removeItem('contentItemId')
+          }
+        }
+        console.log("result", result)
+      });
+    }
+    else {
+      this.openFailureSnackBar('Please select a tool', 'Error')
+    }
   }
 
   getAllTools() {
     this.ltiService.getToolsList().subscribe((res: any) => {
       this.toolsList = res.data
+      let tool = this.toolsList.find((x) => {
+        if (x.id == this.dialogData.extra_data.assignment.tool_id) {
+          return true
+        }
+        return false
+      })
+      this.toolName = tool.name
+
     })
   }
 

@@ -9,7 +9,10 @@
         <div>
             <mat-form-field appearance="fill" style="width: 100%">
                 <mat-label>Select Tool</mat-label>
-                <mat-select formControlName="tool_id" (selectionChange)="onDropdownChange()">
+                <input *ngIf="toolSelectDisabled" [value]="toolName" [disabled]="true" readonly="true" matInput>
+                <input *ngIf="toolSelectDisabled" formControlName="tool_id" [disabled]="true" readonly="true" type="hidden">
+                <mat-select *ngIf="!toolSelectDisabled" formControlName="tool_id"
+                    (selectionChange)="onDropdownChange()">
                     <mat-option *ngFor="let tool of toolsList" [value]="tool.id">{{tool.name}}</mat-option>
                 </mat-select>
             </mat-form-field>
@@ -27,14 +30,15 @@
                 <mat-label>LTI Content item id</mat-label>
                 <div class="contentItemIdRow">
                     <input style="width: 80%;" formControlName="lti_content_item_id" matInput>
-                <button mat-flat-button color="primary" (click)="openContentSelector()">Select Content</button>
-            </div>
+                    <button mat-flat-button color="primary" (click)="openContentSelector()">Select Content</button>
+                </div>
             </mat-form-field>
         </div>
 
         <div>
             <mat-form-field appearance="fill" style="width: 100%">
                 <mat-label>Start Date</mat-label>
+                <!-- <input formControlName="start_date" matInput type="datetime-local"> -->
                 <input formControlName="start_date" matInput [matDatepicker]="start_date">
                 <mat-datepicker-toggle matIconSuffix matSuffix [for]="start_date"></mat-datepicker-toggle>
                 <mat-datepicker #start_date></mat-datepicker>

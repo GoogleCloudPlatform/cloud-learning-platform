@@ -1,6 +1,6 @@
-import { Component, ViewChild, Inject,HostListener } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { LtiService } from '../service/lti.service';
-import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 
@@ -12,25 +12,23 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 export class ContentSelectorComponent {
   loadingIframe = true
   iframeUrl: any = null
-  isContentItemId:boolean=true
+  urlAlreadyLoaded: boolean = false
+  isContentItemId: boolean = true
+
   constructor(
     private _snackBar: MatSnackBar,
     private sanitizer: DomSanitizer,
     public dialogRef: MatDialogRef<ContentSelectorComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: any, public ltiService: LtiService
   ) {
-    console.log(dialogData)
     this.getToolUrl()
-    // window.addEventListener('message', e => {
-    //   // Get the sent data
-    //   console.log("coded", e)
-    //   // const data = e.data;
-    //   // const decoded = JSON.parse(data);
-    //   // console.log("decoded", decoded)
-    //   // this.dialogRef.close({ data: 'abc' });
-    // });
-    // localStorage.setItem("contentItemId",'ZOFyk4JiRJtqdsW29erH')
-    if(localStorage.getItem("contentItemId")){
+    window.addEventListener('message', (e: MessageEvent) => {
+      // Get the sent data
+      const data = e.data;
+      const decoded = JSON.parse(data);
+      this.dialogRef.close({ data: decoded });
+    });
+    if (localStorage.getItem("contentItemId")) {
       localStorage.removeItem('contentItemId')
     }
 
@@ -41,19 +39,9 @@ export class ContentSelectorComponent {
       (response: any) => {
         this.loadingIframe = false
         this.iframeUrl = response.url
-        this.isContentItemId=false        
+        this.isContentItemId = false
       }
     )
-  }
-  get_content_item_id(){
-    if(localStorage.getItem('contentItemId')){
-      this.openSuccessSnackBar('Content item id copied to create assignment form','Success')
-      this.dialogRef.close({ data: localStorage.getItem('contentItemId') });
-    }
-    else{
-      this.openFailureSnackBar('content item is not available', 'Error')
-    }
-  //  this.dialogRef.close({ data: 'abc' });
   }
 
   openFailureSnackBar(message: string, action: string) {
@@ -74,8 +62,11 @@ export class ContentSelectorComponent {
     this.dialogRef.close({ data: 'closed' });
   }
 
-  getUrl(url) {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url)
+  getUrl(url): any {
+    if (!this.urlAlreadyLoaded) {
+      this.urlAlreadyLoaded = true
+      return this.sanitizer.bypassSecurityTrustResourceUrl(url)
+    }
   }
 
 }

@@ -8,6 +8,7 @@
             console.log("data type", typeof('{{data}}'))
             console.log("data type json", typeof('{{data | tojson}}'))
             localStorage.setItem("contentItemId", '{{data["response"][0]["content_item_id"]}}');
+            window.parent.postMessage('{{data | tojson}}', '*');
         }
     </script>
 </head>
