@@ -421,6 +421,7 @@ def update_section(sections_details: UpdateSection):
           "cohortId":updated_section["cohort"].split("/")[1],\
           "courseTemplateId":updated_section["course_template"].split("/")[1],\
             "status":section.status,
+            "enrollmentStatus": section.enrollment_status,
           "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(
