@@ -20,7 +20,9 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
     "https://www.googleapis.com/auth/classroom.rosters.readonly",
     "https://www.googleapis.com/auth/classroom.profile.emails",
-    "https://www.googleapis.com/auth/classroom.profile.photos"
+    "https://www.googleapis.com/auth/classroom.profile.photos",
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials",
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
 ]
 
 def get_service():
@@ -57,6 +59,20 @@ def get_course_work(course_id,course_work_id):
   """
   service=get_service()
   return service.courses().courseWork().get(
+    courseId=course_id,id=course_work_id).execute()
+
+def get_course_work_material(course_id,course_work_id):
+  """get course work material details
+
+  Args:
+    course_id (str): _description_
+    course_work_id (str): _description_
+
+  Returns:
+    _type_: _description_
+  """
+  service=get_service()
+  return service.courses().courseWorkMaterials().get(
     courseId=course_id,id=course_work_id).execute()
 
 
