@@ -7,7 +7,7 @@
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-from common.models import User, CourseEnrollmentMapping
+from common.models import User, CourseEnrollmentMapping, Section
 
 # Use a service account.
 cred = credentials.Certificate("service_creds.json")
@@ -31,6 +31,10 @@ for doc in docs:
       count = count + 1
       print(f"{doc.id} => {doc_ref.get().to_dict()}")
     else:
+      try:
+        print(Section.find_by_id(d["section"].id).to_dict())
+      except Exception as e:
+        print(e)
       print(f"User not found by this user_id {d['user']}." +
-            f" Section {d['section'].id}")
+            f" Section {d['section'].id} status {d['status']}")
 print("updation count", count)

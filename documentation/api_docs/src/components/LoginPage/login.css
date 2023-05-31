@@ -1,0 +1,118 @@
+.app {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--ifm-background-color);
+    color: var(--ifm-font-color-base);
+    font: var(--ifm-font-size-base) / var(--ifm-line-height-base) var(--ifm-font-family-base);
+}
+
+input[type="email"],
+input[type="password"] {
+    height: 35px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    padding: 10px;
+}
+
+input[type="submit"] {
+    margin-top: 10px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 3px;
+    background-color: var(--ifm-color-primary);
+    color: #f2fff2;
+    font: var(--ifm-font-size-base) / var(--ifm-line-height-base) var(--ifm-font-family-base);
+    font-weight: var(--ifm-font-weight-semibold);
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background: var(--ifm-color-primary-darker);
+    transition: 0.2s;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+}
+
+.login-form {
+    padding: 2rem;
+    background-color: var(--ifm-navbar-background-color);
+    box-shadow: 0 0 15px 10px rgb(0 0 0 / 20%);
+    border-radius: 5px;
+}
+
+.list-container {
+    display: flex;
+}
+
+.error {
+    text-align: center;
+    margin: 0 10px;
+    color: var(--ifm-color-danger);
+}
+
+.title {
+    text-align: center;
+    font-size: 30px;
+    font-weight: var(--ifm-font-weight-semibold);
+    margin-bottom: 20px;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 10px;
+}
+
+.or-container {
+    align-items: center;
+    color: #ccc;
+    display: flex;
+    margin: 15px 0;
+}
+
+.line-separator {
+    background-color: #ccc;
+    flex-grow: 5;
+    height: 1px;
+}
+
+.or-label {
+    flex-grow: 1;
+    margin: 0 15px;
+    text-align: center;
+}
+
+.google-sign-in-btn {
+    background-color: #4285f4;
+    border: none;
+    color: #fff;
+    display: flex;
+    align-content: flex-end;
+    align-items: center;
+    padding: 0;
+    border-radius: 3px;
+    box-shadow: 0px 0px 8px 2px #00000029;
+}
+
+
+.google-logo {
+    background-color: #ffffff;
+    padding: 9px 16px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+.google-sign-in-text {
+    padding: 8px 16px;
+    color: #f2fff2;
+    font: var(--ifm-font-size-base) / var(--ifm-line-height-base) var(--ifm-font-family-base);
+    font-weight: var(--ifm-font-weight-semibold);
+    cursor: pointer;
+}

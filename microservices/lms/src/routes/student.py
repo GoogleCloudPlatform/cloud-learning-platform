@@ -650,16 +650,15 @@ def update_invites():
           # Logger.info(f"User record found for User {user_details}")
           user_profile = classroom_crud.get_user_profile_information(
               course_record.user.email)
-          user_rec = User.collection.filter("user_id", "==",
-                                            course_record.user.id).get()
-
+          user_ref = course_record.user
+          Logger.info(user_ref.to_dict())
           # Check if gaia_id is "" if yes so update personal deatils
-          if user_rec.gaia_id == "":
-            user_rec.first_name = user_profile["name"]["givenName"]
-            user_rec.last_name = user_profile["name"]["familyName"]
-            user_rec.gaia_id = user_profile["id"]
-            user_rec.photo_url = user_profile["photoUrl"]
-            user_rec.update()
+          if user_ref.gaia_id == "":
+            user_ref.first_name = user_profile["name"]["givenName"]
+            user_ref.last_name = user_profile["name"]["familyName"]
+            user_ref.gaia_id = user_profile["id"]
+            user_ref.photo_url = user_profile["photoUrl"]
+            user_ref.update()
           course_record.status = "active"
           course_record.update()
           # Update section enrolled student count
