@@ -121,11 +121,15 @@
                         </mat-select>
                     </mat-form-field>
 
-                    <!-- <div style="margin-right: 1%;">
+                    <div style="margin-right: 2%;">
                         <mat-chip-list>
-                            <mat-chip>Active</mat-chip>
+                            <mat-chip (click)="onChipClick()" [class]="getChipClass(selectedSection.status)">
+                                {{getStatusName(selectedSection.status)}} <span style="padding-left: 10px;font-size: 1.3rem;" class="material-symbols-rounded">
+                                    sync
+                                </span> 
+                            </mat-chip>
                         </mat-chip-list>
-                    </div> -->
+                    </div>
 
                     <button mat-button (click)="openCreateSectionDialog()"><span class="material-symbols-rounded">
                             add_circle
@@ -204,7 +208,7 @@
                                 <th mat-header-cell *matHeaderCellDef>
                                     Status
                                 </th>
-                                <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+                                <td mat-cell *matCellDef="let element"> {{element.enrollment_status}} </td>
                             </ng-container>
 
                             <ng-container matColumnDef="action">
@@ -220,7 +224,8 @@
                             </ng-container>
 
                             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                            [ngClass]="{'disabledRow': row.enrollment_status == 'invited'}"></tr>
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="4">No data found</td>
                             </tr>
