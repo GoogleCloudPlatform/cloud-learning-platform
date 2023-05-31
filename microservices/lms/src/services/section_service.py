@@ -50,6 +50,7 @@ def copy_course_background_task(course_template_details,
     section.name = course_template_details.name
     section.section = sections_details.name
     section.description = sections_details.description
+    section.max_students = sections_details.max_students
     # Reference document can be get using get() method
     section.course_template = course_template_details
     section.cohort = cohort_details

@@ -409,6 +409,7 @@ def update_section(sections_details: UpdateSection):
           f" {sections_details.course_id} is not found in classroom")
     section.section = sections_details.section_name
     section.description = sections_details.description
+    section.max_students = sections_details.max_students
     section.update()
     updated_section = convert_section_to_section_model(section)
     rows=[{
