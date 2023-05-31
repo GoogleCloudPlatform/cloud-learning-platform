@@ -23,7 +23,8 @@ from schemas.section import (
     UpdateSectionResponseModel,TeachersListResponseModel,
     GetTeacherResponseModel,AssignmentModel,GetCourseWorkList,
     ImportGradeResponseModel,
-    EnrollTeacherSection,DeleteTeacherFromSectionResponseModel)
+    EnrollTeacherSection,DeleteTeacherFromSectionResponseModel,
+    UpdateEnrollmentStatusSectionModel)
 from schemas.update_section import UpdateSection
 from services.section_service import copy_course_background_task,\
 update_grades,add_teacher
@@ -633,4 +634,40 @@ def import_grade(section_id: str,coursework_id:str,
     Logger.error(error)
     raise InternalServerError(str(e)) from e
 
+@router.patch("/{section_id}/change_enrollment_status/{enrollment_status}",
+              response_model=UpdateEnrollmentStatusSectionModel)
+def update_enrollment_status(section_id:str,enrollment_status: str):
+  """Update enrollment status for a section
 
+  Args:
+    section_id(str): id of the section in firestore
+    status: enrollment status of the section
+    [OPEN,CLOSED]
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if course_id or section_id is not found
+  Returns:
+    {"status":"Success","data":{}}: Returns Updated course details,
+    {'status': 'Failed'} if the user creation raises an exception.
+  """
+  try:
+    if enrollment_status in ("OPEN","CLOSED"):
+      section = Section.find_by_id(section_id)
+      section.enrollment_status = enrollment_status
+      section.update()
+      updated_section = convert_section_to_section_model(section)
+      return {"data": updated_section}
+    else:
+      raise ValidationError("Accepted parameters are only 'OPEN' and 'CLOSED'")
+
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except HttpError as hte:
+    Logger.error(hte)
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
+  except Exception as e:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
