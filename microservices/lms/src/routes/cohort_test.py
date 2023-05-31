@@ -57,7 +57,10 @@ def create_fake_data():
       "classroom_url": "https://classroom.google.com",
       "course_template": course_template,
       "cohort": cohort,
-      "teachers": ["teachera@gmail.com", "teacherb@gmail.com"]
+      "teachers": ["teachera@gmail.com", "teacherb@gmail.com"],
+      "enrollment_status":"OPEN",
+      "status":"ACTIVE",
+      "max_students":25
   }
 
   section = Section.from_dict(test_section_dict)
