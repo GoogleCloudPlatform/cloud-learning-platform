@@ -18,7 +18,7 @@
 name: Unit test & lint for Learning object service
 on:
   pull_request:
-    branches: [ "main", "migrate-ailearning-services-clp" ]
+    branches: [ "main" ]
     paths:
       # TODO: Add all microservice folders below.
       - 'microservices/**'
