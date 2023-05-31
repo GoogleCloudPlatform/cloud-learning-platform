@@ -30,8 +30,9 @@ requires:
 - path: ./microservices/lti
   configs: [lti]
 
-- path: ./microservices/llm_service
-  configs: [llm-service]
+# Commenting llm service due to deployment error in Longchain package
+# - path: ./microservices/llm_service
+#   configs: [llm-service]
 
 - path: ./microservices/classroom_notification_service
   configs: [classroom-notification-service]
