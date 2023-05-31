@@ -49,7 +49,8 @@ def create_fake_data():
       "classroom_url": "https://classroom.google.com",
       "course_template": course_template,
       "cohort": cohort,
-      "max_students":50
+      "max_students":50,
+      "enrollment_status":"OPEN"
   }
 
   section = Section.from_dict(test_section_dict)
