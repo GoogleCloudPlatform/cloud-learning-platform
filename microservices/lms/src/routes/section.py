@@ -253,7 +253,7 @@ def delete_section(section_id: str):
     Section.soft_delete_by_id(section_id)
     rows=[{
       "sectionId":section_details.id,
-      "courseId":section_details.course_id,
+      "courseId":section_details.classroom_id,
       "classroomUrl":section_details.classroom_url,
       "name":section_details.section,
       "description":section_details.description,
