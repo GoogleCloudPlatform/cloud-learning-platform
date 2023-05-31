@@ -2,7 +2,7 @@
 import traceback
 from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
-from services import student_service
+from services import student_service,section_service
 from utils.user_helper import (
   course_enrollment_user_model,get_user_id,
   check_user_can_enroll_in_section)
@@ -436,15 +436,17 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
-    if section.enrolled_students_count >= section.max_students:
-      raise Conflict("Max student count reached for section hence student can't be invited"
-      )
-    if section.enrolled_students_count == "CLOSED" or section.status != "ACTIVE":
-      raise BadRequest("Enrollment is not active for this section"
-      )
+    # if section.enrolled_students_count >= section.max_students:
+    #   raise Conflict("Max student count reached for section hence student can't be invited"
+    #   )
+    # Logger.info(f"Enrollment status {section.enrolled_students_count} {section.status}")
+    # if section.enrolled_students_count is "CLOSED" or section.status is not "ACTIVE":
+    #   raise ValidationError("Enrollment is not active for this section"
+    #   )
+    section_service.validate_section(section)
     cohort = section.cohort
     if cohort.enrolled_students_count >= cohort.max_students:
-      raise Conflict("Cohort Max count reached hence student cannot" +
+      raise ValidationError("Cohort Max count reached hence student cannot" +
                      " be erolled in this cohort")
     if not check_user_can_enroll_in_section( 
         email=input_data.email, headers=headers, section=section):
@@ -507,6 +509,9 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
     raise ClassroomHttpException(status_code=ae.resp.status,
                                  message="Can't enroll student to classroom,\
   Please check organizations policy or authentication scopes") from ae
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -535,9 +540,10 @@ def invite_student(section_id: str, student_email: str, request: Request):
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
-    if section.enrolled_students_count >= section.max_students:
-      raise Conflict("Max student count reached for section hence student can't be invited"
-      )
+    # if section.enrolled_students_count >= section.max_students:
+    #   raise Conflict("Max student count reached for section hence student can't be invited"
+    #   )
+    section_service.validate_section(section)
     #TODO: add logic for cohort max count
     cohort = section.cohort
     if cohort.enrolled_students_count >= cohort.max_students:
@@ -559,6 +565,9 @@ def invite_student(section_id: str, student_email: str, request: Request):
   except HttpError as ae:
     raise ClassroomHttpException(status_code=ae.resp.status,
                                  message=str(ae)) from ae
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")

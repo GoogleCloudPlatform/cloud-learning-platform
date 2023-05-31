@@ -27,6 +27,7 @@ class Sections(BaseModel):
   course_template: str
   cohort: str
   status: Optional[str]
+  enrollment_status:Optional[str]
   enrolled_students_count: int
   max_students:int
 
