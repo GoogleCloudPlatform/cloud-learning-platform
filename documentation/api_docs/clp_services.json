@@ -23,5 +23,10 @@
         "spec": "/learning-record-service/api/v1/openapi.json",
         "route": "/learning-record-service/api/v1/redoc",
         "label": "Learning Record Service"
+    },
+    {
+        "spec": "/llm-service/api/v1/openapi.json",
+        "route": "/llm-service/api/v1/redoc",
+        "label": "LLM Service"
     }
 ]
