@@ -8,12 +8,10 @@
                     open_in_new
                 </span>
 
-                <div style="margin-left: 3%;">
+                <div style="margin-left: 2%;">
                     <mat-chip-list>
                         <mat-chip (click)="onChipClick()" [class]="getChipClass(section.status)">
-                            {{getStatusName(section.status)}} <span style="padding-left: 10px;font-size: 1.3rem;" class="material-symbols-rounded">
-                                sync
-                            </span> 
+                            {{getStatusName(section.status)}} 
                         </mat-chip>
                     </mat-chip-list>
                 </div>

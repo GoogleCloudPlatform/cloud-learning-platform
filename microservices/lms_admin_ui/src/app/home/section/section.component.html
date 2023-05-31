@@ -121,12 +121,10 @@
                         </mat-select>
                     </mat-form-field>
 
-                    <div style="margin-right: 2%;">
+                    <div style="margin-right: 1%;">
                         <mat-chip-list>
                             <mat-chip (click)="onChipClick()" [class]="getChipClass(selectedSection.status)">
-                                {{getStatusName(selectedSection.status)}} <span style="padding-left: 10px;font-size: 1.3rem;" class="material-symbols-rounded">
-                                    sync
-                                </span> 
+                                {{getStatusName(selectedSection.status)}} 
                             </mat-chip>
                         </mat-chip-list>
                     </div>
@@ -208,7 +206,7 @@
                                 <th mat-header-cell *matHeaderCellDef>
                                     Status
                                 </th>
-                                <td mat-cell *matCellDef="let element"> {{element.enrollment_status}} </td>
+                                <td mat-cell *matCellDef="let element"> {{element.status}} </td>
                             </ng-container>
 
                             <ng-container matColumnDef="action">
@@ -225,7 +223,7 @@
 
                             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                             <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                            [ngClass]="{'disabledRow': row.enrollment_status == 'invited'}"></tr>
+                            [ngClass]="{'disabledRow': row.status == 'invited'}"></tr>
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="4">No data found</td>
                             </tr>
@@ -266,12 +264,12 @@
                             </ng-container>
 
                             <!-- Created  Column -->
-                            <ng-container matColumnDef="created time">
+                            <!-- <ng-container matColumnDef="created time">
                                 <th mat-header-cell *matHeaderCellDef>
                                     Created Time
                                 </th>
                                 <td mat-cell *matCellDef="let element"> {{element.created_time | date:'short'}} </td>
-                            </ng-container>
+                            </ng-container> -->
 
                             <!-- Status  Column -->
                             <ng-container matColumnDef="status">
