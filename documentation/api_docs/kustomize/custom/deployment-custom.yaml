@@ -3,13 +3,14 @@ kind: Deployment
 metadata:
   name: api-docs
 spec:
+  replicas: 1
   template:
     spec:
       serviceAccountName: ksa
       containers:
       - name: api-docs
-        image: api-docs
-        imagePullPolicy: IfNotPresent
+        image: gcr.io/core-learning-services-dev/api-docs
+        imagePullPolicy: Always
         resources:
           requests:
             memory: "500Mi"
