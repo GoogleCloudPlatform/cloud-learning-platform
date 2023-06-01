@@ -37,14 +37,28 @@ deploy:
     - ./kustomize/minikube
 profiles:
 - name: custom
-  build:
-    googleCloudBuild: {}
-    artifacts:
-    - image: api-docs
   deploy:
     kustomize:
       paths:
       - ./kustomize/custom
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: api-docs
+      sync:
+        infer:
+          - '**/*.js'
+          - '**/*.json'
+          - '**/*.css'
+      docker:
+        cacheFrom:
+          - api-docs
+          - api-docs:latest
+        buildArgs:
+          API_DOMAIN: "{{.API_DOMAIN}}"
+          FIREBASE_API_KEY: "{{.FIREBASE_API_KEY}}"
+          FIREBASE_APP_ID: "{{.FIREBASE_APP_ID}}"
+          PROJECT_ID: "{{.PROJECT_ID}}"
 - name: dev
   activation:
   - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
@@ -56,6 +70,11 @@ profiles:
         cacheFrom:
           - gcr.io/core-learning-services-dev/api-docs
           - gcr.io/core-learning-services-dev/api-docs:latest
+        buildArgs:
+          API_DOMAIN: "{{.API_DOMAIN}}"
+          FIREBASE_API_KEY: "{{.FIREBASE_API_KEY}}"
+          FIREBASE_APP_ID: "{{.FIREBASE_APP_ID}}"
+          PROJECT_ID: "{{.PROJECT_ID}}"
       sync:
         infer:
           - "**/*.js"
@@ -77,6 +96,11 @@ profiles:
         cacheFrom:
           - api-docs
           - api-docs:latest
+        buildArgs:
+          API_DOMAIN: "{{.API_DOMAIN}}"
+          FIREBASE_API_KEY: "{{.FIREBASE_API_KEY}}"
+          FIREBASE_APP_ID: "{{.FIREBASE_APP_ID}}"
+          PROJECT_ID: "{{.PROJECT_ID}}"
 - name: prod_non_cloudbuild
   deploy:
     kustomize:
