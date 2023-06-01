@@ -427,7 +427,8 @@ def test_delete_section(client_with_emulator, create_fake_data):
   url = BASE_URL + f"/sections/{create_fake_data['section']}"
   with mock.patch("routes.section.classroom_crud.update_course_state",
                   return_value=[]):
-    resp = client_with_emulator.delete(url)
+    with mock.patch("routes.section.insert_rows_to_bq"):
+      resp = client_with_emulator.delete(url)
   assert resp.status_code == 200
 
 
