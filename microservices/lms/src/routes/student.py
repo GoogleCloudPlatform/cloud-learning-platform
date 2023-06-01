@@ -332,7 +332,7 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
   try:
     cohort = Cohort.find_by_id(cohort_id)
     sections = Section.collection.filter("cohort", "==", cohort.key).filter(
-                    "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
+    "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
     if cohort.enrolled_students_count >= cohort.max_students:
@@ -347,8 +347,8 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
                       enrolled for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
     if section is None:
-      raise Conflict("Max count reached for all sctions is reached hence student cannot" +
-                     " be erolled in this cohort")
+      raise Conflict("Max count reached for all sctions is reached hence" +
+                  "student cannot be erolled in this cohort")
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {input_data.email}")
     user_object = classroom_crud.enroll_student(
@@ -436,18 +436,11 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
-    # if section.enrolled_students_count >= section.max_students:
-    #   raise Conflict("Max student count reached for section hence student can't be invited"
-    #   )
-    # Logger.info(f"Enrollment status {section.enrolled_students_count} {section.status}")
-    # if section.enrolled_students_count is "CLOSED" or section.status is not "ACTIVE":
-    #   raise ValidationError("Enrollment is not active for this section"
-    #   )
     section_service.validate_section(section)
     cohort = section.cohort
     if cohort.enrolled_students_count >= cohort.max_students:
       raise ValidationError("Cohort Max count reached hence student cannot" +
-                     " be erolled in this cohort")
+            "be erolled in this cohort")
     if not check_user_can_enroll_in_section( 
         email=input_data.email, headers=headers, section=section):
       raise Conflict(f"User {input_data.email} is already\
@@ -540,9 +533,6 @@ def invite_student(section_id: str, student_email: str, request: Request):
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
-    # if section.enrolled_students_count >= section.max_students:
-    #   raise Conflict("Max student count reached for section hence student can't be invited"
-    #   )
     section_service.validate_section(section)
     #TODO: add logic for cohort max count
     cohort = section.cohort
@@ -606,12 +596,13 @@ def invite_student_cohort(cohort_id: str, student_email: str,
       raise ResourceNotFoundException("Given CohortId\
          does not have any sections")
     if not student_service.check_student_can_enroll_in_cohort(
-        email=student_email, headers=headers, sections=sections):
+    email=student_email, headers=headers, sections=sections):
       raise Conflict(f"User {student_email} is already\
                       registered for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
     if section is None:
-      raise Conflict("Max count reached for all sctions is reached hence student cannot" +
+      raise Conflict(
+        "Max count reached for all sctions is reached hence student cannot" +
                      " be erolled in this cohort")
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {student_email}")
@@ -620,7 +611,7 @@ def invite_student_cohort(cohort_id: str, student_email: str,
         section=section, student_email=student_email, headers=headers)
     return {
         "message":
-        f"Successfully Added the Student with email {student_email}",
+  f"Successfully Added the Student with email {student_email}",
         "data": invitation_details
     }
   except ResourceNotFoundException as err:

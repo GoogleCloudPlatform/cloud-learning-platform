@@ -185,6 +185,9 @@ def create_section(context):
   section.classroom_id = classroom["id"]
   section.classroom_code = classroom["enrollmentCode"]
   section.classroom_url = classroom["alternateLink"]
+  section.enrollment_status = "OPEN"
+  section.max_students = 25
+  section.status = "ACTIVE"
   section.save()
   # Create teachers in the DB
   instructional_designer_email = cohort.course_template.instructional_designer
