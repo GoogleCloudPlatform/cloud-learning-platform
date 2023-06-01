@@ -61,7 +61,7 @@ class SectionDetails(BaseModel):
   description: str
   course_template: str
   cohort: str
-  max_students :str
+  max_students :int
   # teachers: list[constr(
   #     min_length=7,
   #     max_length=128,
