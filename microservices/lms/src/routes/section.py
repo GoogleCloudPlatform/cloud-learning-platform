@@ -435,13 +435,13 @@ def update_section(sections_details: UpdateSection):
     section.update()
     updated_section = convert_section_to_section_model(section)
     rows=[{
-      "sectionId":sections_details.id,\
-      "courseId":sections_details.course_id,\
-      "classroomUrl":updated_section["classroom_url"],\
-        "name":sections_details.section_name,\
-        "description":sections_details.description,\
-          "cohortId":updated_section["cohort"].split("/")[1],\
-          "courseTemplateId":updated_section["course_template"].split("/")[1],\
+      "sectionId":section.id,\
+      "courseId":section.classroom_id,\
+      "classroomUrl":section.classroom_url,\
+        "name":section.section_name,\
+        "description":section.description,\
+          "cohortId":section.cohort.id,\
+          "courseTemplateId":section.course_template.id,\
             "status":section.status,
             "enrollmentStatus": section.enrollment_status,
             "maxStudents": section.max_students,
@@ -678,13 +678,13 @@ def update_enrollment_status(section_id:str,enrollment_status: str):
       rows=[{
       "sectionId":section.id,\
       "courseId":section.classroom_id,\
-      "classroomUrl":updated_section["classroom_url"],\
-        "name":section.section_name,\
+      "classroomUrl":section.classroom_url,\
+        "name":section.name,\
         "description":section.description,\
-          "cohortId":updated_section["cohort"].split("/")[1],\
-          "courseTemplateId":updated_section["course_template"].split("/")[1],\
+          "cohortId":section.cohort.id,\
+          "courseTemplateId":section.course_template.id,\
             "status":section.status,
-            "enrollmentStatus": updated_section.enrollment_status,
+            "enrollmentStatus": section.enrollment_status,
             "maxStudents": section.max_students,
           "timestamp":datetime.datetime.utcnow()
           }]
@@ -696,7 +696,8 @@ def update_enrollment_status(section_id:str,enrollment_status: str):
       return {"data": updated_section}
     else:
       raise ValidationError("Accepted parameters are only 'OPEN' and 'CLOSED'")
-
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err

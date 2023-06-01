@@ -75,6 +75,7 @@ SECTION_EXAMPLE = {
     "status": "provisioned",
     "course_template": "course_templates/7d2zTApD-id",
     "cohort": "cohorts/1j-id",
+    "enrollment_status":"OPEN",
     "enrolled_students_count": 2
 }
 INSERT_SECTION_EXAMPLE = {
