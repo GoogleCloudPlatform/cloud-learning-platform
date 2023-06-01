@@ -27,7 +27,9 @@ class Sections(BaseModel):
   course_template: str
   cohort: str
   status: Optional[str]
+  enrollment_status:Optional[str]
   enrolled_students_count: int
+  max_students:int
 
   class Config():
     orm_mode = True
@@ -59,7 +61,7 @@ class SectionDetails(BaseModel):
   description: str
   course_template: str
   cohort: str
-
+  max_students :str
   # teachers: list[constr(
   #     min_length=7,
   #     max_length=128,

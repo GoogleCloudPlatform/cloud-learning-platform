@@ -340,6 +340,22 @@ def delete_section(section_id: str):
     section_details.enrollment_status="CLOSED"
     section_details.update()
     Section.soft_delete_by_id(section_id)
+    rows=[{
+      "sectionId":section_details.id,
+      "courseId":section_details.classroom_id,
+      "classroomUrl":section_details.classroom_url,
+      "name":section_details.section,
+      "description":section_details.description,
+      "cohortId":section_details.cohort.id,
+      "courseTemplateId":section_details.course_template.id,
+      "status":section_details.status,
+      "enrollmentStatus": section_details.enrollment_status,
+      "maxStudents": section_details.max_students,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+    insert_rows_to_bq(rows=rows,
+                      dataset=BQ_DATASET,
+                      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
     return {
         "message": f"Successfully archived the Section with id {section_id}"
     }
@@ -415,6 +431,7 @@ def update_section(sections_details: UpdateSection):
           f" {sections_details.course_id} is not found in classroom")
     section.section = sections_details.section_name
     section.description = sections_details.description
+    section.max_students = sections_details.max_students
     section.update()
     updated_section = convert_section_to_section_model(section)
     rows=[{
@@ -426,6 +443,8 @@ def update_section(sections_details: UpdateSection):
           "cohortId":updated_section["cohort"].split("/")[1],\
           "courseTemplateId":updated_section["course_template"].split("/")[1],\
             "status":section.status,
+            "enrollmentStatus": section.enrollment_status,
+            "maxStudents": section.max_students,
           "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(

@@ -4,14 +4,12 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/palenight');
 
-const appUrl = process.env.API_DOMAIN
+const appUrl = `https://${process.env.API_DOMAIN}`;
+
 if (!appUrl) {
   throw Error("app url is not provided")
 }
 
-const env = process.env.ENVIRONMENT
-
-console.log("Running for environment: " + env)
 
 let clpServices = require("./clp_services.json")
 let redocusaurusSpecs = []
