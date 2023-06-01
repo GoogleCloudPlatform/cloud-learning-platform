@@ -586,7 +586,7 @@ def invite_student_cohort(cohort_id: str, student_email: str,
   try:
     cohort = Cohort.find_by_id(cohort_id)
     sections = Section.collection.filter("cohort", "==", cohort.key).filter(
-            "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
+    "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
     if cohort.enrolled_students_count >= cohort.max_students:
