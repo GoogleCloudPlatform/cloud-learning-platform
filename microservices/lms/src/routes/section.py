@@ -677,7 +677,7 @@ def update_enrollment_status(section_id:str,enrollment_status: str):
       updated_section = convert_section_to_section_model(section)
       rows=[{
       "sectionId":section.id,\
-      "courseId":section.course_id,\
+      "courseId":section.classroom_id,\
       "classroomUrl":updated_section["classroom_url"],\
         "name":section.section_name,\
         "description":section.description,\
