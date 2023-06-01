@@ -53,12 +53,12 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: gcr.io/aitutor-dev/credential-pathway-service
+    - image: gcr.io/core-learning-services-dev/credential-pathway-service
       docker:
         cacheFrom:
-          - gcr.io/aitutor-dev/credential-pathway-service:latest
+          - gcr.io/core-learning-services-dev/credential-pathway-service:latest
       requires:
-        - image: gcr.io/aitutor-dev/common
+        - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG
       sync:
         infer:
