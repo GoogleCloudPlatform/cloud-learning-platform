@@ -348,6 +348,8 @@ def delete_section(section_id: str):
       "cohortId":section_details.cohort.id,
       "courseTemplateId":section_details.course_template.id,
       "status":section_details.status,
+      "enrollmentStatus": section_details.enrollment_status,
+      "maxStudents": section_details.max_students,
       "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(rows=rows,
@@ -428,6 +430,7 @@ def update_section(sections_details: UpdateSection):
           f" {sections_details.course_id} is not found in classroom")
     section.section = sections_details.section_name
     section.description = sections_details.description
+    section.max_students = sections_details.max_students
     section.update()
     updated_section = convert_section_to_section_model(section)
     rows=[{
@@ -439,6 +442,8 @@ def update_section(sections_details: UpdateSection):
           "cohortId":updated_section["cohort"].split("/")[1],\
           "courseTemplateId":updated_section["course_template"].split("/")[1],\
             "status":section.status,
+            "enrollmentStatus": section.enrollment_status,
+            "maxStudents": section.max_students,
           "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(
