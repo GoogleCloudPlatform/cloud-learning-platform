@@ -618,27 +618,7 @@ return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
     "message"] == "Grades for coursework will be updated shortly","message"
 
 def test_update_enrollment_status(client_with_emulator, create_fake_data):
-
-  # section = Section.find_by_id(create_fake_data["section"])
-  # data = {
-  #     "id": section.id,
-  #     "course_id": "561822649300",
-  #     "section_name": "tsection",
-  #     "description": "tdescription",
-  #     "max_students":50
-  # }
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/change_enrollment_status/OPEN"
   resp = client_with_emulator.patch(url)
   assert resp.status_code == 200
-  # with mock.patch("routes.section.classroom_crud.update_course"):
-  #   with mock.patch("routes.section.classroom_crud.acceept_invite"):
-  #     with mock.patch(
-  #   "routes.section.classroom_crud.get_user_profile_information",
-  #     return_value=mocked_value):
-  #       with mock.patch("routes.section.classroom_crud.acceept_invite"):
-  #         with mock.patch("routes.section.insert_rows_to_bq"):
-  #           resp = client_with_emulator.patch(url, json=data)
-  # assert resp.status_code == 200
-  # assert resp.json()["data"][
-  #   "classroom_id"] == section.classroom_id,"Check Data"
