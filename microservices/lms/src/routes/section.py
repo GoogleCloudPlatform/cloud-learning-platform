@@ -675,6 +675,24 @@ def update_enrollment_status(section_id:str,enrollment_status: str):
       section.enrollment_status = enrollment_status
       section.update()
       updated_section = convert_section_to_section_model(section)
+      rows=[{
+      "sectionId":section.id,\
+      "courseId":section.course_id,\
+      "classroomUrl":updated_section["classroom_url"],\
+        "name":section.section_name,\
+        "description":section.description,\
+          "cohortId":updated_section["cohort"].split("/")[1],\
+          "courseTemplateId":updated_section["course_template"].split("/")[1],\
+            "status":section.status,
+            "enrollmentStatus": updated_section.enrollment_status,
+            "maxStudents": section.max_students,
+          "timestamp":datetime.datetime.utcnow()
+          }]
+      insert_rows_to_bq(
+      rows=rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"]
+      )
       return {"data": updated_section}
     else:
       raise ValidationError("Accepted parameters are only 'OPEN' and 'CLOSED'")
