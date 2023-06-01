@@ -340,3 +340,19 @@ class ImportGradeResponseModel(BaseModel):
             "data": None
         }
     }
+
+class UpdateEnrollmentStatusSectionModel(BaseModel):
+  """Update  Section Response Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success"
+  data: Optional[Sections] = None
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data": SECTION_EXAMPLE
+        }
+    }

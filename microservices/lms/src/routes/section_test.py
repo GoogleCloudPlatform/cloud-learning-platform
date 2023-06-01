@@ -485,8 +485,6 @@ def test_enable_notifications_using_fake_section_id(client_with_emulator):
 def test_get_assignment(client_with_emulator, create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/assignments/5789246"
-  print("========")
-  print(url)
   course_work_data = {
       "courseId": "555555555",
       "id": "5789246",
@@ -618,3 +616,10 @@ return_value=EDIT_VIEW_URL_FILE_ID_MAPPING_FORM):
   assert resp.status_code == 202, "Status 202"
   assert resp_json[
     "message"] == "Grades for coursework will be updated shortly","message"
+
+def test_update_enrollment_status(client_with_emulator, create_fake_data):
+  url = BASE_URL + \
+      f"/sections/{create_fake_data['section']}/change_enrollment_status/OPEN"
+  with mock.patch("routes.section.insert_rows_to_bq"):
+    resp = client_with_emulator.patch(url)
+  assert resp.status_code == 200
