@@ -602,7 +602,7 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     section = student_service.get_section_with_minimum_student(sections)
     if section is None:
       raise Conflict(
-        "Max count reached for all sctions is reached hence student cannot" +
+    "Max count reached for all sctions is reached hence student cannot" +
                      " be erolled in this cohort")
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {student_email}")
