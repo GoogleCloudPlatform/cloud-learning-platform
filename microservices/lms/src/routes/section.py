@@ -348,6 +348,8 @@ def delete_section(section_id: str):
       "cohortId":section_details.cohort.id,
       "courseTemplateId":section_details.course_template.id,
       "status":section_details.status,
+      "enrollmentStatus": section_details.enrollment_status,
+      "maxStudents": section_details.max_students,
       "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(rows=rows,
