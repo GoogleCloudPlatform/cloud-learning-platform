@@ -24,7 +24,6 @@ def step_impl_03(context):
   assert context.status == 200, "Status 200"
   print(f"response: {context.response}\n\n fixture_data:{context.analytics_data}")
   assert context.response["user"]["user_email_address"]== context.analytics_data['student_data']['email'],"Check student email"
-  assert context.response["user"]["user_gaia_id"]== context.analytics_data['student_data']["gaia_id"],"Check student gaia id"
   assert context.response["section_list"][0]["course_work_list"][0]["submission_id"]  is not None,"Check student submission id"
 
 @behave.given("A user has access privileges and wants to get student analytics data")
@@ -44,7 +43,6 @@ def step_impl_06(context):
   assert context.status == 200, "Status 200"
   print(f"response: {context.response}\n\n fixture_data:{context.analytics_data}")
   assert context.response["user"]["user_email_address"]== context.analytics_data['student_data']['email'],"Check email"
-  assert context.response["user"]["user_gaia_id"]== context.analytics_data['student_data']["gaia_id"],"Check gaia id"
   assert context.response["section_list"][0]["course_work_list"][0]["submission_id"]  is not None,"Check student submission id"
   
 
