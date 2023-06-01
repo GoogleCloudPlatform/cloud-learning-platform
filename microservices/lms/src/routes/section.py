@@ -438,7 +438,7 @@ def update_section(sections_details: UpdateSection):
       "sectionId":section.id,\
       "courseId":section.classroom_id,\
       "classroomUrl":section.classroom_url,\
-        "name":section.section_name,\
+        "name":section.name,\
         "description":section.description,\
           "cohortId":section.cohort.id,\
           "courseTemplateId":section.course_template.id,\
