@@ -16,9 +16,6 @@ spec:
       - name: api-docs
         image: api-docs
         imagePullPolicy: IfNotPresent
-        envFrom:
-        - configMapRef:
-            name: env-vars
         resources:
           requests:
             cpu: "250m"

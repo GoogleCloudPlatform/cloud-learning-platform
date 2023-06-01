@@ -17,7 +17,3 @@ kind: Kustomization
 resources:
 - ./deployment.yaml
 - ./service.yaml
-configMapGenerator:
-- name: env-vars
-  envs:
-  - env.properties
