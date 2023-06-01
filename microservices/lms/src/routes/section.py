@@ -422,6 +422,7 @@ def update_section(sections_details: UpdateSection):
           "courseTemplateId":updated_section["course_template"].split("/")[1],\
             "status":section.status,
             "enrollmentStatus": section.enrollment_status,
+            "maxStudents": section.max_students,
           "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(
