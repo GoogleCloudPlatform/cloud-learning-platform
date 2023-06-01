@@ -516,4 +516,4 @@ def validate_section(section):
   if section.enrolled_students_count == "CLOSED" or section.status != "ACTIVE":
     raise ValidationError("Enrollment is not active for this section"
       )
-  return
+  return True
