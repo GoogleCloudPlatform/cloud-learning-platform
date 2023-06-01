@@ -20,7 +20,7 @@ import uuid
 from common.utils.logging_handler import Logger
 from common.utils.bq_helper import insert_rows_to_bq
 from googleapiclient.errors import HttpError
-from helper.classroom_helper import get_course_work,get_student_submissions
+from helper.classroom_helper import get_course_work, get_student_submissions, get_course_work_material
 from helper.json_helper import convert_dict_array_to_json,convert_to_json
 from config import BQ_TABLE_DICT,BQ_DATASET
 # disabling for linting to pass
@@ -90,21 +90,33 @@ def save_course_work_collection(course_id,course_work_id,message_id,event_type):
   Returns:
     _type_: _description_
   """
-  course_work=get_course_work(course_id=course_id,course_work_id=course_work_id)
-  course_work["uuid"] = str(uuid.uuid4())
-  course_work["message_id"] = message_id
-  course_work["assignment"] =convert_to_json(course_work,"assignment")
-  course_work["multipleChoiceQuestion"] = convert_to_json(
-      course_work, "multipleChoiceQuestion")
-  course_work["individualStudentsOptions"] = convert_to_json(
-      course_work, "individualStudentsOptions")
-  course_work["gradeCategory"] = convert_to_json(course_work, "gradeCategory")
-  course_work["materials"] = convert_dict_array_to_json(course_work,"materials")
-  course_work["event_type"] = event_type
-  course_work["timestamp"] = datetime.datetime.utcnow()
-  return insert_rows_to_bq(rows=[course_work],
-                           dataset=BQ_DATASET,
-                           table_name=BQ_TABLE_DICT["BQ_COLL_CW_TABLE"])
+  try:
+    course_work=get_course_work(
+      course_id=course_id,course_work_id=course_work_id)
+    course_work["uuid"] = str(uuid.uuid4())
+    course_work["message_id"] = message_id
+    course_work["assignment"] =convert_to_json(course_work,"assignment")
+    course_work["multipleChoiceQuestion"] = convert_to_json(
+        course_work, "multipleChoiceQuestion")
+    course_work["individualStudentsOptions"] = convert_to_json(
+        course_work, "individualStudentsOptions")
+    course_work["gradeCategory"] = convert_to_json(course_work, "gradeCategory")
+    course_work["materials"] = convert_dict_array_to_json(
+      course_work,"materials")
+    course_work["event_type"] = event_type
+    course_work["timestamp"] = datetime.datetime.utcnow()
+    return insert_rows_to_bq(rows=[course_work],
+                            dataset=BQ_DATASET,
+                            table_name=BQ_TABLE_DICT["BQ_COLL_CW_TABLE"])
+  except HttpError as hte:
+    Logger.info(hte)
+    if hte.status_code == 404:
+      course_work_material=get_course_work_material(
+        course_id,course_work_id)
+      if course_work_material:
+        return True
+    else:
+      raise HttpError(hte.resp,hte.content,hte.uri) from hte
 
 
 def save_student_submission(course_id, course_work_id,
