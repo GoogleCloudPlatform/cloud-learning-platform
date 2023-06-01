@@ -86,4 +86,7 @@ export class HomeService {
   deleteTeacher(sectionId: any,email:any) {
     return this.http.delete(`${environment.apiurl}sections/${sectionId}/teachers/${email}`)
   }
+  changeEnrollmentStatus(sectionId:any,status:string){
+    return this.http.patch(`${environment.apiurl}sections/${sectionId}/change_enrollment_status/${status}`, null)
+  }
 }

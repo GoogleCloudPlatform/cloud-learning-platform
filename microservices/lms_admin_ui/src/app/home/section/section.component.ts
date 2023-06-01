@@ -79,6 +79,7 @@ export class SectionComponent implements OnInit,OnDestroy {
   getTeacherListSub:Subscription
   importGradesSub:Subscription
   disableCourseworkAction:boolean=false
+  enrollmentLoader:boolean=false
   constructor(private _liveAnnouncer: LiveAnnouncer, private _snackBar: MatSnackBar, public dialog: MatDialog, public _HomeService: HomeService, 
     public router: Router, private _location: Location) { }
   @ViewChild(MatSort) sort: MatSort;
@@ -285,6 +286,7 @@ transformCourseworkTableData(data:any){
     tempObj['section'] = this.selectedSection.section
     tempObj['description'] = this.selectedSection.description
     tempObj['classroom_id'] = this.selectedSection.classroom_id
+    tempObj['max_students'] = this.selectedSection.max_students
     // tempObj['teachers'] = []
     // for (let x of this.selectedSection.teachers) {
     //   if (x != this.courseTemplateDetails.admin && x != this.courseTemplateDetails.instructional_designer) {
@@ -519,8 +521,21 @@ transformCourseworkTableData(data:any){
   getChipClass(status:any){
 return 'section-'+status+'-chip'
   }
-  onChipClick(){
-    console.log('chip click')
+  getEnrollmentChipClass(status:any){
+return 'enrollment-'+status+'-chip'
+  }
+  onEnrollmentChipClick(status:string){
+    let reverseStatus=''
+    status == 'OPEN' ? reverseStatus = 'CLOSED' : reverseStatus = 'OPEN'
+    this.enrollmentLoader = true
+    this._HomeService.changeEnrollmentStatus(this.selectedSection.id,reverseStatus).subscribe((res:any)=>{
+if(res.success == true){
+  this.selectedSection['enrollment_status'] = res.data['enrollment_status']
+}
+this.enrollmentLoader = false
+    },(err:any)=>{
+      this.enrollmentLoader = false
+    })
   }
 
   ngOnDestroy(): void {

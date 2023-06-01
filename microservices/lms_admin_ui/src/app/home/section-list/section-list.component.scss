@@ -94,24 +94,32 @@ $primary-color : #8c1d40;
     background-color: #03C003;
     color: white;
     font-size: 0.7rem;
-cursor: pointer;
+    padding: 3px;
+    font-weight: 800;
+    letter-spacing: 1px;
 
 }
 :host ::ng-deep .section-ARCHIVED-chip {
     background-color: #6b6b6b;
     color: white;
     font-size: 0.7rem;
-cursor: pointer;
+    padding: 3px;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
 :host ::ng-deep .section-FAILED_TO_PROVISION-chip {
     background-color: #DE0000;
     color: white;
     font-size: 0.7rem;
-cursor: pointer;
+    padding: 3px;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
 :host ::ng-deep .section-PROVISIONING-chip {
     background-color: #c08f03;
     color: white;
     font-size: 0.7rem;
-cursor: pointer;
+    padding: 3px;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
