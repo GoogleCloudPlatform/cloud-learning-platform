@@ -89,3 +89,29 @@ $primary-color : #8c1d40;
         align-items: center;
     }
 }
+
+:host ::ng-deep .section-ACTIVE-chip {
+    background-color: #03C003;
+    color: white;
+    font-size: 0.7rem;
+cursor: pointer;
+
+}
+:host ::ng-deep .section-ARCHIVED-chip {
+    background-color: #6b6b6b;
+    color: white;
+    font-size: 0.7rem;
+cursor: pointer;
+}
+:host ::ng-deep .section-FAILED_TO_PROVISION-chip {
+    background-color: #DE0000;
+    color: white;
+    font-size: 0.7rem;
+cursor: pointer;
+}
+:host ::ng-deep .section-PROVISIONING-chip {
+    background-color: #c08f03;
+    color: white;
+    font-size: 0.7rem;
+cursor: pointer;
+}

@@ -672,7 +672,6 @@ def update_invites():
           user_profile = classroom_crud.get_user_profile_information(
               course_record.user.email)
           user_ref = course_record.user
-          Logger.info(user_ref.to_dict())
           # Check if gaia_id is "" if yes so update personal deatils
           if user_ref.gaia_id == "":
             user_ref.first_name = user_profile["name"]["givenName"]

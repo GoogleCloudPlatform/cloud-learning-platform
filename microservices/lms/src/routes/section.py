@@ -209,11 +209,16 @@ def enroll_teacher(section_id: str,request: Request,
                      +f" in this section {section.id} as a leaner or faculty")
 
     result=add_teacher(headers,section,teacher_email)
-    message=f"Successfully enrolled the teacher using {teacher_email}"
-    return {
-        "message": message,
+    if result.invitation_id:
+      return {
+        "message": f"Successfully invited the teacher using {teacher_email}",
         "data": course_enrollment_user_model(result)
     }
+    return {
+        "message": f"Successfully enrolled the teacher using {teacher_email}",
+        "data": course_enrollment_user_model(result)
+    }
+
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -334,6 +339,20 @@ def delete_section(section_id: str):
     section_details.enrollment_status="CLOSED"
     section_details.update()
     Section.soft_delete_by_id(section_id)
+    rows=[{
+      "sectionId":section_details.id,
+      "courseId":section_details.classroom_id,
+      "classroomUrl":section_details.classroom_url,
+      "name":section_details.section,
+      "description":section_details.description,
+      "cohortId":section_details.cohort.id,
+      "courseTemplateId":section_details.course_template.id,
+      "status":section_details.status,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+    insert_rows_to_bq(rows=rows,
+                      dataset=BQ_DATASET,
+                      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
     return {
         "message": f"Successfully archived the Section with id {section_id}"
     }

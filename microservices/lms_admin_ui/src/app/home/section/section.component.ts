@@ -57,7 +57,7 @@ export interface ltiAssignment {
 export class SectionComponent implements OnInit,OnDestroy {
   selectedSection: any
   displayedColumns: string[] = ['name','email','role','status','action'];
-  studentDisplayedColumns: string[] = ['first name', 'last name', 'email', 'created time','status','action'];
+  studentDisplayedColumns: string[] = ['first name', 'last name', 'email','status','action'];
   courseworkDisplayColumns: string[] = ['title', 'state', 'created time','action']
   ltiAssignmentsDisplayedColumns: string[] = ["id", "lti_assignment_title", "start_date", "end_date", "due_date", "action"];
   teacherTableData: staff[] = []
@@ -198,7 +198,7 @@ transformCourseworkTableData(data:any){
       staffObj.name = x.first_name+' '+x.last_name
       staffObj.email = x.email
       staffObj.role = 'Teaching Staff'
-      staffObj.status = x.status
+      staffObj.status = x.enrollment_status
       this.teacherTableData.push(staffObj)
     }
 
@@ -512,6 +512,15 @@ transformCourseworkTableData(data:any){
       width: '500px',
       data: sectionTemp
     });
+  }
+  getStatusName(status:any){
+    return status.replace(/_/g,' ')
+  }
+  getChipClass(status:any){
+return 'section-'+status+'-chip'
+  }
+  onChipClick(){
+    console.log('chip click')
   }
 
   ngOnDestroy(): void {
