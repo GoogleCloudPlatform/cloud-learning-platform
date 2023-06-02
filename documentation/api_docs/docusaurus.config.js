@@ -4,7 +4,7 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/palenight');
 
-const appUrl = `https://${process.env.API_DOMAIN}`;
+const appUrl = `https://core-learning-services-dev.cloudpssolutions.com`;
 
 if (!appUrl) {
   throw Error("app url is not provided")
