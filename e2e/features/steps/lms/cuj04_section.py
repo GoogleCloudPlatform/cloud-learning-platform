@@ -1,9 +1,10 @@
 import behave
 import requests
 import time
-from testing_objects.test_config import API_URL,e2e_google_form_id,e2e_drive_folder_id
-from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA,emails
-from testing_objects.user import TEST_USER
+from e2e.gke_api_tests.testing_objects.test_config import API_URL
+from e2e.test_config import e2e_google_form_id,e2e_drive_folder_id
+from e2e.gke_api_tests.testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA,emails
+from e2e.gke_api_tests.testing_objects.user import TEST_USER
 from e2e.gke_api_tests.secrets_helper import get_student_email_and_token,\
   get_workspace_student_email_and_token,create_coursework_submission,\
 list_coursework_submission_user,insert_file_into_folder

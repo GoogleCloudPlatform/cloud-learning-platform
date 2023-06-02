@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication
+spec:
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: authentication
+        image: authentication
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX
+        - name: INSPACE_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: INSPACE_BASE_URL
+

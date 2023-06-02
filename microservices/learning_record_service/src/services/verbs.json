@@ -1,0 +1,45 @@
+[
+    {
+        "name": "clicked",
+        "url": "",
+        "canonical_data": {
+            "description": "Indicates that the actor has clicked the object."
+        }
+    },
+    {
+        "name": "started",
+        "url": "",
+        "canonical_data": {
+            "description": "Indicates that the actor has started the object."
+        }
+    },
+    {
+        "name": "resumed",
+        "url": "",
+        "canonical_data": {
+            "description": "Indicates that the actor has resumed the object."
+        }
+    },
+    {
+        "name": "completed",
+        "url": "",
+        "canonical_data": {
+            "description": "Indicates that the actor has completed the object."
+        }
+    },
+    {
+        "name": "attended",
+        "url": "",
+        "canonical_data": {
+            "description": "Indicates that the actor has attended the object."
+        }
+    },
+    {
+        "name": "submitted",
+        "url": "",
+        "canonical_data": {
+            "description": "Indicates that the actor has submitted the object."
+
+        }
+    }
+]
