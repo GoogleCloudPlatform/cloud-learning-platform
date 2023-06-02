@@ -534,7 +534,6 @@ def invite_student(section_id: str, student_email: str, request: Request):
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
     section_service.validate_section(section)
-    #TODO: add logic for cohort max count
     cohort = section.cohort
     if cohort.enrolled_students_count >= cohort.max_students:
       raise Conflict("Cohort Max count reached hence student cannot" +

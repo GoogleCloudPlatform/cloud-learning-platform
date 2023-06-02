@@ -76,13 +76,15 @@ SECTION_EXAMPLE = {
     "course_template": "course_templates/7d2zTApD-id",
     "cohort": "cohorts/1j-id",
     "enrollment_status":"OPEN",
-    "enrolled_students_count": 2
+    "enrolled_students_count": 2,
+    "max_students":50
 }
 INSERT_SECTION_EXAMPLE = {
     "name": "section c",
     "description": "This is updated create section test",
     "course_template": "course_template-id",
-    "cohort": "cohort-id"
+    "cohort": "cohort-id",
+    "max_students":50
 }
 
 CREDENTIAL_JSON = {
@@ -137,7 +139,8 @@ UPDATE_SECTION = {
     "id": "string",
     "course_id": "string",
     "section_name": "string",
-    "description": "string"
+    "description": "string",
+    "max_students":50
 }
 
 ASSIGNMENT_MODEL = {
