@@ -17,8 +17,9 @@
 """ LLM endpoints """
 import traceback
 from typing import Optional
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from common.models import UserChat
+from common.utils.auth_service import validate_token, get_user_data
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
                                  ValidationError,
@@ -30,7 +31,7 @@ from schemas.llm_schema import (LLMGenerateModel, LLMGetTypesResponse,
                                 LLMUserChatResponse,
                                 LLMUserAllChatsResponse)
 from services.llm_generate import llm_generate
-from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, LLM_TYPES
+from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, LLM_TYPES, auth_client
 
 router = APIRouter(prefix="/llm", tags=["LLMs"], responses=ERROR_RESPONSES)
 
@@ -57,12 +58,15 @@ def get_llm_list():
 
 
 @router.get(
-    "/user/{userid}/chat",
+    "/chat",
     name="Get all user chats",
     response_model=LLMUserAllChatsResponse)
-def get_chat_list(userid: str, skip: int = 0, limit: int = 20):
+def get_chat_list(skip: int = 0, limit: int = 20,
+                  user_details: dict = Depends(validate_token)):
   """
-  Get user chats
+  Get user chats for authenticated user.  Chat data does not include
+  chat history to slim payload.  To retrieve chat history use the
+  get single chat endpoint.
 
   Args:
     skip: `int`
@@ -80,18 +84,51 @@ def get_chat_list(userid: str, skip: int = 0, limit: int = 20):
     if limit < 1:
       raise ValidationError("Invalid value passed to \"limit\" query parameter")
 
+    user_data = get_user_data(user_details, auth_client)
+    userid = user_data.get("user_id")
     user_chats = UserChat.find_by_user(userid)
 
     chat_list = []
     for i in user_chats:
       chat_data = i.get_fields(reformat_datetime=True)
       chat_data["id"] = i.id
+      # don't inculde chat history to slim return payload
+      del chat_data["history"]
       chat_list.append(chat_data)
 
     return {
       "success": True,
       "message": f"Successfully retrieved user chats for user {userid}",
       "data": chat_list
+    }
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
+  except ResourceNotFoundException as e:
+    raise ResourceNotFound(str(e)) from e
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+
+@router.get(
+    "/chat/{chatid}",
+    name="Get user chat",
+    response_model=LLMUserChatResponse)
+def get_chat(chatid: str):
+  """
+  Get a specific user chat by id
+
+  Returns:
+      LLMUserChatResponse
+  """
+  try:
+    user_chat = UserChat.find_by_id(chatid)
+    chat_data = user_chat.get_fields(reformat_datetime=True)
+    chat_data["id"] = user_chat.id
+
+    return {
+      "success": True,
+      "message": f"Successfully retrieved user chat {chatid}",
+      "data": chat_data
     }
   except ValidationError as e:
     raise BadRequest(str(e)) from e
@@ -140,12 +177,13 @@ async def generate(gen_config: LLMGenerateModel):
 
 
 @router.post(
-    "/user/{userid}/chat",
+    "/chat",
     name="Create new chat",
     response_model=LLMUserChatResponse)
-async def create_user_chat(userid: str, gen_config: LLMGenerateModel):
+async def create_user_chat(gen_config: LLMGenerateModel,
+                           user_details: dict = Depends(validate_token)):
   """
-  Create new chat for user with text response
+  Create new chat for authentcated user
 
   Args:
       prompt(str): Input prompt for model
@@ -165,6 +203,9 @@ async def create_user_chat(userid: str, gen_config: LLMGenerateModel):
   llm_type = genconfig_dict.get("llm_type")
 
   try:
+    user_data = get_user_data(user_details, auth_client)
+    userid = user_data.get("user_id")
+
     # generate text from prompt
     result = await llm_generate(prompt, llm_type)
 
@@ -173,11 +214,13 @@ async def create_user_chat(userid: str, gen_config: LLMGenerateModel):
     user_chat.history = [prompt, result]
     user_chat.save()
 
+    chat_data = user_chat.get_fields(reformat_datetime=True)
+    chat_data["id"] = user_chat.id
+
     return {
         "success": True,
         "message": "Successfully created chat",
-        "content": result,
-        "chatid": user_chat.id
+        "chat": chat_data
     }
   except Exception as e:
     raise InternalServerError(str(e)) from e

@@ -18,6 +18,7 @@
 # pylint: disable=unspecified-encoding,line-too-long
 import os
 from common.utils.logging_handler import Logger
+from common.utils.token_handler import UserCredentials
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
@@ -106,19 +107,17 @@ def load_google_access_token():
   google_access_token = google_access_token.strip()
   return google_access_token
 
-GOOGLE_VERTEX_ENDPOINT = "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-large-language-models/locations/us-central1/endpoints/{}:predict"
-
 OPENAI_LLM_TYPE_GPT3_5 = "OpenAI-GPT3.5"
 OPENAI_LLM_TYPE_GPT4 = "OpenAI-GPT4"
 COHERE_LLM_TYPE = "Cohere"
-VERTEX_LLM_TYPE_BISON_001 = "VertexAI-Text-alpha"
-VERTEX_LLM_TYPE_BISON_CHAT = "VertexAI-Chat-alpha"
+VERTEX_LLM_TYPE_BISON_TEXT = "VertexAI-Text"
+VERTEX_LLM_TYPE_BISON_CHAT = "VertexAI-Chat"
 
 LLM_TYPES = []
 #OPENAI_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, OPENAI_LLM_TYPE_GPT4]
 OPENAI_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5]
 COHERE_LLM_TYPES = [COHERE_LLM_TYPE]
-GOOGLE_LLM_TYPES = [VERTEX_LLM_TYPE_BISON_001, VERTEX_LLM_TYPE_BISON_CHAT]
+GOOGLE_LLM_TYPES = [VERTEX_LLM_TYPE_BISON_TEXT, VERTEX_LLM_TYPE_BISON_CHAT]
 
 # these LLMs are trained as chat models
 CHAT_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, VERTEX_LLM_TYPE_BISON_CHAT]
@@ -145,8 +144,30 @@ if ENABLE_OPENAI_LLM:
 GOOGLE_LLM = {}
 if ENABLE_GOOGLE_LLM:
   GOOGLE_LLM = {
-    VERTEX_LLM_TYPE_BISON_001: "text-bison-001",
-    VERTEX_LLM_TYPE_BISON_CHAT: "text-bison-alpha"
+    VERTEX_LLM_TYPE_BISON_TEXT: "text-bison@001",
+    VERTEX_LLM_TYPE_BISON_CHAT: "chat-bison@001"
   }
 
 Logger.info(f"LLM types loaded {LLM_TYPES}")
+
+# backend robot and auth client
+try:
+  LLM_BACKEND_ROBOT_USERNAME = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/llm-backend-robot-username/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  LLM_BACKEND_ROBOT_USERNAME = None
+
+try:
+  LLM_BACKEND_ROBOT_PASSWORD = secrets.access_secret_version(
+      request={
+          "name":
+              f"projects/{PROJECT_ID}/secrets/llm-backend-robot-password/versions/latest"
+      }).payload.data.decode("utf-8")
+except Exception as e:
+  LLM_BACKEND_ROBOT_PASSWORD = None
+
+auth_client = UserCredentials(LLM_BACKEND_ROBOT_USERNAME,
+                              LLM_BACKEND_ROBOT_PASSWORD)

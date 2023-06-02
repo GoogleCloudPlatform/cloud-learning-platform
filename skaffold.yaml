@@ -50,3 +50,19 @@ requires:
 
 build:
   googleCloudBuild: {}
+
+---
+# Skaffold for LLM Service
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: llm_service
+requires:
+- path: ./common
+  configs: [common]
+
+- path: ./microservices/llm_service
+  configs: [llm-service]
+
+build:
+  googleCloudBuild: {}
