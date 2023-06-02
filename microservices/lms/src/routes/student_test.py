@@ -413,7 +413,7 @@ def test_invite_student_to_cohort_archived_section(
       "services.student_service.check_student_can_enroll_in_cohort",
     return_value =True):
       resp = client_with_emulator.post(url)
-  assert resp.status_code == 404
+  assert resp.status_code == 422
 
 def test_update_invites(client_with_emulator,create_fake_data):
   url = BASE_URL + "/sections/update_invites"
