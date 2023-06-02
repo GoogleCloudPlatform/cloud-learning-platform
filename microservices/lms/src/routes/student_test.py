@@ -260,7 +260,7 @@ def test_enroll_student_section_closed_enrollment(
   print(resp.json())
   assert resp.status_code == 422, "Status 422"
  
- def test_enroll_student_section_enrollment_count(
+def test_enroll_student_section_enrollment_count(
   client_with_emulator, create_fake_data):
 
   url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
