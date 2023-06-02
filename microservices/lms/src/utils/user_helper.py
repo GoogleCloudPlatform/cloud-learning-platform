@@ -65,7 +65,6 @@ def check_user_can_enroll_in_section(email, headers, section):
     Logger.error(rte)
     Logger.info("User is not present in database")
     return True
-  # print("Student details____", student_details)
   if student_details["data"] != []:
     user_id = student_details["data"][0]["user_id"]
     result = CourseEnrollmentMapping.check_enrollment_exists_section(
