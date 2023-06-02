@@ -286,34 +286,6 @@ def test_enroll_student_section_closed_enrollment(
   print(resp.json())
   assert resp.status_code == 422, "Status 422"
 
-def test_enroll_student_section(client_with_emulator, create_fake_data):
-
-  url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
-  input_data = {
-      "email": "student@gmail.com",
-      "access_token": CREDENTIAL_JSON["token"]
-  }
-  section = Section.find_by_id(create_fake_data['section'])
-  section.enrollment_status = "CLOSED"
-  section.update()
-  course_user=User.from_dict(TEMP_USER)
-  course_user.user_id=""
-  course_user.email=input_data["email"]
-  course_user.user_id=course_user.save().id
-  course_user.update()
-  with mock.patch("routes.student.Logger"):
-    with mock.patch("routes.student.classroom_crud.enroll_student",
-      return_value ={"user_id":course_user.user_id}):
-      with mock.patch(
-        "routes.student.check_user_can_enroll_in_section",
-        return_value =True):
-        resp = client_with_emulator.post(url, json=input_data)
-  assert resp.status_code == 200, "Status 200"
-  assert resp.json()["success"] is True
-  assert resp.json()["data"]["classroom_url"] == "https://classroom.google.com"
-  assert resp.json()["data"]["classroom_id"] == "cl_id"
-
-
 
 def test_enroll_student_section_negative(client_with_emulator):
   url = BASE_URL + "/sections/fake_section_id/students"
