@@ -54,7 +54,7 @@ class Section(BaseModel):
   enrollment_status = TextField(default="CLOSED",
                                 validator=check_enrollment_status)
   enrolled_students_count = NumberField(default=0)
-
+  max_students = NumberField()
   class Meta:
     ignore_none_field = False
     collection_name = BaseModel.DATABASE_PREFIX + "sections"

@@ -1,0 +1,1 @@
+ALTER TABLE section ADD COLUMN IF NOT EXISTS maxStudents INTEGER OPTIONS(description = "Max students counts of the section");

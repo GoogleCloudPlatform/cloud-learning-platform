@@ -10,9 +10,9 @@
 
                 <div style="margin-left: 2%;">
                     <mat-chip-list>
-                        <mat-chip (click)="onChipClick()" [class]="getChipClass(section.status)">
+                        <mat-basic-chip [class]="getChipClass(section.status)">
                             {{getStatusName(section.status)}} 
-                        </mat-chip>
+                        </mat-basic-chip>
                     </mat-chip-list>
                 </div>
 
