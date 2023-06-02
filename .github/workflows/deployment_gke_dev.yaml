@@ -51,7 +51,7 @@ env:
   # For Scalability in Dev env using Prod config
   BQ_DATASET: lms_analytics
   BQ_REGION: US
-
+  
 # cookiecutter:raw 
 jobs:
   deploy_backends:
@@ -210,4 +210,4 @@ jobs:
         run: |
           gsutil cp ~/.skaffold/cache "${SKAFFOLD_CACHE_GCS}/api_docs/cache"
 
-# cookiecutter:endraw s
+# cookiecutter:endraw 
