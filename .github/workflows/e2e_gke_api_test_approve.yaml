@@ -117,8 +117,8 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd utils/
         python -m pip install -r requirements.txt
-        BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
-        BQ_DATASET=lrs DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
+        BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_approval_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
+        BQ_DATASET=lrs DATABASE_PREFIX=e2e_approval_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
 
     - name: Build and deploy to cluster
       run: |
@@ -131,21 +131,6 @@ jobs:
         --module backends \
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }}
-
-    - name: Build and deploy external services to cluster
-      run: |
-        pushd ${{ format('ailearning-backend_{0}', github.run_id) }}
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE=e2e-pr-approval-$PR_NUMBER
-        export DATABASE_PREFIX=e2e_approval_pr${PR_NUMBER}_
-        export GCP_PROJECT=$PROJECT_ID
-        skaffold run \
-        -p custom \
-        --module authentication,redis,user-management,student-learner-profile,learning-record-service \
-        --namespace $NAMESPACE \
-        -l commit=$GITHUB_SHA \
-        --tag PR${{ github.event.pull_request.number }} 
-        popd
 
     # TODO: remove the below steps while updating workflows
     # - name: Checkout external repo
@@ -162,8 +147,8 @@ jobs:
     #   run: |
     #     pushd ${{ format('ailearning-backend_{0}', github.run_id) }}
     #     PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-    #     NAMESPACE=e2e-pr-$PR_NUMBER
-    #     export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+    #     NAMESPACE=e2e-approval-pr-$PR_NUMBER
+    #     export DATABASE_PREFIX=e2e_approval_pr${PR_NUMBER}_
     #     export GCP_PROJECT=$PROJECT_ID
     #     skaffold run \
     #     -p custom \
@@ -223,6 +208,17 @@ jobs:
         NAMESPACE=e2e-pr-approval-$PR_NUMBER
         python e2e/utils/port_forward.py --namespace $NAMESPACE
 
+    - name: Setup redis
+      uses: supercharge/redis-github-action@1.2.0
+      with:
+        redis-version: 6
+
+    - name: Install redis cli
+      run: sudo apt-get install -y redis-tools
+
+    - name: Verify that redis is up
+      run: redis-cli ping
+
     - name: Cleaning up database
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
@@ -253,7 +249,7 @@ jobs:
     - name: Run behave
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m behave e2e/features/ --tags=~@test --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode --tags=~@inspace
+        PYTHONPATH=common/src DATABASE_PREFIX=e2e_approval_pr${PR_NUMBER}_ python -m behave e2e/features/ --tags=~@test --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode --tags=~@inspace
 
   dataset-cleanup:
     runs-on: ubuntu-latest
@@ -369,7 +365,7 @@ jobs:
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd utils/
         python -m pip install -r requirements.txt
-        BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_cleanup.py  
-        BQ_DATASET=lrs DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_cleanup.py  
+        BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_approval_pr${PR_NUMBER}_ python bq_cleanup.py  
+        BQ_DATASET=lrs DATABASE_PREFIX=e2e_approval_pr${PR_NUMBER}_ python bq_cleanup.py  
 
 # cookiecutter:endraw
