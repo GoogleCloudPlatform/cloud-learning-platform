@@ -157,6 +157,7 @@ try:
           "name":
               f"projects/{PROJECT_ID}/secrets/llm-backend-robot-username/versions/latest"
       }).payload.data.decode("utf-8")
+  LLM_BACKEND_ROBOT_USERNAME = LLM_BACKEND_ROBOT_USERNAME.strip()
 except Exception as e:
   LLM_BACKEND_ROBOT_USERNAME = None
 
@@ -166,6 +167,7 @@ try:
           "name":
               f"projects/{PROJECT_ID}/secrets/llm-backend-robot-password/versions/latest"
       }).payload.data.decode("utf-8")
+  LLM_BACKEND_ROBOT_PASSWORD = LLM_BACKEND_ROBOT_PASSWORD.strip()
 except Exception as e:
   LLM_BACKEND_ROBOT_PASSWORD = None
 

@@ -74,10 +74,9 @@ class LLMGenerateResponse(BaseModel):
 
 class LLMUserChatResponse(BaseModel):
   """LLM User Create Chat Response model"""
-  chatid: str
   success: Optional[bool] = True
   message: Optional[str] = "Successfully created chat"
-  chat: ChatModel
+  data: ChatModel
 
   class Config():
     orm_mode = True
@@ -85,7 +84,7 @@ class LLMUserChatResponse(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully created chat",
-            "chat": ChatModel
+            "data": ChatModel
         }
     }
 

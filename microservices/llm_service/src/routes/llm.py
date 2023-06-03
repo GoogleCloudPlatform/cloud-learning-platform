@@ -220,9 +220,11 @@ async def create_user_chat(gen_config: LLMGenerateModel,
     return {
         "success": True,
         "message": "Successfully created chat",
-        "chat": chat_data
+        "data": chat_data
     }
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
