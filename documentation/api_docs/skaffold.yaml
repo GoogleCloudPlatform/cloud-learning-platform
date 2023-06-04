@@ -31,6 +31,7 @@ portForward:
 - resourceType: service
   resourceName: api-docs
   port: 80
+  localPort: 8888
 deploy:
   kustomize:
     paths:
