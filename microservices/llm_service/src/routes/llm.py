@@ -26,7 +26,9 @@ from common.utils.errors import (ResourceNotFoundException,
                                  PayloadTooLargeError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, PayloadTooLarge)
-from schemas.llm_schema import (LLMGenerateModel, LLMGetTypesResponse,
+from schemas.llm_schema import (ChatModel, ChatUpdateModel,
+                                LLMGenerateModel,
+                                LLMGetTypesResponse,
                                 LLMGenerateResponse,
                                 LLMUserChatResponse,
                                 LLMUserAllChatsResponse)
@@ -135,6 +137,46 @@ def get_chat(chatid: str):
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+
+@router.put(
+  "/chat/{chatid}",
+  name="Update user chat"
+)
+def update_chat(chatid: str, input_chat: ChatUpdateModel):
+  """Update a user chat
+
+  Args:
+    input_chat (ChatUpdateModel): fields in body of chat to update.
+      The only field that can be updated is the title.
+
+  Raises:
+    ResourceNotFoundException: If the Chat does not exist
+    HTTPException: 500 Internal Server Error if something fails
+
+  Returns:
+    [JSON]: {'success': 'True'} if the chat is updated,
+    NotFoundErrorResponseModel if the chat not found,
+    InternalServerErrorResponseModel if the chat update raises an exception
+  """
+  try:
+    input_chat_dict = {**input_chat.dict()}
+
+    existing_chat = UserChat.find_by_id(chatid)
+    for key in input_chat_dict:
+      if input_chat_dict.get(key) is not None:
+        setattr(existing_chat, key, input_chat_dict.get(key))
+    existing_chat.update()
+
+    return {
+      "success": True,
+      "message": f"Successfully updated user chat {chatid}",
+    }
+  except ResourceNotFoundException as re:
+    raise ResourceNotFound(str(re)) from re
+  except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 

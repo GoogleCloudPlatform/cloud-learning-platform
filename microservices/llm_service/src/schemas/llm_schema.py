@@ -19,12 +19,18 @@ from pydantic import BaseModel
 from schemas.schema_examples import LLM_GENERATE_EXAMPLE
 
 class ChatModel(BaseModel):
-  id: str
+  id: Optional[str] = None
   user_id: str
   llm_type: str
+  title: Optional[str] = ""
   history: Optional[List[str]] = []
   created_time: str
   last_modified_time: str
+
+
+class ChatUpdateModel(BaseModel):
+  title: str
+
 
 class LLMGetTypesResponse(BaseModel):
   """LLM Get types model"""
@@ -41,6 +47,7 @@ class LLMGetTypesResponse(BaseModel):
             "data": []
         }
     }
+
 
 class LLMGenerateModel(BaseModel):
   """LLM Generate model"""
