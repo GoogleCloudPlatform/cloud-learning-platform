@@ -52,21 +52,3 @@ spec:
               key: API_DOMAIN
         ports:
         - containerPort: 80
-        livenessProbe:
-          failureThreshold: 5
-          httpGet:
-            path: /ping
-            port: 80
-            scheme: HTTP
-          periodSeconds: 30
-          successThreshold: 1
-          timeoutSeconds: 10
-        readinessProbe:
-          failureThreshold: 5
-          httpGet:
-            path: /ping
-            port: 80
-            scheme: HTTP
-          periodSeconds: 30
-          successThreshold: 1
-          timeoutSeconds: 10
