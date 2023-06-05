@@ -52,21 +52,6 @@ build:
   googleCloudBuild: {}
 
 ---
-# Skaffold for LLM Service solo deploy
-apiVersion: skaffold/v2beta12
-kind: Config
-metadata:
-  name: llm_service
-requires:
-- path: ./common
-  configs: [common]
-
-- path: ./microservices/llm_service
-  configs: [llm-service]
-
-build:
-  googleCloudBuild: {}
-
 # Master Skaffold for API Docs
 apiVersion: skaffold/v2beta12
 kind: Config
@@ -75,3 +60,6 @@ metadata:
 requires:
 - path: ./documentation/api_docs
   configs: [api-docs]
+
+build:
+  googleCloudBuild: {}
