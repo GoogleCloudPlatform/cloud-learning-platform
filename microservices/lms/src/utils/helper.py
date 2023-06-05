@@ -1,7 +1,6 @@
 """ Helper Functions"""
 import datetime
 from functools import reduce
-from fastapi import Depends
 from common.utils.errors import ResourceNotFoundException
 from schemas.analytics import (
   AnalyticsCourse,AnalyticsCourseWork,AnalyticsUser,AnalyticsResponse)
