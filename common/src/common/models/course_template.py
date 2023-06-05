@@ -26,7 +26,6 @@ class CourseTemplate(BaseModel):
   name = TextField(required=True)
   description = TextField(required=True)
   admin = TextField(required=True, format="lower")
-  # instructional_designer = TextField(required=True, format="lower")
   classroom_id = TextField()
   classroom_code = TextField()
   classroom_url = TextField()
