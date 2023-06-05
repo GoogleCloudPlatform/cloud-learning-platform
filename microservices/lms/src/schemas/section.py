@@ -27,7 +27,9 @@ class Sections(BaseModel):
   course_template: str
   cohort: str
   status: Optional[str]
+  enrollment_status:Optional[str]
   enrolled_students_count: int
+  max_students:int
 
   class Config():
     orm_mode = True
@@ -59,7 +61,7 @@ class SectionDetails(BaseModel):
   description: str
   course_template: str
   cohort: str
-
+  max_students :int
   # teachers: list[constr(
   #     min_length=7,
   #     max_length=128,
@@ -336,5 +338,21 @@ class ImportGradeResponseModel(BaseModel):
             "success": True,
             "message": "Success",
             "data": None
+        }
+    }
+
+class UpdateEnrollmentStatusSectionModel(BaseModel):
+  """Update  Section Response Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success"
+  data: Optional[Sections] = None
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data": SECTION_EXAMPLE
         }
     }
