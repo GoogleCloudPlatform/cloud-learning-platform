@@ -1,5 +1,6 @@
 """
-  Script to create teacher course template enrollment mapping from  instructional designer
+  Script to create teacher course template enrollment mapping
+  from  instructional designer
 """
 
 # disabling for linting to pass
