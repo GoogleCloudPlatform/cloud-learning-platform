@@ -347,7 +347,7 @@ def test_get_instructional_designer(client_with_emulator,
     resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True, "check status"
-  assert resp.json["data"]["email"] == email ,"Check email"
+  assert resp.json()["data"]["email"] == email ,"Check email"
 
 def test_get_instructional_designer_by_user_id(client_with_emulator,
                                        enroll_instructional_designer_data):
@@ -363,7 +363,7 @@ def test_get_instructional_designer_by_user_id(client_with_emulator,
     resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True, "check status"
-  assert resp.json["data"]["email"] == email ,"Check email"
+  assert resp.json()["data"]["email"] == email ,"Check email"
 
 def test_get_instructional_designer_negative(client_with_emulator,
                                        enroll_instructional_designer_data):
@@ -391,4 +391,4 @@ def test_list_instructional_designers(client_with_emulator,
   resp = client_with_emulator.get(url)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True, "check status"
-  assert resp.json["data"][0]["email"] == email ,"Check email"
+  assert resp.json()["data"][0]["email"] == email ,"Check email"

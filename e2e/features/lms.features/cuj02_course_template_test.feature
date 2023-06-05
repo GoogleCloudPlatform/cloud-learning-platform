@@ -62,8 +62,8 @@ Feature: Create, Read, Retrieve all and delete APIs for Course Template
 
     fixture.enroll.instructional_designer.course_template
   Scenario: Get instructional designer from course template using course template id and user id
-    Given A user has access privileges wants to get instructional designer with valid course template id and valid indtructional designer id
-    When API request is sent which contains valid course template id and valid user id to delete instructional designer
+    Given A user has access privileges wants to get instructional designer with valid course template id and valid instructional designer id
+    when Get request with valid data is sent
     Then Get instructional designer API will show user details
 
   @fixture.enroll.instructional_designer.course_template
