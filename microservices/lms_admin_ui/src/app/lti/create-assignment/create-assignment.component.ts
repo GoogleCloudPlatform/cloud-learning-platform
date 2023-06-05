@@ -6,6 +6,7 @@ import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA
 import { ContentSelectorComponent } from '../content-selector/content-selector.component';
 import { HomeService } from 'src/app/home/service/home.service';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { AuthService } from 'src/app/shared/service/auth.service';
 interface LooseObject {
   [key: string]: any
 }
@@ -26,7 +27,7 @@ export class CreateAssignmentComponent {
     public dialogRef: MatDialogRef<CreateAssignmentComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     public dialog: MatDialog,
-    private fb: FormBuilder, private homeService: HomeService, private ltiService: LtiService) { }
+    private fb: FormBuilder, private homeService: HomeService, private ltiService: LtiService, private authService: AuthService) { }
 
   ngOnInit() {
     this.getAllTools()
@@ -119,7 +120,13 @@ export class CreateAssignmentComponent {
   }
 
   openContentSelector() {
-    console.log("this.ltiAssignmentForm.value", this.ltiAssignmentForm.value)
+    let userId = null
+    if (localStorage.getItem("userId")) {
+      userId = localStorage.getItem("userId")
+    } else {
+      this.authService.findEmailSetId()
+      userId = localStorage.getItem("userId")
+    }
     if (this.ltiAssignmentForm.value['tool_id'] != null) {
       let ltiModalData: LooseObject = {}
       ltiModalData['mode'] = 'Open'
@@ -128,7 +135,7 @@ export class CreateAssignmentComponent {
         contextId: this.dialogData.extra_data.contextId,
         contextType: this.dialogData.page,
         toolId: this.ltiAssignmentForm.value['tool_id'],
-        userId: "vcmt4ZemmyFm59rDzl1U"
+        userId: userId
       }
 
       const dialogRef = this.dialog.open(ContentSelectorComponent, {

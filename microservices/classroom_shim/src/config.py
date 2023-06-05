@@ -36,6 +36,12 @@ ERROR_RESPONSES = {
     }
 }
 
+SERVICES = {"user-management": {"host": "user-management", "port": 80}}
+
+USER_MANAGEMENT_BASE_URL = f"http://{SERVICES['user-management']['host']}:" \
+                  f"{SERVICES['user-management']['port']}" \
+                  f"/user-management/api/v1"
+
 try:
   LMS_BACKEND_ROBOT_USERNAME = secrets.access_secret_version(
       request={
