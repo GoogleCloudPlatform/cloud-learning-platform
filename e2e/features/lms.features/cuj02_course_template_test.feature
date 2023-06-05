@@ -60,6 +60,12 @@ Feature: Create, Read, Retrieve all and delete APIs for Course Template
     When API request is sent to fetch all Cohorts Records by providing Course template invalid id
     Then Course Template list Cohort API will throw a resource not found error
 
+    fixture.enroll.instructional_designer.course_template
+  Scenario: Get instructional designer from course template using course template id and user id
+    Given A user has access privileges wants to get instructional designer with valid course template id and valid indtructional designer id
+    When API request is sent which contains valid course template id and valid user id to delete instructional designer
+    Then Get instructional designer API will show user details
+
   @fixture.enroll.instructional_designer.course_template
   Scenario: Delete instructional designer in course template with given course_template id and email
     Given A user has access to admin portal and needs to delete the instructional designer with valid course template id and email

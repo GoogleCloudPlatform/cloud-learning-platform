@@ -416,3 +416,31 @@ def step_impl_42(context):
   print(f"------------------data: {context.response}------------------------")
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check Data"
+
+# ---------------------------Get instructional designer---------------------------------------------
+#---Positive scenario
+
+
+@behave.given(
+    "A user has access privileges wants to get instructional designer with valid course template id and valid instructional designer id"
+)
+def step_impl_34(context):
+  context.url = f'{API_URL}/course_templates/{context.enrollment_mapping.course_template.id}/instructional_designers/{context.enrollment_mapping.user.email}'
+
+
+@behave.when(
+    "Get request with valid data is sent")
+def step_impl_35(context):
+  resp = requests.get(context.url, headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Get instructional designer API will show user details")
+def step_impl_36(context):
+  print(f"--------------------url: {context.url}-----------------------")
+  print(f"------------------Status: {context.status}------------------------")
+  print(f"------------------data: {context.response}------------------------")
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "check data"
