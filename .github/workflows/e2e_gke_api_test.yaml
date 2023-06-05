@@ -71,7 +71,9 @@ env:
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
   USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT }}
-  E2E_PREFIX: "${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}"
+  E2E_PR_NUMBER: ${{ github.event.number }}
+  E2E_PREFIX: "${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr' || 'e2e_pr' }}"
+  E2E_NAMESPACE_PREFIX: "${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-approval-' }}"
 # cookiecutter:raw 
 jobs:
   deploy:
@@ -79,7 +81,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: echo E2E_PREFIX
-      run: echo $E2E_PREFIX
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        DATABASE_PREFIX=$E2E_PREFIX${PR_NUMBER}_
+        NAMESPACE=$E2E_NAMESPACE_PREFIX$PR_NUMBER
+        echo $NAMESPACE
+        echo $DATABASE_PREFIX
+        echo $E2E_PR_NUMBER
     - name: Check out repository
       uses: actions/checkout@v3
 
