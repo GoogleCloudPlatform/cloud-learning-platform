@@ -71,12 +71,15 @@ env:
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
   USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT }}
+  E2E_PREFIX: "${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}"
 # cookiecutter:raw 
 jobs:
   deploy:
     name: Deploy all microservices in PR namespace
     runs-on: ubuntu-latest
     steps:
+    - name: echo E2E_PREFIX
+      run: echo $E2E_PREFIX
     - name: Check out repository
       uses: actions/checkout@v3
 
@@ -88,13 +91,6 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
     
-    - name: echo namespace and DATABASE_PREFIX
-      run: |
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        export NAMESPACE = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-$PR_NUMBER' || 'e2e-pr-$PR_NUMBER' }}
-        echo $NAMESPACE
-        echo $DATABASE_PREFIX
-
     - name: Install GKE Auth Plugin
       run: | 
         gcloud components install gke-gcloud-auth-plugin
@@ -124,14 +120,14 @@ jobs:
     - name: Set up Kubernetes namespace and Service Account
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE= ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-$PR_NUMBER' || 'e2e-pr-$PR_NUMBER' }}
+        NAMESPACE=e2e-pr-$PR_NUMBER
         kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
         NAMESPACE=${NAMESPACE} bash setup/setup_ksa.sh
 
     - name: Add indexing to collections in firestore
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
+        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
         cd utils/
         python -m pip install -r requirements.txt
         PYTHONPATH=../common/src python firestore_indexing.py
@@ -142,22 +138,20 @@ jobs:
         cd e2e
         python -m pip install -r requirements.txt
         cd utils
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        PYTHONPATH=../common/src python pub_sub_setup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python pub_sub_setup.py
 
     - name: Initialize BQ
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd utils/
         python -m pip install -r requirements.txt
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        BQ_DATASET=lms_analytics python bq_setup.py --create-dataset=true
+        BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
 
     - name: Build and deploy to cluster
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE= ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-$PR_NUMBER' || 'e2e-pr-$PR_NUMBER' }}
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
+        NAMESPACE=e2e-pr-$PR_NUMBER
+        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
         skaffold run \
         --profile dev \
         --namespace $NAMESPACE \
@@ -179,8 +173,8 @@ jobs:
       run: |
         pushd ${{ format('ailearning-backend_{0}', github.run_id) }}
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE= ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-$PR_NUMBER' || 'e2e-pr-$PR_NUMBER' }}
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
+        NAMESPACE=e2e-pr-$PR_NUMBER
+        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
         export GCP_PROJECT=$PROJECT_ID
         skaffold run \
         -p custom \
@@ -236,22 +230,20 @@ jobs:
     - name: Set up port forwarding
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE= ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-$PR_NUMBER' || 'e2e-pr-$PR_NUMBER' }}
+        NAMESPACE=e2e-pr-$PR_NUMBER
         python e2e/utils/port_forward.py --namespace $NAMESPACE
 
     - name: Cleaning up database
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        PYTHONPATH=../common/src python database_cleanup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_cleanup.py
 
     - name: Cleaning up classroom
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        PYTHONPATH=../common/src python classroom_cleanup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python classroom_cleanup.py
 
     - name: Wait for 5s for database cleaning up
       run: sleep 10s
@@ -261,20 +253,17 @@ jobs:
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        PYTHONPATH=../common/src python database_setup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_setup.py
 
     - name: Run pytest
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        PYTHONPATH=common/src python -m pytest e2e/gke_api_tests/
+        PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m pytest e2e/gke_api_tests/
     
     - name: Run behave
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        PYTHONPATH=common/src python -m behave e2e/features/
+        PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m behave e2e/features/
 
   dataset-cleanup:
     runs-on: ubuntu-latest
@@ -314,7 +303,7 @@ jobs:
     - name: Removing firestore indexes
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
+        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
         cd utils/
         python -m pip install -r requirements.txt
         PYTHONPATH=../common/src python firestore_indexing_cleanup.py
@@ -323,15 +312,13 @@ jobs:
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        PYTHONPATH=../common/src python database_cleanup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_cleanup.py
 
     - name: Cleaning up classroom
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        PYTHONPATH=../common/src python classroom_cleanup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python classroom_cleanup.py
 
   deployment-cleanup:
     name: Clean up deployment in PR namespace
@@ -375,7 +362,7 @@ jobs:
     - name: Delete all deployments and namespace
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE= ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-$PR_NUMBER' || 'e2e-pr-$PR_NUMBER' }}
+        NAMESPACE=e2e-pr-$PR_NUMBER
         skaffold delete --namespace $NAMESPACE
         kubectl delete namespace $NAMESPACE
 
@@ -385,15 +372,13 @@ jobs:
         cd e2e
         python -m pip install -r requirements.txt
         cd utils
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        PYTHONPATH=../common/src python pub_sub_cleanup.py  
+        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python pub_sub_cleanup.py  
 
     - name: Cleaning up BQ
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd utils/
         python -m pip install -r requirements.txt
-        export DATABASE_PREFIX = ${{ USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr${PR_NUMBER}_' || 'e2e_pr${PR_NUMBER}_' }}
-        BQ_DATASET=lms_analytics python bq_cleanup.py  
+        BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_cleanup.py  
 
 # cookiecutter:endraw 
