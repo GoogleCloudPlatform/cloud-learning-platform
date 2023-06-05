@@ -19,7 +19,8 @@ metadata:
 data:
   lms.PORT: "8888"
   authentication.PORT: "8889"
-  user-managemen.PORT : "9011"
+  user-management.PORT : "9011"
   student-learner-profile : "9014"
   learning-record-service : "9020"
+  api-docs.PORT: "3000"
     
