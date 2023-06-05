@@ -15,7 +15,7 @@
 Module to add cohort in Fireo
 """
 from fireo.fields import TextField, ListField, IDField
-from common.models import BaseModel, User
+from common.models import BaseModel
 
 # pylint: disable=unused-argument
 

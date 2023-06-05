@@ -149,27 +149,3 @@ if ENABLE_GOOGLE_LLM:
   }
 
 Logger.info(f"LLM types loaded {LLM_TYPES}")
-
-# backend robot and auth client
-try:
-  LLM_BACKEND_ROBOT_USERNAME = secrets.access_secret_version(
-      request={
-          "name":
-              f"projects/{PROJECT_ID}/secrets/llm-backend-robot-username/versions/latest"
-      }).payload.data.decode("utf-8")
-  LLM_BACKEND_ROBOT_USERNAME = LLM_BACKEND_ROBOT_USERNAME.strip()
-except Exception as e:
-  LLM_BACKEND_ROBOT_USERNAME = None
-
-try:
-  LLM_BACKEND_ROBOT_PASSWORD = secrets.access_secret_version(
-      request={
-          "name":
-              f"projects/{PROJECT_ID}/secrets/llm-backend-robot-password/versions/latest"
-      }).payload.data.decode("utf-8")
-  LLM_BACKEND_ROBOT_PASSWORD = LLM_BACKEND_ROBOT_PASSWORD.strip()
-except Exception as e:
-  LLM_BACKEND_ROBOT_PASSWORD = None
-
-auth_client = UserCredentials(LLM_BACKEND_ROBOT_USERNAME,
-                              LLM_BACKEND_ROBOT_PASSWORD)

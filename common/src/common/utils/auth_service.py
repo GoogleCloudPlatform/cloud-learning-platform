@@ -4,7 +4,6 @@ from fastapi import Depends
 from fastapi.security import HTTPBearer
 from common.utils.errors import InvalidTokenError
 from common.utils.http_exceptions import Unauthenticated, InternalServerError
-from common.utils.token_handler import UserCredentials
 
 auth_scheme = HTTPBearer(auto_error=False)
 
@@ -95,37 +94,3 @@ def validate_user_type_and_token(accepted_user_types: list,
     raise InternalServerError(str(e)) from e
 
 
-def get_user_data(user_details: dict, auth_client: UserCredentials):
-  """
-  Get User data from user-management service
-
-  Args:
-      token (auth_scheme, optional): _description_. Defaults to Depends().
-
-  Raises:
-      InvalidTokenError: _description_
-      Unauthenticated: _description_
-      InternalServerError: _description_
-
-  Returns:
-      Boolean: token is valid or not
-  """
-  # verify user if it exists
-  user_email = user_details.get("email")
-  headers = {"Authorization": f"Bearer {auth_client.get_id_token()}"}
-  fetch_user_request = requests.get(
-      "http://user-management/user-management/api/v1/user/search/email",
-      params={"email": user_email},
-      headers=headers,
-      timeout=60)
-
-  if fetch_user_request.status_code == 200:
-    user_data = fetch_user_request.json().get("data")[0]
-  elif fetch_user_request.status_code == 404:
-    raise UnauthorizedUserError(
-        "Access Denied with code 1001, Please contact administrator")
-  else:
-    raise Exception(
-        "Request Denied with code 1002, Please contact administrator")
-
-  return user_data

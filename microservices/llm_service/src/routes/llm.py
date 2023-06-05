@@ -18,8 +18,8 @@
 import traceback
 from typing import Optional
 from fastapi import APIRouter, Depends
-from common.models import UserChat
-from common.utils.auth_service import validate_token, get_user_data
+from common.models import User, UserChat
+from common.utils.auth_service import validate_token
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
                                  ValidationError,
@@ -33,7 +33,7 @@ from schemas.llm_schema import (ChatModel, ChatUpdateModel,
                                 LLMUserChatResponse,
                                 LLMUserAllChatsResponse)
 from services.llm_generate import llm_generate
-from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, LLM_TYPES, auth_client
+from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, LLM_TYPES
 
 router = APIRouter(prefix="/llm", tags=["LLMs"], responses=ERROR_RESPONSES)
 
@@ -64,7 +64,7 @@ def get_llm_list():
     name="Get all user chats",
     response_model=LLMUserAllChatsResponse)
 def get_chat_list(skip: int = 0, limit: int = 20,
-                  user_details: dict = Depends(validate_token)):
+                  user_data: dict = Depends(validate_token)):
   """
   Get user chats for authenticated user.  Chat data does not include
   chat history to slim payload.  To retrieve chat history use the
@@ -86,9 +86,8 @@ def get_chat_list(skip: int = 0, limit: int = 20,
     if limit < 1:
       raise ValidationError("Invalid value passed to \"limit\" query parameter")
 
-    user_data = get_user_data(user_details, auth_client)
-    userid = user_data.get("user_id")
-    user_chats = UserChat.find_by_user(userid)
+    user = User.find_by_email(user_data.get("email"))
+    user_chats = UserChat.find_by_user(user.user_id)
 
     chat_list = []
     for i in user_chats:
@@ -100,7 +99,7 @@ def get_chat_list(skip: int = 0, limit: int = 20,
 
     return {
       "success": True,
-      "message": f"Successfully retrieved user chats for user {userid}",
+      "message": f"Successfully retrieved user chats for user {user.user_id}",
       "data": chat_list
     }
   except ValidationError as e:
@@ -223,7 +222,7 @@ async def generate(gen_config: LLMGenerateModel):
     name="Create new chat",
     response_model=LLMUserChatResponse)
 async def create_user_chat(gen_config: LLMGenerateModel,
-                           user_details: dict = Depends(validate_token)):
+                           user_data: dict = Depends(validate_token)):
   """
   Create new chat for authentcated user
 
@@ -245,14 +244,13 @@ async def create_user_chat(gen_config: LLMGenerateModel,
   llm_type = genconfig_dict.get("llm_type")
 
   try:
-    user_data = get_user_data(user_details, auth_client)
-    userid = user_data.get("user_id")
+    user = User.find_by_email(user_data.get("email"))
 
     # generate text from prompt
     result = await llm_generate(prompt, llm_type)
 
     # create new chat for user
-    user_chat = UserChat(user_id=userid, llm_type=llm_type)
+    user_chat = UserChat(user_id=user.user_id, llm_type=llm_type)
     user_chat.history = [prompt, result]
     user_chat.save()
 
