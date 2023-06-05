@@ -16,7 +16,7 @@ from fastapi import FastAPI, Depends
 from routes import (tool_registration, content_item, content_item_return,
                     platform_registration, platform_auth, platform_launch,
                     tool_auth, tool_launch, line_item, nrps, results)
-from utils.helper import validate_user
+from common.utils.auth_service import validate_user
 from common.utils.http_exceptions import add_exception_handlers
 from common.utils.auth_service import validate_token
 

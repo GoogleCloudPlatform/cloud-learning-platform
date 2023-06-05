@@ -30,9 +30,8 @@ requires:
 - path: ./microservices/lti
   configs: [lti]
 
-# Commenting llm service due to deployment error in Longchain package
-# - path: ./microservices/llm_service
-#   configs: [llm-service]
+- path: ./microservices/llm_service
+  configs: [llm-service]
 
 - path: ./microservices/classroom_notification_service
   configs: [classroom-notification-service]
@@ -61,3 +60,6 @@ metadata:
 requires:
 - path: ./documentation/api_docs
   configs: [api-docs]
+
+build:
+  googleCloudBuild: {}

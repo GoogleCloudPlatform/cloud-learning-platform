@@ -14,34 +14,44 @@
 """
 Module to add cohort in Fireo
 """
-from fireo.fields import TextField, IDField, ReferenceField
-from common.models import BaseModel, User
+from fireo.fields import TextField, ListField, IDField
+from common.models import BaseModel
 
 # pylint: disable=unused-argument
 
-class UserLLM(BaseModel):
-  """UserLLM ORM class
+class UserChat(BaseModel):
+  """UserChat ORM class
   """
   id = IDField()
-  user = ReferenceField(User, required=True)
+  user_id = TextField(required=True)
+  title = TextField(required=False)
   llm_type = TextField(required=True)
+  history = ListField(default=[])
 
   class Meta:
     ignore_none_field = False
-    collection_name = BaseModel.DATABASE_PREFIX + "user_llms"
+    collection_name = BaseModel.DATABASE_PREFIX + "user_chats"
 
   @classmethod
   def find_by_user(cls,
                    userid,
-                   llm_type,
+                   skip=0,
                    order_by="-created_time",
                    limit=1000):
-    """_summary_
+    """
+    Fetch all chats for user
 
     Args:
-        
+        userid (str): User id
+        skip (int, optional): number of chats to skip.
+        order_by (str, optional): order list according to order_by field.
+        limit (int, optional): limit till cohorts to be fetched.
 
     Returns:
         _type_: _description_
     """
-    return None
+    objects = cls.collection.filter(
+        "user_id", "==", userid).filter(
+            "deleted_at_timestamp", "==",
+            None).order(order_by).offset(skip).fetch(limit)
+    return list(objects)
