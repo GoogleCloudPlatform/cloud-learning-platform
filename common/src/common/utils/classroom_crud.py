@@ -5,6 +5,7 @@ from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from common.utils.jwt_creds import JwtCredentials
 from common.utils.errors import InvalidTokenError, UserManagementServiceError, ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
@@ -41,11 +42,24 @@ SCOPES = [
 ]
 
 
-def get_credentials():
-  classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
-  creds = service_account.Credentials.from_service_account_info(classroom_key,
-                                                                scopes=SCOPES)
-  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+# def get_credentials():
+#   classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
+#   creds = service_account.Credentials.from_service_account_info(classroom_key,
+#                                                                 scopes=SCOPES)
+#   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+#   return creds
+
+def get_credentials(email=CLASSROOM_ADMIN_EMAIL):
+  # Logger.info(f"SERVICE ACCOUNT FROM GITHUB SECRETS {SERVICES_ACCOUNT} {CLASSROOM_ADMIN_EMAIL} {PROJECT_ID}")
+  google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
+  service_account = helper.get_gke_pd_sa_key_from_secret_manager()
+  creds = JwtCredentials.from_default_with_subject(
+    email,
+    service_account["client_email"],
+    # "gke-pod-sa@study-hall-dev-365218.iam.gserviceaccount.com",
+    google_oauth_token_endpoint,
+    scopes=SCOPES)
+  Logger.info(f"Creds {creds}")
   return creds
 
 
@@ -765,8 +779,10 @@ def acceept_invite(invitation_id, email):
   Returns:
       dict: response from create invitation method
   """
+  # service = build("classroom", "v1", \
+  #   credentials=impersonate_teacher_creds(email))
   service = build("classroom", "v1", \
-    credentials=impersonate_teacher_creds(email))
+    credentials=get_credentials(email))
   course = service.invitations().accept(id=invitation_id).execute()
   return course
 
