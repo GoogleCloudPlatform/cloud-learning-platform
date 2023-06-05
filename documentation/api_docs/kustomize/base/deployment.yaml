@@ -55,16 +55,19 @@ spec:
         livenessProbe:
           failureThreshold: 5
           httpGet:
-            path: /ping
+            path: /healthz
             port: 80
             scheme: HTTP
+            httpHeaders:
+            - name: Custom-Header
+              value: Awesome
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 10
         readinessProbe:
           failureThreshold: 5
           httpGet:
-            path: /ping
+            path: /healthz
             port: 80
             scheme: HTTP
           periodSeconds: 30
