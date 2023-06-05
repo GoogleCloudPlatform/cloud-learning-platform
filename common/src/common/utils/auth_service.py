@@ -94,3 +94,6 @@ def validate_user_type_and_token(accepted_user_types: list,
     raise InternalServerError(str(e)) from e
 
 
+def validate_user(token: auth_scheme = Depends()):
+  return validate_user_type_and_token(["other", "faculty", "admin", "robot"],
+                                      token)

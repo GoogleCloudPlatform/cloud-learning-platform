@@ -2,7 +2,6 @@
 import datetime
 from functools import reduce
 from fastapi import Depends
-from common.utils.auth_service import validate_user_type_and_token, auth_scheme
 from common.utils.errors import ResourceNotFoundException
 from schemas.analytics import (
   AnalyticsCourse,AnalyticsCourseWork,AnalyticsUser,AnalyticsResponse)
@@ -37,10 +36,6 @@ def convert_section_to_section_model(section):
   cohort = loaded_section.pop("cohort").to_dict()
   loaded_section["cohort"] = cohort["key"]
   return loaded_section
-
-
-def validate_user(token: auth_scheme = Depends()):
-  return validate_user_type_and_token(["robot", "faculty","admin"], token)
 
 
 def convert_assignment_to_assignment_model(assignment):

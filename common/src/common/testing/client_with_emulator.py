@@ -25,15 +25,27 @@ import pytest
 from fastapi.testclient import TestClient
 from main import app, api
 from common.testing.firestore_emulator import clean_firestore
-from utils.helper import validate_user
+from common.utils.auth_service import validate_user
+from common.utils.auth_service import validate_token
 
+FAKE_USER_DATA = {
+    "id": "fake-user-id",
+    "user_id": "fake-user-id",
+    "auth_id": "fake-user-id",
+    "email": "user@gmail.com",
+    "role": "Admin"
+}
 
 @pytest.fixture
 def client_with_emulator(clean_firestore, scope="module"):
 
-  def mock_validate_token():
+  def mock_validate_user():
     return True
 
-  api.dependency_overrides[validate_user] = mock_validate_token
+  def mock_validate_token():
+    return FAKE_USER_DATA
+
+  api.dependency_overrides[validate_user] = mock_validate_user
+  api.dependency_overrides[validate_token] = mock_validate_token
   test_client = TestClient(app)
   yield test_client
