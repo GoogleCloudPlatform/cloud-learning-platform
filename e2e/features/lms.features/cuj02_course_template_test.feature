@@ -60,17 +60,30 @@ Feature: Create, Read, Retrieve all and delete APIs for Course Template
     When API request is sent to fetch all Cohorts Records by providing Course template invalid id
     Then Course Template list Cohort API will throw a resource not found error
 
-    fixture.enroll.instructional_designer.course_template
+  @fixture.enroll.instructional_designer.course_template
   Scenario: Get instructional designer from course template using course template id and user id
     Given A user has access privileges wants to get instructional designer with valid course template id and valid instructional designer id
     when Get request with valid data is sent
     Then Get instructional designer API will show user details
+
+    
+  Scenario: Get instructional designer from course template using course template id and invalid user id
+    Given A user has access privileges wants to get instructional designer with valid course template id and invalid instructional designer id
+    when Get request with invalid data is sent to get instructional designer
+    Then Get instructional designer API will throw user not found error
 
   @fixture.enroll.instructional_designer.course_template
   Scenario: Delete instructional designer in course template with given course_template id and email
     Given A user has access to admin portal and needs to delete the instructional designer with valid course template id and email
     When Delete request is sent which contains valid course template id and email
     Then Set inactive instructional designer from enrollment mapping collection
+
+  
+  @fixture.enroll.instructional_designer.course_template
+  Scenario: List instructional designer in course template with given course_template id
+    Given A user has access to admin portal and needs to get the instructional designer with valid course template id
+    When Get request is sent which contains valid course template id to list instructional_designers
+    Then fetch list of Id for given course template
 
   @fixture.create.course_template
   Scenario: Delete instructional designer from course template using course template id and user id

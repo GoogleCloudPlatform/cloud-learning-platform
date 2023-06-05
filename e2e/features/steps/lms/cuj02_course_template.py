@@ -444,3 +444,55 @@ def step_impl_36(context):
   print(f"------------------data: {context.response}------------------------")
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "check data"
+
+#---negative scenario
+
+
+@behave.given(
+    "A user has access privileges wants to get instructional designer with valid course template id and invalid instructional designer id"
+)
+def step_impl_34(context):
+  context.url = f'{API_URL}/course_templates/{context.enrollment_mapping.course_template.id}/instructional_designers/{context.enrollment_mapping.user.email}'
+
+
+@behave.when(
+    "Get request with invalid data is sent to get instructional designer")
+def step_impl_35(context):
+  resp = requests.get(context.url, headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Get instructional designer API will throw user not found error")
+def step_impl_36(context):
+  print(f"--------------------url: {context.url}-----------------------")
+  print(f"------------------Status: {context.status}------------------------")
+  print(f"------------------data: {context.response}------------------------")
+  assert context.status == 404, "Status 404"
+  assert context.response["success"] is False, "check data"
+
+# ---------------------------List instructional dessigner------------------------------
+# positive
+@behave.given(
+    "A user has access to admin portal and needs to get the instructional designer with valid course template id"
+)
+def step_impl_34(context):
+  context.url = f'{API_URL}/course_templates/{context.enrollment_mapping.course_template.id}/instructional_designers
+
+@behave.when(
+    "Get request is sent which contains valid course template id to list instructional_designers")
+def step_impl_35(context):
+  resp = requests.get(context.url, headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "fetch list of Id for given course template")
+def step_impl_36(context):
+  print(f"--------------------url: {context.url}-----------------------")
+  print(f"------------------Status: {context.status}------------------------")
+  print(f"------------------data: {context.response}------------------------")
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is False, "check data"
