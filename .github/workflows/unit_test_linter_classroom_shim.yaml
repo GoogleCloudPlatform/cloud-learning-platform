@@ -20,19 +20,18 @@ on:
   pull_request:
     branches:
       - main
-
     paths:
       # TODO: Add all microservice folders below.
-      - "microservices/**"
-      - "common/**"
-      - ".github/workflows/unit_test_linter_classroom_shim.yaml"
-      - ".pylintrc"
+      - 'microservices/**'
+      - 'common/**'
+      - '.github/workflows/unit_test_linter_classroom_shim.yaml'
+      - '.pylintrc'
   workflow_dispatch:
 
 env:
   PROJECT_ID: core-learning-services-dev
 
-# cookiecutter:raw
+# cookiecutter:raw 
 jobs:
   unit-test:
     runs-on: ubuntu-latest
@@ -42,46 +41,46 @@ jobs:
       matrix:
         python-version: [3.9]
         target-folder: [
-            # TODO: Add all microservice folders below.
-            microservices/classroom_shim,
-          ]
+          # TODO: Add all microservice folders below.
+          microservices/classroom_shim,
+        ]
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: Install gcloud
-        uses: google-github-actions/setup-gcloud@v0
-        with:
-          project_id: ${{env.PROJECT_ID}}
-          service_account_key: ${{ secrets.FIREBASE_EMULATOR_SA_KEY }}
-          export_default_credentials: true
+    - name: Install gcloud
+      uses: google-github-actions/setup-gcloud@v0
+      with:
+        project_id: ${{env.PROJECT_ID}}
+        service_account_key: ${{ secrets.FIREBASE_EMULATOR_SA_KEY }}
+        export_default_credentials: true
 
-      - name: Install Firebase CLI
-        run: |
-          curl -sL https://firebase.tools | bash
+    - name: Install Firebase CLI
+      run: |
+        curl -sL https://firebase.tools | bash
 
-      - name: Download Firestore emulator
-        run: |
-          firebase setup:emulators:firestore
+    - name: Download Firestore emulator
+      run: |
+        firebase setup:emulators:firestore
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          BASE_DIR=$(pwd)
-          cd ${{ matrix.target-folder }}
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
-          if [ -f $BASE_DIR/common/requirements.txt ]; then pip install -r $BASE_DIR/common/requirements.txt; fi
+    - name: Install dependencies
+      run: |
+        BASE_DIR=$(pwd)
+        cd ${{ matrix.target-folder }}
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
+        if [ -f $BASE_DIR/common/requirements.txt ]; then pip install -r $BASE_DIR/common/requirements.txt; fi
 
-      - name: Run pytest with coverage
-        run: |
-          BASE_DIR=$(pwd)
-          cd ${{ matrix.target-folder }}/src
-          PYTEST_ADDOPTS="--cache-clear --cov . " PYTHONPATH=$BASE_DIR/common/src python -m pytest
+    - name: Run pytest with coverage
+      run: |
+        BASE_DIR=$(pwd)
+        cd ${{ matrix.target-folder }}/src
+        PYTEST_ADDOPTS="--cache-clear --cov . " PYTHONPATH=$BASE_DIR/common/src python -m pytest
 
   linter:
     runs-on: ubuntu-latest
@@ -90,24 +89,26 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.9]
-        target-folder: [microservices/classroom_shim]
+        target-folder: [
+          microservices/classroom_shim,
+        ]
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          cd ${{ matrix.target-folder }}
-          python -m pip install --upgrade pip
-          if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
+    - name: Install dependencies
+      run: |
+        cd ${{ matrix.target-folder }}
+        python -m pip install --upgrade pip
+        if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
 
-      - name: Lint with pylint
-        run: |
-          BASE_DIR=$(pwd)
-          cd ${{ matrix.target-folder }}/src
-          python -m pylint $(git ls-files '*.py') --rcfile=$BASE_DIR/.pylintrc
+    - name: Lint with pylint
+      run: |
+        BASE_DIR=$(pwd)
+        cd ${{ matrix.target-folder }}/src
+        python -m pylint $(git ls-files '*.py') --rcfile=$BASE_DIR/.pylintrc
 
-# cookiecutter:endraw
+# cookiecutter:endraw 

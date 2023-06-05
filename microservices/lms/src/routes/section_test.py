@@ -667,7 +667,8 @@ def test_update_enrollment_status(client_with_emulator, create_fake_data):
     resp = client_with_emulator.patch(url)
   assert resp.status_code == 200
 
-def test_negative_update_enrollment_status(client_with_emulator, create_fake_data):
+def test_negative_update_enrollment_status(
+  client_with_emulator, create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/change_enrollment_status/OPENED"
   with mock.patch("routes.section.insert_rows_to_bq"):
