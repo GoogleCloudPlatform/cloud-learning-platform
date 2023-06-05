@@ -94,7 +94,6 @@ class CourseTemplateListModel(BaseModel):
 		}
 			}
 
-
 class CreateCourseTemplateResponseModel(BaseModel):
 	"""Create Course Template Response Model"""
 	success: Optional[bool] = True
@@ -110,7 +109,6 @@ class CreateCourseTemplateResponseModel(BaseModel):
 				"course_template": COURSE_TEMPLATE_EXAMPLE
 			}
 			}
-
 
 class InputCourseTemplateModel(BaseModel):
 	"""Insert Course Template Model"""

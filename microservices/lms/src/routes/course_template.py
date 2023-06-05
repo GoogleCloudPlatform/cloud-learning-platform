@@ -57,7 +57,7 @@ def get_course_template_list(skip: int = 0, limit: int = 10):
 			CourseTemplateListModel:
 				object which contains list of course template object.
 			InternalServerErrorResponseModel:
-				if the get Course Template list raises an exception.
+		if the get Course Template list raises an exception.
 	"""
 	try:
 		if skip < 0:
@@ -82,7 +82,6 @@ def get_course_template_list(skip: int = 0, limit: int = 10):
 @router.get("/{course_template_id}", response_model=CourseTemplateModel)
 def get_course_template(course_template_id: str):
 	"""Get a Course Template endpoint
-
 		Args:
 			course_template_id (str): unique id of the course template
 
