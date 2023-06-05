@@ -478,7 +478,7 @@ def step_impl_36(context):
     "A user has access to admin portal and needs to get the instructional designer with valid course template id"
 )
 def step_impl_34(context):
-  context.url = f'{API_URL}/course_templates/{context.enrollment_mapping.course_template.id}/instructional_designers
+  context.url = f"{API_URL}/course_templates/{context.enrollment_mapping.course_template.id}/instructional_designers"
 
 @behave.when(
     "Get request is sent which contains valid course template id to list instructional_designers")

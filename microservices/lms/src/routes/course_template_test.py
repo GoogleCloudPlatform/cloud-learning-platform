@@ -369,13 +369,11 @@ def test_get_instructional_designer_negative(client_with_emulator,
                                        enroll_instructional_designer_data):
   course_template = enroll_instructional_designer_data[
       "enrollment_mapping"].course_template
-  # email = enroll_instructional_designer_data["enrollment_mapping"].user.user_id
   user_id = enroll_instructional_designer_data["enrollment_mapping"].user.user_id
   url = (BASE_URL + f"/course_templates/{course_template.id}/" +
          "instructional_designers/test_email_11@gmail.com")
   with mock.patch(
-      "routes.course_template.get_user_id",
-      return_value=user_id):
+      "routes.course_template.get_user_id"):
     resp = client_with_emulator.get(url)
     print("This is response json",resp.json())
   assert resp.status_code == 404, "Status 404"
