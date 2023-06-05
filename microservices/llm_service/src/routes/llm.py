@@ -271,7 +271,7 @@ async def create_user_chat(gen_config: LLMGenerateModel,
 @router.post(
     "/chat/{chatid}/generate",
     name="Generate new chat response",
-    response_model=LLMGenerateResponse)
+    response_model=LLMUserChatResponse)
 async def user_chat_generate(chatid: str, gen_config: LLMGenerateModel):
   """
   Continue chat based on context of user chat
@@ -281,7 +281,7 @@ async def user_chat_generate(chatid: str, gen_config: LLMGenerateModel):
       llm_type(str): LLM type
 
   Returns:
-      LLMUserGenerateResponse
+      LLMUserChatResponse
   """
   genconfig_dict = {**gen_config.dict()}
 
@@ -306,10 +306,13 @@ async def user_chat_generate(chatid: str, gen_config: LLMGenerateModel):
     user_chat.history.append(result)
     user_chat.save()
 
+    chat_data = user_chat.get_fields(reformat_datetime=True)
+    chat_data["id"] = user_chat.id
+
     return {
         "success": True,
         "message": "Successfully generated text",
-        "content": result
+        "data": chat_data
     }
   except Exception as e:
     raise InternalServerError(str(e)) from e
