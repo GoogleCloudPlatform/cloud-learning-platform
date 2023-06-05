@@ -22,5 +22,5 @@ data:
   user-management.PORT : "9011"
   student-learner-profile : "9014"
   learning-record-service : "9020"
-  api-docs.PORT: "9022"
+  # api-docs.PORT: "9022"
     

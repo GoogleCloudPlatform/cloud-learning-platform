@@ -31,7 +31,7 @@ portForward:
 - resourceType: service
   resourceName: api-docs
   port: 80
-  localPort: 9022
+  # localPort: 9022
 deploy:
   kustomize:
     paths:
