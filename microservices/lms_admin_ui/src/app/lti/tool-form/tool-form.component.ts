@@ -11,6 +11,7 @@ import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDia
 })
 export class ToolFormComponent {
   toolForm: FormGroup;
+  showProgressSpinner: boolean = false
 
   constructor(public dialogRef: MatDialogRef<ToolFormComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -80,13 +81,16 @@ export class ToolFormComponent {
   }
 
   onSubmit(toolForm) {
+    this.showProgressSpinner = true
     const data = this.processFormInputs(toolForm.value)
     if (this.dialogData.mode == "Create") {
       this.ltiService.postTool(data).subscribe(response => {
+        this.showProgressSpinner = false
         this.dialogRef.close({ data: 'success' })
       })
     } else {
       this.ltiService.updateTool(this.dialogData.extra_data.id, data).subscribe(response => {
+        this.showProgressSpinner = false
         this.dialogRef.close({ data: 'success' })
       })
     }
