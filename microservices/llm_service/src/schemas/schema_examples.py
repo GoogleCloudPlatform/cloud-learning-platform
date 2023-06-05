@@ -24,7 +24,7 @@ LLM_GENERATE_EXAMPLE = {
 
 CHAT_EXAMPLE = {
   "id": "asd98798as7dhjgkjsdfh",
-  "user_id": "dhjgkjsdfhasd98798as7",
+  "user_id": "fake-user-id",
   "title": "Test chat",
   "llm_type": "VertexAI-Text-alpha",
   "history": [
@@ -35,4 +35,16 @@ CHAT_EXAMPLE = {
   ],
   "created_time": "2023-05-05 09:22:49.843674+00:00",
   "last_modified_time": "2023-05-05 09:22:49.843674+00:00"
+}
+
+USER_EXAMPLE = {
+    "id": "fake-user-id",
+    "first_name": "Test",
+    "last_name": "Tester",
+    "user_id": "fake-user-id",
+    "auth_id": "fake-user-id",
+    "email": "user@gmail.com",
+    "role": "Admin",
+    "user_type": "learner",
+    "status": "active"   
 }
