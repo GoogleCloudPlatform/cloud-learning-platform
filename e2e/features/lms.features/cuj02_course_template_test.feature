@@ -59,3 +59,39 @@ Feature: Create, Read, Retrieve all and delete APIs for Course Template
     Given A user has access to admin portal and wants to retrieve list of Cohort Records using course template
     When API request is sent to fetch all Cohorts Records by providing Course template invalid id
     Then Course Template list Cohort API will throw a resource not found error
+
+  @fixture.enroll.instructional_designer.course_template
+  Scenario: Get instructional designer from course template using course template id and user id
+    Given A user has access privileges wants to get instructional designer with valid course template id and valid instructional designer id
+    When Get request with valid data is sent
+    Then Get instructional designer API will show user details
+
+  @fixture.create.course_template
+  Scenario: Get instructional designer from course template using course template id and invalid user id
+    Given A user has access privileges wants to get instructional designer with valid course template id and invalid instructional designer id
+    When Get request with invalid data is sent to get instructional designer
+    Then Get instructional designer API will throw user not found error
+
+  @fixture.enroll.instructional_designer.course_template
+  Scenario: Delete instructional designer in course template with given course_template id and email
+    Given A user has access to admin portal and needs to delete the instructional designer with valid course template id and email
+    When Delete request is sent which contains valid course template id and email
+    Then Set inactive instructional designer from enrollment mapping collection
+
+  @fixture.enroll.instructional_designer.course_template
+  Scenario: List instructional designer in course template with given course_template id
+    Given A user has access to admin portal and needs to get the instructional designer with valid course template id
+    When Get request is sent which contains valid course template id to list instructional_designers
+    Then fetch list of Id for given course template
+
+  @fixture.create.course_template
+  Scenario: Delete instructional designer from course template using course template id and user id
+    Given A user has access privileges wants to delete instructional designer with valid course template id and invalid indtructional designer id
+    When API request is sent which contains valid course template id and invalid user id to delete instructional designer
+    Then Delete instructional designer API throw user not found error
+
+  @fixture.create.course_template
+  Scenario: Enroll instructional designer in a Course Template using course_template id and request payload
+    Given A user has access privileges wants to enroll the instructional designer using valid section id and email
+    When Post request is sent which contains valid course template id and payload which contains valid email
+    Then The instruction designer enrolled in classroom and a enrollment mapping is created and return user details with enrollment details

@@ -1,4 +1,3 @@
-<ng-container>
     <div *ngFor="let courseTemplate of courseTemplateList" class="data-obj-card">
         <div class="block-header">
             <div class="title">
@@ -33,29 +32,42 @@
         <div class="block-metadata">
             <div class="metadata">
 
-                <div class="id-block">
-                    <span class="material-symbols-rounded">
-                        history_edu
+                <div class="date-block" *ngIf="courseTemplate.instructional_designer == ''"><ngx-skeleton-loader count="1"
+                    [theme]="{'height': '30px','width': '200px','background-color': '#EAEAEA'}">
+                </ngx-skeleton-loader></div>
+           
+
+                <div *ngIf="courseTemplate.instructional_designer != ''" class="date-block"><span class="material-symbols-rounded">
+                    history_edu
                     </span>
-                    <span class="heading">ID : </span>
-                    <span class="body">{{courseTemplate.instructional_designer}}</span>
+                    <div class="date-body">
+                        <div class="title">Instructional Designer :</div>
+                        
+
+                        <div *ngIf="courseTemplate.instructional_designer != 'null'"  [matBadge]="getIdTotal(courseTemplate.instructional_designer)" 
+                        [matBadgeHidden]="checkIfBadgeHidden(courseTemplate.instructional_designer)" (click)="setSelected(courseTemplate);openAddOrEditIdTemplate()" matBadgeOverlap="false" matBadgeSize="medium" class="content">
+                    {{courseTemplate.instructional_designer[0] ? courseTemplate.instructional_designer[0]['email'] : ''}}
+                        </div>
+
+            </div>
+
                 </div>
 
-                <div class="admin-block">
-                    <span class="material-symbols-rounded">
-                        admin_panel_settings
+                <div class="date-block"><span class="material-symbols-rounded">
+                    admin_panel_settings
                     </span>
-                    <span class="heading">Admin : </span>
-                    <span class="body">{{courseTemplate.admin}}</span>
+                    <span class="date-body"><span class="title">Admin :
+                        </span>
+                        <span class="content">{{courseTemplate.admin}}</span>
+                    </span>
                 </div>
-
-
             </div>
         </div>
 
 
+
+
     </div>
-</ng-container>
 
 <!-- <ng-template #noResult>
     <div class="no-data-inner-comp">No Data Found</div>
@@ -63,6 +75,10 @@
 
 <mat-menu #subMenu="matMenu" yPosition="below">
     <div class="edit-menu">
+        <button mat-menu-item class="button" (click)="openAddOrEditIdTemplate()"><span class="material-symbols-rounded"
+            style="padding-right: 10px;">
+            person_add
+        </span>Add / Edit Instructional Designer</button>
         <button mat-menu-item class="button" (click)="openEditCourseTemplate()"><span class="material-symbols-rounded"
                 style="padding-right: 10px;">
                 edit

@@ -5,12 +5,12 @@ from common.models import Cohort, CourseTemplate, Section, CourseEnrollmentMappi
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ClassroomHttpException,
                                           InternalServerError,
-                                          ResourceNotFound, BadRequest,Conflict
-                                          )
+                                          ResourceNotFound, BadRequest,
+                                          Conflict)
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.utils.bq_helper import insert_rows_to_bq
-from fastapi import APIRouter, Request,BackgroundTasks,status
+from fastapi import APIRouter, Request, BackgroundTasks, status
 from googleapiclient.errors import HttpError
 from schemas.classroom_courses import EnableNotificationsResponse
 from schemas.error_schema import (ConflictResponseModel,
@@ -29,12 +29,11 @@ from schemas.update_section import UpdateSection
 from services.section_service import copy_course_background_task,\
 update_grades,add_teacher
 from utils.helper import (convert_section_to_section_model,
-                          convert_assignment_to_assignment_model,
-                          FEED_TYPES,
-                    convert_coursework_to_short_coursework_model)
-from utils.user_helper import (course_enrollment_user_model,
-                               get_user_id,check_user_can_enroll_in_section)
-from config import BQ_TABLE_DICT,BQ_DATASET
+                          convert_assignment_to_assignment_model, FEED_TYPES,
+                          convert_coursework_to_short_coursework_model)
+from utils.user_helper import (course_enrollment_user_model, get_user_id,
+                               check_user_can_enroll_in_section)
+from config import BQ_TABLE_DICT, BQ_DATASET
 # disabling for linting to pass
 # pylint: disable = broad-except
 
@@ -58,12 +57,10 @@ router = APIRouter(prefix="/sections",
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
 
-@router.post("",
-             status_code=status.HTTP_202_ACCEPTED)
+
+@router.post("", status_code=status.HTTP_202_ACCEPTED)
 def create_section(sections_details: SectionDetails,
-                  request: Request,
-                   background_tasks: BackgroundTasks
-                   ):
+                   background_tasks: BackgroundTasks):
   """Create section API
   Args:
     name (section): Section name
@@ -79,7 +76,6 @@ def create_section(sections_details: SectionDetails,
     {'status': 'Failed'} if the user creation raises an exception
   """
   try:
-    headers = {"Authorization": request.headers.get("Authorization")}
     course_template_details = CourseTemplate.find_by_id(
         sections_details.course_template)
     cohort_details = Cohort.find_by_id(sections_details.cohort)
@@ -91,23 +87,25 @@ def create_section(sections_details: SectionDetails,
           "classroom  with id" +
           f" {course_template_details.classroom_id} is not found")
     background_tasks.add_task(copy_course_background_task,
-                              course_template_details,
-                             sections_details,
-                             cohort_details,
-                             headers,message = "started process")
+                              course_template_details=course_template_details,
+                              sections_details=sections_details,
+                              cohort_details=cohort_details,
+                              message="started process")
     Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
                  section name{sections_details.name}")
-    return { "success": True,
-            "message": "Section will be created shortly",
-            "data": None}
+    return {
+        "success": True,
+        "message": "Section will be created shortly",
+        "data": None
+    }
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except HttpError as hte:
     Logger.error(hte)
     raise ClassroomHttpException(status_code=hte.resp.status,
-                              message=str(hte)) from hte
+                                 message=str(hte)) from hte
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
@@ -140,12 +138,13 @@ def get_section(section_id: str):
   except HttpError as ae:
     Logger.error(ae)
     raise ClassroomHttpException(status_code=ae.resp.status,
-                              message=str(ae)) from ae
+                                 message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-@router.get("/{section_id}/teachers",response_model=TeachersListResponseModel)
+
+@router.get("/{section_id}/teachers", response_model=TeachersListResponseModel)
 def get_teachers_list(section_id: str):
   """Get a list of teachers for a section details from db
 
@@ -161,11 +160,9 @@ def get_teachers_list(section_id: str):
   try:
     # headers = {"Authorization": request.headers.get("Authorization")}
     section_details = Section.find_by_id(section_id)
-    teacher_list=CourseEnrollmentMapping.fetch_all_by_section(
-      section_details.key,"faculty")
-    data = [
-        course_enrollment_user_model(i) for i in teacher_list
-    ]
+    teacher_list = CourseEnrollmentMapping.fetch_all_by_section(
+        section_details.key, "faculty")
+    data = [course_enrollment_user_model(i) for i in teacher_list]
     return {"data": data}
   except ResourceNotFoundException as err:
     Logger.error(err)
@@ -173,16 +170,16 @@ def get_teachers_list(section_id: str):
   except HttpError as ae:
     Logger.error(ae)
     raise ClassroomHttpException(status_code=ae.resp.status,
-                              message=str(ae)) from ae
+                                 message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-@router.post("/{section_id}/teachers",
-response_model=GetTeacherResponseModel)
-def enroll_teacher(section_id: str,request: Request,
+
+@router.post("/{section_id}/teachers", response_model=GetTeacherResponseModel)
+def enroll_teacher(section_id: str, request: Request,
                    teacher_details: EnrollTeacherSection):
   """_summary_
 
@@ -205,9 +202,9 @@ def enroll_teacher(section_id: str,request: Request,
     teacher_email = teacher_details.email
     headers = {"Authorization": request.headers.get("Authorization")}
     section = Section.find_by_id(section_id)
-    if not check_user_can_enroll_in_section(teacher_email,headers,section):
-      raise Conflict(f"User {teacher_email} is already"
-                     +f" in this section {section.id} as a leaner or faculty")
+    if not check_user_can_enroll_in_section(teacher_email, headers, section):
+      raise Conflict(f"User {teacher_email} is already" +
+                     f" in this section {section.id} as a leaner or faculty")
 
     result=add_teacher(headers,section,teacher_email)
     if result.invitation_id:
@@ -231,14 +228,15 @@ def enroll_teacher(section_id: str,request: Request,
   except HttpError as ae:
     Logger.error(ae)
     raise ClassroomHttpException(status_code=ae.resp.status,
-                              message=str(ae)) from ae
+                                 message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
 @router.get("/{section_id}/teachers/{teacher}",
-response_model=GetTeacherResponseModel)
-def get_teacher(section_id: str,teacher:str,request: Request):
+            response_model=GetTeacherResponseModel)
+def get_teacher(section_id: str, teacher: str, request: Request):
   """Get teacher for a section .If teacher is present in given section
     get teacher details else throw
   Args:
@@ -270,16 +268,17 @@ def get_teacher(section_id: str,teacher:str,request: Request):
   except HttpError as ae:
     Logger.error(ae)
     raise ClassroomHttpException(status_code=ae.resp.status,
-                              message=str(ae)) from ae
+                                 message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
 @router.delete("/{section_id}/teachers/{teacher}",
-response_model=DeleteTeacherFromSectionResponseModel)
-def delete_teacher(section_id: str,teacher:str,request: Request):
+               response_model=DeleteTeacherFromSectionResponseModel)
+def delete_teacher(section_id: str, teacher: str, request: Request):
   """Delete teacher for a section
   Args:
       section_id (str): section_id in firestore
@@ -295,17 +294,17 @@ def delete_teacher(section_id: str,teacher:str,request: Request):
     headers = {"Authorization": request.headers.get("Authorization")}
     user_id = get_user_id(user=teacher, headers=headers)
     section = Section.find_by_id(section_id)
-    result=CourseEnrollmentMapping.find_active_enrolled_teacher_record(
-     section_key = section.key,user_id = user_id)
+    result = CourseEnrollmentMapping.find_active_enrolled_teacher_record(
+        section_key=section.key, user_id=user_id)
     if result is None:
       raise ResourceNotFoundException(
           f"Teacher not found in this section {section_id}")
-    classroom_crud.delete_teacher(section.classroom_id,result.user.email)
-    result.status="inactive"
+    classroom_crud.delete_teacher(section.classroom_id, result.user.email)
+    result.status = "inactive"
     result.update()
     return {
-        "message": ("Successfully deleted the teacher from the section"
-        + f" {section_id} using {teacher}")
+        "message": ("Successfully deleted the teacher from the section" +
+                    f" {section_id} using {teacher}")
     }
   except ResourceNotFoundException as err:
     Logger.error(err)
@@ -313,10 +312,11 @@ def delete_teacher(section_id: str,teacher:str,request: Request):
   except HttpError as ae:
     Logger.error(ae)
     raise ClassroomHttpException(status_code=ae.resp.status,
-                              message=str(ae)) from ae
+                                 message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
 
 @router.delete("/{section_id}", response_model=DeleteSectionResponseModel)
 def delete_section(section_id: str):
@@ -337,7 +337,7 @@ def delete_section(section_id: str):
     classroom_crud.update_course_state(section_details.classroom_id,\
       "ARCHIVED")
     section_details.status = "ARCHIVED"
-    section_details.enrollment_status="CLOSED"
+    section_details.enrollment_status = "CLOSED"
     section_details.update()
     Section.soft_delete_by_id(section_id)
     rows=[{
@@ -365,7 +365,7 @@ def delete_section(section_id: str):
   except HttpError as ae:
     Logger.error(ae)
     raise ClassroomHttpException(status_code=ae.resp.status,
-                              message=str(ae)) from ae
+                                 message=str(ae)) from ae
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
@@ -447,11 +447,9 @@ def update_section(sections_details: UpdateSection):
             "maxStudents": section.max_students,
           "timestamp":datetime.datetime.utcnow()
     }]
-    insert_rows_to_bq(
-      rows=rows,
-      dataset=BQ_DATASET,
-      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"]
-      )
+    insert_rows_to_bq(rows=rows,
+                      dataset=BQ_DATASET,
+                      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
     return {"data": updated_section}
   except ResourceNotFoundException as err:
     Logger.error(err)
@@ -459,15 +457,16 @@ def update_section(sections_details: UpdateSection):
   except HttpError as hte:
     Logger.error(hte)
     raise ClassroomHttpException(status_code=hte.resp.status,
-                              message=str(hte)) from hte
+                                 message=str(hte)) from hte
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
 @router.patch("/{section_id}/update_classroom_code",
               response_model=GetSectiontResponseModel)
-def update_section_classroom_code(section_id:str):
+def update_section_classroom_code(section_id: str):
   """_summary_
 
   Args:
@@ -482,18 +481,17 @@ def update_section_classroom_code(section_id:str):
       _type_: _description_
   """
   try:
-    section=Section.find_by_id(section_id)
-    course=classroom_crud.get_course_by_id(section.classroom_id)
+    section = Section.find_by_id(section_id)
+    course = classroom_crud.get_course_by_id(section.classroom_id)
     if course is None:
-      raise ResourceNotFoundException(
-          "Classroom with section id" +
-          f" {section_id} is not found")
-    section.classroom_code=course["enrollmentCode"]
+      raise ResourceNotFoundException("Classroom with section id" +
+                                      f" {section_id} is not found")
+    section.classroom_code = course["enrollmentCode"]
     section.update()
     return {
-      "message":"Successfully updated the classroom code",
-      "data":convert_section_to_section_model(section)
-      }
+        "message": "Successfully updated the classroom code",
+        "data": convert_section_to_section_model(section)
+    }
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -501,9 +499,10 @@ def update_section_classroom_code(section_id:str):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+
 @router.post("/{section_id}/enable_notifications",
              response_model=EnableNotificationsResponse)
-def section_enable_notifications_pub_sub(section_id:str):
+def section_enable_notifications_pub_sub(section_id: str):
   """Resgister section with a pub/sub topic
 
   Args:
@@ -518,15 +517,16 @@ def section_enable_notifications_pub_sub(section_id:str):
   try:
     section = Section.find_by_id(section_id)
     responses = [
-        classroom_crud.enable_notifications(
-            section.classroom_id, i) for i in FEED_TYPES
+        classroom_crud.enable_notifications(section.classroom_id, i)
+        for i in FEED_TYPES
     ]
     return {
-          "message":
-          "Successfully enable the notifications of the course using section "
-          + f"{section_id} id",
-          "data":responses
-      }
+        "message":
+        "Successfully enable the notifications of the course using section " +
+        f"{section_id} id",
+        "data":
+        responses
+    }
   except ValidationError as ve:
     raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as err:
@@ -534,7 +534,7 @@ def section_enable_notifications_pub_sub(section_id:str):
     raise ResourceNotFound(str(err)) from err
   except HttpError as hte:
     raise ClassroomHttpException(status_code=hte.resp.status,
-                              message=str(hte)) from hte
+                                 message=str(hte)) from hte
   except InternalServerError as ie:
     raise InternalServerError(str(ie)) from ie
   except Exception as e:
@@ -564,13 +564,14 @@ def get_assignment(section_id: str, assignment_id: str):
     return convert_assignment_to_assignment_model(assignment)
   except HttpError as hte:
     raise ClassroomHttpException(status_code=hte.resp.status,
-                              message=str(hte)) from hte
+                                 message=str(hte)) from hte
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
 
 @router.get("/{section_id}/get_coursework_list",
             response_model=GetCourseWorkList)
@@ -587,19 +588,21 @@ def get_coursework_list(section_id: str):
         contains all the course work details
   """
   try:
-    data=[]
+    data = []
     course_work_list = classroom_crud.get_course_work_list\
       (section_id=section_id)
     for x in course_work_list:
       data.append(convert_coursework_to_short_coursework_model(x))
-    return {"data":data}
+    return {"data": data}
   except HttpError as hte:
     raise ClassroomHttpException(status_code=hte.resp.status,
-                              message=str(hte)) from hte
+                                 message=str(hte)) from hte
+
+
 @router.patch("/{section_id}/coursework/{coursework_id}",
               response_model=ImportGradeResponseModel,
               status_code=status.HTTP_202_ACCEPTED)
-def import_grade(section_id: str,coursework_id:str,
+def import_grade(section_id: str, coursework_id: str,
                  background_tasks: BackgroundTasks):
   """Get a section details from db and use the coursework Id
   Args:
@@ -615,35 +618,32 @@ def import_grade(section_id: str,coursework_id:str,
   """
   try:
     section = Section.find_by_id(section_id)
-    result = classroom_crud.get_course_work(
-    section.classroom_id,coursework_id)
+    result = classroom_crud.get_course_work(section.classroom_id,
+                                            coursework_id)
     #Get url mapping of google forms view links and edit ids
     is_google_form_present = False
     if "materials" in result.keys():
       for material in result["materials"]:
         if "form" in material.keys():
           is_google_form_present = True
-          background_tasks.add_task(update_grades,material,
-                                    section,coursework_id)
+          background_tasks.add_task(update_grades, material, section,
+                                    coursework_id)
 
       if is_google_form_present:
-        return {
-           "message":"Grades for coursework will be updated shortly"}
+        return {"message": "Grades for coursework will be updated shortly"}
       else:
         raise ResourceNotFoundException(
-          f"Form is not present for coursework_id {coursework_id}"
-          )
+            f"Form is not present for coursework_id {coursework_id}")
     else:
       raise ResourceNotFoundException(
-          f"Form is not present for coursework_id {coursework_id}"
-          )
+          f"Form is not present for coursework_id {coursework_id}")
   except HttpError as hte:
     Logger.error(hte)
     message = str(hte)
     if hte.resp.status == 404:
       message = "Coursework not found"
     raise ClassroomHttpException(status_code=hte.resp.status,
-                              message=message) from hte
+                                 message=message) from hte
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
