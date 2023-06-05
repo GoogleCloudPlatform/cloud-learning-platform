@@ -220,7 +220,6 @@ class BaseModel(Model):
       raise ResourceNotFoundException(
           f"{cls.__name__} with uuid {uuid} not found")
 
-
   @classmethod
   def archive_by_uuid(cls, uuid, archive=True):
     doc = cls.collection.filter("uuid", "==",
