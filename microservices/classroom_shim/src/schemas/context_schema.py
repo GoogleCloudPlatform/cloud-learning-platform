@@ -15,6 +15,7 @@ class ContextModel(BaseModel):
   id: str
   name: Optional[str]
   description: Optional[str]
+  context_type: str
 
   class Config():
     orm_mode = True

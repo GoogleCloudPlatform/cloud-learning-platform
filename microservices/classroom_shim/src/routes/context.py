@@ -135,7 +135,7 @@ def get_context_members(context_id: str, context_type: str):
       else:
         Logger.error(
             f"Error 1140 response: Internal error from LMS get students API with \
-               Status code: {get_ids_res.status_code}; Response: {get_ids_res.text}"
+               Status code: {teachers_res.status_code}; Response: {teachers_res.text}"
         )
         raise Exception("Request failed with error code 1140")
 
@@ -151,7 +151,7 @@ def get_context_members(context_id: str, context_type: str):
       else:
         Logger.error(
             f"Error 1150 response: Internal error from LMS get students API \
-              Status code: {get_ids_res.status_code}; Response: {get_ids_res.text}"
+              Status code: {student_res.status_code}; Response: {student_res.text}"
         )
         raise Exception("Request failed with error code 1150")
 
