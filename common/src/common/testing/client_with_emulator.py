@@ -38,7 +38,7 @@ FAKE_USER_DATA = {
 
 @pytest.fixture
 def client_with_emulator(clean_firestore, scope="module"):
-
+  """ Create FastAPI test client with clean firestore emulator """
   def mock_validate_user():
     return True
 

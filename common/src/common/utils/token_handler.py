@@ -39,7 +39,7 @@ class UserCredentials:
     except Exception as e:
       Logger.error(e)
       Logger.error(traceback.print_exc())
-      raise Exception(e)
+      raise Exception(e) from e
 
   def get_id_token(self):
     """This function returns the id token"""
