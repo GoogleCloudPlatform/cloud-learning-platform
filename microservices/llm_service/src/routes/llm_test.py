@@ -27,7 +27,12 @@ from schemas.schema_examples import (LLM_GENERATE_EXAMPLE, CHAT_EXAMPLE,
                                      USER_EXAMPLE)
 from common.models import UserChat, User
 from common.utils.http_exceptions import add_exception_handlers
-from common.testing.client_with_emulator import client_with_emulator
+with mock.patch(
+    "google.cloud.secretmanager.SecretManagerServiceClient",
+    side_effect=mock.MagicMock()) as mok:
+  with mock.patch("langchain.chat_models.ChatOpenAI"):
+    with mock.patch("langchain.llms.Cohere"):
+      from common.testing.client_with_emulator import client_with_emulator
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 
 with mock.patch(
