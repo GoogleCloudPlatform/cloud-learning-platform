@@ -29,7 +29,7 @@ from routes import (
   classroom_courses,analytics
   # ,user
         )
-from utils.helper import validate_user
+from common.utils.auth_service import validate_user
 
 app = FastAPI()
 
