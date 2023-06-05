@@ -424,13 +424,13 @@ def step_impl_42(context):
 @behave.given(
     "A user has access privileges wants to get instructional designer with valid course template id and valid instructional designer id"
 )
-def step_impl_34(context):
+def step_impl_43(context):
   context.url = f'{API_URL}/course_templates/{context.enrollment_mapping.course_template.id}/instructional_designers/{context.enrollment_mapping.user.email}'
 
 
 @behave.when(
     "Get request with valid data is sent")
-def step_impl_35(context):
+def step_impl_44(context):
   resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
@@ -438,7 +438,7 @@ def step_impl_35(context):
 
 @behave.then(
     "Get instructional designer API will show user details")
-def step_impl_36(context):
+def step_impl_45(context):
   print(f"--------------------url: {context.url}-----------------------")
   print(f"------------------Status: {context.status}------------------------")
   print(f"------------------data: {context.response}------------------------")
@@ -451,13 +451,13 @@ def step_impl_36(context):
 @behave.given(
     "A user has access privileges wants to get instructional designer with valid course template id and invalid instructional designer id"
 )
-def step_impl_34(context):
-  context.url = f'{API_URL}/course_templates/{context.enrollment_mapping.course_template.id}/instructional_designers/{context.enrollment_mapping.user.email}'
+def step_impl_46(context):
+  context.url = f'{API_URL}/course_templates/{context.course_template.id}/instructional_designers/xyz@gmail.com'
 
 
 @behave.when(
     "Get request with invalid data is sent to get instructional designer")
-def step_impl_35(context):
+def step_impl_47(context):
   resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
@@ -465,7 +465,7 @@ def step_impl_35(context):
 
 @behave.then(
     "Get instructional designer API will throw user not found error")
-def step_impl_36(context):
+def step_impl_48(context):
   print(f"--------------------url: {context.url}-----------------------")
   print(f"------------------Status: {context.status}------------------------")
   print(f"------------------data: {context.response}------------------------")
@@ -477,12 +477,12 @@ def step_impl_36(context):
 @behave.given(
     "A user has access to admin portal and needs to get the instructional designer with valid course template id"
 )
-def step_impl_34(context):
+def step_impl_49(context):
   context.url = f"{API_URL}/course_templates/{context.enrollment_mapping.course_template.id}/instructional_designers"
 
 @behave.when(
     "Get request is sent which contains valid course template id to list instructional_designers")
-def step_impl_35(context):
+def step_impl_50(context):
   resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
@@ -490,7 +490,7 @@ def step_impl_35(context):
 
 @behave.then(
     "fetch list of Id for given course template")
-def step_impl_36(context):
+def step_impl_51(context):
   print(f"--------------------url: {context.url}-----------------------")
   print(f"------------------Status: {context.status}------------------------")
   print(f"------------------data: {context.response}------------------------")

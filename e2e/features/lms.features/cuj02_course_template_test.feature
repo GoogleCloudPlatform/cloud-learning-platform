@@ -63,13 +63,13 @@ Feature: Create, Read, Retrieve all and delete APIs for Course Template
   @fixture.enroll.instructional_designer.course_template
   Scenario: Get instructional designer from course template using course template id and user id
     Given A user has access privileges wants to get instructional designer with valid course template id and valid instructional designer id
-    when Get request with valid data is sent
+    When Get request with valid data is sent
     Then Get instructional designer API will show user details
 
-    
+  @fixture.create.course_template
   Scenario: Get instructional designer from course template using course template id and invalid user id
     Given A user has access privileges wants to get instructional designer with valid course template id and invalid instructional designer id
-    when Get request with invalid data is sent to get instructional designer
+    When Get request with invalid data is sent to get instructional designer
     Then Get instructional designer API will throw user not found error
 
   @fixture.enroll.instructional_designer.course_template
@@ -78,7 +78,6 @@ Feature: Create, Read, Retrieve all and delete APIs for Course Template
     When Delete request is sent which contains valid course template id and email
     Then Set inactive instructional designer from enrollment mapping collection
 
-  
   @fixture.enroll.instructional_designer.course_template
   Scenario: List instructional designer in course template with given course_template id
     Given A user has access to admin portal and needs to get the instructional designer with valid course template id
