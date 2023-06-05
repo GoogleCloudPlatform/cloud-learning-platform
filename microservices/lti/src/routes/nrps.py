@@ -45,7 +45,7 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
   try:
     nrps_id = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/memberships"
 
-    get_context_url = f"http://lms/lms/api/v1/contexts/{context_id}"
+    get_context_url = f"http://classroom-shim/classroom-shim/api/v1/contexts/{context_id}"
 
     context_res = requests.get(
         url=get_context_url,
@@ -72,7 +72,7 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
     members_list = []
     members_data = []
 
-    get_members_url = f"http://lms/lms/api/v1/contexts/{context_id}/members?context_type={context_type}"
+    get_members_url = f"http://classroom-shim/classroom-shim/api/v1/contexts/{context_id}/members?context_type={context_type}"
     members_res = requests.get(
         url=get_members_url,
         headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
@@ -83,7 +83,7 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
     else:
       Logger.error(
           f"Error 1220: Internal error from Shim service get members API with \
-             Status code: {context_res.status_code}; Response: {context_res.text}"
+             Status code: {members_res.status_code}; Response: {members_res.text}"
       )
       raise Exception("Request failed with error code 1220")
 
@@ -93,12 +93,20 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
         pass
 
       else:
+        member_name = member.get("first_name", "") + " " + member.get(
+            "last_name", "")
+
+        if member.get("enrollment_status"):
+          member_status = member.get("enrollment_status").capitalize()
+        else:
+          member_status = "Active"
+
         members_info = {
             "user_id": member.get("user_id"),
-            "status": "Active",
+            "status": member_status,
             "given_name": member.get("first_name"),
             "family_name": member.get("last_name"),
-            "name": member.get("first_name", "") + member.get("last_name", ""),
+            "name": member_name,
             "email": member.get("email"),
             "picture": member.get("photo_url"),
             "lis_person_sourcedid": member.get("user_id")
