@@ -52,14 +52,14 @@ os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 os.environ["OPENAI_API_KEY"] = "fake-key"
 os.environ["COHERE_API_KEY"] = "fake-key"
 
-# Commenting these imports and unit test since some packages
-# have breaking changes which are causing unit test failures
+with mock.patch(
+    "google.cloud.secretmanager.SecretManagerServiceClient",
+    side_effect=mock.MagicMock()) as mok:
+  from routes.llm import router
 
-# with mock.patch(
-#     "google.cloud.secretmanager.SecretManagerServiceClient",
-#     side_effect=mock.MagicMock()) as mok:
-#   from routes.llm import router
-
+app = FastAPI()
+add_exception_handlers(app)
+app.include_router(router, prefix="/llm-service/api/v1")
 
 FAKE_GENERATE_PARAMS = {
     "llm_type": "LLM Test",
