@@ -15,30 +15,33 @@
 Module to add course enrollment in Fireo
 """
 from fireo.fields import TextField, ReferenceField, IDField
-from common.models import BaseModel,Section
+from common.models import BaseModel, Section, User
+
 
 def check_status(field_val):
   """validator method for status field"""
-  status = ["active", "inactive","invited"]
-  if field_val.lower() in ["active", "inactive","invited"]:
+  status = ["active", "inactive", "invited"]
+  if field_val.lower() in ["active", "inactive", "invited"]:
     return True
-  return (False,
-          "Status must be one of " + ",".join("'" + i + "'" for i in status))
+  return (False, "Status must be one of " + ",".join("'" + i + "'"
+                                                     for i in status))
+
 
 def check_role(field_val):
   """validator method for status field"""
-  role = ["learner", "faculty","other","admin"]
-  if field_val.lower() in ["learner", "faculty","other","admin"]:
+  role = ["learner", "faculty", "admin"]
+  if field_val.lower() in ["learner", "faculty", "other", "admin"]:
     return True
-  return (False,
-          "role must be one of " + ",".join("'" + i + "'" for i in role))
+  return (False, "role must be one of " + ",".join("'" + i + "'"
+                                                   for i in role))
+
 
 class CourseEnrollmentMapping(BaseModel):
   """Course Enrollment Mapping ORM class
   """
   id = IDField()
-  section = ReferenceField(Section,required=True)
-  user = TextField(required=True)
+  section = ReferenceField(Section, required=True)
+  user = ReferenceField(User, required=True)
   status = TextField(validator=check_status)
   role = TextField(validator=check_role)
   invitation_id = TextField()
@@ -46,6 +49,7 @@ class CourseEnrollmentMapping(BaseModel):
   class Meta:
     ignore_none_field = False
     collection_name = BaseModel.DATABASE_PREFIX + "course_enrollment_mapping"
+
   @classmethod
   def find_by_user(cls, user_id):
     """Find user using using user_id
@@ -54,16 +58,18 @@ class CourseEnrollmentMapping(BaseModel):
     Returns:
         user_object
     """
-    result = CourseEnrollmentMapping.collection.filter("user","==",user_id).\
+    user_key = f"{User.collection_name}/{user_id}"
+    result = CourseEnrollmentMapping.collection.filter("user","==",user_key).\
       filter(
         "status", "==","active").fetch()
     return list(result)
 
   @classmethod
-  def fetch_all_by_section(cls,
-                          section_key,
-                          role,
-                          ):
+  def fetch_all_by_section(
+      cls,
+      section_key,
+      role,
+  ):
     """_summary_
 
     Args:
@@ -81,10 +87,12 @@ class CourseEnrollmentMapping(BaseModel):
     return list(objects)
 
   @classmethod
-  def find_course_enrollment_record(cls,
-                          section_key,
-                          user_id,
-                        ):
+  def find_course_enrollment_record(
+      cls,
+      section_key,
+      user_id,
+      role
+  ):
     """_summary_
 
     Args:
@@ -94,15 +102,17 @@ class CourseEnrollmentMapping(BaseModel):
     Returns:
         course_enrollment object
     """
-    return CourseEnrollmentMapping.collection.filter("user","==",user_id).\
+    user_key = f"{User.collection_name}/{user_id}"
+    return CourseEnrollmentMapping.collection.filter("user","==",user_key).\
     filter("status", "in",["active","invited"]).\
-    filter("section","==",section_key).get()
+    filter("section","==",section_key).filter("role","==",role).get()
 
   @classmethod
-  def find_enrolled_student_record(cls,
-                          section_key,
-                          user_id,
-                        ):
+  def find_active_enrolled_student_record(
+      cls,
+      section_key,
+      user_id
+  ):
     """_summary_
 
     Args:
@@ -112,5 +122,45 @@ class CourseEnrollmentMapping(BaseModel):
     Returns:
         course_enrollment object
     """
-    return CourseEnrollmentMapping.collection.filter("user","==",user_id).\
-    filter("status", "==","active").filter("section","==",section_key).get()
+    user_key = f"{User.collection_name}/{user_id}"
+    return CourseEnrollmentMapping.collection.filter("user","==",user_key).\
+    filter("status", "==","active").filter("role","==","learner").\
+      filter("section","==",section_key).get()
+
+  @classmethod
+  def find_active_enrolled_teacher_record(
+      cls,
+      section_key,
+      user_id
+  ):
+    """_summary_
+
+    Args:
+        section_key (str): section unique key to filter data
+        user_id(str, optional): user_id from user collection
+
+    Returns:
+        course_enrollment object
+    """
+    user_key = f"{User.collection_name}/{user_id}"
+    return CourseEnrollmentMapping.collection.filter("user","==",user_key).\
+    filter("status", "==","active").filter("role","==","faculty").\
+      filter("section","==",section_key).get()
+
+  @classmethod
+  def check_enrollment_exists_section(cls,
+      section_key,
+      user_id):
+    """check if any enrollment exists for a section by user id
+
+    Args:
+        section_key (str): unique section key
+        user_id (str): unique user id
+
+    Returns:
+        CourseEnrollmentMapping: returns a object.
+    """
+    user_key = f"{User.collection_name}/{user_id}"
+    return CourseEnrollmentMapping.collection.filter("user","==",user_key).\
+    filter("status", "in",["active","invited"]).\
+      filter("section","==",section_key).get()

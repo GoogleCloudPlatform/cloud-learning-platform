@@ -8,6 +8,15 @@
                     open_in_new
                 </span>
 
+                <div style="margin-left: 2%;">
+                    <mat-chip-list>
+                        <mat-basic-chip [class]="getChipClass(section.status)">
+                            {{getStatusName(section.status)}} 
+                        </mat-basic-chip>
+                    </mat-chip-list>
+                </div>
+
+
                 <button mat-stroked-button (click)="openClassroom(section.classroom_url)" color="primary" style="padding: 0 20px 0 14px;
                 margin-left: 4%;
                 line-height: 30px;">

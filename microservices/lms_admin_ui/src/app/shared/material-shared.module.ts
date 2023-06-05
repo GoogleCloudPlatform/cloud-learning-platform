@@ -19,6 +19,8 @@ import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy
 import { MatDividerModule } from '@angular/material/divider';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import {MatBadgeModule} from '@angular/material/badge';
+
 
 
 @NgModule({
@@ -46,7 +48,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
         MatTableModule,
         MatDividerModule,
         MatPaginatorModule,
-        MatCheckboxModule
+        MatCheckboxModule,
+        MatBadgeModule
     ]
 })
 export class MaterialSharedModule { }

@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-docs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-docs
+  template:
+    metadata:
+      labels:
+        app: api-docs
+    spec:
+      containers:
+      - name: api-docs
+        image: api-docs
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "100Mi"
+          limits:
+            memory: "2000Mi"
+            cpu: "2000m"
+        env:
+        # Define the environment variable
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID
+        - name: FIREBASE_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: FIREBASE_API_KEY
+        - name: FIREBASE_AUTH_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: FIREBASE_AUTH_DOMAIN
+        - name: FIREBASE_STORAGE_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: FIREBASE_STORAGE_BUCKET
+        - name: API_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: API_DOMAIN
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10

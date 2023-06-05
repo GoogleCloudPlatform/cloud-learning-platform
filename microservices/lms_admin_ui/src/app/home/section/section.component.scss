@@ -84,6 +84,7 @@ $primary-color : #8c1d40;
     background-color: #ebebeb;
     padding: 1%;
     align-items: center;
+    margin-top:2.5%;
 
     .heading {
         font-size: 1.3rem;
@@ -104,22 +105,69 @@ $primary-color : #8c1d40;
 }
 
 :host ::ng-deep .active-chip {
-    background-color: #a2ea8c;
-    color: rgb(7 96 26 / 87%);
+    background-color: #03C003;
+    color: white;
     font-size: 0.7rem;
-    font-weight: 700;
-    /* padding: 3%; */
-    padding: 4px 9px;
+    padding: 3px;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
 
 :host ::ng-deep .deactive-chip {
-    background-color: #ea8c8c;
-    color: rgba(96, 7, 7, 0.87);
+    background-color: #DE0000;
+    color: white;
     font-size: 0.7rem;
-    font-weight: 700;
-    /* padding: 3%; */
-    padding: 4px 9px;
+    padding: 3px;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
+
+:host ::ng-deep .section-ACTIVE-chip {
+    background-color: #03C003;
+    color: white;
+    font-size: 0.7rem;
+    padding: 3px;
+    font-weight: 800;
+    letter-spacing: 1px;
+
+}
+:host ::ng-deep .section-ARCHIVED-chip {
+    background-color: #6b6b6b;
+    color: white;
+    font-size: 0.7rem;
+    padding: 3px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+:host ::ng-deep .section-FAILED_TO_PROVISION-chip {
+    background-color: #DE0000;
+    color: white;
+    font-size: 0.7rem;
+    padding: 3px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+:host ::ng-deep .section-PROVISIONING-chip {
+    background-color: #c08f03;
+    color: white;
+    font-size: 0.7rem;
+    padding: 3px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+:host ::ng-deep .enrollment-OPEN-chip {
+    background-color: #03C003;
+    color: white;
+    font-size: 0.7rem;
+cursor: pointer;
+}
+:host ::ng-deep .enrollment-CLOSED-chip {
+    background-color: #DE0000;
+    color: white;
+    font-size: 0.7rem;
+cursor: pointer;
+}
+
 .button-content-outer{
     display: flex;
     align-items: center;
@@ -128,3 +176,11 @@ $primary-color : #8c1d40;
         margin-left: 5px;
     }
 }
+:host ::ng-deep .mat-progress-spinner circle,
+.mat-spinner circle {
+    stroke: #FFFFFF;
+}
+
+:host ::ng-deep .mat-chip.mat-standard-chip::after {
+    background: none !important;  // color that you want on hover
+  }
