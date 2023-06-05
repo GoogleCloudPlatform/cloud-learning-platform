@@ -600,4 +600,7 @@ def sign_up_user():
 
 
 def before_all(context):
+  USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT=bool(
+  os.getenv("USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT","false").lower() in ("true",))
+  print(f"-----------------------{USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT}-----------------")
   sign_up_user()
