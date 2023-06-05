@@ -1,0 +1,19 @@
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cpu-pod-scaling-api-docs
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-docs
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    #resource:
+    #  name: memory
+    #  targetAverageValue: 500Mi
+    resource:
+      name: cpu
+      targetAverageUtilization: 60

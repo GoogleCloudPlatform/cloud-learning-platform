@@ -57,7 +57,10 @@ def create_fake_data():
       "classroom_url": "https://classroom.google.com",
       "course_template": course_template,
       "cohort": cohort,
-      "teachers": ["teachera@gmail.com", "teacherb@gmail.com"]
+      "teachers": ["teachera@gmail.com", "teacherb@gmail.com"],
+      "enrollment_status":"OPEN",
+      "status":"ACTIVE",
+      "max_students":25
   }
 
   section = Section.from_dict(test_section_dict)
@@ -300,7 +303,7 @@ def test_get_overall_percentage(client_with_emulator,create_fake_data):
       "draftGrade": 50,
       "assignedGrade": 50,
   }]
-  with mock.patch("routes.cohort.student_service.get_user_id",\
+  with mock.patch("routes.cohort.get_user_id",\
                   return_value="test@gmail.com"):
     with mock.patch("routes.cohort.classroom_crud.get_coursework_list",\
                     return_value=course_work_data):

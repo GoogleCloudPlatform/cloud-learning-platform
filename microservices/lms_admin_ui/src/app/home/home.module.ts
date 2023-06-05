@@ -23,11 +23,12 @@ import { SuccessOverviewDialog } from './home.component';
 import { CourseTemplateDetailsDialog } from './home.component';
 import { InviteStudentModalComponent } from './invite-student-modal/invite-student-modal.component';
 import { SingleTemplateComponent } from './single-template/single-template.component';
+import { AddOrEditCcourseTemplate } from './course-template/course-template.component';
 import { ViewLtiAssignmentDialog } from './single-template/single-template.component';
 import { DeleteLtiDialog } from './single-template/single-template.component';
 import { ViewSectionLtiAssignmentDialog } from './section/section.component';
 import { DeleteSectionLtiDialog } from './section/section.component';
-
+import { addTeacherDialog } from './section/section.component';
 @NgModule({
   declarations: [
     HomeComponent,
@@ -45,10 +46,12 @@ import { DeleteSectionLtiDialog } from './section/section.component';
     CourseTemplateDetailsDialog,
     InviteStudentModalComponent,
     SingleTemplateComponent,
+    AddOrEditCcourseTemplate,
     ViewLtiAssignmentDialog,
     DeleteLtiDialog,
     ViewSectionLtiAssignmentDialog,
-    DeleteSectionLtiDialog
+    DeleteSectionLtiDialog,
+    addTeacherDialog
   ],
   // entryComponents: [CreateCohortModalComponent],
   imports: [

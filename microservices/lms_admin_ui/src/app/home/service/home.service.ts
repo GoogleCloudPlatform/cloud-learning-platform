@@ -77,4 +77,26 @@ export class HomeService {
   deleteLtiAssignments(id: string) {
     return this.http.delete(`${environment.classroomShimUrl}lti-assignment/${id}`)
   }
+  getTeachersInSection(sectionId: any){
+    return this.http.get(`${environment.apiurl}sections/${sectionId}/teachers`)
+  }
+  addTeacher(sectionId: any, email:any){
+    return this.http.post(`${environment.apiurl}sections/${sectionId}/teachers`,email)
+  }
+  deleteTeacher(sectionId: any,email:any) {
+    return this.http.delete(`${environment.apiurl}sections/${sectionId}/teachers/${email}`)
+  }
+  changeEnrollmentStatus(sectionId:any,status:string){
+    return this.http.patch(`${environment.apiurl}sections/${sectionId}/change_enrollment_status/${status}`, null)
+  }
+
+  getInstructionalDesigner(course_template_id: string) {
+    return this.http.get(`${environment.apiurl}course_templates/${course_template_id}/instructional_designers`)
+  }
+  addInstructionalDesigner(course_template_id: string, email:string){
+    return this.http.post(`${environment.apiurl}course_templates/${course_template_id}/instructional_designers`, email)
+  }
+  deleteInstructionalDesigner(course_template_id: string, email:string){
+    return this.http.delete(`${environment.apiurl}course_templates/${course_template_id}/instructional_designers/${email}`)
+  }
 }

@@ -43,12 +43,12 @@ def check_status(field_val):
   status = ["active", "inactive"]
   if field_val.lower() in ["active", "inactive"]:
     return True
-  return (False,
-          "Status must be one of " + ",".join("'" + i + "'" for i in status))
+  return (False, "Status must be one of " + ",".join("'" + i + "'"
+                                                     for i in status))
 
 
 class User(BaseModel):
-  """User Class"""
+  """User base Class"""
   user_id = TextField(required=True)
   first_name = TextField(required=True, validator=validate_name)
   last_name = TextField(required=True, validator=validate_name)

@@ -57,11 +57,35 @@ Feature: Add student to cohort
     When API request is sent which contains invalid section id
     Then Section not found error is sent in response
 
-  @fixture.create.section
+  @fixture.enroll.teacher.section
   Scenario:Get teacher details in section with given section id and teacher email
-    Given A user has access to admin portal and needs to retrieve the details teacher with vailid section id and teacher_email
-    When API request is sent which contains valid section id and teacher email
+    Given A user has access to admin portal and needs to retrieve the details teacher with valid section id and teacher_email
+    When Get request is sent which contains valid section id and teacher email
     Then Get the details of teacher from user collection
+
+  @fixture.create.section
+  Scenario:Fetch teacher details in section with given section id and teacher email
+    Given A user has access privileges wants to retrieve the details teacher with valid section id and invalid teacher_email
+    When API request is sent which contains valid section id and invalid teacher email
+    Then Get teacher API will throw teacher not found error
+
+  @fixture.enroll.teacher.section
+  Scenario:Delete teacher in section with given section id and teacher email
+    Given A user has access to admin portal and needs to delete the teacher with valid section id and teacher_email
+    When Delete request is sent which contains valid section id and teacher email
+    Then Set inactive teacher from enrollment mapping collection
+
+  @fixture.create.section
+  Scenario:Delete teacher from section using section id and teacher id
+    Given A user has access privileges wants to delete teacher with valid section id and invalid teacher id
+    When API request is sent which contains valid section id and invalid teacher id to delete teacher
+    Then Delete teacher API throw teacher not found error
+
+ @fixture.create.section
+  Scenario: Enroll teacher in a section using section id and request payload
+    Given A user has access privileges wants to enroll the teacher using valid section id and teacher_email
+    When Post request is sent which contains valid section id and payload which contains valid teacher email
+    Then The teacher enrolled in classroom and a enrollment mapping is created and return user details with enrollment details
 
   @fixture.import.google_form_grade
   Scenario:Update the student  assignment grades for non domain students who has not Turn_in assignment

@@ -13,11 +13,16 @@
             <mat-label>Section Description</mat-label>
             <input matInput formControlName="section_description">
         </mat-form-field>
-
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Max Students</mat-label>
+            <input type="number" matInput formControlName="max_students">
+        </mat-form-field>
         <mat-form-field appearance="fill" style="width: 100%;">
             <mat-label>Cohort</mat-label>
             <input matInput formControlName="cohort">
         </mat-form-field>
+
+        
 
         <mat-form-field appearance="fill" style="width: 100%;">
             <mat-label>Course Template</mat-label>
@@ -37,24 +42,7 @@
 
 
 
-        <mat-form-field class="example-chip-list" appearance="fill" style="width: 100%;">
-            <mat-label>Add Teaching Staff</mat-label>
-            <mat-chip-list #chipGrid aria-label="Enter email">
-                <mat-chip *ngFor="let staff of teachingStaff" (removed)="remove(staff)">
-                    {{staff}}
-                    <button matChipRemove [attr.aria-label]="'remove ' + staff">
-                        <mat-icon>cancel</mat-icon>
-                    </button>
-                </mat-chip>
-                <input placeholder="New staff..." [matChipInputFor]="chipGrid"
-                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
-                    (matChipInputTokenEnd)="add($event)" formControlName="teaching_staff" />
-
-            </mat-chip-list>
-            <mat-hint align="start"> <div class="hint-style"><span class="material-symbols-rounded info-icon">info</span> <strong>Please enter an email</strong></div> </mat-hint>
-            <mat-hint align="start"><div class="hint-style"><span class="material-symbols-rounded info-icon">info</span> <strong>Do not add admin or instructional designer emails</strong></div></mat-hint>
-            <mat-hint align="start"> <div class="hint-style"><span class="material-symbols-rounded info-icon">info</span> <strong>Add multiple emails separated by comma</strong></div> </mat-hint>
-        </mat-form-field>
+       
 
 
 
