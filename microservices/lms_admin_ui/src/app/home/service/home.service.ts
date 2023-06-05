@@ -65,6 +65,9 @@ export class HomeService {
   getLtiAssignments(contextId: string) {
     return this.http.get(`${environment.classroomShimUrl}lti-assignments?skip=0&limit=100&context_id=${contextId}`)
   }
+  getLtiAssignmentData(ltiAssignmentId: string) {
+    return this.http.get(`${environment.classroomShimUrl}lti-assignments/${ltiAssignmentId}`)
+  }
   postLtiAssignments(data: any) {
     return this.http.post(`${environment.classroomShimUrl}lti-assignment`, data)
   }
