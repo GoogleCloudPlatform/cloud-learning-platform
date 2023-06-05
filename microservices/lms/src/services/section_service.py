@@ -6,7 +6,8 @@ from common.utils import classroom_crud
 from common.utils.bq_helper import insert_rows_to_bq
 from common.utils.secrets import get_backend_robot_id_token
 from common.utils.logging_handler import Logger
-from common.models import Section, CourseEnrollmentMapping, User
+from common.models import (Section, CourseEnrollmentMapping,
+                           CourseTemplateEnrollmentMapping, User)
 from common.utils.http_exceptions import (InternalServerError,
                                           ResourceNotFound)
 from common.utils.errors import ValidationError
@@ -19,7 +20,6 @@ from config import BQ_TABLE_DICT, BQ_DATASET
 def copy_course_background_task(course_template_details,
                                 sections_details,
                                 cohort_details,
-                                headers,
                                 message=""):
   """Create section  Background Task to copy course and updated database
   for newly created section
@@ -75,14 +75,18 @@ def copy_course_background_task(course_template_details,
     classroom_crud.enable_notifications(new_course["id"],
                                         "COURSE_ROSTER_CHANGES")
     # add instructional designer
-    try:
-      add_teacher(headers, section,
-                  course_template_details.instructional_designer)
-    except Exception as error:
-      error = traceback.format_exc().replace("\n", " ")
-      Logger.error(f"Create teacher failed for \
-          for {course_template_details.instructional_designer}")
-      Logger.error(error)
+    list_course_template_enrollment_mapping = CourseTemplateEnrollmentMapping\
+      .fetch_all_by_course_template(course_template_details.key)
+    if list_course_template_enrollment_mapping:
+      for course_template_mapping in list_course_template_enrollment_mapping:
+        try:
+          add_instructional_designer_into_section(section,
+                                                  course_template_mapping)
+        except Exception as error:
+          error = traceback.format_exc().replace("\n", " ")
+          Logger.error(f"Create teacher failed for \
+              for {course_template_details.instructional_designer}")
+          Logger.error(error)
 
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
@@ -175,7 +179,7 @@ def copy_course_background_task(course_template_details,
 
         for assignment_id in coursework_lti_assignment_ids:
           coursework_id = coursework_data.get("id")
-          input_json = {"course_work_id":coursework_id}
+          input_json = {"course_work_id": coursework_id}
           # update assignment with new coursework id
           lti_assignment_req = requests.patch(
               f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
@@ -191,7 +195,9 @@ def copy_course_background_task(course_template_details,
                 f"Failed to update assignment {assignment_id} with course work id {coursework_id} due to error - {lti_assignment_req.text} with status code - {lti_assignment_req.status_code}"
             )
 
-          Logger.info(f"Updated the course work id for new LTI assignment - {assignment_id}")
+          Logger.info(
+              f"Updated the course work id for new LTI assignment - {assignment_id}"
+          )
 
       except Exception as error:
         title = coursework["title"]
@@ -330,7 +336,9 @@ def update_coursework_material(materials,
             split_url = link["url"].split(
                 "/classroom-shim/api/v1/launch?lti_assignment_id=")
             lti_assignment_id = split_url[-1]
-            Logger.info(f"LTI Course copy started for assignment - {lti_assignment_id}")
+            Logger.info(
+                f"LTI Course copy started for assignment - {lti_assignment_id}"
+            )
             copy_assignment = requests.post(
                 "http://classroom-shim/classroom-shim/api/v1/lti-assignment/copy",
                 headers={
@@ -346,14 +354,22 @@ def update_coursework_material(materials,
                 timeout=60)
 
             if copy_assignment.status_code == 200:
-              new_lti_assignment_id = copy_assignment.json().get("data").get("id")
+              new_lti_assignment_id = copy_assignment.json().get("data").get(
+                  "id")
               updated_material_link_url = link["url"].replace(
                   lti_assignment_id, new_lti_assignment_id)
               lti_assignment_ids.append(new_lti_assignment_id)
 
-              updated_material.append({"link": {"url": updated_material_link_url}})
-              Logger.info(f"LTI link updated for new assignment - {new_lti_assignment_id}")
-              Logger.info(f"LTI Course copy completed for assignment - {lti_assignment_id}")
+              updated_material.append(
+                  {"link": {
+                      "url": updated_material_link_url
+                  }})
+              Logger.info(
+                  f"LTI link updated for new assignment - {new_lti_assignment_id}"
+              )
+              Logger.info(
+                  f"LTI Course copy completed for assignment - {lti_assignment_id}"
+              )
             else:
               Logger.error(
                   f"Copying an LTI Assignment failed for {lti_assignment_id}\
@@ -368,7 +384,9 @@ def update_coursework_material(materials,
             split_url = link["url"].split(
                 "/classroom-shim/api/v1/launch?lti_assignment_id=")
             lti_assignment_id = split_url[-1]
-            Logger.info(f"LTI link removed in course work material with assignment ID - {lti_assignment_id}")
+            Logger.info(
+                f"LTI link removed in course work material with assignment ID - {lti_assignment_id}"
+            )
           else:
             updated_material.append({"link": material["link"]})
 
@@ -494,7 +512,6 @@ def add_teacher(headers, section, teacher_email):
     status = "invited"
     invitation_id = invitation_object["id"]
   user_dict = common_service.create_teacher(headers, data)
-  Logger.info(user_dict)
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.section = section
   course_enrollment_mapping.role = "faculty"
@@ -517,3 +534,47 @@ def validate_section(section):
     raise ValidationError("Enrollment is not active for this section"
       )
   return True
+
+
+def add_instructional_designer_into_section(section, course_template_mapping):
+  """Add instructional designer into section
+
+  Args:
+      section (Section): section object
+      course_template_mapping (CourseTemplateMapping):
+      course template enrollment mapping object
+
+  Returns:
+      CourseEnrollmentMapping: enrollment mapping
+  """
+  invitation_object = classroom_crud.invite_user(
+      section.classroom_id, course_template_mapping.user.email, "TEACHER")
+  try:
+    classroom_crud.acceept_invite(invitation_object["id"],
+                                  course_template_mapping.user.email)
+    # if course_template_mapping.status == "invited":
+    #   user_profile = classroom_crud.\
+    #       get_user_profile_information(course_template_mapping.user.email)
+    #   user = User.find_by_id(course_template_mapping.user.id)
+    #   user.first_name = user_profile["name"]["givenName"]
+    #   user.last_name = user_profile["name"]["familyName"]
+    #   user.gaia_id = user_profile["id"]
+    #   user.photo_url = user_profile["photoUrl"]
+    #   user.update()
+    #   course_template_mapping.status = "active"
+    #   course_template_mapping.invitation_id = ""
+    #   course_template_mapping.update()
+    status = "active"
+    invitation_id = ""
+  except Exception as hte:
+    Logger.info(hte)
+    status = "invited"
+    invitation_id = invitation_object["id"]
+  course_enrollment_mapping = CourseEnrollmentMapping()
+  course_enrollment_mapping.section = section
+  course_enrollment_mapping.role = "faculty"
+  course_enrollment_mapping.user = course_template_mapping.user
+  course_enrollment_mapping.status = status
+  course_enrollment_mapping.invitation_id = invitation_id
+  course_enrollment_mapping.save()
+  return course_enrollment_mapping
