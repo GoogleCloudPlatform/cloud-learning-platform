@@ -126,6 +126,7 @@ jobs:
         skaffold run \
         --profile dev \
         --namespace $NAMESPACE \
+        --module backends \
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }}
         

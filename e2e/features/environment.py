@@ -14,7 +14,7 @@ from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE, API_URL,
 from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,\
   get_student_email_and_token,\
   get_required_emails_from_secret_manager,create_coursework,create_google_form,\
-get_file,get_gmail_student_email_and_token,insert_file_into_folder
+get_file,insert_file_into_folder
 
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.user import TEST_USER
@@ -245,6 +245,9 @@ def create_section(context):
   section.classroom_id = classroom["id"]
   section.classroom_code = classroom["enrollmentCode"]
   section.classroom_url = classroom["alternateLink"]
+  section.enrollment_status = "OPEN"
+  section.max_students = 25
+  section.status = "ACTIVE"
   section.save()
   # Create teachers in the DB
   instructional_designer_email=CourseTemplateEnrollmentMapping.\
@@ -391,7 +394,7 @@ def import_google_form_grade(context):
   context.section_id = section.id
   classroom_code = section.classroom_code
   classroom_id = section.classroom_id
-  student_email_and_token = get_gmail_student_email_and_token()
+  student_email_and_token = get_student_email_and_token()
   student_data = enroll_student_classroom(
       student_email_and_token["access_token"], classroom_id,
       student_email_and_token["email"].lower(), classroom_code)

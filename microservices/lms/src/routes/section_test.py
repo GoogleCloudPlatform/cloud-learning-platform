@@ -63,7 +63,9 @@ def create_fake_data():
       "classroom_code": "cl_code",
       "classroom_url": "https://classroom.google.com",
       "course_template": course_template,
-      "cohort": cohort
+      "cohort": cohort,
+      "max_students":50,
+      "enrollment_status":"OPEN"
   }
 
   section = Section.from_dict(test_section_dict)
@@ -117,7 +119,8 @@ def test_create_section(client_with_emulator, create_fake_data):
       "name": "section_20",
       "description": "This is description",
       "course_template": create_fake_data["course_template"],
-      "cohort": create_fake_data["cohort"]
+      "cohort": create_fake_data["cohort"],
+      "max_students":50
   }
   mock_return_course = {
       "id": "57690009090",
@@ -183,7 +186,8 @@ def test_create_section_course_template_not_found(client_with_emulator,
       "name": "section_20",
       "description": "This is description",
       "course_template": "fake-classroom-id_new",
-      "cohort": create_fake_data["cohort"]
+      "cohort": create_fake_data["cohort"],
+      "max_students":50
   }
   mock_return_course = {
       "id": "57690009090",
@@ -223,7 +227,8 @@ def test_create_section_cohort_not_found(client_with_emulator,
       "name": "section_20",
       "description": "This is description",
       "course_template": create_fake_data["course_template"],
-      "cohort": "fake-cohort-id-new"
+      "cohort": "fake-cohort-id-new",
+      "max_students":50
   }
   mock_return_course = {
       "id": "57690009090",
@@ -298,7 +303,8 @@ def test_update_section(client_with_emulator, create_fake_data):
       "id": section.id,
       "course_id": "561822649300",
       "section_name": "tsection",
-      "description": "tdescription"
+      "description": "tdescription",
+      "max_students":50
   }
   url = BASE_URL + "/sections"
   with mock.patch("routes.section.classroom_crud.update_course"):
@@ -320,7 +326,8 @@ def test_update_section_section_id_not_found(client_with_emulator):
       "id": "fake-section-id_new",
       "course_id": "561822649300",
       "section_name": "tsection",
-      "description": "tdescription"
+      "description": "tdescription",
+      "max_students":50
   }
   url = BASE_URL + "/sections"
 
@@ -341,7 +348,8 @@ def test_update_section_course_id_not_found(client_with_emulator,
       "id": create_fake_data["section"],
       "course_id": "561822649300",
       "section_name": "tsection",
-      "description": "tdescription"
+      "description": "tdescription",
+      "max_students":50
   }
   url = BASE_URL + "/sections"
   with mock.patch("routes.section.classroom_crud.update_course",
@@ -463,7 +471,8 @@ def test_delete_section(client_with_emulator, create_fake_data):
   url = BASE_URL + f"/sections/{create_fake_data['section']}"
   with mock.patch("routes.section.classroom_crud.update_course_state",
                   return_value=[]):
-    resp = client_with_emulator.delete(url)
+    with mock.patch("routes.section.insert_rows_to_bq"):
+      resp = client_with_emulator.delete(url)
   assert resp.status_code == 200
 
 
@@ -512,8 +521,6 @@ def test_enable_notifications_using_fake_section_id(client_with_emulator):
 def test_get_assignment(client_with_emulator, create_fake_data):
   url = BASE_URL + \
       f"/sections/{create_fake_data['section']}/assignments/5789246"
-  print("========")
-  print(url)
   course_work_data = {
       "courseId": "555555555",
       "id": "5789246",
@@ -652,3 +659,17 @@ def test_form_grade_import_form_with_response(client_with_emulator,
   assert resp.status_code == 202, "Status 202"
   assert resp_json[
       "message"] == "Grades for coursework will be updated shortly", "message"
+
+def test_update_enrollment_status(client_with_emulator, create_fake_data):
+  url = BASE_URL + \
+      f"/sections/{create_fake_data['section']}/change_enrollment_status/OPEN"
+  with mock.patch("routes.section.insert_rows_to_bq"):
+    resp = client_with_emulator.patch(url)
+  assert resp.status_code == 200
+
+def test_update_enrollment_status(client_with_emulator, create_fake_data):
+  url = BASE_URL + \
+      f"/sections/{create_fake_data['section']}/change_enrollment_status/OPEN"
+  with mock.patch("routes.section.insert_rows_to_bq"):
+    resp = client_with_emulator.patch(url)
+  assert resp.status_code == 200

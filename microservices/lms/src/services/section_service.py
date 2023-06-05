@@ -10,6 +10,7 @@ from common.models import (Section, CourseEnrollmentMapping,
                            CourseTemplateEnrollmentMapping, User)
 from common.utils.http_exceptions import (InternalServerError,
                                           ResourceNotFound)
+from common.utils.errors import ValidationError
 from services import common_service
 from config import BQ_TABLE_DICT, BQ_DATASET
 
@@ -50,6 +51,7 @@ def copy_course_background_task(course_template_details,
     section.name = course_template_details.name
     section.section = sections_details.name
     section.description = sections_details.description
+    section.max_students = sections_details.max_students
     # Reference document can be get using get() method
     section.course_template = course_template_details
     section.cohort = cohort_details
@@ -118,12 +120,17 @@ def copy_course_background_task(course_template_details,
         # Update the due date of the course work if exists
         if coursework.get("dueDate"):
           coursework_due_date = coursework.get("dueDate")
-          coursework_due_time = coursework.get("dueTime")
-          coursework_due_datetime = datetime.datetime(
-              coursework_due_date.get("year"),
-              coursework_due_date.get("month"), coursework_due_date.get("day"),
-              coursework_due_time.get("hours"),
-              coursework_due_time.get("minutes"))
+
+          if coursework.get("dueTime"):
+            coursework_due_time = coursework.get("dueTime")
+            coursework_due_datetime = datetime.datetime(
+                coursework_due_date.get("year"), coursework_due_date.get("month"),
+                coursework_due_date.get("day"), coursework_due_time.get("hours", 0),
+                coursework_due_time.get("minutes", 0))
+          else:
+            coursework_due_datetime = datetime.datetime(
+                coursework_due_date.get("year"), coursework_due_date.get("month"),
+                coursework_due_date.get("day"))
 
           curr_utc_timestamp = datetime.datetime.utcnow()
           lti_assignment_details["start_date"] = (
@@ -257,6 +264,8 @@ def copy_course_background_task(course_template_details,
           "cohortId":cohort_details.id,\
         "courseTemplateId":course_template_details.id,\
           "status":section.status,\
+        "enrollmentStatus": section.enrollment_status,
+        "maxStudents": section.max_students,
           "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(rows=rows,
@@ -403,7 +412,7 @@ def update_coursework_material(materials,
 
 
 def update_grades(material, section, coursework_id):
-  """Takes the forms all responses ,section, and coursework_id and
+  """Takes the forms all responses ,section, and coursework_id aInd
   updates the grades of student who have responsed to form and
   submitted the coursework
   """
@@ -511,6 +520,20 @@ def add_teacher(headers, section, teacher_email):
   course_enrollment_mapping.invitation_id = invitation_id
   course_enrollment_mapping.save()
   return course_enrollment_mapping
+
+def validate_section(section):
+  """
+  Validate the section if it is eligile for enrollment
+  validate the count of enrolled students ,enrollment status, max_students
+  """
+  if section.enrolled_students_count >= section.max_students:
+    raise ValidationError("Maximum student count reached for section hence student can't be enrolled"
+      )
+  Logger.info(f"Enrollment status {section.enrolled_students_count} {section.status}")
+  if section.enrollment_status == "CLOSED" or section.status != "ACTIVE":
+    raise ValidationError("Enrollment is not active for this section"
+      )
+  return True
 
 
 def add_instructional_designer_into_section(section, course_template_mapping):

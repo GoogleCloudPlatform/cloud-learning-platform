@@ -62,23 +62,26 @@ INSERT_COHORT_EXAMPLE = {
 }
 
 SECTION_EXAMPLE = {
-"id": "id",
-"name": "science 101",
-"section": "create_section_test C",
-"description": "This is updated create section test",
-"classroom_id": "123456789100",
-"classroom_code": "abcdef",
-"classroom_url": "https://classroom.google.com",
-"status": "provisioned",
-"course_template": "course_templates/7d2zTApD-id",
-"cohort": "cohorts/1j-id",
-"enrolled_students_count": 2
+    "id": "id",
+    "name": "science 101",
+    "section": "create_section_test C",
+    "description": "This is updated create section test",
+    "classroom_id": "123456789100",
+    "classroom_code": "abcdef",
+    "classroom_url": "https://classroom.google.com",
+    "status": "provisioned",
+    "course_template": "course_templates/7d2zTApD-id",
+    "cohort": "cohorts/1j-id",
+    "enrollment_status":"OPEN",
+    "enrolled_students_count": 2,
+    "max_students":50
 }
 INSERT_SECTION_EXAMPLE = {
-"name": "section c",
-"description": "This is updated create section test",
-"course_template": "course_template-id",
-"cohort": "cohort-id"
+    "name": "section c",
+    "description": "This is updated create section test",
+    "course_template": "course_template-id",
+    "cohort": "cohort-id",
+    "max_students":50
 }
 
 CREDENTIAL_JSON = {
@@ -147,10 +150,11 @@ INSTRUCTIONAL_DESIGNER_USER_EXAMPLE = {
 }
 
 UPDATE_SECTION = {
-"id": "string",
-"course_id": "string",
-"section_name": "string",
-"description": "string"
+    "id": "string",
+    "course_id": "string",
+    "section_name": "string",
+    "description": "string",
+    "max_students":50
 }
 
 ASSIGNMENT_MODEL = {

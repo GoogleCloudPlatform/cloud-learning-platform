@@ -18,11 +18,13 @@ from schemas.error_schema import (ConflictResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
 from schemas.section import (
-    DeleteSectionResponseModel, GetSectiontResponseModel, SectionDetails,
-    SectionListResponseModel, UpdateSectionResponseModel,
-    TeachersListResponseModel, GetTeacherResponseModel, AssignmentModel,
-    GetCourseWorkList, ImportGradeResponseModel, EnrollTeacherSection,
-    DeleteTeacherFromSectionResponseModel)
+    DeleteSectionResponseModel,
+    GetSectiontResponseModel, SectionDetails, SectionListResponseModel,
+    UpdateSectionResponseModel,TeachersListResponseModel,
+    GetTeacherResponseModel,AssignmentModel,GetCourseWorkList,
+    ImportGradeResponseModel,
+    EnrollTeacherSection,DeleteTeacherFromSectionResponseModel,
+    UpdateEnrollmentStatusSectionModel)
 from schemas.update_section import UpdateSection
 from services.section_service import copy_course_background_task,\
 update_grades,add_teacher
@@ -204,9 +206,17 @@ def enroll_teacher(section_id: str, request: Request,
       raise Conflict(f"User {teacher_email} is already" +
                      f" in this section {section.id} as a leaner or faculty")
 
-    result = add_teacher(headers, section, teacher_email)
-    message = f"Successfully enrolled the teacher using {teacher_email}"
-    return {"message": message, "data": course_enrollment_user_model(result)}
+    result=add_teacher(headers,section,teacher_email)
+    if result.invitation_id:
+      return {
+        "message": f"Successfully invited the teacher using {teacher_email}",
+        "data": course_enrollment_user_model(result)
+    }
+    return {
+        "message": f"Successfully enrolled the teacher using {teacher_email}",
+        "data": course_enrollment_user_model(result)
+    }
+
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
@@ -330,6 +340,22 @@ def delete_section(section_id: str):
     section_details.enrollment_status = "CLOSED"
     section_details.update()
     Section.soft_delete_by_id(section_id)
+    rows=[{
+      "sectionId":section_details.id,
+      "courseId":section_details.classroom_id,
+      "classroomUrl":section_details.classroom_url,
+      "name":section_details.section,
+      "description":section_details.description,
+      "cohortId":section_details.cohort.id,
+      "courseTemplateId":section_details.course_template.id,
+      "status":section_details.status,
+      "enrollmentStatus": section_details.enrollment_status,
+      "maxStudents": section_details.max_students,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+    insert_rows_to_bq(rows=rows,
+                      dataset=BQ_DATASET,
+                      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
     return {
         "message": f"Successfully archived the Section with id {section_id}"
     }
@@ -405,17 +431,20 @@ def update_section(sections_details: UpdateSection):
           f" {sections_details.course_id} is not found in classroom")
     section.section = sections_details.section_name
     section.description = sections_details.description
+    section.max_students = sections_details.max_students
     section.update()
     updated_section = convert_section_to_section_model(section)
     rows=[{
-      "sectionId":sections_details.id,\
-      "courseId":sections_details.course_id,\
-      "classroomUrl":updated_section["classroom_url"],\
-        "name":sections_details.section_name,\
-        "description":sections_details.description,\
-          "cohortId":updated_section["cohort"].split("/")[1],\
-          "courseTemplateId":updated_section["course_template"].split("/")[1],\
+      "sectionId":section.id,\
+      "courseId":section.classroom_id,\
+      "classroomUrl":section.classroom_url,\
+        "name":section.name,\
+        "description":section.description,\
+          "cohortId":section.cohort.id,\
+          "courseTemplateId":section.course_template.id,\
             "status":section.status,
+            "enrollmentStatus": section.enrollment_status,
+            "maxStudents": section.max_students,
           "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(rows=rows,
@@ -622,4 +651,61 @@ def import_grade(section_id: str, coursework_id: str,
     Logger.error(e)
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
+    raise InternalServerError(str(e)) from e
+
+@router.patch("/{section_id}/change_enrollment_status/{enrollment_status}",
+              response_model=UpdateEnrollmentStatusSectionModel)
+def update_enrollment_status(section_id:str,enrollment_status: str):
+  """Update enrollment status for a section
+
+  Args:
+    section_id(str): id of the section in firestore
+    status: enrollment status of the section
+    [OPEN,CLOSED]
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if course_id or section_id is not found
+  Returns:
+    {"status":"Success","data":{}}: Returns Updated course details,
+    {'status': 'Failed'} if the user creation raises an exception.
+  """
+  try:
+    if enrollment_status in ("OPEN","CLOSED"):
+      section = Section.find_by_id(section_id)
+      section.enrollment_status = enrollment_status
+      section.update()
+      updated_section = convert_section_to_section_model(section)
+      rows=[{
+      "sectionId":section.id,\
+      "courseId":section.classroom_id,\
+      "classroomUrl":section.classroom_url,\
+        "name":section.name,\
+        "description":section.description,\
+          "cohortId":section.cohort.id,\
+          "courseTemplateId":section.course_template.id,\
+            "status":section.status,
+            "enrollmentStatus": section.enrollment_status,
+            "maxStudents": section.max_students,
+          "timestamp":datetime.datetime.utcnow()
+          }]
+      insert_rows_to_bq(
+      rows=rows,
+      dataset=BQ_DATASET,
+      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"]
+      )
+      return {"data": updated_section}
+    else:
+      raise ValidationError("Accepted parameters are only 'OPEN' and 'CLOSED'")
+  except ValidationError as ve:
+    raise BadRequest(str(ve)) from ve
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except HttpError as hte:
+    Logger.error(hte)
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                              message=str(hte)) from hte
+  except Exception as e:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(e)
     raise InternalServerError(str(e)) from e

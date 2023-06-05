@@ -2,7 +2,7 @@
 import traceback
 from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
-from services import student_service
+from services import student_service,section_service
 from utils.user_helper import (
   course_enrollment_user_model,get_user_id,
   check_user_can_enroll_in_section)
@@ -280,8 +280,12 @@ def delete_student(section_id: str, user: str, request: Request):
     course_id = section_details.classroom_id
     response_get_student = classroom_crud.get_user_details(user_id, headers)
     student_email = response_get_student["data"]["email"]
-    classroom_crud.delete_student(course_id=course_id,\
-      student_email=student_email)
+    try:
+      classroom_crud.delete_student(course_id=course_id,\
+        student_email=student_email)
+    except HttpError as hte:
+      if hte.status_code != 404:
+        raise HttpError(hte.resp,hte.content,hte.uri) from hte
     result.status = "inactive"
     result.update()
     # Update enrolled student count in section
@@ -331,7 +335,8 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
   """
   try:
     cohort = Cohort.find_by_id(cohort_id)
-    sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
+    sections = Section.collection.filter("cohort", "==", cohort.key).filter(
+    "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
     if cohort.enrolled_students_count >= cohort.max_students:
@@ -345,6 +350,9 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
       raise Conflict(f"Student {input_data.email} is already\
                       enrolled for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
+    if section is None:
+      raise Conflict("Max count reached for all sctions is reached hence" +
+                  "student cannot be erolled in this cohort")
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {input_data.email}")
     user_object = classroom_crud.enroll_student(
@@ -432,6 +440,11 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
+    section_service.validate_section(section)
+    cohort = section.cohort
+    if cohort.enrolled_students_count >= cohort.max_students:
+      raise ValidationError("Cohort Max count reached hence student cannot" +
+            "be erolled in this cohort")
     if not check_user_can_enroll_in_section(
         email=input_data.email, headers=headers, section=section):
       raise Conflict(f"User {input_data.email} is already\
@@ -493,6 +506,9 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
     raise ClassroomHttpException(status_code=ae.resp.status,
                                  message="Can't enroll student to classroom,\
   Please check organizations policy or authentication scopes") from ae
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -521,7 +537,11 @@ def invite_student(section_id: str, student_email: str, request: Request):
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
-    #TODO: add logic for cohort max count
+    section_service.validate_section(section)
+    cohort = section.cohort
+    if cohort.enrolled_students_count >= cohort.max_students:
+      raise Conflict("Cohort Max count reached hence student cannot" +
+                     " be erolled in this cohort")
     invitation_details = student_service.invite_student(
         section=section, student_email=student_email, headers=headers)
     return {
@@ -538,6 +558,9 @@ def invite_student(section_id: str, student_email: str, request: Request):
   except HttpError as ae:
     raise ClassroomHttpException(status_code=ae.resp.status,
                                  message=str(ae)) from ae
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -565,7 +588,8 @@ def invite_student_cohort(cohort_id: str, student_email: str,
   """
   try:
     cohort = Cohort.find_by_id(cohort_id)
-    sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
+    sections = Section.collection.filter("cohort", "==", cohort.key).filter(
+    "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
     if cohort.enrolled_students_count >= cohort.max_students:
@@ -575,10 +599,14 @@ def invite_student_cohort(cohort_id: str, student_email: str,
       raise ResourceNotFoundException("Given CohortId\
          does not have any sections")
     if not student_service.check_student_can_enroll_in_cohort(
-        email=student_email, headers=headers, sections=sections):
+    email=student_email, headers=headers, sections=sections):
       raise Conflict(f"User {student_email} is already\
                       registered for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
+    if section is None:
+      raise Conflict(
+    "Max count reached for all sctions is reached hence student cannot" +
+                     " be erolled in this cohort")
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {student_email}")
     headers = {"Authorization": request.headers.get("Authorization")}
@@ -586,7 +614,7 @@ def invite_student_cohort(cohort_id: str, student_email: str,
         section=section, student_email=student_email, headers=headers)
     return {
         "message":
-        f"Successfully Added the Student with email {student_email}",
+  f"Successfully Added the Student with email {student_email}",
         "data": invitation_details
     }
   except ResourceNotFoundException as err:
@@ -646,16 +674,14 @@ def update_invites():
           # Logger.info(f"User record found for User {user_details}")
           user_profile = classroom_crud.get_user_profile_information(
               course_record.user.email)
-          user_rec = User.collection.filter("user_id", "==",
-                                            course_record.user.id).get()
-
+          user_ref = course_record.user
           # Check if gaia_id is "" if yes so update personal deatils
-          if user_rec.gaia_id == "":
-            user_rec.first_name = user_profile["name"]["givenName"]
-            user_rec.last_name = user_profile["name"]["familyName"]
-            user_rec.gaia_id = user_profile["id"]
-            user_rec.photo_url = user_profile["photoUrl"]
-            user_rec.update()
+          if user_ref.gaia_id == "":
+            user_ref.first_name = user_profile["name"]["givenName"]
+            user_ref.last_name = user_profile["name"]["familyName"]
+            user_ref.gaia_id = user_profile["id"]
+            user_ref.photo_url = user_profile["photoUrl"]
+            user_ref.update()
           course_record.status = "active"
           course_record.update()
           # Update section enrolled student count

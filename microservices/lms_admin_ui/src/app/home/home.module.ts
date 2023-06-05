@@ -28,7 +28,7 @@ import { ViewLtiAssignmentDialog } from './single-template/single-template.compo
 import { DeleteLtiDialog } from './single-template/single-template.component';
 import { ViewSectionLtiAssignmentDialog } from './section/section.component';
 import { DeleteSectionLtiDialog } from './section/section.component';
-
+import { addTeacherDialog } from './section/section.component';
 @NgModule({
   declarations: [
     HomeComponent,
@@ -50,7 +50,8 @@ import { DeleteSectionLtiDialog } from './section/section.component';
     ViewLtiAssignmentDialog,
     DeleteLtiDialog,
     ViewSectionLtiAssignmentDialog,
-    DeleteSectionLtiDialog
+    DeleteSectionLtiDialog,
+    addTeacherDialog
   ],
   // entryComponents: [CreateCohortModalComponent],
   imports: [
