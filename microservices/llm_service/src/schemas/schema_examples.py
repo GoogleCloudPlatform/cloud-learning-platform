@@ -46,5 +46,5 @@ USER_EXAMPLE = {
     "email": "user@gmail.com",
     "role": "Admin",
     "user_type": "learner",
-    "status": "active"   
+    "status": "active"
 }

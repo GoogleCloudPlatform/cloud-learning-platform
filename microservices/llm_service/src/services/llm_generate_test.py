@@ -20,6 +20,9 @@
 import os
 import pytest
 from unittest import mock
+from common.testing.firestore_emulator import (firestore_emulator,
+                                               clean_firestore)
+from common.models import UserChat
 
 FAKE_GENERATE_PARAMS = {
     "llm_type": "LLM Test",
@@ -33,12 +36,6 @@ with mock.patch("services.llm_generate.langchain_llm_generate",
   with mock.patch("services.llm_generate.google_llm_predict",
       return_value = FAKE_GENERATE_RESPONSE):
     from services.llm_generate import llm_generate
-
-
-from common.testing.firestore_emulator import (firestore_emulator,
-                                               clean_firestore)
-
-from common.models import UserChat
 
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",

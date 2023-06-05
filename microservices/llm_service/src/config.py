@@ -18,7 +18,6 @@
 # pylint: disable=unspecified-encoding,line-too-long
 import os
 from common.utils.logging_handler import Logger
-from common.utils.token_handler import UserCredentials
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
