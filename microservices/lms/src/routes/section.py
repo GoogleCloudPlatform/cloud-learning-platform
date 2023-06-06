@@ -733,7 +733,7 @@ def failed_to_provision():
         Logger.info(f"Section details {section.id} {section.created_time}")
         time_difference = datetime.datetime.utcnow().replace(
           tzinfo=datetime.timezone.utc) - section.created_time
-        if time_difference.days >= time_difference.days:
+        if time_difference.days >= 7:
           classroom_course = classroom_crud.get_course_by_id(
             section.classroom_id)
           # Delete drive folder of classroom
