@@ -38,7 +38,7 @@ describe('CreateCohortModalComponent', () => {
   });
 
   it('it should call createCohort method',async()=>{
-    const mockCreateCohortResponse = {'success':true}
+    const mockCreateCohortResponse = {'success':false}
     spyOn(homeService, 'createCohort').and.returnValue(of(mockCreateCohortResponse))
     component.createCohort()
     fixture.detectChanges()
@@ -47,7 +47,7 @@ describe('CreateCohortModalComponent', () => {
   })
 
   it('it should call editCohort method',async()=>{
-    const mockCreateCohortResponse = {'success':true}
+    const mockCreateCohortResponse = {'success':false}
     component.cohortModalData.mode = 'Edit'
     spyOn(homeService, 'editCohort').and.returnValue(of(mockCreateCohortResponse))
     component.createCohort()

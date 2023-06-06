@@ -15,14 +15,21 @@ describe('SectionListComponent', () => {
 
     fixture = TestBed.createComponent(SectionListComponent);
     component = fixture.componentInstance;
-    const expectedList = [{
-      'id':1,
-      'section':'saurav section',
-      'cohort': 'A',
-      'classroom_url':'http://abc.com',
-      'description':'ABC',
-      'name':'Test LTI'
-    }]
+    const expectedList = [       {
+      "id": "5lUaIj8fP4cS8jZcEk",
+      "name": "JWT_test2",
+      "section": "test section",
+      "description": "testing",
+      "classroom_id": "6131026561",
+      "classroom_code": "afhn75",
+      "classroom_url": "https://classroom.google.com/c/NjEzMTNTI2NTYx",
+      "course_template": "course_templates/fHI8HdbWACPXsj5w2Y",
+      "cohort": "cohorts/qhDMJeG3BYNe6l6TG6",
+      "status": "FAILED_TO_PROVISION",
+      "enrollment_status": "CLOSED",
+      "enrolled_students_count": 0,
+      "max_students": 2
+  }]
     component.sectionList = expectedList
     fixture.detectChanges();
   });
@@ -42,17 +49,17 @@ describe('SectionListComponent', () => {
   })
 
 
-  it('should have a section title as Saurav Section', ()=>{
+  it('should have a section title as test section', ()=>{
     fixture.detectChanges();
-    const titleText = 'saurav section'
+    const titleText = 'test section'
     const titleElement = fixture.debugElement.query(By.css('.title > .text'))
     expect(titleElement.nativeElement.textContent).toBe(titleText)
   })
 
   
-  it('should have a metadata as Test LTI', ()=>{
+  it('should have a metadata as JWT_test2', ()=>{
     fixture.detectChanges();
-    const metaText = 'Test LTI'
+    const metaText = 'JWT_test2'
     const metaElement = fixture.debugElement.query(By.css('.metadata  .body'))
     expect(metaElement.nativeElement.textContent).toBe(metaText)
   })
