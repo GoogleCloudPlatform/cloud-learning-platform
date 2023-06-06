@@ -11,6 +11,6 @@ spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 80
+    targetPort: 9029
   selector:
     app: api-docs

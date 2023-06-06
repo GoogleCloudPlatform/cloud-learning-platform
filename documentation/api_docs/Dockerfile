@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 8888
 
-ENTRYPOINT ["npm", "run", "serve", "--", "--port", "80", "--host", "0.0.0.0"]
+ENTRYPOINT ["npm", "run", "serve", "--", "--port", "9029", "--host", "0.0.0.0"]
