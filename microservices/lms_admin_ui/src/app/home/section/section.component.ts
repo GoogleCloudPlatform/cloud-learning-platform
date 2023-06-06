@@ -64,6 +64,8 @@ export class SectionComponent implements OnInit,OnDestroy {
   studentTableData: student[] = []
   courseworkTable: coursework[] = []
   ltiAssignmentsTableData: ltiAssignment[] = []
+
+  instructionalDesignerList:string[]=[]
   // dataSource = new MatTableDataSource(this.tableData);
 
   cohortDetails: any
@@ -99,6 +101,7 @@ export class SectionComponent implements OnInit,OnDestroy {
       this.cohortDetails = res
       console.log('cohort details', this.cohortDetails)
       this.getCourseTemplateDetails(res.course_template.split('/')[1])
+      this.getInstructionalDesignerDetails(res.course_template.split('/')[1])
     })
   }
   getCourseTemplateDetails(id: any) {
@@ -109,7 +112,34 @@ export class SectionComponent implements OnInit,OnDestroy {
       this.getSectionList(this.cohortDetails.id)
     })
   }
-
+  getInstructionalDesignerDetails(id:any){
+    this._HomeService.getInstructionalDesigner(id).subscribe((res:any)=>{
+this.instructionalDesignerList=res.data
+    })
+  }
+  getIdTotal(id:any){
+    return '+'+(id.length-1)
+    }
+    checkIfBadgeHidden(id:any){
+      if(id.length == 1){
+        return true
+      }
+      else{
+        return false
+      }
+    }
+    getMattooltipText(arr:any){
+      if(arr.length == 1){
+        return arr[0]['email']
+      }
+      else{
+        let text=''
+        for(let x of arr){
+          text = text+x['email']+' , '
+        }
+        return text
+      }
+    }
   
   getSectionList(cohortid: any) {
     this.loadSection = true
@@ -513,6 +543,12 @@ transformCourseworkTableData(data:any){
     const dialogRef = this.dialog.open(addTeacherDialog, {
       width: '500px',
       data: sectionTemp
+    });
+
+        dialogRef.afterClosed().subscribe(result => {
+      if (result.data == 'closed') {
+        this.getSectionTeachers()
+      }
     });
   }
   getStatusName(status:any){

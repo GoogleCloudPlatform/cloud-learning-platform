@@ -1,6 +1,6 @@
 {
     "/lms/api/v1/*": {
-        "target": "http://localhost:8888",
+        "target": "https://core-learning-services-dev.cloudpssolutions.com",
         "secure": false,
         "logLevel": "debug",
         "changeOrigin": true
