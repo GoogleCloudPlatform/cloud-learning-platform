@@ -107,6 +107,14 @@ class LTIContentItem(BaseModel):
                                          None).get()
     return lti_content_item_doc
 
+  @classmethod
+  def filter_with_context_id_and_tool_id(cls, tool_id, context_id):
+    lti_content_item_doc = cls.collection.filter("tool_id", "==",tool_id)\
+      .filter("context_id", "==", context_id)\
+      .filter("deleted_at_timestamp", "==", None)\
+      .get()
+    return lti_content_item_doc
+
 
 class LTISession(BaseModel):
   """LTI Session Data Model"""

@@ -21,6 +21,10 @@ export class LtiService {
     return this.http.get(`${environment.ltiUrl}tools`)
   }
 
+  getToolsListAndContentItems(tool_id: string, context_id: string) {
+    return this.http.get(`${environment.classroomShimUrl}tools-and-content-items?tool_id=${tool_id}&context_id=${context_id}`)
+  }
+
   postTool(data: object) {
     return this.http.post(`${environment.ltiUrl}tool`, data)
   }

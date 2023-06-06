@@ -16,7 +16,8 @@ BASIC_TOOL_EXAMPLE = {
     "enable_grade_sync": False,
     "enable_nrps": False,
     "custom_params": "deepLinkLaunchEndpoint=$ResourceLink.RelaunchURL;timeZone=$Person.address.timezone",
-    "validate_title_for_grade_sync": False
+    "validate_title_for_grade_sync": False,
+    "lti_tool_type": "tool_type_1"
 }
 
 FULL_TOOL_EXAMPLE = {

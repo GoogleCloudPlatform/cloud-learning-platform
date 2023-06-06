@@ -30,7 +30,7 @@ export class CreateAssignmentComponent {
     private fb: FormBuilder, private homeService: HomeService, private ltiService: LtiService, private authService: AuthService) { }
 
   ngOnInit() {
-    this.getAllTools()
+    this.getAllToolsAndContentItems()
     console.log('dialog data', this.dialogData)
     if (this.dialogData.mode == "Create") {
       this.ltiAssignmentForm = this.fb.group({
@@ -158,7 +158,7 @@ export class CreateAssignmentComponent {
     }
   }
 
-  getAllTools() {
+  getAllToolsAndContentItems() {
     this.ltiService.getToolsList().subscribe((res: any) => {
       this.toolsList = res.data
       let tool = this.toolsList.find((x) => {
