@@ -20,6 +20,8 @@ export class CreateAssignmentComponent {
   toolsList = []
   showProgressSpinner: boolean = false
   toolSelectDisabled: boolean = false
+  isDisplayButtonEnabled: boolean = true
+  displayButton: string = "selectContentItem"
   selectedTool: any
   toolName: any
   constructor(
@@ -61,6 +63,38 @@ export class CreateAssignmentComponent {
 
   onDropdownChange() {
     console.log(this.ltiAssignmentForm.value['tool_id'])
+    let tool = this.toolsList.find((x) => {
+      if (x.id == this.ltiAssignmentForm.value['tool_id']) {
+        return true
+      }
+      return false
+    })
+    // display loader
+    this.ltiService.getContentItems(this.ltiAssignmentForm.value['tool_id'], this.dialogData.extra_data.contextId).subscribe(
+      (response: any) => {
+        // hide loader
+        if (tool.tool_type == "tool_type_1") {
+          this.displayButton = "selectContentItem"
+          if (response.data) {
+            this.isDisplayButtonEnabled = false
+            this.ltiAssignmentForm.get("lti_content_item_id").setValue(response.data[0].id)
+          } else {
+            this.isDisplayButtonEnabled = true
+          }
+        } else if (tool.tool_type == "tool_type_2") {
+          this.displayButton = "createContentItem"
+          if (response.data) {
+            this.isDisplayButtonEnabled = false
+            this.ltiAssignmentForm.get("lti_content_item_id").setValue(response.data[0].id)
+          } else {
+            this.isDisplayButtonEnabled = true
+          }
+        } else {
+          this.displayButton = "selectContentItem"
+          this.isDisplayButtonEnabled = true
+        }
+      }
+    )
   }
 
   processFormInputs(values) {
@@ -120,6 +154,45 @@ export class CreateAssignmentComponent {
   }
 
   openContentSelector() {
+    let userId = null
+    if (localStorage.getItem("userId")) {
+      userId = localStorage.getItem("userId")
+    } else {
+      this.authService.findEmailSetId()
+      userId = localStorage.getItem("userId")
+    }
+    if (this.ltiAssignmentForm.value['tool_id'] != null) {
+      let ltiModalData: LooseObject = {}
+      ltiModalData['mode'] = 'Open'
+      ltiModalData['init_data'] = ''
+      ltiModalData['extra_data'] = {
+        contextId: this.dialogData.extra_data.contextId,
+        contextType: this.dialogData.page,
+        toolId: this.ltiAssignmentForm.value['tool_id'],
+        userId: userId
+      }
+
+      const dialogRef = this.dialog.open(ContentSelectorComponent, {
+        minWidth: '750px',
+        data: ltiModalData
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result.data) {
+          this.ltiAssignmentForm.get("lti_content_item_id").setValue(result.data.response[0].content_item_id)
+          if (localStorage.getItem("contentItemId")) {
+            localStorage.removeItem('contentItemId')
+          }
+        }
+        console.log("result", result)
+      });
+    }
+    else {
+      this.openFailureSnackBar('Please select a tool', 'Error')
+    }
+  }
+  
+  openCreateContentDialogue() {
     let userId = null
     if (localStorage.getItem("userId")) {
       userId = localStorage.getItem("userId")

@@ -109,11 +109,11 @@ class LTIContentItem(BaseModel):
 
   @classmethod
   def filter_with_context_id_and_tool_id(cls, tool_id, context_id):
-    lti_content_item_doc = cls.collection.filter("tool_id", "==",tool_id)\
+    lti_content_items = cls.collection.filter("tool_id", "==",tool_id)\
       .filter("context_id", "==", context_id)\
       .filter("deleted_at_timestamp", "==", None)\
-      .get()
-    return lti_content_item_doc
+      .fetch()
+    return list(lti_content_items)
 
 
 class LTISession(BaseModel):
