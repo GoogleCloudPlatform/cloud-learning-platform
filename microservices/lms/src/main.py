@@ -19,6 +19,7 @@ import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
 import uvicorn
+from common.utils.auth_service import validate_user
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import add_exception_handlers
 from fastapi import FastAPI, Request, Depends
@@ -29,7 +30,6 @@ from routes import (
   classroom_courses,analytics
   # ,user
         )
-from utils.helper import validate_user
 
 app = FastAPI()
 

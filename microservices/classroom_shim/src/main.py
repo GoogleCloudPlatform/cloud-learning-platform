@@ -16,7 +16,7 @@ from fastapi import FastAPI, Depends
 from fastapi.templating import Jinja2Templates
 from routes import launch, lti_assignment, grade, context, assignment_copy
 from common.utils.http_exceptions import add_exception_handlers
-from utils.helper import validate_user
+from common.utils.auth_service import validate_user
 
 templates = Jinja2Templates(directory="templates")
 
