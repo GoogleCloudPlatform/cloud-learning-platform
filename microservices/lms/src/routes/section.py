@@ -24,7 +24,8 @@ from schemas.section import (
     GetTeacherResponseModel,AssignmentModel,GetCourseWorkList,
     ImportGradeResponseModel,
     EnrollTeacherSection,DeleteTeacherFromSectionResponseModel,
-    UpdateEnrollmentStatusSectionModel)
+    UpdateEnrollmentStatusSectionModel,
+    DeleteFailedSectionSectionModel)
 from schemas.update_section import UpdateSection
 from services.section_service import copy_course_background_task,\
 update_grades,add_teacher
@@ -709,7 +710,8 @@ def update_enrollment_status(section_id:str,enrollment_status: str):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-@router.delete("/cronjob/delete_failed_to_provision_section")
+@router.delete("/cronjob/delete_failed_to_provision_section",
+               response_model=DeleteFailedSectionSectionModel)
 def failed_to_provision():
   """Get a section details from db and archive record
   from section collection and
@@ -754,6 +756,7 @@ def failed_to_provision():
                     {section.classroom_id}")
         continue
     return {
+        "su"
         "data":count,
         "message": f"Successfully archived the Section with id {count}"
     }

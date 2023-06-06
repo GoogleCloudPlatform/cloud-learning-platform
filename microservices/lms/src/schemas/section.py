@@ -356,3 +356,18 @@ class UpdateEnrollmentStatusSectionModel(BaseModel):
             "data": SECTION_EXAMPLE
         }
     }
+class DeleteFailedSectionSectionModel(BaseModel):
+  """Update  Section Response Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success"
+  data: Optional[int] = None
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success",
+            "data": 2
+        }
+    }
