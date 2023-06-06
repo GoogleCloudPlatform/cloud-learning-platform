@@ -1,7 +1,7 @@
 [
     {
-        "spec": "/llm-service/api/v1/openapi.json",
-        "route": "/llm-service/api/v1/redoc",
+        "spec": "/lms/api/v1/openapi.json",
+        "route": "/lms/api/v1/redoc",
         "label": "LLM Service"
     }
 ]
