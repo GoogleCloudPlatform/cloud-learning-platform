@@ -90,7 +90,7 @@ def create_section(sections_details: SectionDetails,
                               course_template_details=course_template_details,
                               sections_details=sections_details,
                               cohort_details=cohort_details,
-                              message="Create section background task completed")
+                          message="Create section background task completed")
     Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
                  section name{sections_details.name}")
@@ -731,8 +731,9 @@ def failed_to_provision():
         Logger.info(f"Section details {section.id} {section.created_time}")
         time_difference = datetime.datetime.utcnow().replace(
           tzinfo=datetime.timezone.utc) - section.created_time
-        if time_difference.days >=6:
-          classroom_course = classroom_crud.get_course_by_id(section.classroom_id)
+        if time_difference.days >=7:
+          classroom_course = classroom_crud.get_course_by_id(
+            section.classroom_id)
           # Delete drive folder of classroom
           folder_id = classroom_course["teacherFolder"]["id"]
           Logger.info(f"{folder_id} {section.name}")
@@ -744,7 +745,7 @@ def failed_to_provision():
           classroom_crud.delete_course_by_id(section.classroom_id)
           Section.delete_by_id(section.id)
           Logger.info(f"Deleted section with id \
-                    {section.id} classroom_id {section.classroom_id} {folder_id}")
+                {section.id} classroom_id {section.classroom_id} {folder_id}")
           count=count+1
 
       except HttpError as ae:

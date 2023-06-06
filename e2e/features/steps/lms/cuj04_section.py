@@ -520,8 +520,8 @@ def step_impl_63(context):
 )
 def step_impl_64(context):
   print("-----------------------------------------------------------")
-  print(f"Section with id {context.section.id}")
-  section = Section.find_by_id(context.section.id)
+  print(f"Section with id {context.sections.id}")
+  section = Section.find_by_id(context.sections.id)
   section.status = "FAILED_TO_PROVISION"
   section.created_time = datetime.datetime.utcnow() - timedelta(days=8)
   section.update()
@@ -551,10 +551,10 @@ def step_impl_66(context):
 @behave.given(
     "A cronjob is accessing this API daily to delete section"
 )
-def step_impl_65(context):
+def step_impl_67(context):
   print("-------------------------------------------")
-  print(f"Section with id {context.section.id}")
-  section = Section.find_by_id(context.section.id)
+  print(f"Section with id {context.sections.id}")
+  section = Section.find_by_id(context.sections.id)
   section.status = "ACTIVE"
   section.created_time = datetime.datetime.utcnow() - timedelta(days=5)
   section.update()
@@ -565,7 +565,7 @@ def step_impl_65(context):
 @behave.when(
     "A section with FAILED_TO_PROVISION status is present in db with ACTIVE status"
 )
-def step_impl_66(context):
+def step_impl_68(context):
   resp = requests.delete(context.url,
                        headers=context.header)
   context.status = resp.status_code
@@ -575,7 +575,7 @@ def step_impl_66(context):
 @behave.then(
     "Then section is not deleted from db and google classroom"
 )
-def step_impl_67(context):
+def step_impl_69(context):
   print("Response of delete 1 section API",context.response)
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"

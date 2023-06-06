@@ -691,15 +691,16 @@ def test_delete_section_cronjob(client_with_emulator,create_fake_data):
 "routes.section.classroom_crud.delete_drive_folder"):
         with mock.patch(
         "routes.section.classroom_crud.delete_course_by_id"):
-          resp = client_with_emulator.post(url)
+          resp = client_with_emulator.delete(url)
   resp_json = resp.json()
   print(f"This is response json {resp_json}")
   assert resp.status_code == 200, "Status 200"
   assert resp_json[
     "message"] == "Successfully archived the Section with id 1","message"
   assert resp_json["data"] == 1
-  
-def test_delete_section_cronjob_for_active_section(client_with_emulator,create_fake_data):
+
+def test_delete_section_cronjob_for_active_section(client_with_emulator,
+                                          create_fake_data):
 
   url = BASE_URL + "/sections/cronjob/delete_failed_to_provision_section"
   with mock.patch(
@@ -711,7 +712,7 @@ def test_delete_section_cronjob_for_active_section(client_with_emulator,create_f
 "routes.section.classroom_crud.delete_drive_folder"):
         with mock.patch(
         "routes.section.classroom_crud.delete_course_by_id"):
-          resp = client_with_emulator.post(url)
+          resp = client_with_emulator.deletet(url)
   resp_json = resp.json()
   print(f"This is response json {resp_json}")
   assert resp.status_code == 200, "Status 200"
