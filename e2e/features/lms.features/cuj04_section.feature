@@ -118,6 +118,6 @@ Feature: Add student to cohort
 
    @fixture.create.section
   Scenario: Delete section cronjob with no section failed to create
-    Given A cronjob is accessing this API daily to delete sectio
+    Given A cronjob is accessing this API daily to delete section
     When  A section with FAILED_TO_PROVISION status is present in db with ACTIVE status
-    Then Then section is not deleted from db and google classroom with drive folder is deleted
+    Then Then section is not deleted from db and google classroom

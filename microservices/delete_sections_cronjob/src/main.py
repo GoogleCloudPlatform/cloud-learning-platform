@@ -59,7 +59,7 @@ def main():
   auth_client = UserCredentials(LMS_BACKEND_ROBOT_USERNAME,
                                 LMS_BACKEND_ROBOT_PASSWORD)
   id_token = auth_client.get_id_token()
-  api_endpoint = "http://lms/lms/api/v1/sections/delete_section_cronjob"
+  api_endpoint = "http://lms/lms/api/v1/sections/cronjob/delete_failed_to_provision_section"
 
   res = requests.delete(
       url=api_endpoint,
@@ -67,8 +67,8 @@ def main():
           "Content-Type": "application/json",
           "Authorization": f"Bearer {id_token}"
       })
-  
-  Logger.info(f"Response of delete api {res.status_code}")
+  count = res.json()["data"]
+  Logger.info(f"Response of delete api {res.status_code} deleted section count is {count}")
   if res.status_code != 200:
     Logger.error(
         f"Delete section API failed with status code {res.status_code}")

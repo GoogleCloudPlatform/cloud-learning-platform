@@ -17,7 +17,7 @@ kind: CronJob
 metadata:
   name: delete-sections-cronjob
 spec:
-  schedule: "46 15 * * 1"
+  schedule: "00 5 * * *"
   jobTemplate:
     spec:
       template:
