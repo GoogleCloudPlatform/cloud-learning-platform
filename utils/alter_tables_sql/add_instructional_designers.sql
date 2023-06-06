@@ -1,0 +1,1 @@
+ALTER TABLE courseTemplate ADD COLUMN IF NOT EXISTS instructionalDesigners ARRAY<STRING>;

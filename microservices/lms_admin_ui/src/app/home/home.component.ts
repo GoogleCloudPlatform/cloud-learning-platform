@@ -127,7 +127,19 @@ export class HomeComponent implements OnInit {
     this.courseTemplateList = []
     this._HomeService.getCourseTemplateList(this.courseTemplateSkip, this.courseTemplateLimit).subscribe((res: any) => {
       if (res.success == true) {
-        this.courseTemplateList = res.course_template_list
+for (let x of res.course_template_list){
+  let courseTemplateData: LooseObject = {}
+  courseTemplateData['admin'] = x['admin']
+  courseTemplateData['classroom_code'] = x['classroom_code']
+  courseTemplateData['classroom_id'] = x['classroom_id']
+  courseTemplateData['classroom_url'] = x['classroom_url']
+  courseTemplateData['description'] = x['description']
+  courseTemplateData['id'] = x['id']
+  courseTemplateData['name'] = x['name']
+  courseTemplateData['instructional_designer'] = ''
+  this.courseTemplateList.push(courseTemplateData)
+}
+
         this.courseTemplateLoader = false
       }
     })

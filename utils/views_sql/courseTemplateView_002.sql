@@ -5,7 +5,7 @@ courseTemplateId,
 name,		
 description,			
 classroomId,
-instructionalDesigner,
+instructionalDesigners,
 timestamp
  FROM
 (
