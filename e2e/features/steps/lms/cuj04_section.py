@@ -1,6 +1,7 @@
 import behave
 import requests
 import time
+from common.models import Section
 from testing_objects.test_config import API_URL,e2e_google_form_id,e2e_drive_folder_id
 from testing_objects.course_template import emails
 from e2e.gke_api_tests.secrets_helper import (get_student_email_and_token,
@@ -504,6 +505,32 @@ def step_impl_62(context):
 
 @behave.then(
     "Code will not be updated and API will throw a resource not found error"
+)
+def step_impl_63(context):
+  assert context.status == 404, "Status 404"
+  assert context.response["success"] is False, "Check success"
+
+#--------------------Delete section cronjob----------------------------------
+# positive scenario
+
+@behave.given(
+    "A cronjob is accessing this API daily"
+)
+def step_impl_61(context):
+  context.url = f'{API_URL}/sections/fake_section_id/update_classroom_code'
+
+@behave.when(
+    "A section with FAILED_TO_PROVISION status is present in db with section creation date 7 days before"
+)
+def step_impl_62(context):
+  resp = requests.patch(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Then section is deleted from db and google classroom with ddrive folder is deleted"
 )
 def step_impl_63(context):
   assert context.status == 404, "Status 404"

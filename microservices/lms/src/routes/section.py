@@ -709,7 +709,7 @@ def update_enrollment_status(section_id:str,enrollment_status: str):
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
-@router.post("/delete_section_cronjob")
+@router.delete("/cronjob/delete_failed_to_provision_section")
 def failed_to_provision():
   """Get a section details from db and archive record
   from section collection and
@@ -728,26 +728,32 @@ def failed_to_provision():
     count=0
     for section in sections:
       try :
+        Logger.info(f"Section details {section.id} {section.created_time}")
+        time_difference = datetime.datetime.utcnow().replace(
+          tzinfo=datetime.timezone.utc) - section.created_time
+        if time_difference.days >=6:
+          classroom_course = classroom_crud.get_course_by_id(section.classroom_id)
+          # Delete drive folder of classroom
+          folder_id = classroom_course["teacherFolder"]["id"]
+          Logger.info(f"{folder_id} {section.name}")
+          # Update state of course
+          classroom_crud.update_course_state(section.classroom_id,"ARCHIVED")
+          Logger.info(f"Delete_drive folder {type(classroom_course)}")
+          classroom_crud.delete_drive_folder(
+            classroom_course["teacherFolder"]["id"])
+          classroom_crud.delete_course_by_id(section.classroom_id)
+          Section.delete_by_id(section.id)
+          Logger.info(f"Deleted section with id \
+                    {section.id} classroom_id {section.classroom_id} {folder_id}")
+          count=count+1
 
-        classroom_course = classroom_crud.get_course_by_id(section.classroom_id)
-        # Delete drive folder of classroom
-        folder_id = classroom_course["teacherFolder"]["id"]
-        Logger.info(f"{folder_id} {section.name}")
-        # Update state of course
-        classroom_crud.update_course_state(section.classroom_id,"ARCHIVED")
-        Logger.info(f"Delete_drive folder {type(classroom_course)}")
-        classroom_crud.delete_drive_folder(
-          classroom_course["teacherFolder"]["id"])
-        classroom_crud.delete_course_by_id(section.classroom_id)
-        Section.delete_by_id(section.id)
-        Logger.info(f"Deleted section with id \
-                  {section.id} classroom_id {section.classroom_id} {folder_id}")
-        count=count+1
       except HttpError as ae:
         Logger.error(ae)
         Logger.error(f"Delete course failed for section_id {section.id} \
                     {section.classroom_id}")
+        continue
     return {
+        "data":count,
         "message": f"Successfully archived the Section with id {count}"
     }
   except ResourceNotFoundException as err:

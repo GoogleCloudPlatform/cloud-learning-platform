@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Enable Notifications API Nightly CronJob
+"""Delete section Cronjob 
 
-    Continuously hits the /enable_notifications API nightly to keep
-    the 7 day TTL for Class Notifications running
+    Runs once a day to delete the sections which are failed in 
+    section creation process
 
     https://developers.google.com/classroom/best-practices/push-notifications#overview
 
@@ -54,20 +54,21 @@ except Exception as e:
 
 
 def main():
-  Logger.info("Update Invites cronjob started")
+  Logger.info("Delete section cronjob started")
 
   auth_client = UserCredentials(LMS_BACKEND_ROBOT_USERNAME,
                                 LMS_BACKEND_ROBOT_PASSWORD)
   id_token = auth_client.get_id_token()
   api_endpoint = "http://lms/lms/api/v1/sections/delete_section_cronjob"
 
-  res = requests.post(
+  res = requests.delete(
       url=api_endpoint,
       headers={
           "Content-Type": "application/json",
           "Authorization": f"Bearer {id_token}"
       })
-  Logger.info(f"Response of patch api {res.status_code}")
+  
+  Logger.info(f"Response of delete api {res.status_code}")
   if res.status_code != 200:
     Logger.error(
         f"Delete section API failed with status code {res.status_code}")

@@ -874,13 +874,6 @@ def post_grade_of_the_user(section_id: str,
 
   return output
 
-  except HttpError as ae:
-    raise CustomHTTPException(
-        status_code=ae.resp.status, success=False, message=str(ae),
-        data=None) from ae
-  except Exception as e:
-    raise InternalServerError(str(e)) from e
-
 def delete_drive_folder(folder_id):
   service= build("drive", "v3", credentials=get_credentials())
   result=service.files().delete(fileId=folder_id).execute()

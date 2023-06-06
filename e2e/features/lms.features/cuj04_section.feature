@@ -109,3 +109,15 @@ Feature: Add student to cohort
     Given A user has access to portal and needs to update classroom code for a section
     When API request is sent to update classroom code for a section using invalid section id
     Then Code will not be updated and API will throw a resource not found error
+
+   @fixture.create.section
+  Scenario: Delete section cronjob with one section failed to create
+    Given A cronjob is accessing this API daily
+    When  A section with FAILED_TO_PROVISION status is present in db with section creation date 7 days before
+    Then Then section is deleted from db and google classroom with ddrive folder is deleted
+
+   @fixture.create.section
+  Scenario: Delete section cronjob with no section failed to create
+    Given A cronjob is accessing this API daily to delete sectio
+    When  A section with FAILED_TO_PROVISION status is present in db with ACTIVE status
+    Then Then section is not deleted from db and google classroom with drive folder is deleted

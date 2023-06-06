@@ -5,6 +5,7 @@ import os
 import mock
 import pytest
 import datetime
+from datetime import timedelta
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from common.models.section import Section
@@ -678,8 +679,9 @@ def test_negative_update_enrollment_status(
 def test_delete_section_cronjob(client_with_emulator,create_fake_data):
   section = Section.find_by_id(create_fake_data["section"])
   section.status = "FAILED_TO_PROVISION"
+  section.created_time = datetime.datetime.utcnow() - timedelta(days=8)
   section.update()
-  url = BASE_URL + "/sections/delete_section_cronjob"
+  url = BASE_URL + "/sections/cronjob/delete_failed_to_provision_section"
   with mock.patch(
         "routes.section.classroom_crud.get_course_by_id",
                 return_value={"teacherFolder":{"id":"123344"}}):
@@ -695,3 +697,24 @@ def test_delete_section_cronjob(client_with_emulator,create_fake_data):
   assert resp.status_code == 200, "Status 200"
   assert resp_json[
     "message"] == "Successfully archived the Section with id 1","message"
+  assert resp_json["data"] == 1
+  
+def test_delete_section_cronjob_for_active_section(client_with_emulator,create_fake_data):
+
+  url = BASE_URL + "/sections/cronjob/delete_failed_to_provision_section"
+  with mock.patch(
+        "routes.section.classroom_crud.get_course_by_id",
+                return_value={"teacherFolder":{"id":"123344"}}):
+    with mock.patch("routes.section.classroom_crud.update_course_state"
+    ):
+      with mock.patch(
+"routes.section.classroom_crud.delete_drive_folder"):
+        with mock.patch(
+        "routes.section.classroom_crud.delete_course_by_id"):
+          resp = client_with_emulator.post(url)
+  resp_json = resp.json()
+  print(f"This is response json {resp_json}")
+  assert resp.status_code == 200, "Status 200"
+  assert resp_json["data"] == 0
+  assert resp_json[
+    "message"] == "Successfully archived the Section with id 0","message"
