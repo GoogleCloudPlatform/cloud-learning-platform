@@ -1,6 +1,5 @@
-import { Component, OnInit, ViewChild, Inject } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Inject } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LtiService } from '../service/lti.service';
 import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { ContentSelectorComponent } from '../content-selector/content-selector.component';
@@ -71,7 +70,6 @@ export class CreateAssignmentComponent {
   }
 
   onDropdownChange() {
-    console.log(this.ltiAssignmentForm.value['tool_id'])
     let tool = this.toolsList.find((x) => {
       if (x.id == this.ltiAssignmentForm.value['tool_id']) {
         return true
@@ -184,9 +182,6 @@ export class CreateAssignmentComponent {
       dialogRef.afterClosed().subscribe(result => {
         if (result.data) {
           this.ltiAssignmentForm.get("lti_content_item_id").setValue(result.data.response[0].content_item_id)
-          if (localStorage.getItem("contentItemId")) {
-            localStorage.removeItem('contentItemId')
-          }
         }
         console.log("result", result)
       });

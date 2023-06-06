@@ -13,7 +13,6 @@ export class ContentSelectorComponent {
   loadingIframe = true
   iframeUrl: any = null
   urlAlreadyLoaded: boolean = false
-  isContentItemId: boolean = true
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -28,10 +27,6 @@ export class ContentSelectorComponent {
       const decoded = JSON.parse(data);
       this.dialogRef.close({ data: decoded });
     });
-    if (localStorage.getItem("contentItemId")) {
-      localStorage.removeItem('contentItemId')
-    }
-
   }
   getToolUrl() {
     let data = this.dialogData.extra_data
@@ -39,7 +34,6 @@ export class ContentSelectorComponent {
       (response: any) => {
         this.loadingIframe = false
         this.iframeUrl = response.url
-        this.isContentItemId = false
       }
     )
   }

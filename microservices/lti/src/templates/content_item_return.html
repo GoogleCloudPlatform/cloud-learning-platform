@@ -7,14 +7,12 @@
             console.log("data", '{{data | tojson}}')
             console.log("data type", typeof('{{data}}'))
             console.log("data type json", typeof('{{data | tojson}}'))
-            localStorage.setItem("contentItemId", '{{data["response"][0]["content_item_id"]}}');
             window.parent.postMessage('{{data | tojson}}', '*');
         }
     </script>
 </head>
 
 <body onload="init()">
-    <pre>Click on the below button to copy the content item id into the create assignment form</pre>
 </body>
 
 </html>

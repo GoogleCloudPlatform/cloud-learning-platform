@@ -30,8 +30,9 @@ router = APIRouter(
         "model": NotFoundErrorResponseModel
     }},
     name="DeepLinking Response API for Content Item")
-def content_item_return(request:Request,
-      JWT: str = Form(), context_id: str = None):
+def content_item_return(request: Request,
+                        JWT: str = Form(),
+                        context_id: str = None):
   """
     This endpoint which will be used by tool for sending deep linking response
     for content selection.
@@ -79,11 +80,6 @@ def content_item_return(request:Request,
                                                     context_id)
       content_item_data["content_item_id"] = content_item_fields.get("id")
 
-    # return {
-    #     "success": True,
-    #     "message": "Successfully received and decoded content item",
-    #     "data": content_item_data
-    # }
     return templates.TemplateResponse(
         "content_item_return.html", {
             "request": request,
@@ -92,7 +88,6 @@ def content_item_return(request:Request,
                 "response": content_item_data
             }
         })
-
 
   except ResourceNotFoundException as e:
     Logger.error(e)
