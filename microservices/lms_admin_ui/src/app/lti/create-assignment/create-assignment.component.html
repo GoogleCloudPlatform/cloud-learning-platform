@@ -30,8 +30,8 @@
                 <mat-label>LTI Content item id</mat-label>
                 <div class="contentItemIdRow">
                     <input style="width: 80%;" formControlName="lti_content_item_id" matInput>
-                    <button *ngIf="displayButton == 'selectContentItem'" mat-flat-button color="primary" (click)="openContentSelector()">Select Content</button>
-                    <button *ngIf="displayButton == 'createContentItem'" mat-flat-button color="primary" (click)="openCreateContentDialogue()">Create Content Item</button>
+                    <button *ngIf="displayButton == 'selectContentItem'" [disabled]="!isDisplayButtonEnabled" mat-flat-button color="primary" (click)="openContentSelector()">Select Content</button>
+                    <button *ngIf="displayButton == 'createContentItem'" [disabled]="!isDisplayButtonEnabled" mat-flat-button color="primary" (click)="createContentItem()">Create Content Item</button>
                 </div>
             </mat-form-field>
         </div>

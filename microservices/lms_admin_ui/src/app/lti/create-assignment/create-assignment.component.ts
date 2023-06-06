@@ -32,7 +32,7 @@ export class CreateAssignmentComponent {
     private fb: FormBuilder, private homeService: HomeService, private ltiService: LtiService, private authService: AuthService) { }
 
   ngOnInit() {
-    this.getAllToolsAndContentItems()
+    this.getAllTools()
     console.log('dialog data', this.dialogData)
     if (this.dialogData.mode == "Create") {
       this.ltiAssignmentForm = this.fb.group({
@@ -45,6 +45,16 @@ export class CreateAssignmentComponent {
         "max_points": [null]
       });
     } else {
+      let tool = this.toolsList.find((x) => {
+        if (x.id == this.ltiAssignmentForm.value['tool_id']) {
+          return true
+        }
+        return false
+      })
+      if (tool.deeplink_type == "Not required") {
+        this.displayButton = "createContentItem"
+        this.isDisplayButtonEnabled = false
+      }
       this.ltiAssignmentForm = this.fb.group({
         "tool_id": [this.dialogData.extra_data.assignment.tool_id, Validators.required],
         "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title, Validators.required],
@@ -55,9 +65,6 @@ export class CreateAssignmentComponent {
         "max_points": [this.dialogData.extra_data.assignment.max_points]
       });
       this.toolSelectDisabled = true
-      // console.log({...this.ltiAssignmentForm.value})
-      // this.ltiAssignmentForm.get("tool_id").disable()
-      // console.log({...this.ltiAssignmentForm.value})
     }
   }
 
@@ -69,21 +76,19 @@ export class CreateAssignmentComponent {
       }
       return false
     })
-    // display loader
     this.ltiService.getContentItems(this.ltiAssignmentForm.value['tool_id'], this.dialogData.extra_data.contextId).subscribe(
       (response: any) => {
-        // hide loader
-        if (tool.lti_tool_type == "tool_type_1") {
+        if (tool.deeplink_type == "Allow once per context") {
           this.displayButton = "selectContentItem"
-          if (response.data) {
+          if (response.data.length) {
             this.isDisplayButtonEnabled = false
             this.ltiAssignmentForm.get("lti_content_item_id").setValue(response.data[0].id)
           } else {
             this.isDisplayButtonEnabled = true
           }
-        } else if (tool.lti_tool_type == "tool_type_2") {
+        } else if (tool.deeplink_type == "Not required") {
           this.displayButton = "createContentItem"
-          if (response.data) {
+          if (response.data.length) {
             this.isDisplayButtonEnabled = false
             this.ltiAssignmentForm.get("lti_content_item_id").setValue(response.data[0].id)
           } else {
@@ -109,11 +114,8 @@ export class CreateAssignmentComponent {
 
   onSubmit(ltiAssignmentForm) {
     this.showProgressSpinner = true
-    console.log(ltiAssignmentForm.value)
     const data = ltiAssignmentForm.value
     let context_type = this.dialogData.page
-    console.log(data)
-    console.log("Extra dataaaaa", this.dialogData.extra_data)
     if (this.dialogData.mode == "Create") {
       this.homeService.postLtiAssignments({ ...data, context_type: context_type, context_id: this.dialogData.extra_data.contextId }).subscribe((response: any) => {
         if (response.success == true) {
@@ -191,47 +193,33 @@ export class CreateAssignmentComponent {
       this.openFailureSnackBar('Please select a tool', 'Error')
     }
   }
-  
-  openCreateContentDialogue() {
-    let userId = null
-    if (localStorage.getItem("userId")) {
-      userId = localStorage.getItem("userId")
-    } else {
-      this.authService.findEmailSetId()
-      userId = localStorage.getItem("userId")
-    }
-    if (this.ltiAssignmentForm.value['tool_id'] != null) {
-      let ltiModalData: LooseObject = {}
-      ltiModalData['mode'] = 'Open'
-      ltiModalData['init_data'] = ''
-      ltiModalData['extra_data'] = {
-        contextId: this.dialogData.extra_data.contextId,
-        contextType: this.dialogData.page,
-        toolId: this.ltiAssignmentForm.value['tool_id'],
-        userId: userId
+
+  createContentItem() {
+    let tool = this.toolsList.find((x) => {
+      if (x.id == this.ltiAssignmentForm.value['tool_id']) {
+        return true
       }
+      return false
+    })
 
-      const dialogRef = this.dialog.open(ContentSelectorComponent, {
-        minWidth: '750px',
-        data: ltiModalData
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result.data) {
-          this.ltiAssignmentForm.get("lti_content_item_id").setValue(result.data.response[0].content_item_id)
-          if (localStorage.getItem("contentItemId")) {
-            localStorage.removeItem('contentItemId')
-          }
-        }
-        console.log("result", result)
-      });
+    let data = {
+      tool_id: this.ltiAssignmentForm.value['tool_id'],
+      context_id: this.dialogData.extra_data.contextId,
+      content_item_type: "ltiResourceLink",
+      content_item_info: {
+        "text": tool.description,
+        "title": tool.name,
+        "type": "ltiResourceLink",
+        "url": tool.tool_url
+      },
     }
-    else {
-      this.openFailureSnackBar('Please select a tool', 'Error')
-    }
+    this.ltiService.postContentItem(data).subscribe((res: any) => {
+      this.isDisplayButtonEnabled = false
+      this.ltiAssignmentForm.get("lti_content_item_id").setValue(res.data.id)
+    })
   }
 
-  getAllToolsAndContentItems() {
+  getAllTools() {
     this.ltiService.getToolsList().subscribe((res: any) => {
       this.toolsList = res.data
       let tool = this.toolsList.find((x) => {

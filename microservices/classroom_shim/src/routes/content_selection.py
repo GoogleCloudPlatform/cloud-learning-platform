@@ -26,7 +26,7 @@ router = APIRouter(
     })
 
 
-@router.get("/{context_id}/tools-and-content-items")
+@router.get("/context/{context_id}/content-items")
 def get_tool_and_context_list(context_id: str, tool_id: str):
   """API to return content items for give tool id and context id"""
   try:

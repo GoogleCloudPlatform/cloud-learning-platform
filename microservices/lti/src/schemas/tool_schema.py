@@ -9,7 +9,7 @@ from config import LTI_ISSUER_DOMAIN
 
 # pylint: disable = invalid-name
 ALLOWED_PUBLIC_KEY_TYPES = Literal["JWK URL", "Public Key"]
-ALLOWED_TOOL_TYPES = Literal["tool_type_1", "tool_type_2", "tool_type_3"]
+ALLOWED_TOOL_TYPES = Literal["Allow once per context", "Not required", "Allow everytime"]
 
 
 class BasicToolModel(BaseModel):
@@ -27,7 +27,7 @@ class BasicToolModel(BaseModel):
   enable_nrps: Optional[bool] = False
   custom_params: Optional[str]
   validate_title_for_grade_sync: Optional[bool] = False
-  lti_tool_type: ALLOWED_TOOL_TYPES
+  deeplink_type: ALLOWED_TOOL_TYPES
 
 
 class FullToolModel(BasicToolModel):
