@@ -1,6 +1,9 @@
 import behave
 import requests
 import time
+import datetime
+from datetime import timedelta
+from common.models import Section
 from testing_objects.test_config import API_URL,e2e_google_form_id,e2e_drive_folder_id
 from testing_objects.course_template import emails
 from e2e.gke_api_tests.secrets_helper import (get_student_email_and_token,
@@ -508,3 +511,72 @@ def step_impl_62(context):
 def step_impl_63(context):
   assert context.status == 404, "Status 404"
   assert context.response["success"] is False, "Check success"
+
+#--------------------Delete section cronjob----------------------------------
+# positive scenario
+
+@behave.given(
+    "A cronjob is accessing this API daily"
+)
+def step_impl_64(context):
+  print("-----------------------------------------------------------")
+  print(f"Section with id {context.sections.id}")
+  section = Section.find_by_id(context.sections.id)
+  section.status = "FAILED_TO_PROVISION"
+  section.created_time = datetime.datetime.utcnow() - timedelta(days=8)
+  section.update()
+  print("Section details updated in firestore with details",section.id ,section.status,section.created_time)
+  print("------------------------------------------------")
+  context.url = f'{API_URL}/sections/cronjob/delete_failed_to_provision_section'
+
+@behave.when(
+    "A section with FAILED_TO_PROVISION status is present in db with section creation date 7 days before"
+)
+def step_impl_65(context):
+  resp = requests.delete(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Then section is deleted from db and google classroom with ddrive folder is deleted"
+)
+def step_impl_66(context):
+  print("Response of delete 1 section API",context.response)
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "Check success"
+  assert context.response["data"] ==1 ,"count of deleted section"
+
+@behave.given(
+    "A cronjob is accessing this API daily to delete section"
+)
+def step_impl_67(context):
+  print("-------------------------------------------")
+  print(f"Section with id {context.sections.id}")
+  section = Section.find_by_id(context.sections.id)
+  section.status = "ACTIVE"
+  section.created_time = datetime.datetime.utcnow() - timedelta(days=5)
+  section.update()
+  print("Section details updated in firestore with details",section.id ,section.status,section.created_time)
+  print("------------------------------------------------")
+  context.url = f'{API_URL}/sections/cronjob/delete_failed_to_provision_section'
+
+@behave.when(
+    "A section with FAILED_TO_PROVISION status is present in db with ACTIVE status"
+)
+def step_impl_68(context):
+  resp = requests.delete(context.url,
+                       headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then(
+    "Then section is not deleted from db and google classroom"
+)
+def step_impl_69(context):
+  print("Response of delete 1 section API",context.response)
+  assert context.status == 200, "Status 200"
+  assert context.response["success"] is True, "Check success"
+  assert context.response["data"] ==0 ,"count of deleted section"

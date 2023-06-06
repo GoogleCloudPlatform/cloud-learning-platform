@@ -24,7 +24,8 @@ from schemas.section import (
     GetTeacherResponseModel,AssignmentModel,GetCourseWorkList,
     ImportGradeResponseModel,
     EnrollTeacherSection,DeleteTeacherFromSectionResponseModel,
-    UpdateEnrollmentStatusSectionModel)
+    UpdateEnrollmentStatusSectionModel,
+    DeleteFailedSectionSectionModel)
 from schemas.update_section import UpdateSection
 from services.section_service import copy_course_background_task,\
 update_grades,add_teacher
@@ -90,7 +91,7 @@ def create_section(sections_details: SectionDetails,
                               course_template_details=course_template_details,
                               sections_details=sections_details,
                               cohort_details=cohort_details,
-                              message="started process")
+                          message="Create section background task completed")
     Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
                  section name{sections_details.name}")
@@ -657,7 +658,6 @@ def import_grade(section_id: str, coursework_id: str,
               response_model=UpdateEnrollmentStatusSectionModel)
 def update_enrollment_status(section_id:str,enrollment_status: str):
   """Update enrollment status for a section
-
   Args:
     section_id(str): id of the section in firestore
     status: enrollment status of the section
@@ -709,3 +709,60 @@ def update_enrollment_status(section_id:str,enrollment_status: str):
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
+@router.delete("/cronjob/delete_failed_to_provision_section",
+               response_model=DeleteFailedSectionSectionModel)
+def failed_to_provision():
+  """Get a section details from db and archive record
+  from section collection and
+  google classroom course
+
+  Args:
+      section_id (str): section_id in firestore
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      ResourceNotFound: 404 Section with section id is not found
+  Returns:
+    {"message": "Successfully deleted section"}
+  """
+  try:
+    sections = Section.get_section_by_status("FAILED_TO_PROVISION")
+    count=0
+    for section in sections:
+      try :
+        Logger.info(f"Section details {section.id} {section.created_time}")
+        time_difference = datetime.datetime.utcnow().replace(
+          tzinfo=datetime.timezone.utc) - section.created_time
+        if time_difference.days >= 7:
+          classroom_course = classroom_crud.get_course_by_id(
+            section.classroom_id)
+          # Delete drive folder of classroom
+          folder_id = classroom_course["teacherFolder"]["id"]
+          Logger.info(f"{folder_id} {section.name}")
+          # Update state of course
+          classroom_crud.update_course_state(section.classroom_id,"ARCHIVED")
+          Logger.info(f"Delete_drive folder {type(classroom_course)}")
+          classroom_crud.delete_drive_folder(
+            classroom_course["teacherFolder"]["id"])
+          classroom_crud.delete_course_by_id(section.classroom_id)
+          Section.delete_by_id(section.id)
+          Logger.info(f"Deleted section with id \
+                {section.id} classroom_id {section.classroom_id} {folder_id}")
+          count=count+1
+
+      except HttpError as ae:
+        Logger.error(ae)
+        Logger.error(f"Delete course failed for section_id {section.id} \
+                    {section.classroom_id}")
+        continue
+    return {
+        "data":count,
+        "message": f"Successfully archived the Section with id {count}"
+    }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+

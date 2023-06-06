@@ -64,6 +64,20 @@
         "query_scope": "COLLECTION",
         "fields": [
             {
+                "field_path": "status",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
+        "collection_group": "sections",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
                 "field_path": "cohort",
                 "order": "ASCENDING"
             },

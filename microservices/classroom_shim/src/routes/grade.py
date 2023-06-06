@@ -88,19 +88,24 @@ def update_classroom_grade(input_grade: PostGradeModel):
 
     headers = {"Authorization": f"Bearer {auth_client.get_id_token()}"}
 
-    submissions = get_submitted_course_work_list(
-        section_id=lti_assignment.section_id,
-        user_id=user_id,
-        headers=headers,
-        course_work_id=course_work_id)
+    if lti_assignment.context_type.lower() == "section":
+      submissions = get_submitted_course_work_list(
+          section_id=lti_assignment.context_id,
+          user_id=user_id,
+          headers=headers,
+          course_work_id=course_work_id)
 
-    if submissions:
-      submission_id = submissions[0].get("id")
-      post_grade_of_the_user(lti_assignment.section_id, course_work_id,
-                             submission_id, assigned_grade, draft_grade)
+      if submissions:
+        submission_id = submissions[0].get("id")
+        post_grade_of_the_user(lti_assignment.context_id, course_work_id,
+                               submission_id, assigned_grade, draft_grade)
+      else:
+        Logger.error(
+            f"Submission not found for the user with id - {user_id}, section id - {lti_assignment.context_id} and course work id - {course_work_id}"
+        )
     else:
-      Logger.error(
-          f"Submission not found for the user with id - {user_id}, section id - {lti_assignment.section_id} and course work id - {course_work_id}"
+      Logger.info(
+          f"Grade passback not supported for lti assignment - {lti_assignment.id} due to the context type - {lti_assignment.context_type}"
       )
 
     return {"success": True}

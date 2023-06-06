@@ -46,5 +46,6 @@ LTI_POST_GRADE_MODEL = {
 CONTEXT_EXAMPLE = {
     "id": "BOqh34378v3qGir",
     "name": "Context name",
-    "description": "Context description"
+    "description": "Context description",
+    "context_type": "section"
 }
