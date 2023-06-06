@@ -360,7 +360,7 @@ class DeleteFailedSectionSectionModel(BaseModel):
   """Update  Section Response Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Success"
-  data: Optional[int] = None
+  data: Optional[int] = 0
 
   class Config():
     orm_mode = True
