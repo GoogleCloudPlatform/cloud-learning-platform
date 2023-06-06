@@ -52,24 +52,21 @@ spec:
               key: API_DOMAIN
         ports:
         - containerPort: 80
-        # livenessProbe:
-        #   failureThreshold: 5
-        #   httpGet:
-        #     path: /healthz
-        #     port: 80
-        #     scheme: HTTP
-        #     httpHeaders:
-        #     - name: Custom-Header
-        #       value: Awesome
-        #   periodSeconds: 30
-        #   successThreshold: 1
-        #   timeoutSeconds: 10
-        # readinessProbe:
-        #   failureThreshold: 5
-        #   httpGet:
-        #     path: /healthz
-        #     port: 80
-        #     scheme: HTTP
-        #   periodSeconds: 30
-        #   successThreshold: 1
-        #   timeoutSeconds: 10
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
