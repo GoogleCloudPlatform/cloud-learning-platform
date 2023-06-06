@@ -72,20 +72,19 @@ env:
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
   USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT }}
   E2E_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr' || 'e2e_pr' }}${{  github.event.number }}_
-  E2E_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-approval-' }}${{  github.event.number }}
+  E2E_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-' }}${{  github.event.number }}
 # cookiecutter:raw 
 jobs:
   deploy:
     name: Deploy all microservices in PR namespace
     runs-on: ubuntu-latest
     steps:
-    - name: echo PREFIX, namespace and use gmail account flag
+    - name: echo PREFIX and namespace
       run: |
         DATABASE_PREFIX=$E2E_PREFIX
         NAMESPACE=$E2E_NAMESPACE_PREFIX
         echo $NAMESPACE
         echo $DATABASE_PREFIX
-        echo $USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT
     - name: Check out repository
       uses: actions/checkout@v3
 
