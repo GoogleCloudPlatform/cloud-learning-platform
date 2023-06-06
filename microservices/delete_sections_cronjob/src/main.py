@@ -13,10 +13,10 @@
 # limitations under the License.
 """Delete section Cronjob 
 
-    Runs once a day to delete the sections which are failed in 
-    section creation process
+  Runs once a day to delete the sections which are failed in 
+  section creation process
 
-    https://developers.google.com/classroom/best-practices/push-notifications#overview
+  https://developers.google.com/classroom/best-practices/push-notifications#overview
 
 """
 
@@ -36,7 +36,7 @@ try:
   LMS_BACKEND_ROBOT_USERNAME = secrets.access_secret_version(
       request={
           "name":
-              f"projects/{PROJECT_ID}/secrets/lms-backend-robot-username/versions/latest"
+  f"projects/{PROJECT_ID}/secrets/lms-backend-robot-username/versions/latest"
       }).payload.data.decode("utf-8")
 except Exception as e:
   Logger.error("Failed to fetch robot username")
@@ -46,7 +46,7 @@ try:
   LMS_BACKEND_ROBOT_PASSWORD = secrets.access_secret_version(
       request={
           "name":
-              f"projects/{PROJECT_ID}/secrets/lms-backend-robot-password/versions/latest"
+  f"projects/{PROJECT_ID}/secrets/lms-backend-robot-password/versions/latest"
       }).payload.data.decode("utf-8")
 except Exception as e:
   Logger.error("Failed to fetch robot password")
@@ -59,7 +59,8 @@ def main():
   auth_client = UserCredentials(LMS_BACKEND_ROBOT_USERNAME,
                                 LMS_BACKEND_ROBOT_PASSWORD)
   id_token = auth_client.get_id_token()
-  api_endpoint = "http://lms/lms/api/v1/sections/cronjob/delete_failed_to_provision_section"
+  api_endpoint = "http://lms/lms/api/v1/sections/cronjob/\
+    delete_failed_to_provision_section"
 
   res = requests.delete(
       url=api_endpoint,
@@ -68,14 +69,16 @@ def main():
           "Authorization": f"Bearer {id_token}"
       })
   count = res.json()["data"]
-  Logger.info(f"Response of delete api {res.status_code} deleted section count is {count}")
+  Logger.info(f"Response of delete api {res.status_code}\
+               deleted section count is {count}")
   if res.status_code != 200:
     Logger.error(
         f"Delete section API failed with status code {res.status_code}")
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     return False
-  Logger.info("Delete FAILED TO PROVIOSION section cronjob finished")
+  Logger.info(
+    "Delete FAILED TO PROVIOSION section cronjob finished")
   return True
 
 
