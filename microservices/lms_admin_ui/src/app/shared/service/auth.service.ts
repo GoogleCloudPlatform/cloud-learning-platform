@@ -96,12 +96,12 @@ export class AuthService {
 
   setUserId(email) {
     this.searchUser(email).subscribe((res: any) => {
-      localStorage.setItem("userId", res.data.user_id)
+      localStorage.setItem("userId", res.data[0].user_id)
     })
   }
 
   searchUser(email) {
-    return this.http.get(`${environment.classroomShimUrl}user/search/email&email=${email}`)
+    return this.http.get(`${environment.classroomShimUrl}user/search/email?email=${email}`)
   }
 
 

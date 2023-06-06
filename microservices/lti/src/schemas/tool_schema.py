@@ -27,7 +27,7 @@ class BasicToolModel(BaseModel):
   enable_nrps: Optional[bool] = False
   custom_params: Optional[str]
   validate_title_for_grade_sync: Optional[bool] = False
-  tool_type: ALLOWED_TOOL_TYPES
+  lti_tool_type: ALLOWED_TOOL_TYPES
 
 
 class FullToolModel(BasicToolModel):

@@ -73,7 +73,7 @@ export class CreateAssignmentComponent {
     this.ltiService.getContentItems(this.ltiAssignmentForm.value['tool_id'], this.dialogData.extra_data.contextId).subscribe(
       (response: any) => {
         // hide loader
-        if (tool.tool_type == "tool_type_1") {
+        if (tool.lti_tool_type == "tool_type_1") {
           this.displayButton = "selectContentItem"
           if (response.data) {
             this.isDisplayButtonEnabled = false
@@ -81,7 +81,7 @@ export class CreateAssignmentComponent {
           } else {
             this.isDisplayButtonEnabled = true
           }
-        } else if (tool.tool_type == "tool_type_2") {
+        } else if (tool.lti_tool_type == "tool_type_2") {
           this.displayButton = "createContentItem"
           if (response.data) {
             this.isDisplayButtonEnabled = false

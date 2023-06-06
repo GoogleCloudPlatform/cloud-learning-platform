@@ -27,6 +27,7 @@ class Tool(BaseModel):
   tool_login_url = TextField(required=True)
   client_id = TextField(required=True)
   public_key_type = TextField(required=True)
+  lti_tool_type = TextField(required=True)
   tool_public_key = TextField()
   tool_keyset_url = TextField()
   content_selection_url = TextField()
