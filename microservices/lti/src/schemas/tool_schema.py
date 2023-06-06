@@ -9,7 +9,8 @@ from config import LTI_ISSUER_DOMAIN
 
 # pylint: disable = invalid-name
 ALLOWED_PUBLIC_KEY_TYPES = Literal["JWK URL", "Public Key"]
-ALLOWED_TOOL_TYPES = Literal["Allow once per context", "Not required", "Allow everytime"]
+ALLOWED_TOOL_TYPES = Literal["Allow once per context", "Not required",
+                             "Allow everytime"]
 
 
 class BasicToolModel(BaseModel):
