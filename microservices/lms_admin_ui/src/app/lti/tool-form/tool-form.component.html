@@ -1,4 +1,4 @@
-<h1 mat-dialog-title style="font-weight: bold;">Tool</h1>
+<h1 mat-dialog-title style="font-weight: bold;"> {{dialogData.mode}} Tool</h1>
 <form [formGroup]="toolForm" (ngSubmit)="onSubmit(toolForm)">
     <div>
         <mat-form-field appearance="fill" style="width: 100%">
@@ -53,8 +53,24 @@
     </div>
     <div>
         <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Deeplink Type</mat-label>
+            <mat-select formControlName="deeplink_type">
+                <mat-option value="Allow once per context">Allow once per context</mat-option>
+                <mat-option value="Not required">Not required</mat-option>
+                <mat-option value="Allow everytime">Allow everytime</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field appearance="fill" style="width: 100%">
             <mat-label>Redirect URI's</mat-label>
             <textarea formControlName="redirect_uris" matInput></textarea>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Custom Params</mat-label>
+            <textarea formControlName="custom_params" matInput></textarea>
         </mat-form-field>
     </div>
     <div>
@@ -66,12 +82,6 @@
         <section class="example-section">
             <mat-checkbox formControlName="enable_nrps" class="example-margin">Enable NRPS</mat-checkbox>
         </section>
-    </div>
-    <div>
-        <mat-form-field appearance="fill" style="width: 100%">
-            <mat-label>Custom Params</mat-label>
-            <textarea formControlName="custom_params" matInput></textarea>
-        </mat-form-field>
     </div>
     <div>
         <section class="example-section">

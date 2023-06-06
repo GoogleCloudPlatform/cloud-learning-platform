@@ -45,16 +45,6 @@ export class CreateAssignmentComponent {
         "max_points": [null]
       });
     } else {
-      let tool = this.toolsList.find((x) => {
-        if (x.id == this.ltiAssignmentForm.value['tool_id']) {
-          return true
-        }
-        return false
-      })
-      if (tool.deeplink_type == "Not required") {
-        this.displayButton = "createContentItem"
-        this.isDisplayButtonEnabled = false
-      }
       this.ltiAssignmentForm = this.fb.group({
         "tool_id": [this.dialogData.extra_data.assignment.tool_id, Validators.required],
         "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title, Validators.required],
@@ -65,6 +55,18 @@ export class CreateAssignmentComponent {
         "max_points": [this.dialogData.extra_data.assignment.max_points]
       });
       this.toolSelectDisabled = true
+      setTimeout(() => {
+        let tool = this.toolsList.find((x) => {
+          if (x.id == this.dialogData.extra_data.assignment.tool_id) {
+            return true
+          }
+          return false
+        })
+        if (tool.deeplink_type == "Not required") {
+          this.displayButton = "createContentItem"
+          this.isDisplayButtonEnabled = false
+        }
+      }, 500);
     }
   }
 
@@ -229,7 +231,6 @@ export class CreateAssignmentComponent {
         return false
       })
       this.toolName = tool.name
-
     })
   }
 
