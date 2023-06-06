@@ -68,6 +68,9 @@ requires:
 - path: ./microservices/learning_object_service
   configs: [learning-object-service]
 
+# - path: ./microservices/assessment_service
+#   configs: [assessment-service]
+
 build:
   googleCloudBuild: {}
 

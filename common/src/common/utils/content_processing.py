@@ -3,10 +3,10 @@ import os
 from glob import glob
 import pathlib
 from zipfile import ZipFile
-from common.utils.errors import (ValidationError)
+from common.utils.errors import (ValidationError,
+                                  InternalServerError)
 
-# pylint: disable = line-too-long
-# pylint: disable = invalid-name
+# pylint: disable = line-too-long,consider-using-join
 FOLDER_NAMES_TO_EXCLUDE = ["Templates", "Resources"]
 
 ALLOWED_CONTENT_TYPES = [
@@ -58,7 +58,6 @@ class ContentValidator:
     return os.path.exists(f"{src_path}/{relative_entry_point}")
 
   def checkResourceTypeAndExtension(self, resource_type, extension):
-    """Validate the resource type and extension"""
     file_extensions = ["pdf", "image", "html", "video", "docx"]
     if resource_type in file_extensions:
       if resource_type == "pdf" and extension in ["pdf", "PDF"]:
@@ -77,7 +76,6 @@ class ContentValidator:
     return False
 
   def checkExtensionAndContentHeader(self, content_header, extension):
-    """Validate the extension and content header"""
     if content_header.split("/")[-1] == extension.lower():
       return True
     elif content_header == "text/html" and extension.lower() in ["htm","html"]:
@@ -143,6 +141,32 @@ class FileUtils:
   def __init__(self):
     pass
 
+  def zip(self, file_path_list, dest_path, output_filename):
+
+    # Validate files
+    missing_files_list = []
+    for file in file_path_list:
+      if not os.path.exists(file):
+        missing_files_list.append(file)
+
+    if len(missing_files_list) != 0:
+      # Generate Error log
+      err_msg = f"Total missing files: {len(missing_files_list)}"
+      err_msg = "Following files were not found: \n"
+      for file in missing_files_list:
+        err_msg += f"{file} \n"
+
+      raise InternalServerError(err_msg)
+
+    # Create zip
+    zip_destination = f"{dest_path}/{output_filename}"
+
+    with ZipFile(zip_destination, "w") as zip_object:
+      for file in file_path_list:
+        zip_object.write(file)
+
+    return zip_destination
+
   def unzipPackage(self, file_path, dest_path):
     with ZipFile(file_path, "r") as zObject:
       zObject.extractall(path=dest_path)
@@ -155,7 +179,6 @@ class FileUtils:
     print(f"File at path {filepath} does not exist")
 
   def deleteFolder(self, dir_name):
-    """Delete a folder in the given directory"""
     if os.path.exists(dir_name):
       folder = pathlib.Path(dir_name)
       all_children = list(folder.rglob("*"))
@@ -171,7 +194,6 @@ class FileUtils:
       print(f"Folder at path {dir_name} was not found")
 
   def getContentFolderFiles(self, dir_name):
-    """Retreive the content of a folder"""
     if os.path.exists(dir_name):
       content_folder_htm_files = []
 
