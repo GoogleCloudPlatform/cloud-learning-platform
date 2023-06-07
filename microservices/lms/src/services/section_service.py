@@ -127,6 +127,7 @@ def copy_course_background_task(course_template_details,
 
         lti_assignment_details = {
             "section_id": section_id,
+            "coursework_title": coursework["title"],
             "start_date": None,
             "end_date": None,
             "due_date": None
@@ -393,10 +394,11 @@ def update_coursework_material(materials,
             split_url = link["url"].split(
                 "/classroom-shim/api/v1/launch?lti_assignment_id=")
             lti_assignment_id = split_url[-1]
+            coursework_title = lti_assignment_details.get("coursework_title")
             logs["info"].append(
-                f"LTI Course copy started for assignment - {lti_assignment_id}")
+                f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - {coursework_title}")
             Logger.info(
-                f"LTI Course copy started for assignment - {lti_assignment_id}")
+                f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - {coursework_title}")
             copy_assignment = requests.post(
                 "http://classroom-shim/classroom-shim/api/v1/lti-assignment/copy",
                 headers={
@@ -423,22 +425,16 @@ def update_coursework_material(materials,
                       "url": updated_material_link_url
                   }})
               Logger.info(
-                  f"LTI link updated for new assignment - {new_lti_assignment_id}"
-              )
-              Logger.info(
-                  f"LTI Course copy completed for assignment - {lti_assignment_id}"
+                  f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - {coursework_title}, new assignment id - {new_lti_assignment_id}"
               )
               logs["info"].append(
-                  f"LTI link updated for new assignment - {new_lti_assignment_id}"
-              )
-              logs["info"].append(
-                  f"LTI Course copy completed for assignment - {lti_assignment_id}"
+                  f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - {coursework_title}, new assignment id - {new_lti_assignment_id}"
               )
             else:
               logs["info"].append(
-                  f"LTI Course copy failed for assignment - {lti_assignment_id}"
+                  f"LTI Course copy failed for assignment - {lti_assignment_id}, coursework title - {coursework_title}"
               )
-              error_msg = f"Copying an LTI Assignment failed for {lti_assignment_id}\
+              error_msg = f"Copying an LTI Assignment failed for {lti_assignment_id}, coursework title - {coursework_title}\
                            in the new section {lti_assignment_details.get('section_id')} with status code: \
                            {copy_assignment.status_code} and error msg: {copy_assignment.text}"
 

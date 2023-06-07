@@ -101,12 +101,13 @@ def create_section(sections_details: SectionDetails,
     batch_job = BatchJob.from_dict(batch_job_input)
     batch_job.save()
 
-    background_tasks.add_task(copy_course_background_task,
-                              course_template_details=course_template_details,
-                              sections_details=sections_details,
-                              cohort_details=cohort_details,
-                                                           batch_job_id =batch_job.id,
-                          message="Create section background task completed")
+    background_tasks.add_task(
+        copy_course_background_task,
+        course_template_details=course_template_details,
+        sections_details=sections_details,
+        cohort_details=cohort_details,
+        batch_job_id=batch_job.id,
+        message="Create section background task completed")
     info_msg = f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
                  section name {sections_details.name}"
@@ -640,8 +641,7 @@ def import_grade(section_id: str, coursework_id: str,
   """
   try:
     section = Section.find_by_id(section_id)
-    result = classroom_crud.get_course_work(
-    section.classroom_id,coursework_id)
+    result = classroom_crud.get_course_work(section.classroom_id, coursework_id)
 
     batch_job_input = {
         "job_type": "grade_import",
@@ -667,8 +667,8 @@ def import_grade(section_id: str, coursework_id: str,
       for material in result["materials"]:
         if "form" in material.keys():
           is_google_form_present = True
-          background_tasks.add_task(update_grades,material,
-                                    section,coursework_id,batch_job.id)
+          background_tasks.add_task(update_grades, material, section,
+                                    coursework_id, batch_job.id)
 
       if is_google_form_present:
         return {
