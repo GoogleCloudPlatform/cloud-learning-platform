@@ -42,7 +42,8 @@ this.instructionalDesignerList=res.data
     return '+'+(id.length-1)
     }
     checkIfBadgeHidden(id:any){
-      if(id.length == 1){
+
+      if(id.length < 2){
         return true
       }
       else{
