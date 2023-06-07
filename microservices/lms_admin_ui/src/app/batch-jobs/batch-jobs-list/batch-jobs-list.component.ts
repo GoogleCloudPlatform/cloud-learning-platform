@@ -36,20 +36,20 @@ export class BatchJobsListComponent {
 
   handleBatchJobPageEvent(e: PageEvent) {
     this.paginator = e;
-
     if (this.paginator.pageSize != this.jobPageSize) {
       this.jobSkip = 0
       this.jobLimit = this.paginator.pageSize
       this.jobPageSize = this.paginator.pageSize
+      this.paginator.pageIndex = 0
     }
     else {
       if (this.paginator.pageIndex > this.paginator.previousPageIndex) {
-        this.jobSkip = this.jobLimit
-        this.jobLimit = this.jobLimit + this.paginator.pageSize
+        this.jobSkip = this.paginator.pageIndex * this.paginator.pageSize
+        this.jobLimit = this.paginator.pageSize
       }
       else if (this.paginator.previousPageIndex > this.paginator.pageIndex) {
         this.jobSkip = this.jobSkip - this.paginator.pageSize
-        this.jobLimit = this.jobLimit - this.paginator.pageSize
+        this.jobLimit = this.paginator.pageSize
       }
     }
     console.log("skip ", this.jobSkip, 'limit ', this.jobLimit)
@@ -64,7 +64,6 @@ export class BatchJobsListComponent {
       }, 100);
       if (response.success == true) {
         this.batchJobsData = response.data
-        console.log("batchJobsData", this.batchJobsData)
       }
       else {
         console.log("response", response?.message)
@@ -73,7 +72,6 @@ export class BatchJobsListComponent {
   }
 
   openViewLogsDialog(data): void {
-    console.log("data", data)
     let jobLogs: LooseObject = {}
     jobLogs['mode'] = 'View'
     jobLogs['init_data'] = ''
@@ -92,7 +90,6 @@ export class BatchJobsListComponent {
   }
 
   openViewInputDataDialog(data): void {
-    console.log("data", data)
     let inputData: LooseObject = {}
     inputData['mode'] = 'View'
     inputData['init_data'] = ''
@@ -125,7 +122,6 @@ export class ViewJobLogDialog {
     @Inject(MAT_DIALOG_DATA) public viewDialogData: any, public JobsService: JobsService
   ) {
     this.logData = viewDialogData.data
-    console.log("log data", this.logData)
   }
 
   onNoClick(): void {
@@ -147,7 +143,6 @@ export class ViewInputDataDialog {
     @Inject(MAT_DIALOG_DATA) public viewDialogData: any, public JobsService: JobsService
   ) {
     this.inputData = viewDialogData.data
-    console.log("input data", this.inputData)
   }
 
   onNoClick(): void {
