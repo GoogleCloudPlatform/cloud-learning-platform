@@ -9,7 +9,9 @@ COPY . .
 RUN npm install --legacy-peer-deps
 RUN npm run build
 
-FROM nginx:1.21.1-alpine
-RUN rm -rf /usr/share/nginx/html/* && rm -rf /etc/nginx/nginx.conf
-COPY --from=builder /opt/nginx.conf /etc/nginx/nginx.conf
-COPY --from=builder /opt/build /usr/share/nginx/html
+CMD npm run serve -- --port 80
+
+# FROM nginx:1.21.1-alpine
+# RUN rm -rf /usr/share/nginx/html/* && rm -rf /etc/nginx/nginx.conf
+# COPY --from=builder /opt/nginx.conf /etc/nginx/nginx.conf
+# COPY --from=builder /opt/build /usr/share/nginx/html
