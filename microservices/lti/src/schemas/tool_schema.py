@@ -68,6 +68,7 @@ class UpdateToolModel(BaseModel):
   enable_nrps: Optional[bool]
   custom_params: Optional[str]
   validate_title_for_grade_sync: Optional[bool]
+  deeplink_type: ALLOWED_TOOL_TYPES
 
   class Config():
     orm_mode = True
