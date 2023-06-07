@@ -59,7 +59,8 @@ def get_credentials(email=CLASSROOM_ADMIN_EMAIL):
     # "gke-pod-sa@study-hall-dev-365218.iam.gserviceaccount.com",
     google_oauth_token_endpoint,
     scopes=SCOPES)
-  Logger.info(f"Creds {creds}")
+  Logger.info(service_account["client_email"])
+  # Logger.info(f"Creds {creds}")
   return creds
 
 

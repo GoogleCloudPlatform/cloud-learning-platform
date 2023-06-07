@@ -8,6 +8,7 @@ from common.models import (CourseTemplate, Cohort, Section, TempUser,
                            CourseEnrollmentMapping, User,CourseTemplateEnrollmentMapping)
 from common.testing.example_objects import TEST_SECTION, TEST_COHORT
 from common.utils.bq_helper import insert_rows_to_bq
+from common.utils.jwt_creds import JwtCredentials
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE, API_URL, e2e_google_form_id
@@ -42,6 +43,20 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
 ]
 
+def get_credentials(email=CLASSROOM_ADMIN_EMAIL):
+  """Generate JWT creds"""
+  print("In get credentials for e2e environment.py__________")
+  service_account_email = "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com"
+  google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
+  creds = JwtCredentials.from_default_with_subject(
+    email,
+    service_account_email,
+    google_oauth_token_endpoint,
+    SCOPES
+  )
+  print(f"----------Creds generate for e2e environment.py____{creds}")
+  return creds
+
 
 def create_course(name, section, description):
   """Create course Function in classroom
@@ -50,9 +65,12 @@ def create_course(name, section, description):
   Returns:
     new created course details
     """
-  a_creds = service_account.Credentials.from_service_account_info(
-      CLASSROOM_KEY, scopes=SCOPES)
-  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  # a_creds = service_account.Credentials.from_service_account_info(
+  #     CLASSROOM_KEY, scopes=SCOPES)
+  # creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  print("----------get credential started for create course fixture-----------------")
+  creds =  get_credentials()
+  print("_----------------course created  creds--------------------------",creds)
   service = build("classroom", "v1", credentials=creds)
   new_course = {}
   new_course["name"] = name
@@ -136,9 +154,12 @@ def invite_user(course_id, email, role):
   Returns:
       dict: response from create invitation method
   """
-  a_creds = service_account.Credentials.from_service_account_info(
-      CLASSROOM_KEY, scopes=SCOPES)
-  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  # a_creds = service_account.Credentials.from_service_account_info(
+  #     CLASSROOM_KEY, scopes=SCOPES)
+  # creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  print("INvite user function start")
+  creds =  get_credentials()
+  print("Got credentialss__",creds)
   service = build("classroom", "v1", credentials=creds)
   body = {"courseId": course_id, "role": role, "userId": email}
   invitation = service.invitations().create(body=body).execute()
@@ -410,9 +431,12 @@ def import_google_form_grade(context):
 def create_assignment(context):
   """Create assignment fixture"""
   section = use_fixture(create_section, context)
-  a_creds = service_account.Credentials.from_service_account_info(
-      CLASSROOM_KEY, scopes=SCOPES)
-  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  # a_creds = service_account.Credentials.from_service_account_info(
+  #     CLASSROOM_KEY, scopes=SCOPES)
+  # creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  print("---------------Create assignment fixture started-------")
+  creds = get_credentials()
+  print("Creds generated for create assignment fixture------------",creds)
   service = build("classroom", "v1", credentials=creds)
   result = service.courses().courseWork().create(courseId=section.classroom_id,
                                                  body={
@@ -459,9 +483,12 @@ def create_analytics_data(context):
       "section": section.section
   }
   print("Response of get student in section", data)
-  a_creds = service_account.Credentials.from_service_account_info(
-      CLASSROOM_KEY, scopes=SCOPES)
-  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  # a_creds = service_account.Credentials.from_service_account_info(
+  #     CLASSROOM_KEY, scopes=SCOPES)
+  # creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  print("-----------Creating creds in anlytics fixture--------------")
+  creds =  get_credentials()
+  print("----------creds generated for analytics--------",creds)
   service = build("classroom", "v1", credentials=creds)
   body_data = {
       "title": "test course work",
