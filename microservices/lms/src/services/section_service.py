@@ -6,8 +6,11 @@ from common.utils import classroom_crud
 from common.utils.bq_helper import insert_rows_to_bq
 from common.utils.secrets import get_backend_robot_id_token
 from common.utils.logging_handler import Logger
-from common.models import Section, CourseEnrollmentMapping, User, BatchJob
-from common.utils.http_exceptions import (InternalServerError, ResourceNotFound)
+from common.models import (Section, CourseEnrollmentMapping,
+                           CourseTemplateEnrollmentMapping, User, BatchJob)
+from common.utils.http_exceptions import (InternalServerError,
+                                          ResourceNotFound)
+from common.utils.errors import ValidationError
 from services import common_service
 from config import BQ_TABLE_DICT, BQ_DATASET
 
@@ -18,7 +21,6 @@ def copy_course_background_task(course_template_details,
                                 sections_details,
                                 cohort_details,
                                 batch_job_id,
-                                headers,
                                 message=""):
   """Create section  Background Task to copy course and updated database
   for newly created section
@@ -60,6 +62,7 @@ def copy_course_background_task(course_template_details,
     section.name = course_template_details.name
     section.section = sections_details.name
     section.description = sections_details.description
+    section.max_students = sections_details.max_students
     # Reference document can be get using get() method
     section.course_template = course_template_details
     section.cohort = cohort_details
@@ -87,14 +90,18 @@ def copy_course_background_task(course_template_details,
     classroom_crud.enable_notifications(new_course["id"],
                                         "COURSE_ROSTER_CHANGES")
     # add instructional designer
-    try:
-      add_teacher(headers, section,
-                  course_template_details.instructional_designer)
-    except Exception as error:
-      error = traceback.format_exc().replace("\n", " ")
-      Logger.error(f"Create teacher failed for \
-          for {course_template_details.instructional_designer}")
-      Logger.error(error)
+    list_course_template_enrollment_mapping = CourseTemplateEnrollmentMapping\
+      .fetch_all_by_course_template(course_template_details.key)
+    if list_course_template_enrollment_mapping:
+      for course_template_mapping in list_course_template_enrollment_mapping:
+        try:
+          add_instructional_designer_into_section(section,
+                                                  course_template_mapping)
+        except Exception as error:
+          error = traceback.format_exc().replace("\n", " ")
+          Logger.error(f"Create teacher failed for \
+              for {course_template_details.instructional_designer}")
+          Logger.error(error)
 
     #If topics are present in course create topics returns a dict
     # with keys a current topicID and new topic id as values
@@ -282,15 +289,17 @@ def copy_course_background_task(course_template_details,
     section.update()
 
     rows=[{
-      "sectionId": section_id,\
-      "courseId": new_course["id"],\
-      "classroomUrl": new_course["alternateLink"],\
-        "name": new_course["section"],\
-        "description": new_course["description"],\
-          "cohortId": cohort_details.id,\
-        "courseTemplateId": course_template_details.id,\
-          "status": section.status,\
-          "timestamp": datetime.datetime.utcnow()
+      "sectionId":section_id,\
+      "courseId":new_course["id"],\
+      "classroomUrl":new_course["alternateLink"],\
+        "name":new_course["section"],\
+        "description":new_course["description"],\
+          "cohortId":cohort_details.id,\
+        "courseTemplateId":course_template_details.id,\
+          "status":section.status,\
+        "enrollmentStatus": section.enrollment_status,
+        "maxStudents": section.max_students,
+          "timestamp":datetime.datetime.utcnow()
     }]
     insert_rows_to_bq(
         rows=rows,
@@ -624,11 +633,68 @@ def add_teacher(headers, section, teacher_email):
     status = "invited"
     invitation_id = invitation_object["id"]
   user_dict = common_service.create_teacher(headers, data)
-  Logger.info(user_dict)
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.section = section
   course_enrollment_mapping.role = "faculty"
   course_enrollment_mapping.user = User.find_by_user_id(user_dict["user_id"])
+  course_enrollment_mapping.status = status
+  course_enrollment_mapping.invitation_id = invitation_id
+  course_enrollment_mapping.save()
+  return course_enrollment_mapping
+
+def validate_section(section):
+  """
+  Validate the section if it is eligile for enrollment
+  validate the count of enrolled students ,enrollment status, max_students
+  """
+  if section.enrolled_students_count >= section.max_students:
+    raise ValidationError("Maximum student count reached for section hence student can't be enrolled"
+      )
+  Logger.info(f"Enrollment status {section.enrolled_students_count} {section.status}")
+  if section.enrollment_status == "CLOSED" or section.status != "ACTIVE":
+    raise ValidationError("Enrollment is not active for this section"
+      )
+  return True
+
+
+def add_instructional_designer_into_section(section, course_template_mapping):
+  """Add instructional designer into section
+
+  Args:
+      section (Section): section object
+      course_template_mapping (CourseTemplateMapping):
+      course template enrollment mapping object
+
+  Returns:
+      CourseEnrollmentMapping: enrollment mapping
+  """
+  invitation_object = classroom_crud.invite_user(
+      section.classroom_id, course_template_mapping.user.email, "TEACHER")
+  try:
+    classroom_crud.acceept_invite(invitation_object["id"],
+                                  course_template_mapping.user.email)
+    # if course_template_mapping.status == "invited":
+    #   user_profile = classroom_crud.\
+    #       get_user_profile_information(course_template_mapping.user.email)
+    #   user = User.find_by_id(course_template_mapping.user.id)
+    #   user.first_name = user_profile["name"]["givenName"]
+    #   user.last_name = user_profile["name"]["familyName"]
+    #   user.gaia_id = user_profile["id"]
+    #   user.photo_url = user_profile["photoUrl"]
+    #   user.update()
+    #   course_template_mapping.status = "active"
+    #   course_template_mapping.invitation_id = ""
+    #   course_template_mapping.update()
+    status = "active"
+    invitation_id = ""
+  except Exception as hte:
+    Logger.info(hte)
+    status = "invited"
+    invitation_id = invitation_object["id"]
+  course_enrollment_mapping = CourseEnrollmentMapping()
+  course_enrollment_mapping.section = section
+  course_enrollment_mapping.role = "faculty"
+  course_enrollment_mapping.user = course_template_mapping.user
   course_enrollment_mapping.status = status
   course_enrollment_mapping.invitation_id = invitation_id
   course_enrollment_mapping.save()

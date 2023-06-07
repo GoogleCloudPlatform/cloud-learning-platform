@@ -50,10 +50,6 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: API_DOMAIN
-        - name: API_BASE_URL
-          value: api/v1
-        - name: SERVICE_NAME
-          value: api-docs
         ports:
         - containerPort: 80
         livenessProbe:

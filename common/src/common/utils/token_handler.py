@@ -20,7 +20,7 @@ class UserCredentials:
 
   def get_token(self):
     """
-      This function fetches toe id token using sign-in api from auth service 
+      This function fetches token id token using sign-in api from auth service
     """
     try:
       payload = {"email": self.email, "password": self.password}
@@ -39,6 +39,7 @@ class UserCredentials:
     except Exception as e:
       Logger.error(e)
       Logger.error(traceback.print_exc())
+      raise Exception(e) from e
 
   def get_id_token(self):
     """This function returns the id token"""
@@ -51,7 +52,7 @@ class UserCredentials:
   def _fetch_refresh_token(self):
     """
       This function fetches the refresh token using refresh token api from
-      auth service 
+      auth service
     """
     try:
       if not self.refresh_token:

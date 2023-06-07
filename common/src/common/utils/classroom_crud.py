@@ -873,3 +873,8 @@ def post_grade_of_the_user(section_id: str,
       body=student_submission).execute()
 
   return output
+
+def delete_drive_folder(folder_id):
+  service= build("drive", "v3", credentials=get_credentials())
+  result=service.files().delete(fileId=folder_id).execute()
+  return result

@@ -11,16 +11,16 @@
 
                 <div class="status-chip">
                     <mat-chip-list *ngIf="ifUpcoming(cohortDetails.start_date); else active">
-                        <mat-chip class="active-chip">Upcoming</mat-chip>
+                        <mat-basic-chip class="active-chip">Upcoming</mat-basic-chip>
                     </mat-chip-list>
 
                     <ng-template #active>
                         <mat-chip-list>
-                            <mat-chip
+                            <mat-basic-chip
                                 *ngIf="checkIfActive(cohortDetails.start_date,cohortDetails.end_date); else elseChip"
-                                class="active-chip">Active</mat-chip>
+                                class="active-chip">Active</mat-basic-chip>
                             <ng-template #elseChip>
-                                <mat-chip class="deactive-chip">Expired</mat-chip>
+                                <mat-basic-chip class="deactive-chip">Expired</mat-basic-chip>
                             </ng-template>
                         </mat-chip-list>
                     </ng-template>
@@ -31,8 +31,15 @@
                 <div style="width:50%;">
                     <div class="element"><span class="element-heading">Cohort Description : </span> <span
                             class="element-content">{{cohortDetails.description}}</span></div>
-                    <div class="element"><span class="element-heading">Instructional Designer : </span> <span
-                            class="element-content">{{courseTemplateDetails.instructional_designer}}</span></div>
+                    <div class="element">
+                        <span class="element-heading">Instructional Designer : </span>
+                        <span class="element-content">
+                            <div  [matTooltip]="getMattooltipText(instructionalDesignerList)" contentType="template" [matBadge]="getIdTotal(instructionalDesignerList)" 
+                        [matBadgeHidden]="checkIfBadgeHidden(instructionalDesignerList)" matBadgeOverlap="false" matBadgeSize="medium" class="content">
+                    {{instructionalDesignerList[0] ? instructionalDesignerList[0]['email'] : ''}}
+                        </div>
+                        </span>
+                    </div>
                     <div class="element"><span class="element-heading">Course Admin : </span> <span
                             class="element-content">{{courseTemplateDetails.admin}}</span></div>
                     <div class="element"><span class="element-heading">Course Template : </span> <span
@@ -121,10 +128,24 @@
                         </mat-select>
                     </mat-form-field>
 
+                    <!-- <div style="margin-right: 1%;">
+                        <mat-chip-list>
+                            <mat-basic-chip [class]="getChipClass(selectedSection.status)">
+                                {{getStatusName(selectedSection.status)}} 
+                            </mat-basic-chip>
+                        </mat-chip-list>
+                    </div> -->
+
                     <div style="margin-right: 1%;">
                         <mat-chip-list>
-                            <mat-chip (click)="onChipClick()" [class]="getChipClass(selectedSection.status)">
-                                {{getStatusName(selectedSection.status)}} 
+                            <mat-chip (click)="onEnrollmentChipClick(selectedSection.enrollment_status)" [class]="getEnrollmentChipClass(selectedSection.enrollment_status)">
+                                ENROLLMENT {{selectedSection.enrollment_status}}
+                                <mat-icon *ngIf="enrollmentLoader" style="margin-left:8px;">
+                                    <mat-spinner diameter="20"></mat-spinner>
+                                </mat-icon>
+                                <span *ngIf="!enrollmentLoader" style="margin-left: 8px;font-size: 1.1rem;" class="material-symbols-rounded">
+                                    rule_settings
+                                </span>
                             </mat-chip>
                         </mat-chip-list>
                     </div>
@@ -133,25 +154,31 @@
                             add_circle
                         </span> Add Section</button>
 
+                        <button mat-button (click)="openEditSelectionDialog()"><span class="material-symbols-rounded">
+                            edit
+                        </span>View / Edit Section</button>
+
                     <button mat-button (click)="openClassroom()"><span class="material-symbols-rounded">
                             account_box
                         </span> Go to classroom</button>
 
-                    <button mat-button (click)="openEditSelectionDialog()"><span class="material-symbols-rounded">
-                            edit
-                        </span> View / Edit info</button>
+                    
 
                     <button mat-button (click)="openInviteStudentDialog()"><span class="material-symbols-rounded"
                             style="padding-right: 3px;">
                             person_add
                         </span> Invite student</button>
-
-                    <button mat-button disabled><span class="material-symbols-rounded">
-                            insights
-                        </span> View Reports</button>
                 </div>
 
 
+            </div>
+
+            <div style="margin-right: 1%;padding-left: 10px;margin-top:-10px;">
+                <mat-chip-list>
+                    <mat-basic-chip [class]="getChipClass(selectedSection.status)">
+                        {{getStatusName(selectedSection.status)}} 
+                    </mat-basic-chip>
+                </mat-chip-list>
             </div>
 
             <div class="section-management">
@@ -468,3 +495,7 @@
     </ng-container>
 
 </div>
+
+<ng-template #HtmlContent>
+    <b>abcdef</b>
+  </ng-template>

@@ -11,6 +11,7 @@ class UpdateSection(BaseModel):
   course_id: str
   section_name: str
   description: str
+  max_students : int
 
   class Config():
     orm_mode = True

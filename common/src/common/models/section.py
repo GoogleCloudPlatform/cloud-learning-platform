@@ -54,7 +54,7 @@ class Section(BaseModel):
   enrollment_status = TextField(default="CLOSED",
                                 validator=check_enrollment_status)
   enrolled_students_count = NumberField(default=0)
-
+  max_students = NumberField()
   class Meta:
     ignore_none_field = False
     collection_name = BaseModel.DATABASE_PREFIX + "sections"
@@ -79,4 +79,25 @@ class Section(BaseModel):
     objects = cls.collection.filter("cohort", "==", cohort_key).filter(
         "deleted_at_timestamp", "==",
         None).order(order_by).offset(skip).fetch(limit)
+    return list(objects)
+
+  @classmethod
+  def get_section_by_status(cls,
+                          status,
+                          skip=0,
+                          order_by="-created_time",
+                          limit=1000):
+    """_summary_
+
+    Args:
+        cohort_key (str): cohort unique key to filter data
+        skip (int, optional): number of sections to be skip.
+        order_by(str, optional): order list according to order_by field.
+        limit (int, optional): limit till sections to be fetched.
+
+    Returns:
+        list: list of sections
+    """
+    objects = cls.collection.filter("status", "==", status).order(
+      order_by).offset(skip).fetch(limit)
     return list(objects)
