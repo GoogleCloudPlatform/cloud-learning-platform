@@ -17,6 +17,11 @@ const routes: Routes = [
     path: 'lti',
     canActivate: [AuthGuard],
     loadChildren: () => import('./lti/lti.module').then(m => m.LtiModule),
+  },
+  {
+    path: 'jobs',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./batch-jobs/batch-jobs.module').then(m => m.JobsModule),
   }
 ];
 

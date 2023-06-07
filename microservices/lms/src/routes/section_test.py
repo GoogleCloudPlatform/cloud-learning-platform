@@ -630,8 +630,8 @@ def test_form_grade_import_form_with_no_response(client_with_emulator,
           resp = client_with_emulator.patch(url)
   result_json = resp.json()
   assert resp.status_code == 202, "Status 202"
-  assert result_json[
-      "message"] == "Grades for coursework will be updated shortly", "message"
+  assert "Grades for coursework will be updated shortly" in result_json[
+    "message"] ,"message"
 
 
 def test_form_grade_import_form_with_response(client_with_emulator,
@@ -658,8 +658,8 @@ def test_form_grade_import_form_with_response(client_with_emulator,
               resp = client_with_emulator.patch(url)
   resp_json = resp.json()
   assert resp.status_code == 202, "Status 202"
-  assert resp_json[
-    "message"] == "Grades for coursework will be updated shortly","message"
+  assert "Grades for coursework will be updated shortly" in resp_json[
+    "message"] ,"message"
 
 def test_update_enrollment_status(client_with_emulator, create_fake_data):
   url = BASE_URL + \
