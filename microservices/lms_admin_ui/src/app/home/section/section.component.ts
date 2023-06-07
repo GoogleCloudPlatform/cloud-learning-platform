@@ -64,6 +64,8 @@ export class SectionComponent implements OnInit,OnDestroy {
   studentTableData: student[] = []
   courseworkTable: coursework[] = []
   ltiAssignmentsTableData: ltiAssignment[] = []
+
+  instructionalDesignerList:string[]=[]
   // dataSource = new MatTableDataSource(this.tableData);
 
   cohortDetails: any
@@ -79,6 +81,7 @@ export class SectionComponent implements OnInit,OnDestroy {
   getTeacherListSub:Subscription
   importGradesSub:Subscription
   disableCourseworkAction:boolean=false
+  enrollmentLoader:boolean=false
   constructor(private _liveAnnouncer: LiveAnnouncer, private _snackBar: MatSnackBar, public dialog: MatDialog, public _HomeService: HomeService, 
     public router: Router, private _location: Location) { }
   @ViewChild(MatSort) sort: MatSort;
@@ -98,6 +101,7 @@ export class SectionComponent implements OnInit,OnDestroy {
       this.cohortDetails = res
       console.log('cohort details', this.cohortDetails)
       this.getCourseTemplateDetails(res.course_template.split('/')[1])
+      this.getInstructionalDesignerDetails(res.course_template.split('/')[1])
     })
   }
   getCourseTemplateDetails(id: any) {
@@ -108,7 +112,34 @@ export class SectionComponent implements OnInit,OnDestroy {
       this.getSectionList(this.cohortDetails.id)
     })
   }
-
+  getInstructionalDesignerDetails(id:any){
+    this._HomeService.getInstructionalDesigner(id).subscribe((res:any)=>{
+this.instructionalDesignerList=res.data
+    })
+  }
+  getIdTotal(id:any){
+    return '+'+(id.length-1)
+    }
+    checkIfBadgeHidden(id:any){
+      if(id.length < 2){
+        return true
+      }
+      else{
+        return false
+      }
+    }
+    getMattooltipText(arr:any){
+      if(arr.length == 1){
+        return arr[0]['email']
+      }
+      else{
+        let text=''
+        for(let x of arr){
+          text = text+x['email']+' , '
+        }
+        return text
+      }
+    }
   
   getSectionList(cohortid: any) {
     this.loadSection = true
@@ -285,6 +316,7 @@ transformCourseworkTableData(data:any){
     tempObj['section'] = this.selectedSection.section
     tempObj['description'] = this.selectedSection.description
     tempObj['classroom_id'] = this.selectedSection.classroom_id
+    tempObj['max_students'] = this.selectedSection.max_students
     // tempObj['teachers'] = []
     // for (let x of this.selectedSection.teachers) {
     //   if (x != this.courseTemplateDetails.admin && x != this.courseTemplateDetails.instructional_designer) {
@@ -512,6 +544,12 @@ transformCourseworkTableData(data:any){
       width: '500px',
       data: sectionTemp
     });
+
+        dialogRef.afterClosed().subscribe(result => {
+      if (result.data == 'closed') {
+        this.getSectionTeachers()
+      }
+    });
   }
   getStatusName(status:any){
     return status.replace(/_/g,' ')
@@ -519,8 +557,21 @@ transformCourseworkTableData(data:any){
   getChipClass(status:any){
 return 'section-'+status+'-chip'
   }
-  onChipClick(){
-    console.log('chip click')
+  getEnrollmentChipClass(status:any){
+return 'enrollment-'+status+'-chip'
+  }
+  onEnrollmentChipClick(status:string){
+    let reverseStatus=''
+    status == 'OPEN' ? reverseStatus = 'CLOSED' : reverseStatus = 'OPEN'
+    this.enrollmentLoader = true
+    this._HomeService.changeEnrollmentStatus(this.selectedSection.id,reverseStatus).subscribe((res:any)=>{
+if(res.success == true){
+  this.selectedSection['enrollment_status'] = res.data['enrollment_status']
+}
+this.enrollmentLoader = false
+    },(err:any)=>{
+      this.enrollmentLoader = false
+    })
   }
 
   ngOnDestroy(): void {

@@ -46,11 +46,39 @@
         ]
     },
     {
+        "collection_group": "batch_jobs",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "deleted_at_timestamp",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
         "collection_group": "sections",
         "query_scope": "COLLECTION",
         "fields": [
             {
                 "field_path": "deleted_at_timestamp",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
+        "collection_group": "sections",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "status",
                 "order": "ASCENDING"
             },
             {

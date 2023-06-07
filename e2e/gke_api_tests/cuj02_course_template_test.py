@@ -6,7 +6,7 @@ from common.testing.example_objects import TEST_COURSE_TEMPLATE
 from common.utils.errors import ResourceNotFoundException
 from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
 from testing_objects.test_config import API_URL
-from testing_objects.token_fixture import get_token,sign_up_user
+from testing_objects.token_fixture import get_token, sign_up_user
 
 
 @pytest.fixture
@@ -27,10 +27,14 @@ def test_create_course_template(get_token):
   print("Course template api execution started")
   print("______This is course template Body__________")
   print(COURSE_TEMPLATE_INPUT_DATA)
-  resp = requests.post(url=url, json=COURSE_TEMPLATE_INPUT_DATA,headers=get_token)
+  resp = requests.post(url=url,
+                       json=COURSE_TEMPLATE_INPUT_DATA,
+                       headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
-  print("___________*********Course template api response***********____________")
+  print(
+      "___________*********Course template api response***********____________"
+  )
   print(resp.json())
   assert resp_json["success"] is True, "Check success"
   assert resp_json["course_template"]["classroom_code"] not in [
@@ -49,10 +53,8 @@ def test_create_course_template_validation(get_token):
   """
   url = f"{API_URL}/course_templates"
   resp = requests.post(url=url,
-                     json={
-                         "name": "e2e_test_cases",
-                         "description": "description"
-                     },headers=get_token)
+                       json={"name": "e2e_test_cases"},
+                       headers=get_token)
   assert resp.status_code == 422, "Status 422"
   assert resp.json()["success"] is False
 
@@ -65,7 +67,7 @@ def test_get_course_template(setup_course_templates, get_token):
   """
 
   url = f"{API_URL}/course_templates/{setup_course_templates.id}"
-  resp = requests.get(url=url,headers=get_token)
+  resp = requests.get(url=url, headers=get_token)
   data = TEST_COURSE_TEMPLATE
   data["id"] = setup_course_templates.id
   resp_json = resp.json()
@@ -80,7 +82,7 @@ def test_get_course_template_negative(get_token):
   Which will return a not found error response.
   """
   url = f"{API_URL}/course_templates/fake-id"
-  resp = requests.get(url=url,headers=get_token)
+  resp = requests.get(url=url, headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 404, "Status 404"
   assert resp_json["success"] is False, "Data doesn't Match"
@@ -93,7 +95,7 @@ def test_delete_course_template(setup_course_templates, get_token):
   Which will return a DeleteCourseTemplateModel object as a response.
   """
   url = f"{API_URL}/course_templates/{setup_course_templates.id}"
-  resp = requests.delete(url=url,headers=get_token)
+  resp = requests.delete(url=url, headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
   assert resp_json["success"] is True, "Check success"
@@ -106,7 +108,7 @@ def test_delete_course_template_negative(get_token):
   Which will return a not found error response.
   """
   url = f"{API_URL}/course_templates/fake-id"
-  resp = requests.delete(url=url,headers=get_token)
+  resp = requests.delete(url=url, headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 404, "Status 404"
   assert resp_json["success"] is False, "Data doesn't Match"
@@ -118,7 +120,7 @@ def test_get_list_course_template(get_token):
   Which will return a CourseTemplateList object.
   """
   url = f"{API_URL}/course_templates"
-  resp = requests.get(url=url,headers=get_token)
+  resp = requests.get(url=url, headers=get_token)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
   assert resp_json["success"] is True, "Check success"

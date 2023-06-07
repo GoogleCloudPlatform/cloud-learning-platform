@@ -12,15 +12,15 @@
 
                     <div class="status-chip">
                         <mat-chip-list *ngIf="ifUpcoming(cohort.start_date); else active">
-                            <mat-chip class="active-chip">Upcoming</mat-chip>
+                            <mat-basic-chip class="active-chip">Upcoming</mat-basic-chip>
                         </mat-chip-list>
 
                         <ng-template #active>
                             <mat-chip-list>
-                                <mat-chip *ngIf="checkIfActive(cohort.start_date,cohort.end_date); else elseChip"
-                                    class="active-chip">Active</mat-chip>
+                                <mat-basic-chip *ngIf="checkIfActive(cohort.start_date,cohort.end_date); else elseChip"
+                                    class="active-chip">Active</mat-basic-chip>
                                 <ng-template #elseChip>
-                                    <mat-chip class="deactive-chip">Expired</mat-chip>
+                                    <mat-basic-chip class="deactive-chip">Expired</mat-basic-chip>
                                 </ng-template>
                             </mat-chip-list>
                         </ng-template>
