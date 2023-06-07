@@ -180,6 +180,39 @@ def update_chat(chatid: str, input_chat: ChatUpdateModel):
     raise InternalServerError(str(e)) from e
 
 
+@router.delete(
+  "/chat/{chatid}",
+  name="Delete user chat"
+)
+def delete_chat(chatid: str):
+  """Delete a user chat.
+
+  Args:
+    chatid: id of user chat to delete.  We do a soft delete.
+
+  Raises:
+    ResourceNotFoundException: If the Chat does not exist
+    HTTPException: 500 Internal Server Error if something fails
+
+  Returns:
+    [JSON]: {'success': 'True'} if the chat is deleted,
+    NotFoundErrorResponseModel if the chat not found,
+    InternalServerErrorResponseModel if the chat deletion raises an exception
+  """
+  try:
+    UserChat.soft_delete_by_id(chatid)
+
+    return {
+      "success": True,
+      "message": f"Successfully deleted user chat {chatid}",
+    }
+  except ResourceNotFoundException as re:
+    raise ResourceNotFound(str(re)) from re
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
 @router.post(
     "/generate",
     name="Generate text from LLM",
