@@ -19,6 +19,7 @@ export class SingleTemplateComponent implements OnInit {
   loadTable = false
   dataSource = new MatTableDataSource(this.ltiAssignments);
   ltiAssignmentsDisplayedColumns: string[] = ["id", "lti_assignment_title", "start_date", "end_date", "due_date", "action"];
+  instructionalDesignerList:string[]=[]
 
   constructor(private router: Router, private homeService: HomeService, public dialog: MatDialog) {
 
@@ -28,8 +29,39 @@ export class SingleTemplateComponent implements OnInit {
     let courseTemplateId = this.router.url.split('/')[this.router.url.split('/').length - 1]
     this.fetchDetails(courseTemplateId)
     this.fetchLtiAssignments(courseTemplateId)
+    this.getInstructionalDesignerDetails(courseTemplateId)
 
   }
+
+  getInstructionalDesignerDetails(id:any){
+    this.homeService.getInstructionalDesigner(id).subscribe((res:any)=>{
+this.instructionalDesignerList=res.data
+    })
+  }
+  getIdTotal(id:any){
+    return '+'+(id.length-1)
+    }
+    checkIfBadgeHidden(id:any){
+
+      if(id.length < 2){
+        return true
+      }
+      else{
+        return false
+      }
+    }
+    getMattooltipText(arr:any){
+      if(arr.length == 1){
+        return arr[0]['email']
+      }
+      else{
+        let text=''
+        for(let x of arr){
+          text = text+x['email']+' , '
+        }
+        return text
+      }
+    }
 
   fetchDetails(contextId) {
     this.homeService.getCourseTemplate(contextId).subscribe(
