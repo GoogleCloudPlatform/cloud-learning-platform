@@ -23,7 +23,7 @@ class ChatModel(BaseModel):
   user_id: str
   llm_type: str
   title: Optional[str] = ""
-  history: Optional[List[str]] = []
+  history: Optional[List[dict]] = []
   created_time: str
   last_modified_time: str
 
