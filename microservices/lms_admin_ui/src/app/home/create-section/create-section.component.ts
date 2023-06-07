@@ -33,6 +33,7 @@ export class CreateSectionComponent implements OnInit {
       this.addSectionForm = this.fb.group({
         section_name: this.fb.control('', [Validators.required]),
         section_description: this.fb.control('', [Validators.required]),
+        max_students:this.fb.control('', [Validators.required]),
         cohort: this.fb.control({ value: this.requiredDetails.extra_data.cohort_name, disabled: true }, [Validators.required]),
         course_template: this.fb.control({ value: this.requiredDetails.extra_data.course_template_name, disabled: true }, [Validators.required]),
         instructional_designer: this.fb.control({ value: this.requiredDetails.extra_data.instructional_desiner, disabled: true }, [Validators.required]),
@@ -44,6 +45,7 @@ export class CreateSectionComponent implements OnInit {
       this.addSectionForm = this.fb.group({
         section_name: this.fb.control({ value: this.requiredDetails.init_data.section, disabled: false }, [Validators.required]),
         section_description: this.fb.control({ value: this.requiredDetails.init_data.description, disabled: false }, [Validators.required]),
+        max_students: this.fb.control({value: this.requiredDetails.init_data.max_students, disabled: false}, [Validators.required]),
         cohort: this.fb.control({ value: this.requiredDetails.init_data.cohort_name, disabled: true }, [Validators.required]),
         course_template: this.fb.control({ value: this.requiredDetails.init_data.course_template_name, disabled: true }, [Validators.required]),
         instructional_designer: this.fb.control({ value: this.requiredDetails.init_data.instructional_desiner, disabled: true }, [Validators.required]),
@@ -98,15 +100,13 @@ export class CreateSectionComponent implements OnInit {
     let sectionObj: LooseObject = {}
     sectionObj['description'] = this.addSectionForm.value.section_description.trim()
     sectionObj['cohort'] = this.requiredDetails.extra_data.cohort_id ? this.requiredDetails.extra_data.cohort_id : this.requiredDetails.init_data.cohort_id
-    // for (let x of this.teachingStaff) {
-    //   tempTeacherList.push(x)
-    // }
-    // sectionObj['teachers'] = tempTeacherList
+    
 
     if (this.requiredDetails.mode == 'Edit') {
       console.log('sec obj', sectionObj)
       // this.requiredDetails.extra_data.instructional_desiner ? tempTeacherList.push(this.requiredDetails.extra_data.instructional_desiner) : tempTeacherList.push(this.requiredDetails.init_data.instructional_desiner)
       sectionObj['section_name'] = this.addSectionForm.value.section_name.trim()
+      sectionObj['max_students'] = this.addSectionForm.value.max_students
       sectionObj['id'] = this.requiredDetails.init_data.section_id
       sectionObj['course_id'] = this.requiredDetails.init_data.classroom_id
       this._HomeService.editSection(sectionObj).subscribe((res: any) => {
@@ -127,6 +127,7 @@ export class CreateSectionComponent implements OnInit {
     }
     else {
       sectionObj['name'] = this.addSectionForm.value.section_name.trim()
+      sectionObj['max_students'] = this.addSectionForm.value.max_students
       sectionObj['course_template'] = this.requiredDetails.extra_data.course_template_id
       this._HomeService.createSection(sectionObj).subscribe((res: any) => {
         if (res.success == true) {
@@ -134,7 +135,7 @@ export class CreateSectionComponent implements OnInit {
           this.dialogRef.close({ data: 'success' });
           const successOverviewDialogRef = this.dialog.open(SuccessOverviewDialog, {
             width: '500px',
-            data: "Section creation in progress"
+            data: res.message
           });
         }
         else {

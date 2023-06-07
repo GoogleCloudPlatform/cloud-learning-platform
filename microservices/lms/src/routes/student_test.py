@@ -234,6 +234,86 @@ def test_enroll_student_section(client_with_emulator, create_fake_data):
   assert resp.json()["data"]["classroom_url"] == "https://classroom.google.com"
   assert resp.json()["data"]["classroom_id"] == "cl_id"
 
+def test_enroll_student_section_closed_enrollment(
+    client_with_emulator, create_fake_data):
+
+  url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
+  section = Section.find_by_id(create_fake_data["section"])
+  section.enrollment_status = "CLOSED"
+  section.update()
+  course_user=User.from_dict(TEMP_USER)
+  course_user.user_id=""
+  course_user.email=input_data["email"]
+  course_user.user_id=course_user.save().id
+  course_user.update()
+  with mock.patch("routes.student.Logger"):
+    with mock.patch("routes.student.classroom_crud.enroll_student",
+      return_value ={"user_id":course_user.user_id}):
+      with mock.patch(
+        "routes.student.check_user_can_enroll_in_section",
+        return_value =True):
+        resp = client_with_emulator.post(url, json=input_data)
+  print(resp.json())
+  assert resp.status_code == 422, "Status 422"
+
+def test_enroll_student_section_failed_section(
+    client_with_emulator, create_fake_data):
+
+  url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
+  section = Section.find_by_id(create_fake_data["section"])
+  section.status = "FAILED_TO_PROVISION"
+  section.update()
+  course_user=User.from_dict(TEMP_USER)
+  course_user.user_id=""
+  course_user.email=input_data["email"]
+  course_user.user_id=course_user.save().id
+  course_user.update()
+  with mock.patch("routes.student.Logger"):
+    with mock.patch("routes.student.classroom_crud.enroll_student",
+      return_value ={"user_id":course_user.user_id}):
+      with mock.patch(
+        "routes.student.check_user_can_enroll_in_section",
+        return_value =True):
+        resp = client_with_emulator.post(url, json=input_data)
+  print(resp.json())
+  assert resp.status_code == 422, "Status 422"
+
+
+def test_enroll_student_section_enrollment_count(
+  client_with_emulator, create_fake_data):
+
+  url = BASE_URL + f"/sections/{create_fake_data['section']}/students"
+  input_data = {
+      "email": "student@gmail.com",
+      "access_token": CREDENTIAL_JSON["token"]
+  }
+  section = Section.find_by_id(create_fake_data["section"])
+  section.enrolled_students_count = section.max_students +1
+  section.update()
+  course_user=User.from_dict(TEMP_USER)
+  course_user.user_id=""
+  course_user.email=input_data["email"]
+  course_user.user_id=course_user.save().id
+  course_user.update()
+  with mock.patch("routes.student.Logger"):
+    with mock.patch("routes.student.classroom_crud.enroll_student",
+      return_value ={"user_id":course_user.user_id}):
+      with mock.patch(
+        "routes.student.check_user_can_enroll_in_section",
+        return_value =True):
+        resp = client_with_emulator.post(url, json=input_data)
+  print(resp.json())
+  assert resp.status_code == 422, "Status 422"
+
+
 def test_enroll_student_section_negative(client_with_emulator):
   url = BASE_URL + "/sections/fake_section_id/students"
   input_data = {
@@ -312,6 +392,28 @@ def test_invite_student_to_cohort_api(client_with_emulator,create_fake_data):
     return_value =True):
       resp = client_with_emulator.post(url)
   assert resp.status_code == 200
+
+def test_invite_student_to_cohort_archived_section(
+    client_with_emulator,create_fake_data):
+  section_id=create_fake_data["section"]
+  section = Section.find_by_id(section_id)
+  section.status = "ARCHIVED"
+  section.update()
+  url = BASE_URL + f"/sections/{section_id}/invite/clplmstest_user4@gmail.com"
+  with mock.patch\
+  ("routes.student.student_service.invite_student",
+   return_value={"invitation_id":"abcde",
+                  "course_enrollment_id":"course_enrollment_id",
+                  "user_id":"user_id",
+                  "section_id":"section.id",
+                  "cohort_id":"section.cohort.key",
+            "classroom_id":"section.classroom_id",
+            "classroom_url":"section.classroom_url"}):
+    with mock.patch(
+      "services.student_service.check_student_can_enroll_in_cohort",
+    return_value =True):
+      resp = client_with_emulator.post(url)
+  assert resp.status_code == 422
 
 def test_update_invites(client_with_emulator,create_fake_data):
   url = BASE_URL + "/sections/update_invites"

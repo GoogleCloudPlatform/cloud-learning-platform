@@ -24,14 +24,14 @@ export class CreateCourseTemplateModalComponent implements OnInit {
       this.courseTemplateForm = this.fb.group({
         name: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
         description: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
-        instructional_designer: this.fb.control('', [Validators.required, Validators.email]),
+        // instructional_designer: this.fb.control('', [Validators.required, Validators.email]),
       });
     }
     else {
       this.courseTemplateForm = this.fb.group({
         name: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),
         description: this.fb.control({ value: this.courseTemplateModalData.init_data.description, disabled: false }, [Validators.required]),
-        instructional_designer: this.fb.control({ value: this.courseTemplateModalData.init_data.instructional_designer, disabled: false }, [Validators.required, Validators.email]),
+        // instructional_designer: this.fb.control({ value: this.courseTemplateModalData.init_data.instructional_designer, disabled: false }, [Validators.required, Validators.email]),
       });
     }
 
@@ -81,7 +81,7 @@ export class CreateCourseTemplateModalComponent implements OnInit {
 
           const successOverviewDialogRef = this.dialog.open(SuccessOverviewDialog, {
             width: '500px',
-            data: "Instructional Designer might get an email promting to accept the class in classroom, please ignore that !"
+            data: "Course template created"
           });
 
 
