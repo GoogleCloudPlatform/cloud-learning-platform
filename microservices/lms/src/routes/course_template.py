@@ -270,7 +270,7 @@ def update_course_template(
         "name": course_template.name,
         "description": course_template.description,
         "timestamp": datetime.datetime.utcnow(),
-        "instructionalDesigners": [list_instructional_designers]
+        "instructionalDesigners": list_instructional_designers
     }]
     insert_rows_to_bq(rows=rows,
                       dataset=BQ_DATASET,
@@ -369,14 +369,12 @@ def add_instructional_designer(
         "photo_url": user_profile["photoUrl"]
     }
     status = "active"
-    invitation_id = invitation_object["id"]
     user_dict = common_service.create_teacher(headers, data)
     course_template_enrollment = CourseTemplateEnrollmentMapping()
     course_template_enrollment.course_template = course_template
     course_template_enrollment.user = User.find_by_user_id(
         user_dict["user_id"])
     course_template_enrollment.status = status
-    course_template_enrollment.invitation_id = invitation_id
     course_template_enrollment.role = "faculty"
     course_template_enrollment.save()
     list_enrollment_mapping = CourseTemplateEnrollmentMapping\
@@ -464,7 +462,7 @@ def delete_instructional_designer(course_template_id: str,
         "name": course_template.name,
         "description": course_template.description,
         "timestamp": datetime.datetime.utcnow(),
-        "instructionalDesigners": [list_instructional_designers]
+        "instructionalDesigners": list_instructional_designers
     }]
     insert_rows_to_bq(rows=rows,
                       dataset=BQ_DATASET,

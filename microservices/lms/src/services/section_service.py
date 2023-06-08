@@ -665,21 +665,15 @@ def add_instructional_designer_into_section(section, course_template_mapping):
       CourseEnrollmentMapping: enrollment mapping
   """
   invitation_object = classroom_crud.invite_user(
-      section.classroom_id, course_template_mapping.user.email, "TEACHER")
-  try:
-    classroom_crud.acceept_invite(invitation_object["id"],
-                                  course_template_mapping.user.email)
-    status = "active"
-    invitation_id = ""
-  except Exception as hte:
-    Logger.info(hte)
-    status = "invited"
-    invitation_id = invitation_object["id"]
+    section.classroom_id, course_template_mapping.user.email, "TEACHER")
+  
+  classroom_crud.acceept_invite(invitation_object["id"],
+                                course_template_mapping.user.email)
+  status = "active"
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.section = section
   course_enrollment_mapping.role = "faculty"
   course_enrollment_mapping.user = course_template_mapping.user
   course_enrollment_mapping.status = status
-  course_enrollment_mapping.invitation_id = invitation_id
   course_enrollment_mapping.save()
   return course_enrollment_mapping
