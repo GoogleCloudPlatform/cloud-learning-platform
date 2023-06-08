@@ -97,7 +97,7 @@ this.instructionalDesignerList=res.data
       maxHeight: "90vh",
       data: ltiModalData
     });
-
+    
     dialogRef.afterClosed().subscribe(result => {
       console.log("result", result)
       if (result?.data == "success") {
@@ -110,8 +110,9 @@ this.instructionalDesignerList=res.data
     let courseTemplateId = this.router.url.split('/')[this.router.url.split('/').length - 1]
     let ltiModalData = {}
     ltiModalData['mode'] = 'Update'
+    ltiModalData['page'] = 'course_template'
     ltiModalData['init_data'] = ''
-    ltiModalData['extra_data'] = { courseTemplateId, assignment: data }
+    ltiModalData['extra_data'] = { "contextId": courseTemplateId, assignment: data }
 
     const dialogRef = this.dialog.open(CreateAssignmentComponent, {
       width: '80vw',
