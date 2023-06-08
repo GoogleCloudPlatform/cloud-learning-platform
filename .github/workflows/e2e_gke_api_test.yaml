@@ -139,20 +139,20 @@ jobs:
         path: ${{ format('ailearning-backend_{0}', github.run_id) }}
         token: ${{ secrets.GH_PAT }}
 
-    - name: Build and deploy external services to cluster
-      run: |
-        pushd ${{ format('ailearning-backend_{0}', github.run_id) }}
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE=e2e-pr-$PR_NUMBER
-        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
-        export GCP_PROJECT=$PROJECT_ID
-        skaffold run \
-        -p custom \
-        --module authentication,redis,user-management,student-learner-profile,learning-record-service \
-        --namespace $NAMESPACE \
-        -l commit=$GITHUB_SHA \
-        --tag PR${{ github.event.pull_request.number }} 
-        popd
+    # - name: Build and deploy external services to cluster
+    #   run: |
+    #     pushd ${{ format('ailearning-backend_{0}', github.run_id) }}
+    #     PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+    #     NAMESPACE=e2e-pr-$PR_NUMBER
+    #     export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+    #     export GCP_PROJECT=$PROJECT_ID
+    #     skaffold run \
+    #     -p custom \
+    #     --module authentication,redis,user-management,student-learner-profile,learning-record-service \
+    #     --namespace $NAMESPACE \
+    #     -l commit=$GITHUB_SHA \
+    #     --tag PR${{ github.event.pull_request.number }} 
+    #     popd
 
     - name: Upload Skaffold cache
       if: always()
