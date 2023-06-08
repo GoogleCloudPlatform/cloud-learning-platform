@@ -17,10 +17,13 @@ Module to add cohort in Fireo
 from fireo.fields import TextField, ListField, IDField
 from common.models import BaseModel
 
-# pylint: disable=unused-argument
+# constants used as tags for chat history
+CHAT_HUMAN = "HumanInput"
+CHAT_AI = "AIOutput"
 
 class UserChat(BaseModel):
-  """UserChat ORM class
+  """
+  UserChat ORM class
   """
   id = IDField()
   user_id = TextField(required=True)
@@ -48,7 +51,8 @@ class UserChat(BaseModel):
         limit (int, optional): limit till cohorts to be fetched.
 
     Returns:
-        _type_: _description_
+        List[UserChat]: List of chats for user.
+
     """
     objects = cls.collection.filter(
         "user_id", "==", userid).filter(

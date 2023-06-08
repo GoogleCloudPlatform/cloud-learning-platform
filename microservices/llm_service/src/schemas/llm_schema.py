@@ -23,7 +23,7 @@ class ChatModel(BaseModel):
   user_id: str
   llm_type: str
   title: Optional[str] = ""
-  history: Optional[List[str]] = []
+  history: Optional[List[dict]] = []
   created_time: str
   last_modified_time: str
 
@@ -83,7 +83,7 @@ class LLMUserChatResponse(BaseModel):
   """LLM User Create Chat Response model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully created chat"
-  data: ChatModel
+  data: Optional[dict] = {}
 
   class Config():
     orm_mode = True
@@ -91,13 +91,13 @@ class LLMUserChatResponse(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully created chat",
-            "data": ChatModel
+            "data": None
         }
     }
 
 class LLMUserAllChatsResponse(BaseModel):
   """LLM Get User All Chats Response model"""
-  data: List[ChatModel] = []
+  data: List[dict] = []
   success: Optional[bool] = True
   message: Optional[str] = "Successfully retrieved user chats"
 
