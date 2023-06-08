@@ -280,8 +280,12 @@ def delete_student(section_id: str, user: str, request: Request):
     course_id = section_details.classroom_id
     response_get_student = classroom_crud.get_user_details(user_id, headers)
     student_email = response_get_student["data"]["email"]
-    classroom_crud.delete_student(course_id=course_id,\
-      student_email=student_email)
+    try:
+      classroom_crud.delete_student(course_id=course_id,\
+        student_email=student_email)
+    except HttpError as hte:
+      if hte.status_code != 404:
+        raise HttpError(hte.resp,hte.content,hte.uri) from hte
     result.status = "inactive"
     result.update()
     # Update enrolled student count in section
