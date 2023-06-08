@@ -188,8 +188,10 @@ def copy_course_background_task(course_template_details,
               target_folder_id=target_folder_id,
               coursework_type="coursework",
               lti_assignment_details=lti_assignment_details,
-              logs=logs)
+              logs=logs,
+              error_flag=error_flag)
           coursework["materials"] = coursework_update_output["material"]
+          error_flag = coursework_update_output["error_flag"]
           coursework_lti_assignment_ids.extend(
               coursework_update_output["lti_assignment_ids"])
         # final_coursewok.append(coursework)
@@ -259,10 +261,12 @@ def copy_course_background_task(course_template_details,
               materials=coursework_material["materials"],
               url_mapping=url_mapping,
               target_folder_id=target_folder_id,
-              logs=logs)
+              logs=logs,
+              error_flag=error_flag)
 
           coursework_material["materials"] = coursework_material_update_output[
               "material"]
+          error_flag = coursework_update_output["error_flag"]
           print("Updated coursework material attached")
         final_coursewok_material.append(coursework_material)
       except Exception as error:
@@ -346,7 +350,8 @@ def update_coursework_material(materials,
                                target_folder_id,
                                coursework_type=None,
                                lti_assignment_details=None,
-                               logs=None):
+                               logs=None,
+                               error_flag=False):
   """Takes the material attached to any type of cursework and copy it in the
     target folder Id also removes duplicates from material list
   Args:
@@ -440,6 +445,7 @@ def update_coursework_material(materials,
 
               logs["errors"].append(error_msg)
               Logger.error(error_msg)
+              error_flag = True
           else:
             updated_material.append({"link": material["link"]})
 
@@ -474,6 +480,7 @@ def update_coursework_material(materials,
 
   return {
       "material": updated_material,
+      "error_flag": error_flag,
       "lti_assignment_ids": lti_assignment_ids
   }
 
