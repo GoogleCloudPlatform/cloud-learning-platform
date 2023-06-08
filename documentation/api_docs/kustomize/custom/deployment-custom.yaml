@@ -58,4 +58,4 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: API_DOMAIN            
+              key: API_DOMAIN
