@@ -1,4 +1,5 @@
 import { Component, Inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LtiService } from '../service/lti.service';
 import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
@@ -24,6 +25,7 @@ export class CreateAssignmentComponent {
   selectedTool: any
   toolName: any
   constructor(
+    private datePipe: DatePipe,
     private _snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<CreateAssignmentComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -48,9 +50,9 @@ export class CreateAssignmentComponent {
         "tool_id": [this.dialogData.extra_data.assignment.tool_id, Validators.required],
         "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title, Validators.required],
         "lti_content_item_id": [this.dialogData.extra_data.assignment.lti_content_item_id],
-        "start_date": [this.dialogData.extra_data.assignment.start_date],
-        "end_date": [this.dialogData.extra_data.assignment.end_date],
-        "due_date": [this.dialogData.extra_data.assignment.due_date],
+        "start_date": [this.dialogData.extra_data.assignment.start_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.start_date) : null],
+        "end_date": [this.dialogData.extra_data.assignment.end_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.end_date) : null],
+        "due_date": [this.dialogData.extra_data.assignment.due_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.due_date) : null],
         "max_points": [this.dialogData.extra_data.assignment.max_points]
       });
       this.toolSelectDisabled = true
@@ -153,6 +155,22 @@ export class CreateAssignmentComponent {
       duration: 6000,
       panelClass: ['red-snackbar'],
     });
+  }
+
+  getFormattedDatetime(dateString) {
+    const d = new Date(dateString);
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    const year = d.getFullYear();
+    let hour = '' + d.getHours();
+    let min = '' + d.getMinutes();
+    let sec = '' + d.getSeconds();
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+    if (hour.length < 2) hour = '0' + hour;
+    if (min.length < 2) min = '0' + min;
+    if (sec.length < 2) sec = '0' + sec;
+    return [year, month, day].join('-') + 'T' + [hour, min, sec].join(':');
   }
 
   openContentSelector() {
