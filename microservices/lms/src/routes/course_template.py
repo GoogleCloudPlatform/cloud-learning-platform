@@ -270,7 +270,7 @@ def update_course_template(
         "name": course_template.name,
         "description": course_template.description,
         "timestamp": datetime.datetime.utcnow(),
-        "instructionalDesigners": [list_instructional_designers]
+        "instructionalDesigners": list_instructional_designers
     }]
     insert_rows_to_bq(rows=rows,
                       dataset=BQ_DATASET,
@@ -350,51 +350,31 @@ def add_instructional_designer(
           f" exists in this Course template {course_template.id}")
     invitation_object = classroom_crud.invite_user(
         course_template.classroom_id, instructional_designer, "TEACHER")
-    try:
-      classroom_crud.acceept_invite(invitation_object["id"],
+    classroom_crud.acceept_invite(invitation_object["id"],
                                     instructional_designer)
-      user_profile = classroom_crud.\
-        get_user_profile_information(instructional_designer)
+    user_profile = classroom_crud.\
+      get_user_profile_information(instructional_designer)
 
-      data = {
-          "first_name": user_profile["name"]["givenName"],
-          "last_name": user_profile["name"]["familyName"],
-          "email": instructional_designer,
-          "user_type": "faculty",
-          "user_groups": [],
-          "status": "active",
-          "is_registered": True,
-          "failed_login_attempts_count": 0,
-          "access_api_docs": False,
-          "gaia_id": user_profile["id"],
-          "photo_url": user_profile["photoUrl"]
-      }
-      status = "active"
-      invitation_id = ""
-    except Exception as hte:
-      Logger.info(hte)
-      data = {
-          "first_name": "first_name",
-          "last_name": "last_name",
-          "email": instructional_designer,
-          "user_type": "faculty",
-          "user_groups": [],
-          "status": "active",
-          "is_registered": True,
-          "failed_login_attempts_count": 0,
-          "access_api_docs": False,
-          "gaia_id": "",
-          "photo_url": ""
-      }
-      status = "invited"
-      invitation_id = invitation_object["id"]
+    data = {
+        "first_name": user_profile["name"]["givenName"],
+        "last_name": user_profile["name"]["familyName"],
+        "email": instructional_designer,
+        "user_type": "faculty",
+        "user_groups": [],
+        "status": "active",
+        "is_registered": True,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": False,
+        "gaia_id": user_profile["id"],
+        "photo_url": user_profile["photoUrl"]
+    }
+    status = "active"
     user_dict = common_service.create_teacher(headers, data)
     course_template_enrollment = CourseTemplateEnrollmentMapping()
     course_template_enrollment.course_template = course_template
     course_template_enrollment.user = User.find_by_user_id(
         user_dict["user_id"])
     course_template_enrollment.status = status
-    course_template_enrollment.invitation_id = invitation_id
     course_template_enrollment.role = "faculty"
     course_template_enrollment.save()
     list_enrollment_mapping = CourseTemplateEnrollmentMapping\
@@ -402,13 +382,14 @@ def add_instructional_designer(
     list_instructional_designers = [
         i.user.email for i in list_enrollment_mapping
     ]
+    print("list of instructional designer")
     rows = [{
         "courseTemplateId": course_template_id,
         "classroomId": course_template.classroom_id,
         "name": course_template.name,
         "description": course_template.description,
         "timestamp": datetime.datetime.utcnow(),
-        "instructionalDesigners": [list_instructional_designers]
+        "instructionalDesigners": list_instructional_designers
     }]
     insert_rows_to_bq(rows=rows,
                       dataset=BQ_DATASET,
@@ -481,7 +462,7 @@ def delete_instructional_designer(course_template_id: str,
         "name": course_template.name,
         "description": course_template.description,
         "timestamp": datetime.datetime.utcnow(),
-        "instructionalDesigners": [list_instructional_designers]
+        "instructionalDesigners": list_instructional_designers
     }]
     insert_rows_to_bq(rows=rows,
                       dataset=BQ_DATASET,
