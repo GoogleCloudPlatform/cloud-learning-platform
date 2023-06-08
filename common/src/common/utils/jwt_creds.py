@@ -43,7 +43,7 @@ class JwtCredentials(service_account.Credentials):
 
     iam_payload = {"payload": json.dumps(payload)}
 
-    default_creds, _ = google.auth.default()
+    default_creds, _ = google.auth.default(scopes=['https://www.googleapis.com/auth/cloud-platform'])
     authed_session = AuthorizedSession(default_creds)
     iam_url = "https://iamcredentials.googleapis.com/v1/projects/-"\
     "/serviceAccounts/"+self._service_account_email + ":signJwt"

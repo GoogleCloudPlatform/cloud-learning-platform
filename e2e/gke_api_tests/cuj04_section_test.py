@@ -44,7 +44,7 @@ def create_course(name, description, section, owner_id):
     google_oauth_token_endpoint,
     SCOPES
   )
-  print("---------------Courses created------------------",creds)
+  print("---------------Courses creation started------------------",creds)
   service = build("classroom", "v1", credentials=creds)
   new_course = {}
   new_course["name"] = name
@@ -56,6 +56,7 @@ def create_course(name, description, section, owner_id):
   course = service.courses().create(body=new_course).execute()
   course_name = course.get("name")
   course_id = course.get("id")
+  print("___________Course creaated___________________",course)
   return course
 
 
