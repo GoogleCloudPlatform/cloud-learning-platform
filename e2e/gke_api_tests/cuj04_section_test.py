@@ -9,6 +9,7 @@ from secrets_helper import get_required_emails_from_secret_manager
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from common.testing.example_objects import create_fake_data, TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2
+from common.utils.jwt_creds import JwtCredentials
 from testing_objects.test_config import API_URL
 from testing_objects.token_fixture import get_token,sign_up_user
 
@@ -24,15 +25,26 @@ def create_course(name, description, section, owner_id):
   Returns:
     new created course details
     """ ""
+  print("IN create corse fixtureee----------------")
   SCOPES = [
       "https://www.googleapis.com/auth/classroom.courses",
       "https://www.googleapis.com/auth/classroom.courses.readonly"
   ]
   CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
+  print("This is classroom key__________",CLASSROOM_KEY)
   CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
-  a_creds = service_account.Credentials.from_service_account_info(
-      CLASSROOM_KEY, scopes=SCOPES)
-  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  # a_creds = service_account.Credentials.from_service_account_info(
+  #     CLASSROOM_KEY, scopes=SCOPES)
+  # creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  service_account_email = "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com"
+  google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
+  creds =JwtCredentials.from_default_with_subject(
+    CLASSROOM_ADMIN_EMAIL,
+    service_account_email,
+    google_oauth_token_endpoint,
+    SCOPES
+  )
+  print("---------------Courses created------------------",creds)
   service = build("classroom", "v1", credentials=creds)
   new_course = {}
   new_course["name"] = name
@@ -47,7 +59,9 @@ def create_course(name, description, section, owner_id):
   return course
 
 
-def test_create_section(get_token):
+def test_create_section():
+# def test_create_section(get_token):
+
   """
   create a Course template and cohort is created  by  user  
   then user clicks on create section button and makes a section 
@@ -74,6 +88,7 @@ def test_create_section(get_token):
       "cohort": fake_data[1].id,
       "max_students":25
   }
+  # resp = requests.post(url=url, json=data, headers=get_token)
   resp = requests.post(url=url, json=data, headers=get_token)
   resp_json = resp.json()
   print("_______***********create section  response ****_________",resp_json)
