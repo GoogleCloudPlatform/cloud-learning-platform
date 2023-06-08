@@ -3,7 +3,7 @@ import "firebase/storage";
 import "firebase/auth";
 import { GoogleAuthProvider, getAuth, signOut } from "firebase/auth";
 
-const appUrl = process.env.API_DOMAIN
+const appUrl = `https://${process.env.API_DOMAIN}`;
 
 const app = firebase.initializeApp({
 	apiKey: process.env.FIREBASE_API_KEY,
