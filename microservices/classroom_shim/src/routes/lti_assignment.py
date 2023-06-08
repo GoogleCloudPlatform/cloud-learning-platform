@@ -159,7 +159,8 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
     lti_assignment_due_date = lti_assignment_dict.get("due_date")
     if lti_assignment_due_date:
       curr_utc_timestamp = datetime.datetime.utcnow()
-      lti_assignment_datetime = datetime.datetime.fromtimestamp(lti_assignment_due_date.timestamp())
+      lti_assignment_datetime = datetime.datetime.fromtimestamp(
+          lti_assignment_due_date.timestamp())
 
       if lti_assignment_datetime < curr_utc_timestamp:
         raise ValidationError(
@@ -183,8 +184,7 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
         )
       coursework["maxPoints"] = lti_assignment_dict.get("max_points")
 
-    context_resp = get_context_details(lti_assignment.context_id,
-                                       lti_assignment.context_type)
+    context_resp = get_context_details(lti_assignment.context_id)
     course_id = context_resp["data"]["classroom_id"]
 
     try:
@@ -244,8 +244,7 @@ def update_lti_assignment(
           "Invalid request please provide some data " +
           f"to update the LTI Assignment with id {lti_assignment_id}")
 
-    context_resp = get_context_details(lti_assignment_details.context_id,
-                                       lti_assignment_details.context_type)
+    context_resp = get_context_details(lti_assignment_details.context_id)
     course_id = context_resp["data"]["classroom_id"]
 
     coursework_body = {}
@@ -332,8 +331,7 @@ def delete_lti_assignment(lti_assignment_id: str):
     """
   try:
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
-    context_resp = get_context_details(lti_assignment.context_id,
-                                       lti_assignment.context_type)
+    context_resp = get_context_details(lti_assignment.context_id)
     course_id = context_resp["data"]["classroom_id"]
 
     try:
