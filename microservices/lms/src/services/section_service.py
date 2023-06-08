@@ -666,7 +666,6 @@ def add_instructional_designer_into_section(section, course_template_mapping):
   """
   invitation_object = classroom_crud.invite_user(
     section.classroom_id, course_template_mapping.user.email, "TEACHER")
-  
   classroom_crud.acceept_invite(invitation_object["id"],
                                 course_template_mapping.user.email)
   status = "active"
