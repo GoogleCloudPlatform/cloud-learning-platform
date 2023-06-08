@@ -1,0 +1,110 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: utils
+requires:
+  - path: ../../common
+    configs: [common]
+    activeProfiles:
+    - name: custom
+      activatedBy: [custom]
+    - name: dev
+      activatedBy: [dev]
+  - path: ../authentication
+    configs: [authentication]
+    activeProfiles:
+    - name: custom
+      activatedBy: [custom]
+    - name: dev
+      activatedBy: [dev]
+    - name: prod
+      activatedBy: [prod]
+  - path: ../dashboard
+    configs: [dashboard]
+    activeProfiles:
+    - name: custom
+      activatedBy: [custom]
+    - name: dev
+      activatedBy: [dev]
+    - name: prod
+      activatedBy: [prod]
+build:
+  tagPolicy:
+    gitCommit: {}
+  local:
+    concurrency: 1
+  artifacts:
+  - image: utils
+    requires:
+      - image: common
+        alias: BASE_IMG
+    sync:
+      infer:
+        - '**/*.py'
+        - '**/*.json'
+portForward:
+- resourceType: service
+  resourceName: utils
+  port: 80
+  localPort: 8891
+deploy:
+  kustomize:
+    paths:
+    - ./kustomize/minikube
+  statusCheckDeadlineSeconds: 1200
+profiles:
+- name: custom
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: utils
+      docker:
+        cacheFrom:
+          - utils
+          - utils:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/custom
+    statusCheckDeadlineSeconds: 1200
+- name: dev
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: gcr.io/aitutor-dev/utils
+      docker:
+        cacheFrom:
+          - gcr.io/aitutor-dev/utils:latest
+      requires:
+        - image: gcr.io/aitutor-dev/common
+          alias: BASE_IMG
+      sync:
+        infer:
+          - '**/*.py'
+          - '**/*.json'
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/dev
+    statusCheckDeadlineSeconds: 1200
+
+- name: prod
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: utils
+      docker:
+        cacheFrom:
+          - utils
+          - utils:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
+    statusCheckDeadlineSeconds: 1200

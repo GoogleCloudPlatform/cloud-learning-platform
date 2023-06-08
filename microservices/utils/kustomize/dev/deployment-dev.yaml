@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: utils
+spec:
+  template:
+    spec:
+      containers:
+      - name: utils
+        image: gcr.io/aitutor-dev/utils
+        imagePullPolicy: Always
+        resources:
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+            limits:
+              memory: "500Mi"
+              cpu: "200m"
+        env:
+          - name: GCP_LEARNING_RESOURCE_BUCKET
+            value: aitutor-dev
+          - name: DATABASE_PREFIX
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: DATABASE_PREFIX
