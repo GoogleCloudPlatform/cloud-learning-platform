@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" LLM Generation Service """
+""" Query Engine Service """
 
 from common.models import UserQuery
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
 
-async def query_generate(prompt: str, llm_type: str,
-                         user_query: Optional[UserQuery] = None):
+async def query_generate(prompt: str, query_engine: str,
+                         user_query: Optional[UserQuery] = None) -> QueryResult:
   pass
   
 
-async def query_engine_build(doc_url: str, query_engine: str):
+async def query_engine_build(doc_url: str, query_engine: str) -> str:
   pass

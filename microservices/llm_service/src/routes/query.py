@@ -30,7 +30,7 @@ from schemas.llm_schema import (LLMQueryModel,
                                 LLMGetQueryEnginesResponse,
                                 LLMQueryResponse)
 
-from services.query_generate import query_generate, query_engine_build
+from services.query_service import query_generate, query_engine_build
 from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES
 
 router = APIRouter(prefix="/query", tags=["LLMs"], responses=ERROR_RESPONSES)
