@@ -649,9 +649,9 @@ def update_invites(section_id:str):
     InternalServerErrorResponseModel: if the add student raises an exception
   """
   try:
-    # headers = {"Authorization": request.headers.get("Authorization")}
     course_records = CourseEnrollmentMapping.collection.filter(
-        "status", "==", "invited").filter("section", "==", "sections/"+section_id).fetch()
+        "status", "==", "invited").filter(
+      "section", "==", "sections/"+section_id).fetch()
     updated_list_inviations = []
     for course_record in course_records:
       Logger.info(f"course_record {course_record.section.id}, " +

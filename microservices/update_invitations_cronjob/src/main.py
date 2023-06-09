@@ -102,21 +102,22 @@ def main():
       break
 
     for section in sections:
-      api_endpoint = f"http://lms/lms/api/v1/sections/{section.id}/update_invites"
+      section_id=section["id"]
+      api_endpoint = f"http://lms/lms/api/v1/sections/{section_id}/update_invites"
       res = requests.patch(
       url=api_endpoint,
       headers={
           "Content-Type": "application/json",
           "Authorization": f"Bearer {id_token}"
       })
-      Logger.info(f"Response of patch api for section_id{section.id} {res.status_code}")
+      Logger.info(f"Response of patch api for section_id{section_id} {res.status_code}")
     if res.status_code != 200:
       cronjob_status=False
-      update_invites_failed_sections.append(section.id)
+      update_invites_failed_sections.append(section_id)
       response = res.json()
       Logger.error(
         f"Update Invites status API failed with\
-          status code for section {section.id} {res.status_code} {response}"
+          status code for section {section_id} {res.status_code} {response}"
         )
       err = traceback.format_exc().replace("\n", " ")
       Logger.error(err)
