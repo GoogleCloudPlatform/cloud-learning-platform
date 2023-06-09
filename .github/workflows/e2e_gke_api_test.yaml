@@ -250,6 +250,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
+    - name: Install wait-for-it
+      run: sudo apt install -y wait-for-it
+
     - name: Install dependencies
       run: |
           cd ./microservices/lms_admin_ui
@@ -258,7 +261,7 @@ jobs:
     - name: Run frontend server on localhost
       run: |
           cd ./microservices/lms_admin_ui
-          npm start --port=4401
+          npm start & wait-for-it -h localhost -p 4200 -t 0 -- echo "Frontend Dev Server up"
           
     - name: Waiting 30 sec
       run: |
