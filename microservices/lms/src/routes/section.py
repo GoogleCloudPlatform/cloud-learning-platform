@@ -1,7 +1,7 @@
 """ Section endpoints """
 import traceback
 import datetime
-from common.models import Cohort, CourseTemplate, Section, CourseEnrollmentMapping
+from common.models import Cohort, CourseTemplate, Section, BatchJob, CourseEnrollmentMapping
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ClassroomHttpException,
                                           InternalServerError,
@@ -24,7 +24,8 @@ from schemas.section import (
     GetTeacherResponseModel,AssignmentModel,GetCourseWorkList,
     ImportGradeResponseModel,
     EnrollTeacherSection,DeleteTeacherFromSectionResponseModel,
-    UpdateEnrollmentStatusSectionModel)
+    UpdateEnrollmentStatusSectionModel,
+    DeleteFailedSectionSectionModel)
 from schemas.update_section import UpdateSection
 from services.section_service import copy_course_background_task,\
 update_grades,add_teacher
@@ -84,19 +85,41 @@ def create_section(sections_details: SectionDetails,
         course_template_details.classroom_id)
     if current_course is None:
       raise ResourceNotFoundException(
-          "classroom  with id" +
+          "classroom with id" +
           f" {course_template_details.classroom_id} is not found")
-    background_tasks.add_task(copy_course_background_task,
-                              course_template_details=course_template_details,
-                              sections_details=sections_details,
-                              cohort_details=cohort_details,
-                              message="started process")
-    Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
+
+    batch_job_input = {
+        "job_type": "course_copy",
+        "status": "ready",
+        "input_data": {**sections_details.dict()},
+        "logs": {
+            "info": [],
+            "errors": []
+        }
+    }
+
+    batch_job = BatchJob.from_dict(batch_job_input)
+    batch_job.save()
+
+    background_tasks.add_task(
+        copy_course_background_task,
+        course_template_details=course_template_details,
+        sections_details=sections_details,
+        cohort_details=cohort_details,
+        batch_job_id=batch_job.id,
+        message="Create section background task completed")
+    info_msg = f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
-                 section name{sections_details.name}")
+                 section name {sections_details.name}"
+    Logger.info(info_msg)
+
+    batch_job.logs["info"].append(info_msg)
+    batch_job.update()
+
     return {
         "success": True,
-        "message": "Section will be created shortly",
+        "message": "Section will be created shortly, " +
+                    f"use this job id - '{batch_job.id}' for more info",
         "data": None
     }
   except ResourceNotFoundException as err:
@@ -618,8 +641,26 @@ def import_grade(section_id: str, coursework_id: str,
   """
   try:
     section = Section.find_by_id(section_id)
-    result = classroom_crud.get_course_work(section.classroom_id,
-                                            coursework_id)
+    result = classroom_crud.get_course_work(section.classroom_id, coursework_id)
+
+    batch_job_input = {
+        "job_type": "grade_import",
+        "status": "ready",
+        "section_id": section_id,
+        "classroom_id": section.classroom_id,
+        "input_data": {
+            "section_id": section_id,
+            "coursework_id": coursework_id
+        },
+        "logs": {
+            "info": [],
+            "errors": []
+        }
+    }
+
+    batch_job = BatchJob.from_dict(batch_job_input)
+    batch_job.save()
+
     #Get url mapping of google forms view links and edit ids
     is_google_form_present = False
     if "materials" in result.keys():
@@ -627,14 +668,24 @@ def import_grade(section_id: str, coursework_id: str,
         if "form" in material.keys():
           is_google_form_present = True
           background_tasks.add_task(update_grades, material, section,
-                                    coursework_id)
+                                    coursework_id, batch_job.id)
 
       if is_google_form_present:
-        return {"message": "Grades for coursework will be updated shortly"}
+        return {
+            "message":
+                "Grades for coursework will be updated shortly, " +
+                f"use this job id - '{batch_job.id}' for more info"
+        }
       else:
+        batch_job.logs["errors"].append(
+            f"Form is not present for coursework_id {coursework_id}")
+        batch_job.update()
         raise ResourceNotFoundException(
             f"Form is not present for coursework_id {coursework_id}")
     else:
+      batch_job.logs["errors"].append(
+            f"Form is not present for coursework_id {coursework_id}")
+      batch_job.update()
       raise ResourceNotFoundException(
           f"Form is not present for coursework_id {coursework_id}")
   except HttpError as hte:
@@ -657,7 +708,6 @@ def import_grade(section_id: str, coursework_id: str,
               response_model=UpdateEnrollmentStatusSectionModel)
 def update_enrollment_status(section_id:str,enrollment_status: str):
   """Update enrollment status for a section
-
   Args:
     section_id(str): id of the section in firestore
     status: enrollment status of the section
@@ -709,3 +759,60 @@ def update_enrollment_status(section_id:str,enrollment_status: str):
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
+@router.delete("/cronjob/delete_failed_to_provision_section",
+               response_model=DeleteFailedSectionSectionModel)
+def failed_to_provision():
+  """Get a section details from db and archive record
+  from section collection and
+  google classroom course
+
+  Args:
+      section_id (str): section_id in firestore
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      ResourceNotFound: 404 Section with section id is not found
+  Returns:
+    {"message": "Successfully deleted section"}
+  """
+  try:
+    sections = Section.get_section_by_status("FAILED_TO_PROVISION")
+    count=0
+    for section in sections:
+      try :
+        Logger.info(f"Section details {section.id} {section.created_time}")
+        time_difference = datetime.datetime.utcnow().replace(
+          tzinfo=datetime.timezone.utc) - section.created_time
+        if time_difference.days >= 7:
+          classroom_course = classroom_crud.get_course_by_id(
+            section.classroom_id)
+          # Delete drive folder of classroom
+          folder_id = classroom_course["teacherFolder"]["id"]
+          Logger.info(f"{folder_id} {section.name}")
+          # Update state of course
+          classroom_crud.update_course_state(section.classroom_id,"ARCHIVED")
+          Logger.info(f"Delete_drive folder {type(classroom_course)}")
+          classroom_crud.delete_drive_folder(
+            classroom_course["teacherFolder"]["id"])
+          classroom_crud.delete_course_by_id(section.classroom_id)
+          Section.delete_by_id(section.id)
+          Logger.info(f"Deleted section with id \
+                {section.id} classroom_id {section.classroom_id} {folder_id}")
+          count=count+1
+
+      except HttpError as ae:
+        Logger.error(ae)
+        Logger.error(f"Delete course failed for section_id {section.id} \
+                    {section.classroom_id}")
+        continue
+    return {
+        "data":count,
+        "message": f"Successfully archived the Section with id {count}"
+    }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+

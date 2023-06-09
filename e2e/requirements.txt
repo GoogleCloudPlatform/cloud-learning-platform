@@ -10,7 +10,7 @@ pytest-custom_exit_code==0.3.0
 pytest-mock==3.10.0
 behave==1.2.6
 pyyaml==6.0
-requests==2.30.0
+requests==2.31.0
 google-auth==2.17.3
 google-api-python-client==2.86.0
 google-auth-httplib2==0.1.0
