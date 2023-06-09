@@ -10,7 +10,7 @@ exports.config = {
   output: './ui_tests_output',
   helpers: {
     Puppeteer: {
-      url: 'http://localhost:4401/',
+      url: 'http://localhost:8887/',
       show: true,
       waitForNavigation: 'networkidle0',
       restart: false,

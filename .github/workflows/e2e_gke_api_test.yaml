@@ -250,20 +250,20 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install dependencies
-      run: |
-          cd ./microservices/lms_admin_ui
-          npm install
+    # - name: Install dependencies
+    #   run: |
+    #       cd ./microservices/lms_admin_ui
+    #       npm install
 
-    - name: Run frontend server on localhost
-      run: |
-          cd ./microservices/lms_admin_ui
-          npm start --port=4401
+    # - name: Run frontend server on localhost
+    #   run: |
+    #       cd ./microservices/lms_admin_ui
+    #       npm start --port=4401
           
-    - name: Waiting 30 sec
-      run: |
-          sleep 30s
-      shell: bash
+    # - name: Waiting 30 sec
+    #   run: |
+    #       sleep 30s
+    #   shell: bash
 
     - name: Run E2E UI Tests
       run: |
