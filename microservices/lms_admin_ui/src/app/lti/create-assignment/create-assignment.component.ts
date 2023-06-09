@@ -20,7 +20,8 @@ export class CreateAssignmentComponent {
   toolsList = []
   showProgressSpinner: boolean = false
   toolSelectDisabled: boolean = false
-  isDisplayButtonEnabled: boolean = true
+  isDisplayButtonEnabled: boolean = false
+  isLoading: boolean = true
   displayButton: string = "selectContentItem"
   selectedTool: any
   toolName: any
@@ -33,42 +34,46 @@ export class CreateAssignmentComponent {
     private fb: FormBuilder, private homeService: HomeService, private ltiService: LtiService, private authService: AuthService) { }
 
   ngOnInit() {
-    this.getAllTools()
     console.log('dialog data', this.dialogData)
-    if (this.dialogData.mode == "Create") {
-      this.ltiAssignmentForm = this.fb.group({
-        "tool_id": [null, Validators.required],
-        "lti_assignment_title": [null, Validators.required],
-        "lti_content_item_id": [null],
-        "start_date": [null],
-        "end_date": [null],
-        "due_date": [null],
-        "max_points": [null]
-      });
-    } else {
-      this.ltiAssignmentForm = this.fb.group({
-        "tool_id": [this.dialogData.extra_data.assignment.tool_id, Validators.required],
-        "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title, Validators.required],
-        "lti_content_item_id": [this.dialogData.extra_data.assignment.lti_content_item_id],
-        "start_date": [this.dialogData.extra_data.assignment.start_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.start_date) : null],
-        "end_date": [this.dialogData.extra_data.assignment.end_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.end_date) : null],
-        "due_date": [this.dialogData.extra_data.assignment.due_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.due_date) : null],
-        "max_points": [this.dialogData.extra_data.assignment.max_points]
-      });
-      this.toolSelectDisabled = true
-      setTimeout(() => {
+    this.ltiService.getToolsList().subscribe((res: any) => {
+      this.isLoading = false
+      this.toolsList = res.data
+      if (this.dialogData.mode == "Create") {
+        this.ltiAssignmentForm = this.fb.group({
+          "tool_id": [null, Validators.required],
+          "lti_assignment_title": [null, Validators.required],
+          "lti_content_item_id": [null],
+          "start_date": [null],
+          "end_date": [null],
+          "due_date": [null],
+          "max_points": [null]
+        });
+      } else {
+        this.ltiAssignmentForm = this.fb.group({
+          "tool_id": [this.dialogData.extra_data.assignment.tool_id, Validators.required],
+          "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title, Validators.required],
+          "lti_content_item_id": [this.dialogData.extra_data.assignment.lti_content_item_id],
+          "start_date": [this.dialogData.extra_data.assignment.start_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.start_date) : null],
+          "end_date": [this.dialogData.extra_data.assignment.end_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.end_date) : null],
+          "due_date": [this.dialogData.extra_data.assignment.due_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.due_date) : null],
+          "max_points": [this.dialogData.extra_data.assignment.max_points]
+        });
+        this.toolSelectDisabled = true
         let tool = this.toolsList.find((x) => {
           if (x.id == this.dialogData.extra_data.assignment.tool_id) {
             return true
           }
           return false
         })
+        this.toolName = tool.name
         if (tool.deeplink_type == "Not required") {
           this.displayButton = "createContentItem"
           this.isDisplayButtonEnabled = false
         }
-      }, 500);
-    }
+      }
+    }, err => {
+      this.openFailureSnackBar("Failed to load tools", "Error")
+    })
   }
 
   onDropdownChange() {
@@ -235,16 +240,7 @@ export class CreateAssignmentComponent {
   }
 
   getAllTools() {
-    this.ltiService.getToolsList().subscribe((res: any) => {
-      this.toolsList = res.data
-      let tool = this.toolsList.find((x) => {
-        if (x.id == this.dialogData.extra_data.assignment.tool_id) {
-          return true
-        }
-        return false
-      })
-      this.toolName = tool.name
-    })
+
   }
 
   onNoClick(): void {
