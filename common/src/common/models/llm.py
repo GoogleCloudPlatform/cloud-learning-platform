@@ -59,3 +59,58 @@ class UserChat(BaseModel):
             "deleted_at_timestamp", "==",
             None).order(order_by).offset(skip).fetch(limit)
     return list(objects)
+
+
+class UserQuery(BaseModel):
+  """
+  UserQuery ORM class
+  """
+  id = IDField()
+  user_id = TextField(required=True)
+  title = TextField(required=False)
+  query_engine_id = TextField(required=True)
+  history = ListField(default=[])
+
+  class Meta:
+    ignore_none_field = False
+    collection_name = BaseModel.DATABASE_PREFIX + "user_queries"
+
+  @classmethod
+  def find_by_user(cls,
+                   userid,
+                   skip=0,
+                   order_by="-created_time",
+                   limit=1000):
+    """
+    Fetch all queries for user
+
+    Args:
+        userid (str): User id
+        skip (int, optional): number of chats to skip.
+        order_by (str, optional): order list according to order_by field.
+        limit (int, optional): limit till cohorts to be fetched.
+
+    Returns:
+        List[UserQuery]: List of queries for user.
+
+    """
+    objects = cls.collection.filter(
+        "user_id", "==", userid).filter(
+            "deleted_at_timestamp", "==",
+            None).order(order_by).offset(skip).fetch(limit)
+    return list(objects)
+
+
+class QueryEngine(BaseModel):
+  """
+  QueryEngine ORM class
+  """
+  id = IDField()
+  name = TextField(required=True)
+  llm_type = TextField(required=True)
+  history = ListField(default=[])
+
+  class Meta:
+    ignore_none_field = False
+    collection_name = BaseModel.DATABASE_PREFIX + "query_engines"
+

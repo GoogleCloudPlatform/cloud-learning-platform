@@ -27,7 +27,7 @@ from vertexai.preview.language_models import (ChatModel,
     TextGenerationModel)
 
 async def llm_generate(prompt: str, llm_type: str,
-                       user_chat: Optional[UserChat] = None):
+                       user_chat: Optional[UserChat] = None) -> str:
   """
   Generate text with an LLM given a prompt.  This is
     always done asychronously, and so must be used in a route defined with

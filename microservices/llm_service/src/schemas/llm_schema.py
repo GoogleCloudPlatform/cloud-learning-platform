@@ -16,7 +16,9 @@ Pydantic Model for LLM API's
 """
 from typing import List, Optional
 from pydantic import BaseModel
-from schemas.schema_examples import LLM_GENERATE_EXAMPLE
+from schemas.schema_examples import (LLM_GENERATE_EXAMPLE,
+                                     LLM_QUERY_EXAMPLE,
+                                     LLM_QUERY_ENGINE_EXAMPLE)
 
 class ChatModel(BaseModel):
   id: Optional[str] = None
@@ -62,6 +64,46 @@ class LLMGenerateModel(BaseModel):
         "example": LLM_GENERATE_EXAMPLE
     }
 
+
+class LLMQueryModel(BaseModel):
+  """LLM Query model"""
+  prompt: str
+  query_engine: str
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": LLM_QUERY_EXAMPLE
+    }
+
+
+class LLMQueryEngineModel(BaseModel):
+  """LLM Query Engine model"""
+  doc_url: str
+  query_engine: str
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": LLM_QUERY_ENGINE_EXAMPLE
+    }
+
+
+class LLMQueryEngineResponse(BaseModel):
+  """LLM Generate Response model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully generated text"
+  data: Optional[str] = ""
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully generated text",
+            "data": None
+        }
+    }
 
 class LLMGenerateResponse(BaseModel):
   """LLM Generate Response model"""

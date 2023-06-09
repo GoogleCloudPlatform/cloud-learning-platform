@@ -22,6 +22,16 @@ LLM_GENERATE_EXAMPLE = {
   "primer":  "",
 }
 
+LLM_QUERY_EXAMPLE = {
+  "prompt": "",
+  "query_engine": "",
+}
+
+LLM_QUERY_ENGINE_EXAMPLE = {
+  "doc_url": "",
+  "query_engine": "",
+}
+
 CHAT_EXAMPLE = {
   "id": "asd98798as7dhjgkjsdfh",
   "user_id": "fake-user-id",
