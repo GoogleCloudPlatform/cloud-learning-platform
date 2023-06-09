@@ -142,8 +142,9 @@ def get_workspace_student_email_and_token():
     "org-test-user-3-username" : "org-test-user-3-student-token",
     "org-test-user-4-username" : "org-test-user-4-student-token"
   }
-  student_email_secret_id = random.choice(users_dict.keys())
+  student_email_secret_id = random.choice(list(users_dict.keys()))
   student_token_secret_id = users_dict.get(student_email_secret_id)
+  print(f"----------------------{student_email_secret_id}:{student_token_secret_id}-----------------")
   student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
   student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
   student_email_response = client.access_secret_version(
