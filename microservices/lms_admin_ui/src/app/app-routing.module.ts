@@ -14,7 +14,7 @@ const routes: Routes = [
     loadChildren: () => import('./home/home.module').then(m => m.HomeModule),
   },
   {
-    path: 'lti',
+    path: 'lti-tools',
     canActivate: [AuthGuard],
     loadChildren: () => import('./lti/lti.module').then(m => m.LtiModule),
   },
