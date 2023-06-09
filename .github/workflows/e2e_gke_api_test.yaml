@@ -148,7 +148,7 @@ jobs:
         export GCP_PROJECT=$PROJECT_ID
         skaffold run \
         -p custom \
-        --module authentication,redis,user-management,student-learner-profile,learning-record-service \
+        --module authentication,user-management,student-learner-profile,learning-record-service \
         --namespace $NAMESPACE \
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }} 
