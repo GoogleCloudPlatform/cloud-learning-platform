@@ -158,11 +158,10 @@ def get_workspace_student_email_and_token():
     if creds and creds.expired and creds.refresh_token:
       creds.refresh(Request())
       credentials_dict = json.loads(creds.to_json())
-  data = {
+  return {
       "email": student_email_response.payload.data.decode("UTF-8"),
       "access_token": credentials_dict["token"]
   }
-  return data
 
 def get_user_email_and_password_for_e2e():
   client = secretmanager.SecretManagerServiceClient()
