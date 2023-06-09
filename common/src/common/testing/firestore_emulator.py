@@ -54,10 +54,13 @@ def firestore_emulator():
   # yield so emulator isn't recreated each test
   yield emulator
 
-  if is_windows:
-    os.kill(emulator.pid, signal.SIGTERM)
-  else:
-    os.killpg(os.getpgid(emulator.pid), signal.SIGTERM)
+  try:
+    if is_windows:
+      os.kill(emulator.pid, signal.SIGTERM)
+    else:
+      os.killpg(os.getpgid(emulator.pid), signal.SIGTERM)
+  except ProcessLookupError:
+    pass
 
   # delete debug files
   # some get deleted, not all

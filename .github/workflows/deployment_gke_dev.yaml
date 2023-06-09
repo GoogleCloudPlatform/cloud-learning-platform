@@ -131,7 +131,7 @@ jobs:
           skaffold run \
           -p custom \
           --namespace $NAMESPACE \
-          --module authentication,redis,user-management,student-learner-profile,learning-record-service \
+          --module authentication,user-management,student-learner-profile,learning-record-service \
           -l commit=$GITHUB_SHA \
           --tag PR${{ github.event.pull_request.number }}
           popd
@@ -195,10 +195,6 @@ jobs:
 
       - name: Build and deploy documentation to cluster
         run: |
-          cd documentation/api_docs
-          npm install
-          npm run build
-          cd ../..
           skaffold run -m api_docs \
           --profile custom \
           --namespace $NAMESPACE \

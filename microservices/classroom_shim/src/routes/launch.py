@@ -156,21 +156,13 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
             "Access Denied with code 1011, Please contact administrator")
 
       elif user_type in ("faculty", "admin"):
-        course_template_url = f"http://lms/lms/api/v1/course_templates/{context_id}"
+        course_template_url = f"http://lms/lms/api/v1/course_templates/{context_id}/instructional_designers/{user_email}"
 
         course_template_resp = requests.get(
             course_template_url, headers=headers, timeout=60)
 
         if course_template_resp.status_code == 200:
-          course_template_resp_data = course_template_resp.json()
-          faculty_list = []
-          faculty_list.append(
-              course_template_resp_data.get("instructional_designer"))
-          faculty_list.append(course_template_resp_data.get("admin"))
-
-          if user_email not in faculty_list:
-            raise UnauthorizedUserError(
-                "Access Denied with code 1012, Please contact administrator")
+          course_template_faculty_resp_data = course_template_resp.json()
         else:
           raise Exception(
               "Request failed with code 1013, Please contact administrator")

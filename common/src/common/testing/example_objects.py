@@ -19,7 +19,6 @@ TEST_COURSE_TEMPLATE = {
     "name": "name",
     "description": "description",
     "admin": "admin@gmail.com",
-    "instructional_designer": "idesiner@gmail.com",
     "classroom_id": "clID",
     "classroom_code": "clcode",
     "classroom_url": "https://classroom.google.com"
@@ -43,7 +42,8 @@ TEST_SECTION = {
     "classroom_id": "cl_id",
     "classroom_code": "cl_code",
     "classroom_url": "https://classroom.google.com",
-    "enrolled_students_count": 0
+    "enrolled_students_count": 0,
+    "max_students":25
 }
 
 TEST_COURSE_TEMPLATE2 = {
@@ -77,7 +77,9 @@ TEST_SECTION2 = {
     "classroom_url": "https://classroom.google.com",
     "course_template": "fake_template_id",
     "cohort": "fake_cohort_id",
-    "enrolled_students_count": 0
+    "enrolled_students_count": 0,
+    "max_students":25
+
 }
 
 
