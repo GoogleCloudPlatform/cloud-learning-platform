@@ -234,6 +234,45 @@ jobs:
       run: |
         PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m behave e2e/features/
+  
+  e2e-ui-test-lms-admin-ui:
+    runs-on: ubuntu-latest
+    needs: deploy
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [12.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install wait-for-it
+      run: sudo apt install -y wait-for-it
+
+    - name: Install dependencies
+      run: |
+          cd ./microservices/lms_admin_ui
+          npm install
+
+    - name: Run frontend server on localhost
+      run: |
+          cd ./microservices/lms_admin_ui
+          npm start & wait-for-it -h localhost -p 4401 -t 0 -- echo "Frontend Dev Server up"
+          
+    - name: Waiting 30 sec
+      run: |
+          sleep 30s
+      shell: bash
+
+    - name: Run E2E UI Tests
+      run: |
+          cd ./microservices/lms_admin_ui
+          npm run e2e-ui
+
 
   dataset-cleanup:
     runs-on: ubuntu-latest
