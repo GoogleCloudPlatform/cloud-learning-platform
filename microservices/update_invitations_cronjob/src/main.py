@@ -111,7 +111,7 @@ def main():
           "Content-Type": "application/json",
           "Authorization": f"Bearer {id_token}"
       })
-      
+
       if res.status_code == 200:
         Logger.info(f"Update invite response for section_id {section_id} {res.status_code}")
       else:
@@ -124,12 +124,12 @@ def main():
           )
         err = traceback.format_exc().replace("\n", " ")
         Logger.error(err)
-    
+
     if len(sections) < page_size:
       break
     skip += skip_increment
 
-  if cronjob_status == False:
+  if not cronjob_status:
     Logger.error(f"Update_invites cronjob failed for sections {update_invites_failed_sections}")
   Logger.info(f"Update invites cronjob completed with status {cronjob_status}")
   Logger.info(f"Numeber of sections scanned {total_num_sections}")
