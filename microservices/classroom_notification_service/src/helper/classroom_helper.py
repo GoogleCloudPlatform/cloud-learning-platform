@@ -1,5 +1,4 @@
 """ Hepler functions for classroom crud API """
-from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from config import CLASSROOM_ADMIN_EMAIL
 from helper.secrets_helper import get_gke_pd_sa_key_from_secret_manager

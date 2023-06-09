@@ -762,7 +762,7 @@ def acceept_invite(invitation_id, email):
   Returns:
       dict: response from create invitation method
   """
-  service = build("classroom", "v1", 
+  service = build("classroom", "v1",
     credentials=get_credentials(email))
   course = service.invitations().accept(id=invitation_id).execute()
   return course

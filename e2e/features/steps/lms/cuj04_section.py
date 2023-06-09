@@ -459,7 +459,7 @@ def step_impl_57(context):
                                   context.coursework["id"],"me")
   print("This is result after Turn in list coursework submission",result)
   assert context.status == 202, "Status 202"
-  assert context.response["message"] == "Grades for coursework will be updated shortly","message not matching"
+  assert context.response["success"] == "True","success status"
 
 # -------------------------------update classroom code of a section-------------------------------------
 # ----Positive Scenario-----
