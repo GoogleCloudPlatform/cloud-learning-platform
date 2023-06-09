@@ -36,7 +36,6 @@ export class CreateAssignmentComponent {
   ngOnInit() {
     console.log('dialog data', this.dialogData)
     this.ltiService.getToolsList().subscribe((res: any) => {
-      this.isLoading = false
       this.toolsList = res.data
       if (this.dialogData.mode == "Create") {
         this.ltiAssignmentForm = this.fb.group({
@@ -70,6 +69,7 @@ export class CreateAssignmentComponent {
           this.displayButton = "createContentItem"
           this.isDisplayButtonEnabled = false
         }
+        this.isLoading = false
       }
     }, err => {
       this.openFailureSnackBar("Failed to load tools", "Error")
@@ -83,6 +83,7 @@ export class CreateAssignmentComponent {
       }
       return false
     })
+    this.ltiAssignmentForm.get("lti_content_item_id").setValue(null)
     this.ltiService.getContentItems(this.ltiAssignmentForm.value['tool_id'], this.dialogData.extra_data.contextId).subscribe(
       (response: any) => {
         if (tool.deeplink_type == "Allow once per context") {
