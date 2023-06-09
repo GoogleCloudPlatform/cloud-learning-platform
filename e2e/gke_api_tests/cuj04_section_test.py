@@ -25,26 +25,15 @@ def create_course(name, description, section, owner_id):
   Returns:
     new created course details
     """ ""
-  print("IN create corse fixtureee----------------")
   SCOPES = [
       "https://www.googleapis.com/auth/classroom.courses",
       "https://www.googleapis.com/auth/classroom.courses.readonly"
   ]
   CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
-  print("This is classroom key__________",CLASSROOM_KEY)
   CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
   creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-  # service_account_email = "gke-pod-sa@core-learning-services-dev.iam.gserviceaccount.com"
-  # google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
-  # creds =JwtCredentials.from_default_with_subject(
-  #   CLASSROOM_ADMIN_EMAIL,
-  #   service_account_email,
-  #   google_oauth_token_endpoint,
-  #   SCOPES
-  # )
-  print("---------------Courses creation started------------------",creds)
   service = build("classroom", "v1", credentials=creds)
   new_course = {}
   new_course["name"] = name
@@ -59,8 +48,6 @@ def create_course(name, description, section, owner_id):
   print("___________Course creaated___________________",course)
   return course
 
-
-# def test_create_section():
 def test_create_section(get_token):
 
   """
@@ -89,10 +76,8 @@ def test_create_section(get_token):
       "cohort": fake_data[1].id,
       "max_students":25
   }
-  # resp = requests.post(url=url, json=data, headers=get_token)
   resp = requests.post(url=url, json=data, headers=get_token)
   resp_json = resp.json()
-  print("_______***********create section  response ****_________",resp_json)
   assert resp.status_code == 202, "Status 202"
 
 

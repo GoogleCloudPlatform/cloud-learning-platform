@@ -50,31 +50,13 @@ SCOPES = [
 #   return creds
 
 def get_credentials(email=CLASSROOM_ADMIN_EMAIL):
-  # Logger.info(f"SERVICE ACCOUNT FROM GITHUB SECRETS {SERVICES_ACCOUNT} {CLASSROOM_ADMIN_EMAIL} {PROJECT_ID}")
   google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
-  service_account = helper.get_gke_pd_sa_key_from_secret_manager()
+  service_account_details = helper.get_gke_pd_sa_key_from_secret_manager()
   creds = JwtCredentials.from_default_with_subject(
     email,
-    service_account["client_email"],
-    # "gke-pod-sa@study-hall-dev-365218.iam.gserviceaccount.com",
+    service_account_details["client_email"],
     google_oauth_token_endpoint,
     scopes=SCOPES)
-  Logger.info(service_account["client_email"])
-  # Logger.info(f"Creds {creds}")
-  return creds
-
-
-def impersonate_teacher_creds(teacher_email):
-  """Impersonate teacher in a classroom
-  Args:
-    teacher_email(str): teacher email which needs to be impersonated
-  Return:
-    creds(dict): returns a dict which credentils
-  """
-  classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
-  creds = service_account.Credentials.from_service_account_info(classroom_key,
-                                                                scopes=SCOPES)
-  creds = creds.with_subject(teacher_email)
   return creds
 
 
@@ -780,9 +762,7 @@ def acceept_invite(invitation_id, email):
   Returns:
       dict: response from create invitation method
   """
-  # service = build("classroom", "v1", \
-  #   credentials=impersonate_teacher_creds(email))
-  service = build("classroom", "v1", \
+  service = build("classroom", "v1", 
     credentials=get_credentials(email))
   course = service.invitations().accept(id=invitation_id).execute()
   return course

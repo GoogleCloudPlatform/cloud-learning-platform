@@ -32,15 +32,11 @@ def get_service():
   Returns:
     _type_: _description_
   """
-  # creds = service_account.Credentials.from_service_account_info(
-  #     get_gke_pd_sa_key_from_secret_manager(), scopes=SCOPES)
-  # creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
-  service_account = get_gke_pd_sa_key_from_secret_manager()
+  service_account_details = get_gke_pd_sa_key_from_secret_manager()
   creds = JwtCredentials.from_default_with_subject(
     CLASSROOM_ADMIN_EMAIL,
-    service_account["client_email"],
-    # "gke-pod-sa@study-hall-dev-365218.iam.gserviceaccount.com",
+    service_account_details["client_email"],
     google_oauth_token_endpoint,
     scopes=SCOPES)
   return build("classroom", "v1", credentials=creds,num_retries=15)
