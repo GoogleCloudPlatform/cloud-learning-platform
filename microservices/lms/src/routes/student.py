@@ -633,9 +633,9 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     raise InternalServerError(str(e)) from e
 
 
-@section_student_router.patch("/update_invites",
+@section_student_router.patch("/{section_id}/update_invites",
                               response_model=UpdateInviteResponseModel)
-def update_invites():
+def update_invites(section_id:str):
   """
   Args:
   Raises:
@@ -651,7 +651,7 @@ def update_invites():
   try:
     # headers = {"Authorization": request.headers.get("Authorization")}
     course_records = CourseEnrollmentMapping.collection.filter(
-        "status", "==", "invited").fetch()
+        "status", "==", "invited").filter("section", "==", "sections/"+section_id).fetch()
     updated_list_inviations = []
     for course_record in course_records:
       Logger.info(f"course_record {course_record.section.id}, " +

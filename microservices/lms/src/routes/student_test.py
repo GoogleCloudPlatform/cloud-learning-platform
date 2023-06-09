@@ -416,7 +416,8 @@ def test_invite_student_to_cohort_archived_section(
   assert resp.status_code == 422
 
 def test_update_invites(client_with_emulator,create_fake_data):
-  url = BASE_URL + "/sections/update_invites"
+  section_id =create_fake_data["section"]
+  url = BASE_URL + f"/sections/{section_id}/update_invites"
   with mock.patch\
   ("routes.student.classroom_crud.get_invite",
    return_value={
