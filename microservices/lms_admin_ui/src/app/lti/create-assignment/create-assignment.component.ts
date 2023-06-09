@@ -1,5 +1,4 @@
 import { Component, Inject } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LtiService } from '../service/lti.service';
 import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
@@ -26,7 +25,6 @@ export class CreateAssignmentComponent {
   selectedTool: any
   toolName: any
   constructor(
-    private datePipe: DatePipe,
     private _snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<CreateAssignmentComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -69,8 +67,8 @@ export class CreateAssignmentComponent {
           this.displayButton = "createContentItem"
           this.isDisplayButtonEnabled = false
         }
-        this.isLoading = false
       }
+      this.isLoading = false
     }, err => {
       this.openFailureSnackBar("Failed to load tools", "Error")
     })
@@ -238,10 +236,6 @@ export class CreateAssignmentComponent {
       this.isDisplayButtonEnabled = false
       this.ltiAssignmentForm.get("lti_content_item_id").setValue(res.data.id)
     })
-  }
-
-  getAllTools() {
-
   }
 
   onNoClick(): void {
