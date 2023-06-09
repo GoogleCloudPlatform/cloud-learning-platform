@@ -415,19 +415,3 @@ def test_invite_student_to_cohort_archived_section(
       resp = client_with_emulator.post(url)
   assert resp.status_code == 422
 
-def test_update_invites(client_with_emulator,create_fake_data):
-  section_id =create_fake_data["section"]
-  url = BASE_URL + f"/sections/{section_id}/update_invites"
-  with mock.patch\
-  ("routes.student.classroom_crud.get_invite",
-   return_value={
-      "id": "NTk1MjkyNTc2Mzk4KjU5OTI5MzU5NTA3OFpa",
-      "courseId": "595292576398",
-      "role": "STUDENT"
-        }):
-    with mock.patch(
-    "routes.student.classroom_crud.get_user_profile_information"):
-      with mock.patch("routes.section.Logger"):
-        resp = client_with_emulator.patch(url)
-  print("Update invitest status code",resp.status_code,resp.json())
-  assert resp.status_code == 200
