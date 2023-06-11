@@ -335,8 +335,9 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
   """
   try:
     cohort = Cohort.find_by_id(cohort_id)
-    sections = Section.collection.filter("cohort", "==", cohort.key).filter(
-    "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
+    # sections = Section.collection.filter("cohort", "==", cohort.key).filter(
+    # "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
+    sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
     if cohort.enrolled_students_count >= cohort.max_students:
@@ -351,8 +352,8 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
                       enrolled for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
     if section is None:
-      raise Conflict("Max count reached for all sctions is reached hence" +
-                  "student cannot be erolled in this cohort")
+      raise Conflict(
+        "All sections in chorot are full or not open for enrollment")
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {input_data.email}")
     user_object = classroom_crud.enroll_student(
@@ -445,10 +446,20 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
     if cohort.enrolled_students_count >= cohort.max_students:
       raise ValidationError("Cohort Max count reached hence student cannot" +
             "be erolled in this cohort")
-    if not check_user_can_enroll_in_section(
-        email=input_data.email, headers=headers, section=section):
+    if section.enrolled_students_count >= section.max_students:
+      raise ValidationError("Cohort Max count reached hence student cannot" +
+            "be erolled in this cohort")
+    # if not check_user_can_enroll_in_section(
+    #     email=input_data.email, headers=headers, section=section):
+    #   raise Conflict(f"User {input_data.email} is already\
+    #                   enrolled for section {section_id}")
+    sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
+    sections = list(sections)
+    if not student_service.check_student_can_enroll_in_cohort(
+    email=input_data.email, headers=headers, sections=sections):
       raise Conflict(f"User {input_data.email} is already\
-                      enrolled for section {section_id}")
+                      registered for cohort {section.cohort.id}")
+
     Logger.info(f"Section {section.id},\
                 enroll student intiated for {input_data.email}")
     user_object = classroom_crud.enroll_student(
@@ -542,8 +553,18 @@ def invite_student(section_id: str, student_email: str, request: Request):
     if cohort.enrolled_students_count >= cohort.max_students:
       raise Conflict("Cohort Max count reached hence student cannot" +
                      " be erolled in this cohort")
+    sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
+    sections = list(sections)
+    if not student_service.check_student_can_enroll_in_cohort(
+    email=student_email, headers=headers, sections=sections):
+      raise Conflict(f"User {student_email} is already\
+                      registered for cohort {section.cohort.id}")
     invitation_details = student_service.invite_student(
         section=section, student_email=student_email, headers=headers)
+    section.enrolled_students_count +=1
+    section.update()
+    cohort.enrolled_students_count +=1
+    cohort.update()
     return {
         "message":
         f"Successfully Added the Student with email {student_email}",
@@ -588,8 +609,11 @@ def invite_student_cohort(cohort_id: str, student_email: str,
   """
   try:
     cohort = Cohort.find_by_id(cohort_id)
-    sections = Section.collection.filter("cohort", "==", cohort.key).filter(
-    "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
+
+    # sections = Section.collection.filter("cohort", "==", cohort.key).filter(
+    # "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
+    
+    sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
     if cohort.enrolled_students_count >= cohort.max_students:
@@ -605,13 +629,16 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     section = student_service.get_section_with_minimum_student(sections)
     if section is None:
       raise Conflict(
-    "Max count reached for all sctions is reached hence student cannot" +
-                     " be erolled in this cohort")
+    "All sections in chorot are full or not open for enrollment")
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {student_email}")
     headers = {"Authorization": request.headers.get("Authorization")}
     invitation_details = student_service.invite_student(
         section=section, student_email=student_email, headers=headers)
+    section.enrolled_students_count +=1
+    section.update()
+    cohort.enrolled_students_count +=1
+    cohort.update()
     return {
         "message":
   f"Successfully Added the Student with email {student_email}",

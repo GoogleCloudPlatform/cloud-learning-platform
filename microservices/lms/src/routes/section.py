@@ -794,12 +794,16 @@ def failed_to_provision():
           Logger.info(f"Delete_drive folder {type(classroom_course)}")
           classroom_crud.delete_drive_folder(
             classroom_course["teacherFolder"]["id"])
+          course_enrollments =CourseEnrollmentMapping.fetch_users_by_section(
+            section.key)
+          Logger.info(f"Course enrollments {course_enrollments}")
+          for course_enrollment in course_enrollments:
+            CourseEnrollmentMapping.delete_by_id(course_enrollment.id)
           classroom_crud.delete_course_by_id(section.classroom_id)
           Section.delete_by_id(section.id)
           Logger.info(f"Deleted section with id \
                 {section.id} classroom_id {section.classroom_id} {folder_id}")
           count=count+1
-
       except HttpError as ae:
         Logger.error(ae)
         Logger.error(f"Delete course failed for section_id {section.id} \
@@ -868,13 +872,13 @@ def update_invites(section_id:str):
           course_record.status = "active"
           course_record.update()
           # Update section enrolled student count
-          section = Section.find_by_id(course_record.section.key)
-          section.enrolled_students_count += 1
-          section.update()
+          # section = Section.find_by_id(course_record.section.key)
+          # section.enrolled_students_count += 1
+          # section.update()
           # Update COhort enrolled student count
-          cohort = Cohort.find_by_id(section.cohort.key)
-          cohort.enrolled_students_count += 1
-          cohort.update()
+          # cohort = Cohort.find_by_id(section.cohort.key)
+          # cohort.enrolled_students_count += 1
+          # cohort.update()
           updated_list_inviations.append(course_record.key)
           Logger.info(
               f"Successfully  updated the invitations {updated_list_inviations}"
