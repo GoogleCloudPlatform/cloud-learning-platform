@@ -49,16 +49,27 @@ SCOPES = [
 #   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
 #   return creds
 
+def get_default_service_account_email():
+  METADATA_URL = "http://metadata.google.internal/computeMetadata/v1/"
+  METADATA_HEADERS = {"Metadata-Flavor": "Google"}
+  url = f"{METADATA_URL}instance/service-accounts"
+  r = requests.get(url, headers=METADATA_HEADERS)
+  service_account_email = r.text.split("/")[1]
+  return service_account_email
+
 def get_credentials(email=CLASSROOM_ADMIN_EMAIL):
   google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
-  service_account_details = helper.get_gke_pd_sa_key_from_secret_manager()
+  service_account_details = get_default_service_account_email()
+  # service_account_details = helper.get_gke_pd_sa_key_from_secret_manager()
+  typee=type(service_account_details)
+  Logger.info(f"Service_ACCOUNT_EMAIL {service_account_details} {typee}")
+  # service_account_details.split("/")
   creds = JwtCredentials.from_default_with_subject(
-    email,
-    service_account_details["client_email"],
-    google_oauth_token_endpoint,
+    subject=email,
+    service_account_email=service_account_details,
+    token_uri=google_oauth_token_endpoint,
     scopes=SCOPES)
   return creds
-
 
 def create_course(name, description, section, owner_id):
   """Create course Function in classroom
