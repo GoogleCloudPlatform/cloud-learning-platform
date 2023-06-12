@@ -36,9 +36,8 @@ requires:
 - path: ./microservices/lti
   configs: [lti]
 
-# Commenting llm service due to deployment error in Longchain package
-# - path: ./microservices/llm_service
-#   configs: [llm-service]
+- path: ./microservices/llm_service
+  configs: [llm-service]
 
 - path: ./microservices/classroom_notification_service
   configs: [classroom-notification-service]
@@ -68,6 +67,9 @@ requires:
 - path: ./microservices/learning_object_service
   configs: [learning-object-service]
 
+- path: ./microservices/delete_sections_cronjob
+  configs: [delete-sections-cronjob]
+
 build:
   googleCloudBuild: {}
 
@@ -81,3 +83,5 @@ requires:
 - path: ./documentation/api_docs
   configs: [api-docs]
 
+build:
+  googleCloudBuild: {}

@@ -14,15 +14,13 @@
             <input matInput formControlName="description">
         </mat-form-field>
 
-        <ng-container *ngIf="courseTemplateModalData.mode == 'Create'; else elseTemplate">
+        <!-- <ng-container *ngIf="courseTemplateModalData.mode == 'Create'; else elseTemplate">
             <mat-form-field appearance="fill" style="width: 100%;">
                 <mat-label>Instructional Designer</mat-label>
 
                 <input matInput formControlName="instructional_designer">
                 <mat-hint align="start"> <div class="hint-style"><span class="material-symbols-rounded info-icon">info</span> <strong>Please enter an email</strong></div> </mat-hint>
-                <!-- <mat-select formControlName="instructional_designer">
-                    <mat-option value="test_user_1@dhodun.altostrat.com">test_user_1@dhodun.altostrat.com</mat-option>
-                </mat-select> -->
+                
             </mat-form-field>
 
         </ng-container>
@@ -33,7 +31,7 @@
                 <input matInput formControlName="instructional_designer">
                 <mat-hint align="start"> <div class="hint-style"><span class="material-symbols-rounded info-icon">info</span> <strong>Please enter an email</strong></div> </mat-hint>
             </mat-form-field>
-        </ng-template>
+        </ng-template> -->
 
     </form>
 

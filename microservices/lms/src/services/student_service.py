@@ -19,15 +19,16 @@ def get_section_with_minimum_student(sections):
   """
   min_sections_count_mapping = None
   min_student = 0
-  for i in sections:
+  for section in sections:
     if min_sections_count_mapping is None:
-      if i.enrolled_students_count < i.max_students:
-        min_sections_count_mapping = i
-        min_student = i.enrolled_students_count
+      if section.enrolled_students_count < section.max_students and\
+          section.status =="ACTIVE" and section.enrollment_status=="OPEN":
+        min_sections_count_mapping = section
+        min_student = section.enrolled_students_count
     else:
-      if i.enrolled_students_count < min_student:
-        min_student = i.enrolled_students_count
-        min_sections_count_mapping = i
+      if section.enrolled_students_count < min_student:
+        min_student = section.enrolled_students_count
+        min_sections_count_mapping = section
   return min_sections_count_mapping
 
 

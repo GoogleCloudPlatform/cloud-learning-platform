@@ -4,6 +4,8 @@ metadata:
   name: api-docs
   labels:
     app: api-docs
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}' # Creates a NEG after an Ingress is created
 spec:
   type: NodePort
   ports:

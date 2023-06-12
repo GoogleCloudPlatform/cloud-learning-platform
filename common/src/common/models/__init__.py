@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Flatten import namespace for models
 """
@@ -19,6 +18,7 @@ Flatten import namespace for models
 from .base_model import *
 from .node_item import *
 from .competency import *
+from .course_template_enrollment_mapping import *
 from .temp_user import *
 from .user import *
 from .course_template import *
