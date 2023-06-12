@@ -22,12 +22,6 @@ FEED_TYPE_DICT = {
     "COURSE_ROSTER_CHANGES": "courseRosterChangesInfo"
 }
 
-REGISTER_SCOPES = [
-    "https://www.googleapis.com/auth/classroom.push-notifications",
-    "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
-    "https://www.googleapis.com/auth/classroom.rosters.readonly"
-]
-
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.rosters",
@@ -38,35 +32,27 @@ SCOPES = [
     "https://www.googleapis.com/auth/forms.body.readonly",
     "https://www.googleapis.com/auth/classroom.profile.photos",
     "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
+    "https://www.googleapis.com/auth/classroom.push-notifications",
+    "https://www.googleapis.com/auth/classroom.student-submissions."+
+    "students.readonly",
+    "https://www.googleapis.com/auth/classroom.rosters.readonly"
 ]
-
-
-# def get_credentials():
-#   classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
-#   creds = service_account.Credentials.from_service_account_info(classroom_key,
-#                                                                 scopes=SCOPES)
-#   creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
-#   return creds
 
 def get_default_service_account_email():
   METADATA_URL = "http://metadata.google.internal/computeMetadata/v1/"
   METADATA_HEADERS = {"Metadata-Flavor": "Google"}
   url = f"{METADATA_URL}instance/service-accounts"
   r = requests.get(url, headers=METADATA_HEADERS)
-  service_account_email = r.text.split("/")[1]
+  service_account_email = r.text.split("/")[1].strip()
   return service_account_email
 
 def get_credentials(email=CLASSROOM_ADMIN_EMAIL):
   google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
-  service_account_details = get_default_service_account_email()
-  # service_account_details = helper.get_gke_pd_sa_key_from_secret_manager()
-  typee=type(service_account_details)
-  Logger.info(f"Service_ACCOUNT_EMAIL {service_account_details} {typee}")
-  # service_account_details.split("/")
+  service_account_email = get_default_service_account_email()
   creds = JwtCredentials.from_default_with_subject(
     subject=email,
-    service_account_email=service_account_details,
+    service_account_email=service_account_email,
     token_uri=google_oauth_token_endpoint,
     scopes=SCOPES)
   return creds
@@ -690,9 +676,7 @@ def enable_notifications(course_id, feed_type):
   Returns:
       _type_: _description_
   """
-  creds = service_account.Credentials.from_service_account_info(
-      helper.get_gke_pd_sa_key_from_secret_manager(), scopes=REGISTER_SCOPES)
-  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  creds = get_credentials(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
   body = {
       "feed": {

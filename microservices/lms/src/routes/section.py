@@ -36,7 +36,6 @@ from utils.helper import (convert_section_to_section_model,
 from utils.user_helper import (course_enrollment_user_model, get_user_id,
                                check_user_can_enroll_in_section)
 from config import BQ_TABLE_DICT, BQ_DATASET
-import requests
 # disabling for linting to pass
 # pylint: disable = broad-except
 
@@ -817,41 +816,3 @@ def failed_to_provision():
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
-
-@router.get("test/test/")
-def test(name:str,description:str):
-  email = "lms_admin_teacher@dhodun.altostrat.com"
-  SCOPES=SCOPES = [
-    "https://www.googleapis.com/auth/classroom.courses",
-    "https://www.googleapis.com/auth/classroom.rosters",
-    "https://www.googleapis.com/auth/classroom.topics",
-    "https://www.googleapis.com/auth/classroom.coursework.students",
-    "https://www.googleapis.com/auth/classroom.coursework.me",
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/forms.body.readonly",
-    "https://www.googleapis.com/auth/classroom.profile.photos",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
-]
-  google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
-  service_account_details = get_default_service_account_email()
-  # service_account_details = helper.get_gke_pd_sa_key_from_secret_manager()
-  typee=type(service_account_details)
-  Logger.info(f"Service_ACCOUNT_EMAIL {service_account_details} {typee}")
-  # service_account_details.split("/")
-  creds = JwtCredentials.from_default_with_subject(
-    subject=email,
-    service_account_email=service_account_details,
-    token_uri=google_oauth_token_endpoint,
-    scopes=SCOPES)
-  course=classroom_crud.create_course(name=name,description=description,
-                                      section="template",owner_id=email,creds=creds)
-  return creds
-
-def get_default_service_account_email():
-  METADATA_URL = "http://metadata.google.internal/computeMetadata/v1/"
-  METADATA_HEADERS = {"Metadata-Flavor": "Google"}
-  url = f"{METADATA_URL}instance/service-accounts"
-  r = requests.get(url, headers=METADATA_HEADERS)
-  service_account_email = r.text.split("/")[1]
-  return service_account_email

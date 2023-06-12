@@ -50,14 +50,12 @@ class JwtCredentials(service_account.Credentials):
     response = authed_session.request("POST",
                                       url=iam_url,
                                       data=json.dumps(iam_payload))
-    Logger.info(f"Response of auth session {response.status_code}")
     return response.json()["signedJwt"]
 
   @classmethod
   def from_default_with_subject(self, subject, service_account_email,
                                 token_uri, scopes):
     """returns the JWT credentials object"""
-    Logger.info(f"In JWT credentials {subject}--{service_account_email}--{token_uri}--{scopes}")
     return self(signer=None,
                 service_account_email=service_account_email,
                 token_uri=token_uri,
