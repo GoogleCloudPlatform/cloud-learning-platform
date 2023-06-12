@@ -29,5 +29,6 @@ class SessionServiceTest(unittest.TestCase):
             "Authorization": "TEST_TOKEN"
         },
         params={"id": "TEST_SESSION_ID"},
-        url="http://TEST_SERVICES:TEST_SERVICES/dashboard/api/v1/session")
+        url="http://TEST_SERVICES:TEST_SERVICES/dashboard/api/v1/session",
+        timeout=60)
     self.assertEqual(actual, expected_value)
