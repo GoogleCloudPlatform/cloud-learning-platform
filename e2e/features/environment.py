@@ -42,7 +42,6 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
 ]
 
-
 def create_course(name, section, description):
   """Create course Function in classroom
 
@@ -367,9 +366,6 @@ def enroll_teacher_into_section(context):
 def import_google_form_grade(context):
   "Fixture for import grade"
   section = use_fixture(create_section, context)
-  # folder_id = context.classroom_drive_folder_id
-  # result =insert_file_into_folder(folder_id,e2e_google_form_id)
-  # print("Inserted in classroom folder",result)
   coursework_body = {
       "title":
       "Test_quize11",
