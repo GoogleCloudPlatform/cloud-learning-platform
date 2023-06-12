@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { JobsService } from './batch-jobs.service';
+import { JobsService } from './lms-jobs.service';
 
 describe('JobsService', () => {
   let service: JobsService;

@@ -6,7 +6,7 @@ from common.utils import classroom_crud
 from common.utils.bq_helper import insert_rows_to_bq
 from common.utils.logging_handler import Logger
 from common.models import (Section, CourseEnrollmentMapping,
-                           CourseTemplateEnrollmentMapping, User, BatchJob)
+                           CourseTemplateEnrollmentMapping, User, LmsJob)
 from common.utils.http_exceptions import (InternalServerError,
                                           ResourceNotFound)
 from common.utils.errors import ValidationError
@@ -19,7 +19,7 @@ from config import BQ_TABLE_DICT, BQ_DATASET, auth_client
 def copy_course_background_task(course_template_details,
                                 sections_details,
                                 cohort_details,
-                                batch_job_id,
+                                lms_job_id,
                                 message=""):
   """Create section  Background Task to copy course and updated database
   for newly created section
@@ -36,8 +36,8 @@ def copy_course_background_task(course_template_details,
   Returns:
     True : (bool) on success
   """
-  batch_job = BatchJob.find_by_id(batch_job_id)
-  logs = batch_job.logs
+  lms_job = LmsJob.find_by_id(lms_job_id)
+  logs = lms_job.logs
   try:
     # Create a new course
     info_msg = f"Background Task started for the cohort id {cohort_details.id}\
@@ -51,10 +51,10 @@ def copy_course_background_task(course_template_details,
                                               sections_details.description,
                                               sections_details.name, "me")
 
-    batch_job.classroom_id = new_course["id"]
-    batch_job.start_time = datetime.datetime.utcnow()
-    batch_job.status = "running"
-    batch_job.update()
+    lms_job.classroom_id = new_course["id"]
+    lms_job.start_time = datetime.datetime.utcnow()
+    lms_job.status = "running"
+    lms_job.update()
 
     # Create section with the required fields
     section = Section()
@@ -73,8 +73,8 @@ def copy_course_background_task(course_template_details,
     section_id = section.save().id
     classroom_id = new_course["id"]
 
-    batch_job.section_id = section_id
-    batch_job.update()
+    lms_job.section_id = section_id
+    lms_job.update()
 
     error_flag = False
     target_folder_id = new_course["teacherFolder"]["id"]
@@ -321,13 +321,13 @@ def copy_course_background_task(course_template_details,
     logs["info"].append(f"Section Details are section id {section_id},\
                 classroom id {classroom_id}")
 
-    batch_job.logs = logs
+    lms_job.logs = logs
     if error_flag:
-      batch_job.status = "failed"
+      lms_job.status = "failed"
     else:
-      batch_job.status = "success"
-    batch_job.end_time = datetime.datetime.utcnow()
-    batch_job.update()
+      lms_job.status = "success"
+    lms_job.end_time = datetime.datetime.utcnow()
+    lms_job.update()
 
     return True
   except Exception as e:
@@ -336,10 +336,10 @@ def copy_course_background_task(course_template_details,
     Logger.error(e)
 
     logs["errors"].append(str(e))
-    batch_job.logs = logs
-    batch_job.end_time = datetime.datetime.utcnow()
-    batch_job.status = "failed"
-    batch_job.update()
+    lms_job.logs = logs
+    lms_job.end_time = datetime.datetime.utcnow()
+    lms_job.status = "failed"
+    lms_job.update()
 
     raise InternalServerError(str(e)) from e
 
@@ -484,13 +484,13 @@ def update_coursework_material(materials,
   }
 
 
-def update_grades(material, section, coursework_id, batch_job_id):
+def update_grades(material, section, coursework_id, lms_job_id):
   """Takes the forms all responses ,section, and coursework_id and
   updates the grades of student who have responsed to form and
   submitted the coursework
   """
-  batch_job = BatchJob.find_by_id(batch_job_id)
-  logs = batch_job.logs
+  lms_job = LmsJob.find_by_id(lms_job_id)
+  logs = lms_job.logs
 
   try:
     student_grades = {}
@@ -501,9 +501,9 @@ def update_grades(material, section, coursework_id, batch_job_id):
 
     logs["info"].append(info_msg)
     Logger.info(info_msg)
-    batch_job.start_time = datetime.datetime.utcnow()
-    batch_job.status = "running"
-    batch_job.update()
+    lms_job.start_time = datetime.datetime.utcnow()
+    lms_job.status = "running"
+    lms_job.update()
 
     #Get url mapping of google forms view links and edit ids
     url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
@@ -566,10 +566,10 @@ def update_grades(material, section, coursework_id, batch_job_id):
 
     logs["info"].append(f"Student grades updated\
                   for {count} student_data {student_grades}")
-    batch_job.logs = logs
-    batch_job.end_time = datetime.datetime.utcnow()
-    batch_job.status = "success"
-    batch_job.update()
+    lms_job.logs = logs
+    lms_job.end_time = datetime.datetime.utcnow()
+    lms_job.status = "success"
+    lms_job.update()
 
     return count, student_grades
 
@@ -579,10 +579,10 @@ def update_grades(material, section, coursework_id, batch_job_id):
     Logger.error(f"Traceback - {error}")
 
     logs["errors"].append(f"Grade import failed due to error - {str(e)}")
-    batch_job.end_time = datetime.datetime.utcnow()
-    batch_job.logs = logs
-    batch_job.status = "failed"
-    batch_job.update()
+    lms_job.end_time = datetime.datetime.utcnow()
+    lms_job.logs = logs
+    lms_job.status = "failed"
+    lms_job.update()
 
     raise InternalServerError(str(e)) from e
 
