@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: utils
-        image: gcr.io/aitutor-dev/utils
+        image: gcr.io/core-learning-services-dev/utils
         imagePullPolicy: Always
         resources:
             requests:

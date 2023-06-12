@@ -36,8 +36,8 @@ if INLINE_FEEDBACK_COLLECTION:
 
 GCP_LEARNING_RESOURCE_BUCKET = os.getenv("GCP_LEARNING_RESOURCE_BUCKET")
 
-IS_DEVELOPMENT = bool(os.getenv("IS_DEVELOPMENT", "").lower() \
-    in ("True", "true"))
+IS_DEVELOPMENT = bool(os.getenv("IS_DEVELOPMENT", "").lower()
+                      in ("True", "true"))
 
 SERVICES = {
   "authentication": {
