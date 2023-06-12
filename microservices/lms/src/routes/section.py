@@ -29,7 +29,6 @@ from schemas.section import (
 from schemas.update_section import UpdateSection
 from services.section_service import copy_course_background_task,\
 update_grades,add_teacher
-from common.utils.jwt_creds import JwtCredentials
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model, FEED_TYPES,
                           convert_coursework_to_short_coursework_model)

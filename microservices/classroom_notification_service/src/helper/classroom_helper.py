@@ -1,7 +1,6 @@
 """ Hepler functions for classroom crud API """
 from googleapiclient.discovery import build
 from config import CLASSROOM_ADMIN_EMAIL
-from helper.secrets_helper import get_gke_pd_sa_key_from_secret_manager
 from common.utils.jwt_creds import JwtCredentials
 from common.utils import classroom_crud
 

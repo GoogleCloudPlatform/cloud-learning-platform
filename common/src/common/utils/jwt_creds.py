@@ -5,7 +5,6 @@ import google.auth
 from google.oauth2 import service_account
 from google.auth import _helpers
 from google.auth.transport.requests import AuthorizedSession
-from common.utils.logging_handler import Logger
 
 _DEFAULT_TOKEN_LIFETIME_SECS = 3600  # 1 hour in seconds
 _GOOGLE_OAUTH2_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"

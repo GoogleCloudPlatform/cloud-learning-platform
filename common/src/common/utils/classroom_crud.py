@@ -1,7 +1,6 @@
 """ Helper functions for classroom crud API """
 import requests
 from asyncio.log import logger
-from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -12,7 +11,6 @@ from common.utils.logging_handler import Logger
 from common.models import Section
 
 from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL, PUB_SUB_PROJECT_ID, DATABASE_PREFIX
-from common.utils import helper
 # pylint: disable=line-too-long
 
 SUCCESS_RESPONSE = {"status": "Success"}
@@ -40,10 +38,10 @@ SCOPES = [
 ]
 
 def get_default_service_account_email():
-  METADATA_URL = "http://metadata.google.internal/computeMetadata/v1/"
-  METADATA_HEADERS = {"Metadata-Flavor": "Google"}
-  url = f"{METADATA_URL}instance/service-accounts"
-  r = requests.get(url, headers=METADATA_HEADERS)
+  metadata_url = "http://metadata.google.internal/computeMetadata/v1/"
+  metadata_headers = {"Metadata-Flavor": "Google"}
+  url = f"{metadata_url}instance/service-accounts"
+  r = requests.get(url, headers=metadata_headers)
   service_account_email = r.text.split("/")[1].strip()
   return service_account_email
 
