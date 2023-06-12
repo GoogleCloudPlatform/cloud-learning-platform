@@ -253,6 +253,9 @@ jobs:
     - name: Install wait-for-it
       run: sudo apt install -y wait-for-it
 
+    - name: Install chromium
+      run: sudo apt-get install chromium-browser
+
     - name: Install dependencies
       run: |
           cd ./microservices/lms_admin_ui
