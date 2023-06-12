@@ -294,5 +294,19 @@
                 "order": "DESCENDING"
             }
         ]
+    },
+    {
+        "collection_group": "course_enrollment_mapping",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "status",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "section",
+                "order": "ASCENDING"
+            }
+        ]
     }
 ]

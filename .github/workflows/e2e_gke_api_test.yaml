@@ -164,7 +164,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         repository: GPS-Solutions/ailearning-backend
-        ref: df352edb8c4572c87c88896245af3c3db8bcb5cc
+        ref: clp-feature-branch
         # adding run_id so we can fold in the repo without collision
         path: ${{ format('ailearning-backend_{0}', github.run_id) }}
         token: ${{ secrets.GH_PAT }}
@@ -177,7 +177,7 @@ jobs:
         export GCP_PROJECT=$PROJECT_ID
         skaffold run \
         -p custom \
-        --module authentication,user-management,student-learner-profile,learning-record-service \
+        --module authentication,redis,user-management,student-learner-profile,learning-record-service \
         --namespace $NAMESPACE \
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }} 

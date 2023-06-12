@@ -25,7 +25,7 @@ from schemas.section import (
     ImportGradeResponseModel,
     EnrollTeacherSection,DeleteTeacherFromSectionResponseModel,
     UpdateEnrollmentStatusSectionModel,
-    DeleteFailedSectionSectionModel)
+    DeleteFailedSectionSectionModel,UpdateInviteResponseModel)
 from schemas.update_section import UpdateSection
 from services.section_service import copy_course_background_task,\
 update_grades,add_teacher
@@ -794,12 +794,16 @@ def failed_to_provision():
           Logger.info(f"Delete_drive folder {type(classroom_course)}")
           classroom_crud.delete_drive_folder(
             classroom_course["teacherFolder"]["id"])
+          course_enrollments =CourseEnrollmentMapping.fetch_users_by_section(
+            section.key)
+          Logger.info(f"Course enrollments {course_enrollments}")
+          for course_enrollment in course_enrollments:
+            CourseEnrollmentMapping.delete_by_id(course_enrollment.id)
           classroom_crud.delete_course_by_id(section.classroom_id)
           Section.delete_by_id(section.id)
           Logger.info(f"Deleted section with id \
                 {section.id} classroom_id {section.classroom_id} {folder_id}")
           count=count+1
-
       except HttpError as ae:
         Logger.error(ae)
         Logger.error(f"Delete course failed for section_id {section.id} \
@@ -816,3 +820,81 @@ def failed_to_provision():
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+@router.patch("/{section_id}/update_invites",
+                              response_model=UpdateInviteResponseModel)
+def update_invites(section_id:str):
+  """
+  Args:
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    : if the student successfully added,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    course_records = CourseEnrollmentMapping.collection.filter(
+        "status", "==", "invited").filter(
+      "section", "==", "sections/"+section_id).fetch()
+    updated_list_inviations = []
+    for course_record in course_records:
+      Logger.info(f"course_record {course_record.section.id}, " +
+                  f"user_id {course_record.user.id}")
+      if course_record.invitation_id:
+        try:
+          result = classroom_crud.get_invite(course_record.invitation_id)
+          Logger.info(
+              f"Invitation {result} found for User id {course_record.user.id},\
+          course_enrollment_id {course_record.id} database will be updated\
+          once invite is accepted.")
+        except HttpError as ae:
+          Logger.info(f"Get invite response status code {ae.resp.status}")
+          Logger.info(
+              f"Could not get the invite for user_id {course_record.user.id}\
+          section_id{course_record.section.id}\
+           course_enrollment id {course_record.id}")
+          # user_details = classroom_crud.get_user_details(
+          #     user_id=course_record.user, headers=headers)
+          # Logger.info(f"User record found for User {user_details}")
+          user_profile = classroom_crud.get_user_profile_information(
+              course_record.user.email)
+          user_ref = course_record.user
+          # Check if gaia_id is "" if yes so update personal deatils
+          if user_ref.gaia_id == "":
+            user_ref.first_name = user_profile["name"]["givenName"]
+            user_ref.last_name = user_profile["name"]["familyName"]
+            user_ref.gaia_id = user_profile["id"]
+            user_ref.photo_url = user_profile["photoUrl"]
+            user_ref.update()
+          course_record.status = "active"
+          course_record.update()
+          updated_list_inviations.append(course_record.key)
+          Logger.info(
+              f"Successfully  updated the invitations {updated_list_inviations}"
+          )
+    return {
+        "message": "Successfully  updated the invitations",
+        "data": {
+            "list_coursenrolment": updated_list_inviations
+        }
+    }
+  except ResourceNotFoundException as err:
+    error = traceback.format_exc().replace("\n", " ")
+    Logger.error(error)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                                 message=str(ae)) from ae
+  except Exception as e:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
