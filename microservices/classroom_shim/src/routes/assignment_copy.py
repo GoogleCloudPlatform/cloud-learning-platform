@@ -8,12 +8,12 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest)
-from common.utils.secrets import get_backend_robot_id_token
 from schemas.lti_assignment_schema import (InputCopyLTIAssignmentModel,
                                            CopyLTIAssignmentResponseModel)
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
+from config import auth_client
 # pylint: disable=line-too-long
 
 router = APIRouter(
@@ -62,7 +62,7 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
 
     content_item_req = requests.get(
         f"http://lti/lti/api/v1/content-item/{content_item_id}",
-        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+        headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
         timeout=60)
 
     if content_item_req.status_code == 200:
@@ -78,7 +78,7 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     del content_item_data["last_modified_time"]
     copy_content_item_req = requests.post(
         "http://lti/lti/api/v1/content-item",
-        headers={"Authorization": f"Bearer {get_backend_robot_id_token()}"},
+        headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
         json=content_item_data,
         timeout=60)
 

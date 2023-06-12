@@ -73,11 +73,10 @@ def health_check():
 def hello():
   return "Hello World."
 
-
-api = FastAPI(
-    title="LMS Service APIs",
-    version="latest",
-    dependencies=[Depends(validate_user)])
+api = FastAPI(title="LMS Service APIs",
+              version="latest",
+              dependencies=[Depends(validate_user)]
+              )
 
 # api.include_router(user.router)
 api.include_router(section.router)
