@@ -17,6 +17,7 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AuthenticationInterceptor } from './interceptors/authentication.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { NgxMatDatetimePickerModule, NgxMatNativeDateModule } from '@angular-material-components/datetime-picker';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,8 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireStorageModule,
     AngularFireAuthModule,
+    NgxMatNativeDateModule,
+    NgxMatDatetimePickerModule
   ],
   providers: [
     {

@@ -66,7 +66,8 @@ def step_impl_15(context):
 #-------------------------------Update invites patch api--------------------------------------
 @behave.given("A student is invited and has not accepted the invite via email")
 def step_impl_16(context):
-  context.url = f'{API_URL}/sections/update_invites'
+  section_id = context.invitation_data["section_id"]
+  context.url = f'{API_URL}/sections/{section_id}/update_invites'
 
 @behave.when("cron job is triggered and calls update_invites endpoint")
 def step_impl_17(context):

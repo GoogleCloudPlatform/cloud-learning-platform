@@ -106,35 +106,10 @@ class InviteStudentToSectionResponseModel(BaseModel):
             "data": INVITE_STUDENT
         }
     }
-
-
-class UpdateInviteResponseModel(BaseModel):
-  """Invite Student Model"""
-  success: Optional[bool] = True
-  message: Optional[str] = "Successfully Updated the invitation status"
-  data: Optional[dict] = None
-
-  class Config():
-    orm_mode = True
-    schema_extra = {
-        "example": {
-            "success": True,
-            "message": "Successfully Invited the Student",
-            "data": {
-                "list_coursenrolment": [
-                    "courseenrollment_id1", "courseenrollment_id2",
-                    "courseenrollment_id3"
-                ]
-            }
-        }
-    }
-
-
 class GetProgressPercentageResponseModel(BaseModel):
   """Get Progress Percentage"""
   success: Optional[bool] = True
   data: int = None
-
 
 class GetProgressPercentageCohortResponseModel(BaseModel):
   """Get Progress Percentage"""

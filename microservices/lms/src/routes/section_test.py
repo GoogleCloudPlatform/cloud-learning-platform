@@ -717,3 +717,20 @@ def test_delete_section_cronjob_for_active_section(client_with_emulator,
   assert resp_json["data"] == 0
   assert resp_json[
     "message"] == "Successfully archived the Section with id 0","message"
+
+def test_update_invites(client_with_emulator,create_fake_data):
+  section_id =create_fake_data["section"]
+  url = BASE_URL + f"/sections/{section_id}/update_invites"
+  with mock.patch\
+  ("routes.section.classroom_crud.get_invite",
+   return_value={
+      "id": "NTk1MjkyNTc2Mzk4KjU5OTI5MzU5NTA3OFpa",
+      "courseId": "595292576398",
+      "role": "STUDENT"
+        }):
+    with mock.patch(
+    "routes.section.classroom_crud.get_user_profile_information"):
+      with mock.patch("routes.section.Logger"):
+        resp = client_with_emulator.patch(url)
+  print("Update invitest status code",resp.status_code,resp.json())
+  assert resp.status_code == 200

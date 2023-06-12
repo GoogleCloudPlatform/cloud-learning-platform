@@ -186,10 +186,12 @@ def copy_course_background_task(course_template_details,
               materials=coursework["materials"],
               url_mapping=url_mapping,
               target_folder_id=target_folder_id,
+              error_flag=error_flag,
               coursework_type="coursework",
               lti_assignment_details=lti_assignment_details,
               logs=logs)
           coursework["materials"] = coursework_update_output["material"]
+          error_flag = coursework_update_output["error_flag"]
           coursework_lti_assignment_ids.extend(
               coursework_update_output["lti_assignment_ids"])
         # final_coursewok.append(coursework)
@@ -228,11 +230,11 @@ def copy_course_background_task(course_template_details,
       except Exception as error:
         title = coursework["title"]
         error_flag = True
-        logs["errors"].append(f"Error - {error}")
-        logs["errors"].append(f"Get coursework failed for \
-              course_id {course_template_details.classroom_id} for {title}")
-        Logger.error(f"Get coursework failed for \
-              course_id {course_template_details.classroom_id} for {title}")
+        logs["errors"].append(f"Error - {error} for '{title}'")
+        logs["errors"].append(f"Copy coursework failed for \
+              course_id {course_template_details.classroom_id} for '{title}'")
+        Logger.error(f"Copy coursework failed for \
+              course_id {course_template_details.classroom_id} for '{title}'")
         error = traceback.format_exc().replace("\n", " ")
         Logger.error(error)
         continue
@@ -259,10 +261,12 @@ def copy_course_background_task(course_template_details,
               materials=coursework_material["materials"],
               url_mapping=url_mapping,
               target_folder_id=target_folder_id,
+              error_flag=error_flag,
               logs=logs)
 
           coursework_material["materials"] = coursework_material_update_output[
               "material"]
+          error_flag = coursework_update_output["error_flag"]
           print("Updated coursework material attached")
         final_coursewok_material.append(coursework_material)
       except Exception as error:
@@ -344,6 +348,7 @@ def copy_course_background_task(course_template_details,
 def update_coursework_material(materials,
                                url_mapping,
                                target_folder_id,
+                               error_flag,
                                coursework_type=None,
                                lti_assignment_details=None,
                                logs=None):
@@ -396,9 +401,9 @@ def update_coursework_material(materials,
             lti_assignment_id = split_url[-1]
             coursework_title = lti_assignment_details.get("coursework_title")
             logs["info"].append(
-                f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - {coursework_title}")
+                f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'")
             Logger.info(
-                f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - {coursework_title}")
+                f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'")
             copy_assignment = requests.post(
                 "http://classroom-shim/classroom-shim/api/v1/lti-assignment/copy",
                 headers={
@@ -425,21 +430,22 @@ def update_coursework_material(materials,
                       "url": updated_material_link_url
                   }})
               Logger.info(
-                  f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - {coursework_title}, new assignment id - {new_lti_assignment_id}"
+                  f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}', new assignment id - {new_lti_assignment_id}"
               )
               logs["info"].append(
-                  f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - {coursework_title}, new assignment id - {new_lti_assignment_id}"
+                  f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}', new assignment id - {new_lti_assignment_id}"
               )
             else:
               logs["info"].append(
-                  f"LTI Course copy failed for assignment - {lti_assignment_id}, coursework title - {coursework_title}"
+                  f"LTI Course copy failed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'"
               )
-              error_msg = f"Copying an LTI Assignment failed for {lti_assignment_id}, coursework title - {coursework_title}\
+              error_msg = f"Copying an LTI Assignment failed for {lti_assignment_id}, coursework title - '{coursework_title}'\
                            in the new section {lti_assignment_details.get('section_id')} with status code: \
                            {copy_assignment.status_code} and error msg: {copy_assignment.text}"
 
               logs["errors"].append(error_msg)
               Logger.error(error_msg)
+              error_flag = True
           else:
             updated_material.append({"link": material["link"]})
 
@@ -449,10 +455,10 @@ def update_coursework_material(materials,
                 "/classroom-shim/api/v1/launch?lti_assignment_id=")
             lti_assignment_id = split_url[-1]
             logs["info"].append(
-                f"LTI link removed in course work material with assignment ID - {lti_assignment_id}"
+                f"LTI link removed in course work material with assignment ID - '{lti_assignment_id}'"
             )
             Logger.info(
-                f"LTI link removed in course work material with assignment ID - {lti_assignment_id}"
+                f"LTI link removed in course work material with assignment ID - '{lti_assignment_id}'"
             )
           else:
             updated_material.append({"link": material["link"]})
@@ -474,6 +480,7 @@ def update_coursework_material(materials,
 
   return {
       "material": updated_material,
+      "error_flag": error_flag,
       "lti_assignment_ids": lti_assignment_ids
   }
 
@@ -644,7 +651,8 @@ def validate_section(section):
   validate the count of enrolled students ,enrollment status, max_students
   """
   if section.enrolled_students_count >= section.max_students:
-    raise ValidationError("Maximum student count reached for section hence student can't be enrolled"
+    raise ValidationError(
+      "Maximum student count reached for section hence student can't be enrolled"
       )
   Logger.info(f"Enrollment status {section.enrolled_students_count} {section.status}")
   if section.enrollment_status == "CLOSED" or section.status != "ACTIVE":
