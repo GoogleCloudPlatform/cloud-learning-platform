@@ -73,7 +73,7 @@ class CourseEnrollmentMapping(BaseModel):
     """_summary_
 
     Args:
-        cohort_key (str): cohort unique key to filter data
+        section_key (str): section unique key to filter data
         skip (int, optional): number of sections to be skip.
         order_by(str, optional): order list according to order_by field.
         limit (int, optional): limit till sections to be fetched.
@@ -84,6 +84,21 @@ class CourseEnrollmentMapping(BaseModel):
     objects = CourseEnrollmentMapping.collection.\
       filter("section", "==", section_key).filter(
         "status", "in",["active","invited"]).filter("role", "==",role).fetch()
+    return list(objects)
+
+  @classmethod
+  def fetch_users_by_section(
+      cls,
+      section_key):
+    """_summary_
+
+    Args:
+      section_key (str): cohort unique key to filter data
+    Returns:
+      list: list of sections
+    """
+    objects = CourseEnrollmentMapping.collection.\
+      filter("section", "==", section_key).fetch()
     return list(objects)
 
   @classmethod
