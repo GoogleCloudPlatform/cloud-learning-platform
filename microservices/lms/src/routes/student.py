@@ -4,8 +4,7 @@ from fastapi import APIRouter, Request
 from googleapiclient.errors import HttpError
 from services import student_service,section_service
 from utils.user_helper import (
-  course_enrollment_user_model,get_user_id,
-  check_user_can_enroll_in_section)
+  course_enrollment_user_model,get_user_id)
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  InvalidTokenError)
@@ -335,8 +334,6 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
   """
   try:
     cohort = Cohort.find_by_id(cohort_id)
-    # sections = Section.collection.filter("cohort", "==", cohort.key).filter(
-    # "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
     sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
@@ -449,10 +446,6 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
     if section.enrolled_students_count >= section.max_students:
       raise ValidationError("Cohort Max count reached hence student cannot" +
             "be erolled in this cohort")
-    # if not check_user_can_enroll_in_section(
-    #     email=input_data.email, headers=headers, section=section):
-    #   raise Conflict(f"User {input_data.email} is already\
-    #                   enrolled for section {section_id}")
     sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
     if not student_service.check_student_can_enroll_in_cohort(
@@ -608,11 +601,7 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
   try:
-    cohort = Cohort.find_by_id(cohort_id)
-
-    # sections = Section.collection.filter("cohort", "==", cohort.key).filter(
-    # "enrollment_status","==","OPEN").filter("status","==","ACTIVE").fetch()
-    
+    cohort = Cohort.find_by_id(cohort_id)    
     sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}

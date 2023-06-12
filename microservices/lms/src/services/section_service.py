@@ -644,7 +644,8 @@ def validate_section(section):
   validate the count of enrolled students ,enrollment status, max_students
   """
   if section.enrolled_students_count >= section.max_students:
-    raise ValidationError("Maximum student count reached for section hence student can't be enrolled"
+    raise ValidationError(
+      "Maximum student count reached for section hence student can't be enrolled"
       )
   Logger.info(f"Enrollment status {section.enrolled_students_count} {section.status}")
   if section.enrollment_status == "CLOSED" or section.status != "ACTIVE":

@@ -871,14 +871,6 @@ def update_invites(section_id:str):
             user_ref.update()
           course_record.status = "active"
           course_record.update()
-          # Update section enrolled student count
-          # section = Section.find_by_id(course_record.section.key)
-          # section.enrolled_students_count += 1
-          # section.update()
-          # Update COhort enrolled student count
-          # cohort = Cohort.find_by_id(section.cohort.key)
-          # cohort.enrolled_students_count += 1
-          # cohort.update()
           updated_list_inviations.append(course_record.key)
           Logger.info(
               f"Successfully  updated the invitations {updated_list_inviations}"
