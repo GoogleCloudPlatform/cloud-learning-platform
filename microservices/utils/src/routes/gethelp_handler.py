@@ -9,29 +9,39 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel,
                                   UnauthorizedUserErrorResponseModel)
 
-
 router = APIRouter(
-    prefix="/help",
-    responses={
-        500: {
-            "model": InternalServerErrorResponseModel
-        },
-        422: {
-            "model": ValidationErrorResponseModel
-        },
-        401: {
-            "model": UnauthorizedUserErrorResponseModel
-        }
-    })
+  prefix="/help",
+  responses={
+    500: {
+      "model": InternalServerErrorResponseModel
+    },
+    422: {
+      "model": ValidationErrorResponseModel
+    },
+    401: {
+      "model": UnauthorizedUserErrorResponseModel
+    }
+  })
+
 
 @router.get("")
 def get_help(page: int = 1, topic: str = None):
+  """
+  Endpoint to get help
+  Args:
+    page: int
+    topic: int
+  Returns:
+    get_help: dict
+  Raises:
+    InternalServerError: 500
+  """
   try:
-    response=get_help_faqs(GET_HELP_COLLECTION, topic, int(page))
+    response = get_help_faqs(GET_HELP_COLLECTION, topic, int(page))
     return {
-        "success": True,
-        "message": "Successfully fetched help me faqs",
-        "data": response
+      "success": True,
+      "message": "Successfully fetched help me faqs",
+      "data": response
     }
   except Exception as e:
     Logger.error(e)

@@ -12,46 +12,60 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   UnauthorizedUserErrorResponseModel)
 
 router = APIRouter(
-    prefix="/feedback",
-    responses={
-        500: {
-            "model": InternalServerErrorResponseModel
-        },
-        422: {
-            "model": ValidationErrorResponseModel
-        },
-        401: {
-            "model": UnauthorizedUserErrorResponseModel
-        }
-    })
+  prefix="/feedback",
+  responses={
+    500: {
+      "model": InternalServerErrorResponseModel
+    },
+    422: {
+      "model": ValidationErrorResponseModel
+    },
+    401: {
+      "model": UnauthorizedUserErrorResponseModel
+    }
+  })
+
 
 @router.get("")
 def get_feedback():
+  """
+  Endpoint to get feedback
+  """
   try:
-    response=get_feedback_options(FEEDBACK_COLLECTION)
+    response = get_feedback_options(FEEDBACK_COLLECTION)
     return {
-        "success": True,
-        "message": "Successfully fetched options for feedback",
-        "data": response
+      "success": True,
+      "message": "Successfully fetched options for feedback",
+      "data": response
     }
   except Exception as e:
     Logger.error(e)
     Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
+
 @router.post("")
-def post_feedback(req_body: FeedbackRequestModel,
-                     authorized: dict = Depends(
-                       get_user_identity)):
+def post_feedback(req_body: FeedbackRequestModel, authorized: dict = Depends(
+  get_user_identity)):
+  """
+  Endpoint to create feedback
+  Args:
+    req_body: FeedbackRequestModel
+    authorized: dict
+  return:
+    Feedback: dict
+  Raises:
+    InternalServerError: 500
+  """
   try:
     user_id = authorized["user_id"]
     req_body.__dict__["token"] = authorized["token"]
     response = save_feedback(USER_COLLECTION, USER_SUBCOLLECTION,
                              req_body.__dict__, user_id)
     return {
-        "success": True,
-        "message": "Successfully saved feedback of the user",
-        "data": response
+      "success": True,
+      "message": "Successfully saved feedback of the user",
+      "data": response
     }
   except Exception as e:
     Logger.error(e)

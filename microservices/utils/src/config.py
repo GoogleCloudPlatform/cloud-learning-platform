@@ -6,16 +6,6 @@ GCP_PROJECT = os.environ.get("GCP_PROJECT", "")
 os.environ["GOOGLE_CLOUD_PROJECT"] = GCP_PROJECT
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
-SIGNURL_SA_KEY = "keys/{}-signurl-sa-key.json".format(GCP_PROJECT)
-
-SCOPES = [
-  "https://www.googleapis.com/auth/cloud-platform",
-  "https://www.googleapis.com/auth/cloud-platform.read-only",
-  "https://www.googleapis.com/auth/devstorage.full_control",
-  "https://www.googleapis.com/auth/devstorage.read_only",
-  "https://www.googleapis.com/auth/devstorage.read_write"
-]
-
 API_BASE_URL = os.getenv("API_BASE_URL")
 
 SERVICE_NAME = os.getenv("SERVICE_NAME")

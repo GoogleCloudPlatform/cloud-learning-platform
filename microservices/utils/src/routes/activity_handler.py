@@ -9,30 +9,33 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   UnauthorizedUserErrorResponseModel)
 
 router = APIRouter(
-    prefix="/activities",
-    responses={
-        500: {
-            "model": InternalServerErrorResponseModel
-        },
-        422: {
-            "model": ValidationErrorResponseModel
-        },
-        401: {
-            "model": UnauthorizedUserErrorResponseModel
-        }
-    })
+  prefix="/activities",
+  responses={
+    500: {
+      "model": InternalServerErrorResponseModel
+    },
+    422: {
+      "model": ValidationErrorResponseModel
+    },
+    401: {
+      "model": UnauthorizedUserErrorResponseModel
+    }
+  })
+
 
 @router.get("")
 def get_activities():
+  """
+  Endpoint to get activities
+  """
   try:
-    response=get_activity_list()
+    response = get_activity_list()
     return {
-        "success": True,
-        "message": "Successfully fetched all activities",
-        "data": response
+      "success": True,
+      "message": "Successfully fetched all activities",
+      "data": response
     }
   except Exception as e:
     Logger.error(e)
     Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
-
