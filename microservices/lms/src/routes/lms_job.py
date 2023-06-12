@@ -1,4 +1,4 @@
-'''Batch Job Endpoint'''
+'''LMS Job Endpoint'''
 from fastapi import APIRouter
 from common.models import LmsJob
 from common.utils.logging_handler import Logger
@@ -12,8 +12,8 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
 
 router = APIRouter(
-    prefix="/batch-jobs",
-    tags=["Batch Jobs"],
+    prefix="/lms-jobs",
+    tags=["LMS Jobs"],
     responses={
         500: {
             "model": InternalServerErrorResponseModel
@@ -32,14 +32,14 @@ router = APIRouter(
 
 @router.get("", response_model=LmsJobsListResponseModel)
 def get_lms_jobs_list(skip: int = 0, limit: int = 10):
-  """Get a list of Batch jobs endpoint
+  """Get a list of LMS jobs endpoint
     Raises:
         HTTPException: 500 Internal Server Error if something fails.
 
     Returns:
-        LmsJobsListResponseModel: list of Batch jobs objects.
+        LmsJobsListResponseModel: list of LMS jobs objects.
         InternalServerErrorResponseModel:
-            if the get batch jobs list raises an exception.
+            if the get LMS jobs list raises an exception.
     """
   try:
     if skip < 0:
@@ -64,14 +64,14 @@ def get_lms_jobs_list(skip: int = 0, limit: int = 10):
 
 @router.get("/{lms_job_id}", response_model=LmsJobResponseModel)
 def get_lms_job(lms_job_id: str):
-  """Get a Batch jobs using the batch job id endpoint
+  """Get a LMS jobs using the LMS job id endpoint
     Raises:
         HTTPException: 500 Internal Server Error if something fails.
 
     Returns:
-        LmsJobResponseModel: details of the given Batch job.
+        LmsJobResponseModel: details of the given LMS job.
         InternalServerErrorResponseModel:
-            if the get batch jobs list raises an exception.
+            if the get LMS jobs list raises an exception.
     """
   try:
     lms_job = LmsJob.find_by_id(lms_job_id)

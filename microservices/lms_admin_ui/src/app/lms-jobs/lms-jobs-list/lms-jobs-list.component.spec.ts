@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LmsJobsListComponent } from './batch-jobs-list.component';
+import { LmsJobsListComponent } from './lms-jobs-list.component';
 
 describe('LmsJobsListComponent', () => {
   let component: LmsJobsListComponent;

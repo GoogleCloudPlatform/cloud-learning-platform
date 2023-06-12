@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LmsJobsListComponent } from './batch-jobs-list/batch-jobs-list.component';
+import { LmsJobsListComponent } from './lms-jobs-list/lms-jobs-list.component';
 
 const routes: Routes = [
   {

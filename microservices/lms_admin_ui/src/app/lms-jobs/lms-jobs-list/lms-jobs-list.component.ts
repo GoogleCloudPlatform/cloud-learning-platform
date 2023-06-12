@@ -1,7 +1,7 @@
 import { Component, ViewChild, Inject } from '@angular/core';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
 import { MatSort } from '@angular/material/sort';
-import { JobsService } from '../service/batch-jobs.service';
+import { JobsService } from '../service/lms-jobs.service';
 import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { PageEvent } from '@angular/material/paginator';
 
@@ -10,9 +10,9 @@ interface LooseObject {
   [key: string]: any
 }
 @Component({
-  selector: 'app-batch-jobs-list',
-  templateUrl: './batch-jobs-list.component.html',
-  styleUrls: ['./batch-jobs-list.component.scss']
+  selector: 'app-lms-jobs-list',
+  templateUrl: './lms-jobs-list.component.html',
+  styleUrls: ['./lms-jobs-list.component.scss']
 })
 export class LmsJobsListComponent {
   isLoadingData: boolean = true
@@ -110,9 +110,9 @@ export class LmsJobsListComponent {
 }
 
 @Component({
-  selector: 'view-batch-job-log-dialog',
-  templateUrl: 'view-batch-job-log-dialog.html',
-  styleUrls: ['batch-jobs-list.component.scss']
+  selector: 'view-lms-job-log-dialog',
+  templateUrl: 'view-lms-job-log-dialog.html',
+  styleUrls: ['lms-jobs-list.component.scss']
 })
 export class ViewJobLogDialog {
   logData: any;
@@ -132,8 +132,8 @@ export class ViewJobLogDialog {
 
 @Component({
   selector: 'view-input-data-dialog',
-  templateUrl: 'view-batch-job-input-data-dialog.html',
-  styleUrls: ['batch-jobs-list.component.scss']
+  templateUrl: 'view-lms-job-input-data-dialog.html',
+  styleUrls: ['lms-jobs-list.component.scss']
 })
 export class ViewInputDataDialog {
   inputData: any;
