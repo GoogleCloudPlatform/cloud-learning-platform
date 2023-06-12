@@ -4,7 +4,6 @@ import datetime
 import requests
 from common.utils import classroom_crud
 from common.utils.bq_helper import insert_rows_to_bq
-from common.utils.secrets import get_backend_robot_id_token
 from common.utils.logging_handler import Logger
 from common.models import (Section, CourseEnrollmentMapping,
                            CourseTemplateEnrollmentMapping, User, BatchJob)
@@ -12,7 +11,7 @@ from common.utils.http_exceptions import (InternalServerError,
                                           ResourceNotFound)
 from common.utils.errors import ValidationError
 from services import common_service
-from config import BQ_TABLE_DICT, BQ_DATASET
+from config import BQ_TABLE_DICT, BQ_DATASET, auth_client
 
 
 # disabling for linting to pass
@@ -206,7 +205,7 @@ def copy_course_background_task(course_template_details,
           lti_assignment_req = requests.patch(
               f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
               headers={
-                  "Authorization": f"Bearer {get_backend_robot_id_token()}"
+                  "Authorization": f"Bearer {auth_client.get_id_token()}"
               },
               json=input_json,
               timeout=60)
@@ -407,7 +406,7 @@ def update_coursework_material(materials,
             copy_assignment = requests.post(
                 "http://classroom-shim/classroom-shim/api/v1/lti-assignment/copy",
                 headers={
-                    "Authorization": f"Bearer {get_backend_robot_id_token()}"
+                    "Authorization": f"Bearer {auth_client.get_id_token()}"
                 },
                 json={
                     "lti_assignment_id": lti_assignment_id,
