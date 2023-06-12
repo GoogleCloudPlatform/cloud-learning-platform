@@ -395,7 +395,7 @@ transformCourseworkTableData(data:any){
       width: '500px',
       data: inviteStudentModalData
     });
-
+    
     dialogRef.afterClosed().subscribe(result => {
       if (result.data == 'success') {
         this.getSectionStudents()
@@ -407,8 +407,9 @@ transformCourseworkTableData(data:any){
     let sectionId = this.selectedSection.id
     let ltiModalData = {}
     ltiModalData['mode'] = 'Update'
+    ltiModalData['page'] = 'section'
     ltiModalData['init_data'] = ''
-    ltiModalData['extra_data'] = { sectionId, assignment: data }
+    ltiModalData['extra_data'] = { contextId: sectionId, assignment: data }
 
     const dialogRef = this.dialog.open(CreateAssignmentComponent, {
       width: '80vw',
@@ -426,7 +427,6 @@ transformCourseworkTableData(data:any){
   }
 
   openDeleteLtiAssignmentDialog(id, name) {
-    let courseTemplateId = this.router.url.split('/')[this.router.url.split('/').length - 1]
     const dialogRef = this.dialog.open(DeleteSectionLtiDialog, {
       width: '500px',
       data: { id, name }

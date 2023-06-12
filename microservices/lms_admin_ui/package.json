@@ -21,6 +21,7 @@
     "@angular/platform-browser": "15.0.4",
     "@angular/platform-browser-dynamic": "15.0.4",
     "@angular/router": "15.0.4",
+    "@angular-material-components/datetime-picker": "^9.0.0",
     "bootstrap": "5.2.3",
     "firebase": "9.15.0",
     "jquery": "3.6.1",
