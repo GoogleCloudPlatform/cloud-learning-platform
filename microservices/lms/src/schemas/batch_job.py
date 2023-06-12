@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from schemas.schema_examples import BATCH_JOB_EXAMPLE
 
 
-class BatchJobModel(BaseModel):
+class LmsJobModel(BaseModel):
   """Batch job Pydantic Model
 
   Args:
@@ -30,11 +30,11 @@ class BatchJobModel(BaseModel):
     schema_extra = {"example": BATCH_JOB_EXAMPLE}
 
 
-class BatchJobResponseModel(BaseModel):
+class LmsJobResponseModel(BaseModel):
   """Batch job List Response model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the Batch job details"
-  data: Optional[BatchJobModel]
+  data: Optional[LmsJobModel]
 
   class Config():
     orm_mode = True
@@ -47,11 +47,11 @@ class BatchJobResponseModel(BaseModel):
     }
 
 
-class BatchJobsListResponseModel(BaseModel):
+class LmsJobsListResponseModel(BaseModel):
   """Batch job List Response model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the Batch job list"
-  data: Optional[list[BatchJobModel]]
+  data: Optional[list[LmsJobModel]]
 
   class Config():
     orm_mode = True

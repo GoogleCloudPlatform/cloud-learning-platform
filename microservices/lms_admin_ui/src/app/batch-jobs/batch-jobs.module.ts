@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BatchJobsListComponent } from './batch-jobs-list/batch-jobs-list.component';
+import { LmsJobsListComponent } from './batch-jobs-list/batch-jobs-list.component';
 import { SharedModule } from '../shared/shared.module';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -11,7 +11,7 @@ import { ViewInputDataDialog } from './batch-jobs-list/batch-jobs-list.component
 
 @NgModule({
   declarations: [
-    BatchJobsListComponent,
+    LmsJobsListComponent,
     ViewJobLogDialog,
     ViewInputDataDialog
   ],

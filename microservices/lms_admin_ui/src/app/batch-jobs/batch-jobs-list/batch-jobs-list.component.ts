@@ -14,17 +14,17 @@ interface LooseObject {
   templateUrl: './batch-jobs-list.component.html',
   styleUrls: ['./batch-jobs-list.component.scss']
 })
-export class BatchJobsListComponent {
+export class LmsJobsListComponent {
   isLoadingData: boolean = true
-  batchJobsData = []
+  lmsJobsData = []
   jobSkip: number = 0
   jobLimit: number = 10
   jobPageSize: number = 10
   paginator: PageEvent;
 
-  dataSource = new MatTableDataSource(this.batchJobsData);
+  dataSource = new MatTableDataSource(this.lmsJobsData);
 
-  batchJobDisplayedColumns: string[] = ['id', 'job_type', 'section_id', 'classroom_id', 'created_time', 'start_time', 'end_time', 'status', 'input_data', 'logs'];
+  lmsJobDisplayedColumns: string[] = ['id', 'job_type', 'section_id', 'classroom_id', 'created_time', 'start_time', 'end_time', 'status', 'input_data', 'logs'];
 
   constructor(public dialog: MatDialog, private JobsService: JobsService) { }
   @ViewChild(MatSort) sort: MatSort;
@@ -34,7 +34,7 @@ export class BatchJobsListComponent {
     this.fetchJobs()
   }
 
-  handleBatchJobPageEvent(e: PageEvent) {
+  handleLmsJobPageEvent(e: PageEvent) {
     this.paginator = e;
     if (this.paginator.pageSize != this.jobPageSize) {
       this.jobSkip = 0
@@ -63,7 +63,7 @@ export class BatchJobsListComponent {
         this.isLoadingData = false
       }, 100);
       if (response.success == true) {
-        this.batchJobsData = response.data
+        this.lmsJobsData = response.data
       }
       else {
         console.log("response", response?.message)
