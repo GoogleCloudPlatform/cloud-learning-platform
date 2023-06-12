@@ -33,13 +33,17 @@ if __name__ == "__main__":
   if PROJECT_ID is None:
     raise Exception("PROJECT_ID is not defined. Indexing skipped.")
 
-  indexes = []
+  with open("indexe_rules.json", encoding="utf-8") as indexes_file:
+    indexes = list(json.load(indexes_file))
+  for index in indexes:
+    create_index(index)
 
-  with open("indexe_rules.json", encoding="utf-8") as indexs_file:
-    indexes.extend(json.load(indexs_file))
+  with open("v3_filter_api_indexes.json", encoding="utf-8") as indexes_file:
+    indexes = list(json.load(indexes_file))
+  for index in indexes:
+    create_index(index)
 
-  with open("v3_filter_api_indexes.json", encoding="utf-8") as indexs_file:
-    indexes.extend(json.load(indexs_file))
-
+  with open("index_llms.json", encoding="utf-8") as indexes_file:
+    indexes = list(json.load(indexes_file))
   for index in indexes:
     create_index(index)

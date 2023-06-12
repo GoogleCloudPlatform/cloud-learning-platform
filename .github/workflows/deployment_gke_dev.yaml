@@ -173,10 +173,6 @@ jobs:
 
       - name: Build and deploy documentation to cluster
         run: |
-          cd documentation/api_docs
-          npm install
-          npm run build
-          cd ../..
           skaffold run -m api_docs \
           --profile custom \
           --namespace $NAMESPACE \

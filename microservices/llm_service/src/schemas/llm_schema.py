@@ -12,14 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Pydantic Model for Grade API's
+Pydantic Model for LLM API's
 """
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel
-from schemas.schema_examples import LLM_GENERATE_EXAMPLE, USER_LLM_MODEL_EXAMPLE
+from schemas.schema_examples import LLM_GENERATE_EXAMPLE
 
-class LLMGetResponse(BaseModel):
-  """LLM Get list model"""
+class ChatModel(BaseModel):
+  id: Optional[str] = None
+  user_id: str
+  llm_type: str
+  title: Optional[str] = ""
+  history: Optional[List[dict]] = []
+  created_time: str
+  last_modified_time: str
+
+
+class ChatUpdateModel(BaseModel):
+  title: str
+
+
+class LLMGetTypesResponse(BaseModel):
+  """LLM Get types model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully retrieved llm types"
   data: Optional[list[str]] = []
@@ -29,10 +43,11 @@ class LLMGetResponse(BaseModel):
     schema_extra = {
         "example": {
             "success": True,
-            "message": "Successfully generated text",
+            "message": "Successfully retrieved llm types",
             "data": []
         }
     }
+
 
 class LLMGenerateModel(BaseModel):
   """LLM Generate model"""
@@ -48,21 +63,6 @@ class LLMGenerateModel(BaseModel):
     }
 
 
-class UserLLMModel(BaseModel):
-  """User LLM model"""
-  prompt: str
-  llm_type: Optional[str] = ""
-  context: Optional[str] = ""
-  primer: Optional[list[str]] = []
-  history: Optional[list[str]] = []
-  memory: Optional[str] = ""
-
-  class Config():
-    orm_mode = True
-    schema_extra = {
-        "example": USER_LLM_MODEL_EXAMPLE
-    }
-
 class LLMGenerateResponse(BaseModel):
   """LLM Generate Response model"""
   success: Optional[bool] = True
@@ -76,5 +76,37 @@ class LLMGenerateResponse(BaseModel):
             "success": True,
             "message": "Successfully generated text",
             "content": None
+        }
+    }
+
+class LLMUserChatResponse(BaseModel):
+  """LLM User Create Chat Response model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully created chat"
+  data: Optional[dict] = {}
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully created chat",
+            "data": None
+        }
+    }
+
+class LLMUserAllChatsResponse(BaseModel):
+  """LLM Get User All Chats Response model"""
+  data: List[dict] = []
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully retrieved user chats"
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully generated text",
+            "data": None
         }
     }

@@ -15,7 +15,12 @@
                     <div class="element"><span class="element-heading">Cohort Description : </span> <span
                             class="element-content">{{courseTemplateDetails.description}}</span></div>
                     <div class="element"><span class="element-heading">Instructional Designer : </span> <span
-                            class="element-content">{{courseTemplateDetails.instructional_designer}}</span></div>
+                            class="element-content">
+                            <div  [matTooltip]="getMattooltipText(instructionalDesignerList)" contentType="template" [matBadge]="getIdTotal(instructionalDesignerList)" 
+                            [matBadgeHidden]="checkIfBadgeHidden(instructionalDesignerList)" matBadgeOverlap="false" matBadgeSize="medium" class="content">
+                        {{instructionalDesignerList[0] ? instructionalDesignerList[0]['email'] : ''}}
+                            </div>
+                        </span></div>
                     <div class="element"><span class="element-heading">Course Admin : </span> <span
                             class="element-content">{{courseTemplateDetails.admin}}</span></div>
                 </div>

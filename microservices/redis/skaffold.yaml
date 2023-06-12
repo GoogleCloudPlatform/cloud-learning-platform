@@ -10,6 +10,7 @@ deploy:
         remoteChart: redis
         setValues:
           auth.enabled: false
+          global.storageClass: "standard"
 portForward:
 - resourceType: service
   resourceName: redis-master

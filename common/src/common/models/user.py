@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-User Data Model
-"""
+
+"""User Data Model"""
 import regex
 from common.models import BaseModel, NodeItem, LearningUnit
 from common.utils.errors import ResourceNotFoundException
@@ -56,7 +55,7 @@ def check_association_type(field_val):
           ",".join("'" + i + "'" for i in association_types))
 
 class User(BaseModel):
-  """User Class for course enrollment mapping"""
+  """User base Class"""
   user_id = TextField(required=True)
   first_name = TextField(required=True, validator=validate_name)
   last_name = TextField(required=True, validator=validate_name)

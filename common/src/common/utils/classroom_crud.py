@@ -648,6 +648,7 @@ def invite_user(course_id, email, role):
   Returns:
       dict: response from create invitation method
   """
+  Logger.info(f"Inviting User {email} in course {course_id} as {role}")
   service = build("classroom", "v1", credentials=get_credentials())
   body = {"courseId": course_id, "role": role, "userId": email}
   invitation = service.invitations().create(body=body).execute()
@@ -873,3 +874,8 @@ def post_grade_of_the_user(section_id: str,
       body=student_submission).execute()
 
   return output
+
+def delete_drive_folder(folder_id):
+  service= build("drive", "v3", credentials=get_credentials())
+  result=service.files().delete(fileId=folder_id).execute()
+  return result
