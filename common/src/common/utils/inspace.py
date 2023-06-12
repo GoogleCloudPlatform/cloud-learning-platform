@@ -7,7 +7,7 @@ from google.cloud import secretmanager
 from datetime import datetime, timedelta
 
 from common.models.user import User
-from common.utils.config import STAFF_USERS
+from common.utils.config import STAFF_USERS, EXTERNAL_USER_PROPERTY_PREFIX
 from common.utils.logging_handler import Logger
 from common.utils.jwt_token_generator import TokenGenerator
 
@@ -100,8 +100,8 @@ def create_inspace_user_helper(user) -> bool:
       "firstName": user.first_name,
       "lastName": user.last_name,
       "userProperties": {
-        "SNHU_USER_ID": user.user_id,
-        "SNHU_USER_ROLE": inspace_user_type
+        f"{EXTERNAL_USER_PROPERTY_PREFIX}_USER_ID": user.user_id,
+        f"{EXTERNAL_USER_PROPERTY_PREFIX}_USER_ROLE": inspace_user_type
       }
     }
 
