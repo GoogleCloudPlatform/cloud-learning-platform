@@ -135,9 +135,11 @@ def test_list_sections(get_token):
   classroom_id = course["id"]
   create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
                    classroom_id)
-  url = f"{API_URL}/sections"
+  url = f"{API_URL}/sections?skip=0&limit=10"
+  print("List sections API url----",url)
   resp = requests.get(url=url, headers=get_token)
   resp_json = resp.json()
+  print("This is response JSo list secctions",resp_json)
   assert resp.status_code == 200, "Status 200"
 
 
