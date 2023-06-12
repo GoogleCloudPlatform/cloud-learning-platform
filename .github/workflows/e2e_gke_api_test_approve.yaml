@@ -45,6 +45,7 @@ env:
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
   USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: True
+  EXTERNAL_USER_PROPERTY_PREFIX: SNHU
 # cookiecutter:raw 
 jobs:
   deploy:

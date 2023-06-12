@@ -43,6 +43,7 @@ env:
   CLOUD_LOGGING_ENABLED: False
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+  EXTERNAL_USER_PROPERTY_PREFIX: SNHU
 # cookiecutter:raw 
 jobs:
   deploy:
