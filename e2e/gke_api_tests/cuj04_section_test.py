@@ -9,6 +9,7 @@ from secrets_helper import get_required_emails_from_secret_manager
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from common.testing.example_objects import create_fake_data, TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2
+from common.utils.jwt_creds import JwtCredentials
 from testing_objects.test_config import API_URL
 from testing_objects.token_fixture import get_token,sign_up_user
 
@@ -44,10 +45,11 @@ def create_course(name, description, section, owner_id):
   course = service.courses().create(body=new_course).execute()
   course_name = course.get("name")
   course_id = course.get("id")
+  print("___________Course creaated___________________",course)
   return course
 
-
 def test_create_section(get_token):
+
   """
   create a Course template and cohort is created  by  user  
   then user clicks on create section button and makes a section 
@@ -76,7 +78,6 @@ def test_create_section(get_token):
   }
   resp = requests.post(url=url, json=data, headers=get_token)
   resp_json = resp.json()
-  print("_______***********create section  response ****_________",resp_json)
   assert resp.status_code == 202, "Status 202"
 
 
@@ -134,9 +135,11 @@ def test_list_sections(get_token):
   classroom_id = course["id"]
   create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2, TEST_SECTION2,
                    classroom_id)
-  url = f"{API_URL}/sections"
+  url = f"{API_URL}/sections?skip=0&limit=10"
+  print("List sections API url----",url)
   resp = requests.get(url=url, headers=get_token)
   resp_json = resp.json()
+  print("This is response JSo list secctions",resp_json)
   assert resp.status_code == 200, "Status 200"
 
 
