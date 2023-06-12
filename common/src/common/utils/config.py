@@ -55,3 +55,4 @@ SERVICES = {
 }
 
 STAFF_USERS = ["assessor", "instructor", "coach"]
+EXTERNAL_USER_PROPERTY_PREFIX = "SNHU"
