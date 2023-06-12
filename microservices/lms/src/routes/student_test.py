@@ -203,7 +203,7 @@ def test_enroll_student_already_present_section\
   with mock.patch("routes.student.classroom_crud.enroll_student",
   return_value ={"user_id":"test_user_id"}):
     with mock.patch(
-      "routes.student.check_student_can_enroll_in_cohort",
+  "routes.student.student_service.check_student_can_enroll_in_cohort",
     return_value =False):
       with mock.patch("routes.student.Logger"):
         resp = client_with_emulator.post(url, json=input_data)
@@ -226,7 +226,7 @@ def test_enroll_student_section(client_with_emulator, create_fake_data):
     with mock.patch("routes.student.classroom_crud.enroll_student",
       return_value ={"user_id":course_user.user_id}):
       with mock.patch(
-        "routes.student.check_student_can_enroll_in_cohort",
+  "routes.student.student_service.check_student_can_enroll_in_cohort",
         return_value =True):
         resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 200, "Status 200"
@@ -254,7 +254,7 @@ def test_enroll_student_section_closed_enrollment(
     with mock.patch("routes.student.classroom_crud.enroll_student",
       return_value ={"user_id":course_user.user_id}):
       with mock.patch(
-        "routes.student.check_user_can_enroll_in_section",
+    "routes.student.student_service.check_user_can_enroll_in_section",
         return_value =True):
         resp = client_with_emulator.post(url, json=input_data)
   print(resp.json())
@@ -280,7 +280,7 @@ def test_enroll_student_section_failed_section(
     with mock.patch("routes.student.classroom_crud.enroll_student",
       return_value ={"user_id":course_user.user_id}):
       with mock.patch(
-        "routes.student.check_user_can_enroll_in_section",
+    "routes.student.student_service.check_student_can_enroll_in_cohort",
         return_value =True):
         resp = client_with_emulator.post(url, json=input_data)
   print(resp.json())
@@ -307,7 +307,7 @@ def test_enroll_student_section_enrollment_count(
     with mock.patch("routes.student.classroom_crud.enroll_student",
       return_value ={"user_id":course_user.user_id}):
       with mock.patch(
-        "routes.student.check_user_can_enroll_in_section",
+  "routes.student.student_service.check_student_can_enroll_in_cohort",
         return_value =True):
         resp = client_with_emulator.post(url, json=input_data)
   print(resp.json())

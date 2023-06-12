@@ -601,7 +601,7 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
   try:
-    cohort = Cohort.find_by_id(cohort_id)    
+    cohort = Cohort.find_by_id(cohort_id)
     sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
