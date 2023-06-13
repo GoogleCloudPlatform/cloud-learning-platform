@@ -59,15 +59,13 @@ export class HomeComponent implements OnInit {
     else {
 
       if (this.pageEvent.pageIndex > this.pageEvent.previousPageIndex) {
-        this.cohortSkip = this.cohortLimit
-        // this.cohortLimit = this.cohortLimit + this.pageEvent.pageSize
-        this.cohortLimit = this.cohortLimit
+        this.cohortLimit = this.pageEvent.pageSize
+        this.cohortSkip = this.cohortSkip+this.pageEvent.pageSize
 
       }
       else if (this.pageEvent.previousPageIndex > this.pageEvent.pageIndex) {
-        this.cohortSkip = this.cohortSkip - this.pageEvent.pageSize
-        // this.cohortLimit = this.cohortLimit - this.pageEvent.pageSize
-        this.cohortLimit = this.cohortLimit
+        this.cohortLimit = this.pageEvent.pageSize
+        this.cohortSkip = this.cohortSkip-this.pageEvent.pageSize
 
       }
     }
@@ -88,15 +86,17 @@ export class HomeComponent implements OnInit {
     else {
 
       if (this.pageEvent.pageIndex > this.pageEvent.previousPageIndex) {
-        this.courseTemplateSkip = this.courseTemplateLimit
+        this.courseTemplateLimit = this.pageEvent.pageSize
+        this.courseTemplateSkip = this.courseTemplateSkip + this.pageEvent.pageSize
         // this.courseTemplateLimit = this.courseTemplateLimit + this.pageEvent.pageSize
-        this.courseTemplateLimit = this.courseTemplateLimit
+        
 
       }
       else if (this.pageEvent.previousPageIndex > this.pageEvent.pageIndex) {
+        this.courseTemplateLimit = this.pageEvent.pageSize
         this.courseTemplateSkip = this.courseTemplateSkip - this.pageEvent.pageSize
         // this.courseTemplateLimit = this.courseTemplateLimit - this.pageEvent.pageSize
-        this.courseTemplateLimit = this.courseTemplateLimit
+        // this.courseTemplateLimit = this.courseTemplateLimit
 
       }
     }
@@ -117,15 +117,12 @@ export class HomeComponent implements OnInit {
     else {
 
       if (this.pageEvent.pageIndex > this.pageEvent.previousPageIndex) {
-        this.sectionSkip = this.sectionLimit
-        // this.sectionLimit = this.sectionLimit + this.pageEvent.pageSize
-        this.sectionLimit = this.sectionLimit
-
+        this.sectionLimit = this.pageEvent.pageSize
+        this.sectionSkip = this.sectionSkip + this.pageEvent.pageSize
       }
       else if (this.pageEvent.previousPageIndex > this.pageEvent.pageIndex) {
+        this.sectionLimit = this.pageEvent.pageSize
         this.sectionSkip = this.sectionSkip - this.pageEvent.pageSize
-        // this.sectionLimit = this.sectionLimit - this.pageEvent.pageSize
-        this.sectionLimit = this.sectionLimit
 
       }
     }

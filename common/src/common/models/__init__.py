@@ -26,4 +26,4 @@ from .course_template_enrollment_mapping import *
 from .temp_user import *
 from .lti_assignment import *
 from .llm import *
-from .batch_job import *
+from .lms_job import *

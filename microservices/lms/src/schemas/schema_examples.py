@@ -354,7 +354,7 @@ COURSE_EXAMPLE = {
 }
 }
 
-BATCH_JOB_EXAMPLE = {
+LMS_JOB_EXAMPLE = {
     "id": "vbt1o7bp0n91e",
     "job_type": "copy_course",
     "status": "success",

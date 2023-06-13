@@ -1,19 +1,19 @@
-'''Batch Job Endpoint'''
+'''LMS Job Endpoint'''
 from fastapi import APIRouter
-from common.models import BatchJob
+from common.models import LmsJob
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import ResourceNotFound, InternalServerError, BadRequest
-from schemas.batch_job import (BatchJobsListResponseModel,
-                               BatchJobResponseModel)
+from schemas.lms_job import (LmsJobsListResponseModel,
+                               LmsJobResponseModel)
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ConflictResponseModel,
                                   ValidationErrorResponseModel)
 
 router = APIRouter(
-    prefix="/batch-jobs",
-    tags=["Batch Jobs"],
+    prefix="/lms-jobs",
+    tags=["LMS Jobs"],
     responses={
         500: {
             "model": InternalServerErrorResponseModel
@@ -30,16 +30,16 @@ router = APIRouter(
     })
 
 
-@router.get("", response_model=BatchJobsListResponseModel)
-def get_batch_jobs_list(skip: int = 0, limit: int = 10):
-  """Get a list of Batch jobs endpoint
+@router.get("", response_model=LmsJobsListResponseModel)
+def get_lms_jobs_list(skip: int = 0, limit: int = 10):
+  """Get a list of LMS jobs endpoint
     Raises:
         HTTPException: 500 Internal Server Error if something fails.
 
     Returns:
-        BatchJobsListResponseModel: list of Batch jobs objects.
+        LmsJobsListResponseModel: list of LMS jobs objects.
         InternalServerErrorResponseModel:
-            if the get batch jobs list raises an exception.
+            if the get LMS jobs list raises an exception.
     """
   try:
     if skip < 0:
@@ -48,10 +48,10 @@ def get_batch_jobs_list(skip: int = 0, limit: int = 10):
       raise ValidationError\
         ("Invalid value passed to \"limit\" query parameter")
 
-    batch_job_data = BatchJob.fetch_all(skip=skip, limit=limit)
-    batch_job_list = list(batch_job_data)
+    lms_job_data = LmsJob.fetch_all(skip=skip, limit=limit)
+    lms_job_list = list(lms_job_data)
 
-    return {"data": batch_job_list}
+    return {"data": lms_job_list}
   except ValidationError as ve:
     raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as re:
@@ -62,22 +62,22 @@ def get_batch_jobs_list(skip: int = 0, limit: int = 10):
     raise InternalServerError(str(e)) from e
 
 
-@router.get("/{batch_job_id}", response_model=BatchJobResponseModel)
-def get_batch_job(batch_job_id: str):
-  """Get a Batch jobs using the batch job id endpoint
+@router.get("/{lms_job_id}", response_model=LmsJobResponseModel)
+def get_lms_job(lms_job_id: str):
+  """Get a LMS jobs using the LMS job id endpoint
     Raises:
         HTTPException: 500 Internal Server Error if something fails.
 
     Returns:
-        BatchJobResponseModel: details of the given Batch job.
+        LmsJobResponseModel: details of the given LMS job.
         InternalServerErrorResponseModel:
-            if the get batch jobs list raises an exception.
+            if the get LMS jobs list raises an exception.
     """
   try:
-    batch_job = BatchJob.find_by_id(batch_job_id)
-    batch_job_data = batch_job.to_dict()
+    lms_job = LmsJob.find_by_id(lms_job_id)
+    lms_job_data = lms_job.to_dict()
 
-    return {"data": batch_job_data}
+    return {"data": lms_job_data}
   except ValidationError as ve:
     raise BadRequest(str(ve)) from ve
   except ResourceNotFoundException as re:
