@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Unit test for course_template.py
 """
@@ -22,18 +21,17 @@ import pytest
 from common.models import CourseTemplate
 from common.utils.errors import ResourceNotFoundException
 from common.testing.example_objects import TEST_COURSE_TEMPLATE
-from common.testing.firestore_emulator import  firestore_emulator, clean_firestore
+from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 
 
 def test_new_course(clean_firestore):
   """Test for creating and loading a new course"""
   new_course_template = CourseTemplate.from_dict(TEST_COURSE_TEMPLATE)
   new_course_template.save()
-  course_template=CourseTemplate.find_by_id(new_course_template.id)
-  assert course_template.name==TEST_COURSE_TEMPLATE["name"]
+  course_template = CourseTemplate.find_by_id(new_course_template.id)
+  assert course_template.name == TEST_COURSE_TEMPLATE["name"]
   assert course_template.description == TEST_COURSE_TEMPLATE["description"]
-  assert course_template.instructional_designer == TEST_COURSE_TEMPLATE[
-      "instructional_designer"].lower()
+
 
 def test_delete_course_template(clean_firestore):
   '''test for soft delete method'''

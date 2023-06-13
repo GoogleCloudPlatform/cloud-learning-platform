@@ -2,66 +2,63 @@
 import datetime
 
 USER_EXAMPLE = {
-    "id": "fake-user-id",
-    "auth_id": "fake-user-id",
-    "email": "user@gmail.com",
-    "role": "Admin"
+"id": "fake-user-id",
+"auth_id": "fake-user-id",
+"email": "user@gmail.com",
+"role": "Admin"
 }
 
 COURSE_TEMPLATE_EXAMPLE = {
-    "id": "id",
-    "name": "name",
-    "description": "description",
-    "admin": "admin@gmail.com",
-    "instructional_designer": "idesiner@gmail.com",
-    "classroom_id": "clID",
-    "classroom_code": "clcode",
-    "classroom_url": "https://classroom.google.com"
+"id": "id",
+"name": "name",
+"description": "description",
+"admin": "admin@gmail.com",
+"classroom_id": "clID",
+"classroom_code": "clcode",
+"classroom_url": "https://classroom.google.com"
 }
 UPDATE_COURSE_TEMPLATE_EXAMPLE = {
-    "name": "name",
-    "description": "description",
-    "instructional_designer": "idesiner@gmail.com"
+"name": "name",
+"description": "description"
 }
 
 INSERT_COURSE_TEMPLATE_EXAMPLE = {
-    "name": "name",
-    "description": "description",
-    "instructional_designer": "idesiner@gmail.com"
+"name": "name",
+"description": "description",
 }
 
 COHORT_EXAMPLE = {
-    "id": "fake-cohort-id",
-    "name": "name",
-    "description": "description",
-    "start_date": datetime.datetime(year=2022, month=10, day=14),
-    "end_date": datetime.datetime(year=2022, month=12, day=25),
-    "registration_start_date": datetime.datetime(year=2022, month=10, day=20),
-    "registration_end_date": datetime.datetime(year=2022, month=11, day=14),
-    "max_students": 200,
-    "enrolled_students_count": 0,
-    "course_template": "course_template/fake-id"
+"id": "fake-cohort-id",
+"name": "name",
+"description": "description",
+"start_date": datetime.datetime(year=2022, month=10, day=14),
+"end_date": datetime.datetime(year=2022, month=12, day=25),
+"registration_start_date": datetime.datetime(year=2022, month=10, day=20),
+"registration_end_date": datetime.datetime(year=2022, month=11, day=14),
+"max_students": 200,
+"enrolled_students_count": 0,
+"course_template": "course_template/fake-id"
 }
 UPDATE_COHORT_EXAMPLE = {
-    "name": "name",
-    "description": "description",
-    "start_date": datetime.datetime(year=2022, month=10, day=14),
-    "end_date": datetime.datetime(year=2022, month=12, day=25),
-    "registration_start_date": datetime.datetime(year=2022, month=10, day=20),
-    "registration_end_date": datetime.datetime(year=2022, month=11, day=14),
-    "max_students": 200,
-    "enrolled_students_count": 0,
-    "course_template": "course_template/fake-id"
+"name": "name",
+"description": "description",
+"start_date": datetime.datetime(year=2022, month=10, day=14),
+"end_date": datetime.datetime(year=2022, month=12, day=25),
+"registration_start_date": datetime.datetime(year=2022, month=10, day=20),
+"registration_end_date": datetime.datetime(year=2022, month=11, day=14),
+"max_students": 200,
+"enrolled_students_count": 0,
+"course_template": "course_template/fake-id"
 }
 INSERT_COHORT_EXAMPLE = {
-    "name": "name",
-    "description": "description",
-    "start_date": datetime.datetime(year=2022, month=10, day=14),
-    "end_date": datetime.datetime(year=2022, month=12, day=25),
-    "registration_start_date": datetime.datetime(year=2022, month=10, day=20),
-    "registration_end_date": datetime.datetime(year=2022, month=11, day=14),
-    "max_students": 200,
-    "course_template_id": "fake-id"
+"name": "name",
+"description": "description",
+"start_date": datetime.datetime(year=2022, month=10, day=14),
+"end_date": datetime.datetime(year=2022, month=12, day=25),
+"registration_start_date": datetime.datetime(year=2022, month=10, day=20),
+"registration_end_date": datetime.datetime(year=2022, month=11, day=14),
+"max_students": 200,
+"course_template_id": "fake-id"
 }
 
 SECTION_EXAMPLE = {
@@ -88,23 +85,23 @@ INSERT_SECTION_EXAMPLE = {
 }
 
 CREDENTIAL_JSON = {
-    "token": "fake-token",
-    "refresh_token": "refresh-token",
-    "token_uri": "fake_token_uri",
-    "client_id": "client_fake_id",
-    "client_secret": "client_fake_secrets",
-    "scopes": ["Scopes"],
-    "expiry": "2022-11-23T12:01:17Z"
+"token": "fake-token",
+"refresh_token": "refresh-token",
+"token_uri": "fake_token_uri",
+"client_id": "client_fake_id",
+"client_secret": "client_fake_secrets",
+"scopes": ["Scopes"],
+"expiry": "2022-11-23T12:01:17Z"
 }
 TEMP_USER = {
-    "user_id": "kh5FoIBOx5qDsfh4ZRuv",
-    "first_name": "first",
-    "last_name": "last",
-    "email": "clplmstestuser1@gmail.com",
-    "user_type": "learner",
-    "status": "active",
-    "gaia_id": "1234577657333",
-    "photo_url": "https://lh3.googleusercontent.com/a/AEd"
+"user_id": "kh5FoIBOx5qDsfh4ZRuv",
+"first_name": "first",
+"last_name": "last",
+"email": "clplmstestuser1@gmail.com",
+"user_type": "learner",
+"status": "active",
+"gaia_id": "1234577657333",
+"photo_url": "https://lh3.googleusercontent.com/a/AEd"
 }
 GET_STUDENT_EXAMPLE = TEMP_USER
 GET_STUDENT_EXAMPLE["course_enrollment_id"] = "2xBnBjqm2X3eRgVxE6Bv"
@@ -118,21 +115,38 @@ GET_STUDENT_EXAMPLE[
     "classroom_url"] = "https://classroom.google.com/c/NTYzMhjhjr"
 
 COURSE_ENROLLMENT_USER_EXAMPLE = {
-    "user_id": "kh5FoIBOx5qDsfh4ZRuv",
-    "first_name": "",
-    "last_name": "",
-    "email": "clplmstestuser1@gmail.com",
-    "user_type": "learner",
-    "status": "active",
-    "gaia_id": "1234577657333",
-    "photo_url": "https://lh3.googleusercontent.com/a/AEd",
-    "course_enrollment_id": "2xBnBjqm2X3eRgVxE6Bv",
-    "invitation_id": "2xBnBjqm2X3eRgVxE6Bv",
-    "section_id": "fake-section-id",
-    "cohort_id": "fake-cohort-id",
-    "classroom_id": "123453333",
-    "enrollment_status": "active",
-    "classroom_url": "https://classroom.google.com/c/NTYzMhjhjr"
+"user_id": "kh5FoIBOx5qDsfh4ZRuv",
+"first_name": "",
+"last_name": "",
+"email": "clplmstestuser1@gmail.com",
+"user_type": "learner",
+"status": "active",
+"gaia_id": "1234577657333",
+"photo_url": "https://lh3.googleusercontent.com/a/AEd",
+"course_enrollment_id": "2xBnBjqm2X3eRgVxE6Bv",
+"invitation_id": "2xBnBjqm2X3eRgVxE6Bv",
+"section_id": "fake-section-id",
+"cohort_id": "fake-cohort-id",
+"classroom_id": "123453333",
+"enrollment_status": "active",
+"classroom_url": "https://classroom.google.com/c/NTYzMhjhjr"
+}
+
+INSTRUCTIONAL_DESIGNER_USER_EXAMPLE = {
+"user_id": "kh5FoIBOx5qDsfh4ZRuv",
+"first_name": "",
+"last_name": "",
+"email": "clplmstestuser1@gmail.com",
+"user_type": "faculty",
+"status": "active",
+"gaia_id": "1234577657333",
+"photo_url": "https://lh3.googleusercontent.com/a/AEd",
+"course_template_enrollment_id": "2xBnBjqm2X3eRgVxE6Bv",
+"invitation_id": "2xBnBjqm2X3eRgVxE6Bv",
+"course_template_id": "fake-course-template-id",
+"classroom_id": "123453333",
+"enrollment_status": "active",
+"classroom_url": "https://classroom.google.com/c/NTYzMhjhjr"
 }
 
 UPDATE_SECTION = {
@@ -144,67 +158,67 @@ UPDATE_SECTION = {
 }
 
 ASSIGNMENT_MODEL = {
-    "id": "1234567888",
-    "classroom_id": "1237777333",
-    "title": "Assignment name",
-    "description": "description",
-    "link": "https://link.com",
-    "state": "PUBLISHED",
-    "creation_time": "2023-02-16T10:32:25.059Z",
-    "update_time": "2023-02-16T11:01:09.375Z",
-    "due_date": "20xx-0x-1x",
-    "due_time": "hh:mm:ss",
-    "max_grade": 100,
-    "work_type": "ASSIGNMENT",
-    "assignee_mode": "ALL_STUDENTS"
+"id": "1234567888",
+"classroom_id": "1237777333",
+"title": "Assignment name",
+"description": "description",
+"link": "https://link.com",
+"state": "PUBLISHED",
+"creation_time": "2023-02-16T10:32:25.059Z",
+"update_time": "2023-02-16T11:01:09.375Z",
+"due_date": "20xx-0x-1x",
+"due_time": "hh:mm:ss",
+"max_grade": 100,
+"work_type": "ASSIGNMENT",
+"assignee_mode": "ALL_STUDENTS"
 }
 
 SHORT_COURSEWORK_MODEL = {
-    "courseId": "555555555",
-    "id": "5789246",
-    "title": "test assignment",
-    "state": "PUBLISHED",
-    "creationTime": "2023-02-16T10:45:49.833Z",
-    "materials": []
+"courseId": "555555555",
+"id": "5789246",
+"title": "test assignment",
+"state": "PUBLISHED",
+"creationTime": "2023-02-16T10:45:49.833Z",
+"materials": []
 }
 
 STUDENT = {
-    "user_id": "12345678",
-    "first_name": "steve4",
-    "last_name": "jobs",
-    "email": "clplmstestuser1@gmail.com",
-    "user_type": "other",
-    "status": "active",
-    "gaia_id": "F2GGRg5etyty",
-    "created_time": "2023-01-24 17:38:32.689496+00:00",
-    "last_modified_time": "2023-01-24 17:38:32.823430+00:00",
-    "invitation_id": "NTk2NTY1NzYyMjE5KjU5NzAwNTkxMjgzNFpa"
+"user_id": "12345678",
+"first_name": "steve4",
+"last_name": "jobs",
+"email": "clplmstestuser1@gmail.com",
+"user_type": "other",
+"status": "active",
+"gaia_id": "F2GGRg5etyty",
+"created_time": "2023-01-24 17:38:32.689496+00:00",
+"last_modified_time": "2023-01-24 17:38:32.823430+00:00",
+"invitation_id": "NTk2NTY1NzYyMjE5KjU5NzAwNTkxMjgzNFpa"
 }
 
 INVITE_STUDENT = {
-    "course_enrollment_id": "2xBnBjqm2X3eRgVxE6Bv",
-    "email": "test_user@gmail",
-    "section_id": "fake-section-id",
-    "cohort_id": "fake-cohort-id",
-    "classroom_id": "123453333",
-    "classroom_url": "https://classroom.google.com/c/NTYzMhjhjrx",
-    "invitation_id": "NTk2NTY1NzYyMjE5KjU5NzAwNTkwODM2NVpa",
-    "user_id": "En4SSjm3ttfTT8Cq4nog"
+"course_enrollment_id": "2xBnBjqm2X3eRgVxE6Bv",
+"email": "test_user@gmail",
+"section_id": "fake-section-id",
+"cohort_id": "fake-cohort-id",
+"classroom_id": "123453333",
+"classroom_url": "https://classroom.google.com/c/NTYzMhjhjrx",
+"invitation_id": "NTk2NTY1NzYyMjE5KjU5NzAwNTkwODM2NVpa",
+"user_id": "En4SSjm3ttfTT8Cq4nog"
 }
 
 ANALYTICS_USER_EXAMPLE = {
-    "user_gaia_id": "12345678",
-    "user_name": {
-        "givenName": "first_name",
-        "familyName": "last_name",
-        "fullName": "first_name last_name"
-    },
-    "user_email_address": "xyz@gmail.com",
-    "user_photo_url": "//lh3.googleusercontent.com/a/default-user",
-    "user_permissions": [{
-        "permission": "CREATE_COURSE"
-    }],
-    "user_verified_teacher": True
+"user_gaia_id": "12345678",
+"user_name": {
+    "givenName": "first_name",
+    "familyName": "last_name",
+    "fullName": "first_name last_name"
+},
+"user_email_address": "xyz@gmail.com",
+"user_photo_url": "//lh3.googleusercontent.com/a/default-user",
+"user_permissions": [{
+    "permission": "CREATE_COURSE"
+}],
+"user_verified_teacher": True
 }
 
 ANALYTICS_COURSE_WORK_EXAMPLE = {
@@ -288,54 +302,72 @@ ANALYTICS_COURSE_WORK_EXAMPLE = {
 }
 
 ANALYTICS_COURSE_EXAMPLE = {
-    "course_id": "12345678",
-    "course_name": "course_name",
-    "course_section": "section a",
-    "course_description": "section desc",
-    "course_url": "https://classroom.google.com",
-    "section_id": "1235678",
-    "section_name": "section name",
-    "cohort_id": "qwe1234dfg",
-    "cohort_name": "cohort name",
-    "cohort_description": "cohort desc",
-    "cohort_registration_start_date": "2023-02-19T18:30:00+00:00",
-    "cohort_registration_end_date": "2023-05-19T18:30:00+00:00",
-    "cohort_start_date": "2023-02-19T18:30:00+00:00",
-    "cohort_end_date": "2023-05-19T18:30:00+00:00",
-    "cohort_max_students": 0,
-    "course_work_list": [ANALYTICS_COURSE_WORK_EXAMPLE]
+"course_id": "12345678",
+"course_name": "course_name",
+"course_section": "section a",
+"course_description": "section desc",
+"course_url": "https://classroom.google.com",
+"section_id": "1235678",
+"section_name": "section name",
+"cohort_id": "qwe1234dfg",
+"cohort_name": "cohort name",
+"cohort_description": "cohort desc",
+"cohort_registration_start_date": "2023-02-19T18:30:00+00:00",
+"cohort_registration_end_date": "2023-05-19T18:30:00+00:00",
+"cohort_start_date": "2023-02-19T18:30:00+00:00",
+"cohort_end_date": "2023-05-19T18:30:00+00:00",
+"cohort_max_students": 0,
+"course_work_list": [ANALYTICS_COURSE_WORK_EXAMPLE]
 }
 
 COURSE_EXAMPLE = {
-    "id": "456789",
-    "name": "course_name",
-    "section": "section",
-    "description": "desc",
-    "description_heading": "desc_heading",
-    "room": "room",
-    "owner_id": "1234567888887654",
-    "creation_time": "2023-04-20T10:44:05.896Z",
-    "update_time": "2023-04-20T10:44:05.896Z",
-    "enrollment_code": "ry7ui2z",
-    "course_state": "ACTIVE",
-    "alternate_link": "https://classroom.google.com/c/xcvbn",
-    "teacher_group_email": "course_name_section_teachers_678fg@google.com",
-    "course_group_email": "course_name_section_hj678@google.com",
-    "teacher_folder": {
-        "id":
-        "234567xdcfgyhu345678",
-        "title":
-        "course name section",
-        "alternate_link":
-        "https://drive.google.com/drive/folders/234567xdcfgyhu345678"
+"id": "456789",
+"name": "course_name",
+"section": "section",
+"description": "desc",
+"description_heading": "desc_heading",
+"room": "room",
+"owner_id": "1234567888887654",
+"creation_time": "2023-04-20T10:44:05.896Z",
+"update_time": "2023-04-20T10:44:05.896Z",
+"enrollment_code": "ry7ui2z",
+"course_state": "ACTIVE",
+"alternate_link": "https://classroom.google.com/c/xcvbn",
+"teacher_group_email": "course_name_section_teachers_678fg@google.com",
+"course_group_email": "course_name_section_hj678@google.com",
+"teacher_folder": {
+    "id":
+    "234567xdcfgyhu345678",
+    "title":
+    "course name section",
+    "alternate_link":
+    "https://drive.google.com/drive/folders/234567xdcfgyhu345678"
+},
+"course_material_sets": [{
+    "drive_file": "ewrty"
+}],
+"guardians_enabled": False,
+"calendar_id": "dfghj56789@group.calendar.google.com",
+"gradebook_settings": {
+    "calculation_type": "TOTAL_POINTS",
+    "display_setting": "HIDE_OVERALL_GRADE"
+}
+}
+
+LMS_JOB_EXAMPLE = {
+    "id": "vbt1o7bp0n91e",
+    "job_type": "copy_course",
+    "status": "success",
+    "logs": {
+        "errors": ["error1", "error2"],
+        "info": ["info1", "info2"]
     },
-    "course_material_sets": [{
-        "drive_file": "ewrty"
-    }],
-    "guardians_enabled": False,
-    "calendar_id": "dfghj56789@group.calendar.google.com",
-    "gradebook_settings": {
-        "calculation_type": "TOTAL_POINTS",
-        "display_setting": "HIDE_OVERALL_GRADE"
-    }
+    "input_data": {
+        "test_input": "test_input_data"
+    },
+    "section_id": "a5vNi2H9v8b34",
+    "classroom_id": "912406891",
+    "created_time": "2023-01-24 17:37:15",
+    "start_time": "2023-01-24 17:38:32",
+    "end_time": "2023-01-24 17:53:17"
 }

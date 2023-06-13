@@ -46,11 +46,39 @@
         ]
     },
     {
+        "collection_group": "lms_jobs",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "deleted_at_timestamp",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
         "collection_group": "sections",
         "query_scope": "COLLECTION",
         "fields": [
             {
                 "field_path": "deleted_at_timestamp",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
+        "collection_group": "sections",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "status",
                 "order": "ASCENDING"
             },
             {
@@ -180,6 +208,24 @@
         ]
     },
     {
+        "collection_group": "lti_content_items",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "context_id",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "tool_id",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
         "collection_group": "line_items",
         "query_scope": "COLLECTION",
         "fields": [
@@ -246,6 +292,20 @@
             {
                 "field_path": "created_time",
                 "order": "DESCENDING"
+            }
+        ]
+    },
+    {
+        "collection_group": "course_enrollment_mapping",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "status",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "section",
+                "order": "ASCENDING"
             }
         ]
     }

@@ -1,17 +1,16 @@
 """ Helper functions for classroom crud API """
 import requests
 from asyncio.log import logger
-from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from common.utils.jwt_creds import JwtCredentials
 from common.utils.errors import InvalidTokenError, UserManagementServiceError, ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
 from common.models import Section
 
 from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL, PUB_SUB_PROJECT_ID, DATABASE_PREFIX
-from common.utils import helper
 # pylint: disable=line-too-long
 
 SUCCESS_RESPONSE = {"status": "Success"}
@@ -20,12 +19,6 @@ FEED_TYPE_DICT = {
     "COURSE_WORK_CHANGES": "courseWorkChangesInfo",
     "COURSE_ROSTER_CHANGES": "courseRosterChangesInfo"
 }
-
-REGISTER_SCOPES = [
-    "https://www.googleapis.com/auth/classroom.push-notifications",
-    "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
-    "https://www.googleapis.com/auth/classroom.rosters.readonly"
-]
 
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.courses",
@@ -37,31 +30,30 @@ SCOPES = [
     "https://www.googleapis.com/auth/forms.body.readonly",
     "https://www.googleapis.com/auth/classroom.profile.photos",
     "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
+    "https://www.googleapis.com/auth/classroom.push-notifications",
+    "https://www.googleapis.com/auth/classroom.student-submissions."+
+    "students.readonly",
+    "https://www.googleapis.com/auth/classroom.rosters.readonly"
 ]
 
+def get_default_service_account_email():
+  metadata_url = "http://metadata.google.internal/computeMetadata/v1/"
+  metadata_headers = {"Metadata-Flavor": "Google"}
+  url = f"{metadata_url}instance/service-accounts"
+  r = requests.get(url, headers=metadata_headers)
+  service_account_email = r.text.split("/")[1].strip()
+  return service_account_email
 
-def get_credentials():
-  classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
-  creds = service_account.Credentials.from_service_account_info(classroom_key,
-                                                                scopes=SCOPES)
-  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+def get_credentials(email=CLASSROOM_ADMIN_EMAIL):
+  google_oauth_token_endpoint = "https://oauth2.googleapis.com/token"
+  service_account_email = get_default_service_account_email()
+  creds = JwtCredentials.from_default_with_subject(
+    subject=email,
+    service_account_email=service_account_email,
+    token_uri=google_oauth_token_endpoint,
+    scopes=SCOPES)
   return creds
-
-
-def impersonate_teacher_creds(teacher_email):
-  """Impersonate teacher in a classroom
-  Args:
-    teacher_email(str): teacher email which needs to be impersonated
-  Return:
-    creds(dict): returns a dict which credentils
-  """
-  classroom_key = helper.get_gke_pd_sa_key_from_secret_manager()
-  creds = service_account.Credentials.from_service_account_info(classroom_key,
-                                                                scopes=SCOPES)
-  creds = creds.with_subject(teacher_email)
-  return creds
-
 
 def create_course(name, description, section, owner_id):
   """Create course Function in classroom
@@ -648,6 +640,7 @@ def invite_user(course_id, email, role):
   Returns:
       dict: response from create invitation method
   """
+  Logger.info(f"Inviting User {email} in course {course_id} as {role}")
   service = build("classroom", "v1", credentials=get_credentials())
   body = {"courseId": course_id, "role": role, "userId": email}
   invitation = service.invitations().create(body=body).execute()
@@ -682,9 +675,7 @@ def enable_notifications(course_id, feed_type):
   Returns:
       _type_: _description_
   """
-  creds = service_account.Credentials.from_service_account_info(
-      helper.get_gke_pd_sa_key_from_secret_manager(), scopes=REGISTER_SCOPES)
-  creds = creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+  creds = get_credentials(CLASSROOM_ADMIN_EMAIL)
   service = build("classroom", "v1", credentials=creds)
   body = {
       "feed": {
@@ -765,8 +756,8 @@ def acceept_invite(invitation_id, email):
   Returns:
       dict: response from create invitation method
   """
-  service = build("classroom", "v1", \
-    credentials=impersonate_teacher_creds(email))
+  service = build("classroom", "v1",
+    credentials=get_credentials(email))
   course = service.invitations().accept(id=invitation_id).execute()
   return course
 
@@ -873,3 +864,8 @@ def post_grade_of_the_user(section_id: str,
       body=student_submission).execute()
 
   return output
+
+def delete_drive_folder(folder_id):
+  service= build("drive", "v3", credentials=get_credentials())
+  result=service.files().delete(fileId=folder_id).execute()
+  return result
