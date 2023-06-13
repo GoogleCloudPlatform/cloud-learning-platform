@@ -262,7 +262,8 @@ jobs:
   
   e2e-ui-test-lms-admin-ui:
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: e2e-api-test
+    # if: contains(github.event.pull_request.labels.*.name, 'LMS') 
     env:
       HEADLESS: enables
     strategy:
@@ -418,4 +419,4 @@ jobs:
         python -m pip install -r requirements.txt
         BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_cleanup.py  
 
-cookiecutter:endraw 
+# cookiecutter:endraw 
