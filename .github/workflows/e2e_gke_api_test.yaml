@@ -62,8 +62,6 @@ env:
   KUSTOMIZE_VERSION: 4.1.3
   SKAFFOLD_VERSION: 1.39.2
   SKAFFOLD_CACHE_GCS: gs://core-learning-services-dev.appspot.com/skaffold/cache
-  # CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
-  # CLASSROOM_ADMIN_EMAIL : lms_admin_teacher@dhodun.altostrat.com
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
@@ -91,7 +89,7 @@ jobs:
     - name: export admin-teacher account in github env
       id: account-setup
       run: |
-        secret_id=org-test-user-$(shuf -n1 -i 1-4)-username
+        secret_id=e2e-admin-teacher-$(shuf -n1 -i 1-4)-username
         echo "account=$(gcloud secrets versions access latest --secret="$secret_id")" >> "$GITHUB_OUTPUT"
 
   deploy:
@@ -101,13 +99,6 @@ jobs:
     env:
       CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
     steps:
-    - name: echo NAMESPACE and PREFIX
-      run: |
-        DATABASE_PREFIX=$E2E_PREFIX
-        NAMESPACE=$E2E_NAMESPACE_PREFIX
-        echo namespace $NAMESPACE
-        echo $CLASSROOM_ADMIN_EMAIL
-        echo database prefix $DATABASE_PREFIX
     - name: Check out repository
       uses: actions/checkout@v3
 
