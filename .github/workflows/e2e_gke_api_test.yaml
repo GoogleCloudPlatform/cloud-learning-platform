@@ -90,7 +90,8 @@ jobs:
       id: account-setup
       run: |
         secret_id=e2e-admin-teacher-$(shuf -n1 -i 1-4)-username
-        echo "account=$(gcloud secrets versions access latest --secret="$secret_id")" >> "$GITHUB_OUTPUT"
+        account=$(gcloud secrets versions access latest --secret="$secret_id")
+        echo "account=$account" >> "$GITHUB_OUTPUT"
 
   deploy:
     name: Deploy all microservices in PR namespace
