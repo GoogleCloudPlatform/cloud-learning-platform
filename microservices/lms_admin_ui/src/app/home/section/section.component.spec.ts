@@ -85,7 +85,7 @@ describe('SectionComponent', () => {
       imports: [ MatLegacyDialogModule, HttpClientTestingModule,MatSelectModule,MatInputModule, MatTabsModule, BrowserAnimationsModule,NgxSkeletonLoaderModule],
       declarations: [ SectionComponent, addTeacherDialog , DeleteOverviewDialog],
       providers: [ MatSnackBar, MatDialog,UntypedFormBuilder,
-        { provide: MatDialogRef, useValue:  MatDialogRef<addTeacherDialog>  },
+        { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close']) },
         { provide: MAT_DIALOG_DATA, useValue:  { mode: 'Create', init_data: { name: ''}, extra_data:[] }}
       ],
       schemas:[CUSTOM_ELEMENTS_SCHEMA]

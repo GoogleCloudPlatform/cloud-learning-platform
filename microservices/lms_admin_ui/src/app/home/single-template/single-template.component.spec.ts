@@ -15,7 +15,7 @@ describe('SingleTemplateComponent', () => {
       imports: [MatLegacyDialogModule, HttpClientTestingModule],
       declarations: [ SingleTemplateComponent, DeleteLtiDialog ],
       providers: [MatDialog,
-        { provide: MatDialogRef,useValue: MatDialogRef<DeleteLtiDialog>},
+        { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close']) },
         { provide: MAT_DIALOG_DATA, useValue:  { mode: 'Create', init_data: { name: ''}, extra_data:[] }}
       ]
     })

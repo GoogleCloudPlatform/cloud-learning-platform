@@ -20,7 +20,7 @@ describe('CreateCourseTemplateModalComponent', () => {
       imports: [MatLegacyDialogModule, HttpClientTestingModule, BrowserAnimationsModule],
       declarations: [ CreateCourseTemplateModalComponent ],
       providers: [MatDialog, MatSnackBar, HomeService, UntypedFormBuilder,
-        { provide: MatDialogRef, useValue:  MatDialogRef<CreateCourseTemplateModalComponent>  },
+        { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close'])   },
         { provide: MAT_DIALOG_DATA, useValue:  { mode: 'Create', init_data: { name: ''}, extra_data:[]  } }
       ]
     })

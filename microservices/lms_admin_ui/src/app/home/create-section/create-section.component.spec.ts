@@ -20,7 +20,7 @@ describe('CreateSectionComponent', () => {
       imports: [MatLegacyDialogModule, HttpClientTestingModule, BrowserAnimationsModule],
       declarations: [ CreateSectionComponent ],
       providers: [MatSnackBar, MatDialog, UntypedFormBuilder, HomeService,
-        { provide: MatDialogRef, useValue:  MatDialogRef<CreateSectionComponent>},
+        { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close']) },
         { provide: MAT_DIALOG_DATA, useValue:  { mode: 'Create', init_data: { name: ''}, extra_data:[] }}
       ]
     })
