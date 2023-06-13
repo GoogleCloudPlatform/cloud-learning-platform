@@ -300,7 +300,7 @@ jobs:
       run: |
           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
           export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
-          python -m pip install -r common/src/requirements.txt
+          python -m pip install -r common/requirements.txt
           cd utils/
           python -m pip install -r requirements.txt
           PYTHONPATH=../common/src python create_e2e_user.py
