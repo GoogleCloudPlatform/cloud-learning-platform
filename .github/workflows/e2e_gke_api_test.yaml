@@ -89,7 +89,7 @@ jobs:
     - name: export admin-teacher account in github env
       run: |
         secret_no=$(shuf -n1 -i 1-4)
-        account=$(gcloud secrets versions access latest --secret="org-test-user$secret_no-username")
+        account=$(gcloud secrets versions access latest --secret="org-test-user-$secret_no-username")
         echo $account
         echo "CLASSROOM_ADMIN_EMAIL=$account" >> "$GITHUB_ENV"
 
