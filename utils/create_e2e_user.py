@@ -43,3 +43,10 @@ def sign_up_user():
         raise Exception("User sign-up failed")
   else:
     print("firestore: user email already exists")
+
+def main():
+  sign_up_user()
+
+
+if __name__ == "__main__":
+  main()
