@@ -898,8 +898,3 @@ def update_invites(section_id:str):
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
-
-@router.get("/test/test1")
-def test():
-  result = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
-  return result

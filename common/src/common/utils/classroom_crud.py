@@ -585,12 +585,12 @@ def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns
       return a dictionary of view link as keys and edit link as values
   """
-  Logger.info("In get edit and view url mapping func")
   service = build("drive", "v3", credentials=get_credentials())
   page_token = None
   count =0
+  view_link_and_edit_link_matching = {}
   while True:
-    page_size = 75
+    page_size = 50
     response = service.files().list(
         q="mimeType=\"application/vnd.google-apps.form\"",
         spaces="drive",
@@ -598,7 +598,6 @@ def get_edit_url_and_view_url_mapping_of_form():
         fields="nextPageToken, "
         "files(id, name,webViewLink,thumbnailLink)",
         pageToken=page_token).execute()
-    view_link_and_edit_link_matching = {}
     for file in response.get("files", []):
       count=count+1
       result = get_view_link_from_id(file.get("id"))
@@ -606,7 +605,7 @@ def get_edit_url_and_view_url_mapping_of_form():
       {"webViewLink":file.get("webViewLink"),"file_id":file.get("id")}
     if "nextPageToken" in response.keys():
       Logger.info(f"Listed google forms count is {count}")
-      page_token = response['nextPageToken']
+      page_token = response["nextPageToken"]
     else:
       Logger.info(f"Listed all  google forms {count}")
       page_token = None
