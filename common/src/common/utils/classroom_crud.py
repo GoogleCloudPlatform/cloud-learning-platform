@@ -590,7 +590,7 @@ def get_edit_url_and_view_url_mapping_of_form():
   page_token = None
   count =0
   while True:
-    page_size = 50
+    page_size = 75
     response = service.files().list(
         q="mimeType=\"application/vnd.google-apps.form\"",
         spaces="drive",
