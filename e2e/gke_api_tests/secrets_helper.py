@@ -11,11 +11,9 @@ from google.auth.transport.requests import Request
 PROJECT_ID = os.getenv("PROJECT_ID", "")
 CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
-
-CLASSROOM_ADMIN_EMAIL = "lms_admin_teacher@dhodun.altostrat.com"
 PROJECT_ID="core-learning-services-dev"
 USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT=bool(
-  os.getenv("USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT","false").lower() in ("true",))
+os.getenv("USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT","false").lower() in ("true",))
 
 SCOPES = [
   "https://www.googleapis.com/auth/classroom.courses",
