@@ -4,10 +4,10 @@
 
 export const environment = {
   production: false,
-  apiurl: 'http://localhost:4401/lms/api/v1/',
-  ltiUrl: 'http://localhost:4401/lti/api/v1/',
-  classroomShimUrl: 'http://localhost:4401/classroom-shim/api/v1/',
-  auth_apiUrl: 'http://localhost:4401/authentication/api/v1/',
+  apiurl: 'http://localhost:4200/lms/api/v1/',
+  ltiUrl: 'http://localhost:4200/lti/api/v1/',
+  classroomShimUrl: 'http://localhost:4200/classroom-shim/api/v1/',
+  auth_apiUrl: 'http://localhost:4200/authentication/api/v1/',
   firebase: {
     apiKey: "AIzaSyC7ZF4D98P6woFEYCeIpdFSY4S73btYA7Y",
     authDomain: "core-learning-services-dev.firebaseapp.com",

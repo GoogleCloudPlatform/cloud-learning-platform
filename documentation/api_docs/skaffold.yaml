@@ -48,6 +48,11 @@ profiles:
       docker:
         cacheFrom:
           - api-docs:latest
+        buildArgs:
+          API_DOMAIN: "{{.API_DOMAIN}}"
+          FIREBASE_API_KEY: "{{.FIREBASE_API_KEY}}"
+          FIREBASE_AUTH_DOMAIN: "{{.FIREBASE_AUTH_DOMAIN}}"
+          PROJECT_ID: "{{.PROJECT_ID}}"
 - name: dev
   activation:
   - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
@@ -59,6 +64,11 @@ profiles:
         cacheFrom:
           - gcr.io/core-learning-services-dev/api-docs
           - gcr.io/core-learning-services-dev/api-docs:latest
+        buildArgs:
+          API_DOMAIN: "{{.API_DOMAIN}}"
+          FIREBASE_API_KEY: "{{.FIREBASE_API_KEY}}"
+          FIREBASE_AUTH_DOMAIN: "{{.FIREBASE_AUTH_DOMAIN}}"
+          PROJECT_ID: "{{.PROJECT_ID}}"
       sync:
         infer:
           - '**/*.js'
@@ -80,6 +90,11 @@ profiles:
         cacheFrom:
           - api-docs
           - api-docs:latest
+        buildArgs:
+          API_DOMAIN: "{{.API_DOMAIN}}"
+          FIREBASE_API_KEY: "{{.FIREBASE_API_KEY}}"
+          FIREBASE_AUTH_DOMAIN: "{{.FIREBASE_AUTH_DOMAIN}}"
+          PROJECT_ID: "{{.PROJECT_ID}}"
 - name: prod_non_cloudbuild
   deploy:
     kustomize:

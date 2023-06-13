@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --live-reload",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "e2e-ui": "codeceptjs -c ./e2e/codecept-ui-tests.conf.js run --steps"
   },
   "private": true,
   "dependencies": {
@@ -21,10 +22,13 @@
     "@angular/platform-browser": "15.0.4",
     "@angular/platform-browser-dynamic": "15.0.4",
     "@angular/router": "15.0.4",
+    "@angular-material-components/datetime-picker": "^9.0.0",
     "bootstrap": "5.2.3",
+    "codeceptjs": "^3.4.1",
     "firebase": "9.15.0",
     "jquery": "3.6.1",
     "ngx-skeleton-loader": "6.0.0",
+    "puppeteer": "^20.5.0",
     "rxjs": "7.4.0",
     "tslib": "2.3.0",
     "zone.js": "0.11.4"
