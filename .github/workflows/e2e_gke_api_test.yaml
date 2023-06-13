@@ -78,6 +78,8 @@ jobs:
   admin-teacher:
     name: Set admin-teacher account as env
     runs-on: ubuntu-latest
+    outputs:
+      CLASSROOM_ADMIN_EMAIL: ${{steps.account-setup.outputs.account}}
     steps:
     - name: 'Set up Gcloud auth'
       id: 'gcloud_auth'
@@ -87,18 +89,17 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
     - name: export admin-teacher account in github env
+      id: account-setup
       run: |
-        secret_no=$(shuf -n1 -i 1-4)
-        account=$(gcloud secrets versions access latest --secret="org-test-user-$secret_no-username")
-        echo "CLASSROOM_ADMIN_EMAIL=$account" >> "$GITHUB_ENV"
-        echo ${{ env.CLASSROOM_ADMIN_EMAIL }}
+        secret_id=org-test-user-$(shuf -n1 -i 1-4)-username
+        echo "account=$(gcloud secrets versions access latest --secret="$secret_id")" >> "$GITHUB_OUTPUT"
 
   deploy:
     name: Deploy all microservices in PR namespace
     runs-on: ubuntu-latest
     needs: admin-teacher
     env:
-      CLASSROOM_ADMIN_EMAIL: ${{ env.CLASSROOM_ADMIN_EMAIL }}
+      CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
     steps:
     - name: echo NAMESPACE and PREFIX
       run: |
@@ -212,7 +213,9 @@ jobs:
 
   e2e-api-test:
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: [deploy,admin-teacher]
+    env:
+      CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
     strategy:
       fail-fast: false
       matrix:
@@ -284,8 +287,10 @@ jobs:
 
   dataset-cleanup:
     runs-on: ubuntu-latest
-    needs: e2e-api-test
+    needs: [e2e-api-test,admin-teacher]
     if: always()
+    env:
+      CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
     strategy:
       fail-fast: false
       matrix:
@@ -336,8 +341,10 @@ jobs:
 
   deployment-cleanup:
     name: Clean up deployment in PR namespace
-    needs: e2e-api-test
+    needs: [e2e-api-test,admin-teacher]
     if: always()
+    env:
+      CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository
