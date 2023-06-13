@@ -6,6 +6,7 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HomeService } from '../service/home.service';
 import { of } from 'rxjs';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('InviteStudentModalComponent', () => {
   let component: InviteStudentModalComponent;
@@ -14,10 +15,10 @@ describe('InviteStudentModalComponent', () => {
   let homeService : HomeService;
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MatLegacyDialogModule, HttpClientTestingModule],
+      imports: [MatLegacyDialogModule, HttpClientTestingModule, BrowserAnimationsModule],
       declarations: [ InviteStudentModalComponent ],
       providers: [UntypedFormBuilder, MatSnackBar, HomeService,
-        { provide: MatDialogRef, useValue:  MatDialogRef<InviteStudentModalComponent>},
+        { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close']) },
         { provide: MAT_DIALOG_DATA, useValue:  { mode: 'Cohort', init_data: { name: ''}, extra_data:[] }}
       ]
     })
