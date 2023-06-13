@@ -91,14 +91,14 @@ jobs:
         secret_no=$(shuf -n1 -i 1-4)
         account=$(gcloud secrets versions access latest --secret="org-test-user-$secret_no-username")
         echo "CLASSROOM_ADMIN_EMAIL=$account" >> "$GITHUB_ENV"
-        echo ${{env.CLASSROOM_ADMIN_EMAIL}}
+        echo ${{ env.CLASSROOM_ADMIN_EMAIL }}
 
   deploy:
     name: Deploy all microservices in PR namespace
     runs-on: ubuntu-latest
     needs: admin-teacher
     env:
-      CLASSROOM_ADMIN_EMAIL: ${{env.CLASSROOM_ADMIN_EMAIL}}
+      CLASSROOM_ADMIN_EMAIL: ${{ env.CLASSROOM_ADMIN_EMAIL }}
     steps:
     - name: echo NAMESPACE and PREFIX
       run: |
