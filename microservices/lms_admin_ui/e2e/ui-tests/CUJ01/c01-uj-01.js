@@ -10,8 +10,8 @@ Scenario('User opens login page and sees login button', async ({ I }) => {
 });
 
 Scenario('User sees Dashboard after logged in.', async ({ I }) => {
-  I.fillField('Email', 'saurav.minimi@gmail.com');
-  I.fillField('Password', 'Saurav@412');
+  I.fillField('Email', 'e2e_7112f773_1a53_email@gmail.com');
+  I.fillField('Password', '!45RK&2L!m9%Ef');
   I.click('Login');
   I.wait(5)
   I.see('Course Template List');
