@@ -286,31 +286,13 @@ jobs:
         
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
-    
-    - name: Checkout external repo
-      id: checkout_external_repo
-      uses: actions/checkout@v3
-      with:
-        repository: GPS-Solutions/ailearning-backend
-        ref: clp-feature-branch
-        # adding run_id so we can fold in the repo without collision
-        path: ${{ format('ailearning-backend_{0}', github.run_id) }}
-        token: ${{ secrets.GH_PAT }}
 
-    - name: Build and deploy external services to cluster
+    - name: Set up port forwarding
       run: |
-        pushd ${{ format('ailearning-backend_{0}', github.run_id) }}
-        NAMESPACE=$E2E_NAMESPACE_PREFIX 
-        export DATABASE_PREFIX=$E2E_PREFIX
-        export GCP_PROJECT=$PROJECT_ID
-        skaffold run \
-        -p custom \
-        --module authentication,redis,user-management,student-learner-profile,learning-record-service \
-        --namespace $NAMESPACE \
-        -l commit=$GITHUB_SHA \
-        --tag PR${{ github.event.pull_request.number }} 
-        popd
-
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        python -m pip install -r e2e/requirements.txt
+        python e2e/utils/port_forward.py --namespace $NAMESPACE
+    
     - name: Install wait-for-it
       run: sudo apt install -y wait-for-it
 
