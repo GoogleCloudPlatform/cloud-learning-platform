@@ -39,3 +39,4 @@ from .learning_record import *
 from .session import *
 from .faq import *
 from .staff import *
+from .lms_job import *
