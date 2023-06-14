@@ -16,7 +16,7 @@ import { LtiService } from '../service/lti.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { By } from '@angular/platform-browser';
 
-fdescribe('ToolFormComponent', () => {
+describe('ToolFormComponent', () => {
   let component: ToolFormComponent;
   let fixture: ComponentFixture<ToolFormComponent>;
   let ltiService: LtiService;
@@ -73,7 +73,7 @@ fdescribe('ToolFormComponent', () => {
     }
     // create tool heading
     const headingElement = fixture.debugElement.query(By.css('h1'))
-    expect(headingElement.nativeElement.textContent.toLowerCase().trim()).toBe('Create Tool')
+    expect(headingElement.nativeElement.textContent.toLowerCase().toLowerCase().trim()).toBe('create tool')
     // insert in name input field
     const nameElement = fixture.debugElement.query(By.css(`input[formControlName='name']`));
     const nameInput = nameElement.nativeElement as HTMLInputElement;
