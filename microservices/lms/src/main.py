@@ -24,12 +24,8 @@ from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import add_exception_handlers
 from fastapi import FastAPI, Request, Depends
 import config
-from routes import (
-  section,student,
-  course_template,cohort,
-  classroom_courses,analytics
-  # ,user
-        )
+from routes import (section, student, course_template, cohort,
+                    classroom_courses, analytics, lms_job)
 
 app = FastAPI()
 
@@ -62,11 +58,9 @@ async def add_process_time_header(request: Request, call_next):
     try:
       client_ip = request.headers.getlist("X-Forwarded-For")[0].split(",")[0]
     except IndexError:
-      client_ip=f"{request.client.host}:{request.client.port}"
-    Logger.info(
-      f"{client_ip} - {method} {path}" +
-      f" Time elapsed: {str(time_elapsed)} ms Status: {status}"
-      )
+      client_ip = f"{request.client.host}:{request.client.port}"
+    Logger.info(f"{client_ip} - {method} {path}" +
+                f" Time elapsed: {str(time_elapsed)} ms Status: {status}")
   return response
 
 
@@ -93,16 +87,17 @@ api.include_router(course_template.router)
 api.include_router(classroom_courses.router)
 api.include_router(cohort.router)
 api.include_router(analytics.router)
+api.include_router(lms_job.router)
 
 add_exception_handlers(app)
 add_exception_handlers(api)
 app.mount("/lms/api/v1", api)
 
-
 if __name__ == "__main__":
-  uvicorn.run("main:app",
-              host="0.0.0.0",
-              port=int(config.PORT),
-              log_level="debug",
-              reload=True,
-              access_log=config.ENABLE_UVICORN_LOGS)
+  uvicorn.run(
+      "main:app",
+      host="0.0.0.0",
+      port=int(config.PORT),
+      log_level="debug",
+      reload=True,
+      access_log=config.ENABLE_UVICORN_LOGS)

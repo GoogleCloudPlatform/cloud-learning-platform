@@ -45,59 +45,47 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
   try:
     nrps_id = f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{context_id}/memberships"
 
-    get_section_url = f"http://lms/lms/api/v1/sections/{context_id}"
+    get_context_url = f"http://classroom-shim/classroom-shim/api/v1/contexts/{context_id}"
 
-    section_res = requests.get(
-        url=get_section_url,
+    context_res = requests.get(
+        url=get_context_url,
         headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
         timeout=60)
 
-    if section_res.status_code == 200:
-      section_data = section_res.json().get("data")
+    if context_res.status_code == 200:
+      context_data = context_res.json().get("data")
     else:
-      raise Exception(
-          f"Internal error from LMS get section API with status code - {section_res.status_code}"
+      Logger.error(
+          f"Error 1210: Internal error from Shim service get context API with \
+             Status code: {context_res.status_code}; Response: {context_res.text}"
       )
+      raise Exception("Request failed with error code 1210")
 
     context_details = {
-        "id": section_data.get("id"),
-        "label": section_data.get("section"),
-        "title": section_data.get("description")
+        "id": context_data.get("id"),
+        "label": context_data.get("description"),
+        "title": context_data.get("name")
     }
+
+    context_type = context_data.get("context_type")
 
     members_list = []
     members_data = []
-    get_teachers_members_url = f"http://lms/lms/api/v1/sections/{context_id}/teachers"
 
-    teachers_res = requests.get(
-        url=get_teachers_members_url,
+    get_members_url = f"http://classroom-shim/classroom-shim/api/v1/contexts/{context_id}/members?context_type={context_type}"
+    members_res = requests.get(
+        url=get_members_url,
         headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
         timeout=60)
 
-    if teachers_res.status_code == 200:
-      teachers_data = teachers_res.json().get("data")
+    if members_res.status_code == 200:
+      members_data = members_res.json().get("data")
     else:
-      raise Exception(
-          f"Internal error from LMS get teachers API with status code - {teachers_res.status_code}"
+      Logger.error(
+          f"Error 1220: Internal error from Shim service get members API with \
+             Status code: {members_res.status_code}; Response: {members_res.text}"
       )
-
-    members_data.extend(teachers_data)
-
-    get_student_members_url = f"http://lms/lms/api/v1/sections/{context_id}/students"
-
-    student_res = requests.get(
-        url=get_student_members_url,
-        headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
-        timeout=60)
-
-    if student_res.status_code == 200:
-      student_data = student_res.json().get("data")
-    else:
-      raise Exception(
-          f"Internal error from LMS get students API with status code - {student_res.status_code}"
-      )
-
-    members_data.extend(student_data)
+      raise Exception("Request failed with error code 1220")
 
     for member in members_data:
       if member.get("user_type") == "learner" and member.get(
@@ -105,12 +93,20 @@ def get_context_members(context_id: str, token: auth_scheme = Depends()):
         pass
 
       else:
+        member_name = member.get("first_name", "") + " " + member.get(
+            "last_name", "")
+
+        if member.get("enrollment_status"):
+          member_status = member.get("enrollment_status").capitalize()
+        else:
+          member_status = "Active"
+
         members_info = {
             "user_id": member.get("user_id"),
-            "status": "Active",
+            "status": member_status,
             "given_name": member.get("first_name"),
             "family_name": member.get("last_name"),
-            "name": member.get("first_name", "") + member.get("last_name", ""),
+            "name": member_name,
             "email": member.get("email"),
             "picture": member.get("photo_url"),
             "lis_person_sourcedid": member.get("user_id")

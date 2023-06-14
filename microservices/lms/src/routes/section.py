@@ -1,7 +1,7 @@
 """ Section endpoints """
 import traceback
 import datetime
-from common.models import Cohort, CourseTemplate, Section, CourseEnrollmentMapping
+from common.models import Cohort, CourseTemplate, Section, LmsJob, CourseEnrollmentMapping
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ClassroomHttpException,
                                           InternalServerError,
@@ -24,7 +24,8 @@ from schemas.section import (
     GetTeacherResponseModel,AssignmentModel,GetCourseWorkList,
     ImportGradeResponseModel,
     EnrollTeacherSection,DeleteTeacherFromSectionResponseModel,
-    UpdateEnrollmentStatusSectionModel)
+    UpdateEnrollmentStatusSectionModel,
+    DeleteFailedSectionSectionModel,UpdateInviteResponseModel)
 from schemas.update_section import UpdateSection
 from services.section_service import copy_course_background_task,\
 update_grades,add_teacher
@@ -84,19 +85,41 @@ def create_section(sections_details: SectionDetails,
         course_template_details.classroom_id)
     if current_course is None:
       raise ResourceNotFoundException(
-          "classroom  with id" +
+          "classroom with id" +
           f" {course_template_details.classroom_id} is not found")
-    background_tasks.add_task(copy_course_background_task,
-                              course_template_details=course_template_details,
-                              sections_details=sections_details,
-                              cohort_details=cohort_details,
-                              message="started process")
-    Logger.info(f"Background Task called for the cohort id {cohort_details.id}\
+
+    lms_job_input = {
+        "job_type": "course_copy",
+        "status": "ready",
+        "input_data": {**sections_details.dict()},
+        "logs": {
+            "info": [],
+            "errors": []
+        }
+    }
+
+    lms_job = LmsJob.from_dict(lms_job_input)
+    lms_job.save()
+
+    background_tasks.add_task(
+        copy_course_background_task,
+        course_template_details=course_template_details,
+        sections_details=sections_details,
+        cohort_details=cohort_details,
+        lms_job_id=lms_job.id,
+        message="Create section background task completed")
+    info_msg = f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
-                 section name{sections_details.name}")
+                 section name {sections_details.name}"
+    Logger.info(info_msg)
+
+    lms_job.logs["info"].append(info_msg)
+    lms_job.update()
+
     return {
         "success": True,
-        "message": "Section will be created shortly",
+        "message": "Section will be created shortly, " +
+                    f"use this job id - '{lms_job.id}' for more info",
         "data": None
     }
   except ResourceNotFoundException as err:
@@ -618,8 +641,26 @@ def import_grade(section_id: str, coursework_id: str,
   """
   try:
     section = Section.find_by_id(section_id)
-    result = classroom_crud.get_course_work(section.classroom_id,
-                                            coursework_id)
+    result = classroom_crud.get_course_work(section.classroom_id, coursework_id)
+
+    lms_job_input = {
+        "job_type": "grade_import",
+        "status": "ready",
+        "section_id": section_id,
+        "classroom_id": section.classroom_id,
+        "input_data": {
+            "section_id": section_id,
+            "coursework_id": coursework_id
+        },
+        "logs": {
+            "info": [],
+            "errors": []
+        }
+    }
+
+    lms_job = LmsJob.from_dict(lms_job_input)
+    lms_job.save()
+
     #Get url mapping of google forms view links and edit ids
     is_google_form_present = False
     if "materials" in result.keys():
@@ -627,14 +668,24 @@ def import_grade(section_id: str, coursework_id: str,
         if "form" in material.keys():
           is_google_form_present = True
           background_tasks.add_task(update_grades, material, section,
-                                    coursework_id)
+                                    coursework_id, lms_job.id)
 
       if is_google_form_present:
-        return {"message": "Grades for coursework will be updated shortly"}
+        return {
+            "message":
+                "Grades for coursework will be updated shortly, " +
+                f"use this job id - '{lms_job.id}' for more info"
+        }
       else:
+        lms_job.logs["errors"].append(
+            f"Form is not present for coursework_id {coursework_id}")
+        lms_job.update()
         raise ResourceNotFoundException(
             f"Form is not present for coursework_id {coursework_id}")
     else:
+      lms_job.logs["errors"].append(
+            f"Form is not present for coursework_id {coursework_id}")
+      lms_job.update()
       raise ResourceNotFoundException(
           f"Form is not present for coursework_id {coursework_id}")
   except HttpError as hte:
@@ -657,7 +708,6 @@ def import_grade(section_id: str, coursework_id: str,
               response_model=UpdateEnrollmentStatusSectionModel)
 def update_enrollment_status(section_id:str,enrollment_status: str):
   """Update enrollment status for a section
-
   Args:
     section_id(str): id of the section in firestore
     status: enrollment status of the section
@@ -708,4 +758,143 @@ def update_enrollment_status(section_id:str,enrollment_status: str):
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+@router.delete("/cronjob/delete_failed_to_provision_section",
+               response_model=DeleteFailedSectionSectionModel)
+def failed_to_provision():
+  """Get a section details from db and archive record
+  from section collection and
+  google classroom course
+
+  Args:
+      section_id (str): section_id in firestore
+  Raises:
+      HTTPException: 500 Internal Server Error if something fails
+      ResourceNotFound: 404 Section with section id is not found
+  Returns:
+    {"message": "Successfully deleted section"}
+  """
+  try:
+    sections = Section.get_section_by_status("FAILED_TO_PROVISION")
+    count=0
+    for section in sections:
+      try :
+        Logger.info(f"Section details {section.id} {section.created_time}")
+        time_difference = datetime.datetime.utcnow().replace(
+          tzinfo=datetime.timezone.utc) - section.created_time
+        if time_difference.days >= 7:
+          classroom_course = classroom_crud.get_course_by_id(
+            section.classroom_id)
+          # Delete drive folder of classroom
+          folder_id = classroom_course["teacherFolder"]["id"]
+          Logger.info(f"{folder_id} {section.name}")
+          # Update state of course
+          classroom_crud.update_course_state(section.classroom_id,"ARCHIVED")
+          Logger.info(f"Delete_drive folder {type(classroom_course)}")
+          classroom_crud.delete_drive_folder(
+            classroom_course["teacherFolder"]["id"])
+          course_enrollments =CourseEnrollmentMapping.fetch_users_by_section(
+            section.key)
+          Logger.info(f"Course enrollments {course_enrollments}")
+          for course_enrollment in course_enrollments:
+            CourseEnrollmentMapping.delete_by_id(course_enrollment.id)
+          classroom_crud.delete_course_by_id(section.classroom_id)
+          Section.delete_by_id(section.id)
+          Logger.info(f"Deleted section with id \
+                {section.id} classroom_id {section.classroom_id} {folder_id}")
+          count=count+1
+      except HttpError as ae:
+        Logger.error(ae)
+        Logger.error(f"Delete course failed for section_id {section.id} \
+                    {section.classroom_id}")
+        continue
+    return {
+        "data":count,
+        "message": f"Successfully archived the Section with id {count}"
+    }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+@router.patch("/{section_id}/update_invites",
+                              response_model=UpdateInviteResponseModel)
+def update_invites(section_id:str):
+  """
+  Args:
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    : if the student successfully added,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    course_records = CourseEnrollmentMapping.collection.filter(
+        "status", "==", "invited").filter(
+      "section", "==", "sections/"+section_id).fetch()
+    updated_list_inviations = []
+    for course_record in course_records:
+      Logger.info(f"course_record {course_record.section.id}, " +
+                  f"user_id {course_record.user.id}")
+      if course_record.invitation_id:
+        try:
+          result = classroom_crud.get_invite(course_record.invitation_id)
+          Logger.info(
+              f"Invitation {result} found for User id {course_record.user.id},\
+          course_enrollment_id {course_record.id} database will be updated\
+          once invite is accepted.")
+        except HttpError as ae:
+          Logger.info(f"Get invite response status code {ae.resp.status}")
+          Logger.info(
+              f"Could not get the invite for user_id {course_record.user.id}\
+          section_id{course_record.section.id}\
+           course_enrollment id {course_record.id}")
+          # user_details = classroom_crud.get_user_details(
+          #     user_id=course_record.user, headers=headers)
+          # Logger.info(f"User record found for User {user_details}")
+          user_profile = classroom_crud.get_user_profile_information(
+              course_record.user.email)
+          user_ref = course_record.user
+          # Check if gaia_id is "" if yes so update personal deatils
+          if user_ref.gaia_id == "":
+            user_ref.first_name = user_profile["name"]["givenName"]
+            user_ref.last_name = user_profile["name"]["familyName"]
+            user_ref.gaia_id = user_profile["id"]
+            user_ref.photo_url = user_profile["photoUrl"]
+            user_ref.update()
+          course_record.status = "active"
+          course_record.update()
+          updated_list_inviations.append(course_record.key)
+          Logger.info(
+              f"Successfully  updated the invitations {updated_list_inviations}"
+          )
+    return {
+        "message": "Successfully  updated the invitations",
+        "data": {
+            "list_coursenrolment": updated_list_inviations
+        }
+    }
+  except ResourceNotFoundException as err:
+    error = traceback.format_exc().replace("\n", " ")
+    Logger.error(error)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                                 message=str(ae)) from ae
+  except Exception as e:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
     raise InternalServerError(str(e)) from e

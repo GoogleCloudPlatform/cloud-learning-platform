@@ -5,6 +5,7 @@ import os
 import mock
 import pytest
 import datetime
+from datetime import timedelta
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from common.models.section import Section
@@ -629,8 +630,8 @@ def test_form_grade_import_form_with_no_response(client_with_emulator,
           resp = client_with_emulator.patch(url)
   result_json = resp.json()
   assert resp.status_code == 202, "Status 202"
-  assert result_json[
-      "message"] == "Grades for coursework will be updated shortly", "message"
+  assert "Grades for coursework will be updated shortly" in result_json[
+    "message"] ,"message"
 
 
 def test_form_grade_import_form_with_response(client_with_emulator,
@@ -657,8 +658,8 @@ def test_form_grade_import_form_with_response(client_with_emulator,
               resp = client_with_emulator.patch(url)
   resp_json = resp.json()
   assert resp.status_code == 202, "Status 202"
-  assert resp_json[
-      "message"] == "Grades for coursework will be updated shortly", "message"
+  assert "Grades for coursework will be updated shortly" in resp_json[
+    "message"] ,"message"
 
 def test_update_enrollment_status(client_with_emulator, create_fake_data):
   url = BASE_URL + \
@@ -674,3 +675,62 @@ def test_negative_update_enrollment_status(
   with mock.patch("routes.section.insert_rows_to_bq"):
     resp = client_with_emulator.patch(url)
   assert resp.status_code == 422
+
+def test_delete_section_cronjob(client_with_emulator,create_fake_data):
+  section = Section.find_by_id(create_fake_data["section"])
+  section.status = "FAILED_TO_PROVISION"
+  section.created_time = datetime.datetime.utcnow() - timedelta(days=8)
+  section.update()
+  url = BASE_URL + "/sections/cronjob/delete_failed_to_provision_section"
+  with mock.patch(
+        "routes.section.classroom_crud.get_course_by_id",
+                return_value={"teacherFolder":{"id":"123344"}}):
+    with mock.patch("routes.section.classroom_crud.update_course_state"
+    ):
+      with mock.patch(
+"routes.section.classroom_crud.delete_drive_folder"):
+        with mock.patch(
+        "routes.section.classroom_crud.delete_course_by_id"):
+          resp = client_with_emulator.delete(url)
+  resp_json = resp.json()
+  assert resp.status_code == 200, "Status 200"
+  assert resp_json[
+    "message"] == "Successfully archived the Section with id 1","message"
+  assert resp_json["data"] == 1
+
+def test_delete_section_cronjob_for_active_section(client_with_emulator,
+                                      ):
+
+  url = BASE_URL + "/sections/cronjob/delete_failed_to_provision_section"
+  with mock.patch(
+        "routes.section.classroom_crud.get_course_by_id",
+                return_value={"teacherFolder":{"id":"123344"}}):
+    with mock.patch("routes.section.classroom_crud.update_course_state"
+    ):
+      with mock.patch(
+"routes.section.classroom_crud.delete_drive_folder"):
+        with mock.patch(
+        "routes.section.classroom_crud.delete_course_by_id"):
+          resp = client_with_emulator.delete(url)
+  resp_json = resp.json()
+  assert resp.status_code == 200, "Status 200"
+  assert resp_json["data"] == 0
+  assert resp_json[
+    "message"] == "Successfully archived the Section with id 0","message"
+
+def test_update_invites(client_with_emulator,create_fake_data):
+  section_id =create_fake_data["section"]
+  url = BASE_URL + f"/sections/{section_id}/update_invites"
+  with mock.patch\
+  ("routes.section.classroom_crud.get_invite",
+   return_value={
+      "id": "NTk1MjkyNTc2Mzk4KjU5OTI5MzU5NTA3OFpa",
+      "courseId": "595292576398",
+      "role": "STUDENT"
+        }):
+    with mock.patch(
+    "routes.section.classroom_crud.get_user_profile_information"):
+      with mock.patch("routes.section.Logger"):
+        resp = client_with_emulator.patch(url)
+  print("Update invitest status code",resp.status_code,resp.json())
+  assert resp.status_code == 200

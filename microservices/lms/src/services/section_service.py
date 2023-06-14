@@ -4,15 +4,14 @@ import datetime
 import requests
 from common.utils import classroom_crud
 from common.utils.bq_helper import insert_rows_to_bq
-from common.utils.secrets import get_backend_robot_id_token
 from common.utils.logging_handler import Logger
 from common.models import (Section, CourseEnrollmentMapping,
-                           CourseTemplateEnrollmentMapping, User)
+                           CourseTemplateEnrollmentMapping, User, LmsJob)
 from common.utils.http_exceptions import (InternalServerError,
                                           ResourceNotFound)
 from common.utils.errors import ValidationError
 from services import common_service
-from config import BQ_TABLE_DICT, BQ_DATASET
+from config import BQ_TABLE_DICT, BQ_DATASET, auth_client
 
 
 # disabling for linting to pass
@@ -20,6 +19,7 @@ from config import BQ_TABLE_DICT, BQ_DATASET
 def copy_course_background_task(course_template_details,
                                 sections_details,
                                 cohort_details,
+                                lms_job_id,
                                 message=""):
   """Create section  Background Task to copy course and updated database
   for newly created section
@@ -36,15 +36,25 @@ def copy_course_background_task(course_template_details,
   Returns:
     True : (bool) on success
   """
+  lms_job = LmsJob.find_by_id(lms_job_id)
+  logs = lms_job.logs
   try:
     # Create a new course
-    Logger.info(
-        f"Background Task started for the cohort id {cohort_details.id}\
+    info_msg = f"Background Task started for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} \
-                with section name{sections_details.name}")
+                with section name{sections_details.name}"
+
+    logs["info"].append(info_msg)
+    Logger.info(info_msg)
+
     new_course = classroom_crud.create_course(course_template_details.name,
                                               sections_details.description,
                                               sections_details.name, "me")
+
+    lms_job.classroom_id = new_course["id"]
+    lms_job.start_time = datetime.datetime.utcnow()
+    lms_job.status = "running"
+    lms_job.update()
 
     # Create section with the required fields
     section = Section()
@@ -63,15 +73,19 @@ def copy_course_background_task(course_template_details,
     section_id = section.save().id
     classroom_id = new_course["id"]
 
+    lms_job.section_id = section_id
+    lms_job.update()
+
     error_flag = False
     target_folder_id = new_course["teacherFolder"]["id"]
+    logs["info"].append(
+        f"ID of target drive folder for section {target_folder_id}")
     Logger.info(f"ID of target drive folder for section {target_folder_id}")
 
     # Get topics of current course
     topics = classroom_crud.get_topics(course_template_details.classroom_id)
     # add new_course to pubsub topic for both course work and roaster changes
-    classroom_crud.enable_notifications(new_course["id"],
-                                        "COURSE_WORK_CHANGES")
+    classroom_crud.enable_notifications(new_course["id"], "COURSE_WORK_CHANGES")
     classroom_crud.enable_notifications(new_course["id"],
                                         "COURSE_ROSTER_CHANGES")
     # add instructional designer
@@ -96,8 +110,7 @@ def copy_course_background_task(course_template_details,
     # google form which returns
     # a dictionary of view_links as keys and edit
     #  links/  and file_id as values for all drive files
-    url_mapping = classroom_crud.\
-            get_edit_url_and_view_url_mapping_of_form()
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
 
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework_list(
@@ -112,6 +125,7 @@ def copy_course_background_task(course_template_details,
 
         lti_assignment_details = {
             "section_id": section_id,
+            "coursework_title": coursework["title"],
             "start_date": None,
             "end_date": None,
             "due_date": None
@@ -124,12 +138,15 @@ def copy_course_background_task(course_template_details,
           if coursework.get("dueTime"):
             coursework_due_time = coursework.get("dueTime")
             coursework_due_datetime = datetime.datetime(
-                coursework_due_date.get("year"), coursework_due_date.get("month"),
-                coursework_due_date.get("day"), coursework_due_time.get("hours", 0),
+                coursework_due_date.get("year"),
+                coursework_due_date.get("month"),
+                coursework_due_date.get("day"),
+                coursework_due_time.get("hours", 0),
                 coursework_due_time.get("minutes", 0))
           else:
             coursework_due_datetime = datetime.datetime(
-                coursework_due_date.get("year"), coursework_due_date.get("month"),
+                coursework_due_date.get("year"),
+                coursework_due_date.get("month"),
                 coursework_due_date.get("day"))
 
           curr_utc_timestamp = datetime.datetime.utcnow()
@@ -167,9 +184,12 @@ def copy_course_background_task(course_template_details,
               materials=coursework["materials"],
               url_mapping=url_mapping,
               target_folder_id=target_folder_id,
+              error_flag=error_flag,
               coursework_type="coursework",
-              lti_assignment_details=lti_assignment_details)
+              lti_assignment_details=lti_assignment_details,
+              logs=logs)
           coursework["materials"] = coursework_update_output["material"]
+          error_flag = coursework_update_output["error_flag"]
           coursework_lti_assignment_ids.extend(
               coursework_update_output["lti_assignment_ids"])
         # final_coursewok.append(coursework)
@@ -184,17 +204,23 @@ def copy_course_background_task(course_template_details,
           lti_assignment_req = requests.patch(
               f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
               headers={
-                  "Authorization": f"Bearer {get_backend_robot_id_token()}"
+                  "Authorization": f"Bearer {auth_client.get_id_token()}"
               },
               json=input_json,
               timeout=60)
 
           if lti_assignment_req.status_code != 200:
             error_flag = True
-            Logger.error(
-                f"Failed to update assignment {assignment_id} with course work id {coursework_id} due to error - {lti_assignment_req.text} with status code - {lti_assignment_req.status_code}"
-            )
+            error_msg = f"Failed to update assignment {assignment_id} with course work id \
+                          {coursework_id} due to error - {lti_assignment_req.text} with \
+                            status code - {lti_assignment_req.status_code}"
 
+            logs["errors"].append(error_msg)
+            Logger.error(error_msg)
+
+          logs["info"].append(
+              f"Updated the course work id for new LTI assignment - {assignment_id}"
+          )
           Logger.info(
               f"Updated the course work id for new LTI assignment - {assignment_id}"
           )
@@ -202,8 +228,11 @@ def copy_course_background_task(course_template_details,
       except Exception as error:
         title = coursework["title"]
         error_flag = True
-        Logger.error(f"Get coursework failed for \
-              course_id{course_template_details.classroom_id} for {title}")
+        logs["errors"].append(f"Error - {error} for '{title}'")
+        logs["errors"].append(f"Copy coursework failed for \
+              course_id {course_template_details.classroom_id} for '{title}'")
+        Logger.error(f"Copy coursework failed for \
+              course_id {course_template_details.classroom_id} for '{title}'")
         error = traceback.format_exc().replace("\n", " ")
         Logger.error(error)
         continue
@@ -229,17 +258,24 @@ def copy_course_background_task(course_template_details,
           coursework_material_update_output = update_coursework_material(
               materials=coursework_material["materials"],
               url_mapping=url_mapping,
-              target_folder_id=target_folder_id)
+              target_folder_id=target_folder_id,
+              error_flag=error_flag,
+              logs=logs)
 
           coursework_material["materials"] = coursework_material_update_output[
               "material"]
+          error_flag = coursework_update_output["error_flag"]
           print("Updated coursework material attached")
         final_coursewok_material.append(coursework_material)
       except Exception as error:
         title = coursework_material["title"]
         error_flag = True
         Logger.error(f"Get coursework material failed for\
-        course_id{course_template_details.classroom_id} for {title}")
+        course_id {course_template_details.classroom_id} for {title}")
+
+        logs["errors"].append(f"Error - {error}")
+        logs["errors"].append(f"Get coursework material failed for\
+        course_id {course_template_details.classroom_id} for {title}")
         error = traceback.format_exc().replace("\n", " ")
         Logger.error(error)
         continue
@@ -268,27 +304,52 @@ def copy_course_background_task(course_template_details,
         "maxStudents": section.max_students,
           "timestamp":datetime.datetime.utcnow()
     }]
-    insert_rows_to_bq(rows=rows,
-                      dataset=BQ_DATASET,
-                      table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
+    insert_rows_to_bq(
+        rows=rows,
+        dataset=BQ_DATASET,
+        table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
     Logger.info(message)
     Logger.info(f"Background Task Completed for section Creation for cohort\
                 {cohort_details.id}")
     Logger.info(f"Section Details are section id {section_id},\
                 classroom id {classroom_id}")
+
+    logs["info"].append(
+        f"Background Task Completed for section Creation for cohort\
+                {cohort_details.id}")
+    logs["info"].append(f"Section Details are section id {section_id},\
+                classroom id {classroom_id}")
+
+    lms_job.logs = logs
+    if error_flag:
+      lms_job.status = "failed"
+    else:
+      lms_job.status = "success"
+    lms_job.end_time = datetime.datetime.utcnow()
+    lms_job.update()
+
     return True
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(error)
     Logger.error(e)
+
+    logs["errors"].append(str(e))
+    lms_job.logs = logs
+    lms_job.end_time = datetime.datetime.utcnow()
+    lms_job.status = "failed"
+    lms_job.update()
+
     raise InternalServerError(str(e)) from e
 
 
 def update_coursework_material(materials,
                                url_mapping,
                                target_folder_id,
+                               error_flag,
                                coursework_type=None,
-                               lti_assignment_details=None):
+                               lti_assignment_details=None,
+                               logs=None):
   """Takes the material attached to any type of cursework and copy it in the
     target folder Id also removes duplicates from material list
   Args:
@@ -336,13 +397,15 @@ def update_coursework_material(materials,
             split_url = link["url"].split(
                 "/classroom-shim/api/v1/launch?lti_assignment_id=")
             lti_assignment_id = split_url[-1]
+            coursework_title = lti_assignment_details.get("coursework_title")
+            logs["info"].append(
+                f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'")
             Logger.info(
-                f"LTI Course copy started for assignment - {lti_assignment_id}"
-            )
+                f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'")
             copy_assignment = requests.post(
                 "http://classroom-shim/classroom-shim/api/v1/lti-assignment/copy",
                 headers={
-                    "Authorization": f"Bearer {get_backend_robot_id_token()}"
+                    "Authorization": f"Bearer {auth_client.get_id_token()}"
                 },
                 json={
                     "lti_assignment_id": lti_assignment_id,
@@ -365,17 +428,22 @@ def update_coursework_material(materials,
                       "url": updated_material_link_url
                   }})
               Logger.info(
-                  f"LTI link updated for new assignment - {new_lti_assignment_id}"
+                  f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}', new assignment id - {new_lti_assignment_id}"
               )
-              Logger.info(
-                  f"LTI Course copy completed for assignment - {lti_assignment_id}"
+              logs["info"].append(
+                  f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}', new assignment id - {new_lti_assignment_id}"
               )
             else:
-              Logger.error(
-                  f"Copying an LTI Assignment failed for {lti_assignment_id}\
+              logs["info"].append(
+                  f"LTI Course copy failed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'"
+              )
+              error_msg = f"Copying an LTI Assignment failed for {lti_assignment_id}, coursework title - '{coursework_title}'\
                            in the new section {lti_assignment_details.get('section_id')} with status code: \
                            {copy_assignment.status_code} and error msg: {copy_assignment.text}"
-              )
+
+              logs["errors"].append(error_msg)
+              Logger.error(error_msg)
+              error_flag = True
           else:
             updated_material.append({"link": material["link"]})
 
@@ -384,8 +452,11 @@ def update_coursework_material(materials,
             split_url = link["url"].split(
                 "/classroom-shim/api/v1/launch?lti_assignment_id=")
             lti_assignment_id = split_url[-1]
+            logs["info"].append(
+                f"LTI link removed in course work material with assignment ID - '{lti_assignment_id}'"
+            )
             Logger.info(
-                f"LTI link removed in course work material with assignment ID - {lti_assignment_id}"
+                f"LTI link removed in course work material with assignment ID - '{lti_assignment_id}'"
             )
           else:
             updated_material.append({"link": material["link"]})
@@ -396,8 +467,8 @@ def update_coursework_material(materials,
       if "title" not in material["form"].keys():
         raise ResourceNotFound("Form to be copied is deleted")
       result1 = classroom_crud.drive_copy(
-          url_mapping[material["form"]["formUrl"]]["file_id"],
-          target_folder_id, material["form"]["title"])
+          url_mapping[material["form"]["formUrl"]]["file_id"], target_folder_id,
+          material["form"]["title"])
       material["link"] = {
           "title": material["form"]["title"],
           "url": result1["webViewLink"]
@@ -407,61 +478,112 @@ def update_coursework_material(materials,
 
   return {
       "material": updated_material,
+      "error_flag": error_flag,
       "lti_assignment_ids": lti_assignment_ids
   }
 
 
-def update_grades(material, section, coursework_id):
-  """Takes the forms all responses ,section, and coursework_id aInd
+def update_grades(material, section, coursework_id, lms_job_id):
+  """Takes the forms all responses ,section, and coursework_id and
   updates the grades of student who have responsed to form and
   submitted the coursework
   """
-  student_grades = {}
-  count = 0
-  Logger.info(f"Student grade update background tasks started\
-              for coursework_id {coursework_id}")
-  #Get url mapping of google forms view links and edit ids
-  url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
-  form_details = url_mapping[material["form"]["formUrl"]]
+  lms_job = LmsJob.find_by_id(lms_job_id)
+  logs = lms_job.logs
 
-  form_id = form_details["file_id"]
-  # Get all responses for the form if no responses of
-  # the form then return
-  all_responses_of_form = classroom_crud.\
-  retrieve_all_form_responses(form_id)
-  if all_responses_of_form == {}:
-    Logger.error("Responses not available for google form")
-  for response in all_responses_of_form["responses"]:
-    try:
-      if "respondentEmail" not in response.keys():
-        raise Exception(f"Respondent Email is not collected in form for\
-        coursework {coursework_id} Update form settings to collect Email")
-      respondent_email = response["respondentEmail"]
-      submissions = classroom_crud.list_coursework_submissions_user(
-          section.classroom_id, coursework_id, response["respondentEmail"])
-      if submissions:
-        if submissions[0]["state"] == "TURNED_IN":
-          Logger.info(f"Updating grades for {respondent_email}")
-          if "totalScore" not in response.keys():
-            response["totalScore"] = 0
-          classroom_crud.patch_student_submission(section.classroom_id,
-                                                  coursework_id,
-                                                  submissions[0]["id"],
-                                                  response["totalScore"],
-                                                  response["totalScore"])
-          count += 1
-          student_grades[response["respondentEmail"]] = response["totalScore"]
-          Logger.info(f"Updated grades for {respondent_email}")
-        else:
-          Logger.info(f"Submission state is not turn in {respondent_email}")
-    except Exception as e:
-      error = traceback.format_exc().replace("\n", " ")
-      Logger.error(error)
-      Logger.error(e)
-      continue
-  Logger.info(f"Student grades updated\
-                for {count} student_data {student_grades}")
-  return count, student_grades
+  try:
+    student_grades = {}
+    count = 0
+
+    info_msg = f"Student grade update background tasks started\
+                for coursework_id {coursework_id}"
+
+    logs["info"].append(info_msg)
+    Logger.info(info_msg)
+    lms_job.start_time = datetime.datetime.utcnow()
+    lms_job.status = "running"
+    lms_job.update()
+
+    #Get url mapping of google forms view links and edit ids
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+    form_details = url_mapping[material["form"]["formUrl"]]
+
+    form_id = form_details["file_id"]
+    # Get all responses for the form if no responses of
+    # the form then return
+    all_responses_of_form = classroom_crud.\
+    retrieve_all_form_responses(form_id)
+
+    if all_responses_of_form == {}:
+      logs["errors"].append("Responses not available for google form")
+      Logger.error("Responses not available for google form")
+
+    for response in all_responses_of_form.get("responses", []):
+      try:
+        if "respondentEmail" not in response.keys():
+          error_msg = f"Respondent Email is not collected in form for\
+          coursework {coursework_id} Update form settings to collect Email"
+
+          logs["errors"].append(error_msg)
+          raise Exception(error_msg)
+
+        respondent_email = response["respondentEmail"]
+        submissions = classroom_crud.list_coursework_submissions_user(
+            section.classroom_id, coursework_id, response["respondentEmail"])
+
+        if submissions:
+          if submissions[0]["state"] == "TURNED_IN":
+            logs["info"].append(f"Updating grades for {respondent_email}")
+            Logger.info(f"Updating grades for {respondent_email}")
+
+            if "totalScore" not in response.keys():
+              response["totalScore"] = 0
+            classroom_crud.patch_student_submission(section.classroom_id,
+                                                    coursework_id,
+                                                    submissions[0]["id"],
+                                                    response["totalScore"],
+                                                    response["totalScore"])
+            count += 1
+            student_grades[response["respondentEmail"]] = response["totalScore"]
+            logs["info"].append(f"Updated grades for {respondent_email}")
+            Logger.info(f"Updated grades for {respondent_email}")
+
+          else:
+            logs["info"].append(
+                f"Submission state is not turn in {respondent_email}")
+            Logger.info(f"Submission state is not turn in {respondent_email}")
+
+      except Exception as e:
+        error = traceback.format_exc().replace("\n", " ")
+        Logger.error(error)
+        Logger.error(e)
+        logs["errors"].append(f"Error - {e}")
+        continue
+
+    Logger.info(f"Student grades updated\
+                  for {count} student_data {student_grades}")
+
+    logs["info"].append(f"Student grades updated\
+                  for {count} student_data {student_grades}")
+    lms_job.logs = logs
+    lms_job.end_time = datetime.datetime.utcnow()
+    lms_job.status = "success"
+    lms_job.update()
+
+    return count, student_grades
+
+  except Exception as e:
+    Logger.error(f"Grade import failed due to error - {str(e)}")
+    error = traceback.format_exc().replace("\n", " ")
+    Logger.error(f"Traceback - {error}")
+
+    logs["errors"].append(f"Grade import failed due to error - {str(e)}")
+    lms_job.end_time = datetime.datetime.utcnow()
+    lms_job.logs = logs
+    lms_job.status = "failed"
+    lms_job.update()
+
+    raise InternalServerError(str(e)) from e
 
 
 def add_teacher(headers, section, teacher_email):
@@ -527,7 +649,8 @@ def validate_section(section):
   validate the count of enrolled students ,enrollment status, max_students
   """
   if section.enrolled_students_count >= section.max_students:
-    raise ValidationError("Maximum student count reached for section hence student can't be enrolled"
+    raise ValidationError(
+      "Maximum student count reached for section hence student can't be enrolled"
       )
   Logger.info(f"Enrollment status {section.enrolled_students_count} {section.status}")
   if section.enrollment_status == "CLOSED" or section.status != "ACTIVE":
@@ -548,33 +671,14 @@ def add_instructional_designer_into_section(section, course_template_mapping):
       CourseEnrollmentMapping: enrollment mapping
   """
   invitation_object = classroom_crud.invite_user(
-      section.classroom_id, course_template_mapping.user.email, "TEACHER")
-  try:
-    classroom_crud.acceept_invite(invitation_object["id"],
-                                  course_template_mapping.user.email)
-    # if course_template_mapping.status == "invited":
-    #   user_profile = classroom_crud.\
-    #       get_user_profile_information(course_template_mapping.user.email)
-    #   user = User.find_by_id(course_template_mapping.user.id)
-    #   user.first_name = user_profile["name"]["givenName"]
-    #   user.last_name = user_profile["name"]["familyName"]
-    #   user.gaia_id = user_profile["id"]
-    #   user.photo_url = user_profile["photoUrl"]
-    #   user.update()
-    #   course_template_mapping.status = "active"
-    #   course_template_mapping.invitation_id = ""
-    #   course_template_mapping.update()
-    status = "active"
-    invitation_id = ""
-  except Exception as hte:
-    Logger.info(hte)
-    status = "invited"
-    invitation_id = invitation_object["id"]
+    section.classroom_id, course_template_mapping.user.email, "TEACHER")
+  classroom_crud.acceept_invite(invitation_object["id"],
+                                course_template_mapping.user.email)
+  status = "active"
   course_enrollment_mapping = CourseEnrollmentMapping()
   course_enrollment_mapping.section = section
   course_enrollment_mapping.role = "faculty"
   course_enrollment_mapping.user = course_template_mapping.user
   course_enrollment_mapping.status = status
-  course_enrollment_mapping.invitation_id = invitation_id
   course_enrollment_mapping.save()
   return course_enrollment_mapping

@@ -48,6 +48,9 @@ requires:
 - path: ./microservices/update_invitations_cronjob
   configs: [update-invitations-cronjob]
 
+- path: ./microservices/delete_sections_cronjob
+  configs: [delete-sections-cronjob]
+
 build:
   googleCloudBuild: {}
 

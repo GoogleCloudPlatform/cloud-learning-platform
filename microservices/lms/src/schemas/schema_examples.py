@@ -353,3 +353,21 @@ COURSE_EXAMPLE = {
     "display_setting": "HIDE_OVERALL_GRADE"
 }
 }
+
+LMS_JOB_EXAMPLE = {
+    "id": "vbt1o7bp0n91e",
+    "job_type": "copy_course",
+    "status": "success",
+    "logs": {
+        "errors": ["error1", "error2"],
+        "info": ["info1", "info2"]
+    },
+    "input_data": {
+        "test_input": "test_input_data"
+    },
+    "section_id": "a5vNi2H9v8b34",
+    "classroom_id": "912406891",
+    "created_time": "2023-01-24 17:37:15",
+    "start_time": "2023-01-24 17:38:32",
+    "end_time": "2023-01-24 17:53:17"
+}
