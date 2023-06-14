@@ -74,11 +74,15 @@ export class AuthService {
 
   async emaiAndPasswordSignIn(email:string,password:string) {
     const provider = new auth.GoogleAuthProvider();
-    const credential = await this.afAuth.signInWithEmailAndPassword(email,password);
+    const credential = await this.afAuth.signInWithEmailAndPassword(email,password)
+console.log("credential",credential)
     console.log('user', credential.user.displayName)
     localStorage.setItem('user', credential.user.displayName)
+
     credential.user?.getIdToken().then(idToken => {
       localStorage.setItem('idToken', idToken)
+      // this.openFailureSnackBar('idToken :' +idToken, 'Close')
+      
       this.validate().subscribe((res: any) => {
         // console.log(res)
         if (res.success == true) {
@@ -87,13 +91,17 @@ export class AuthService {
           }
         }
         else {
-          this.openFailureSnackBar('Authentication Failed', 'Close')
+          this.openFailureSnackBar(res.message, 'Close')
+          // this.openFailureSnackBar(environment.auth_apiUrl,'Close')
         }
       }, (error: any) => {
-        this.openFailureSnackBar('Authentication Failed', 'Close')
+        this.openFailureSnackBar("504 error", 'Close')
       })
 
-    });
+    })
+    .catch(error => {
+      console.log('Something is wrong:', error.message);
+      });
   }
 
   private updateUserData(user: any) {
@@ -145,7 +153,7 @@ export class AuthService {
 
   openFailureSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
-      duration: 6000,
+      duration: 100000,
       panelClass: ['red-snackbar'],
     });
   }

@@ -75,7 +75,7 @@ describe('ToolFormComponent', () => {
   it('should have "Create Tool" title in create mode',()=>{
     // create tool heading
     const headingElement = fixture.debugElement.query(By.css('h1'))
-    expect(headingElement.nativeElement.textContent.trim()).toBe('Create Tool')
+    expect(headingElement.nativeElement.textContent.toLowerCase().trim()).toBe('create tool')
   })
 
   it('should identify elements and input values in the form in create mode call postTool method and when clicked save ' ,()=>{

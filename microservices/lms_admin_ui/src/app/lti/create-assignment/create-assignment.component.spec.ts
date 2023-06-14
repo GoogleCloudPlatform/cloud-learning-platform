@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { CreateAssignmentComponent } from './create-assignment.component';
 import { MatLegacyDialogModule, MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
@@ -19,6 +19,8 @@ import { MatOption, MatOptionModule } from '@angular/material/core';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { NgxMatDatetimePickerModule, NgxMatNativeDateModule} from '@angular-material-components/datetime-picker';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+
+
 describe('CreateAssignmentComponent', () => {
   let component: CreateAssignmentComponent;
   let fixture: ComponentFixture<CreateAssignmentComponent>;
@@ -196,7 +198,7 @@ describe('CreateAssignmentComponent', () => {
         AngularFireModule.initializeApp(environment.firebase)],
       declarations: [ CreateAssignmentComponent ],
       providers: [MatSnackBar, FormBuilder, LtiService,
-        { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close']) },
+        { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close', 'disableClose']) },
         { provide: MAT_DIALOG_DATA, useValue:  { mode: 'Create', init_data: '', extra_data:{} }},
       ]
     })
