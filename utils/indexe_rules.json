@@ -46,7 +46,7 @@
         ]
     },
     {
-        "collection_group": "batch_jobs",
+        "collection_group": "lms_jobs",
         "query_scope": "COLLECTION",
         "fields": [
             {
