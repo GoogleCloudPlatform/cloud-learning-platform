@@ -287,6 +287,14 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
 
+    - name: Install GKE Auth Plugin
+      run: | 
+        gcloud components install gke-gcloud-auth-plugin
+
+    - name: Connect to cluster
+      run: |
+        gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+
     - name: Set up port forwarding
       run: |
         NAMESPACE=$E2E_NAMESPACE_PREFIX
