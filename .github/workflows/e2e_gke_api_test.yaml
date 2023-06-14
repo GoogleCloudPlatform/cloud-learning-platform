@@ -148,16 +148,16 @@ jobs:
         python -m pip install -r requirements.txt
         BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_setup.py --create-dataset=true
 
-    - name: Build and deploy to cluster
-      run: |
-        NAMESPACE=$E2E_NAMESPACE_PREFIX
-        export DATABASE_PREFIX=$E2E_PREFIX
-        skaffold run \
-        --profile dev \
-        --namespace $NAMESPACE \
-        --module backends \
-        -l commit=$GITHUB_SHA \
-        --tag PR${{ github.event.pull_request.number }}
+    # - name: Build and deploy to cluster
+    #   run: |
+    #     NAMESPACE=$E2E_NAMESPACE_PREFIX
+    #     export DATABASE_PREFIX=$E2E_PREFIX
+    #     skaffold run \
+    #     --profile dev \
+    #     --namespace $NAMESPACE \
+    #     --module backends \
+    #     -l commit=$GITHUB_SHA \
+    #     --tag PR${{ github.event.pull_request.number }}
         
     - name: Checkout external repo
       id: checkout_external_repo
