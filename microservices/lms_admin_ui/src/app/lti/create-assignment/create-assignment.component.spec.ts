@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { CreateAssignmentComponent } from './create-assignment.component';
-import { MatLegacyDialogModule, MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatLegacyDialogModule,  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { FormBuilder } from '@angular/forms';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -19,12 +19,14 @@ import { MatOption, MatOptionModule } from '@angular/material/core';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { NgxMatDatetimePickerModule, NgxMatNativeDateModule} from '@angular-material-components/datetime-picker';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { HomeService } from 'src/app/home/service/home.service';
 
 
 describe('CreateAssignmentComponent', () => {
   let component: CreateAssignmentComponent;
   let fixture: ComponentFixture<CreateAssignmentComponent>;
   let ltiService : LtiService;
+  let homeService : HomeService;
   const toolList = [
         {
             "name": "Harmonize Google Dev",
@@ -199,13 +201,14 @@ describe('CreateAssignmentComponent', () => {
       declarations: [ CreateAssignmentComponent ],
       providers: [MatSnackBar, FormBuilder, LtiService,
         { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close', 'disableClose']) },
-        { provide: MAT_DIALOG_DATA, useValue:  { mode: 'Create', init_data: '', extra_data:{} }},
+        { provide: MAT_DIALOG_DATA, useValue:  { mode: 'Create', page : 'course_template', init_data: '', extra_data:{"contextId": "ABC" } }},
       ]
     })
     .compileComponents();
     fixture = TestBed.createComponent(CreateAssignmentComponent);
     component = fixture.componentInstance;
     ltiService = TestBed.inject(LtiService);
+    homeService = TestBed.inject(HomeService)
     component.dialogData = TestBed.inject(MAT_DIALOG_DATA)
     fixture.detectChanges();
   });
@@ -239,7 +242,7 @@ describe('CreateAssignmentComponent', () => {
     expect(titleElement.nativeElement.textContent.trim()).toBe("Update LTI Assignment")
   })
 
-  it('select content button should be disabled', ()=>{
+  it('select content button should be disabled in create mode initially', ()=>{
     // identify button Select Content and it is disabled
     const select_content_buttonElements = fixture.debugElement.queryAll(By.css('button'))
     const select_content_buttonElement = select_content_buttonElements.find((button) => button.nativeElement.textContent.trim() === "Select Content");
@@ -362,9 +365,101 @@ describe('CreateAssignmentComponent', () => {
     expect(component.openContentSelector).toHaveBeenCalled()
   })
 
-  it('should check in Create mode Start Date field is empty and on date select should render date in field', ()=>{
-    const lti_content_item_idElement = fixture.debugElement.query(By.css(`input[formControlName='start_date']`));
-    expect(lti_content_item_idElement.nativeElement.value).toBe("")
+  it('should check in Create mode all Date field is empty', ()=>{
+    const startDateInputElement = fixture.debugElement.query(By.css(`input[formControlName='start_date']`));
+    expect(startDateInputElement.nativeElement.value).toBe("")
+    const endDateInputElement = fixture.debugElement.query(By.css(`input[formControlName='end_date']`));
+    expect(endDateInputElement.nativeElement.value).toBe("")
+    const dueDateInputElement = fixture.debugElement.query(By.css(`input[formControlName='due_date']`));
+    expect(dueDateInputElement.nativeElement.value).toBe("")
+  })
+
+  it('should fill LTI form, submit and observe response of postLtiAssignments', ()=>{
+    // Set tool_id
+    const tool_Element = fixture.debugElement.query(By.css(`mat-select[formControlName='tool_id']`));
+    tool_Element.nativeElement.click() 
+    fixture.detectChanges()
+    const tool_ElementSelect = tool_Element.componentInstance as MatSelect
+    tool_ElementSelect.value = "Harmonize Google Dev";
+    tool_ElementSelect.writeValue(tool_ElementSelect.value);
+    //Set lti_assignment_title
+    const lti_assignment_titleElement = fixture.debugElement.query(By.css(`input[formControlName='lti_assignment_title']`));
+    const lti_assignment_titleInput = lti_assignment_titleElement.nativeElement as HTMLInputElement;
+    lti_assignment_titleInput.value = "Test Harmonize assignment 2";
+    lti_assignment_titleInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    // set Toady's date as start_date
+    let date:any = new Date()
+    date = component.getFormattedDatetime(date)
+    const start_dateControl = component.ltiAssignmentForm.get('start_date')
+    start_dateControl.setValue(date)
+    // set 20 days later date as end_date
+    let plusTwenTyDate:any = new Date()
+    plusTwenTyDate.setDate(plusTwenTyDate.getDate()+20)
+    plusTwenTyDate = component.getFormattedDatetime(plusTwenTyDate)
+    const end_dateControl = component.ltiAssignmentForm.get('end_date')
+    end_dateControl.setValue(plusTwenTyDate)
+    // set Tomorrow's date as due_date
+    let tomorrowDate:any = new Date()
+    tomorrowDate.setDate(tomorrowDate.getDate()+20)
+    tomorrowDate = component.getFormattedDatetime(tomorrowDate)
+    const due_dateControl = component.ltiAssignmentForm.get('due_date')
+    due_dateControl.setValue(tomorrowDate)
+
+    const max_pointElement = fixture.debugElement.query(By.css(`input[formControlName='max_points']`));
+    const max_inputComp = max_pointElement.nativeElement as HTMLInputElement;
+    max_inputComp.value = '50'
+    max_inputComp.dispatchEvent(new Event('input'));
+    fixture.detectChanges()
+    expect(component.ltiAssignmentForm.value.start_date).toBe(date)
+    expect(component.ltiAssignmentForm.value.end_date).toBe(plusTwenTyDate)
+    expect(component.ltiAssignmentForm.value.due_date).toBe(tomorrowDate)
+    expect(component.ltiAssignmentForm.value.max_points).toBe('50')
+
+    const submitButtonElement = fixture.debugElement.query(By.css('button[type="submit"]'));
+    spyOn(homeService, 'postLtiAssignments').and.returnValue(of({success:true}))
+    submitButtonElement.nativeElement.click()
+    fixture.detectChanges()
+    expect(homeService.postLtiAssignments).toHaveBeenCalled()
+  })
+
+  it('should fill form in update mode and tool_id be disabled, form should be valid and on submit observe response of updateLtiAssignments',()=>{
+    const mockData = {
+      "id": "IdpXgN3UODfmTlqibMKl",
+      "context_id": "cNcuWUQ0VdidE7s9zcA",
+      "context_type": "course_template",
+      "lti_assignment_title": "Quiz 1 (Aleks)",
+      "lti_content_item_id": "zr0mfn2CqpAeUddaqBT",
+      "tool_id": "46G7Lol0eHx1th4WJEVE",
+      "course_work_id": "6135897136",
+      "max_points": 30.0,
+      "start_date": "2023-04-01T00:00:00+00:00",
+      "end_date": "2023-06-17T00:00:00+00:00",
+      "due_date": "2023-06-24T00:00:00+00:00"
+    }
+    component.dialogData.extra_data.assignment = mockData 
+    component.dialogData.mode = 'Update'
+    component.ngOnInit()
+    fixture.detectChanges()
+    const tool_idElement = fixture.debugElement.query(By.css('input[formControlName="tool_id"]'))
+    const tool_idInput = tool_idElement.nativeElement as HTMLInputElement;
+    expect(tool_idInput.disabled).toBeTruthy()
+    // Set lti_assignment_title to empty
+    const lti_assignment_titleElement = fixture.debugElement.query(By.css('input[formControlName="lti_assignment_title"]'))
+    const ltiEle = lti_assignment_titleElement.nativeElement as HTMLInputElement;
+    ltiEle.value = ""
+    ltiEle.dispatchEvent(new Event('input'))
+    fixture.detectChanges()
+    expect(component.ltiAssignmentForm.valid).toBeFalse()
+    ltiEle.value = "Quiz (Aleks)"
+    ltiEle.dispatchEvent(new Event('input'))
+    fixture.detectChanges()
+    expect(component.ltiAssignmentForm.valid).toBeTruthy()
+    const submitButtonElement = fixture.debugElement.query(By.css('button[type="submit"]'));
+    spyOn(homeService, 'updateLtiAssignments').and.returnValue(of({success:true}))
+    submitButtonElement.nativeElement.click()
+    fixture.detectChanges()
+    expect(homeService.updateLtiAssignments).toHaveBeenCalled()
   })
 
 });
