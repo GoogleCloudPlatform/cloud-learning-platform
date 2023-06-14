@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgxMatDatetimePickerModule } from '@angular-material-components/datetime-picker';
 import { ToolsListComponent } from './tools-list/tools-list.component';
 import { ToolFormComponent } from './tool-form/tool-form.component';
 import { SharedModule } from '../shared/shared.module';
@@ -27,7 +28,8 @@ import { DeleteLtiDialog } from './tools-list/tools-list.component';
     SharedModule,
     MaterialSharedModule,
     ReactiveFormsModule,
-    NgxSkeletonLoaderModule.forRoot({ animation: 'progress' })
+    NgxSkeletonLoaderModule.forRoot({ animation: 'progress' }),
+    NgxMatDatetimePickerModule
   ]
 })
 export class LtiModule { }

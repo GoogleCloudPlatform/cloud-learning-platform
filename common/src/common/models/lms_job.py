@@ -16,8 +16,8 @@ from fireo.fields import TextField, MapField, IDField, DateTime
 from common.models import BaseModel
 
 
-class BatchJob(BaseModel):
-  """Batch job Data Model"""
+class LmsJob(BaseModel):
+  """LMS job Data Model"""
   id = IDField()
   job_type = TextField()
   status = TextField()
@@ -30,9 +30,9 @@ class BatchJob(BaseModel):
 
   class Meta:
     ignore_none_field = False
-    collection_name = BaseModel.DATABASE_PREFIX + "batch_jobs"
+    collection_name = BaseModel.DATABASE_PREFIX + "lms_jobs"
 
 
-# type -> Batch job type would be couse_copy/grade_import/cron_job(specific)
+# type -> LMS job type would be couse_copy/grade_import/cron_job(specific)
 # status -> ready, running, failed, success
 # logs -> {"errors": ["error1","error2"], "info": ["info1","info2"]}

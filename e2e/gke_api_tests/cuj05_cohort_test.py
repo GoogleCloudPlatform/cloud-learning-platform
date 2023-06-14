@@ -226,9 +226,11 @@ def test_get_list_sections_by_cohort(get_token, create_section):
   """
   Get a sections list for a perticular cohort by giving cohort_id as query paramter 
   """
-  url = f"{API_URL}/cohorts/{create_section.cohort.id}/sections"
+  url = f"{API_URL}/cohorts/{create_section.cohort.id}/sections?skip=0&limit=10"
+  print("URLLL----",url)
   resp = requests.get(url=url, headers=get_token)
   resp_json = resp.json()
+  print("This is resp json for list sections of cohort",resp_json)
   assert resp.status_code == 200, "Status 200"
 
 

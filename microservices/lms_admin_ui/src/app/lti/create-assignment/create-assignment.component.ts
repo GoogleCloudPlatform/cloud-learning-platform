@@ -19,7 +19,8 @@ export class CreateAssignmentComponent {
   toolsList = []
   showProgressSpinner: boolean = false
   toolSelectDisabled: boolean = false
-  isDisplayButtonEnabled: boolean = true
+  isDisplayButtonEnabled: boolean = false
+  isLoading: boolean = true
   displayButton: string = "selectContentItem"
   selectedTool: any
   toolName: any
@@ -31,42 +32,46 @@ export class CreateAssignmentComponent {
     private fb: FormBuilder, private homeService: HomeService, private ltiService: LtiService, private authService: AuthService) { }
 
   ngOnInit() {
-    this.getAllTools()
     console.log('dialog data', this.dialogData)
-    if (this.dialogData.mode == "Create") {
-      this.ltiAssignmentForm = this.fb.group({
-        "tool_id": [null, Validators.required],
-        "lti_assignment_title": [null, Validators.required],
-        "lti_content_item_id": [null],
-        "start_date": [null],
-        "end_date": [null],
-        "due_date": [null],
-        "max_points": [null]
-      });
-    } else {
-      this.ltiAssignmentForm = this.fb.group({
-        "tool_id": [this.dialogData.extra_data.assignment.tool_id, Validators.required],
-        "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title, Validators.required],
-        "lti_content_item_id": [this.dialogData.extra_data.assignment.lti_content_item_id],
-        "start_date": [this.dialogData.extra_data.assignment.start_date],
-        "end_date": [this.dialogData.extra_data.assignment.end_date],
-        "due_date": [this.dialogData.extra_data.assignment.due_date],
-        "max_points": [this.dialogData.extra_data.assignment.max_points]
-      });
-      this.toolSelectDisabled = true
-      setTimeout(() => {
+    this.ltiService.getToolsList().subscribe((res: any) => {
+      this.toolsList = res.data
+      if (this.dialogData.mode == "Create") {
+        this.ltiAssignmentForm = this.fb.group({
+          "tool_id": [null, Validators.required],
+          "lti_assignment_title": [null, Validators.required],
+          "lti_content_item_id": [null],
+          "start_date": [null],
+          "end_date": [null],
+          "due_date": [null],
+          "max_points": [null]
+        });
+      } else {
+        this.ltiAssignmentForm = this.fb.group({
+          "tool_id": [this.dialogData.extra_data.assignment.tool_id, Validators.required],
+          "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title, Validators.required],
+          "lti_content_item_id": [this.dialogData.extra_data.assignment.lti_content_item_id],
+          "start_date": [this.dialogData.extra_data.assignment.start_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.start_date) : null],
+          "end_date": [this.dialogData.extra_data.assignment.end_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.end_date) : null],
+          "due_date": [this.dialogData.extra_data.assignment.due_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.due_date) : null],
+          "max_points": [this.dialogData.extra_data.assignment.max_points]
+        });
+        this.toolSelectDisabled = true
         let tool = this.toolsList.find((x) => {
           if (x.id == this.dialogData.extra_data.assignment.tool_id) {
             return true
           }
           return false
         })
+        this.toolName = tool.name
         if (tool.deeplink_type == "Not required") {
           this.displayButton = "createContentItem"
           this.isDisplayButtonEnabled = false
         }
-      }, 500);
-    }
+      }
+      this.isLoading = false
+    }, err => {
+      this.openFailureSnackBar("Failed to load tools", "Error")
+    })
   }
 
   onDropdownChange() {
@@ -76,6 +81,7 @@ export class CreateAssignmentComponent {
       }
       return false
     })
+    this.ltiAssignmentForm.get("lti_content_item_id").setValue(null)
     this.ltiService.getContentItems(this.ltiAssignmentForm.value['tool_id'], this.dialogData.extra_data.contextId).subscribe(
       (response: any) => {
         if (tool.deeplink_type == "Allow once per context") {
@@ -155,6 +161,22 @@ export class CreateAssignmentComponent {
     });
   }
 
+  getFormattedDatetime(dateString) {
+    const d = new Date(dateString);
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    const year = d.getFullYear();
+    let hour = '' + d.getHours();
+    let min = '' + d.getMinutes();
+    let sec = '' + d.getSeconds();
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+    if (hour.length < 2) hour = '0' + hour;
+    if (min.length < 2) min = '0' + min;
+    if (sec.length < 2) sec = '0' + sec;
+    return [year, month, day].join('-') + 'T' + [hour, min, sec].join(':');
+  }
+
   openContentSelector() {
     let userId = null
     if (localStorage.getItem("userId")) {
@@ -213,19 +235,6 @@ export class CreateAssignmentComponent {
     this.ltiService.postContentItem(data).subscribe((res: any) => {
       this.isDisplayButtonEnabled = false
       this.ltiAssignmentForm.get("lti_content_item_id").setValue(res.data.id)
-    })
-  }
-
-  getAllTools() {
-    this.ltiService.getToolsList().subscribe((res: any) => {
-      this.toolsList = res.data
-      let tool = this.toolsList.find((x) => {
-        if (x.id == this.dialogData.extra_data.assignment.tool_id) {
-          return true
-        }
-        return false
-      })
-      this.toolName = tool.name
     })
   }
 
