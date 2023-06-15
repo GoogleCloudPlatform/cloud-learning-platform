@@ -16,8 +16,8 @@
 
 name: E2E API Tests on GKE Microservices on approval
 on:
-  pull_request_review:
-    types: [submitted]
+  pull_request:
+    types: [labeled]
     branches:
       - main
     paths:
@@ -32,10 +32,10 @@ on:
 jobs:
   run-e2e-with-gmail:
     name: Run E2E with gmail user
-    if: github.event.review.state == 'approved' && contains(github.event.pull_request.labels.*.name, 'LMS') 
+    if: ${{ github.event.label.name == 'LMS_ADMIN_UI' }} 
     uses: ./.github/workflows/e2e_gke_api_test.yaml
     with:
-      USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: True
+      USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: False
     secrets:
       GH_PAT: ${{ secrets.GH_PAT }}
       GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}

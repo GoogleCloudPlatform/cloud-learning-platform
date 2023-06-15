@@ -25,6 +25,7 @@ on:
 jobs:
   unit-test:
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'LMS_ADMIN_UI') 
     strategy:
       matrix:
         node-version: [16.x]
