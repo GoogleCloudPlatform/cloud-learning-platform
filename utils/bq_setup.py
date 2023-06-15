@@ -73,7 +73,8 @@ def create_views(dataset):
   print("dataset", dataset)
   sql_file_list = []
 
-  file_path = "views_sql/"
+  bq_dataset_name = os.getenv("BQ_DATASET")
+  file_path = f"views_sql/{bq_dataset_name}"
   sql_files = listdir(file_path)
   sql_file_list = [file_path + i for i in sql_files]
   sql_file_list.sort(key=lambda x: x[-7:])
@@ -109,7 +110,8 @@ def alter_tables(dataset):
   print("dataset", dataset)
   sql_file_list = []
 
-  file_path = "alter_tables_sql/"
+  bq_dataset_name = os.getenv("BQ_DATASET")
+  file_path = f"alter_tables_sql/{bq_dataset_name}"
   sql_files = listdir(file_path)
   sql_file_list = [file_path + i for i in sql_files]
 
