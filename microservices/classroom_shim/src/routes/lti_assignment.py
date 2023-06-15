@@ -20,6 +20,7 @@ from schemas.lti_assignment_schema import (
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
+from services.ext_service_handler import get_content_item, copy_content_item
 # pylint: disable=line-too-long
 
 router = APIRouter(
@@ -390,34 +391,15 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     content_item_id = lti_assignment_data.get("lti_content_item_id")
     prev_context_id = lti_assignment_data.get("context_id")
 
-    content_item_req = requests.get(
-        f"http://lti/lti/api/v1/content-item/{content_item_id}",
-        headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
-        timeout=60)
-
-    if content_item_req.status_code == 200:
-      content_item_data = content_item_req.json().get("data")
-    else:
-      raise Exception(f"Request failed with code 1300 and the status code is \
-            {content_item_req.status_code} with error: {content_item_req.text}")
+    content_item_data = get_content_item(content_item_id)
 
     # create a copy of above content item
     content_item_data["context_id"] = input_data_dict.get("context_id")
     del content_item_data["id"]
     del content_item_data["created_time"]
     del content_item_data["last_modified_time"]
-    copy_content_item_req = requests.post(
-        "http://lti/lti/api/v1/content-item",
-        headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
-        json=content_item_data,
-        timeout=60)
 
-    if copy_content_item_req.status_code == 200:
-      copy_content_item_data = copy_content_item_req.json().get("data")
-    else:
-      raise Exception(f"Request failed with code 1310 and the status code is \
-            {copy_content_item_req.status_code} and error: {copy_content_item_req.text}"
-                     )
+    copy_content_item_data = copy_content_item(content_item_data)
 
     prev_context_ids = lti_assignment_data["prev_context_ids"]
     prev_content_item_ids = lti_assignment_data["prev_content_item_ids"]
