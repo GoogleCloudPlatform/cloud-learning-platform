@@ -20,6 +20,7 @@ from common.utils.logging_handler import Logger
 from typing import Optional
 from common.models import UserChat
 from langchain.schema import HumanMessage, AIMessage
+from lanchain.llm import BaseModel
 
 from config import LANGCHAIN_LLM, CHAT_LLM_TYPES, COHERE_LLM_TYPES
 
@@ -82,3 +83,10 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
     return result_text
   except Exception as e:
     raise InternalServerError(str(e)) from e
+
+
+def get_model(llm_type: str) -> BaseModel:
+  """ return a lanchain model given type """
+  llm = LANGCHAIN_LLM.get(llm_type)
+
+  return llm

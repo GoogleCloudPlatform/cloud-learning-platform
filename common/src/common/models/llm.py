@@ -136,6 +136,24 @@ class QueryEngine(BaseModel):
             None).order(order_by).offset(skip).fetch(limit)
     return list(objects)
 
+  @classmethod
+  def find_by_name(cls, name):
+    """
+    Fetch a specific query engine by name
+
+    Args:
+        name (str): Query engine name
+
+    Returns:
+        QueryEngine: query engine object
+
+    """
+    q_engine = cls.collection.filter(
+        "name", "==", name).filter(
+            "deleted_at_timestamp", "==",
+            None).fetch()
+    return q_engine
+
 
 class QueryResult(BaseModel):
   """
@@ -152,14 +170,14 @@ class QueryResult(BaseModel):
     collection_name = BaseModel.DATABASE_PREFIX + "query_results"
 
   @classmethod
-  def load_references(query_result):
+  def load_references(cls, query_result: str):
     references = []
     for ref in query_result.results:
-      object = cls.collection.filter(
+      obj = cls.collection.filter(
           "id", "==", ref.id).filter(
               "deleted_at_timestamp", "==", None)
-      if object is not None:
-        references.append(object)
+      if obj is not None:
+        references.append(obj)
     return references
 
 

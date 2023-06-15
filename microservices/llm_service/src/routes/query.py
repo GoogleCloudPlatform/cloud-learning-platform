@@ -27,6 +27,7 @@ from common.utils.http_exceptions import (InternalServerError, BadRequest,
 from common.models import QueryEngine, UserQuery
 from schemas.llm_schema import (LLMQueryModel,
                                 LLMQueryEngineModel,
+                                LLMQueryEngineResponse,
                                 LLMGetQueryEnginesResponse,
                                 LLMQueryResponse)
 
@@ -48,7 +49,7 @@ def get_query_list():
       LLMGetQueryEnginesResponse
   """
   query_engines = QueryEngine.collection.fetch()
-  query_engine_data = [{"name": qe.name, "id": qe.id}] for qe in query_engines]
+  query_engine_data = [{"name": qe.name, "id": qe.id} for qe in query_engines]
   try:
     return {
       "success": True,
@@ -63,7 +64,7 @@ def get_query_list():
     "",
     name="Create a query engine",
     response_model=LLMQueryEngineResponse)
-async def query(gen_config: LLMQueryEngineModel):
+async def query_engine_create(gen_config: LLMQueryEngineModel):
   """
   Start a query engine build job
 
@@ -134,8 +135,8 @@ async def query(gen_config: LLMQueryModel):
 @router.post(
     "/user/{user_queryid}",
     name="Make a query to a query engine based on a prior user query",
-    response_model=LLMGenerateResponse)
-async def query(gen_config: LLMQueryModel):
+    response_model=LLMQueryEngineResponse)
+async def query_continue(user_queryid: str, gen_config: LLMQueryModel):
   """
   Send a query to a query engine with a prior user query as context
 
@@ -155,9 +156,10 @@ async def query(gen_config: LLMQueryModel):
     return PayloadTooLargeError(
       f"Prompt must be less than {PAYLOAD_FILE_SIZE}")
 
-  user_query = UserQuery.find_by_id(user_queryid)
-
   try:
+    user_query = UserQuery.find_by_id(user_queryid)
+    query_engine = user_query.query_engine
+
     result = await query_generate(prompt, query_engine, user_query)
 
     return {

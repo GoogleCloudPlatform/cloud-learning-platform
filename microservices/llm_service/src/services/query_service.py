@@ -19,6 +19,8 @@ import gc
 import json
 import tempfile
 import time
+import os
+import math
 from typing import List, Optional, Generator, Tuple, Dict
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
@@ -28,19 +30,20 @@ from common.utils.logging_handler import Logger
 from common.models import UserQuery, QueryResult, QueryEngine
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
-from common.utils.logging_handler import Logger
 from google.cloud import aiplatform
 from google.cloud import storage
 from vertexai.preview.language_models import TextEmbeddingModel
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders import CSVLoader, PDFMinerLoader
+from langchain.chains import RetrievalQAWithSourcesChain
+import langchain_service
 
 from config import PROJECT_ID
 
 # text chunk size for embedding data
 CHUNK_SIZE = 1000
 
-# Create a rate limit of 300 requests per minute. Adjust this depending on your quota.
+# Create a rate limit of 300 requests per minute.
 API_CALLS_PER_SECOND = 300 / 60
 
 # According to the docs, each request can process 5 instances per request
@@ -51,17 +54,62 @@ DIMENSIONS = 768
 
 async def query_generate(prompt: str, query_engine: str,
                          user_query: Optional[UserQuery] = None) -> QueryResult:
-  pass
-  
+  """
+  Use langchain to execute a query over a query engine
 
-def query_engine_build(doc_url: str, query_engine: str, params: Dict) -> QueryEngine:
+  Args:
+    prompt: the text prompt to pass to the query engine
+
+    query_engine: the name of the query engine to use
+
+    user_query (optional): an existing user query for context
+
+  Returns:
+    QueryResult: the query result object
+  """
+  q_engine = QueryEngine.find_by_name(query_engine)
+  if q_engine is None:
+    raise ResourceNotFoundException(f"cant find query engine {query_engine}")
+
+  llm = langchain_service.get_model(q_engine.llm_type)
+  docsearch = None
+  chain = RetrievalQAWithSourcesChain.from_chain_type(llm, chain_type="stuff",
+              retriever=docsearch.as_retriever())
+  query_config = {"question": prompt}
+
+  if user_query is not None:
+    query_config.update({"context": user_query.history})
+
+  chain_result = chain(query_config, return_only_outputs=True)
+  query_result = QueryResult(query_engine_id=q_engine.id,
+                             query_engine=query_engine,
+                             results=[chain_result])
+
+  return query_result
+
+def query_engine_build(doc_url: str, query_engine: str,
+                       params: Dict) -> QueryEngine:
+  """
+  Build a new query engine.
+
+  Args:
+    doc_url: the URL to the set of documents to be indexed
+
+    query_engine: the name of the query engine to create
+
+    params: query engine params
+
+  Returns:
+    QueryEngine: the query engine object
+  """
   # build document index
   build_doc_index(doc_url, query_engine)
-    
+
   # create model
   is_public = params.get("is_public", True)
   user_id = params.get("user_id")
-  query_engine = QueryEngine(created_by=user_id, is_public=is_public)
+  query_engine = QueryEngine(name=query_engine,
+                             created_by=user_id, is_public=is_public)
   query_engine.save()
 
   return query_engine
@@ -69,67 +117,79 @@ def query_engine_build(doc_url: str, query_engine: str, params: Dict) -> QueryEn
 
 def build_doc_index(doc_url:str, query_engine: str) -> bool:
   """
-  Build the document index.  
+  Build the document index.
   Supports only GCS URLs initially, containing PDF and CSV files.
   """
-  # download files to local directory
-  doc_filepaths = _download_files_to_local(doc_url)
+  try:
 
-  # ME index name and description
-  index_name = query_engine + "_MEindex"
-  index_description = \
-    "Matching Engine index for LLM Service query engine: " + query_engine
+    # download files to local directory
+    storage_client = storage.Client(project=PROJECT_ID)
+    doc_filepaths = _download_files_to_local(storage_client, doc_url)
 
-  # bucket for ME index data
-  bucket_name = f"{index_name}_ME_data"
-  bucket = storage_client.create_bucket(bucket_name)
-  bucket_uri = f"gs://{bucket.name}"
+    # ME index name and description
+    index_name = query_engine + "_MEindex"
+    index_description = \
+      "Matching Engine index for LLM Service query engine: " + query_engine
 
-  # use langchain text splitter
-  text_splitter = CharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=0)
+    # bucket for ME index data
+    bucket_name = f"{index_name}_ME_data"
+    bucket = storage_client.create_bucket(bucket_name)
+    bucket_uri = f"gs://{bucket.name}"
 
-  # add embeddings for each doc to index data stored in bucket
-  for doc in doc_filepaths:
-    doc_name, doc_filepath = doc
+    # use langchain text splitter
+    text_splitter = CharacterTextSplitter(chunk_size=CHUNK_SIZE,
+                                          chunk_overlap=0)
 
-    # read doc data and split into text chunks
-    doc_text_list = _read_doc(doc_name, doc_filepath)  
-    text_chunks = []
-    for text in doc_text_list:
-      text_chunks.extend(text_splitter.split_text(text))
-    
-    # generate embedding data and store in local dir
-    embeddings_file_path = _generate_index_data(doc_name, text_chunks)
+    # add embeddings for each doc to index data stored in bucket
+    for doc in doc_filepaths:
+      doc_name, doc_filepath = doc
+      Logger.info(f"generating index data for {doc_name}")
 
-    # copy data files up to bucket
-    remote_folder = f"{bucket_uri}/{doc_name}/"
-    blob = bucket.blob(remote_folder)
-    data_path = f"{embeddings_file_path}/*" 
-    blob.upload_from_filename(data_path)
+      # read doc data and split into text chunks
+      doc_text_list = _read_doc(doc_name, doc_filepath)
+      text_chunks = []
+      for text in doc_text_list:
+        text_chunks.extend(text_splitter.split_text(text))
 
-  # create ME index
-  tree_ah_index = aiplatform.MatchingEngineIndex.create_tree_ah_index(
-      display_name=index_name,
-      contents_delta_uri=bucket_uri,
-      dimensions=DIMENSIONS,
-      approximate_neighbors_count=150,
-      distance_measure_type="DOT_PRODUCT_DISTANCE",
-      leaf_node_embedding_count=500,
-      leaf_nodes_to_search_percent=80,
-      description=index_description,
-  )
-    
+      # generate embedding data and store in local dir
+      embeddings_file_path = _generate_index_data(doc_name, text_chunks)
 
-def _download_files_to_local(doc_url: str) -> List[Tuple[str, List[str]]]:
-  client = storage.Client(project=PROJECT_ID)
+      # copy data files up to bucket
+      remote_folder = f"{bucket_uri}/{doc_name}/"
+      blob = bucket.blob(remote_folder)
+      data_path = f"{embeddings_file_path}/*"
+      blob.upload_from_filename(data_path)
+      Logger.info(f"data uploaded for {doc_name}")
+
+    # create ME index
+    Logger.info(f"creating matching engine index {index_name}")
+    tree_ah_index = aiplatform.MatchingEngineIndex.create_tree_ah_index(
+        display_name=index_name,
+        contents_delta_uri=bucket_uri,
+        dimensions=DIMENSIONS,
+        approximate_neighbors_count=150,
+        distance_measure_type="DOT_PRODUCT_DISTANCE",
+        leaf_node_embedding_count=500,
+        leaf_nodes_to_search_percent=80,
+        description=index_description,
+    )
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+  return tree_ah_index is not None
+
+
+def _download_files_to_local(storage_client, doc_url: str) -> \
+    List[Tuple[str, List[str]]]:
+  """ Download files from GCS to a local tmp directory """
   docs = []
-  for blob in client.list_blobs(doc_url):
+  for blob in storage_client.list_blobs(doc_url):
     # skip directories for now
     if blob.name.endswith("/"):
       continue
     # Create a blob object from the filepath
     with tempfile.TemporaryDirectory() as temp_dir:
-      file_path = f"{temp_dir}/{self.blob}"
+      file_path = f"{temp_dir}/{blob.name}"
       os.makedirs(os.path.dirname(file_path), exist_ok=True)
       # Download the file to a destination
       blob.download_to_filename(file_path)
@@ -153,7 +213,7 @@ def _read_doc(doc_name:str, doc_filepath: str) -> List[str]:
     loader = PDFMinerLoader(file_path=doc_filepath)
   else:
     # return None if doc type not supported
-    pass 
+    pass
 
   if loader is not None:
     langchain_document = loader.load()
@@ -163,6 +223,7 @@ def _read_doc(doc_name:str, doc_filepath: str) -> List[str]:
 
 def _encode_texts_to_embeddings(
     sentence_list: List[str]) -> List[Optional[List[float]]]:
+  """ encode text using Vertex AI embedding model """
   model = TextEmbeddingModel.from_pretrained("textembedding-gecko@001")
   try:
     embeddings = model.get_embeddings(sentence_list)
@@ -175,13 +236,15 @@ def _encode_texts_to_embeddings(
 def _generate_batches(
     sentences: List[str], batch_size: int
 ) -> Generator[List[str], None, None]:
-    for i in range(0, len(sentences), batch_size):
-        yield sentences[i : i + batch_size]
+  """ generate batches sentences """
+  for i in range(0, len(sentences), batch_size):
+    yield sentences[i : i + batch_size]
 
 
 def _get_embedding_batched(
     sentences: List[str], api_calls_per_second: int = 10, batch_size: int = 5
 ) -> Tuple[List[bool], np.ndarray]:
+  """ get embbedings for a list of text strings """
 
   embeddings_list: List[List[float]] = []
 
@@ -204,21 +267,24 @@ def _get_embedding_batched(
       embeddings_list.extend(future.result())
 
   is_successful = [
-    embedding is not None for sentence, embedding in zip(sentences, embeddings_list)
+    embedding is not None
+      for sentence, embedding in zip(sentences, embeddings_list)
   ]
   embeddings_list_successful = np.squeeze(
-    np.stack([embedding for embedding in embeddings_list if embedding is not None])
+    np.stack([embedding
+      for embedding in embeddings_list if embedding is not None])
   )
   return is_successful, embeddings_list_successful
 
 
-def _generate_index_data(doc_name: str, text_chunks: List[str]) -> str
+def _generate_index_data(doc_name: str, text_chunks: List[str]) -> str:
+  """ generate matching engine index data files in a local directory """
 
   for i in range(len(text_chunks)):
 
     # Create temporary file to write embeddings to
     embeddings_file_path = Path(tempfile.mkdtemp())
-  
+
     # Create a unique output file for each set of embeddings
     chunk_path = embeddings_file_path.joinpath(
         f"{doc_name}_{i}.json"
@@ -232,7 +298,7 @@ def _generate_index_data(doc_name: str, text_chunks: List[str]) -> str
           api_calls_per_second=API_CALLS_PER_SECOND,
           batch_size=ITEMS_PER_REQUEST,
       )
-  
+
       # Append to file
       embeddings_formatted = [
         json.dumps(
