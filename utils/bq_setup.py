@@ -60,7 +60,7 @@ def get_sql_files_list(bq_dataset_name, folder_name):
   if not os.path.exists(file_path):
     return []
   sql_files = listdir(file_path)
-  return [file_path + i for i in sql_files]
+  return [file_path + "/" + i for i in sql_files]
 
 def create_tables(dataset):
   """Create tables in the bigquery"""
