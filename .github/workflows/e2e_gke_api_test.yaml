@@ -37,7 +37,8 @@ on:
       GH_PAT:
         required: true
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
     paths:
       - 'microservices/**'
       - 'common/**'
