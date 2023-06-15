@@ -1,7 +1,7 @@
 """ Section endpoints """
 import traceback
 import datetime
-from common.models import Cohort, CourseTemplate, Section, BatchJob, CourseEnrollmentMapping
+from common.models import Cohort, CourseTemplate, Section, LmsJob, CourseEnrollmentMapping
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ClassroomHttpException,
                                           InternalServerError,
@@ -88,7 +88,7 @@ def create_section(sections_details: SectionDetails,
           "classroom with id" +
           f" {course_template_details.classroom_id} is not found")
 
-    batch_job_input = {
+    lms_job_input = {
         "job_type": "course_copy",
         "status": "ready",
         "input_data": {**sections_details.dict()},
@@ -98,28 +98,28 @@ def create_section(sections_details: SectionDetails,
         }
     }
 
-    batch_job = BatchJob.from_dict(batch_job_input)
-    batch_job.save()
+    lms_job = LmsJob.from_dict(lms_job_input)
+    lms_job.save()
 
     background_tasks.add_task(
         copy_course_background_task,
         course_template_details=course_template_details,
         sections_details=sections_details,
         cohort_details=cohort_details,
-        batch_job_id=batch_job.id,
+        lms_job_id=lms_job.id,
         message="Create section background task completed")
     info_msg = f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
                  section name {sections_details.name}"
     Logger.info(info_msg)
 
-    batch_job.logs["info"].append(info_msg)
-    batch_job.update()
+    lms_job.logs["info"].append(info_msg)
+    lms_job.update()
 
     return {
         "success": True,
         "message": "Section will be created shortly, " +
-                    f"use this job id - '{batch_job.id}' for more info",
+                    f"use this job id - '{lms_job.id}' for more info",
         "data": None
     }
   except ResourceNotFoundException as err:
@@ -643,7 +643,7 @@ def import_grade(section_id: str, coursework_id: str,
     section = Section.find_by_id(section_id)
     result = classroom_crud.get_course_work(section.classroom_id, coursework_id)
 
-    batch_job_input = {
+    lms_job_input = {
         "job_type": "grade_import",
         "status": "ready",
         "section_id": section_id,
@@ -658,8 +658,8 @@ def import_grade(section_id: str, coursework_id: str,
         }
     }
 
-    batch_job = BatchJob.from_dict(batch_job_input)
-    batch_job.save()
+    lms_job = LmsJob.from_dict(lms_job_input)
+    lms_job.save()
 
     #Get url mapping of google forms view links and edit ids
     is_google_form_present = False
@@ -668,24 +668,24 @@ def import_grade(section_id: str, coursework_id: str,
         if "form" in material.keys():
           is_google_form_present = True
           background_tasks.add_task(update_grades, material, section,
-                                    coursework_id, batch_job.id)
+                                    coursework_id, lms_job.id)
 
       if is_google_form_present:
         return {
             "message":
                 "Grades for coursework will be updated shortly, " +
-                f"use this job id - '{batch_job.id}' for more info"
+                f"use this job id - '{lms_job.id}' for more info"
         }
       else:
-        batch_job.logs["errors"].append(
+        lms_job.logs["errors"].append(
             f"Form is not present for coursework_id {coursework_id}")
-        batch_job.update()
+        lms_job.update()
         raise ResourceNotFoundException(
             f"Form is not present for coursework_id {coursework_id}")
     else:
-      batch_job.logs["errors"].append(
+      lms_job.logs["errors"].append(
             f"Form is not present for coursework_id {coursework_id}")
-      batch_job.update()
+      lms_job.update()
       raise ResourceNotFoundException(
           f"Form is not present for coursework_id {coursework_id}")
   except HttpError as hte:

@@ -8,7 +8,7 @@
         [theme]="{'height': '40px','margin-top':'15px','background-color': '#EAEAEA'}">
     </ngx-skeleton-loader>
 
-    <table *ngIf="!isLoadingData" mat-table [dataSource]="batchJobsData" class="mat-elevation-z8" style="width: 100%;">
+    <table *ngIf="!isLoadingData" mat-table [dataSource]="lmsJobsData" class="mat-elevation-z8" style="width: 100%;">
 
         <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef>
@@ -97,13 +97,13 @@
             <mat-cell *matCellDef="let element">No Data</mat-cell>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="batchJobDisplayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: batchJobDisplayedColumns;"></tr>
+        <tr mat-header-row *matHeaderRowDef="lmsJobDisplayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: lmsJobDisplayedColumns;"></tr>
 
         <tr class="mat-row" *matNoDataRow>
             <td class="mat-cell" colspan="4">No data found</td>
         </tr>
     </table>
-    <mat-paginator [length]="500" (page)="handleBatchJobPageEvent($event)" [pageSizeOptions]="[10, 20, 50, 100]"
+    <mat-paginator [length]="500" (page)="handleLmsJobPageEvent($event)" [pageSizeOptions]="[10, 20, 50, 100]"
         [pageSize]='10' [disabled]="isLoadingData" aria-label="Select page" style="margin: 12px 0px;"></mat-paginator>
 </div>

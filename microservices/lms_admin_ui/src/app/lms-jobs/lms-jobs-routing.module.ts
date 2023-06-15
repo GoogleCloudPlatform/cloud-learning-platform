@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { BatchJobsListComponent } from './batch-jobs-list/batch-jobs-list.component';
+import { LmsJobsListComponent } from './lms-jobs-list/lms-jobs-list.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: BatchJobsListComponent
+    component: LmsJobsListComponent
   }
 ];
 

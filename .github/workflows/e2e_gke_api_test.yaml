@@ -17,6 +17,25 @@
 
 name: E2E API Tests on GKE Microservices
 on:
+  workflow_call:
+    inputs:
+      USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      GKE_POD_SA_KEY:
+        required: true
+      FIREBASE_API_KEY:
+        required: true
+      API_DOMAIN:
+        required: true
+      FIREBASE_APP_ID:
+        required: true
+      DEPLOYMENT_DEV_SA_KEY:
+        required: true
+      GH_PAT:
+        required: true
   pull_request:
     branches: [ "main" ]
     paths:
@@ -27,6 +46,13 @@ on:
       - '.github/workflows/e2e_gke_api_test.yaml'
       - 'skaffold.yaml'
   workflow_dispatch:
+    inputs:
+      USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT:
+        description: "set flag to use gmail account"
+        required: false
+        type: boolean
+        default: false
+
 env:
   PROJECT_ID: core-learning-services-dev
   SKAFFOLD_DEFAULT_REPO: gcr.io/core-learning-services-dev
@@ -44,12 +70,21 @@ env:
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
   EXTERNAL_USER_PROPERTY_PREFIX: SNHU
+  USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT }}
+  E2E_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr' || 'e2e_pr' }}${{  github.event.pull_request.number }}_
+  E2E_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-' }}${{  github.event.pull_request.number }}
 # cookiecutter:raw 
 jobs:
   deploy:
     name: Deploy all microservices in PR namespace
     runs-on: ubuntu-latest
     steps:
+    - name: echo NAMESPACE and PREFIX
+      run: |
+        DATABASE_PREFIX=$E2E_PREFIX
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        echo namespace $NAMESPACE
+        echo database prefix $DATABASE_PREFIX
     - name: Check out repository
       uses: actions/checkout@v3
 
@@ -89,40 +124,35 @@ jobs:
 
     - name: Set up Kubernetes namespace and Service Account
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE=e2e-pr-$PR_NUMBER
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
         kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
         NAMESPACE=${NAMESPACE} bash setup/setup_ksa.sh
 
     - name: Add indexing to collections in firestore
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+        export DATABASE_PREFIX=$E2E_PREFIX
         cd utils/
         python -m pip install -r requirements.txt
         PYTHONPATH=../common/src python firestore_e2e_indexing_setup.py
 
     - name: Initialize Pub/Sub
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e
         python -m pip install -r requirements.txt
         cd utils
-        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python pub_sub_setup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python pub_sub_setup.py
 
     - name: Initialize BQ
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd utils/
         python -m pip install -r requirements.txt
-        BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
-        BQ_DATASET=lrs DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_setup.py --create-dataset=true
+        BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_setup.py --create-dataset=true
+        BQ_DATASET=lrs DATABASE_PREFIX=$E2E_PREFIX python bq_setup.py --create-dataset=true
 
     - name: Build and deploy to cluster
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE=e2e-pr-$PR_NUMBER
-        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        export DATABASE_PREFIX=$E2E_PREFIX
         skaffold run \
         --profile dev \
         --namespace $NAMESPACE \
@@ -175,8 +205,7 @@ jobs:
 
     - name: Set up port forwarding
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE=e2e-pr-$PR_NUMBER
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
         python e2e/utils/port_forward.py --namespace $NAMESPACE
 
     - name: Setup redis
@@ -192,15 +221,14 @@ jobs:
 
     - name: Cleaning up database
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
-        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_cleanup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python database_cleanup.py
 
     - name: Cleaning up classroom
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        
         cd e2e/utils
-        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python classroom_cleanup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python classroom_cleanup.py
 
     - name: Wait for 5s for database cleaning up
       run: sleep 10s
@@ -208,19 +236,17 @@ jobs:
 
     - name: Initialize database
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
-        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_setup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python database_setup.py
 
     - name: Run pytest
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m pytest e2e/gke_api_tests/
+        
+        PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m pytest e2e/gke_api_tests/
     
     - name: Run behave
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        PYTHONPATH=common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python -m behave e2e/features/ --tags=~@test --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode --tags=~@inspace
+        PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m behave e2e/features/ --tags=~@test --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode --tags=~@inspace
 
   dataset-cleanup:
     runs-on: ubuntu-latest
@@ -259,23 +285,20 @@ jobs:
 
     - name: Removing firestore indexes
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+        export DATABASE_PREFIX=$E2E_PREFIX
         cd utils/
         python -m pip install -r requirements.txt
         PYTHONPATH=../common/src python firestore_indexing_cleanup.py
 
     - name: Cleaning up database
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
-        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python database_cleanup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python database_cleanup.py
 
     - name: Cleaning up classroom
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e/utils
-        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python classroom_cleanup.py
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python classroom_cleanup.py
 
   deployment-cleanup:
     name: Clean up deployment in PR namespace
@@ -318,25 +341,22 @@ jobs:
 
     - name: Delete all deployments and namespace
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        NAMESPACE=e2e-pr-$PR_NUMBER
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
         skaffold delete --namespace $NAMESPACE
         kubectl delete namespace $NAMESPACE
 
     - name: Cleaning up Pub/Sub
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd e2e
         python -m pip install -r requirements.txt
         cd utils
-        PYTHONPATH=../common/src DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python pub_sub_cleanup.py  
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python pub_sub_cleanup.py  
 
     - name: Cleaning up BQ
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
         cd utils/
         python -m pip install -r requirements.txt
-        BQ_DATASET=lms_analytics DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_cleanup.py  
-        BQ_DATASET=lrs DATABASE_PREFIX=e2e_pr${PR_NUMBER}_ python bq_cleanup.py  
+        BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_cleanup.py
+        BQ_DATASET=lrs DATABASE_PREFIX=$E2E_PREFIX python bq_cleanup.py
 
 # cookiecutter:endraw 
