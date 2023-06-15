@@ -14,7 +14,7 @@
 """
 Module to add cohort in Fireo
 """
-from fireo.fields import TextField, ListField, IDField
+from fireo.fields import TextField, ListField, IDField, BooleanField
 from common.models import BaseModel
 
 # constants used as tags for chat history
@@ -106,11 +106,75 @@ class QueryEngine(BaseModel):
   QueryEngine ORM class
   """
   id = IDField()
+  created_by = TextField(required=True)
+  is_public = BooleanField(default=False)
   name = TextField(required=True)
-  llm_type = TextField(required=True)
+  query_engine = TextField(required=True)
   history = ListField(default=[])
 
   class Meta:
     ignore_none_field = False
     collection_name = BaseModel.DATABASE_PREFIX + "query_engines"
+
+  @classmethod
+  def get_all_public(cls,
+                     skip=0,
+                     order_by="-created_time",
+                     limit=1000):
+    """
+    Fetch all public query engines
+
+    Args:
+
+    Returns:
+        List[QueryEngine]: List of public query engines
+
+    """
+    objects = cls.collection.filter(
+        "is_public", "==", "true").filter(
+            "deleted_at_timestamp", "==",
+            None).order(order_by).offset(skip).fetch(limit)
+    return list(objects)
+
+
+class QueryResult(BaseModel):
+  """
+  QueryResult ORM class.  Results consist of a list of query reference
+  ids.
+  """
+  id = IDField()
+  query_engine_id = TextField(required=True)
+  query_engine = TextField(required=True)
+  results = ListField(default=[])
+
+  class Meta:
+    ignore_none_field = False
+    collection_name = BaseModel.DATABASE_PREFIX + "query_results"
+
+  @classmethod
+  def load_references(query_result):
+    references = []
+    for ref in query_result.results:
+      object = cls.collection.filter(
+          "id", "==", ref.id).filter(
+              "deleted_at_timestamp", "==", None)
+      if object is not None:
+        references.append(object)
+    return references
+
+
+class QueryReference(BaseModel):
+  """
+  QueryReference ORM class.  Each reference consists of a text query
+  response and a link to a source document.
+  """
+  id = IDField()
+  query_engine_id = TextField(required=True)
+  query_engine = TextField(required=True)
+  query_response = TextField(required=True)
+  reference_link = TextField(required=True)
+
+  class Meta:
+    ignore_none_field = False
+    collection_name = BaseModel.DATABASE_PREFIX + "query_references"
 
