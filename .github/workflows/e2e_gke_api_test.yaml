@@ -69,7 +69,7 @@ env:
   CLOUD_LOGGING_ENABLED: False
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
-  EXTERNAL_USER_PROPERTY_PREFIX: SNHU
+  EXTERNAL_USER_PROPERTY_PREFIX: SNHU_
   USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT }}
   E2E_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr' || 'e2e_pr' }}${{  github.event.pull_request.number }}_
   E2E_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-' }}${{  github.event.pull_request.number }}
