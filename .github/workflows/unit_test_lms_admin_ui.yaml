@@ -23,7 +23,7 @@ on:
       - 'microservices/lms_admin_ui/**'
   workflow_dispatch:
 jobs:
-  aitutor-linter:
+  unit-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -43,4 +43,4 @@ jobs:
     - name: Run unit tests
       run: |
           cd ./microservices/lms_admin_ui
-          npm run test
+          npm run test:prod
