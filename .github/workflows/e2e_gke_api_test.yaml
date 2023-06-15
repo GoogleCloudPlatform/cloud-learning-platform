@@ -263,7 +263,7 @@ jobs:
   e2e-ui-test-lms-admin-ui:
     runs-on: ubuntu-latest
     needs: deploy
-    # if: contains(github.event.pull_request.labels.*.name, 'LMS') 
+    if: contains(github.event.pull_request.labels.*.name, 'LMS_ADMIN_UI') 
     env:
       HEADLESS: enables
     strategy:

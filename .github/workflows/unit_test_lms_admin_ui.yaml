@@ -1,0 +1,52 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+name: Unit test for lms_admin_ui
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - aitutor/src/*
+      - tagging_tool/src/*
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'microservices/lms_admin_ui/**'
+  workflow_dispatch:
+jobs:
+  aitutor-linter:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}  
+    
+    - name: Install dependencies
+      run: |
+          cd ./microservices/lms_admin_ui
+          npm install --save-exact
+
+    - name: Run unit tests
+      run: |
+          cd ./microservices/lms_admin_ui
+          npm run test
