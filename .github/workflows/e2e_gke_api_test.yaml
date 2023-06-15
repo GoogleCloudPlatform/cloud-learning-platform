@@ -36,16 +36,16 @@ on:
         required: true
       GH_PAT:
         required: true
-  # pull_request:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'microservices/**'
-  #     - 'common/**'
-  #     - 'e2e/**'
-  #     - 'utils/**'
-  #     - '.github/workflows/e2e_gke_api_test.yaml'
-  #     - 'skaffold.yaml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'microservices/**'
+      - 'common/**'
+      - 'e2e/**'
+      - 'utils/**'
+      - '.github/workflows/e2e_gke_api_test.yaml'
+      - 'skaffold.yaml'
   workflow_dispatch:
     inputs:
       USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT:
@@ -263,7 +263,7 @@ jobs:
   e2e-ui-test-lms-admin-ui:
     runs-on: ubuntu-latest
     needs: deploy
-    if: contains(github.event.pull_request.labels.*.name, 'LMS_ADMIN_UI') 
+    if: ${{contains(github.event.pull_request.labels.*.name, 'LMS_ADMIN_UI') || inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true}} 
     env:
       HEADLESS: enables
     strategy:
