@@ -20,6 +20,7 @@ on:
     types: [submitted]
     branches:
       - main
+      - feature-clp
     paths:
       - 'microservices/**'
       - 'common/**'

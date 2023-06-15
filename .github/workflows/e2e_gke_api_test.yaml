@@ -39,6 +39,7 @@ on:
   pull_request:
     branches:
       - main
+      - feature-clp
     paths:
       - 'microservices/**'
       - 'common/**'
