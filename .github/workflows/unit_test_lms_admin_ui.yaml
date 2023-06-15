@@ -16,15 +16,9 @@
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 name: Unit test for lms_admin_ui
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - aitutor/src/*
-      - tagging_tool/src/*
   pull_request:
     branches:
-      - master
+      - main
     paths:
       - 'microservices/lms_admin_ui/**'
   workflow_dispatch:
