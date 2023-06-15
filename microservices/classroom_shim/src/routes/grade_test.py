@@ -1,13 +1,10 @@
 """
-  Tests for LTI Assignment endpoints
+  Tests for Grade endpoints
 """
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import,line-too-long
 import os
-import json
-import datetime
 import pytest
-from copy import deepcopy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from common.models import LTIAssignment
@@ -45,14 +42,8 @@ def test_grade(create_lti_assignment):
   lti_assignment = create_lti_assignment
 
   input_json = {
-      "user_id": "V2bpB62b8nPb18yn9",
-      "comment": "Good work!",
-      "lti_content_item_id": lti_assignment.lti_content_item_id,
-      "maximum_grade": "50",
-      "assigned_grade": "30",
-      "draft_grade": "20",
-      "line_item_title": "Test Assignment 1",
-      "validate_title": False
+      **LTI_POST_GRADE_MODEL, "lti_content_item_id":
+          lti_assignment.lti_content_item_id
   }
   with mock.patch("routes.grade.auth_client.get_id_token", return_value=True):
     with mock.patch(
@@ -67,4 +58,3 @@ def test_grade(create_lti_assignment):
         json_response = resp.json()
         print("resp", resp)
         assert json_response.get("success") is True
-

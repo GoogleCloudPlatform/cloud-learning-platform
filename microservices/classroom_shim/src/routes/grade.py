@@ -94,6 +94,7 @@ def update_classroom_grade(input_grade: PostGradeModel):
           user_id=user_id,
           headers=headers,
           course_work_id=course_work_id)
+
       if submissions:
         submission_id = submissions[0].get("id")
         post_grade_of_the_user(lti_assignment.context_id, course_work_id,
