@@ -100,8 +100,8 @@ def create_inspace_user_helper(user) -> bool:
       "firstName": user.first_name,
       "lastName": user.last_name,
       "userProperties": {
-        f"{EXTERNAL_USER_PROPERTY_PREFIX}_USER_ID": user.user_id,
-        f"{EXTERNAL_USER_PROPERTY_PREFIX}_USER_ROLE": inspace_user_type
+        f"{EXTERNAL_USER_PROPERTY_PREFIX}USER_ID": user.user_id,
+        f"{EXTERNAL_USER_PROPERTY_PREFIX}USER_ROLE": inspace_user_type
       }
     }
 

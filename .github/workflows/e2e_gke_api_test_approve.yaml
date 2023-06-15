@@ -18,7 +18,8 @@ name: E2E API Tests on GKE Microservices on approval
 on:
   pull_request_review:
     types: [submitted]
-    branches: [ "main" ]
+    branches:
+      - main
     paths:
       - 'microservices/**'
       - 'common/**'
