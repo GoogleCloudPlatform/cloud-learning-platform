@@ -1,0 +1,85 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: common-ml
+requires:
+  - path: ../common
+    configs: [common]
+    activeProfiles:
+    - name: custom
+      activatedBy: [custom]
+    - name: dev
+      activatedBy: [dev]
+    - name: prod
+      activatedBy: [prod]
+build:
+  tagPolicy:
+    sha256: {}
+  artifacts:
+  - image: common-ml
+    requires:
+      - image: common
+        alias: BASE_IMG
+    sync:
+      infer:
+        - 'src/**'
+
+profiles:
+- name: custom
+  build:
+    googleCloudBuild:
+      machineType: N1_HIGHCPU_8
+      timeout: '900s'
+    artifacts:
+    - image: common-ml
+      docker:
+        cacheFrom:
+          - common-ml
+          - common-ml:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+- name: gpu
+  build:
+    googleCloudBuild:
+      machineType: N1_HIGHCPU_8
+      timeout: '900s'
+    artifacts:
+    - image: common-ml
+      docker:
+        cacheFrom:
+          - common-ml
+          - common-ml:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+- name: dev
+  build:
+    googleCloudBuild:
+      machineType: N1_HIGHCPU_8
+      timeout: '900s'
+    artifacts:
+    - image: gcr.io/aitutor-dev/common-ml
+      docker:
+        cacheFrom:
+          - gcr.io/aitutor-dev/common-ml:latest
+      requires:
+        - image: gcr.io/aitutor-dev/common
+          alias: BASE_IMG
+      sync:
+        infer:
+          - 'src/**'
+- name: prod
+  build:
+    googleCloudBuild:
+      machineType: N1_HIGHCPU_8
+      timeout: '900s'
+    artifacts:
+    - image: common-ml
+      docker:
+        cacheFrom:
+          - common-ml
+          - common-ml:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
