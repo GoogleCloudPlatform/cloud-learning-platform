@@ -1592,7 +1592,7 @@ def merge_split_paragraphs(sentences, merge_index):
   Args:
     sentences: list(list(text)) List of sentences in each split paragraph
     merge_index: list(orig_index (before split), initial_index (after_split),
-    final_index (after_split), split_occured(bool))
+    final_index (after_split), split_occurred(bool))
   Returns:
     final_sentences: list(list(text))) List of sentences in each original
     paragraph"""
