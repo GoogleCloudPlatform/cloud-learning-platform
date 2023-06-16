@@ -8,6 +8,10 @@ from google.cloud import firestore_admin_v1
 from common.models import TempUser
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
 PROJECT_ID = os.getenv("PROJECT_ID", None)
+CREDS = os.getenv("account", None)
+print("=========================")
+print(CREDS)
+print(type(CREDS))
 # disabling for linting to pass
 # pylint: disable = broad-exception-raised, broad-except
 TEST_USER = {

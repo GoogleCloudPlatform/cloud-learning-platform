@@ -289,12 +289,10 @@ jobs:
 
     - name: export admin-teacher account in github env
       id: account-setup
-      uses: 'google-github-actions/get-secretmanager-secrets@v1'
-      with:
-        secrets: |-
-          token:core-learning-services-dev/e2e_test_email_password
-        env:
-        CREDS: '${{ steps.secrets.outputs.token }}'
+      run: |
+        secret_id=e2e_test_email_password
+        export account=$(gcloud secrets versions access latest --secret="$secret_id")
+
 
     - name: Install GKE Auth Plugin
       run: | 
@@ -303,6 +301,7 @@ jobs:
     - name: Connect to cluster
       run: |
         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+        echo $account
 
     - name: Set up port forwarding
       run: |
