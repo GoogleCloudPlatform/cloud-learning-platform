@@ -326,9 +326,9 @@ jobs:
           cd ./microservices/lms_admin_ui
           npm start & wait-for-it -h localhost -p 4200 -t 0 -- echo "Frontend Dev Server up"
           
-    # - name: Waiting 30 sec
-    #   run: |
-    #       sleep 30s
+    - name: Waiting 30 sec
+      run: |
+          sleep 30s
 
     - name: Create new user for e2e
       # run: |
@@ -339,6 +339,7 @@ jobs:
       #     python -m pip install -r requirements.txt
       #     PYTHONPATH=../common/src python test_env.py
       run: |
+          cd utils/
           python test_env.py
 
     - name: Run E2E UI Tests
