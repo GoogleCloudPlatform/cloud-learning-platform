@@ -95,7 +95,7 @@ jobs:
         credentials_json: '${{ secrets.DEPLOYMENT_DEV_SA_KEY }}'
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
-        
+
     - name: Install GKE Auth Plugin
       run: | 
         gcloud components install gke-gcloud-auth-plugin
@@ -295,7 +295,7 @@ jobs:
       uses: 'google-github-actions/get-secretmanager-secrets@v1'
       with:
         secrets: |-
-          token:$PROJECT_ID/e2e_test_email_password
+          token:${{ secrets.PROJECT_ID }}/e2e_test_email_password
 
     - name: Set Secret
       env:
@@ -313,23 +313,22 @@ jobs:
         python -m pip install -r e2e/requirements.txt
         python e2e/utils/port_forward.py --namespace $NAMESPACE
     
-    # - name: Install wait-for-it
-    #   run: sudo apt install -y wait-for-it
+    - name: Install wait-for-it
+      run: sudo apt install -y wait-for-it
 
-    # - name: Install dependencies
-    #   run: |
-    #       cd ./microservices/lms_admin_ui
-    #       npm install --save-exact
+    - name: Install dependencies
+      run: |
+          cd ./microservices/lms_admin_ui
+          npm install --save-exact
 
-    # - name: Run frontend server on localhost
-    #   run: |
-    #       cd ./microservices/lms_admin_ui
-    #       npm start & wait-for-it -h localhost -p 4200 -t 0 -- echo "Frontend Dev Server up"
+    - name: Run frontend server on localhost
+      run: |
+          cd ./microservices/lms_admin_ui
+          npm start & wait-for-it -h localhost -p 4200 -t 0 -- echo "Frontend Dev Server up"
           
     # - name: Waiting 30 sec
     #   run: |
     #       sleep 30s
-      # shell: bash
 
     - name: Create new user for e2e
       # run: |
