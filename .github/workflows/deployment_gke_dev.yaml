@@ -111,7 +111,7 @@ jobs:
         run: |
           skaffold run \
           --profile custom \
-          --namespace default \
+          --namespace $NAMESPACE \
           --module backends \
           -l commit=$GITHUB_SHA \
           --tag latest
