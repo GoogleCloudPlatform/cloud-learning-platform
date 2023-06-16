@@ -293,9 +293,7 @@ jobs:
       with:
         secrets: |-
           token:core-learning-services-dev/e2e_test_email_password
-
-    - id: 'publish'
-      env:
+        env:
         CREDS: '${{ steps.secrets.outputs.token }}'
 
     - name: Install GKE Auth Plugin
