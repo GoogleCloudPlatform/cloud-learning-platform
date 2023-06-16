@@ -297,13 +297,13 @@ jobs:
         secrets: |-
           token:core-learning-services-dev/e2e_test_email_password
 
-     - name: echo account
-       env:
-         account : '${{ steps.secrets.outputs.token }}'
-       run: |
-         echo $account
-         cd utils/
-         python test_env.py
+    - name: echo account
+      env:
+        account : '${{ steps.secrets.outputs.token }}'
+      run: |
+        echo $account
+        cd utils/
+        python test_env.py
 
     - name: Connect to cluster
       run: |
