@@ -2,7 +2,7 @@ const { setHeadlessWhen, setWindowSize } = require('@codeceptjs/configure');
 
 setWindowSize(1600, 1100);
 setHeadlessWhen(process.env.HEADLESS);
-console.log(process.env.account)
+console.log(process.env.CREDS)
 
 let testPath = './ui-tests/**/*.js';
 

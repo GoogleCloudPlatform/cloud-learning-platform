@@ -289,10 +289,15 @@ jobs:
 
     - name: export admin-teacher account in github env
       id: account-setup
-      run: |
-        secret_id=e2e_test_email_password
-        account=$(gcloud secrets versions access latest --secret="$secret_id")
-        echo "account=$account" >> "$GITHUB_OUTPUT"
+      uses: 'google-github-actions/get-secretmanager-secrets@v1'
+      with:
+        secrets: |-
+          token:core-learning-services-dev/e2e_test_email_password
+
+    - id: 'publish'
+      uses: 'foo/bar@main'
+      env:
+        CREDS: '${{ steps.secrets.outputs.token }}'
 
     - name: Install GKE Auth Plugin
       run: | 
