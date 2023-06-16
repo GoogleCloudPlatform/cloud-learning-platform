@@ -30,7 +30,6 @@ def get_section_with_minimum_student(sections):
       if section.enrolled_students_count < min_student and\
         section.enrolled_students_count < section.max_students and\
         section.status =="ACTIVE" and section.enrollment_status=="OPEN":
-        Logger.info(f"Section {section.id} {section.enrollment_status} {section.status}" )
         min_student = section.enrolled_students_count
         min_sections_count_mapping = section
   return min_sections_count_mapping
