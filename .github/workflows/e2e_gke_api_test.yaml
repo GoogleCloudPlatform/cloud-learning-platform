@@ -333,7 +333,10 @@ jobs:
           sleep 30s
 
     - name: Create new user for e2e
+      env:
+        account : '${{ steps.secrets.outputs.token }}'
       run: |
+          echo $account
           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
           export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
           python -m pip install -r common/requirements.txt
