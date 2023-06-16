@@ -444,7 +444,7 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
       raise ValidationError("Cohort Max count reached hence student cannot" +
             "be erolled in this cohort")
     if section.enrolled_students_count >= section.max_students:
-      raise ValidationError("Cohort Max count reached hence student cannot" +
+      raise ValidationError("Section Max count reached hence student cannot" +
             "be erolled in this cohort")
     sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
@@ -546,6 +546,9 @@ def invite_student(section_id: str, student_email: str, request: Request):
     if cohort.enrolled_students_count >= cohort.max_students:
       raise Conflict("Cohort Max count reached hence student cannot" +
                      " be erolled in this cohort")
+    if section.enrolled_students_count >= section.max_students:
+      raise ValidationError("Section Max count reached hence student cannot" +
+            "be erolled in this cohort")
     sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
     if not student_service.check_student_can_enroll_in_cohort(
