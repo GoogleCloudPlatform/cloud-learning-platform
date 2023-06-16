@@ -115,13 +115,22 @@ def query_engine_build(doc_url: str, query_engine: str,
   return query_engine
 
 
-def build_doc_index(doc_url:str, query_engine: str) -> bool:
+def build_doc_index(doc_url:str, query_engine: str):
   """
   Build the document index.
   Supports only GCS URLs initially, containing PDF and CSV files.
-  """
-  try:
 
+  Args:
+    doc_url: URL pointing to folder of documents
+    query_engine: the query engine to
+  Returns:
+    true if index creation is succesful
+  """
+  q_engine = QueryEngine.find_by_name(query_engine)
+  if q_engine is None:
+    raise ResourceNotFoundException(f"cant find query engine {query_engine}")
+
+  try:
     # download files to local directory
     storage_client = storage.Client(project=PROJECT_ID)
     doc_filepaths = _download_files_to_local(storage_client, doc_url)
@@ -176,7 +185,10 @@ def build_doc_index(doc_url:str, query_engine: str) -> bool:
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
-  return tree_ah_index is not None
+  if tree_ah_index is not None:
+    # store index in query engine model
+    q_engine.index_id = tree_ah_index.index_name
+    q_engine.update()
 
 
 def _download_files_to_local(storage_client, doc_url: str) -> \

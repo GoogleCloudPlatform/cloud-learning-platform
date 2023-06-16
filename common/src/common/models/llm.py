@@ -110,6 +110,7 @@ class QueryEngine(BaseModel):
   is_public = BooleanField(default=False)
   name = TextField(required=True)
   query_engine = TextField(required=True)
+  index_id = TextField(required=False)
   history = ListField(default=[])
 
   class Meta:
