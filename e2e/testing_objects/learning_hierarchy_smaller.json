@@ -1,0 +1,254 @@
+{
+    "curriculum_pathways": {
+      "name": "Level Up Program",
+      "display_name": "Level Up Program",
+      "description": "Level Up Program Pathway",
+      "alias": "program",
+      "child_nodes": {
+        "curriculum_pathways": [
+          {
+            "name": "Level 1",
+            "display_name": "Level 1",
+            "description": "",
+            "order": 1,
+            "alias": "level",
+            "achievements": [
+              {
+                "type": "level",
+                "name": "Level 1",
+                "description": "Level 1",
+                "metadata": {
+                  "design_config": {
+                    "shape": "",
+                    "theme": "",
+                    "illustration": ""
+                  }
+                }
+              }
+            ],
+            "child_nodes": {
+              "curriculum_pathways": [
+                {
+                  "name": "Humanities",
+                  "display_name": "Humanities",
+                  "description": "Understanding Your World",
+                  "order": 1,
+                  "alias": "discipline",
+                  "achievements": [
+                    {
+                      "type": "course equate",
+                      "name": "Humanities",
+                      "description": "Understanding Your World",
+                      "metadata": {
+                        "design_config": {
+                          "shape": "",
+                          "theme": "",
+                          "illustration": ""
+                        }
+                      }
+                    }
+                  ],
+                  "child_nodes": {
+                    "curriculum_pathways": [
+                      {
+                        "name": "HUM-13507",
+                        "display_name": "HUM-13507",
+                        "description": "Unit 1:HUM-13507",
+                        "alias": "unit",
+                        "order": 1,
+                        "metadata": {
+                          "design_config": {
+                            "illustration": "L1_U2",
+                            "theme": "red-primary-light"
+                          }
+                        },
+                        "achievements": [
+                          {
+                            "type": "competency",
+                            "name": "Humanities, Self & Society",
+                            "description": "Humanities, Self & Society",
+                            "metadata": {
+                              "design_config": {
+                                "shape": "circle",
+                                "theme": "",
+                                "illustration": "L1_A2"
+                              }
+                            }
+                          }
+                        ],
+                        "child_nodes": {
+                          "learning_experiences": [
+                            {
+                              "description": "",
+                              "display_name": "Humanities, Self & Society",
+                              "name": "Humanities, Self & Society",
+                              "order": 1,
+                              "alias": "learning_experience",
+                              "metadata": {
+                                "design_config": {
+                                  "illustration": "L1_U2",
+                                  "theme": "red-primary-light"
+                                }
+                              },
+                              "child_nodes": {
+                                "learning_objects": [
+                                    {
+                                      "description": "Reflect on Learning",
+                                      "display_name": "Reflect on Learning",
+                                      "name": "Reflect on Learning",
+                                      "type": "cognitive_wrapper",
+                                      "alias": "module",
+                                      "order": 1,
+                                      "is_optional": true,
+                                      "is_hidden": true,
+                                      "child_nodes": {
+                                        "assessments": [
+                                          {
+                                            "name": "Cognitive wrapper assessment",
+                                            "display_name": "Cognitive wrapper assessment",
+                                            "type": "cognitive_wrapper",
+                                            "assessment_reference": {
+                                              "activity_template_id": "SRL8-1-howdidyoudo"
+                                            },
+                                            "order": 1,
+                                            "alias": "assessment"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "name": "HUM102.1 Exam",
+                                      "display_name": "HUM102.1 Exam",
+                                      "description": "Module 9",
+                                      "order": 2,
+                                      "alias": "module",
+                                      "type": "project",
+                                      "references": {
+                                        "competencies": [
+                                          {
+                                            "name": "HUM-13507",
+                                            "description": "Differentiate the various perspectives of the humanities in relation to a topic"
+                                          }
+                                        ],
+                                        "skills": [
+                                          {
+                                            "name": "HUM-13507_S1",
+                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                          },
+                                          {
+                                            "name": "HUM-13507_S2",
+                                            "description": "Determine the utility of each of the humanities perspectives"
+                                          },
+                                          {
+                                            "name": "HUM-13507_S3",
+                                            "description": "Determine sources on a topic pertinent to the perspective of the humanities"
+                                          },
+                                          {
+                                            "name": "HUM-13507_S4",
+                                            "description": "Summarize relevant information from a variety of sources"
+                                          },
+                                          {
+                                            "name": "HUM-13507_S5",
+                                            "description": "Identify potential biases and assumptions related to the information about a topic"
+                                          }
+                                        ]
+                                      },
+                                      "child_nodes": {
+                                        "assessments": [
+                                          {
+                                            "name": "Project Submission",
+                                            "display_name": "Project Submission",
+                                            "type": "project",
+                                            "max_attempts": 3,
+                                            "assessment_reference": {
+                                              "activity_template_id": "HUM13507_M8_2_submityourproject"
+                                            },
+                                            "order": 1,
+                                            "alias": "assessment"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "HUM-13508",
+                        "display_name": "HUM-13508",
+                        "description": "Unit 2:HUM-13508",
+                        "alias": "unit",
+                        "order": 2,
+                        "metadata": {
+                          "design_config": {
+                            "illustration": "L1_U1",
+                            "theme": "purple-primary"
+                          }
+                        },
+                        "achievements": [
+                          {
+                            "type": "competency",
+                            "name": "Perspectives of the Humanities",
+                            "description": "Perspectives of the Humanities",
+                            "metadata": {
+                              "design_config": {
+                                "shape": "circle",
+                                "theme": "",
+                                "illustration": "L1_A1"
+                              }
+                            }
+                          }
+                        ],
+                        "child_nodes": {
+                          "learning_experiences": [
+                            {
+                              "description": "",
+                              "display_name": "Perspectives of the Humanities",
+                              "name": "Perspectives of the Humanities",
+                              "order": 1,
+                              "alias": "learning_experience",
+                              "metadata": {
+                                "design_config": {
+                                  "illustration": "L1_U1",
+                                  "theme": "purple-primary"
+                                }
+                              },
+                              "child_nodes": {
+                                "learning_objects": [
+                                  {
+                                    "name": "Unit Overview",
+                                    "display_name": "Unit Overview",
+                                    "description": "Module 1",
+                                    "order": 1,
+                                    "type": "unit_overview",
+                                    "alias": "module",
+                                    "child_nodes": {
+                                      "learning_resources": [
+                                        {
+                                          "name": "Unit Overview",
+                                          "display_name": "Unit Overview",
+                                          "type": "html",
+                                          "alias": "lesson",
+                                          "order": 1
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }

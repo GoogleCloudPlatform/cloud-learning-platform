@@ -1,0 +1,19 @@
+[
+  {
+    "name": "Assessment 1",
+    "type": "random",
+    "author_id": "author_id",
+    "instructor_id": "instructor_id",
+    "assessor_id": "assessor_id",
+    "assessment_reference": {},
+    "max_attempts": 3,
+    "pass_threshold": 0.7,
+    "achievements": [],
+    "alignments": {},
+    "references": {},
+    "parent_nodes": {},
+    "child_nodes": {},
+    "prerequisites": {},
+    "metadata": {}
+  }
+]
