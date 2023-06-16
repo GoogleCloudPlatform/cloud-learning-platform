@@ -287,6 +287,13 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
 
+    - name: export admin-teacher account in github env
+      id: account-setup
+      run: |
+        secret_id=e2e-admin-teacher-$(shuf -n1 -i 1-4)-username
+        account=$(gcloud secrets versions access latest --secret="$secret_id")
+        echo "account=$account" >> "$GITHUB_OUTPUT"
+
     - name: Install GKE Auth Plugin
       run: | 
         gcloud components install gke-gcloud-auth-plugin
