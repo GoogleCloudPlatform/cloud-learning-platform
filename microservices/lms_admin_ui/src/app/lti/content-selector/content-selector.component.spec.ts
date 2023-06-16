@@ -7,7 +7,7 @@ import { LtiService } from '../service/lti.service';
 import { of } from 'rxjs';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 
-fdescribe('ContentSelectorComponent', () => {
+describe('ContentSelectorComponent', () => {
   let component: ContentSelectorComponent;
   let fixture: ComponentFixture<ContentSelectorComponent>;
   let ltiService : LtiService;
