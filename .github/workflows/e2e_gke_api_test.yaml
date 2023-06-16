@@ -96,11 +96,11 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
     
-    - id: 'secrets'
-      uses: 'google-github-actions/get-secretmanager-secrets@v1'
-      with:
-        secrets: |-
-          token:core-learning-services-dev/e2e_test_email_password
+    # - id: 'secrets'
+    #   uses: 'google-github-actions/get-secretmanager-secrets@v1'
+    #   with:
+    #     secrets: |-
+    #       token:core-learning-services-dev/e2e_test_email_password
     
     # - name: export admin-teacher account in github env
     #   id: account-setup
@@ -109,13 +109,13 @@ jobs:
     #     export account=$(gcloud secrets versions access latest --secret="$secret_id")
     #     echo "account=$account" >> "$GITHUB_ENV"
 
-    - name: echo account
-      env:
-        account : '${{ steps.secrets.outputs.token }}'
-      run: |
-        echo $account
-        cd utils/
-        python test_env.py
+    # - name: echo account
+    #   env:
+    #     account : '${{ steps.secrets.outputs.token }}'
+    #   run: |
+    #     echo $account
+    #     cd utils/
+    #     python test_env.py
 
     - name: Install GKE Auth Plugin
       run: | 
@@ -316,40 +316,53 @@ jobs:
       run: |
         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
+    - name: Fetch secrets
+    - id: 'secrets'
+      uses: 'google-github-actions/get-secretmanager-secrets@v1'
+      with:
+        secrets: |-
+          token:$PROJECT_ID/e2e_test_email_password
+
+    - name: Set Secret
+      env:
+        account : '${{ steps.secrets.outputs.token }}'
+      run: |
+        echo $account
+
     - name: Set up port forwarding
       run: |
         NAMESPACE=$E2E_NAMESPACE_PREFIX
         python -m pip install -r e2e/requirements.txt
         python e2e/utils/port_forward.py --namespace $NAMESPACE
     
-    - name: Install wait-for-it
-      run: sudo apt install -y wait-for-it
+    # - name: Install wait-for-it
+    #   run: sudo apt install -y wait-for-it
 
-    - name: Install dependencies
-      run: |
-          cd ./microservices/lms_admin_ui
-          npm install --save-exact
+    # - name: Install dependencies
+    #   run: |
+    #       cd ./microservices/lms_admin_ui
+    #       npm install --save-exact
 
-    - name: Run frontend server on localhost
-      run: |
-          cd ./microservices/lms_admin_ui
-          npm start & wait-for-it -h localhost -p 4200 -t 0 -- echo "Frontend Dev Server up"
+    # - name: Run frontend server on localhost
+    #   run: |
+    #       cd ./microservices/lms_admin_ui
+    #       npm start & wait-for-it -h localhost -p 4200 -t 0 -- echo "Frontend Dev Server up"
           
     # - name: Waiting 30 sec
     #   run: |
     #       sleep 30s
-      shell: bash
+      # shell: bash
 
     - name: Create new user for e2e
-      # env:
-      #   account : ${{steps.account-setup.outputs.account}}
+      # run: |
+      #     PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+      #     export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+      #     python -m pip install -r common/requirements.txt
+      #     cd utils/
+      #     python -m pip install -r requirements.txt
+      #     PYTHONPATH=../common/src python test_env.py
       run: |
-          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-          export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
-          python -m pip install -r common/requirements.txt
-          cd utils/
-          python -m pip install -r requirements.txt
-          PYTHONPATH=../common/src python create_e2e_user.py
+          python test_env.py
 
     - name: Run E2E UI Tests
       run: |
