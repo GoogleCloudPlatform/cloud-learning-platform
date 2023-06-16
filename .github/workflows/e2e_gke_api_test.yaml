@@ -96,16 +96,22 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
     
-    - name: export admin-teacher account in github env
-      id: account-setup
-      run: |
-        secret_id=e2e_test_email_password
-        export account=$(gcloud secrets versions access latest --secret="$secret_id")
-        echo "account=$account" >> "$GITHUB_ENV"
+    - id: 'secrets'
+      uses: 'google-github-actions/get-secretmanager-secrets@v1'
+      with:
+        secrets: |-
+          token:core-learning-services-dev/e2e_test_email_password
+    
+    # - name: export admin-teacher account in github env
+    #   id: account-setup
+    #   run: |
+    #     secret_id=e2e_test_email_password
+    #     export account=$(gcloud secrets versions access latest --secret="$secret_id")
+    #     echo "account=$account" >> "$GITHUB_ENV"
 
     - name: echo account
       env:
-        account : ${{steps.account-setup.outputs.account}}
+        account : '${{ steps.secrets.outputs.token }}'
       run: |
         echo $account
 
