@@ -295,9 +295,10 @@ jobs:
         echo "account=$account" >> "$GITHUB_OUTPUT"
 
     - name: echo account
-      with:
+      env:
         account : ${{steps.account-setup.outputs.account}}
-      run: echo $account
+      run: |
+        echo $account
 
 
     - name: Install GKE Auth Plugin
