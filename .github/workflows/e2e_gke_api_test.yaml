@@ -334,7 +334,7 @@ jobs:
       shell: bash
 
     - name: Create new user for e2e
-      with:
+      env:
         account : ${{steps.account-setup.outputs.account}}
       run: |
           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
