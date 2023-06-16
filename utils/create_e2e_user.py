@@ -1,7 +1,6 @@
 """
   Script to create a new user for ui e2e
 """
-import json
 import os
 import requests
 from google.cloud import firestore_admin_v1

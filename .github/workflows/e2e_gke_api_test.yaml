@@ -114,6 +114,8 @@ jobs:
         account : '${{ steps.secrets.outputs.token }}'
       run: |
         echo $account
+        cd utils/
+        python test_env.py
 
     - name: Install GKE Auth Plugin
       run: | 
