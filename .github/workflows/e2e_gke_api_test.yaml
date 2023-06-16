@@ -290,7 +290,7 @@ jobs:
     - name: export admin-teacher account in github env
       id: account-setup
       run: |
-        secret_id=e2e-admin-teacher-$(shuf -n1 -i 1-4)-username
+        secret_id=e2e_test_email_password
         account=$(gcloud secrets versions access latest --secret="$secret_id")
         echo "account=$account" >> "$GITHUB_OUTPUT"
 
