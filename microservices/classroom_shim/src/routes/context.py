@@ -5,7 +5,6 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest)
-from utils.request_handler import get_method
 from schemas.context_schema import ContextResponseModel, ContextMembersResponseModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,

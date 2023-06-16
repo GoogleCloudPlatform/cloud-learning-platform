@@ -1,6 +1,5 @@
 '''LTI Assignment Endpoints'''
 import traceback
-import requests
 import datetime
 from fastapi import APIRouter
 from common.models import LTIAssignment
@@ -9,7 +8,6 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest)
-from config import API_DOMAIN, auth_client
 from routes.context import get_context_details
 from schemas.lti_assignment_schema import (
     LTIAssignmentListResponseModel, GetLTIAssignmentResponseModel,
