@@ -297,7 +297,7 @@ jobs:
     - name: echo account
       with:
         account : ${{steps.account-setup.outputs.account}}
-      run : echo $account
+      run: echo $account
 
 
     - name: Install GKE Auth Plugin
