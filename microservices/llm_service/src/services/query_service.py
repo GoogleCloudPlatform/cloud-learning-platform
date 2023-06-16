@@ -204,7 +204,7 @@ def _read_doc(doc_name:str, doc_filepath: str) -> List[str]:
   doc_text_list = None
   loader = None
   if doc_extension == "txt":
-    with open(doc_filepath) as f:
+    with open(doc_filepath, "r", encoding="utf-8") as f:
       doc_text = f.read()
     doc_text_list = [doc_text]
   elif doc_extension == "csv":
@@ -232,31 +232,30 @@ def _encode_texts_to_embeddings(
     return [None for _ in range(len(sentence_list))]
 
 
-# Generator function to yield batches of sentences
-def _generate_batches(
-    sentences: List[str], batch_size: int
-) -> Generator[List[str], None, None]:
-  """ generate batches sentences """
-  for i in range(0, len(sentences), batch_size):
-    yield sentences[i : i + batch_size]
+# Generator function to yield batches of text_chunks
+def _generate_batches(text_chunks: List[str], batch_size: int
+    ) -> Generator[List[str], None, None]:
+  """ generate batches of text_chunks """
+  for i in range(0, len(text_chunks), batch_size):
+    yield text_chunks[i : i + batch_size]
 
 
 def _get_embedding_batched(
-    sentences: List[str], api_calls_per_second: int = 10, batch_size: int = 5
+    text_chunks: List[str], api_calls_per_second: int = 10, batch_size: int = 5
 ) -> Tuple[List[bool], np.ndarray]:
   """ get embbedings for a list of text strings """
 
   embeddings_list: List[List[float]] = []
 
   # Prepare the batches using a generator
-  batches = _generate_batches(sentences, batch_size)
+  batches = _generate_batches(text_chunks, batch_size)
 
   seconds_per_job = 1 / api_calls_per_second
 
   with ThreadPoolExecutor() as executor:
     futures = []
     for batch in tqdm(
-        batches, total=math.ceil(len(sentences) / batch_size), position=0
+        batches, total=math.ceil(len(text_chunks) / batch_size), position=0
     ):
       futures.append(
           executor.submit(functools.partial(_encode_texts_to_embeddings), batch)
@@ -266,15 +265,11 @@ def _get_embedding_batched(
     for future in futures:
       embeddings_list.extend(future.result())
 
-  is_successful = [
-    embedding is not None
-      for sentence, embedding in zip(sentences, embeddings_list)
-  ]
   embeddings_list_successful = np.squeeze(
     np.stack([embedding
       for embedding in embeddings_list if embedding is not None])
   )
-  return is_successful, embeddings_list_successful
+  return embeddings_list_successful
 
 
 def _generate_index_data(doc_name: str, text_chunks: List[str]) -> str:
@@ -282,7 +277,7 @@ def _generate_index_data(doc_name: str, text_chunks: List[str]) -> str:
 
   for i in range(len(text_chunks)):
 
-    # Create temporary file to write embeddings to
+    # Create temporary folder to write embeddings to
     embeddings_file_path = Path(tempfile.mkdtemp())
 
     # Create a unique output file for each set of embeddings
@@ -290,11 +285,10 @@ def _generate_index_data(doc_name: str, text_chunks: List[str]) -> str:
         f"{doc_name}_{i}.json"
     )
 
-    with open(chunk_path, "a") as f:
-
-      # Convert batch to embeddings
-      is_successful, question_chunk_embeddings = _get_embedding_batched(
-          sentences=text_chunks,
+    with open(chunk_path, "a", encoding="utf-8") as f:
+      # Convert chunks to embeddings in batches, to manage API throttling
+      question_chunk_embeddings = _get_embedding_batched(
+          text_chunks=text_chunks,
           api_calls_per_second=API_CALLS_PER_SECOND,
           batch_size=ITEMS_PER_REQUEST,
       )
