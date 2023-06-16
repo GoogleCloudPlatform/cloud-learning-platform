@@ -295,7 +295,7 @@ jobs:
       uses: 'google-github-actions/get-secretmanager-secrets@v1'
       with:
         secrets: |-
-          token:${{ secrets.PROJECT_ID }}/e2e_test_email_password
+          token:core-learning-services-dev/e2e_test_email_password
 
     - name: Set Secret
       env:
