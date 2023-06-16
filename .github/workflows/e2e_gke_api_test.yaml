@@ -295,7 +295,6 @@ jobs:
           token:core-learning-services-dev/e2e_test_email_password
 
     - id: 'publish'
-      uses: 'foo/bar@main'
       env:
         CREDS: '${{ steps.secrets.outputs.token }}'
 
