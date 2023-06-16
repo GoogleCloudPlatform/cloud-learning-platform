@@ -292,6 +292,12 @@ jobs:
       run: |
         secret_id=e2e_test_email_password
         export account=$(gcloud secrets versions access latest --secret="$secret_id")
+        echo "account=$account" >> "$GITHUB_OUTPUT"
+
+    - name: echo account
+      with:
+        account : ${{steps.account-setup.outputs.account}}
+      run : echo $account
 
 
     - name: Install GKE Auth Plugin
@@ -301,7 +307,6 @@ jobs:
     - name: Connect to cluster
       run: |
         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
-        echo $account
 
     - name: Set up port forwarding
       run: |
@@ -328,6 +333,8 @@ jobs:
       shell: bash
 
     - name: Create new user for e2e
+      with:
+        account : ${{steps.account-setup.outputs.account}}
       run: |
           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
           export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
