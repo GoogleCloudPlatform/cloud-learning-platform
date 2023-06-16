@@ -297,11 +297,13 @@ jobs:
         secrets: |-
           token:core-learning-services-dev/e2e_test_email_password
 
-    - name: Set Secret
-      env:
-        account : '${{ steps.secrets.outputs.token }}'
-      run: |
-        echo $account
+     - name: echo account
+       env:
+         account : '${{ steps.secrets.outputs.token }}'
+       run: |
+         echo $account
+         cd utils/
+         python test_env.py
 
     - name: Connect to cluster
       run: |
@@ -330,7 +332,7 @@ jobs:
       run: |
           sleep 30s
 
-    - name: Create new user for e2e
+    # - name: Create new user for e2e
       # run: |
       #     PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
       #     export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
@@ -338,9 +340,9 @@ jobs:
       #     cd utils/
       #     python -m pip install -r requirements.txt
       #     PYTHONPATH=../common/src python test_env.py
-      run: |
-          cd utils/
-          python test_env.py
+      # run: |
+      #     cd utils/
+      #     python test_env.py
 
     - name: Run E2E UI Tests
       run: |
