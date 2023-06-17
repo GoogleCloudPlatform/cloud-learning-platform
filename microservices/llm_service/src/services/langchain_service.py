@@ -17,10 +17,9 @@
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
-from typing import Optional
+from typing import Optional, Any
 from common.models import UserChat
 from langchain.schema import HumanMessage, AIMessage
-from lanchain.llm import BaseModel
 
 from config import LANGCHAIN_LLM, CHAT_LLM_TYPES, COHERE_LLM_TYPES
 
@@ -85,7 +84,7 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
     raise InternalServerError(str(e)) from e
 
 
-def get_model(llm_type: str) -> BaseModel:
+def get_model(llm_type: str) -> Any:
   """ return a lanchain model given type """
   llm = LANGCHAIN_LLM.get(llm_type)
 

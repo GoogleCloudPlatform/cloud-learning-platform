@@ -24,7 +24,6 @@ import math
 from typing import List, Optional, Generator, Tuple, Dict
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
-from tqdm.auto import tqdm
 from pathlib import Path
 from common.utils.logging_handler import Logger
 from common.models import UserQuery, QueryResult, QueryEngine
@@ -34,7 +33,8 @@ from google.cloud import aiplatform
 from google.cloud import storage
 from vertexai.preview.language_models import TextEmbeddingModel
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.document_loaders import CSVLoader, PDFMinerLoader
+from langchain.document_loaders import CSVLoader
+from PyPDF2 import PdfReader
 from langchain.chains import RetrievalQAWithSourcesChain
 import langchain_service
 
@@ -155,7 +155,15 @@ def build_doc_index(doc_url:str, query_engine: str):
       Logger.info(f"generating index data for {doc_name}")
 
       # read doc data and split into text chunks
-      doc_text_list = _read_doc(doc_name, doc_filepath)
+      # skip any file that can't be read or generates an error
+      try:
+        doc_text_list = _read_doc(doc_name, doc_filepath)
+        if doc_text_list is None:
+          continue
+      except Exception as e:
+        continue
+      
+      # split text into chunks
       text_chunks = []
       for text in doc_text_list:
         text_chunks.extend(text_splitter.split_text(text))
@@ -215,6 +223,7 @@ def _read_doc(doc_name:str, doc_filepath: str) -> List[str]:
   doc_extension = doc_extension.lower()
   doc_text_list = None
   loader = None
+  
   if doc_extension == "txt":
     with open(doc_filepath, "r", encoding="utf-8") as f:
       doc_text = f.read()
@@ -222,7 +231,15 @@ def _read_doc(doc_name:str, doc_filepath: str) -> List[str]:
   elif doc_extension == "csv":
     loader = CSVLoader(file_path=doc_filepath)
   elif doc_extension == "pdf":
-    loader = PDFMinerLoader(file_path=doc_filepath)
+    # read PDF into array of pages
+    doc_text_list = []
+    with open(doc_filepath, "rb") as f:
+      reader = PdfReader(f)
+      num_pages = len(reader.pages)
+      Logger.info("Reading pdf file {doc_name} with {num_pages} pages")
+      for page in range(num_pages):
+        doc_text_list.append(reader.pages[page].extract_text())
+      Logger.info("Finished reading pdf file {doc_name}")
   else:
     # return None if doc type not supported
     pass
@@ -266,9 +283,7 @@ def _get_embedding_batched(
 
   with ThreadPoolExecutor() as executor:
     futures = []
-    for batch in tqdm(
-        batches, total=math.ceil(len(text_chunks) / batch_size), position=0
-    ):
+    for batch in batches:
       futures.append(
           executor.submit(functools.partial(_encode_texts_to_embeddings), batch)
       )
@@ -287,6 +302,8 @@ def _get_embedding_batched(
 def _generate_index_data(doc_name: str, text_chunks: List[str]) -> str:
   """ generate matching engine index data files in a local directory """
 
+  doc_stem = Path(doc_name).stem
+
   for i in range(len(text_chunks)):
 
     # Create temporary folder to write embeddings to
@@ -294,7 +311,7 @@ def _generate_index_data(doc_name: str, text_chunks: List[str]) -> str:
 
     # Create a unique output file for each set of embeddings
     chunk_path = embeddings_file_path.joinpath(
-        f"{doc_name}_{i}.json"
+        f"{doc_stem}_{i}.json"
     )
 
     with open(chunk_path, "a", encoding="utf-8") as f:
