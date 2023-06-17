@@ -29,6 +29,7 @@ from common.utils.logging_handler import Logger
 from common.models import UserQuery, QueryResult, QueryEngine
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
+import common.utils.gcs_adapter
 from google.cloud import aiplatform
 from google.cloud import storage
 from vertexai.preview.language_models import TextEmbeddingModel
@@ -125,8 +126,9 @@ def build_doc_index(doc_url:str, query_engine: str):
   Args:
     doc_url: URL pointing to folder of documents
     query_engine: the query engine to
+
   Returns:
-    true if index creation is succesful
+    None
   """
   q_engine = QueryEngine.find_by_name(query_engine)
   if q_engine is None:
@@ -138,12 +140,12 @@ def build_doc_index(doc_url:str, query_engine: str):
     doc_filepaths = _download_files_to_local(storage_client, doc_url)
 
     # ME index name and description
-    index_name = query_engine + "_MEindex"
+    index_name = query_engine + "-MEindex"
     index_description = \
       "Matching Engine index for LLM Service query engine: " + query_engine
 
     # bucket for ME index data
-    bucket_name = f"{index_name}_ME_data"
+    bucket_name = f"{query_engine}-me-data"
     bucket = storage_client.create_bucket(bucket_name)
     bucket_uri = f"gs://{bucket.name}"
 
@@ -174,14 +176,11 @@ def build_doc_index(doc_url:str, query_engine: str):
         text_chunks.extend(text_splitter.split_text(text))
 
       # generate embedding data and store in local dir
-      index_base, embeddings_file_path = \
+      index_base, embeddings_dir = \
           _generate_index_data(doc_name, text_chunks, index_base)
 
       # copy data files up to bucket
-      remote_folder = f"{bucket_uri}/{doc_name}/"
-      blob = bucket.blob(remote_folder)
-      data_path = f"{embeddings_file_path}/*"
-      blob.upload_from_filename(data_path)
+      gcs_adapter.upload_folder(bucket_name, embeddings_dir, bucket_uri)
       Logger.info(f"data uploaded for {doc_name}")
 
     # create ME index
@@ -308,7 +307,7 @@ def _get_embedding_batched(
 
 
 def _generate_index_data(doc_name: str, text_chunks: List[str],
-                         index_base: int) -> str:
+                         index_base: int) -> Tuple[int, str]:
   """ generate matching engine index data files in a local directory """
 
   doc_stem = Path(doc_name).stem
@@ -317,7 +316,7 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
   ids = np.arange(index_base, index_base + len(text_chunks))
 
   # Create temporary folder to write embeddings to
-  embeddings_file_path = Path(tempfile.mkdtemp())
+  embeddings_dir = Path(tempfile.mkdtemp())
 
   # Convert chunks to embeddings in batches, to manage API throttling
   is_successful, chunk_embeddings = _get_embedding_batched(
@@ -338,7 +337,7 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
   ]
 
   # Create output file
-  chunk_path = embeddings_file_path.joinpath(f"{doc_stem}_index.json")
+  chunk_path = embeddings_dir.joinpath(f"{doc_stem}_index.json")
 
   # write embeddings for chunk to file
   with open(chunk_path, "w", encoding="utf-8") as f:
@@ -349,4 +348,4 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
 
   index_base = index_base + len(text_chunks)
 
-  return index_base, embeddings_file_path
+  return index_base, embeddings_dir
