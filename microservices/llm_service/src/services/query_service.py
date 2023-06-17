@@ -20,23 +20,24 @@ import json
 import tempfile
 import time
 import os
-import math
 from typing import List, Optional, Generator, Tuple, Dict
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 from pathlib import Path
 from common.utils.logging_handler import Logger
-from common.models import UserQuery, QueryResult, QueryEngine
+from common.models import (UserQuery, QueryResult,
+                          QueryEngine, QueryDocument,
+                          QueryDocumentChunk)
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
-import common.utils.gcs_adapter
+from common.utils import gcs_adapter
 from google.cloud import aiplatform
 from google.cloud import storage
 from vertexai.preview.language_models import TextEmbeddingModel
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders import CSVLoader
-from PyPDF2 import PdfReader
 from langchain.chains import RetrievalQAWithSourcesChain
+from PyPDF2 import PdfReader
 import langchain_service
 
 from config import PROJECT_ID
@@ -54,7 +55,7 @@ ITEMS_PER_REQUEST = 5
 DIMENSIONS = 768
 
 async def query_generate(
-            prompt: str, 
+            prompt: str,
             query_engine: str,
             user_query: Optional[UserQuery] = None) -> QueryResult:
   """
@@ -105,15 +106,15 @@ def query_engine_build(doc_url: str, query_engine: str,
   Returns:
     QueryEngine: the query engine object
   """
-  # build document index
-  build_doc_index(doc_url, query_engine)
-
   # create model
   is_public = params.get("is_public", True)
   user_id = params.get("user_id")
   query_engine = QueryEngine(name=query_engine,
                              created_by=user_id, is_public=is_public)
   query_engine.save()
+
+  # build document index
+  build_doc_index(doc_url, query_engine)
 
   return query_engine
 
@@ -155,10 +156,10 @@ def build_doc_index(doc_url:str, query_engine: str):
 
     # counter for unique index ids
     index_base = 0
-    
+
     # add embeddings for each doc to index data stored in bucket
     for doc in doc_filepaths:
-      doc_name, doc_filepath = doc
+      doc_name, doc_url, doc_filepath = doc
       Logger.info(f"generating index data for {doc_name}")
 
       # read doc data and split into text chunks
@@ -167,21 +168,40 @@ def build_doc_index(doc_url:str, query_engine: str):
         doc_text_list = _read_doc(doc_name, doc_filepath)
         if doc_text_list is None:
           continue
-      except Exception as e:
+      except Exception:
         continue
-      
+
       # split text into chunks
       text_chunks = []
       for text in doc_text_list:
         text_chunks.extend(text_splitter.split_text(text))
 
       # generate embedding data and store in local dir
-      index_base, embeddings_dir = \
+      new_index_base, embeddings_dir = \
           _generate_index_data(doc_name, text_chunks, index_base)
 
       # copy data files up to bucket
       gcs_adapter.upload_folder(bucket_name, embeddings_dir, bucket_uri)
       Logger.info(f"data uploaded for {doc_name}")
+
+      # store QueryDocument and QueryDocumentChunk models
+      query_doc = QueryDocument(query_engine_id = q_engine.id,
+                                query_engine = q_engine.name,
+                                doc_url = doc_url,
+                                index_start = index_base,
+                                index_end = new_index_base
+                                )
+      query_doc.save()
+
+      for i in range(index_base, new_index_base):
+        query_doc_chunk = QueryDocumentChunk(
+                                  query_document_id = query_doc.id,
+                                  index = i,
+                                  text = text_chunks[i],
+                                  )
+        query_doc_chunk.save()
+
+      index_base = new_index_base
 
     # create ME index
     Logger.info(f"creating matching engine index {index_name}")
@@ -199,13 +219,15 @@ def build_doc_index(doc_url:str, query_engine: str):
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
+  # create index endpoint
+
   # store index in query engine model
   q_engine.index_id = tree_ah_index.index_name
   q_engine.update()
 
 
 def _download_files_to_local(storage_client, doc_url: str) -> \
-    List[Tuple[str, List[str]]]:
+    List[Tuple[str, str, List[str]]]:
   """ Download files from GCS to a local tmp directory """
   docs = []
   for blob in storage_client.list_blobs(doc_url):
@@ -218,7 +240,7 @@ def _download_files_to_local(storage_client, doc_url: str) -> \
       os.makedirs(os.path.dirname(file_path), exist_ok=True)
       # Download the file to a destination
       blob.download_to_filename(file_path)
-      docs.append((blob.name, file_path))
+      docs.append((blob.name, blob.path, file_path))
   return docs
 
 
@@ -228,7 +250,7 @@ def _read_doc(doc_name:str, doc_filepath: str) -> List[str]:
   doc_extension = doc_extension.lower()
   doc_text_list = None
   loader = None
-  
+
   if doc_extension == "txt":
     with open(doc_filepath, "r", encoding="utf-8") as f:
       doc_text = f.read()
@@ -298,10 +320,12 @@ def _get_embedding_batched(
       embeddings_list.extend(future.result())
 
   is_successful = [
-      embedding is not None for sentence, embedding in zip(text_chunks, embeddings_list)
+      embedding is not None for sentence, embedding in zip(
+        text_chunks, embeddings_list)
   ]
   embeddings_list_successful = np.squeeze(
-      np.stack([embedding for embedding in embeddings_list if embedding is not None])
+      np.stack([embedding for embedding in embeddings_list
+                if embedding is not None])
   )
   return is_successful, embeddings_list_successful
 
@@ -324,7 +348,7 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
       api_calls_per_second=API_CALLS_PER_SECOND,
       batch_size=ITEMS_PER_REQUEST,
   )
-  # create JSON 
+  # create JSON
   embeddings_formatted = [
     json.dumps(
       {
