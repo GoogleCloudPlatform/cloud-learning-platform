@@ -244,7 +244,7 @@ def _process_documents(doc_url: str, bucket_name: str,
           _generate_index_data(doc_name, text_chunks, index_base)
 
       # copy data files up to bucket
-      gcs_adapter.upload_folder(bucket_name, embeddings_dir,
+      gcs_adapter.upload_folder(bucket_name, str(embeddings_dir),
                                 f"gs://{bucket_name}")
       Logger.info(f"data uploaded for {doc_name}")
 

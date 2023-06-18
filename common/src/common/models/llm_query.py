@@ -108,7 +108,7 @@ class QueryEngine(BaseModel):
     q_engine = cls.collection.filter(
         "name", "==", name).filter(
             "deleted_at_timestamp", "==",
-            None).fetch()
+            None).get()
     return q_engine
 
 
@@ -132,7 +132,7 @@ class QueryResult(BaseModel):
     for ref in query_result.results:
       obj = cls.collection.filter(
           "id", "==", ref.id).filter(
-              "deleted_at_timestamp", "==", None)
+          "deleted_at_timestamp", "==", None).get()
       if obj is not None:
         references.append(obj)
     return references
