@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""class for handling errors"""
+"""class for handling errors specific to LLM Service"""
 
+class NoDocumentsIndexedException(Exception):
+  """Exception for No documents found for query indexing"""
 
-class ResourceNotFoundException(Exception):
-  """Class for custom Exceptions"""
-
-  def __init__(self, message="Resource not found"):
+  def __init__(self, message="No documents found"):
     self.message = message
     super().__init__(self.message)

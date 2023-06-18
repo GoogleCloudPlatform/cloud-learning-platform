@@ -63,13 +63,11 @@ class QueryEngine(BaseModel):
   QueryEngine ORM class
   """
   id = IDField()
+  name = TextField(required=True)
   created_by = TextField(required=True)
   is_public = BooleanField(default=False)
-  name = TextField(required=True)
-  query_engine = TextField(required=True)
   index_id = TextField(required=False)
   index_endpoint = TextField(required=False)
-  history = ListField(default=[])
 
   class Meta:
     ignore_none_field = False

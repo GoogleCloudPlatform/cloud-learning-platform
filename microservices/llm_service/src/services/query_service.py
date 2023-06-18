@@ -17,6 +17,7 @@
 import functools
 import gc
 import json
+import shutil
 import tempfile
 import time
 import os
@@ -28,11 +29,12 @@ from common.utils.logging_handler import Logger
 from common.models import (UserQuery, QueryResult,
                           QueryEngine, QueryDocument,
                           QueryDocumentChunk)
-from common.utils.errors import ResourceNotFoundException
+from common.utils.errors import (ResourceNotFoundException,
+                                 ValidationError)
 from common.utils.http_exceptions import InternalServerError
 from common.utils import gcs_adapter
-from google.cloud import aiplatform
-from google.cloud import storage
+from utils.errors import NoDocumentsIndexedException
+from google.cloud import aiplatform, storage
 from vertexai.preview.language_models import TextEmbeddingModel
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders import CSVLoader
@@ -59,7 +61,7 @@ async def query_generate(
             query_engine: str,
             user_query: Optional[UserQuery] = None) -> QueryResult:
   """
-  Use langchain to execute a query over a query engine
+  Execute a query over a query engine
 
   Args:
     prompt: the text prompt to pass to the query engine
@@ -70,6 +72,9 @@ async def query_generate(
 
   Returns:
     QueryResult: the query result object
+
+  Raises:
+    ResourceNotFoundException if the named query engine doesn't exist
   """
   q_engine = QueryEngine.find_by_name(query_engine)
   if q_engine is None:
@@ -101,22 +106,30 @@ def query_engine_build(doc_url: str, query_engine: str,
 
     query_engine: the name of the query engine to create
 
-    params: query engine params
+    params: query engine params dict, specifying
+            user_id, is_public
 
   Returns:
     QueryEngine: the query engine object
+
+  Raises:
+    ValidationError if the named query engine already exists
   """
+  q_engine = QueryEngine.find_by_name(query_engine)
+  if q_engine is not None:
+    raise ValidationError(f"Query engine {query_engine} already exists")
+
   # create model
   is_public = params.get("is_public", True)
   user_id = params.get("user_id")
-  query_engine = QueryEngine(name=query_engine,
-                             created_by=user_id, is_public=is_public)
-  query_engine.save()
+  q_engine = QueryEngine(name=query_engine,
+                         created_by=user_id, is_public=is_public)
+  q_engine.save()
 
   # build document index
   build_doc_index(doc_url, query_engine)
 
-  return query_engine
+  return q_engine
 
 
 def build_doc_index(doc_url:str, query_engine: str):
@@ -136,72 +149,26 @@ def build_doc_index(doc_url:str, query_engine: str):
     raise ResourceNotFoundException(f"cant find query engine {query_engine}")
 
   try:
-    # download files to local directory
     storage_client = storage.Client(project=PROJECT_ID)
-    doc_filepaths = _download_files_to_local(storage_client, doc_url)
-
-    # ME index name and description
-    index_name = query_engine + "-MEindex"
-    index_description = \
-      "Matching Engine index for LLM Service query engine: " + query_engine
 
     # bucket for ME index data
     bucket_name = f"{query_engine}-me-data"
     bucket = storage_client.create_bucket(bucket_name)
     bucket_uri = f"gs://{bucket.name}"
 
-    # use langchain text splitter
-    text_splitter = CharacterTextSplitter(chunk_size=CHUNK_SIZE,
-                                          chunk_overlap=0)
+    # process docs at url and upload embeddings to GCS for indexing
+    docs_processed = _process_documents(doc_url, bucket_name,
+                                        q_engine, storage_client)
 
-    # counter for unique index ids
-    index_base = 0
+    # make sure we actually processed some docs
+    if len(docs_processed) == 0:
+      raise NoDocumentsIndexedException(
+          f"Failed to process any documents at url {doc_url}")
 
-    # add embeddings for each doc to index data stored in bucket
-    for doc in doc_filepaths:
-      doc_name, doc_url, doc_filepath = doc
-      Logger.info(f"generating index data for {doc_name}")
-
-      # read doc data and split into text chunks
-      # skip any file that can't be read or generates an error
-      try:
-        doc_text_list = _read_doc(doc_name, doc_filepath)
-        if doc_text_list is None:
-          continue
-      except Exception:
-        continue
-
-      # split text into chunks
-      text_chunks = []
-      for text in doc_text_list:
-        text_chunks.extend(text_splitter.split_text(text))
-
-      # generate embedding data and store in local dir
-      new_index_base, embeddings_dir = \
-          _generate_index_data(doc_name, text_chunks, index_base)
-
-      # copy data files up to bucket
-      gcs_adapter.upload_folder(bucket_name, embeddings_dir, bucket_uri)
-      Logger.info(f"data uploaded for {doc_name}")
-
-      # store QueryDocument and QueryDocumentChunk models
-      query_doc = QueryDocument(query_engine_id = q_engine.id,
-                                query_engine = q_engine.name,
-                                doc_url = doc_url,
-                                index_start = index_base,
-                                index_end = new_index_base
-                                )
-      query_doc.save()
-
-      for i in range(index_base, new_index_base):
-        query_doc_chunk = QueryDocumentChunk(
-                                  query_document_id = query_doc.id,
-                                  index = i,
-                                  text = text_chunks[i],
-                                  )
-        query_doc_chunk.save()
-
-      index_base = new_index_base
+    # ME index name and description
+    index_name = query_engine + "-MEindex"
+    index_description = \
+      "Matching Engine index for LLM Service query engine: " + query_engine
 
     # create ME index
     Logger.info(f"creating matching engine index {index_name}")
@@ -226,21 +193,101 @@ def build_doc_index(doc_url:str, query_engine: str):
   q_engine.update()
 
 
-def _download_files_to_local(storage_client, doc_url: str) -> \
+def _process_documents(doc_url: str, bucket_name: str,
+                       q_engine: QueryEngine, storage_client) -> List[str]:
+  """
+  Process docs at url and upload embeddings to GCS for indexing.
+  Returns:
+     list of names of fully processed documents.
+  """
+  with tempfile.TemporaryDirectory() as temp_dir:
+    # download files to local directory
+    doc_filepaths = _download_files_to_local(storage_client, temp_dir, doc_url)
+
+    if len(doc_filepaths) == 0:
+      raise NoDocumentsIndexedException(
+          f"No documents can be indexed at url {doc_url}")
+
+    # use langchain text splitter
+    text_splitter = CharacterTextSplitter(chunk_size=CHUNK_SIZE,
+                                          chunk_overlap=0)
+
+    # counter for unique index ids
+    index_base = 0
+
+    # add embeddings for each doc to index data stored in bucket
+    docs_processed = []
+    for doc in doc_filepaths:
+      doc_name, doc_url, doc_filepath = doc
+      Logger.info(f"generating index data for {doc_name}")
+
+      # read doc data and split into text chunks
+      # skip any file that can't be read or generates an error
+      try:
+        doc_text_list = _read_doc(doc_name, doc_filepath)
+        if doc_text_list is None:
+          Logger.error(f"no content read from {doc_name}")
+          continue
+      except Exception as e:
+        Logger.error(f"error reading doc {doc_name}: {e}")
+        continue
+
+      docs_processed.append(doc_name)
+
+      # split text into chunks
+      text_chunks = []
+      for text in doc_text_list:
+        text_chunks.extend(text_splitter.split_text(text))
+
+      # generate embedding data and store in local dir
+      new_index_base, embeddings_dir = \
+          _generate_index_data(doc_name, text_chunks, index_base)
+
+      # copy data files up to bucket
+      gcs_adapter.upload_folder(bucket_name, embeddings_dir,
+                                f"gs://{bucket_name}")
+      Logger.info(f"data uploaded for {doc_name}")
+
+      # clean up tmp data dir
+      shutil.rmtree(embeddings_dir)
+
+      # store QueryDocument and QueryDocumentChunk models
+      query_doc = QueryDocument(query_engine_id = q_engine.id,
+                                query_engine = q_engine.name,
+                                doc_url = doc_url,
+                                index_start = index_base,
+                                index_end = new_index_base
+                                )
+      query_doc.save()
+
+      for i in range(index_base, new_index_base):
+        query_doc_chunk = QueryDocumentChunk(
+                                  query_document_id = query_doc.id,
+                                  index = i,
+                                  text = text_chunks[i],
+                                  )
+        query_doc_chunk.save()
+
+      index_base = new_index_base
+
+  return docs_processed
+
+
+def _download_files_to_local(storage_client, local_dir, doc_url: str) -> \
     List[Tuple[str, str, List[str]]]:
   """ Download files from GCS to a local tmp directory """
   docs = []
-  for blob in storage_client.list_blobs(doc_url):
+  bucket_name = doc_url.split("gs://")[1].split("/")[0]
+  for blob in storage_client.list_blobs(bucket_name):
     # skip directories for now
     if blob.name.endswith("/"):
       continue
     # Create a blob object from the filepath
-    with tempfile.TemporaryDirectory() as temp_dir:
-      file_path = f"{temp_dir}/{blob.name}"
-      os.makedirs(os.path.dirname(file_path), exist_ok=True)
-      # Download the file to a destination
-      blob.download_to_filename(file_path)
-      docs.append((blob.name, blob.path, file_path))
+    file_path = os.path.join(local_dir, blob.name)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    # Download the file to a destination
+    blob.download_to_filename(file_path)
+    docs.append((blob.name, blob.path, file_path))
   return docs
 
 
