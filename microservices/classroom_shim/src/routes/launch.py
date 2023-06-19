@@ -3,7 +3,7 @@ import traceback
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from config import ERROR_RESPONSES, API_DOMAIN, FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, PROJECT_ID, auth_client
+from config import ERROR_RESPONSES, API_DOMAIN, FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, PROJECT_ID
 from common.models import LTIAssignment
 from common.utils.auth_service import validate_token
 from common.utils.errors import (ResourceNotFoundException, ValidationError,

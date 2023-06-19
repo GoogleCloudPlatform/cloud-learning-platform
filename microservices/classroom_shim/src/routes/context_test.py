@@ -12,7 +12,7 @@ from schemas.schema_examples import CONTEXT_EXAMPLE, CONTEXT_MEMBERS_EXAMPLE
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
     side_effect=mock.MagicMock()) as mok:
-  with mock.patch("routes.lti_assignment.Logger"):
+  with mock.patch("routes.context.Logger"):
     from routes.context import router
     from testing.test_config import API_URL
 

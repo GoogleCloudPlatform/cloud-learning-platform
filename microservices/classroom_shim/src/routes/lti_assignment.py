@@ -8,6 +8,7 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest)
+from config import API_DOMAIN
 from routes.context import get_context_details
 from schemas.lti_assignment_schema import (
     LTIAssignmentListResponseModel, GetLTIAssignmentResponseModel,
@@ -18,7 +19,7 @@ from schemas.lti_assignment_schema import (
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
-from services.ext_service_handler import get_content_item, copy_content_item
+from services.ext_service_handler import get_content_item, create_content_item
 # pylint: disable=line-too-long
 
 router = APIRouter(
@@ -397,7 +398,7 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     del content_item_data["created_time"]
     del content_item_data["last_modified_time"]
 
-    copy_content_item_data = copy_content_item(content_item_data)
+    copy_content_item_data = create_content_item(content_item_data)
 
     prev_context_ids = lti_assignment_data["prev_context_ids"]
     prev_content_item_ids = lti_assignment_data["prev_content_item_ids"]

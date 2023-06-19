@@ -14,7 +14,7 @@ import mock
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
     side_effect=mock.MagicMock()) as mok:
-  with mock.patch("routes.lti_assignment.Logger"):
+  with mock.patch("routes.grade.Logger"):
     from routes.grade import router
     from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE, LTI_POST_GRADE_MODEL
     from testing.test_config import API_URL
