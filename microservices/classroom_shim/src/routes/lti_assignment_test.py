@@ -41,7 +41,7 @@ def create_lti_assignment():
   return lti_assignment
 
 
-def test_get_lti_assignment(create_lti_assignment):
+def test_get_lti_assignment(create_lti_assignment, clean_firestore):
   lti_assignment = create_lti_assignment
   input_data = deepcopy(INSERT_LTI_ASSIGNMENT_EXAMPLE)
   url = f"{api_url}/{lti_assignment.id}"
@@ -76,7 +76,7 @@ def test_get_lti_assignment_negative():
   assert json_response.get("success") is False, "Response is incorrect"
 
 
-def test_get_lti_assignments(create_lti_assignment):
+def test_get_lti_assignments(create_lti_assignment, clean_firestore):
   lti_assignment = create_lti_assignment
   url = f"{api_url}s"
   resp = client_with_emulator.get(url)
@@ -103,7 +103,8 @@ def test_get_lti_assignments_negative():
 
 @mock.patch("routes.lti_assignment.get_context_details")
 @mock.patch("routes.lti_assignment.classroom_crud.create_coursework")
-def test_post_lti_assignment(mock_classroom_post_coursework, mock_context):
+def test_post_lti_assignment(mock_classroom_post_coursework, mock_context,
+                             clean_firestore):
   mock_context.return_value = {"data": {"classroom_id": "2v1boyeui"}}
   mock_classroom_post_coursework.return_value = {"id": "8v7tcaw"}
 
@@ -140,7 +141,7 @@ def test_post_lti_assignment(mock_classroom_post_coursework, mock_context):
 @mock.patch("routes.lti_assignment.get_context_details")
 @mock.patch("routes.lti_assignment.classroom_crud.update_course_work")
 def test_update_lti_assignment(mock_classroom_update_coursework, mock_context,
-                               create_lti_assignment):
+                               create_lti_assignment, clean_firestore):
   mock_context.return_value = {"data": {"classroom_id": "2v1boyeui"}}
   mock_classroom_update_coursework.return_value = {"id": "8v7tcaw"}
 
@@ -174,7 +175,7 @@ def test_update_lti_assignment_negative():
 @mock.patch("routes.lti_assignment.get_context_details")
 @mock.patch("routes.lti_assignment.classroom_crud.delete_course_work")
 def test_delete_lti_assignment(mock_classroom_delete_coursework, mock_context,
-                               create_lti_assignment):
+                               create_lti_assignment, clean_firestore):
   mock_context.return_value = {"data": {"classroom_id": "2v1boyeui"}}
   mock_classroom_delete_coursework.return_value = {"id": "8v7tcaw"}
 

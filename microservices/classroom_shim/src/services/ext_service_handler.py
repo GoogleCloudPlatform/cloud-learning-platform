@@ -16,7 +16,7 @@ def get_user_details(user_email):
       url=get_user_data_url, query_params=params, use_bot_account=True)
 
   if user_data_res.status_code == 200:
-    return user_data_res.json().get("data")
+    return user_data_res.json()
   if user_data_res.status_code == 404:
     return None
   else:
@@ -175,6 +175,32 @@ def get_content_item(content_item_id):
     )
     raise Exception(f"Request failed with code 1300 and the status code is \
             {content_item_res.status_code} with error: {content_item_res.text}")
+
+
+def list_content_items(context_id=None, tool_id=None):
+  """Get the list of content items for a given context and tool"""
+  params = {}
+
+  if context_id:
+    params["context_id"] = context_id
+
+  if tool_id:
+    params["tool_id"] = tool_id
+
+  list_content_items_url = f"{LTI_BASE_URL}/content-items"
+  content_item_list_res = get_method(
+      url=list_content_items_url, query_params=params, use_bot_account=True)
+
+  if content_item_list_res.status_code == 200:
+    return content_item_list_res.json().get("data")
+  else:
+    Logger.error(
+        f"Error 1300 response: Internal error from LTI get content item API \
+          Status code: {content_item_list_res.status_code}; Response: {content_item_list_res.text}"
+    )
+    raise Exception(f"Request failed with code 1300 and the status code is \
+            {content_item_list_res.status_code} with error: {content_item_list_res.text}"
+                   )
 
 
 def create_content_item(content_item_data):

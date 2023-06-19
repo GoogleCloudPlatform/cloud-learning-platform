@@ -1,6 +1,5 @@
 """Launch Endpoints"""
 import traceback
-import requests
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
@@ -76,8 +75,8 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
   try:
     # verify user if it exists
     user_email = user_details.get("email")
-    user_res_data = get_user_details(user_email)
-
+    user_resp = get_user_details(user_email)
+    user_res_data = user_resp.get("data")
     if user_res_data:
       user_data = user_res_data[0]
     else:
