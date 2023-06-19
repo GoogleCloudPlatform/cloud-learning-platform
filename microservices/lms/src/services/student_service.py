@@ -60,7 +60,8 @@ def check_student_can_enroll_in_cohort(email, headers, sections):
       result = CourseEnrollmentMapping.check_enrollment_exists_section(
           section_key=section.key, user_id=user_id)
       if result is not None:
-        Logger.error(f"Student {email} is present in section_id {section.id}")
+        Logger.error(f"Student {email} is present in section_id {section.id}\
+                     enrollment_id {result.id}")
         return False
   return True
 
