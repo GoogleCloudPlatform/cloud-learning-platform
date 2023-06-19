@@ -156,7 +156,7 @@ jobs:
         NAMESPACE=$E2E_NAMESPACE_PREFIX
         export DATABASE_PREFIX=$E2E_PREFIX
         skaffold run \
-        --profile dev \
+        --profile custom \
         --namespace $NAMESPACE \
         --module backends \
         -l commit=$GITHUB_SHA \
