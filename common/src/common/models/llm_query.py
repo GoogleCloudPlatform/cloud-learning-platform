@@ -131,6 +131,22 @@ class QueryEngine(BaseModel):
     return q_engine
 
 
+class QueryReference(BaseModel):
+  """
+  QueryReference ORM class.  Each reference consists of a text query
+  response and a link to a source query document.
+  """
+  id = IDField()
+  query_engine_id = TextField(required=True)
+  query_engine = TextField(required=True)
+  document_id = TextField(required=True)
+  chunk_id = TextField(required=True)
+
+  class Meta:
+    ignore_none_field = False
+    collection_name = BaseModel.DATABASE_PREFIX + "query_references"
+
+
 class QueryResult(BaseModel):
   """
   QueryResult ORM class.  Results consist of a list of query reference
@@ -153,22 +169,6 @@ class QueryResult(BaseModel):
       if obj is not None:
         references.append(obj)
     return references
-
-
-class QueryReference(BaseModel):
-  """
-  QueryReference ORM class.  Each reference consists of a text query
-  response and a link to a source query document.
-  """
-  id = IDField()
-  query_engine_id = TextField(required=True)
-  query_engine = TextField(required=True)
-  document_id = TextField(required=True)
-  chunk_id = TextField(required=True)
-
-  class Meta:
-    ignore_none_field = False
-    collection_name = BaseModel.DATABASE_PREFIX + "query_references"
 
 
 class QueryDocument(BaseModel):

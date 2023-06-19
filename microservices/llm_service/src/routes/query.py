@@ -121,12 +121,15 @@ async def query(gen_config: LLMQueryModel):
   query_engine = genconfig_dict.get("query_engine")
 
   try:
-    result = await query_generate(prompt, query_engine)
+    query_result, query_references = await query_generate(prompt, query_engine)
 
     return {
         "success": True,
         "message": "Successfully generated text",
-        "content": result
+        "data": {
+            "query_result": str(query_result),
+            "query_references": str(query_references)
+        }
     }
   except Exception as e:
     raise InternalServerError(str(e)) from e
@@ -160,12 +163,15 @@ async def query_continue(user_queryid: str, gen_config: LLMQueryModel):
     user_query = UserQuery.find_by_id(user_queryid)
     query_engine = user_query.query_engine
 
-    result = await query_generate(prompt, query_engine, user_query)
+    query_result, query_references = await query_generate(prompt, query_engine)
 
     return {
         "success": True,
         "message": "Successfully generated text",
-        "content": result
+        "data": {
+            "query_result": str(query_result),
+            "query_references": str(query_references)
+        }
     }
   except Exception as e:
     raise InternalServerError(str(e)) from e

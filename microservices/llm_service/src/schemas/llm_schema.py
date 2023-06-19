@@ -105,6 +105,22 @@ class LLMQueryEngineResponse(BaseModel):
         }
     }
 
+class LLMQueryResponse(BaseModel):
+  """LLM Query Response model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully performed query"
+  data: Optional[str] = ""
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully performed query",
+            "data": None
+        }
+    }
+
 class LLMGenerateResponse(BaseModel):
   """LLM Generate Response model"""
   success: Optional[bool] = True
