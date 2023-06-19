@@ -52,6 +52,7 @@ env:
   BQ_DATASET: lms_analytics
   BQ_REGION: US
   EXTERNAL_USER_PROPERTY_PREFIX: SNHU_
+  SKAFFOLD_BUILD_CONCURRENCY: 0
   
 # cookiecutter:raw 
 jobs:
