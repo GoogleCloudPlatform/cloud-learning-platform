@@ -1,0 +1,67 @@
+[
+  {
+    "uuid": "U2DDBkl3Ayg0PWudzgi",
+    "type": "course equate",
+    "name": "Nursing",
+    "description": "",
+    "alignments": {
+      "competency_alignments": ["cd1", "cd2"],
+      "skill_alignments": ["S1", "S2", "S3", "S4"]
+    },
+    "associations": {
+      "exact_match_of": [],
+      "exemplar": [],
+      "has_skill_level": [],
+      "is_child_of": [],
+      "is_parent_of": [],
+      "is_part_of": [],
+      "is_peer_of": [],
+      "is_related_to": [],
+      "precedes": [],
+      "replaced_by": []
+    },
+    "credits_available": 0,
+    "field_of_study": "",
+"metadata": {"design_config" : {
+                           "shape" : "",
+                           "theme": "",
+                           "illustration": ""
+}},
+    "image": "",
+    "result_descriptions": [],
+    "tags": [],
+    "timestamp": ""
+  },
+  {
+  "uuid": "U2DDBkl3Akjjkash",
+  "type": "course equate",
+  "name": "Nursing",
+  "description": "",
+  "alignments": {
+    "competency_alignments": ["cd3","cd4"],
+    "skill_alignments": ["S5", "S6"]
+  },
+  "associations": {
+    "exact_match_of": [],
+    "exemplar": [],
+    "has_skill_level": [],
+    "is_child_of": [],
+    "is_parent_of": [],
+    "is_part_of": [],
+    "is_peer_of": [],
+    "is_related_to": [],
+    "precedes": [],
+    "replaced_by": []
+  },
+  "credits_available": 0,
+  "field_of_study": "",
+"metadata": {"design_config" : {
+                           "shape" : "",
+                           "theme": "",
+                           "illustration": ""
+}},
+  "image": "",
+  "result_descriptions": [],
+  "tags": [],
+  "timestamp": ""
+  }]

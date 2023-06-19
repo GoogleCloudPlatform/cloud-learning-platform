@@ -3,15 +3,18 @@ kind: Deployment
 metadata:
   name: api-docs
 spec:
-  replicas: 1
   template:
     spec:
-      serviceAccountName: ksa
       containers:
       - name: api-docs
         image: gcr.io/core-learning-services-dev/api-docs
         imagePullPolicy: Always
         env:
+        # Define the environment variable
+        - name: SERVER_DESCRIPTION
+          value: Development Server
+        - name: SERVER
+          value: https://core-learning-services-dev.cloudpssolutions.com
         - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:

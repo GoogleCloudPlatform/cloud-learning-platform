@@ -10,17 +10,30 @@ from common.testing.example_objects import TEST_SECTION, TEST_COHORT
 from common.utils.bq_helper import insert_rows_to_bq
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE, API_URL, e2e_google_form_id
+from e2e.gke_api_tests.testing_objects.test_config import API_URL_AUTHENTICATION_SERVICE, API_URL
+from e2e.test_config import e2e_google_form_id
 from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e,\
   get_student_email_and_token,\
   get_required_emails_from_secret_manager,create_coursework,create_google_form,\
 get_file,insert_file_into_folder
 
-from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
-from testing_objects.user import TEST_USER
-from testing_objects.bq_helper import BQ_DATASET, BQ_TABLE_DICT
+from e2e.gke_api_tests.testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
+from e2e.gke_api_tests.testing_objects.user import TEST_USER
+from e2e.utils.bq_helper import BQ_DATASET, BQ_TABLE_DICT
 from google.oauth2.credentials import Credentials
 import logging
+import sys
+sys.path.append("..")
+from e2e.setup import (GCP_BUCKET,CONTENT_SERVING_BUCKET, user_login)
+from common.models import (Learner, Achievement, Goal, LearnerProfile, LearningResource)
+from e2e.test_config import TESTING_OBJECTS_PATH
+from e2e.test_object_schemas import (DOMAIN_OBJ_TEMPLATE, SUB_DOMAIN_OBJ_TEMPLATE,
+  CATEGORY_OBJ_TEMPLATE, COMPETENCY_OBJ_TEMPLATE, LEARNING_OBJECTIVE_OBJ_TEMPLATE,
+  LEARNING_CONTENT_OBJ_TEMPLATE, LEARNING_UNIT_OBJ_TEMPLATE, CONCEPT_OBJ_TEMPLATE,
+  SUBCONCEPT_OBJ_TEMPLATE, SKILL_OBJ_TEMPLATE, LEARNING_RESOURCE_OBJ_TEMPLATE,
+  DUMMY_BATCH_JOB_NAMES, BATCH_JOB_OBJ_TEMPLATE, TEST_KG_LEARNING_CONTENT,
+  TEST_KG_CONCEPT, TEST_KG_SUBCONCEPT, TEST_KG_LEARNING_OBJECTIVE, TEST_KG_LEARNING_UNIT)
+
 
 USER_EMAIL_PASSWORD_DICT = get_user_email_and_password_for_e2e()
 
@@ -29,19 +42,66 @@ TEACHER_EMAIL = EMAILS["teacher"]
 CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
 SCOPES = [
-    "https://www.googleapis.com/auth/classroom.courses",
-    "https://www.googleapis.com/auth/classroom.courses.readonly",
-    "https://www.googleapis.com/auth/classroom.coursework.students",
-    "https://www.googleapis.com/auth/classroom.rosters",
-    "https://www.googleapis.com/auth/classroom.coursework.me",
-    "https://www.googleapis.com/auth/classroom.topics",
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/forms.body.readonly",
-    "https://www.googleapis.com/auth/classroom.profile.photos",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials",
-    "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
-]
+  "https://www.googleapis.com/auth/classroom.courses",
+  "https://www.googleapis.com/auth/classroom.courses.readonly",
+  "https://www.googleapis.com/auth/classroom.coursework.students",
+  "https://www.googleapis.com/auth/classroom.rosters",
+  "https://www.googleapis.com/auth/classroom.coursework.me",
+  "https://www.googleapis.com/auth/classroom.topics",
+  "https://www.googleapis.com/auth/drive",
+  "https://www.googleapis.com/auth/forms.body.readonly",
+  "https://www.googleapis.com/auth/classroom.profile.photos",
+  "https://www.googleapis.com/auth/classroom.courseworkmaterials",
+  "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
+          ]
 
+
+TEST_E2E_SKILLS_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_wgu_skills.csv")
+TEST_DOMAINS_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_domains.csv")
+TEST_SUBDOMAINS_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_subdomains.csv")
+TEST_CATEGORIES_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_categories.csv")
+TEST_COMPETENCIES_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_competencies.csv")
+TEST_CONCEPTS_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_concepts.csv")
+TEST_SUBCONCEPTS_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_subconcepts.csv")
+TEST_LEARNING_OBJECTIVES_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_learning_objectives.csv")
+TEST_LEARNING_UNITS_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_learning_units.csv")
+TEST_LEARNING_RESOURCES_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_learning_resources.csv")
+TEST_LEARNING_CONTENTS_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_learning_contents.csv")
+TEST_DATA_SOURCE_PATH = os.path.join(TESTING_OBJECTS_PATH, "data_sources.json")
+TEST_LP_PATH = os.path.join(TESTING_OBJECTS_PATH, "learner_profile.json")
+TEST_ACHV_ACHIEVEMENT = os.path.join(TESTING_OBJECTS_PATH, "learner_achievement.json")
+TEST_LEARNER_ACHIEVEMENT = os.path.join(TESTING_OBJECTS_PATH, "learner.json")
+TEST_GOAL_PATH = os.path.join(TESTING_OBJECTS_PATH, "goals.json")
+
+TEST_CSV_SKILLS_PATH = os.path.join(TESTING_OBJECTS_PATH, "generic_skill.csv")
+TEST_INVALID_CSV_SKILLS_PATH = os.path.join(TESTING_OBJECTS_PATH, "invalid_generic_skill.csv")
+TEST_CSV_COMPETENCIES_PATH = os.path.join(TESTING_OBJECTS_PATH, "generic_competency.csv")
+TEST_INVALID_CSV_COMPETENCIES_PATH = os.path.join(TESTING_OBJECTS_PATH, "invalid_generic_competency.csv")
+TEST_CSV_CATEGORIES_PATH = os.path.join(TESTING_OBJECTS_PATH, "generic_category.csv")
+TEST_INVALID_CSV_CATEGORIES_PATH = os.path.join(TESTING_OBJECTS_PATH, "invalid_generic_category.csv")
+TEST_CSV_SUBDOMAINS_PATH = os.path.join(TESTING_OBJECTS_PATH, "generic_sub_domain.csv")
+TEST_INVALID_CSV_SUBDOMAINS_PATH = os.path.join(TESTING_OBJECTS_PATH, "invalid_generic_sub_domain.csv")
+TEST_CSV_DOMAINS_PATH = os.path.join(TESTING_OBJECTS_PATH, "generic_domain.csv")
+TEST_INVALID_CSV_DOMAINS_PATH = os.path.join(TESTING_OBJECTS_PATH, "invalid_generic_domain.csv")
+
+TEST_LEARNING_HIERARCHY_PATH = os.path.join(TESTING_OBJECTS_PATH, "learning_hierarchy.json")
+TEST_INVALID_LEARNING_HIERARCHY_PATH = os.path.join(TESTING_OBJECTS_PATH, "learning_hierarchy_invalid.json")
+TEST_LEARNING_HIERARCHY_SIMPLIFIED_PATH = os.path.join(TESTING_OBJECTS_PATH, "learning_hierarchy_simplified.json")
+TEST_LEARNING_HIERARCHY_FOR_SRL = os.path.join(TESTING_OBJECTS_PATH, "hierarchy_for_srl.json")
+TEST_LEARNING_HIERARCHY_FOR_PROJECT = os.path.join(TESTING_OBJECTS_PATH, "learning_hierarchy_smaller.json")
+
+TEST_CONTENT_SERVING_PATH = os.path.join(TESTING_OBJECTS_PATH, "content_serving.html")
+TEST_CONTENT_SERVING_ZIP_PATH = os.path.join(TESTING_OBJECTS_PATH, "content_serving_sample_upload_scorm.zip")
+TEST_CONTENT_SERVING_PDF_PATH = os.path.join(TESTING_OBJECTS_PATH, "content_serving_sample_upload_pdf.pdf")
+TEST_CONTENT_SERVING_MADCAP_V1_PATH = os.path.join(TESTING_OBJECTS_PATH, "content_serving_sample_upload_madcap_v1.zip")
+TEST_CONTENT_SERVING_MADCAP_V2_PATH = os.path.join(TESTING_OBJECTS_PATH, "content_serving_sample_upload_madcap_v2.zip")
+TEST_CONTENT_SERVING_SRL_V1_PATH = os.path.join(TESTING_OBJECTS_PATH, "SRL_content_serving_valid.zip")
+TEST_CONTENT_SERVING_SRL_V2_PATH = os.path.join(TESTING_OBJECTS_PATH, "SRL_content_serving_v2_valid.zip")
+TEST_CONTENT_SERVING_SRL_V3_PATH = os.path.join(TESTING_OBJECTS_PATH, "SRL_content_serving_v3_invalid.zip")
+
+TEST_ASSESSMENT_SUBMISSION_FILE_PATH = os.path.join(TESTING_OBJECTS_PATH, "sample_assessment_submission.txt")
+
+TEST_USER_MANAGEMENT_PATH = os.path.join(TESTING_OBJECTS_PATH, "user_management_student_list.json")
 
 def create_course(name, section, description):
   """Create course Function in classroom
@@ -367,9 +427,6 @@ def enroll_teacher_into_section(context):
 def import_google_form_grade(context):
   "Fixture for import grade"
   section = use_fixture(create_section, context)
-  # folder_id = context.classroom_drive_folder_id
-  # result =insert_file_into_folder(folder_id,e2e_google_form_id)
-  # print("Inserted in classroom folder",result)
   coursework_body = {
       "title":
       "Test_quize11",
@@ -624,6 +681,9 @@ fixture_registry = {
     "fixture.import.google_form_grade": import_google_form_grade
 }
 
+def after_all(context):
+  pass
+
 
 def before_tag(context, tag):
   if tag.startswith("fixture."):
@@ -657,6 +717,9 @@ def sign_up_user():
   else:
     print("firestore: user email already exists")
 
-
 def before_all(context):
+  USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT=bool(
+  os.getenv("USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT","false").lower() in ("true",))
+  print(f"-----------------------{USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT}-----------------")
   sign_up_user()
+  user_login()

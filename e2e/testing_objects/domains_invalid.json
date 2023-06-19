@@ -1,0 +1,39 @@
+[
+  {
+    "keywords": [
+      "regression",
+      "analysis",
+      "one"
+    ],
+    "child_nodes": {"sub_domains": []},
+    "reference_id": "ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-one",
+    "source_uri": "https://credentialengineregistry.org/resources/ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-two",
+    "source_name": "Credentialengine"
+  },
+  {
+    "name": "Regression Analysis two",
+    "description": "Perform regression analysis two to address an authentic problem",
+    "keywords": [
+      "regression",
+      "analysis",
+      "two"
+    ],
+    "child_nodes": {"sub_domains": []},
+    "reference_id": "ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-two",
+    "source_uri": "https://credentialengineregistry.org/resources/ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-two",
+    "source_name": "Credentialengine"
+  },
+  {
+    "name": "Regression Analysis three",
+    "description": "Perform regression analysis three to address an authentic problem",
+    "keywords": [
+      "regression",
+      "analysis",
+      "three"
+    ],
+    "child_nodes": {"sub_domains": []},
+    "reference_id": "ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-three",
+    "source_uri": "https://credentialengineregistry.org/resources/ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-three",
+    "source_name": "Credentialengine"
+  }
+]

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: cpu-pod-scaling-llm-service
@@ -30,4 +30,6 @@ spec:
     #  targetAverageValue: 500Mi
     resource:
       name: cpu
-      targetAverageUtilization: 60
+      target:
+        averageUtilization: 60
+        type: Utilization
