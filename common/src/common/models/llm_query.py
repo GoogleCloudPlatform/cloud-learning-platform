@@ -56,7 +56,7 @@ class UserQuery(BaseModel):
             "deleted_at_timestamp", "==",
             None).order(order_by).offset(skip).fetch(limit)
     return list(objects)
-
+  
 
 class QueryEngine(BaseModel):
   """
@@ -64,6 +64,7 @@ class QueryEngine(BaseModel):
   """
   id = IDField()
   name = TextField(required=True)
+  llm_type: TextField(required=True)
   created_by = TextField(required=True)
   is_public = BooleanField(default=False)
   index_id = TextField(required=False)
@@ -120,19 +121,18 @@ class QueryResult(BaseModel):
   id = IDField()
   query_engine_id = TextField(required=True)
   query_engine = TextField(required=True)
-  results = ListField(default=[])
+  query_refs = ListField(default=[])
+  response = TextField(required=True)
 
   class Meta:
     ignore_none_field = False
     collection_name = BaseModel.DATABASE_PREFIX + "query_results"
 
   @classmethod
-  def load_references(cls, query_result: str):
+  def load_references(cls, query_result: QueryResult) -> List[QueryReference]:
     references = []
-    for ref in query_result.results:
-      obj = cls.collection.filter(
-          "id", "==", ref.id).filter(
-          "deleted_at_timestamp", "==", None).get()
+    for ref in query_result.query_refs:
+      obj = QueryReference.find_by_id(ref)
       if obj is not None:
         references.append(obj)
     return references
@@ -146,8 +146,8 @@ class QueryReference(BaseModel):
   id = IDField()
   query_engine_id = TextField(required=True)
   query_engine = TextField(required=True)
-  query_response = TextField(required=True)
-  reference_link = TextField(required=True)
+  document_id = TextField(required=True)
+  chunk_id = TextField(required=True)
 
   class Meta:
     ignore_none_field = False
@@ -175,6 +175,7 @@ class QueryDocumentChunk(BaseModel):
   QueryDocumentChunk ORM class.
   """
   id = IDField()
+  query_engine_id = TextField(required=True)
   query_document_id = TextField(required=True)
   index = NumberField(required=True)
   text = TextField(required=True)
@@ -182,3 +183,24 @@ class QueryDocumentChunk(BaseModel):
   class Meta:
     ignore_none_field = False
     collection_name = BaseModel.DATABASE_PREFIX + "query_document_chunks"
+
+  @classmethod
+  def find_by_index(cls, query_engine_id, index):
+    """
+    Fetch a document chunk for a query engine by index
+
+    Args:
+        query_engine_id (str): Query engine id
+        index (str): QueryDocumentChunk index
+
+    Returns:
+        QueryDocumentChunk: query engine object
+
+    """
+    q_chunk = cls.collection.filter(
+        "query_engine_id", "==", query_engine_id).filter(
+            "index", "==", index).filter(
+            "deleted_at_timestamp", "==",
+            None).get()
+    return q_chunk
+

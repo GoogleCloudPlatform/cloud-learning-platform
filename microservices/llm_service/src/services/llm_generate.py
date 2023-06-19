@@ -107,3 +107,7 @@ async def google_llm_predict(prompt, is_chat, google_llm):
   result = response.text
 
   return result
+
+def llm_chat(prompt: str, llm_type: str) -> str:
+  """ send a prompt to a chat model and return response """
+  return ""

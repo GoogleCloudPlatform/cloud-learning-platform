@@ -28,6 +28,7 @@ from pathlib import Path
 from common.utils.logging_handler import Logger
 from common.models import (UserQuery, QueryResult,
                           QueryEngine, QueryDocument,
+                          QueryReference,
                           QueryDocumentChunk)
 from common.utils.errors import (ResourceNotFoundException,
                                  ValidationError)
@@ -38,11 +39,14 @@ from google.cloud import aiplatform, storage
 from vertexai.preview.language_models import TextEmbeddingModel
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders import CSVLoader
-from langchain.chains import RetrievalQAWithSourcesChain
 from PyPDF2 import PdfReader
-import langchain_service
+import llm_generate
+import query_prompts
 
-from config import PROJECT_ID
+from config import PROJECT_ID, DEFAULT_QUERY_CHAT_MODEL
+
+# number of document match results to retrieve
+NUM_MATCH_RESULTS = 5
 
 # text chunk size for embedding data
 CHUNK_SIZE = 1000
@@ -59,7 +63,8 @@ DIMENSIONS = 768
 async def query_generate(
             prompt: str,
             query_engine: str,
-            user_query: Optional[UserQuery] = None) -> QueryResult:
+            user_query: Optional[UserQuery] = None) -> \
+                Tuple[QueryResult, List[QueryReference]]:
   """
   Execute a query over a query engine
 
@@ -80,21 +85,76 @@ async def query_generate(
   if q_engine is None:
     raise ResourceNotFoundException(f"cant find query engine {query_engine}")
 
-  llm = langchain_service.get_model(q_engine.llm_type)
-  docsearch = None
-  chain = RetrievalQAWithSourcesChain.from_chain_type(llm, chain_type="stuff",
-              retriever=docsearch.as_retriever())
-  query_config = {"question": prompt}
-
+  # build query prompt, including query history if present
+  query_prompt = None
   if user_query is not None:
-    query_config.update({"context": user_query.history})
+    query_prompt = query_prompts.query_with_context(user_query, prompt)
+  else:
+    query_prompt = query_prompts.query_prompt(prompt)
 
-  chain_result = chain(query_config, return_only_outputs=True)
+  # get doc context for question
+  query_references = _query_doc_matches(q_engine, query_prompt)
+
+  # generate question prompt for chat model
+  question_prompt = query_prompts.question_prompt(prompt, query_references)
+
+  # send question prompt to model
+  question_response = llm_generate.llm_chat(question_prompt, q_engine.llm_type)
+
+  # save query result
+  query_ref_ids = []
+  for ref in query_references:
+    query_reference = QueryReference(
+      query_engine_id = q_engine.id,
+      query_engine=q_engine.name,
+      document_id = ref["document_id"],
+      chunk_id = ref["chunk_id"]
+    )
+    query_reference.save()
+    query_ref_ids.append(query_reference.id)
+
   query_result = QueryResult(query_engine_id=q_engine.id,
-                             query_engine=query_engine,
-                             results=[chain_result])
+                             query_engine=q_engine.name,
+                             query_refs=query_ref_ids,
+                             response=question_response)
+  query_result.save()
 
-  return query_result
+  return query_result, query_references
+
+
+def _query_doc_matches(q_engine: QueryEngine, query_prompt: str) -> List[dict]:
+  """
+  For a query prompt, retrieve text chunks with doc references
+  from matching documents.
+  """
+  # generate embeddings for prompt
+  query_embeddings = _encode_texts_to_embeddings(query_prompt)
+
+  # retrieve text matches for query
+  index_endpoint = aiplatform.MatchingEngineIndexEndpoint(
+      index_endpoint_name=q_engine.endpoint)
+
+  match_indexes = index_endpoint.find_neighbors(
+      queries=query_embeddings,
+      deployed_index_id=q_engine.endpoint,
+      num_neighbors=NUM_MATCH_RESULTS
+  )
+
+  # assemble document chunk matches from match indexes
+  query_references = []
+  for match_index in match_indexes:
+    doc_chunk = QueryDocumentChunk.find_by_index(q_engine.id, match_index)
+    query_doc = QueryDocument.find_by_id(doc_chunk.query_document_id)
+    query_ref = {
+      "document_id": query_doc.id,
+      "document_url": query_doc.document_url,
+      "document_text": doc_chunk.text,
+      "chunk_id": doc_chunk.id
+    }
+    query_references.append(query_ref)
+
+  return query_references
+
 
 def query_engine_build(doc_url: str, query_engine: str,
                        params: Dict) -> QueryEngine:
@@ -122,8 +182,11 @@ def query_engine_build(doc_url: str, query_engine: str,
   # create model
   is_public = params.get("is_public", True)
   user_id = params.get("user_id")
+  llm_type = params.get("llm_type", DEFAULT_QUERY_CHAT_MODEL)
   q_engine = QueryEngine(name=query_engine,
-                         created_by=user_id, is_public=is_public)
+                         created_by=user_id,
+                         llm_type=llm_type,
+                         is_public=is_public)
   q_engine.save()
 
   # build document index
@@ -167,29 +230,53 @@ def build_doc_index(doc_url:str, query_engine: str):
 
     # ME index name and description
     index_name = query_engine + "-MEindex"
-    index_description = \
-      "Matching Engine index for LLM Service query engine: " + query_engine
 
-    # create ME index
-    Logger.info(f"creating matching engine index {index_name}")
-    tree_ah_index = aiplatform.MatchingEngineIndex.create_tree_ah_index(
-        display_name=index_name,
-        contents_delta_uri=bucket_uri,
-        dimensions=DIMENSIONS,
-        approximate_neighbors_count=150,
-        distance_measure_type="DOT_PRODUCT_DISTANCE",
-        leaf_node_embedding_count=500,
-        leaf_nodes_to_search_percent=80,
-        description=index_description,
-    )
-    Logger.info(f"DONE matching engine index {index_name}")
+    # create ME index and endpoint
+    _create_me_index_and_endpoint(index_name, bucket_uri, q_engine)
+
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
-  # create index endpoint
 
-  # store index in query engine model
-  q_engine.index_id = tree_ah_index.index_name
+def _create_me_index_and_endpoint(index_name: str, bucket_uri: str,
+                                  q_engine: QueryEngine):
+  """ Create matching engine index and endpoint """
+  # create ME index
+  Logger.info(f"creating matching engine index {index_name}")
+
+  index_description = \
+    "Matching Engine index for LLM Service query engine: " + q_engine.name
+
+  tree_ah_index = aiplatform.MatchingEngineIndex.create_tree_ah_index(
+      display_name=index_name,
+      contents_delta_uri=bucket_uri,
+      dimensions=DIMENSIONS,
+      approximate_neighbors_count=150,
+      distance_measure_type="DOT_PRODUCT_DISTANCE",
+      leaf_node_embedding_count=500,
+      leaf_nodes_to_search_percent=80,
+      description=index_description,
+  )
+  Logger.info(f"Created matching engine index {index_name}")
+
+  # create index endpoint
+  index_endpoint = aiplatform.MatchingEngineIndexEndpoint.create(
+      display_name=index_name,
+      description=index_name,
+      public_endpoint_enabled=True,
+  )
+  Logger.info(f"Created matching engine endpoint for {index_name}")
+
+  # deploy index endpoint
+  deployed_index_name = f"deployed_{index_name}"
+  index_endpoint.deploy_index(
+      index=tree_ah_index, deployed_index_id=deployed_index_name
+  )
+  Logger.info(f"Deployed matching engine endpoint for {index_name}")
+
+  # store index and endpoint in query engine model
+  q_engine.index_id = tree_ah_index.resource_name
+  q_engine.endpoint = deployed_index_name
   q_engine.update()
 
 
