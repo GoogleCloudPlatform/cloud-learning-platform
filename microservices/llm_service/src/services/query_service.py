@@ -61,6 +61,7 @@ ITEMS_PER_REQUEST = 5
 DIMENSIONS = 768
 
 async def query_generate(
+            user_id: str,
             prompt: str,
             query_engine: str,
             user_query: Optional[UserQuery] = None) -> \
@@ -85,21 +86,15 @@ async def query_generate(
   if q_engine is None:
     raise ResourceNotFoundException(f"cant find query engine {query_engine}")
 
-  # build query prompt, including query history if present
-  query_prompt = None
-  if user_query is not None:
-    query_prompt = query_prompts.query_with_context(user_query, prompt)
-  else:
-    query_prompt = query_prompts.query_prompt(prompt)
-
   # get doc context for question
-  query_references = _query_doc_matches(q_engine, query_prompt)
+  query_references = await _query_doc_matches(q_engine, prompt)
 
   # generate question prompt for chat model
   question_prompt = query_prompts.question_prompt(prompt, query_references)
 
   # send question prompt to model
-  question_response = llm_generate.llm_chat(question_prompt, q_engine.llm_type)
+  question_response = await llm_generate.llm_chat(
+      question_prompt, q_engine.llm_type)
 
   # save query result
   query_ref_ids = []
@@ -119,10 +114,18 @@ async def query_generate(
                              response=question_response)
   query_result.save()
 
+  # save user query history
+  if user_query is None:
+    user_query = UserQuery(user_id=user_id,
+                           query_engine_id=q_engine.id)
+    user_query.save()
+  user_query.update_history(prompt, question_response)
+
   return query_result, query_references
 
 
-def _query_doc_matches(q_engine: QueryEngine, query_prompt: str) -> List[dict]:
+async def _query_doc_matches(q_engine: QueryEngine,
+                             query_prompt: str) -> List[dict]:
   """
   For a query prompt, retrieve text chunks with doc references
   from matching documents.

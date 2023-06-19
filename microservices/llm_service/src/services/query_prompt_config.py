@@ -12,17 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Query prompt generator methods """
+from langchain.prompts import PromptTemplate
 
-from typing import List
+""" Query prompt templates """
 
-from prompt_config import QUESTION_PROMPT
+prompt_template = \
+"""Use the following pieces of context to answer the question at the end. """
+"""If you don't know the answer, just say that you don't know, don't """
+"""try to make up an answer.
 
-def question_prompt(prompt: str, query_context: List[dict]) -> str:
-  """ Create question prompt with context for LLM """
-  context_list = [ref["document_text"] for ref in query_context]
-  text_context = context_list.join("\n\n")
-  question = QUESTION_PROMPT.format(
-      {"question": prompt, "context": text_context}
-  )
-  return question
+{context}
+
+Question: {question}
+Helpful Answer:"""
+
+QUESTION_PROMPT = PromptTemplate(
+    template=prompt_template, input_variables=["context", "question"]
+)
+
