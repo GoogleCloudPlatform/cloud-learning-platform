@@ -19,7 +19,6 @@ import traceback
 from typing import Optional
 from fastapi import APIRouter, Depends
 from common.models import User, UserChat
-from common.models.llm import CHAT_HUMAN, CHAT_AI
 from common.utils.auth_service import validate_token
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
@@ -225,8 +224,8 @@ async def create_user_chat(gen_config: LLMGenerateModel,
 
     # create new chat for user
     user_chat = UserChat(user_id=user.user_id, llm_type=llm_type)
-    user_chat.history = [{CHAT_HUMAN: prompt}, {CHAT_AI: result}]
     user_chat.save()
+    user_chat.update_history(prompt, result)
 
     chat_data = user_chat.get_fields(reformat_datetime=True)
     chat_data["id"] = user_chat.id
@@ -276,9 +275,7 @@ async def user_chat_generate(chatid: str, gen_config: LLMGenerateModel):
     result = await llm_generate(prompt, llm_type, user_chat)
 
     # save chat history
-    user_chat.history.append({CHAT_HUMAN: prompt})
-    user_chat.history.append({CHAT_AI: result})
-    user_chat.save()
+    user_chat.update_history(prompt, result)
 
     chat_data = user_chat.get_fields(reformat_datetime=True)
     chat_data["id"] = user_chat.id

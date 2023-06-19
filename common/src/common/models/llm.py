@@ -59,3 +59,25 @@ class UserChat(BaseModel):
             "deleted_at_timestamp", "==",
             None).order(order_by).offset(skip).fetch(limit)
     return list(objects)
+
+  def update_history(self, prompt: str, response: str):
+    """ Update history with query and response """
+    self.history.append(
+      {CHAT_HUMAN: prompt}
+    )
+    self.history.append(
+      {CHAT_AI: response}
+    )
+    self.update()
+
+  @classmethod
+  def is_human(cls, entry: dict) -> bool:
+    return CHAT_HUMAN in entry.keys()
+
+  @classmethod
+  def is_ai(cls, entry: dict) -> bool:
+    return CHAT_AI in entry.keys()
+
+  @classmethod
+  def entry_content(cls, entry: dict) -> str:
+    return entry.value()

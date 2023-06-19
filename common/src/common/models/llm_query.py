@@ -14,9 +14,15 @@
 """
 Models for LLM Query Engines
 """
-from fireo.fields import (TextField, ListField, IDField, 
+from typing import List
+from fireo.fields import (TextField, ListField, IDField,
                           BooleanField, NumberField)
 from common.models import BaseModel
+
+# constants used as tags for query history
+QUERY_HUMAN = "HumanQuestion"
+QUERY_AI_RESPONSE = "AIResponse"
+QUERY_AI_REFERENCES = "AIReferences"
 
 class UserQuery(BaseModel):
   """
@@ -56,7 +62,19 @@ class UserQuery(BaseModel):
             "deleted_at_timestamp", "==",
             None).order(order_by).offset(skip).fetch(limit)
     return list(objects)
-  
+
+  def update_history(self, prompt: str, response: str, references: List[dict]):
+    """ Update history with query and response """
+    self.history.append(
+      {QUERY_HUMAN: prompt}
+    )
+    self.history.append(
+      {
+        QUERY_AI_RESPONSE: response,
+        QUERY_AI_REFERENCES: references
+      }
+    )
+    self.update()
 
 class QueryEngine(BaseModel):
   """
@@ -128,10 +146,9 @@ class QueryResult(BaseModel):
     ignore_none_field = False
     collection_name = BaseModel.DATABASE_PREFIX + "query_results"
 
-  @classmethod
-  def load_references(cls, query_result: QueryResult) -> List[QueryReference]:
+  def load_references(self) -> List[QueryReference]:
     references = []
-    for ref in query_result.query_refs:
+    for ref in self.get("query_refs"):
       obj = QueryReference.find_by_id(ref)
       if obj is not None:
         references.append(obj)
@@ -203,4 +220,3 @@ class QueryDocumentChunk(BaseModel):
             "deleted_at_timestamp", "==",
             None).get()
     return q_chunk
-

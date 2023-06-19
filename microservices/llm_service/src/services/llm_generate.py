@@ -62,7 +62,37 @@ async def llm_generate(prompt: str, llm_type: str,
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
-async def google_llm_predict(prompt, is_chat, google_llm):
+async def llm_chat(prompt: str, llm_type: str) -> str:
+  """
+  Send a prompt to a chat model and return response
+
+  Args:
+    prompt: the text prompt to pass to the LLM
+    llm_type: the type of LLM to use (default to openai)
+
+
+  Returns:
+    the text result
+  """
+  Logger.info(f"generating chat with llm_type {llm_type}")
+  llm = CHAT_LLM_TYPES.get(llm_type)
+  if llm is None:
+    raise ResourceNotFoundException(f"Cannot find chat llm type '{llm_type}'")
+
+  try:
+    if llm_type in LANGCHAIN_LLM.keys():
+      result = langchain_llm_generate(prompt, llm_type)
+    elif llm_type in GOOGLE_LLM.keys():
+      google_llm = GOOGLE_LLM.get(llm_type)
+      is_chat = True
+      result = google_llm_predict(prompt, is_chat, google_llm)
+    return result
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+
+async def google_llm_predict(prompt: str, is_chat: bool,
+                             google_llm: str, user_chat=None) -> str:
   """
   Generate text with a Google LLM given a prompt.
 
@@ -74,6 +104,17 @@ async def google_llm_predict(prompt, is_chat, google_llm):
   Returns:
     the text result.
   """
+  prompt_list = []
+  if user_chat is not None:
+    history = user_chat.get("history", [])
+    for entry in history:
+      content = UserChat.entry_content(entry)
+      if UserChat.is_human(entry):
+        prompt_list.append(f"Human input: {content}")
+      elif UserChat.is_ai(entry):
+        prompt_list.append(f"AI response: {content}")
+  prompt_list.append(prompt)
+  context_prompt = prompt.join("\n\n")
 
   # Temperature controls the degree of randomness in token selection.
   # Token limit determines the maximum amount of text output.
@@ -92,11 +133,11 @@ async def google_llm_predict(prompt, is_chat, google_llm):
     if is_chat:
       chat_model = ChatModel.from_pretrained(google_llm)
       chat = chat_model.start_chat()
-      response = chat.send_message(prompt, **parameters)
+      response = chat.send_message(context_prompt, **parameters)
     else:
       text_model = TextGenerationModel.from_pretrained(google_llm)
       response = text_model.predict(
-          prompt,
+          context_prompt,
           **parameters,
       )
 
@@ -107,7 +148,3 @@ async def google_llm_predict(prompt, is_chat, google_llm):
   result = response.text
 
   return result
-
-def llm_chat(prompt: str, llm_type: str) -> str:
-  """ send a prompt to a chat model and return response """
-  return ""

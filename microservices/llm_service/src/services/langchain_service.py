@@ -54,12 +54,13 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
       # create msg history for user chat if it exists
       msg = []
       if user_chat is not None:
-        history = user_chat.history
-        for i in range(len(history)):
-          msg.append(HumanMessage(content=history[i]))
-          msg.append(AIMessage(content=history[i+1]))
-          i = i + 1
-
+        history = user_chat.get("history", [])
+        for entry in history:
+          content = UserChat.entry_content(entry)
+          if UserChat.is_human(entry):
+            msg.append(HumanMessage(content=content))
+          elif UserChat.is_ai(entry):
+            msg.append(AIMessage(content=content))
       msg.append(HumanMessage(content=prompt))
 
       Logger.info(f"generating text for [{prompt}]")
