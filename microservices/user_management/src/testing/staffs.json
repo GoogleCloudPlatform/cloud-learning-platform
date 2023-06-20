@@ -1,0 +1,35 @@
+[
+  {
+    "first_name": "Ron",
+    "last_name": "Turner",
+    "preferred_name": "r staff",
+    "bio": "",
+    "pronoun": "he/him/his",
+    "email": "ron.turner@email.com",
+    "phone_number": "0000000001",
+    "shared_inboxes": "",
+    "office_hours": []
+  },
+  {
+    "first_name": "Jon",
+    "last_name": "Turner",
+    "preferred_name": "j staff",
+    "bio": "",
+    "pronoun": "he/him/his",
+    "email": "jon.turner@email.com",
+    "phone_number": "0000000002",
+    "shared_inboxes": "",
+    "office_hours": []
+  },
+  {
+    "first_name": "Don",
+    "last_name": "Turner",
+    "preferred_name": "d staff",
+    "bio": "",
+    "pronoun": "he/him/his",
+    "email": "don.turner@email.com",
+    "phone_number": "0000000003",
+    "shared_inboxes": "",
+    "office_hours": []
+  }
+]

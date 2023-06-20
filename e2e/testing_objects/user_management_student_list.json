@@ -1,0 +1,14 @@
+[
+    {
+        "first_name": "user01",
+        "last_name": "abc",
+        "email": "dweh4gf834gh34fh34jff39h@gmail.com",
+        "status": "active",
+        "user_type": "learner",
+        "user_groups": [],
+        "is_registered": true,
+        "failed_login_attempts_count": 0,
+        "gaia_id": "F2GGRg5etyty",
+        "photo_url": "//lh3.googleusercontent.com/a/default-user"
+    }
+]

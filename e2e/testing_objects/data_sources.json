@@ -1,0 +1,18 @@
+[{
+    "uuid":"123124",
+    "matching_engine_index_id": {"e2e_wgu": "3436176146939510784"},
+    "source": ["e2e_wgu"],
+    "type": "skill"
+},
+{
+    "uuid":"123123",
+    "matching_engine_index_id": {"e2e_wgu": "3436176146939510785"},
+    "source": ["e2e_test"],
+    "type": "skill"
+},
+{
+    "uuid":"123125",
+    "matching_engine_index_id": {"e2e": "1528620229771395074"},
+    "source": ["e2e"],
+    "type": "role"
+}]

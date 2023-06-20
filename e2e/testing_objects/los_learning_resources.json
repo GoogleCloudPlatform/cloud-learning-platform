@@ -1,0 +1,50 @@
+[{
+    "uuid": "id",
+    "name" : "name",
+    "display_name" : "name",
+    "description": "description",
+    "type": "html",
+    "resource_path": "test_file.html",
+    "lti_content_item_id": "",
+    "course_category":["Mathematics", "Calculus"],
+    "alignments": {
+        "competency_alignments": [],
+        "skill_alignments": []
+    },
+    "parent_nodes": {
+        "learning_objects": []
+    },
+    "child_nodes": {
+        "concepts": []
+    },
+    "metadata": {
+        "theme": "blue",
+        "illustration": "U1C1"
+    }
+},
+{
+    "uuid": "id",
+    "name" : "name demo",
+    "display_name" : "name demo",
+    "description": "description2",
+    "type": "html",
+    "resource_path": "test_file.html",
+    "lti_content_item_id": "",
+    "course_category":["Mathematics", "Geometry"],
+    "alignments": {
+        "competency_alignments": [],
+        "skill_alignments": []
+    },
+    "parent_nodes": {
+        "learning_objects": []
+    },
+    "child_nodes": {
+        "concepts": []
+    },
+    "metadata": {
+        "design_config": {
+            "theme": "blue",
+            "illustration": "U1C1"
+        }
+    }
+}]

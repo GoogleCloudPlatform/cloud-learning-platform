@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-management
+spec:
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: user-management
+        image: user-management
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "500Mi"
+        env:
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX
+        - name: INSPACE_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: INSPACE_BASE_URL
+        - name: EXTERNAL_USER_PROPERTY_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: EXTERNAL_USER_PROPERTY_PREFIX
