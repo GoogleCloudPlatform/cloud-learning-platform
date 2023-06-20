@@ -64,6 +64,7 @@ env:
   SKAFFOLD_VERSION: 1.39.2
   SKAFFOLD_CACHE_GCS: gs://core-learning-services-dev.appspot.com/skaffold/cache
   # CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
+  WORKSPACE_ADMIN_EMAIL: lms_service@dhodun.altostrat.com
   CLASSROOM_ADMIN_EMAIL : lms_admin_teacher@dhodun.altostrat.com
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
