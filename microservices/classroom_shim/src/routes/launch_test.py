@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from common.utils.http_exceptions import add_exception_handlers
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
-from schemas.schema_examples import LTI_ASSIGNMENT_EXAMPLE
+from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
     side_effect=mock.MagicMock()) as mok:
@@ -33,21 +33,17 @@ os.environ[
 
 
 @pytest.mark.parametrize(
-    "create_lti_assignment", [LTI_ASSIGNMENT_EXAMPLE], indirect=True)
+    "create_lti_assignment", [INSERT_LTI_ASSIGNMENT_EXAMPLE], indirect=True)
 @mock.patch("routes.launch.get_teacher_details")
 @mock.patch("routes.launch.get_student_details")
 @mock.patch("routes.launch.get_user_details")
 @mock.patch("common.utils.auth_service.validate_token")
-def test_launch_assignment(
-    mock_decoded_token,
-    mock_user_data,
-    mock_student_data,
-    mock_teacher_data,
-    clean_firestore,
-    create_lti_assignment):
+def test_launch_assignment(mock_decoded_token, mock_user_data,
+                           mock_student_data, mock_teacher_data,
+                           clean_firestore, create_lti_assignment):
   """Test for launch assignment API"""
   test_assignment = create_lti_assignment
-#   test_context_id = "BQ5M3b1vHS436n"
+  #   test_context_id = "BQ5M3b1vHS436n"
   mock_decoded_token.return_value = {"email": "testuser@email.com"}
   mock_user_data.return_value = {
       "data": [{
@@ -78,8 +74,8 @@ def test_launch_assignment(
     print("Resp", resp.status_code, resp.text)
     assert resp.status_code == 200, "Status should be 200"
     json_response = resp.json()
-    assert LTI_ASSIGNMENT_EXAMPLE.get("context_id") in json_response.get(
+    assert INSERT_LTI_ASSIGNMENT_EXAMPLE.get("context_id") in json_response.get(
         "url"), "Incorrect response received"
-    assert LTI_ASSIGNMENT_EXAMPLE.get(
+    assert INSERT_LTI_ASSIGNMENT_EXAMPLE.get(
         "lti_content_item_id") in json_response.get(
             "url"), "Incorrect response received"
