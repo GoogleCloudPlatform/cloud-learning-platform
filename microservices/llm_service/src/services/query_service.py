@@ -33,7 +33,6 @@ from common.models import (UserQuery, QueryResult,
 from common.utils.errors import (ResourceNotFoundException,
                                  ValidationError)
 from common.utils.http_exceptions import InternalServerError
-from common.utils import gcs_adapter
 from utils.errors import NoDocumentsIndexedException
 from google.cloud import aiplatform, storage
 from vertexai.preview.language_models import TextEmbeddingModel
@@ -43,7 +42,7 @@ from PyPDF2 import PdfReader
 import llm_generate
 import query_prompts
 
-from config import PROJECT_ID, DEFAULT_QUERY_CHAT_MODEL
+from config import PROJECT_ID, DEFAULT_QUERY_CHAT_MODEL, REGION
 
 # number of document match results to retrieve
 NUM_MATCH_RESULTS = 5
@@ -219,7 +218,7 @@ def build_doc_index(doc_url:str, query_engine: str):
 
     # bucket for ME index data
     bucket_name = f"{query_engine}-me-data"
-    bucket = storage_client.create_bucket(bucket_name)
+    bucket = storage_client.create_bucket(bucket_name, location=REGION)
     bucket_uri = f"gs://{bucket.name}"
 
     # process docs at url and upload embeddings to GCS for indexing
@@ -334,8 +333,13 @@ def _process_documents(doc_url: str, bucket_name: str,
           _generate_index_data(doc_name, text_chunks, index_base)
 
       # copy data files up to bucket
-      gcs_adapter.upload_folder(bucket_name, str(embeddings_dir),
-                                f"gs://{bucket_name}")
+      bucket = storage_client.get_bucket(bucket_name)
+      for root, dirs, files in os.walk(embeddings_dir):
+        for filename in files:
+          local_path = os.path.join(root, filename)
+          blob = bucket.blob(filename)
+          blob.upload_from_filename(local_path)
+
       Logger.info(f"data uploaded for {doc_name}")
 
       # clean up tmp data dir
