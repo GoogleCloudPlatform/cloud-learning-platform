@@ -8,7 +8,7 @@ from testing_objects.test_config import API_URL,e2e_google_form_id,e2e_drive_fol
 from testing_objects.course_template import emails
 from e2e.gke_api_tests.secrets_helper import (get_student_email_and_token,
   get_workspace_student_email_and_token,create_coursework_submission,
-list_coursework_submission_user,insert_file_into_folder)
+list_coursework_submission_user)
 
 # -------------------------------Enroll student to cohort-------------------------------------
 # ----Positive Scenario-----
@@ -417,7 +417,7 @@ def step_impl_54(context):
   result = list_coursework_submission_user(context.access_token,
                                   context.classroom_id,
                                   context.coursework["id"],"me")
-  insert_file_into_folder(e2e_drive_folder_id,e2e_google_form_id)
+  
   print("This is result after list coursework submission Before turn in",result)
   assert "assignedGrade" not in result[0].keys()
 
@@ -452,7 +452,6 @@ def step_impl_56(context):
 )
 def step_impl_57(context):
   time.sleep(15)
-  insert_file_into_folder(e2e_drive_folder_id,e2e_google_form_id)
   print("After inser to origin folder")
   result = list_coursework_submission_user(context.access_token,
                                   context.classroom_id,
