@@ -24,7 +24,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.courseworkmaterials",
     "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly"
 ]
-def get_creds():
+def get_creds(use_teacher=False):
   """_summary_
 
   Returns:
@@ -32,6 +32,8 @@ def get_creds():
   """
   a_creds = service_account.Credentials.from_service_account_info(
       CLASSROOM_KEY, scopes=SCOPES)
+  if use_teacher:
+    return a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
   return a_creds.with_subject(WORKSPACE_ADMIN_EMAIL)
 
 def create_course(name, section, description):
@@ -100,11 +102,11 @@ def invite_user(course_id, email, role):
   return invitation
 
 def create_course_work(classroom_id,body):
-  service = build("classroom", "v1", credentials=get_creds())
+  service = build("classroom", "v1", credentials=get_creds(True))
   return service.courses().courseWork().create(courseId=classroom_id,
                                                  body=body).execute()
 def get_course_work_submission_list(classroom_id,course_work_id,user_id):
-  service = build("classroom", "v1", credentials=get_creds())
+  service = build("classroom", "v1", credentials=get_creds(True))
   return service.courses().courseWork().studentSubmissions().list(
       courseId=classroom_id,
       courseWorkId=course_work_id,
@@ -122,7 +124,7 @@ def create_coursework_submission(access_token,course_id,coursework_id,submission
   return result
 
 def patch_course_work_submission(classroom_id,course_work_id,submission_id,update_mask,body):
-  service = build("classroom", "v1", credentials=get_creds())
+  service = build("classroom", "v1", credentials=get_creds(True))
   return service.courses().courseWork().studentSubmissions().patch(
       courseId=classroom_id,
       courseWorkId=course_work_id,
