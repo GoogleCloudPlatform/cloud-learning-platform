@@ -1,5 +1,5 @@
 """
-  Tests for Context endpoints
+  Tests for Content Selection endpoints
 """
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import,line-too-long
@@ -14,7 +14,7 @@ from schemas.schema_examples import LTI_ASSIGNMENT_EXAMPLE
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
     side_effect=mock.MagicMock()) as mok:
-  with mock.patch("routes.launch.Logger"):
+  with mock.patch("routes.content_selection.Logger"):
     from routes.content_selection import router
     from testing.test_config import API_URL
 

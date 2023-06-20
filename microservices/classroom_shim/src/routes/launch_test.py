@@ -1,5 +1,5 @@
 """
-  Tests for Context endpoints
+  Tests for Launch endpoints
 """
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import,line-too-long
@@ -16,7 +16,7 @@ with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
     side_effect=mock.MagicMock()) as mok:
   with mock.patch("routes.launch.Logger"):
-    from routes.launch import router
+    from routes.launch import router, validate_token
     from testing.test_config import API_URL
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
@@ -28,54 +28,134 @@ app.include_router(router, prefix="/classroom-shim/api/v1")
 
 client_with_emulator = TestClient(app)
 
-os.environ[
-    "PYTHONPATH"] = "/home/pavansareddy/Documents/Projects/SNHU/cloud-learning-platform/common/src"
+
+def mock_learner_token():
+  return {"email": "testuser@email.com", "user_type": "learner"}
+
+
+def mock_faculty_token():
+  return {"email": "testuser@email.com", "user_type": "faculty"}
+
+
+@pytest.mark.parametrize(
+    "create_lti_assignment", [INSERT_LTI_ASSIGNMENT_EXAMPLE], indirect=True)
+@mock.patch("routes.launch.get_student_details")
+@mock.patch("routes.launch.get_user_details")
+def test_launch_assignment_section_student(mock_user_data, mock_student_data,
+                                           clean_firestore,
+                                           create_lti_assignment):
+  """Test for launch assignment API"""
+  email = "testuser@email.com"
+  user_type = "learner"
+  app.dependency_overrides[validate_token] = mock_learner_token
+  test_assignment = create_lti_assignment
+  mock_user_data.return_value = {
+      "success": True,
+      "data": [{
+          "user_id": "Njy9sg2v9pnH6y8",
+          "email": email
+      }]
+  }
+  mock_student_data.return_value = {
+      "user_id": "V2e4brBn4uT78",
+      "user_type": user_type,
+      "status": "active",
+      "email": email
+  }
+  params = {"lti_assignment_id": test_assignment.id}
+  headers = {"Authorization": "Bearer asvm28.dsiq.vuwmo"}
+
+  resp = client_with_emulator.get(
+      f"{API_URL}/launch-assignment", headers=headers, params=params)
+
+  assert resp.status_code == 200, "Status should be 200"
+  json_response = resp.json()
+  assert INSERT_LTI_ASSIGNMENT_EXAMPLE.get("context_id") in json_response.get(
+      "url"), "Incorrect response received"
+  assert INSERT_LTI_ASSIGNMENT_EXAMPLE.get(
+      "lti_content_item_id") in json_response.get(
+          "url"), "Incorrect response received"
 
 
 @pytest.mark.parametrize(
     "create_lti_assignment", [INSERT_LTI_ASSIGNMENT_EXAMPLE], indirect=True)
 @mock.patch("routes.launch.get_teacher_details")
-@mock.patch("routes.launch.get_student_details")
 @mock.patch("routes.launch.get_user_details")
-@mock.patch("common.utils.auth_service.validate_token")
-def test_launch_assignment(mock_decoded_token, mock_user_data,
-                           mock_student_data, mock_teacher_data,
-                           clean_firestore, create_lti_assignment):
+def test_launch_assignment_section_teacher(mock_user_data, mock_teacher_data,
+                                           clean_firestore,
+                                           create_lti_assignment):
   """Test for launch assignment API"""
+  email = "testuser@email.com"
+  user_type = "faculty"
+  app.dependency_overrides[validate_token] = mock_faculty_token
   test_assignment = create_lti_assignment
-  #   test_context_id = "BQ5M3b1vHS436n"
-  mock_decoded_token.return_value = {"email": "testuser@email.com"}
   mock_user_data.return_value = {
+      "success": True,
       "data": [{
           "user_id": "Njy9sg2v9pnH6y8",
-          "email": "testuser@email.com"
+          "email": email
       }]
   }
   mock_teacher_data.return_value = {
       "user_id": "VmwB3s2nOsF42q8T",
-      "user_type": "faculty",
+      "user_type": user_type,
       "status": "active",
-      "email": "testuser@email.com"
+      "email": email
   }
-  mock_student_data.return_value = {
-      "user_id": "V2e4brBn4uT78",
-      "user_type": "student",
-      "status": "active",
-      "email": "testuser@email.com"
-  }
-  mock_decoded_token = {"email": "testuser@email.com"}
   params = {"lti_assignment_id": test_assignment.id}
   headers = {"Authorization": "Bearer asvm28.dsiq.vuwmo"}
-  with mock.patch("common.utils.auth_service", return_value=mock_decoded_token):
 
-    resp = client_with_emulator.get(
-        f"{API_URL}/launch-assignment", headers=headers, params=params)
+  resp = client_with_emulator.get(
+      f"{API_URL}/launch-assignment", headers=headers, params=params)
 
-    print("Resp", resp.status_code, resp.text)
-    assert resp.status_code == 200, "Status should be 200"
-    json_response = resp.json()
-    assert INSERT_LTI_ASSIGNMENT_EXAMPLE.get("context_id") in json_response.get(
-        "url"), "Incorrect response received"
-    assert INSERT_LTI_ASSIGNMENT_EXAMPLE.get(
-        "lti_content_item_id") in json_response.get(
-            "url"), "Incorrect response received"
+  assert resp.status_code == 200, "Status should be 200"
+  json_response = resp.json()
+  assert INSERT_LTI_ASSIGNMENT_EXAMPLE.get("context_id") in json_response.get(
+      "url"), "Incorrect response received"
+  assert INSERT_LTI_ASSIGNMENT_EXAMPLE.get(
+      "lti_content_item_id") in json_response.get(
+          "url"), "Incorrect response received"
+
+
+test_example = {
+    **INSERT_LTI_ASSIGNMENT_EXAMPLE, "context_type": "course_template"
+}
+
+
+@pytest.mark.parametrize("create_lti_assignment", [test_example], indirect=True)
+@mock.patch("routes.launch.get_instruction_designer_details")
+@mock.patch("routes.launch.get_user_details")
+def test_launch_assignment_course_template(mock_user_data, mock_id_data,
+                                           clean_firestore,
+                                           create_lti_assignment):
+  """Test for launch assignment API"""
+  email = "testuser@email.com"
+  user_type = "faculty"
+  app.dependency_overrides[validate_token] = mock_faculty_token
+  test_assignment = create_lti_assignment
+  mock_user_data.return_value = {
+      "success": True,
+      "data": [{
+          "user_id": "Njy9sg2v9pnH6y8",
+          "email": email
+      }]
+  }
+  mock_id_data.return_value = {
+      "user_id": "VmwB3s2nOsF42q8T",
+      "user_type": user_type,
+      "status": "active",
+      "email": email
+  }
+  params = {"lti_assignment_id": test_assignment.id}
+  headers = {"Authorization": "Bearer asvm28.dsiq.vuwmo"}
+
+  resp = client_with_emulator.get(
+      f"{API_URL}/launch-assignment", headers=headers, params=params)
+
+  assert resp.status_code == 200, "Status should be 200"
+  json_response = resp.json()
+  assert INSERT_LTI_ASSIGNMENT_EXAMPLE.get("context_id") in json_response.get(
+      "url"), "Incorrect response received"
+  assert INSERT_LTI_ASSIGNMENT_EXAMPLE.get(
+      "lti_content_item_id") in json_response.get(
+          "url"), "Incorrect response received"
