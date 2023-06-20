@@ -133,12 +133,11 @@ async def _query_doc_matches(q_engine: QueryEngine,
   query_embeddings = _encode_texts_to_embeddings(query_prompt)
 
   # retrieve text matches for query
-  index_endpoint = aiplatform.MatchingEngineIndexEndpoint(
-      index_endpoint_name=q_engine.endpoint)
+  index_endpoint = aiplatform.MatchingEngineIndexEndpoint(q_engine.endpoint)
 
   match_indexes = index_endpoint.find_neighbors(
       queries=query_embeddings,
-      deployed_index_id=q_engine.endpoint,
+      deployed_index_id=q_engine.deployed_index_name,
       num_neighbors=NUM_MATCH_RESULTS
   )
 
@@ -231,7 +230,7 @@ def build_doc_index(doc_url:str, query_engine: str):
           f"Failed to process any documents at url {doc_url}")
 
     # ME index name and description
-    index_name = query_engine + "-MEindex"
+    index_name = query_engine.replace("-", "_") + "_MEindex"
 
     # create ME index and endpoint
     _create_me_index_and_endpoint(index_name, bucket_uri, q_engine)
@@ -269,17 +268,22 @@ def _create_me_index_and_endpoint(index_name: str, bucket_uri: str,
   )
   Logger.info(f"Created matching engine endpoint for {index_name}")
 
-  # deploy index endpoint
-  deployed_index_name = f"deployed_{index_name}"
-  index_endpoint.deploy_index(
-      index=tree_ah_index, deployed_index_id=deployed_index_name
-  )
-  Logger.info(f"Deployed matching engine endpoint for {index_name}")
-
-  # store index and endpoint in query engine model
+  # store index in query engine model
   q_engine.index_id = tree_ah_index.resource_name
-  q_engine.endpoint = deployed_index_name
+  q_engine.index_name = index_name
+  q_engine.endpoint = index_endpoint.resource_name
   q_engine.update()
+
+  # deploy index endpoint
+  try:
+    # this seems to consistently time out, throwing an error, but
+    # actually sucessfully deploys the endpoint
+    index_endpoint.deploy_index(
+        index=tree_ah_index, deployed_index_id=q_engine.deployed_index_name
+    )
+    Logger.info(f"Deployed matching engine endpoint for {index_name}")
+  except Exception:
+    pass
 
 
 def _process_documents(doc_url: str, bucket_name: str,
@@ -334,7 +338,7 @@ def _process_documents(doc_url: str, bucket_name: str,
 
       # copy data files up to bucket
       bucket = storage_client.get_bucket(bucket_name)
-      for root, dirs, files in os.walk(embeddings_dir):
+      for root, _, files in os.walk(embeddings_dir):
         for filename in files:
           local_path = os.path.join(root, filename)
           blob = bucket.blob(filename)

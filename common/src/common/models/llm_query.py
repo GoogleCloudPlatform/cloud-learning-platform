@@ -86,7 +86,8 @@ class QueryEngine(BaseModel):
   created_by = TextField(required=True)
   is_public = BooleanField(default=False)
   index_id = TextField(required=False)
-  index_endpoint = TextField(required=False)
+  index_name = TextField(required=False)
+  endpoint = TextField(required=False)
 
   class Meta:
     ignore_none_field = False
@@ -129,6 +130,10 @@ class QueryEngine(BaseModel):
             "deleted_at_timestamp", "==",
             None).get()
     return q_engine
+
+  @property
+  def deployed_index_name(self):
+    return f"deployed_{self.index_name}"
 
 
 class QueryReference(BaseModel):
