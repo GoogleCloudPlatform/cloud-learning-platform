@@ -574,7 +574,7 @@ def enroll_student(headers, access_token, course_id, student_email,
     Logger.error(e)
     Logger.error(err)
     raise ValidationError(
-    "Please set first name and last name in your google profile") from e
+  "Please set first name and last name in your google profile or check access token is valid") from e
   create_student_in_course(access_token, student_email, course_id, course_code)
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user user-management API and return user data else
