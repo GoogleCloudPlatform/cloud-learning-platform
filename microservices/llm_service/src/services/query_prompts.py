@@ -16,7 +16,7 @@
 
 from typing import List
 
-from prompt_config import QUESTION_PROMPT
+from query_prompt_config import QUESTION_PROMPT
 
 def question_prompt(prompt: str, query_context: List[dict]) -> str:
   """ Create question prompt with context for LLM """

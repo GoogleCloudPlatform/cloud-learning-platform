@@ -346,16 +346,15 @@ def _process_documents(doc_url: str, bucket_name: str,
                                 query_engine = q_engine.name,
                                 doc_url = doc_url,
                                 index_start = index_base,
-                                index_end = new_index_base
-                                )
+                                index_end = new_index_base)
       query_doc.save()
 
       for i in range(index_base, new_index_base):
         query_doc_chunk = QueryDocumentChunk(
+                                  query_engine_id = q_engine.id,
                                   query_document_id = query_doc.id,
                                   index = i,
-                                  text = text_chunks[i],
-                                  )
+                                  text = text_chunks[i])
         query_doc_chunk.save()
 
       index_base = new_index_base
