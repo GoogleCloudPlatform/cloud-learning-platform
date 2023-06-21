@@ -54,7 +54,7 @@ def get_query_list():
   try:
     return {
       "success": True,
-      "message": "Successfully retrieved query engines",
+      "message": "Successfully retrieved query engine types",
       "data": query_engine_data
     }
   except Exception as e:

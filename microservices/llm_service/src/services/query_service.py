@@ -39,8 +39,8 @@ from vertexai.preview.language_models import TextEmbeddingModel
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders import CSVLoader
 from PyPDF2 import PdfReader
-import llm_generate
-import query_prompts
+from services import llm_generate
+from services import query_prompts
 
 from config import PROJECT_ID, DEFAULT_QUERY_CHAT_MODEL, REGION
 

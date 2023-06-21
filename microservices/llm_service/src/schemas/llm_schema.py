@@ -51,6 +51,22 @@ class LLMGetTypesResponse(BaseModel):
     }
 
 
+class LLMGetQueryEnginesResponse(BaseModel):
+  """LLM Get types model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully retrieved query engine types"
+  data: Optional[list[str]] = []
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully retrieved query engine types",
+            "data": []
+        }
+    }
+
 class LLMGenerateModel(BaseModel):
   """LLM Generate model"""
   prompt: str
