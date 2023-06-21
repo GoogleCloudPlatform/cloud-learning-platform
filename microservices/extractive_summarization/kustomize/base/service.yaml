@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: extractive-summarization
+  labels:
+    app: extractive-summarization
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    name: rest
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: extractive-summarization
