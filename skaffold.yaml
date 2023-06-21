@@ -57,6 +57,9 @@ requires:
 - path: ./microservices/update_invitations_cronjob
   configs: [update-invitations-cronjob]
 
+- path: ./microservices/extractive_summarization
+  configs: [extractive-summarization]
+
 # TODO: Activate when all services from ailearning-backend have been moved
 - path: ./microservices/student_learner_profile
   configs: [student-learner-profile]
