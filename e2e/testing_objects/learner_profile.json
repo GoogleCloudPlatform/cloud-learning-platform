@@ -1,0 +1,65 @@
+[{
+    "uuid": "44qxEpc35pVMb6AkZGbi",
+    "learner_id": "Learner one",
+    "learning_goals": [
+      "Develop Communication Skills",
+      "Teamwork"
+    ],
+    "learning_constraints": {"weekly_study_hours":0},
+    "learning_preferences": {},
+    "patterns_of_participation": {},
+    "employment_history": {},
+    "education_history": {},
+    "account_settings": {},
+    "employment_status": "Unemployed",
+    "potential_career_fields":  [],
+    "personal_goals": "",
+    "contact_preferences": {"email":false, "phone":false},
+    "enrollment_information": {},
+    "attestation_object": {},
+    "progress": {
+      "curriculum_pathways": {},
+      "learning_experiences": {},
+      "learning_objects": {},
+      "learning_resources": {},
+      "assessments": {}
+    },
+    "achievements": [],
+    "tagged_skills": [],
+    "tagged_competencies": [],
+    "mastered_skills": [],
+    "mastered_competencies": []
+  },
+  {
+    "uuid": "44qxEpc35pVM9509503",
+    "learner_id": "Learner two",
+    "learning_goals": [
+      "Develop coding Skills",
+      "ML Ops"
+    ],
+    "learning_constraints": {"weekly_study_hours":10},
+    "learning_preferences": {},
+    "patterns_of_participation": {},
+    "employment_history": {},
+    "education_history": {},
+    "account_settings": {},
+    "employment_status": "Unemployed",
+    "potential_career_fields":  [],
+    "personal_goals": "",
+    "contact_preferences": {"email":false, "phone":false},
+    "enrollment_information": {},
+    "attestation_object": {},
+    "progress": {
+      "curriculum_pathways": {},
+      "learning_experiences": {},
+      "learning_objects": {},
+      "learning_resources": {},
+      "assessments": {}
+    },
+    "achievements": [],
+    "tagged_skills": [],
+    "tagged_competencies": [],
+    "mastered_skills": [],
+    "mastered_competencies": []
+  }
+]

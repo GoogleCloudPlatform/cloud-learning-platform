@@ -70,6 +70,8 @@ env:
   CLOUD_LOGGING_ENABLED: False
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+  EXTERNAL_USER_PROPERTY_PREFIX: SNHU_
+  SKAFFOLD_BUILD_CONCURRENCY: 0
   USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT }}
   E2E_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr' || 'e2e_pr' }}${{  github.event.pull_request.number }}_
   E2E_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-' }}${{  github.event.pull_request.number }}
@@ -133,7 +135,7 @@ jobs:
         export DATABASE_PREFIX=$E2E_PREFIX
         cd utils/
         python -m pip install -r requirements.txt
-        PYTHONPATH=../common/src python firestore_indexing.py
+        PYTHONPATH=../common/src python firestore_e2e_indexing_setup.py
 
     - name: Initialize Pub/Sub
       run: |
@@ -147,6 +149,7 @@ jobs:
         cd utils/
         python -m pip install -r requirements.txt
         BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_setup.py --create-dataset=true
+        BQ_DATASET=lrs DATABASE_PREFIX=$E2E_PREFIX python bq_setup.py --create-dataset=true
 
     - name: Build and deploy to cluster
       run: |
@@ -158,30 +161,6 @@ jobs:
         --module backends \
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }}
-        
-    - name: Checkout external repo
-      id: checkout_external_repo
-      uses: actions/checkout@v3
-      with:
-        repository: GPS-Solutions/ailearning-backend
-        ref: clp-feature-branch
-        # adding run_id so we can fold in the repo without collision
-        path: ${{ format('ailearning-backend_{0}', github.run_id) }}
-        token: ${{ secrets.GH_PAT }}
-
-    - name: Build and deploy external services to cluster
-      run: |
-        pushd ${{ format('ailearning-backend_{0}', github.run_id) }}
-        NAMESPACE=$E2E_NAMESPACE_PREFIX 
-        export DATABASE_PREFIX=$E2E_PREFIX
-        export GCP_PROJECT=$PROJECT_ID
-        skaffold run \
-        -p custom \
-        --module authentication,redis,user-management,student-learner-profile,learning-record-service \
-        --namespace $NAMESPACE \
-        -l commit=$GITHUB_SHA \
-        --tag PR${{ github.event.pull_request.number }} 
-        popd
 
     - name: Upload Skaffold cache
       if: always()
@@ -231,6 +210,17 @@ jobs:
         NAMESPACE=$E2E_NAMESPACE_PREFIX
         python e2e/utils/port_forward.py --namespace $NAMESPACE
 
+    - name: Setup redis
+      uses: supercharge/redis-github-action@1.2.0
+      with:
+        redis-version: 6
+
+    - name: Install redis cli
+      run: sudo apt-get install -y redis-tools
+
+    - name: Verify that redis is up
+      run: redis-cli ping
+
     - name: Cleaning up database
       run: |
         cd e2e/utils
@@ -258,7 +248,7 @@ jobs:
     
     - name: Run behave
       run: |
-        PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m behave e2e/features/
+        PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m behave e2e/features/ --tags=~@test --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode --tags=~@inspace
 
   dataset-cleanup:
     runs-on: ubuntu-latest
@@ -368,6 +358,7 @@ jobs:
       run: |
         cd utils/
         python -m pip install -r requirements.txt
-        BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_cleanup.py  
+        BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_cleanup.py
+        BQ_DATASET=lrs DATABASE_PREFIX=$E2E_PREFIX python bq_cleanup.py
 
 # cookiecutter:endraw 

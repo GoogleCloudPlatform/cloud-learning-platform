@@ -1,0 +1,590 @@
+{
+    "curriculum_pathways": {
+        "name": "Program",
+        "display_name": "Program",
+        "description": "Next Step Pathway",
+        "achievements": [
+            {
+                "type": "course equate",
+                "name": "[A1]",
+                "description": "Cluster A1"
+            },
+            {
+                "type": "course equate",
+                "name": "[A2]",
+                "description": "Cluster A2"
+            },
+            {
+                "type": "course equate",
+                "name": "[A3]",
+                "description": "Cluster A3"
+            }
+        ],
+        "child_nodes": {
+            "curriculum_pathways": [
+                {
+                    "name": "HUM102",
+                    "display_name": "HUM102",
+                    "description": "Cluster A1 Pathway",
+                    "achievements": [
+                        {
+                            "type": "competency",
+                            "name": "[C1]",
+                            "description": "Competency 1"
+                        },
+                        {
+                            "type": "competency",
+                            "name": "[C2]",
+                            "description": "Competency 2"
+                        }
+                    ],
+                    "child_nodes": {
+                        "curriculum_pathways": [
+                            {
+                                "name": "Differentiate the various perspectives of the humanities in relation to a topic",
+                                "display_name": "Differentiate the various perspectives of the humanities in relation to a topic",
+                                "description": "Competency 1 Pathway",
+                                "achievements": [
+                                    {
+                                        "type": "Competency3",
+                                        "name": "[C4]",
+                                        "description": "Competency 4"
+                                    }
+                                ],
+                                "child_nodes": {
+                                    "learning_experiences": [
+                                        {
+                                            "description": "What are the humanities?",
+                                            "display_name": "What are the humanities?",
+                                            "name": "Topic 1",
+                                            "duration": 60,
+                                            "equivalent_credits": 3,
+                                            "child_nodes": {
+                                                "learning_objects": [
+                                                    {
+                                                        "description": "What are the humanities?",
+                                                        "display_name": "What are the humanities?",
+                                                        "name": "Learning Object Topic 1",
+                                                        "references": {
+                                                            "skills": [
+                                                                {
+                                                                    "name": "S1",
+                                                                    "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "child_nodes": {
+                                                            "learning_resources": [
+                                                                {
+                                                                    "name": "Overview of the Humanities",
+                                                                    "display_name": "Overview of the Humanities",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "The Humanities Approach",
+                                                                    "display_name": "The Humanities Approach",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "The Four Humanities Categories",
+                                                                    "display_name": "The Four Humanities Categories",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                }
+                                                            ],
+                                                            "assessments": [
+                                                                {
+                                                                    "name": "Formative assessment",
+                                                                    "type": "practice",
+                                                                    "order": 2
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "description": "Humanities in everyday life",
+                                            "display_name": "Humanities in everyday life",
+                                            "name": "Topic 2",
+                                            "duration": 60,
+                                            "equivalent_credits": 4,
+                                            "child_nodes": {
+                                                "learning_objects": [
+                                                    {
+                                                        "description": "Humanities in everyday life",
+                                                        "display_name": "Humanities in everyday life",
+                                                        "name": "Learning Object Topic 2",
+                                                        "references": {
+                                                            "skills": [
+                                                                {
+                                                                    "name": "S2",
+                                                                    "description": "Determine the utility of each of the humanities perspectivesd historical humanities"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "child_nodes": {
+                                                            "learning_resources": [
+                                                                {
+                                                                    "name": "Major Categories and Academic Programs of the Humanities",
+                                                                    "display_name": "Major Categories and Academic Programs of the Humanities",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Utility of Humanities Perspectives",
+                                                                    "display_name": "Utility of Humanities Perspectives",
+                                                                    "type": "html",
+                                                                    "order": 2
+                                                                },
+                                                                {
+                                                                    "name": "Utility of the Creative Humanities",
+                                                                    "display_name": "Utility of the Creative Humanities",
+                                                                    "type": "html",
+                                                                    "order": 3
+                                                                },
+                                                                {
+                                                                    "name": "Utility of the Scientific Humanities",
+                                                                    "display_name": "Utility of the Scientific Humanities",
+                                                                    "type": "html",
+                                                                    "order": 3
+                                                                },
+                                                                {
+                                                                    "name": "Utility of Cultural and Historical Humanities",
+                                                                    "display_name": "Utility of Cultural and Historical Humanities",
+                                                                    "type": "html",
+                                                                    "order": 3
+                                                                }
+                                                            ],
+                                                            "assessments": [
+                                                                {
+                                                                    "type": "practice",
+                                                                    "name": "Formative assessment",
+                                                                    "order": 4
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "description": "Understanding sources in the humanities",
+                                            "display_name": "Understanding sources in the humanities",
+                                            "name": "Topic 3",
+                                            "duration": 40,
+                                            "equivalent_credits": 3,
+                                            "child_nodes": {
+                                                "learning_objects": [
+                                                    {
+                                                        "description": "Humanities in everyday life",
+                                                        "display_name": "Humanities in everyday life",
+                                                        "name": "Learning Object Topic 3",
+                                                        "references": {
+                                                            "skills": [
+                                                                {
+                                                                    "name": "S3",
+                                                                    "description": "Determine sources on a topic pertinent to the perspective of the humanitiess"
+                                                                },
+                                                                {
+                                                                    "name": "S4",
+                                                                    "description": "Summarize relevant information from a variety of sources"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "child_nodes": {
+                                                            "learning_resources": [
+                                                                {
+                                                                    "name": "Sources: Credible or not?",
+                                                                    "description": "Sources: Credible or not?",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Sources for Study: Primary, Secondary, Tertiary",
+                                                                    "description": "Sources for Study: Primary, Secondary, Tertiary",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Sumarizing vs. Paraphrasing",
+                                                                    "description": "Sumarizing vs. Paraphrasing",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Citing Source Material and Avoiding Plagiarism",
+                                                                    "description": "Citing Source Material and Avoiding Plagiarism",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+  {
+                  "name": "Understanding and Unlocking Your Source",
+                  "description": "Understanding and Unlocking Your Source",
+                  "type": "html",
+                  "order": 1
+              }
+                                                            ],
+                                                            "assessments": [
+                                                                {
+                                                                    "type": "practice",
+                                                                    "name": "Formative assessment",
+                                                                    "order": 2
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "description": "Interpreting the humanities",
+                                            "display_name": "Interpreting the humanities",
+                                            "name": "Topic 4",
+                                            "duration": 60,
+                                            "equivalent_credits": 3,
+                                            "child_nodes": {
+                                                "learning_objects": [
+                                                    {
+                                                        "description": "Interpreting the humanities",
+                                                        "display_name": "Interpreting the humanities",
+                                                        "name": "Learning Object Topic 4",
+                                                        "references": {
+                                                            "skills": [
+                                                                {
+                                                                    "name": "S3",
+                                                                    "description": "Determine sources on a topic pertinent to the perspective of the humanitiess"
+                                                                },
+                                                                {
+                                                                    "name": "S5",
+                                                                    "description": "Identify potential biases and assumptions related to the information about a topic"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "child_nodes": {
+                                                            "learning_resources": [
+                                                                {
+                                                                    "name": "Searching for Credible Internet Sources",
+                                                                    "description": "Searching for Credible Internet Sources",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Identifying Bias",
+                                                                    "description": "Identifying Bias",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Bias and Assumption",
+                                                                    "description": "Bias and Assumption",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                }
+                                                            ],
+                                                            "assessments": [
+                                                                {
+                                                                    "type": "practice",
+                                                                    "name": "Formative assessment",
+                                                                    "order": 2
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "description": "HUM102 Competency 1 Exam",
+                                            "display_name": "HUM102 Competency 1 Exam",
+                                            "name": "Competency A1 Exam",
+                                            "duration": 60,
+                                            "equivalent_credits": 3,
+                                            "child_nodes": {
+                                                "assessments": [
+                                                    {
+                                                        "type": "final",
+                                                        "references": {
+                                                            "competencies": [
+                                                                {
+                                                                    "name": "C1",
+                                                                    "description": "Differentiate the various perspectives of the humanities in relation to a topic"
+                                                                }
+                                                            ],
+                                                            "skills": [
+                                                                {
+                                                                    "name": "S1",
+                                                                    "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                },
+                                                                {
+                                                                    "name": "S2",
+                                                                    "description": "Determine the utility of each of the humanities perspectivesd historical humanities"
+                                                                },
+                                                                {
+                                                                    "name": "S3",
+                                                                    "description": "Determine sources on a topic pertinent to the perspective of the humanitiess"
+                                                                },
+                                                                {
+                                                                    "name": "S4",
+                                                                    "description": "Summarize relevant information from a variety of sources"
+                                                                },
+                                                                {
+                                                                    "name": "S5",
+                                                                    "description": "Identify potential biases and assumptions related to the information about a topic"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "name": "Summative Assessment",
+                                                        "max_attempts": 3
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Examine how the humanities influence understanding of one's self-identity",
+                                "display_name": "Examine how the humanities influence understanding of one's self-identity",
+                                "description": "Competency 2 Pathway",
+                                "child_nodes": {
+                                    "learning_experiences": [
+                                        {
+                                            "description": "What is self-identity?",
+                                            "display_name": "What is self-identity?",
+                                            "name": "Topic 1",
+                                            "duration": 60,
+                                            "equivalent_credits": 3,
+                                            "child_nodes": {
+                                                "learning_objects": [
+                                                    {
+                                                        "description": "What is self-identity?",
+                                                        "display_name": "What is self-identity?",
+                                                        "name": "Learning Object Topic 1",
+                                                        "references": {
+                                                            "skills": [
+                                                                {
+                                                                    "name": "S1",
+                                                                    "description": "Describe the components that comprise self-identity"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "child_nodes": {
+                                                            "learning_resources": [
+                                                                {
+                                                                    "name": "Core beliefs and identity",
+                                                                    "description": "Core beliefs and identity",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Interests and hobbies",
+                                                                    "description": "Interests and hobbies",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Self-identify components infographic",
+                                                                    "description": "Self-identify components infographic",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Cultural context",
+                                                                    "description": "Cultural context",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Affiliations",
+                                                                    "description": "Affiliations",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                }
+                                                            ],
+                                                            "assessments": [
+                                                                {
+                                                                    "type": "practice",
+                                                                    "name": "Formative assessment",
+                                                                    "order": 2
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "description": "How identity is formed",
+                                            "display_name": "How identity is formed",
+                                            "name": "Topic 2",
+                                            "duration": 60,
+                                            "equivalent_credits": 3,
+                                            "child_nodes": {
+                                                "learning_objects": [
+                                                    {
+                                                        "description": "How identity is formed",
+                                                        "display_name": "How identity is formed",
+                                                        "name": "Learning Object Topic 2",
+                                                        "references": {
+                                                            "skills": [
+                                                                {
+                                                                    "name": "S2",
+                                                                    "description": "Determine the utility of each of the humanities perspectives"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "child_nodes": {
+                                                            "learning_resources": [
+                                                                {
+                                                                    "name": "What are social constructs?",
+                                                                    "description": "What are social constructs?",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "How social constructs influence identity",
+                                                                    "description": "How social constructs influence identity",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Social constructs through 3 lenses",
+                                                                    "description": "Social constructs through 3 lenses",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "The status quo and changing social norms",
+                                                                    "description": "The status quo and changing social norms",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                }
+                                                            ],
+                                                            "assessments": [
+                                                                {
+                                                                    "type": "practice",
+                                                                    "name": "Formative assessment",
+                                                                    "order": 2
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "description": "The humanities and the self",
+                                            "display_name": "The humanities and the self",
+                                            "name": "Topic 3",
+                                            "duration": 60,
+                                            "equivalent_credits": 3,
+                                            "child_nodes": {
+                                                "learning_objects": [
+                                                    {
+                                                        "description": "The humanities and the self",
+                                                        "display_name": "The humanities and the self",
+                                                        "name": "Learning Object Topic 3",
+                                                        "references": {
+                                                            "skills": [
+                                                                {
+                                                                    "name": "S3",
+                                                                    "description": "Determine sources on a topic pertinent to the perspective of the humanities"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "child_nodes": {
+                                                            "learning_resources": [
+                                                                {
+                                                                    "name": "Sources: Credible or not?",
+                                                                    "description": "Sources: Credible or not?",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Sources for Study: Primary, Secondary, Tertiary",
+                                                                    "description": "Sources for Study: Primary, Secondary, Tertiary",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Sumarizing vs. Paraphrasing",
+                                                                    "description": "Sumarizing vs. Paraphrasing",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+                                                                {
+                                                                    "name": "Citing Source Material and Avoiding Plagiarism",
+                                                                    "description": "Citing Source Material and Avoiding Plagiarism",
+                                                                    "type": "html",
+                                                                    "order": 1
+                                                                },
+  {
+      "name": "Understanding and Unlocking Your Source",
+      "description": "Understanding and Unlocking Your Source",
+      "type": "html",
+      "order": 1
+  }
+                                                            ],
+                                                            "assessments": [
+                                                                {
+                                                                    "type": "practice",
+                                                                    "name": "Formative assessment",
+                                                                    "order": 2
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "description": "HUM102 Competency 2 Exam",
+                                            "display_name": "HUM102 Competency 2 Exam",
+                                            "name": "Competency A2 Exam",
+                                            "duration": 60,
+                                            "equivalent_credits": 3,
+                                            "child_nodes": {
+                                                "assessments": [
+                                                    {
+                                                        "type": "final",
+                                                        "references": {
+                                                            "competencies": [
+                                                                {
+                                                                    "name": "C2",
+                                                                    "description": "Examine how the humanities influence understanding of one's self-identity"
+                                                                }
+                                                            ],
+                                                            "skills": [
+                                                                {
+                                                                    "name": "S1",
+                                                                    "description": "Describe the components that comprise self-identity"
+                                                                },
+                                                                {
+                                                                    "name": "S2",
+                                                                    "description": "Determine the utility of each of the humanities perspectives"
+                                                                },
+                                                                {
+                                                                    "name": "S3",
+                                                                    "description": "Determine sources on a topic pertinent to the perspective of the humanities"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "name": "Summative Assessment"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+  }

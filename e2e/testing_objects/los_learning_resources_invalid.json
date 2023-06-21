@@ -1,0 +1,15 @@
+[{
+    "uuid": "id",
+    "LR": "random",
+    "description": "description",
+    "type": "html",
+    "resource_path": "test_file.html",
+    "lti_content_item_id": "H4w2CJBwM8AIzW8nN4Ib",
+    "course_category":["Mathematics", "Calculus"],
+    "alignments": {},
+    "parent_nodes": {},
+    "child_nodes": {},
+    "is_archived": true,
+    "version" : 1,
+    "metadata": {}
+}]

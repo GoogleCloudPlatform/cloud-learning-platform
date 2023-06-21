@@ -21,6 +21,15 @@ requires:
 - path: ./common
   configs: [common]
 
+- path: ./common_ml
+  configs: [common_ml]
+
+- path: ./microservices/redis
+  configs: [redis]
+
+- path: ./microservices/authentication
+  configs: [authentication]
+
 - path: ./microservices/lms
   configs: [lms]
 
@@ -47,6 +56,19 @@ requires:
 
 - path: ./microservices/update_invitations_cronjob
   configs: [update-invitations-cronjob]
+
+# TODO: Activate when all services from ailearning-backend have been moved
+- path: ./microservices/student_learner_profile
+  configs: [student-learner-profile]
+
+- path: ./microservices/user_management
+  configs: [user-management]
+
+- path: ./microservices/learning_record_service
+  configs: [learning-record-service]
+
+- path: ./microservices/learning_object_service
+  configs: [learning-object-service]
 
 - path: ./microservices/delete_sections_cronjob
   configs: [delete-sections-cronjob]
