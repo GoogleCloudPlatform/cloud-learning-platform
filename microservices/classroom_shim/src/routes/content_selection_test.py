@@ -10,7 +10,6 @@ from fastapi.testclient import TestClient
 from common.utils.http_exceptions import add_exception_handlers
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
-from schemas.schema_examples import LTI_ASSIGNMENT_EXAMPLE
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
     side_effect=mock.MagicMock()) as mok:
@@ -26,9 +25,6 @@ add_exception_handlers(app)
 app.include_router(router, prefix="/classroom-shim/api/v1")
 
 client_with_emulator = TestClient(app)
-
-os.environ[
-    "PYTHONPATH"] = "/home/pavansareddy/Documents/Projects/SNHU/cloud-learning-platform/common/src"
 
 
 def test_content_selection():
