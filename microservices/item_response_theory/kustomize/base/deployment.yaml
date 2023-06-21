@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: item-response-theory
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: item-response-theory
+  template:
+    metadata:
+      labels:
+        app: item-response-theory
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: item-response-theory
+        image: item-response-theory
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1000Mi"
+          limits:
+            memory: "5000Mi"
+            cpu: "4000m" 
+        env:
+        # Define the environment variable
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: API_BASE_URL
+          # Required format: api/version
+          value: api/v1
+        - name: SERVICE_NAME
+          value: item_response_theory
+        - name: CONTAINER_NAME
+          value: item-response-theory
+        - name: DEPLOYMENT_NAME
+          value: item-response-theory
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          initialDelaySeconds: 10
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
