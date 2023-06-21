@@ -464,7 +464,6 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
         student_email=input_data.email,
         course_id=section.classroom_id,
         course_code=section.classroom_code)
-    
     latest_section = Section.find_by_id(section.id)
     latest_cohort = latest_section.cohort
     latest_cohort.enrolled_students_count += 1
@@ -560,7 +559,7 @@ def invite_student(section_id: str, student_email: str, request: Request):
       raise Conflict(f"User {student_email} is already\
                       registered for cohort {section.cohort.id}")
     invitation_details = student_service.invite_student(
-        section=section, student_email=student_email, headers=headers)    
+    section=section, student_email=student_email, headers=headers)
     latest_section = Section.find_by_id(section.id)
     latest_cohort = latest_section.cohort
     latest_cohort.enrolled_students_count += 1
