@@ -40,7 +40,7 @@ def sign_up_user():
           "message") == "EMAIL_EXISTS":
         print("signup: user email exists")
       else:
-        raise Exception("User sign-up failed")
+        raise ValueError("User sign-up failed")
   else:
     print("firestore: user email already exists")
 
