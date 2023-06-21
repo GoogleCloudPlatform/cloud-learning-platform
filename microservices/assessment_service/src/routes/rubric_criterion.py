@@ -28,13 +28,14 @@ router = APIRouter(tags=["RubricCriterion"], responses=ERROR_RESPONSES)
     "/rubric-criterion/search",
     response_model=RubricCriterionSearchModelResponse)
 def search_rubric_criterion(name: Optional[str] = None):
-  """Search for rubric criterion item based on the name
+  """
+    Search for rubric criterion item based on the name
 
-  Args:
-    name(str): Name of the rubric criterion. Defaults to None.
+    ### Args:
+    - name(str): Name of the rubric criterion. Defaults to None.
 
-  Returns:
-      RubricCriterionSearchModelResponse: List of rubric criterion objects
+    ### Returns:
+    - RubricCriterionSearchModelResponse: List of rubric criterion objects
   """
   try:
     result = []
@@ -65,18 +66,19 @@ def search_rubric_criterion(name: Optional[str] = None):
     "/rubric-criterions", response_model=AllRubricCriterionsModelResponse)
 def get_rubric_criterions(skip: int = Query(0, ge=0, le=2000),
                            limit: int = Query(10, ge=1, le=100)):
-  """The get rubric criterions endpoint will return an array rubric criterions
-  from firestore
+  """
+    The get rubric criterions endpoint will return an array rubric criterions
+    from firestore
 
-  Args:
-      skip (int): Number of objects to be skipped
-      limit (int): Size of rubric criterion array to be returned
+    ### Args:
+    - skip (int): Number of objects to be skipped
+    - limit (int): Size of rubric criterion array to be returned
 
-  Raises:
-      Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - Exception: 500 Internal Server Error if something went wrong
 
-  Returns:
-      AllRubricCriterionsModelResponse: Array of Rubric Criterion Object
+    ### Returns:
+    - AllRubricCriterionsModelResponse: Array of Rubric Criterion Object
   """
   try:
     rubric_criterions = RubricCriterion.collection.order(
@@ -104,18 +106,19 @@ def get_rubric_criterions(skip: int = Query(0, ge=0, le=2000),
         "model": NotFoundErrorResponseModel
     }})
 def get_rubric_criterion(uuid: str):
-  """The get rubric_criterion endpoint will return the rubric criterion from
-  firestore of which uuid is provided
+  """
+    The get rubric_criterion endpoint will return the rubric criterion from
+    firestore of which uuid is provided
 
-  Args:
-      uuid (str): Unique identifier for rubric_criterion
+    ### Args:
+    - uuid (str): Unique identifier for rubric_criterion
 
-  Raises:
-      ResourceNotFoundException: If the rubric criterion does not exist
-      Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the rubric criterion does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-  Returns:
-      RubricCriterionModel: RubricCriterion Object
+    ### Returns:
+    - RubricCriterionModel: RubricCriterion Object
   """
   try:
     rubric_criterion = RubricCriterion.find_by_uuid(uuid)
@@ -134,20 +137,21 @@ def get_rubric_criterion(uuid: str):
 
 @router.post("/rubric-criterion", response_model=RubricCriterionModelResponse)
 def create_rubric_criteria(input_rubric_criterion: RubricCriterionModel):
-  """The create rubric criterion endpoint will add the rubric criterion to the
-  firestore if it does not exist.If the rubric criterion exist then it will
-  update the rubric criterion
+  """
+    The create rubric criterion endpoint will add the rubric criterion to the
+    firestore if it does not exist.If the rubric criterion exist then it will
+    update the rubric criterion
 
-  Args:
-      input_rubric_criterion (RubricCriterionModel): input rubric criterion to
+    ### Args:
+    - input_rubric_criterion (RubricCriterionModel): input rubric criterion to
       be inserted
 
-  Raises:
-      ResourceNotFoundException: If the rubric criterion does not exist
-      Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the rubric criterion does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-  Returns:
-      str: UUID(Unique identifier for rubric criterion)
+    ### Returns:
+    - str: UUID(Unique identifier for rubric criterion)
   """
   try:
 
@@ -165,18 +169,19 @@ def create_rubric_criteria(input_rubric_criterion: RubricCriterionModel):
         "model": NotFoundErrorResponseModel
     }})
 def update_rubric_criterion(input_rubric_criterion: UpdateRubricCriterionModel):
-  """Update a rubric criterion
+  """
+    Update a rubric criterion
 
-  Args:
-      input_rubric_criterion (RubricCriterionModel): Required body of the
+    ### Args:
+    - input_rubric_criterion (RubricCriterionModel): Required body of the
       rubric criterion
 
-  Raises:
-      ResourceNotFoundException: If the rubric criterion does not exist
-      Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the rubric criterion does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-  Returns:
-      JSON: Success/Fail Message
+    ### Returns:
+    - JSON: Success/Fail Message
   """
   try:
     existing_rubric_criterion = RubricCriterion.find_by_uuid(
@@ -212,17 +217,18 @@ def update_rubric_criterion(input_rubric_criterion: UpdateRubricCriterionModel):
         "model": NotFoundErrorResponseModel
     }})
 def delete_rubric_criterion(uuid: str):
-  """Delete a rubric_criterion from firestore
+  """
+    Delete a rubric_criterion from firestore
 
-  Args:
-      uuid (str): Unique id of the rubric criterion
+    ### Args:
+    - uuid (str): Unique id of the rubric criterion
 
-  Raises:
-      ResourceNotFoundException: If the rubric criterion does not exist
-      Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the rubric criterion does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-  Returns:
-      JSON: Success/Fail Message
+    ### Returns:
+    - JSON: Success/Fail Message
   """
   try:
     rubric_criterion = RubricCriterion.find_by_uuid(uuid)
@@ -244,14 +250,15 @@ def delete_rubric_criterion(uuid: str):
         "model": PayloadTooLargeResponseModel
     }})
 async def import_rubric_criterions(json_file: UploadFile = File(...)):
-  """Create rubric_criterions from json file
+  """
+    Create rubric_criterions from json file
 
-  Args:
-    json_file (UploadFile): Upload json file consisting of rubric_criterions.
+    ### Args:
+    - json_file (UploadFile): Upload json file consisting of rubric_criterions.
     json_schema should match RubricCriterionModel
 
-  Raises:
-    Exception: 500 Internal Server Error if something fails
+    ### Raises:
+    - Exception: 500 Internal Server Error if something fails
   """
   try:
     if not json_file.filename.endswith(".json"):

@@ -15,6 +15,10 @@ from config import (ALLOWED_THEMES, ASSESSMENT_TYPES,
 
 SOURCE = Literal["learnosity"]
 
+class Empty(BaseModel):
+  class Config():
+    extra = "forbid"
+
 class DesignConfig(BaseModel):
   """DesignConfig Pydantic Model"""
   theme: Optional[ALLOWED_THEMES]
@@ -100,6 +104,14 @@ class FullAssessmentDataModel(BasicAssessmentModel):
   created_time: str
   last_modified_time: str
 
+class HumanGradedFullAssessmentDataModel(BasicAssessmentModel):
+  """Human Graded Assessment Skeleton Model with uuid, created
+     and updated time"""
+  uuid: str
+  created_time: str
+  last_modified_time: str
+  assessment_reference: Empty
+
 
 class AssessmentModel(BasicAssessmentModel):
   """Assessment Input Pydantic Model"""
@@ -107,8 +119,10 @@ class AssessmentModel(BasicAssessmentModel):
   class Config():
     orm_mode = True
     schema_extra = {"example": BASIC_ASSESSMENT_EXAMPLE}
+
 class HumanGradedAssessmentModel(BasicAssessmentModel):
   """Assessment Input Pydantic Model"""
+  assessment_reference: Empty
 
   class Config():
     orm_mode = True
@@ -140,6 +154,7 @@ class UpdateAssessmentModel(BaseModel):
   is_archived: Optional[bool]
   resource_paths: Optional[List[str]]
   instructions: Optional[dict]
+  is_autogradable: Optional[bool]
 
   class Config():
     orm_mode = True
@@ -147,6 +162,7 @@ class UpdateAssessmentModel(BaseModel):
 
 class UpdateHumanGradedAssessmentModel(UpdateAssessmentModel):
   """Update Input Pydantic Human graded Assessment Model"""
+  assessment_reference: Optional[Empty] = {}
 
   class Config():
     orm_mode = True
@@ -158,6 +174,22 @@ class AssessmentModelResponse(BaseModel):
   success: Optional[bool] = True
   message: Optional[str] = "Successfully created the assessment"
   data: Optional[FullAssessmentDataModel]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully created the assessment",
+            "data": FULL_ASSESSMENT_EXAMPLE
+        }
+    }
+
+class HumanGradedAssessmentResponse(BaseModel):
+  """Assessment Response Pydantic Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully created the assessment"
+  data: Optional[HumanGradedFullAssessmentDataModel]
 
   class Config():
     orm_mode = True

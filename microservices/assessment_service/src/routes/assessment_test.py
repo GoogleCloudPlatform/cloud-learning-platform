@@ -35,6 +35,14 @@ ASSESSMENT_DATA_TESTDATA_FILENAME = os.path.join(TESTING_FOLDER_PATH,
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 
+def mocked_requests_put(**kwargs):
+  class MockResponse:
+    def __init__(self, json_data, status_code):
+      self.json_data = json_data
+      self.status_code = status_code
+    def json(self):
+      return self.json_data
+  return MockResponse({"success":True}, 200)
 
 def test_get_assessment(clean_firestore, mocker):
 
@@ -223,7 +231,7 @@ def test_delete_assessment_negative(clean_firestore):
   url = f"{api_url}/{assessment_uuid}"
   response = {
     "success": False,
-    "message": "assessments with id ASS345Dl3Ayg0PWudzhI is not found",
+    "message": "Assessment with uuid ASS345Dl3Ayg0PWudzhI not found",
     "data": None
   }
   resp = client_with_emulator.delete(url)
@@ -284,8 +292,9 @@ def test_create_human_graded_assessment(mocker, clean_firestore):
   assert get_json_response.get("data") == post_json_response.get("data")
 
 
-def test_replace_old_assessment(clean_firestore):
-
+@mock.patch(
+    "routes.assessment.requests.put",side_effect=mocked_requests_put)
+def test_replace_old_assessment(mock_token_res,clean_firestore):
   parent_lo_dict= {**BASIC_LEARNING_OBJECT_EXAMPLE}
   parent_lo= LearningObject.from_dict(parent_lo_dict)
   parent_lo.uuid=""

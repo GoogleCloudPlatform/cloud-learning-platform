@@ -27,7 +27,7 @@ with mock.patch(
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
-RELATIVE_PATH = "../../../e2e/testing_objects/"
+RELATIVE_PATH = "../../../e2e/api-tests/v3/testing_objects/"
 ASSESSMENT_TESTDATA_FILENAME = os.path.join(TESTING_FOLDER_PATH +
                                             "/assessment.json")
 SUBMITTED_ASSESSMENT_TESTDATA_FILENAME = os.path.join(
@@ -47,7 +47,6 @@ def fixture_create_assessment():
 
 
 def create_single_user(user_id="user_id", ref="learner1"):
-  """Fixture to create a user"""
   # create a user
   with open(RELATIVE_PATH + "user.json", encoding="UTF-8") as json_file:
     user_fields = json.load(json_file)[0]
@@ -73,7 +72,6 @@ def create_single_learner():
 
 
 def create_single_assessment(create_rubric = False):
-  """Fixture to create an assessment"""
   # create an assessment
   if create_rubric:
     rubric = Rubric()
@@ -194,10 +192,6 @@ def test_submit_assessment(clean_firestore, mocker, input_submitted_assessment,
   del submission_output["created_by"]
   del submission_output["last_modified_by"]
   del submission_output["uuid"]
-  del submission_output["archived_by"]
-  del submission_output["deleted_by"]
-  del submission_output["deleted_at_timestamp"]
-  del submission_output["archived_at_timestamp"]
   output["assessment_id"]= assessment.uuid
   assert submission_output == output
 

@@ -161,6 +161,7 @@ class AllSubmittedAssessmentResponseModel(BaseModel):
 
 
 class ReadyForEvaluationModel(FullSubmittedAssessmentModel):
+  assessment_name: Optional[str]
   unit_name: Optional[str] = ""
   discipline_name: Optional[str] = ""
   learner_name: Optional[str] = ""
@@ -180,6 +181,12 @@ class SubmittedAssessmentAssessorResponseModel(BaseModel):
 class TotalCountResponseModel(BaseModel):
   records: Optional[List[ReadyForEvaluationModel]]
   total_count: int
+
+class AllSubmittedAssessmentLearnerResponseModel(BaseModel):
+  success: Optional[bool] = True
+  message: Optional[str] = \
+    "Successfully fetched the ready for evaluation submitted assessments"
+  data: Optional[TotalCountResponseModel]
 
 class AllSubmittedAssessmentAssessorResponseModel(BaseModel):
   success: Optional[bool] = True

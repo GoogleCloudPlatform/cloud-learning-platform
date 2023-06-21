@@ -10,11 +10,8 @@ from fastapi.testclient import TestClient
 from unittest import mock
 with mock.patch(
     "google.cloud.logging.Client", side_effect=mock.MagicMock()) as mok:
-  with mock.patch(
-        "google.cloud.secretmanager.SecretManagerServiceClient",
-        side_effect=mock.MagicMock()) as mok:
-    from routes.assessment_content import router
-    from routes.assessment import router as assessmentrouter
+  from routes.assessment_content import router
+  from routes.assessment import router as assessmentrouter
 from testing.test_config import (API_URL, TESTING_FOLDER_PATH)
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
@@ -68,9 +65,11 @@ class GcsCrudService:
     self.prefix = prefix
     return "signed_url_dummy"
 
+  def get_files_from_folder(self, prefix):
+    return ["abc.txt","def.txt"]
+
 
 def create_single_submitted_assessment(assign_assessor=True):
-  """Fixture to create submitted assessment"""
   # create a submitted assessment
   with open(
       "./testing/submitted_assessment.json", encoding="UTF-8") as json_file:
@@ -265,7 +264,7 @@ def test_upload_assessment_response_negative_2(clean_firestore, mocker):
   assert resp.status_code == 404
   assert resp_json["success"] is False
   assert resp_json[
-      "message"] == f"assessments with id {assessment_id} is not found"
+      "message"] == f"Assessment with uuid {assessment_id} not found"
 
 
 def test_upload_assessment_response_negative_3(clean_firestore, mocker):
@@ -581,7 +580,7 @@ def test_get_url_for_assessment_content_negative_1(clean_firestore, mocker):
 
   assert resp.status_code == 500
   assert resp_json["success"] is False
-  assert resp_json["message"] == "Some error occured while generating signed urls"
+  assert resp_json["message"] == "Some error occurred while generating signed urls"
 
   for i in range(len(resp_json["data"])):
     assert resp_json["data"][i]["file_path"] == file_paths[i]
@@ -608,11 +607,11 @@ def test_get_url_for_assessment_content_negative_1(clean_firestore, mocker):
 def test_get_url_for_assessment_content_negative_2(clean_firestore, mocker):
   """
     Scenario 1:
-      1. Some error occured
+      1. Some error occurred
       2. All failed
 
     Scenario 2:
-      1. Some error occured
+      1. Some error occurred
       2. Partial Success
   """
   mocker.patch("routes.assessment_content.is_valid_path", return_value=True)
@@ -638,22 +637,22 @@ def test_get_url_for_assessment_content_negative_2(clean_firestore, mocker):
   api_url = f"{API_URL}/assessment-content/{assessment_uuid}/signed-url"
 
   # -------------------------------------------------
-  # Scenario 1: Some error occured and all failed
+  # Scenario 1: Some error occurred and all failed
   # -------------------------------------------------
   resp = client_with_emulator.get(api_url)
   resp_json = resp.json()
 
   assert resp.status_code == 500
   assert resp_json["success"] is False
-  assert resp_json["message"] == "Some error occured while generating signed urls"
+  assert resp_json["message"] == "Some error occurred while generating signed urls"
 
   for i in range(len(resp_json["data"])):
     assert resp_json["data"][i]["file_path"] == file_paths[i]
     assert resp_json["data"][i]["signed_url"] is None
-    assert resp_json["data"][i]["status"] == "Some error occured while generating singed url"
+    assert resp_json["data"][i]["status"] == "Some error occurred while generating singed url"
 
   # -------------------------------------------------
-  # Scenario 1: Some error occured and some failed
+  # Scenario 1: Some error occurred and some failed
   # -------------------------------------------------
   mocker.patch("routes.assessment_content.len", return_value=4)
 
@@ -667,7 +666,7 @@ def test_get_url_for_assessment_content_negative_2(clean_firestore, mocker):
   for i in range(len(resp_json["data"])):
     assert resp_json["data"][i]["file_path"] == file_paths[i]
     assert resp_json["data"][i]["signed_url"] is None
-    assert resp_json["data"][i]["status"] == "Some error occured while generating singed url"
+    assert resp_json["data"][i]["status"] == "Some error occurred while generating singed url"
 
 # ---------------------------------------------------------
 # Download all contents linked to Assessment
@@ -762,3 +761,192 @@ def test_download_all_content_for_assessment_negative(clean_firestore, mocker):
   assert res.status_code == 422
   res_json = res.json()
   assert "Cannot generate zip" in res_json["message"]
+
+# ---------------------------------------------------------
+# Delete files uploaded for Assessment by Author
+# ---------------------------------------------------------
+
+def test_delete_file_uploaded_for_assessment_positive(clean_firestore, mocker):
+  """
+    Positive Scenario
+  """
+  mocker.patch("services.assessment_content_helper.is_valid_path", return_value=True)
+  mocker.patch(
+      "routes.assessment_content.User", return_value=MockedDataModel())
+  mocker.patch("services.assessment_content_helper.delete_file_from_gcs")
+
+  file_paths = [
+    "folder/abc.txt",
+    "folder/def.txt",
+    "folder/ghi.txt"
+  ]
+
+  user_id = "random_user_id"
+
+  api_url = f"{API_URL}/assessment-authoring/delete-file/{user_id}"
+
+  res = client_with_emulator.put(
+                                url=api_url,
+                                json={
+                                  "file_list": file_paths
+                                }
+                              )
+  print(res.status_code)
+  print(res.json())
+  assert res.status_code == 200
+  res_json = res.json()
+  assert res_json["success"] is True
+  assert res_json["message"] == f"Successfully deleted files for user with uuid {user_id}"
+
+def test_delete_file_uploaded_for_assessment_negative(clean_firestore, mocker):
+  """
+    Scenario: Requested file does not exists on GCS
+  """
+  mocker.patch("services.assessment_content_helper.is_valid_path", return_value=False)
+  mocker.patch(
+      "routes.assessment_content.User", return_value=MockedDataModel())
+
+  file_paths = [
+    "folder/abc.txt",
+    "folder/def.txt",
+    "folder/ghi.txt"
+  ]
+
+  user_id = "random_user_id"
+
+  api_url = f"{API_URL}/assessment-authoring/delete-file/{user_id}"
+
+  res = client_with_emulator.put(
+                                url=api_url,
+                                json={
+                                  "file_list": file_paths
+                                }
+                              )
+  print(res.status_code)
+  print(res.json())
+  assert res.status_code == 404
+  res_json = res.json()
+  assert res_json["success"] is False
+  assert "Total missing files:" in res_json["message"]
+
+# ---------------------------------------------------------
+# Get uploaded content from `temp` folder
+# ---------------------------------------------------------
+
+def test_get_files_from_temp_folder_positive(clean_firestore, mocker):
+  """
+    Scenario 1: List files from Assessment author's temp
+    Scenario 2: List files from Learner's temp
+  """
+  mocker.patch("services.assessment_content_helper.GcsCrudService",
+                return_value=GcsCrudService(""))
+  mocker.patch("routes.assessment_content.get_blob_from_gcs_path",
+               return_value=MockedBlob())
+  mocker.patch("routes.assessment_content.User",
+                return_value=MockedDataModel())
+  mocker.patch("routes.assessment_content.Assessment",
+                return_value=MockedDataModel())
+  mocker.patch("routes.assessment_content.Learner",
+                return_value=MockedDataModel())
+
+  user_id = "random_user_id"
+  api_url = f"{API_URL}/assessment-content/uploaded-files/{user_id}"
+
+  # Scenario 1: Fetch files from Assessment author's temp folder
+  res = client_with_emulator.get(url=api_url)
+  assert res.status_code == 200
+  res_json = res.json()
+  print(res_json)
+  assert res_json["success"] is True
+  assert res_json["message"] == "Successfully fetched files list"
+  assert len(res_json["data"]) == 2
+
+  # Scenario 2: Fetch files from Learner's temp folder
+  assessment_id = "random_assessment_id"
+  res = client_with_emulator.get(url=api_url,
+                                  params={
+                                    "assessment_id": assessment_id
+                                  })
+  assert res.status_code == 200
+  res_json = res.json()
+  print(res_json)
+  assert res_json["success"] is True
+  assert res_json["message"] == "Successfully fetched files list"
+  assert len(res_json["data"]) == 2
+
+
+# ---------------------------------------------------------
+# Delete files uploaded for Assessment by Learner
+# ---------------------------------------------------------
+
+def test_delete_file_uploaded_for_assessment_submission_positive(clean_firestore, mocker):
+  """
+    Positive Scenario
+  """
+  mocker.patch("services.assessment_content_helper.is_valid_path", return_value=True)
+  mocker.patch(
+      "routes.assessment_content.Learner", return_value=MockedDataModel())
+  mocker.patch(
+      "routes.assessment_content.Assessment", return_value=MockedDataModel())
+  mocker.patch("services.assessment_content_helper.delete_file_from_gcs")
+
+  file_paths = [
+    "folder/abc.txt",
+    "folder/def.txt",
+    "folder/ghi.txt"
+  ]
+
+  learner_id = "random_learner_id"
+  assessment_id = "random_assessment_id"
+
+  api_url = f"{API_URL}/assessment-submission/delete-file/{learner_id}/{assessment_id}"
+
+  res = client_with_emulator.put(
+                                url=api_url,
+                                json={
+                                  "file_list": file_paths
+                                }
+                              )
+  print(res.status_code)
+  print(res.json())
+  assert res.status_code == 200
+  res_json = res.json()
+  assert res_json["success"] is True
+
+  msg = f"Successfully deleted files for Learner with uuid {learner_id}"
+  msg += f" against Assessment with uuid {assessment_id}"
+  assert res_json["message"] == msg
+
+def test_delete_file_uploaded_for_assessment_submission_negative(clean_firestore, mocker):
+  """
+    Scenario: Requested file does not exists on GCS
+  """
+  mocker.patch("services.assessment_content_helper.is_valid_path", return_value=False)
+  mocker.patch(
+      "routes.assessment_content.Learner", return_value=MockedDataModel())
+  mocker.patch(
+      "routes.assessment_content.Assessment", return_value=MockedDataModel())
+
+  file_paths = [
+    "folder/abc.txt",
+    "folder/def.txt",
+    "folder/ghi.txt"
+  ]
+
+  learner_id = "random_learner_id"
+  assessment_id = "random_assessment_id"
+
+  api_url = f"{API_URL}/assessment-submission/delete-file/{learner_id}/{assessment_id}"
+
+  res = client_with_emulator.put(
+                                url=api_url,
+                                json={
+                                  "file_list": file_paths
+                                }
+                              )
+  print(res.status_code)
+  print(res.json())
+  assert res.status_code == 404
+  res_json = res.json()
+  assert res_json["success"] is False
+  assert "Total missing files:" in res_json["message"]

@@ -116,7 +116,6 @@ def update_item_responses(items, responses):
 
 
 def fetch_metadata(assessment):
-  """Function to fetch assessment metadata"""
   activity_id = assessment.get("assessment_reference", {})
   if activity_id is not None:
     activity_id = activity_id.get("activity_template_id", None)

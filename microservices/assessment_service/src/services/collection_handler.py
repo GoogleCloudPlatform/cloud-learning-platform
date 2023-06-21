@@ -31,8 +31,8 @@ class CollectionHandler:
   @classmethod
   def loads_field_data_from_collection(cls, document):
     """To fetch the document from the collection using UUID"""
-    for key in document.items():
-      if key == "references":
+    for key, _ in document.items():
+      if key == "references" and document.get(key, {}):
         for ref_key, ref_val in document.get(key, {}).items():
           try:
             if ref_key in ["competencies", "skills"]:

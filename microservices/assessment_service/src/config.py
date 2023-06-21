@@ -1,7 +1,7 @@
 """
   Assessment Service config file
 """
-# pylint: disable=unspecified-encoding,invalid-name,consider-using-f-string
+# pylint: disable=unspecified-encoding
 import os
 import json
 from typing_extensions import Literal
@@ -15,8 +15,8 @@ from google.cloud import secretmanager
 secrets = secretmanager.SecretManagerServiceClient()
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
-PROJECT_ID = os.environ.get("PROJECT_ID", "core-learning-services-dev")
-os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
+GCP_PROJECT = os.environ.get("GCP_PROJECT", "aitutor-dev")
+os.environ["GOOGLE_CLOUD_PROJECT"] = GCP_PROJECT
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 USE_LEARNOSITY_SECRET = bool(os.getenv(
     "USE_LEARNOSITY_SECRET", "").lower() == "true")
@@ -24,7 +24,7 @@ print("USE_LEARNOSITY_SECRET: ", os.getenv(
     "USE_LEARNOSITY_SECRET", ""))
 
 CONTENT_SERVING_BUCKET = os.environ.get("CONTENT_SERVING_BUCKET", "")
-SIGNURL_SA_KEY_PATH = "./keys/{}-signurl-sa-key.json".format(PROJECT_ID)
+SIGNURL_SA_KEY_PATH = "./keys/{}-signurl-sa-key.json".format(GCP_PROJECT)
 
 try:
   with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace","r",
@@ -64,18 +64,21 @@ ERROR_RESPONSES = {
 PASS_THRESHOLD = 0.8
 
 LEARNOSITY_URL = "https://data.learnosity.com/latest"
-
-LEARNOSITY_CONSUMER_KEY = secrets.access_secret_version(
+if USE_LEARNOSITY_SECRET is True:
+  LEARNOSITY_CONSUMER_KEY = secrets.access_secret_version(
     request={
-        "name": "projects/" + PROJECT_ID +
-                "/secrets/learnosity_consumer_key/versions/latest"
-    }).payload.data.decode("utf-8")
+      "name": "projects/" + GCP_PROJECT +
+        "/secrets/learnosity_consumer_key/versions/latest"
+          }).payload.data.decode("utf-8")
 
-LEARNOSITY_CONSUMER_SECRET = secrets.access_secret_version(
+  LEARNOSITY_CONSUMER_SECRET = secrets.access_secret_version(
     request={
-        "name": "projects/" + PROJECT_ID +
-                "/secrets/learnosity_consumer_secret/versions/latest"
-    }).payload.data.decode("utf-8")
+      "name": "projects/" + GCP_PROJECT +
+        "/secrets/learnosity_consumer_secret/versions/latest"
+          }).payload.data.decode("utf-8")
+else:
+  LEARNOSITY_CONSUMER_KEY = None
+  LEARNOSITY_CONSUMER_SECRET = None
 
 LEARNOSITY_DOMAIN = "demos.learnosity.com"
 

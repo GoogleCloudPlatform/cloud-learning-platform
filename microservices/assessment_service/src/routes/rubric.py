@@ -24,13 +24,14 @@ router = APIRouter(tags=["Rubric"], responses=ERROR_RESPONSES)
 
 @router.get("/rubric/search", response_model=RubricSearchModelResponse)
 def search_rubric(name: Optional[str] = None):
-  """Search for rubric item based on the name
+  """
+    Search for rubric item based on the name
 
-  Args:
-      name(str): Name of the rubric. Defaults to None.
+    ### Args:
+    - name(str): Name of the rubric. Defaults to None.
 
-  Returns:
-      RubricSearchModelResponse: List of rubric objects
+    ### Returns:
+    - RubricSearchModelResponse: List of rubric objects
   """
   try:
     result = []
@@ -60,17 +61,18 @@ def search_rubric(name: Optional[str] = None):
 @router.get("/rubrics", response_model=AllRubricsModelResponse)
 def get_rubrics(skip: int = Query(0, ge=0, le=2000),
                  limit: int = Query(10, ge=1, le=100)):
-  """The get rubrics endpoint will return an array rubrics from firestore
+  """
+    The get rubrics endpoint will return an array rubrics from firestore
 
-  Args:
-      skip (int): Number of objects to be skipped
-      limit (int): Size of rubric array to be returned
+    ### Args:
+    - skip (int): Number of objects to be skipped
+    - limit (int): Size of rubric array to be returned
 
-  Raises:
-      Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - Exception: 500 Internal Server Error if something went wrong
 
-  Returns:
-      AllRubricsModelResponse: Array of Rubric Object
+    ### Returns:
+    - AllRubricsModelResponse: Array of Rubric Object
   """
   try:
     rubrics = Rubric.collection.order("-created_time").offset(skip).fetch(limit)
@@ -95,18 +97,19 @@ def get_rubrics(skip: int = Query(0, ge=0, le=2000),
         "model": NotFoundErrorResponseModel
     }})
 def get_rubric(uuid: str):
-  """The get rubric endpoint will return the rubric from firestore of which
-  uuid is provided
+  """
+    The get rubric endpoint will return the rubric from firestore of which
+    uuid is provided
 
-  Args:
-      uuid (str): Unique identifier for rubric
+    ### Args:
+    - uuid (str): Unique identifier for rubric
 
-  Raises:
-      ResourceNotFoundException: If the rubric does not exist
-      Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the rubric does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-  Returns:
-      RubricModel: Rubric Object
+    ### Returns:
+    - RubricModel: Rubric Object
   """
   try:
     rubric = Rubric.find_by_uuid(uuid)
@@ -124,19 +127,19 @@ def get_rubric(uuid: str):
 
 @router.post("/rubric", response_model=RubricModelResponse)
 def create_rubrics(input_rubric: RubricModel):
-  """The create rubric endpoint will add the rubric to the firestore if it
-  does not exist.If the rubric exist then it will update the rubric
+  """
+    The create rubric endpoint will add the rubric to the firestore if it
+    does not exist.If the rubric exist then it will update the rubric
 
-  Args:
-      input_rubric (RubricModel): input rubric to be
-      inserted
+    ### Args:
+    - input_rubric (RubricModel): input rubric to be inserted
 
-  Raises:
-      ResourceNotFoundException: If the rubric does not exist
-      Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the rubric does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-  Returns:
-      str: UUID(Unique identifier for rubric)
+    ### Returns:
+    - str: UUID(Unique identifier for rubric)
   """
   try:
 
@@ -153,17 +156,18 @@ def create_rubrics(input_rubric: RubricModel):
         "model": NotFoundErrorResponseModel
     }})
 def update_rubric(input_rubric: UpdateRubricModel):
-  """Update a rubric
+  """
+    Update a rubric
 
-  Args:
-      input_rubric (RubricModel): Required body of the rubric
+    ### Args:
+    - input_rubric (RubricModel): Required body of the rubric
 
-  Raises:
-      ResourceNotFoundException: If the rubric does not exist
-      Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the rubric does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-  Returns:
-      JSON: Success/Fail Message
+    ### Returns:
+    - JSON: Success/Fail Message
   """
   try:
     existing_rubric = Rubric.find_by_uuid(input_rubric.uuid)
@@ -197,17 +201,18 @@ def update_rubric(input_rubric: UpdateRubricModel):
         "model": NotFoundErrorResponseModel
     }})
 def delete_rubric(uuid: str):
-  """Delete a rubric from firestore
+  """
+    Delete a rubric from firestore
 
-  Args:
-      uuid (str): Unique id of the rubric
+    ### Args:
+    - uuid (str): Unique id of the rubric
 
-  Raises:
-      ResourceNotFoundException: If the rubric does not exist
-      Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the rubric does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-  Returns:
-      JSON: Success/Fail Message
+    ### Returns:
+    - JSON: Success/Fail Message
   """
   try:
     rubric = Rubric.find_by_uuid(uuid)
@@ -231,14 +236,15 @@ def delete_rubric(uuid: str):
         }
     })
 async def import_rubrics(json_file: UploadFile = File(...)):
-  """Create rubrics from json file
+  """
+    Create rubrics from json file
 
-  Args:
-    json_file (UploadFile): Upload json file consisting of rubrics.
-    json_schema should match RubricModel
+    ### Args:
+    - json_file (UploadFile): Upload json file consisting of rubrics.
+    - json_schema should match RubricModel
 
-  Raises:
-    Exception: 500 Internal Server Error if something fails
+    ### Raises:
+    - Exception: 500 Internal Server Error if something fails
   """
   try:
     if not json_file.filename.endswith(".json"):

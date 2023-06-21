@@ -39,7 +39,7 @@ api_url = f"{API_URL}"
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
-RELATIVE_PATH = "../../../e2e/testing_objects/"
+RELATIVE_PATH = "../../../e2e/api-tests/v3/testing_objects/"
 
 
 @pytest.fixture(name="create_assessment")
@@ -48,7 +48,6 @@ def fixture_create_assessment():
 
 
 def create_single_learning_experience():
-  """Fixture to create a learning experience"""
   # create a learning experience
   with open(
       RELATIVE_PATH + "learning_experiences.json",
@@ -76,7 +75,6 @@ def create_single_learning_object():
 
 
 def create_single_submitted_assessment(assign_assessor=True):
-  """Fixture to create a submitted assessment"""
   # create a submitted assessment
   with open(
       "./testing/submitted_assessment.json", encoding="UTF-8") as json_file:
@@ -200,6 +198,7 @@ def test_get_all_submitted_assessment(mocker, clean_firestore):
     post_resp_json["data"]["max_attempts"] = assessment.max_attempts
     post_resp_json["data"]["instructor_name"] = "Unassigned"
     post_resp_json["data"]["instructor_id"] = ""
+    post_resp_json["data"]["assessment_name"] = None
     post_responses.append(post_resp_json.get("data"))
 
   submitted_assessment_uuid = post_responses[0]["uuid"]
@@ -213,6 +212,8 @@ def test_get_all_submitted_assessment(mocker, clean_firestore):
   assert get_resp_json.get("success") is True, "Success not true"
   assert get_resp.status_code == 200, "Status 200"
   # check if the created submission and the fetched submissions are same
+  for resp in post_responses:
+    resp["assessment_name"] = None
   assert get_resp_json.get("data")["records"] == list(reversed(post_responses))
 
 
@@ -446,6 +447,7 @@ def test_get_latest_submitted_assessment(mocker, clean_firestore):
   post_resp_json["data"]["max_attempts"] = assessment.max_attempts
   post_resp_json["data"]["instructor_name"] = "Unassigned"
   post_resp_json["data"]["instructor_id"] = ""
+  post_resp_json["data"]["assessment_name"] = None
 
   submitted_assessment_uuid = post_resp_json["data"]["uuid"]
 
@@ -458,6 +460,7 @@ def test_get_latest_submitted_assessment(mocker, clean_firestore):
   assert get_resp_json.get("success") is True, "Success not true"
   assert get_resp.status_code == 200, "Status 200"
   # check if the created submission and the fetched submission are same
+  post_resp_json["data"]["assessment_name"] = None
   assert get_resp_json.get("data") == post_resp_json.get("data")
 
 

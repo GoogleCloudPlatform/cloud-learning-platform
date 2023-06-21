@@ -28,14 +28,15 @@ router = APIRouter(tags=["Assessment Items"], responses=ERROR_RESPONSES)
 @router.get(
     "/assessment-item/search", response_model=AssessmentItemSearchModelResponse)
 def search_assessment_item(name: Optional[str] = None):
-  """Search for assessment item based on the name
+  """
+    Search for assessment item based on the name
 
-    Args:
-        name(str): Name of the assessment. Defaults to None.
+    ### Args:
+    - name(str): Name of the assessment. Defaults to None.
 
-    Returns:
-        AssessmentItemSearchModelResponse: List of assessment item objects
-    """
+    ### Returns:
+    - AssessmentItemSearchModelResponse: List of assessment item objects
+  """
   result = []
   if name:
     # fetch assessment item that matches name
@@ -60,21 +61,22 @@ def get_assessment_items(skip: int = Query(0, ge=0, le=2000),
                          sort_by: Optional[str] = "created_time",
                          sort_order: Optional[
                            Literal["ascending", "descending"]] = "descending"):
-  """The get assessment items endpoint will return an array assessment items
+  """
+    The get assessment items endpoint will return an array assessment items
     from firestore
 
-    Args:
-        skip (int): Number of objects to be skipped
-        limit (int): Size of assessment item array to be returned
-        sort_by (str): Data Model Fields name
-        sort_order (str): ascending/descending
+    ### Args:
+    - skip (int): Number of objects to be skipped
+    - limit (int): Size of assessment item array to be returned
+    - sort_by (str): Data Model Fields name
+    - sort_order (str): ascending/descending
 
-    Raises:
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        AllAssessmentItemsModelResponse: Array of Assessment Item Object
-    """
+    ### Returns:
+    - AllAssessmentItemsModelResponse: Array of Assessment Item Object
+  """
   try:
     collection_manager = AssessmentItem.collection
     assessment_items = collection_sorting(
@@ -108,19 +110,20 @@ def get_assessment_items(skip: int = Query(0, ge=0, le=2000),
         "model": NotFoundErrorResponseModel
     }})
 def get_assessment_item(uuid: str, fetch_tree: Optional[bool] = False):
-  """The get assessment_item endpoint will return the assessment_item from
+  """
+    The get assessment_item endpoint will return the assessment_item from
     firestore of which uuid is provided
 
-    Args:
-        uuid (str): Unique identifier for assessment_item
+    ### Args:
+    - uuid (str): Unique identifier for assessment_item
 
-    Raises:
-        ResourceNotFoundException: If the assessment_item does not exist
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the assessment_item does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        AssessmentItemModel: AssessmentItem Object
-    """
+    ### Returns:
+    - AssessmentItemModel: AssessmentItem Object
+  """
   try:
     assessment_item = AssessmentItem.find_by_id(uuid)
     assessment_item = assessment_item.get_fields(reformat_datetime=True)
@@ -146,21 +149,22 @@ def get_assessment_item(uuid: str, fetch_tree: Optional[bool] = False):
 
 @router.post("/assessment-item", response_model=AssessmentItemModelResponse)
 def create_assessment_item(input_assessment_item: AssessmentItemModel):
-  """The create assessment_item endpoint will add the assessment_item to the
+  """
+    The create assessment_item endpoint will add the assessment_item to the
     firestore if it does not exist.If the assessment_item exist then it will
     update the assessment_item.
 
-    Args:
-        input_assessment_item (AssessmentItemModel): input assessment_item to be
-        inserted
+    ### Args:
+    - input_assessment_item (AssessmentItemModel): input assessment_item to be
+      inserted
 
-    Raises:
-        ResourceNotFoundException: If the assessment_item does not exist
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the assessment_item does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        str: UUID(Unique identifier for assessment_item)
-    """
+    ### Returns:
+    - str: UUID(Unique identifier for assessment_item)
+  """
   try:
 
     input_assessment_item_dict = {**input_assessment_item.dict()}
@@ -202,19 +206,20 @@ def create_assessment_item(input_assessment_item: AssessmentItemModel):
     }})
 def update_assessment_item(uuid: str,
                            input_assessment_item: UpdateAssessmentItemModel):
-  """Update a assessment_item
+  """
+    Update a assessment_item
 
-    Args:
-        input_assessment_item (AssessmentItemModel): Required body of
-        assessment_item
+    ### Args:
+    - input_assessment_item (AssessmentItemModel): Required body of
+      assessment_item
 
-    Raises:
-        ResourceNotFoundException: If the assessment_item does not exist
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the assessment_item does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        JSON: Success/Fail Message
-    """
+    ### Returns:
+    - JSON: Success/Fail Message
+  """
   try:
 
     input_assessment_dict = {**input_assessment_item.dict()}
@@ -242,17 +247,18 @@ def update_assessment_item(uuid: str,
         "model": NotFoundErrorResponseModel
     }})
 def delete_assessment_item(uuid: str):
-  """Delete a assessment_item from firestore
+  """
+    Delete a assessment_item from firestore
 
-    Args:
-        uuid (str): Unique id of the assessment_item
+    ### Args:
+    - uuid (str): Unique id of the assessment_item
 
-    Raises:
-        ResourceNotFoundException: If the assessment_item does not exist
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the assessment_item does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        JSON: Success/Fail Message
+    ### Returns:
+    - JSON: Success/Fail Message
     """
   try:
     assessment_item = AssessmentItem.find_by_id(uuid)
@@ -287,14 +293,15 @@ def delete_assessment_item(uuid: str):
         "model": PayloadTooLargeResponseModel
     }})
 async def import_assessment_items(json_file: UploadFile = File(...)):
-  """Create assessment_items from json file
+  """
+    Create assessment_items from json file
 
-  Args:
-    json_file (UploadFile): Upload json file consisting of assessment_items.
+    ### Args:
+    - json_file (UploadFile): Upload json file consisting of assessment_items.
     json_schema should match AssessmentItemModel
 
-  Raises:
-    Exception: 500 Internal Server Error if something fails
+    ### Raises:
+    - Exception: 500 Internal Server Error if something fails
   """
   try:
     if len(await json_file.read()) > PAYLOAD_FILE_SIZE:

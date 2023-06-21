@@ -177,7 +177,7 @@ def test_delete_assessment_item_negative(clean_firestore):
   url = f"{api_url}/{assessment_item_uuid}"
   response = {
     "success": False,
-    "message": "assessment_items with id ASS345Dl3Ayg0PWudzhI is not found",
+    "message": "Assessment Item with uuid ASS345Dl3Ayg0PWudzhI not found",
     "data": None
   }
   resp = client_with_emulator.delete(url)

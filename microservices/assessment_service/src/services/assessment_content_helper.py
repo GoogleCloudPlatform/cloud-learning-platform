@@ -2,11 +2,14 @@
   Helper Functions for file operations for assessment submission
   and creation
 """
+# pylint: disable = line-too-long
 from datetime import datetime
 from common.models import Assessment
 from common.utils.gcs_adapter import (move_file_within_bucket,
                                       is_valid_path,
-                                      download_file_from_gcs)
+                                      download_file_from_gcs,
+                                      delete_file_from_gcs,
+                                      GcsCrudService)
 from common.utils.errors import ResourceNotFoundException
 from common.utils.logging_handler import Logger
 from config import ( ASSESSMENT_AUTHORING_BASE_PATH,
@@ -152,3 +155,150 @@ def attach_files_to_assessment(user_id, assessment_id, resource_paths,
         dest_path=file_destination)
     relocated_files.append(file_location)
   return relocated_files
+
+def delete_files_of_assessment(file_names, user_id, assessment_id=None):
+  """
+        This function will delete uploaded files for/from an
+        assessment.
+        ---------------------------------------------------
+        Input:
+            file_names `list[str]`: list of file names which should be deleted
+            user_id `str`: uuid of the staff
+            assessment_id `str`: uuid of the assessment
+        ---------------------------------------------------
+        Output:
+          error_msg `str`: if error occurs. Default value is None
+    """
+  file_path_list = []
+  invalid_file_paths = []
+  if assessment_id is None:
+    # Files should be taken from `user_id/temp/` folder
+    for file in file_names:
+      file_path = f"{ASSESSMENT_AUTHORING_BASE_PATH}/{user_id}/temp/{file}"
+      # Validate file exists
+      if is_valid_path(f"gs://{CONTENT_SERVING_BUCKET}/{file_path}"):
+        file_path_list.append(file_path)
+      else:
+        invalid_file_paths.append(file)
+  else:
+    # Files should be taken from `user_id/assessment_id/` folder
+    for file in file_names:
+      file_path = f"{ASSESSMENT_AUTHORING_BASE_PATH}/{user_id}/{assessment_id}/{file}"
+      # Validate file exists
+      if is_valid_path(f"gs://{CONTENT_SERVING_BUCKET}/{file_path}"):
+        file_path_list.append(file_path)
+      else:
+        invalid_file_paths.append(file)
+
+  if len(invalid_file_paths) != 0:
+    # Generate error log
+    error_msg = f"Total missing files: {len(invalid_file_paths)} \n"
+    error_msg += "Following files were not found"
+    if assessment_id is None:
+      error_msg += f" in `{ASSESSMENT_AUTHORING_BASE_PATH}/"
+      error_msg += f"{user_id}/temp/` folder.\n"
+    else:
+      error_msg += f" in `{ASSESSMENT_AUTHORING_BASE_PATH}/"
+      error_msg += f"{user_id}/{assessment_id}/` folder.\n"
+
+    for file in invalid_file_paths:
+      error_msg+= f"{file} \n"
+
+    return error_msg
+
+  # Delete files
+  for file_path in file_path_list:
+    delete_file_from_gcs(
+        bucket_name=CONTENT_SERVING_BUCKET,
+        src_path=file_path)
+
+  return None
+
+def get_uploaded_files_list(prefix):
+  """
+    This function returns a list of Files present at
+    a particular location on GCS
+    -------------------------------------------------------
+    Input:
+      prefic `str`: the location from which files to be fetched
+    -------------------------------------------------------
+    Output:
+      files_list `str`: list of files present at requested location
+  """
+  if prefix is None:
+    prefix = ""
+  else:
+    if prefix[-1] != "/":
+      prefix += "/"
+
+  gcs_service = GcsCrudService(CONTENT_SERVING_BUCKET)
+
+  files_list = gcs_service.get_files_from_folder(prefix)
+  files_list_formatted = []
+
+  for file in files_list:
+    if file[-1] != "/":
+      files_list_formatted.append(file)
+
+  return files_list_formatted
+
+def delete_files_of_assessment_submission(file_names,
+                                            user_id,
+                                            assessment_id,
+                                            attempt_id = None):
+  """
+        This function will delete uploaded files for/from an
+        assessment.
+        ---------------------------------------------------
+        Input:
+            file_names `list[str]`: list of file names which should be deleted
+            user_id `str`: uuid of the staff
+            assessment_id `str`: uuid of the assessment
+        ---------------------------------------------------
+        Output:
+          error_msg `str`: if error occurs. Default value is None
+    """
+  file_path_list = []
+  invalid_file_paths = []
+  if attempt_id is None:
+    # Files should be taken from `user_id/assessment_id/temp/` folder
+    for file in file_names:
+      file_path = f"{ASSESSMENT_SUBMISSION_BASE_PATH}/{user_id}/{assessment_id}/temp/{file}"
+      # Validate file exists
+      if is_valid_path(f"gs://{CONTENT_SERVING_BUCKET}/{file_path}"):
+        file_path_list.append(file_path)
+      else:
+        invalid_file_paths.append(file)
+  else:
+    # Files should be taken from `user_id/assessment_id/` folder
+    for file in file_names:
+      file_path = f"{ASSESSMENT_SUBMISSION_BASE_PATH}/{user_id}/{assessment_id}/{attempt_id}/{file}"
+      # Validate file exists
+      if is_valid_path(f"gs://{CONTENT_SERVING_BUCKET}/{file_path}"):
+        file_path_list.append(file_path)
+      else:
+        invalid_file_paths.append(file)
+
+  if len(invalid_file_paths) != 0:
+    # Generate error log
+    error_msg = f"Total missing files: {len(invalid_file_paths)} \n"
+    error_msg += "Following files were not found"
+    if attempt_id is None:
+      error_msg += f" in `{ASSESSMENT_SUBMISSION_BASE_PATH}/"
+      error_msg += f"{user_id}/{assessment_id}/temp/` folder.\n"
+    else:
+      error_msg += f" in `{ASSESSMENT_SUBMISSION_BASE_PATH}/"
+      error_msg += f"{user_id}/{assessment_id}/{attempt_id}/` folder.\n"
+
+    for file in invalid_file_paths:
+      error_msg+= f"{file} \n"
+
+    return error_msg
+
+  # Delete files
+  for file_path in file_path_list:
+    delete_file_from_gcs(
+        bucket_name=CONTENT_SERVING_BUCKET,
+        src_path=file_path)
+
+  return None

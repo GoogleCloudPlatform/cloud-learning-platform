@@ -63,20 +63,23 @@ router = APIRouter(tags=["Submitted Assessment"], responses=ERROR_RESPONSES)
 def create_submitted_assessment(
     request: Request,
     input_submitted_assessment: SubmittedAssessmentRequestModel):
-  """The create_submitted_assessment endpoint will add the
-     submitted_assessment to firestore.
+  """
+    The create_submitted_assessment endpoint will add the 
+    submitted_assessment to firestore.
 
-    Args:
-        input_submitted_assessment (SubmittedAssessmentSchema): input
-              submitted_assessment to be inserted
+    ### Args:
+    - input_submitted_assessment (SubmittedAssessmentSchema): input 
+    submitted_assessment to be inserted
 
-    Raises:
-        ResourceNotFoundException: If the assessment_item does not exist
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the assessment  or learner does not exist
+    - PreconditionFailed: If max_attempt is exceeded
+    - ConnectTimeout: If external service call fails
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        SubmittedAssessmentResponseModel: SubmittedAssessment object
-    """
+    ### Returns:
+    - SubmittedAssessmentResponseModel: SubmittedAssessment object
+  """
   try:
     submitted_assessment_dict = {**input_submitted_assessment.dict()}
 
@@ -116,23 +119,23 @@ def create_submitted_assessment(
 def get_all_submitted_assessment(req: Request, uuid: str,
                                   skip: int = Query(0, ge=0, le=2000),
                                   limit: int = Query(10, ge=1, le=100)):
-  """The get_all_submitted_assessment endpoint will fetch all the
-     submitted_assessment from firestore for a learner and assessment.
+  """
+    The get_all_submitted_assessment endpoint will fetch all the 
+    submitted_assessment from firestore for the learner and the assessment of 
+    the given submitted_assessment uuid
 
-    Args:
-        uuid (str): Unique identifier for submitted_assessment
-        skip (int): Number of objects to be skipped
-        limit (int): Size of submitted assessment array to be returned
+    ### Args:
+    - uuid (str): Unique identifier for submitted_assessment
+    - skip (int): Number of objects to be skipped
+    - limit (int): Size of submitted assessment array to be returned
 
-    Raises:
-        ResourceNotFoundException: If the learner_id/assessment_id does not
-                   exist
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the learner_id/assessment_id does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        AllSubmittedAssessmentAssessorResponseModel: List of
-                                  SubmittedAssessment object
-    """
+    ### Returns:
+    - AllSubmittedAssessmentAssessorResponseModel: List of SubmittedAssessment
+  """
   try:
     header = {"Authorization": req.headers.get("authorization")}
     all_submissions = get_all_submission(uuid, skip, limit, header)
@@ -161,21 +164,21 @@ def get_all_submitted_assessment(req: Request, uuid: str,
         "model": NotFoundErrorResponseModel
     }})
 def get_latest_submitted_assessment(req: Request, uuid: str):
-  """The get_latest_submitted_assessment endpoint will fetch the latest
-     submitted_assessment from firestore.
+  """
+    The get_latest_submitted_assessment endpoint will fetch the latest 
+    submitted_assessment from firestore for the learner and the assessment of 
+    the given submitted_assessment uuid.
 
-    Args:
-        uuid (str): Unique identifier for submitted_assessment
+    ### Args:
+    - uuid (str): Unique identifier for submitted_assessment
 
-    Raises:
-        ResourceNotFoundException: If the submitted_assessment does not
-                   exist
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the submitted_assessment does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        SubmittedAssessmentAssessorResponseModel: SubmittedAssessment
-                                                            object
-    """
+    ### Returns:
+    - SubmittedAssessmentAssessorResponseModel: SubmittedAssessment object
+  """
   try:
     header = {"Authorization": req.headers.get("authorization")}
     submitted_assessment = SubmittedAssessment.find_by_uuid(uuid)
@@ -207,19 +210,20 @@ def get_latest_submitted_assessment(req: Request, uuid: str):
         "model": NotFoundErrorResponseModel
     }})
 def get_submitted_assessment(uuid: str):
-  """The get submitted_assessment endpoint will return the submitted_assessment
+  """
+    The get submitted_assessment endpoint will return the submitted_assessment 
     from firestore of which uuid is provided
 
-    Args:
-        uuid (str): Unique identifier for submitted_assessment
+    ### Args:
+    - uuid (str): Unique identifier for submitted_assessment
 
-    Raises:
-        ResourceNotFoundException: If the submitted_assessment does not exist
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the submitted_assessment does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        AssessmentItemModel: AssessmentItem Object
-    """
+    ### Returns:
+    - SubmittedAssessmentResponseModel: SubmittedAssessment Object
+  """
   try:
     submitted_assessment = SubmittedAssessment.find_by_uuid(uuid)
     submitted_assessment_fields = submitted_assessment.get_fields(
@@ -245,25 +249,27 @@ def get_submitted_assessment(uuid: str):
 
 @router.put(
     "/submitted-assessment/{uuid}",
+    name="Update Submitted Assessment",
     response_model=SubmittedAssessmentResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
 def update_assessment_item(
     uuid: str, input_submitted_assessment: UpdateSubmittedAssessmentModel):
-  """Update a submitted_assessment
+  """
+    Update a submitted_assessment
 
-    Args:
-        input_submitted_assessment (UpdateSubmittedAssessmentModel):
-                Required body of submitted_assessment
+    ### Args:
+    - input_submitted_assessment (UpdateSubmittedAssessmentModel):
+    Required body of submitted_assessment
 
-    Raises:
-        ResourceNotFoundException: If the submitted_assessment does not exist
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the submitted_assessment does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        AssessmentItemModel: AssessmentItem Object
-    """
+    ### Returns:
+    - SubmittedAssessmentResponseModel: SubmittedAssessment Object
+  """
   try:
     submitted_assessment = SubmittedAssessment.find_by_uuid(uuid)
     submitted_assessment_dict = {**input_submitted_assessment.dict()}
@@ -271,7 +277,6 @@ def update_assessment_item(
 
     # Update status, pass_status, and result based on submitted_rubrics
     evaluated = False
-
     if submitted_assessment_fields.get("type") in \
       ["srl", "static_srl", "cognitive_wrapper"]:
       # Always pass SRL assessments
@@ -303,7 +308,6 @@ def update_assessment_item(
             else:
               status = "completed"
             evaluated = True
-
     if evaluated:
       submitted_assessment_dict["status"] = status
       submitted_assessment_dict["result"] = result
@@ -351,18 +355,19 @@ def update_assessment_item(
         "model": NotFoundErrorResponseModel
     }})
 def delete_submitted_assessment(uuid: str):
-  """Delete a submitted_assessment from firestore
+  """
+    Delete a submitted_assessment from firestore
 
-    Args:
-        uuid (str): Unique id of the submitted_assessment
+    ### Args:
+    - uuid (str): Unique id of the submitted_assessment
 
-    Raises:
-        ResourceNotFoundException: If the submitted_assessment does not exist
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the submitted_assessment does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        JSON: Success/Fail Message
-    """
+    ### Returns:
+    - JSON: Success/Fail Message
+  """
   try:
     SubmittedAssessment.delete_by_uuid(uuid)
 
@@ -382,6 +387,7 @@ def delete_submitted_assessment(uuid: str):
 
 @router.get(
     "/learner/{learner_id}/submitted-assessments",
+    name="Get all Submitted Assessments for Learner",
     response_model=AllSubmittedAssessmentResponseModel,
     responses={404: {
         "model": NotFoundErrorResponseModel
@@ -390,20 +396,23 @@ def get_all_submitted_assessment_for_learner(learner_id: str,
                                         assessment_id: Optional[str] = None,
                                         skip: int = Query(0, ge=0, le=2000),
                                         limit: int = Query(10, ge=1, le=100)):
-  """The get_all_submitted_assessment_for_learner endpoint will fetch all the
-     submitted_assessments for a learner from firestore.
+  """
+    The get_all_submitted_assessment_for_learner endpoint will fetch all the 
+    submitted_assessments for a learner from firestore.
 
-    Args:
-        learner_id : uuid of learner
+    ### Args:
+    - learner_id (str): uuid of learner
+    - assessment_id (str): optional uuid of the assessment
+    - skip (int): Number of objects to be skipped
+    - limit (int): Size of array to be returned
 
-    Raises:
-        ResourceNotFoundException: If the learner_id does not
-                   exist
-        Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the learner_id does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-    Returns:
-        SubmittedAssessmentResponseModel: SubmittedAssessment object
-    """
+    ### Returns:
+    - SubmittedAssessmentResponseModel: SubmittedAssessment object
+  """
   try:
     # Check to validate if Learner with given ID exists or not
     _ = Learner.find_by_uuid(learner_id)
@@ -459,28 +468,32 @@ def get_filtered_submitted_assessments(
     is_flagged: Union[bool, None] = Query(default=None),
     skip: int = Query(0, ge=0, le=2000),
     limit: int = Query(10, ge=1, le=100)):
-  """The get filtered submitted assessments endpoint will return an array
-  of submitted assessments from firestore
-  Args:
-      sort_by (str): sort submitted assessment based on this parameter value
-      sort_order (str): ascending or descending sort
-      name (str): search submitted assessment based on assessment name keyword
-      assessor_id (str): uuid of assessor
-      is_autogradable (bool): to return autogradable or manual gradable
-              or both type of assessments
-      discipline_name (List): Pathway disciplines to filter submitted assessment
-      unit_name (List): Pathway units to filter submitted assessments on
-      type (List): type to filter submitted assessments on
-      status (List): status of submitted assessment to filter on
-      result (List): result to filter submitted assessments on
-      is_flagged (bool): return flagged assessments or not or both
-      skip (int): Number of objects to be skipped
-      limit (int): Size of skill array to be returned
-  Raises:
-      Exception: 500 Internal Server Error if something went wrong
-  Returns:
-      AllSubmittedAssessmentAssessorResponseModel: List of
-                                        SubmittedAssessment object
+  """
+    The get filtered submitted assessments endpoint will return an array
+    of submitted assessments from firestore
+
+    ### Args:
+    - sort_by (str): sort submitted assessment based on this parameter value
+    - sort_order (str): ascending or descending sort
+    - name (str): search submitted assessment based on assessment name keyword
+    - assessor_id (str): uuid of assessor
+    - is_autogradable (bool): to return autogradable or human gradable or both 
+      type of assessments
+    - discipline_name (list): Pathway disciplines to filter submitted assessment
+    - unit_name (list): Pathway units to filter submitted assessments on
+    - type (list): type to filter submitted assessments on
+    - status (list): status of submitted assessment to filter on
+    - result (list): result to filter submitted assessments on
+    - is_flagged (bool): return flagged assessments or not or both
+    - skip (int): Number of objects to be skipped
+    - limit (int): Size of array to be returned
+
+    ### Raises:
+    - ValidationError: If filters are incorrect
+    - Exception: 500 Internal Server Error if something went wrong
+
+    ### Returns:
+    - AllSubmittedAssessmentAssessorResponseModel: List of SubmittedAssessments
   """
   try:
     header = {"Authorization": req.headers.get("authorization")}
@@ -664,6 +677,8 @@ def get_filtered_submitted_assessments(
             submitted_assessment_data = get_submitted_assessment_data(
                 submitted_assessment, False, None, assessment_node,
                 assessor_map)
+            submitted_assessment_data["assessment_name"] = assessment_data.get(
+              "display_name")
             submitted_assessment_data["unit_name"] = le_data.get("name", "")
             submitted_assessment_data["discipline_name"] = discipline_data.get(
               "name", "")
@@ -745,24 +760,29 @@ def get_filtered_submitted_assessments(
 @router.get(
     "/submitted-assessments/unique",
     response_model=SubmittedAssessmentUniqueResponseModel,
-    name="Get filtered/searched Submitted Assessments")
+    name="Get Unique Values for Submitted Assessment Filters")
 def get_unique_values_submitted_assessments(
       assessor_id: Optional[str] = None,
       is_autogradable: Union[bool, None] = Query(default=None),
       status: Union[List[str], None] = Query(default=None)
 ):
-  """The get_unique_values_submitted_assessments endpoint will return an array
-  of unique values for competency, type and result
-  Args:
-      assessor_id (str): filter submitted assessments based on assessor id
-      is_autogradable (bool): to return autogradable or manual gradable
-              or both type of assessments
-      status (List): status of submitted assessment to filter on
-  Raises:
-      Exception: 500 Internal Server Error if something went wrong
-  Returns:
-      SubmittedAssessmentUniqueResponseModel: Dictionary of unique values of
-                required SubmittedAssessment fields.
+  """
+    The get_unique_values_submitted_assessments endpoint will return an array
+    of unique values for competency, type and result
+
+    ### Args:
+    - assessor_id (str): filter submitted assessments based on assessor id
+    - is_autogradable (bool): to return autogradable or human gradable or both
+      type of assessments
+    - status (list): status of submitted assessment to filter on
+
+    ### Raises:
+    - ResourceNotFoundException: If the assessor does not exist 
+    - Exception: 500 Internal Server Error if something went wrong
+
+    ### Returns:
+    - SubmittedAssessmentUniqueResponseModel: Dictionary of unique values of
+      required SubmittedAssessment fields.
   """
   try:
 
@@ -850,6 +870,7 @@ def get_unique_values_submitted_assessments(
 @router.get(
   "/learner/{learner_id}/learning-experience/{le_id}/submitted-assessments/"
   "manual-evaluation",
+  name="Get Human Graded Assessments of an Unit for a Learner",
   response_model=ManualEvaluationResponseModel,
   responses={404: {
         "model": NotFoundErrorResponseModel
@@ -861,19 +882,21 @@ def get_all_manual_evaluation_submitted_assessments_for_learner(
     skip: int = Query(0, ge=0, le=2000),
     limit: int = Query(10, ge=1, le=100)):
   """
-  This endpoint will fetch all the submitted_assessments of a learner for a
-  given unit from firestore, that can get feedback from the Assessor.
+    This endpoint will fetch all the submitted_assessments of a learner for a
+    given unit from firestore, that can get feedback from the Assessor.
 
-  Args:
-    learner_id : uuid of learner
-    le_id: uuid of learning_experience
+    ### Args:
+    - learner_id : uuid of learner
+    - le_id: uuid of learning_experience (unit)
+    - skip (int): Number of objects to be skipped. Default 0.
+    - limit (int): Size of array to be returned. Default 10.
 
-  Raises:
-    ResourceNotFoundException: If the learner_id or le_id does not exist
-    Exception: 500 Internal Server Error if something went wrong
+    ### Raises:
+    - ResourceNotFoundException: If the learner_id or le_id does not exist
+    - Exception: 500 Internal Server Error if something went wrong
 
-  Returns:
-      SubmittedAssessmentResponseModel: SubmittedAssessment object
+    ### Returns:
+    - SubmittedAssessmentResponseModel: SubmittedAssessment object
   """
   try:
     header = {"Authorization": req.headers.get("authorization")}
@@ -974,19 +997,22 @@ def get_all_manual_evaluation_submitted_assessments_for_learner(
 def update_assessor_of_submitted_assessments_of_a_discipline(
     req: Request, discipline_id: str,
     input_assessor: Optional[UpdateAssessorIdRequestModel] = None):
-  """Unassign and assign another assessor for all non-evaluated
-      submitted assessements realted to a discipline
+  """
+    Unassign and assign another assessor for all non-evaluated
+    submitted assessments related to a discipline
 
-    Args:
-        discipline_id (str): Unique identifier of a curriculum_pathway
-                              of alias discipline
-        assessor_id (str): Unique identifier of user(assessor)
+    ### Args:
+    - discipline_id (str): Unique identifier of a curriculum_pathway
+      of alias discipline
+    - assessor_id (str): Unique identifier of user(assessor)
 
-    Raises:
-        ResourceNotFoundException: If the discipline_id does not
-                   exist
-        Exception: 500 Internal Server Error if something went wrong
-    """
+    ### Raises:
+    - ResourceNotFoundException: If the discipline_id does not exist
+    - Exception: 500 Internal Server Error if something went wrong
+
+    ### Returns:
+    - JSON: Success/Fail Message
+  """
   try:
     assessor_id = None
     if input_assessor:
