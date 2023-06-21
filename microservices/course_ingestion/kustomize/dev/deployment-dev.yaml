@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: course-ingestion
+spec:
+  template:
+    spec:
+      containers:
+      - name: course-ingestion
+        image: gcr.io/aitutor-dev/course-ingestion
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1000Mi"
+          limits:
+            memory: "4000Mi"
+            cpu: "3000m"
+        env:
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX
+        - name: GCP_LEARNING_RESOURCE_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_LEARNING_RESOURCE_BUCKET
+        
+

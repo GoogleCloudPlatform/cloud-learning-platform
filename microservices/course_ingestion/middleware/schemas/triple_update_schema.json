@@ -1,0 +1,37 @@
+{ 
+    "$schema":"http://json-schema.org/draft-04/schema#",
+    "title":"Schema for creating Triple",
+    "type":"object",
+    "properties":{ 
+        "subject":{ 
+            "type":"string",
+            "minLength":1,
+            "maxLength":1000
+        },
+        "predicate":{ 
+            "type":"string",
+            "minLength":1,
+            "maxLength":1000
+        },
+        "object":{ 
+            "type":"string",
+            "minLength":0,
+            "maxLength":1000
+        },
+        "sentence":{ 
+            "type":"string",
+            "minLength":0,
+            "maxLength":5000
+        },
+        "confidence":{ 
+            "type":"number",
+            "minimum": 0,
+            "maximum": 1
+        },
+        "parent_node":{ 
+            "type":"string",
+            "minLength":0,
+            "maxLength":1000
+        }
+    }
+}

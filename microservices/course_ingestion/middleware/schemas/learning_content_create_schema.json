@@ -1,0 +1,65 @@
+{ 
+  "$schema":"http://json-schema.org/draft-04/schema#",
+  "title":"Create Learning Content",
+  "type":"object",
+  "required":[ 
+      "title",
+      "gcs_path",
+      "format"
+  ],
+  "properties":{ 
+      "title":{ 
+          "type":"string",
+          "minLength":1,
+          "maxLength":1000
+      },
+      "gcs_path":{ 
+          "type":"string",
+          "minLength":0,
+          "maxLength":10000,
+          "pattern": ".(pdf)$"
+      },
+      "format":{ 
+          "type":"string",  
+          "minLength":0,
+          "maxLength":100
+      },
+      "start_page":{
+          "type": "number"
+      },
+      "end_page":{
+          "type":"number"
+      },
+      "using_parser":{
+          "type":"boolean"
+      },
+      "description":{
+          "type":"string"
+      },
+      "created_by":{ 
+        "type":"string",
+        "minLength":0,
+        "maxLength":1000
+    },
+    "last_modified_by":{ 
+        "type":"string",
+        "minLength":0,
+        "maxLength":1000
+    },
+    "create_learning_units":{
+        "type":"boolean"
+    },
+    "create_triples":{
+        "type":"boolean"
+    },
+    "fcm_token":{
+        "type":"string"
+    },
+    "course_category":{
+        "enum": [
+            "default",
+            "bio"
+        ]
+    }
+  }
+}
