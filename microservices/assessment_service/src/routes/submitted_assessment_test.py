@@ -39,7 +39,7 @@ api_url = f"{API_URL}"
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
-RELATIVE_PATH = "../../../e2e/api-tests/v3/testing_objects/"
+RELATIVE_PATH = "../../../e2e/testing_objects/"
 
 
 @pytest.fixture(name="create_assessment")
@@ -48,6 +48,7 @@ def fixture_create_assessment():
 
 
 def create_single_learning_experience():
+  """Function to create a learnin experience"""
   # create a learning experience
   with open(
       RELATIVE_PATH + "learning_experiences.json",
@@ -75,6 +76,7 @@ def create_single_learning_object():
 
 
 def create_single_submitted_assessment(assign_assessor=True):
+  """Function to create submitted assessment"""
   # create a submitted assessment
   with open(
       "./testing/submitted_assessment.json", encoding="UTF-8") as json_file:

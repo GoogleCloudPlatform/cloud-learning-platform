@@ -138,7 +138,7 @@ def submit_assessment(submitted_assessment_dict, header):
   items = {}
 
   assessment_id = submitted_assessment_dict["assessment_id"]
-  assessment = Assessment.find_by_id(assessment_id)
+  assessment = Assessment.find_by_uuid(assessment_id)
   is_autogradable = assessment.is_autogradable
   max_attempts = assessment.max_attempts
   attempt_no = submitted_assessment_dict["attempt_no"]
@@ -270,12 +270,12 @@ def get_all_submission(submitted_assessment_uuid, skip, limit, header=None):
   Returns:
     submitted_assessments: List of SubmittedAssessment object
   """
-  submitted_assessment = SubmittedAssessment.find_by_id(
+  submitted_assessment = SubmittedAssessment.find_by_uuid(
       submitted_assessment_uuid)
   assessment_id = submitted_assessment.assessment_id
   learner_id = submitted_assessment.learner_id
 
-  Assessment.find_by_id(assessment_id)
+  Assessment.find_by_uuid(assessment_id)
   Learner.find_by_uuid(learner_id)
 
   collection_manager = SubmittedAssessment.collection
@@ -310,7 +310,7 @@ def get_latest_submission(learner_id, assessment_id,
     latest_submitted_assessment: SubmittedAssessment object
   """
 
-  Assessment.find_by_id(assessment_id)
+  Assessment.find_by_uuid(assessment_id)
   Learner.find_by_uuid(learner_id)
 
   collection_manager = SubmittedAssessment.collection
@@ -356,7 +356,7 @@ def get_submitted_assessment_data(submitted_assessment,
   learner = Learner.find_by_uuid(submitted_assessment[
     "learner_id"]).get_fields()
   if assessment_node is None:
-    assessment_node = Assessment.find_by_id(
+    assessment_node = Assessment.find_by_uuid(
       submitted_assessment["assessment_id"])
   assessment_data = assessment_node.get_fields(reformat_datetime=True)
 
@@ -438,7 +438,7 @@ def traverse_up(node, level: str, parent_alias: str):
   parent_nodes = node.parent_nodes
   for parent_level in parent_nodes:
     for parent_uuid in parent_nodes[parent_level]:
-      parent_node = collection_references[parent_level].find_by_id(parent_uuid)
+      parent_node = collection_references[parent_level].find_by_uuid(parent_uuid)
       return traverse_up(parent_node, parent_level, parent_alias)
 
 
@@ -446,7 +446,7 @@ def traverse_up_uuid(uuid: str, level: str, parent_alias: str):
   """This function is to traverse from child to parent
   till a parent with alias `parent_alias` is encountered
   The `uuid` and `level` define the child from where to start"""
-  node = collection_references[level].find_by_id(uuid)
+  node = collection_references[level].find_by_uuid(uuid)
   if level not in ["assessments", "learning_resources"] and \
     node.alias == parent_alias:
     return node

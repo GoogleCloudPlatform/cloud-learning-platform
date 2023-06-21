@@ -106,7 +106,7 @@ async def upload_assessment_response(learner_id: str,
       msg += f"received file extension .{file_extension}"
       raise ValidationError(msg)
 
-    assessment_details = Assessment().find_by_id(assessment_id)
+    assessment_details = Assessment().find_by_uuid(assessment_id)
     if assessment_details is None:
       raise ValidationError(
         f"No assessment wit id {assessment_id} found"

@@ -70,6 +70,7 @@ class GcsCrudService:
 
 
 def create_single_submitted_assessment(assign_assessor=True):
+  """Function to create a submitted assessment"""
   # create a submitted assessment
   with open(
       "./testing/submitted_assessment.json", encoding="UTF-8") as json_file:

@@ -41,7 +41,7 @@ from config import (PAYLOAD_FILE_SIZE, ERROR_RESPONSES, CONTENT_SERVING_BUCKET,
 
 router = APIRouter(tags=["Assessments"], responses=ERROR_RESPONSES)
 
-# pylint: disable = broad-except,missing-timeout
+# pylint: disable = broad-except,missing-timeout,invalid-name
 
 
 @router.get("/assessment/search", response_model=AssessmentSearchModelResponse)
@@ -218,7 +218,7 @@ def get_assessment(uuid: str, fetch_tree: bool = False):
     - AssessmentModel: Assessment Object
   """
   try:
-    assessment = Assessment.find_by_id(uuid)
+    assessment = Assessment.find_by_uuid(uuid)
     assessment = assessment.get_fields(reformat_datetime=True)
     if fetch_tree:
       assessment = ParentChildNodesHandler.load_child_nodes_data(
@@ -363,7 +363,7 @@ def delete_assessment(uuid: str):
     - JSON: Success/Fail Message
   """
   try:
-    assessment = Assessment.find_by_id(uuid)
+    assessment = Assessment.find_by_uuid(uuid)
     assessment_fields = assessment.get_fields(reformat_datetime=True)
 
     ParentChildNodesHandler.validate_parent_child_nodes_references(
@@ -501,7 +501,7 @@ def create_human_graded_assessment(input_assessment:HumanGradedAssessmentModel):
     new_assessment.uuid = ""
     # Validate if the skill ID exists in Firestore DB
     for skill_id in performance_indicators:
-      _ = Skill.find_by_id(skill_id)
+      _ = Skill.find_by_uuid(skill_id)
     references = new_assessment.references
     references["skills"] = performance_indicators
     new_assessment.references = references
@@ -565,8 +565,8 @@ def replace_old_assessment(new_assessment_id: str, old_assessment_id: str,
   """
   try:
     # Fetch the details of the placeholder assessment
-    placeholder_assessment_data = Assessment.find_by_id(old_assessment_id)
-    new_assessment = Assessment.find_by_id(new_assessment_id)
+    placeholder_assessment_data = Assessment.find_by_uuid(old_assessment_id)
+    new_assessment = Assessment.find_by_uuid(new_assessment_id)
     new_assessment.parent_nodes = placeholder_assessment_data.parent_nodes
     new_assessment.order = placeholder_assessment_data.order
     new_assessment.prerequisites = placeholder_assessment_data.prerequisites
@@ -583,14 +583,14 @@ def replace_old_assessment(new_assessment_id: str, old_assessment_id: str,
                   "learning_objects", [])) >= 1:
         learning_object_id = placeholder_assessment_data.parent_nodes.get(
             "learning_objects")[0]
-        learning_object = LearningObject.find_by_id(learning_object_id)
+        learning_object = LearningObject.find_by_uuid(learning_object_id)
         neighbour_nodes = learning_object.child_nodes
 
         # Check the neighboring learning_resource nodes
         if "learning_resources" in neighbour_nodes:
           dependent_lr_nodes = neighbour_nodes.get("learning_resources", [])
           for lr in dependent_lr_nodes:
-            lr_data = LearningResource.find_by_id(lr).to_dict()
+            lr_data = LearningResource.find_by_uuid(lr).to_dict()
             if lr_data["order"] > placeholder_assessment_data.order:
               for i in range(len(lr_data["prerequisites"]\
                                  .get("assessments",[]))):
@@ -620,7 +620,7 @@ def replace_old_assessment(new_assessment_id: str, old_assessment_id: str,
         if "assessments" in neighbour_nodes:
           dependent_assessment_nodes = neighbour_nodes.get("assessments", [])
           for assessment in dependent_assessment_nodes:
-            assessment_data = Assessment.find_by_id(assessment)
+            assessment_data = Assessment.find_by_uuid(assessment)
             if (assessment_data.order > placeholder_assessment_data.order) and (
                 old_assessment_id in assessment_data.prerequisites.get(
                     "assessments", [])):
@@ -650,7 +650,7 @@ def replace_old_assessment(new_assessment_id: str, old_assessment_id: str,
         placeholder_assessment_data.update()
 
     new_assessment.update()
-    authored_assessment = Assessment.find_by_id(new_assessment_id)
+    authored_assessment = Assessment.find_by_uuid(new_assessment_id)
     authored_assessment_data = authored_assessment.get_fields(
         reformat_datetime=True)
 
@@ -712,7 +712,7 @@ def update_human_graded_assessment(uuid: str,
         #For existing rubrics
         if "uuid" in rubric_update and\
           rubric_update["uuid"] in existing_rubrics:
-          rubric = Rubric.find_by_id(rubric_update["uuid"])
+          rubric = Rubric.find_by_uuid(rubric_update["uuid"])
           rubric_data = rubric.get_fields(reformat_datetime=True)
           existing_rubric_criteria =\
             rubric_data["child_nodes"]["rubric_criteria"]
@@ -775,7 +775,7 @@ def update_human_graded_assessment(uuid: str,
       # Validate if the skill ID exists in Firestore DB
       unique_performance_indicators = set(performance_indicators)
       for skill_id in unique_performance_indicators:
-        _ = Skill.find_by_id(skill_id)
+        _ = Skill.find_by_uuid(skill_id)
       update_dict["references"]["skills"] = unique_performance_indicators
 
     assessment_fields = CommonAPIHandler.update_document(

@@ -105,3 +105,19 @@ class InternalServerError(Exception):
   def __init__(self, message="Internal Server Error"):
     self.message = message
     super().__init__(self.message)
+
+
+class UserManagementServiceError(Exception):
+  """Error class to be raised when there is error in user management service"""
+
+  def __init__(self, message="Create User failed"):
+    self.message = message
+    super().__init__(self.message)
+
+
+class CronJobException(Exception):
+  """Error class to be raised when issue in executin gCronjob"""
+
+  def __init__(self, message="Cronjob Error"):
+    self.message = message
+    super().__init__(self.message)

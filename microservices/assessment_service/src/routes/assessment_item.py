@@ -125,7 +125,7 @@ def get_assessment_item(uuid: str, fetch_tree: Optional[bool] = False):
     - AssessmentItemModel: AssessmentItem Object
   """
   try:
-    assessment_item = AssessmentItem.find_by_id(uuid)
+    assessment_item = AssessmentItem.find_by_uuid(uuid)
     assessment_item = assessment_item.get_fields(reformat_datetime=True)
 
     if fetch_tree:
@@ -261,7 +261,7 @@ def delete_assessment_item(uuid: str):
     - JSON: Success/Fail Message
     """
   try:
-    assessment_item = AssessmentItem.find_by_id(uuid)
+    assessment_item = AssessmentItem.find_by_uuid(uuid)
     assessment_item_fields = assessment_item.get_fields(reformat_datetime=True)
 
     ParentChildNodesHandler.validate_parent_child_nodes_references(

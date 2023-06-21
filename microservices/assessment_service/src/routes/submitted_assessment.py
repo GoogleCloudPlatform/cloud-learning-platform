@@ -64,11 +64,11 @@ def create_submitted_assessment(
     request: Request,
     input_submitted_assessment: SubmittedAssessmentRequestModel):
   """
-    The create_submitted_assessment endpoint will add the 
+    The create_submitted_assessment endpoint will add the
     submitted_assessment to firestore.
 
     ### Args:
-    - input_submitted_assessment (SubmittedAssessmentSchema): input 
+    - input_submitted_assessment (SubmittedAssessmentSchema): input
     submitted_assessment to be inserted
 
     ### Raises:
@@ -120,8 +120,8 @@ def get_all_submitted_assessment(req: Request, uuid: str,
                                   skip: int = Query(0, ge=0, le=2000),
                                   limit: int = Query(10, ge=1, le=100)):
   """
-    The get_all_submitted_assessment endpoint will fetch all the 
-    submitted_assessment from firestore for the learner and the assessment of 
+    The get_all_submitted_assessment endpoint will fetch all the
+    submitted_assessment from firestore for the learner and the assessment of
     the given submitted_assessment uuid
 
     ### Args:
@@ -165,8 +165,8 @@ def get_all_submitted_assessment(req: Request, uuid: str,
     }})
 def get_latest_submitted_assessment(req: Request, uuid: str):
   """
-    The get_latest_submitted_assessment endpoint will fetch the latest 
-    submitted_assessment from firestore for the learner and the assessment of 
+    The get_latest_submitted_assessment endpoint will fetch the latest
+    submitted_assessment from firestore for the learner and the assessment of
     the given submitted_assessment uuid.
 
     ### Args:
@@ -211,7 +211,7 @@ def get_latest_submitted_assessment(req: Request, uuid: str):
     }})
 def get_submitted_assessment(uuid: str):
   """
-    The get submitted_assessment endpoint will return the submitted_assessment 
+    The get submitted_assessment endpoint will return the submitted_assessment
     from firestore of which uuid is provided
 
     ### Args:
@@ -289,11 +289,11 @@ def update_assessment_item(
                                                         None)
       if submitted_rubrics is not None:
         assessment_id = submitted_assessment.assessment_id
-        assessment = Assessment.find_by_id(assessment_id)
+        assessment = Assessment.find_by_uuid(assessment_id)
         if assessment.child_nodes and "rubrics" in assessment.child_nodes:
           # FIXME: Assumption: only one rubric for each assessment
           rubric_id = assessment.child_nodes["rubrics"][0]
-          rubric = Rubric.find_by_id(rubric_id)
+          rubric = Rubric.find_by_uuid(rubric_id)
           criteria = rubric.evaluation_criteria
           criteria = {v: k for k, v in criteria.items()}
           if len(submitted_rubrics):
@@ -397,7 +397,7 @@ def get_all_submitted_assessment_for_learner(learner_id: str,
                                         skip: int = Query(0, ge=0, le=2000),
                                         limit: int = Query(10, ge=1, le=100)):
   """
-    The get_all_submitted_assessment_for_learner endpoint will fetch all the 
+    The get_all_submitted_assessment_for_learner endpoint will fetch all the
     submitted_assessments for a learner from firestore.
 
     ### Args:
@@ -477,7 +477,7 @@ def get_filtered_submitted_assessments(
     - sort_order (str): ascending or descending sort
     - name (str): search submitted assessment based on assessment name keyword
     - assessor_id (str): uuid of assessor
-    - is_autogradable (bool): to return autogradable or human gradable or both 
+    - is_autogradable (bool): to return autogradable or human gradable or both
       type of assessments
     - discipline_name (list): Pathway disciplines to filter submitted assessment
     - unit_name (list): Pathway units to filter submitted assessments on
@@ -612,7 +612,7 @@ def get_filtered_submitted_assessments(
       if assessment_id in assessment_map:
         assessment_node = assessment_map[assessment_id]
       else:
-        assessment_node = Assessment.find_by_id(assessment_id)
+        assessment_node = Assessment.find_by_uuid(assessment_id)
         assessment_map[assessment_id] = assessment_node
 
       assessment_data = assessment_node.get_fields(reformat_datetime=True)
@@ -777,7 +777,7 @@ def get_unique_values_submitted_assessments(
     - status (list): status of submitted assessment to filter on
 
     ### Raises:
-    - ResourceNotFoundException: If the assessor does not exist 
+    - ResourceNotFoundException: If the assessor does not exist
     - Exception: 500 Internal Server Error if something went wrong
 
     ### Returns:
@@ -818,7 +818,7 @@ def get_unique_values_submitted_assessments(
       # adding unique result
       if submitted_assessment.result:
         unique_results.add(submitted_assessment.result)
-      assessment_node = Assessment.find_by_id(
+      assessment_node = Assessment.find_by_uuid(
           submitted_assessment.assessment_id)
 
       try:
@@ -903,7 +903,7 @@ def get_all_manual_evaluation_submitted_assessments_for_learner(
     # Check to validate if Learner and learning_experience
     # with given ID exists or not
     Learner.find_by_uuid(learner_id)
-    LearningExperience.find_by_id(le_id)
+    LearningExperience.find_by_uuid(le_id)
     assessor_map = {}
 
     collection_manager = SubmittedAssessment.collection
@@ -919,7 +919,7 @@ def get_all_manual_evaluation_submitted_assessments_for_learner(
 
     response = []
     for submitted_assessment in submitted_assessments:
-      assessment_node = Assessment.find_by_id(
+      assessment_node = Assessment.find_by_uuid(
         submitted_assessment.assessment_id)
       try:
         lo_node = traverse_up(assessment_node, "assessments",

@@ -1,7 +1,7 @@
 """
   Assessment Service config file
 """
-# pylint: disable=unspecified-encoding
+# pylint: disable=unspecified-encoding,invalid-name
 import os
 import json
 from typing_extensions import Literal
@@ -24,7 +24,7 @@ print("USE_LEARNOSITY_SECRET: ", os.getenv(
     "USE_LEARNOSITY_SECRET", ""))
 
 CONTENT_SERVING_BUCKET = os.environ.get("CONTENT_SERVING_BUCKET", "")
-SIGNURL_SA_KEY_PATH = "./keys/{}-signurl-sa-key.json".format(GCP_PROJECT)
+SIGNURL_SA_KEY_PATH = f"./keys/{GCP_PROJECT}-signurl-sa-key.json"
 
 try:
   with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace","r",
