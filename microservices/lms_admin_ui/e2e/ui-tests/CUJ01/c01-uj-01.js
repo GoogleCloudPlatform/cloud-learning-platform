@@ -1,6 +1,6 @@
 const { config } = require('../../codecept-ui-tests.conf');
 let url = config.helpers.Puppeteer.url;
-credentials = JSON.parse(process.env.account)
+credentials = JSON.parse(process.env.ACCOUNT)
 
 Feature('User Login');
 

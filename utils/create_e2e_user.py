@@ -7,7 +7,7 @@ import requests
 from common.models import TempUser
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
 PROJECT_ID = os.getenv("PROJECT_ID", None)
-CREDS = os.getenv("account", None)
+CREDS = os.getenv("ACCOUNT", None)
 creds=json.loads(CREDS)
 TEST_USER = {
     "first_name": "firstname",
