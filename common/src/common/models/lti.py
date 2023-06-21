@@ -27,6 +27,7 @@ class Tool(BaseModel):
   tool_login_url = TextField(required=True)
   client_id = TextField(required=True)
   public_key_type = TextField(required=True)
+  deeplink_type = TextField(required=True)
   tool_public_key = TextField()
   tool_keyset_url = TextField()
   content_selection_url = TextField()
@@ -106,6 +107,14 @@ class LTIContentItem(BaseModel):
         "tool_id", "==", tool_id).filter("deleted_at_timestamp", "==",
                                          None).get()
     return lti_content_item_doc
+
+  @classmethod
+  def filter_with_context_id_and_tool_id(cls, tool_id, context_id):
+    lti_content_items = cls.collection.filter("tool_id", "==",tool_id)\
+      .filter("context_id", "==", context_id)\
+      .filter("deleted_at_timestamp", "==", None)\
+      .fetch()
+    return list(lti_content_items)
 
 
 class LTISession(BaseModel):

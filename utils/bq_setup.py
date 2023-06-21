@@ -54,32 +54,37 @@ def create_table_using_sql_file(dataset, file_name):
       raise Exception(error) from e
 
 
+def get_sql_files_list(bq_dataset_name, folder_name):
+  """Returns the set of files in the folder named by the given  dataset name"""
+  file_path = os.path.join(folder_name,bq_dataset_name)
+  if not os.path.exists(file_path):
+    return []
+  sql_files = listdir(file_path)
+  return [file_path + "/" + i for i in sql_files]
+
 def create_tables(dataset):
   """Create tables in the bigquery"""
   print("dataset", dataset)
-  sql_file_list = []
-  bq_dataset_name = os.getenv("BQ_DATASET")
-  file_path = f"tables_sql/{bq_dataset_name}/"
-  sql_files = listdir(file_path)
-  sql_file_list = [file_path + i for i in sql_files]
-
-  for each_file in sql_file_list:
-    print(f"Running ddl_file: {each_file}")
-    create_table_using_sql_file(dataset, each_file)
+  sql_file_list = get_sql_files_list(os.getenv("BQ_DATASET"),"tables_sql")
+  if sql_file_list:
+    for each_file in sql_file_list:
+      print(f"Running ddl_file: {each_file}")
+      create_table_using_sql_file(dataset, each_file)
+  else:
+    print("No files exist at the given path")
 
 
 def create_views(dataset):
   """Create tables in the bigquery """
   print("dataset", dataset)
-  sql_file_list = []
-
-  file_path = "views_sql/"
-  sql_files = listdir(file_path)
-  sql_file_list = [file_path + i for i in sql_files]
-  sql_file_list.sort(key=lambda x: x[-7:])
-  for each_file in sql_file_list:
-    print(f"Running ddl_file: {each_file}")
-    create_table_using_sql_file(dataset, each_file)
+  sql_file_list = get_sql_files_list(os.getenv("BQ_DATASET"),"views_sql")
+  if sql_file_list:
+    sql_file_list.sort(key=lambda x: x[-7:])
+    for each_file in sql_file_list:
+      print(f"Running ddl_file: {each_file}")
+      create_table_using_sql_file(dataset, each_file)
+  else:
+    print("No files exist at the given path")
 
 
 def alter_table_using_sql_file(dataset, file_name):
@@ -107,15 +112,13 @@ def alter_table_using_sql_file(dataset, file_name):
 def alter_tables(dataset):
   """Alter tables in the bigquery"""
   print("dataset", dataset)
-  sql_file_list = []
-
-  file_path = "alter_tables_sql/"
-  sql_files = listdir(file_path)
-  sql_file_list = [file_path + i for i in sql_files]
-
-  for each_file in sql_file_list:
-    print(f"Running ddl_file: {each_file}")
-    alter_table_using_sql_file(dataset, each_file)
+  sql_file_list = get_sql_files_list(os.getenv("BQ_DATASET"),"alter_tables_sql")
+  if sql_file_list:
+    for each_file in sql_file_list:
+      print(f"Running ddl_file: {each_file}")
+      alter_table_using_sql_file(dataset, each_file)
+  else:
+    print("No files exist at the given path")
 
 
 def parse_arguments():

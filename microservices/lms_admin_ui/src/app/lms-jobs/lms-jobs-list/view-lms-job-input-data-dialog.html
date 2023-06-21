@@ -1,0 +1,16 @@
+<h3 mat-dialog-title style="font-size: 25px;"><b>Input Data</b></h3>
+<div mat-dialog-content style="padding-bottom: 4%;padding-top: 1%;">
+    <div>
+        <p *ngFor="let item of inputData | keyvalue">
+            <span style="font-weight:bold;text-transform: capitalize;">
+                {{item.key}}
+            </span>
+            <span>
+                - {{item.value ? item.value : 'null'}}
+            </span>
+        </p>
+    </div>
+</div>
+<div mat-dialog-actions style="display: flex;justify-content: end;">
+    <button mat-flat-button (click)="onNoClick()">Close</button>
+</div>

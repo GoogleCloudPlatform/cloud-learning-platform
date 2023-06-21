@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Flatten import namespace for models
 """
@@ -26,6 +25,7 @@ from .cohort import *
 from .section import *
 from .lti import *
 from .course_enrollment_mapping import *
+from .course_template_enrollment_mapping import *
 from .lti_assignment import *
 from .llm import *
 from .custom_fields import *
@@ -39,3 +39,4 @@ from .learning_record import *
 from .session import *
 from .faq import *
 from .staff import *
+from .lms_job import *

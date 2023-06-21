@@ -48,3 +48,8 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: INSPACE_BASE_URL
+        - name: EXTERNAL_USER_PROPERTY_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: EXTERNAL_USER_PROPERTY_PREFIX

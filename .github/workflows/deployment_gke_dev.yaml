@@ -15,7 +15,8 @@
 name: GKE - Deploy microservices to dev
 on:
   push:
-    branches: [ "main"]
+    branches:
+      - main
     paths:
       - 'microservices/**'
       - 'common/**'
@@ -50,6 +51,8 @@ env:
   # For Scalability in Dev env using Prod config
   BQ_DATASET: lms_analytics
   BQ_REGION: US
+  EXTERNAL_USER_PROPERTY_PREFIX: SNHU_
+  SKAFFOLD_BUILD_CONCURRENCY: 0
   
 # cookiecutter:raw 
 jobs:
@@ -173,10 +176,6 @@ jobs:
 
       - name: Build and deploy documentation to cluster
         run: |
-          cd documentation/api_docs
-          npm install
-          npm run build
-          cd ../..
           skaffold run -m api_docs \
           --profile custom \
           --namespace $NAMESPACE \
