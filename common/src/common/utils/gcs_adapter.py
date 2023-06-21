@@ -331,6 +331,7 @@ def upload_file_to_bucket(bucket_name, prefix, file_name, file):
 
 
 def upload_folder(bucket_name, src_path, dest_base_path):
+  """Function to upload folder to destination"""
   storage_client = storage.Client()
   bucket = storage_client.bucket(bucket_name)
   for source_file in glob.glob(src_path+"/**",recursive=True):

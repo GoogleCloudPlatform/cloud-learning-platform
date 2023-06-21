@@ -28,7 +28,7 @@ def get_last_submitted_assessement_of_assessments(assessment_ids, assessor_id):
   return last_submitted_assessment
 
 def get_assessors_of_dag(dag_id):
-
+  """Function to get assessors tagged to Discipline Association Groups"""
   group = AssociationGroup.find_by_uuid(dag_id)
   group = group.get_fields(reformat_datetime = True)
 
@@ -160,6 +160,7 @@ def update_assessor_of_submitted_assessments_of_a_discipline(
   discipline_id: str,
   input_assessor = None
 ):
+  """Function to update assessor for submitted assessments of discipline"""
   assessor_id = None
   if input_assessor:
     assessor_id = input_assessor.get("user")

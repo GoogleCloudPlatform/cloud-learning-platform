@@ -7,7 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 
 
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,invalid-name
 
 
 class CustomHTTPException(Exception):
@@ -27,6 +27,7 @@ class CustomHTTPException(Exception):
 
 # Exception handlers
 def add_exception_handlers(_app: FastAPI):
+  """Function for exception handler"""
   @_app.exception_handler(CustomHTTPException)
   async def generic_exception_handler(req: Request, exc: CustomHTTPException):
     return JSONResponse(

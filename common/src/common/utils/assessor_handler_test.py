@@ -219,6 +219,7 @@ submitted_assessment_response = {
 # -----------------------------------------------------------------------------
 
 def create_single_user(user_id="user_id", ref="learner1"):
+  """Function to create user"""
   # create a user
   user_fields = USER_EXAMPLE
   user_fields["user_id"] = user_id
@@ -240,6 +241,7 @@ def create_single_learner():
   return learner
 
 def create_single_assessment():
+  """Function to create assessment"""
   # create an assessment
   assessment_fields = ASSESSMENT_EXAMPLE
   assessment_fields["parent_nodes"]["learning_experiences"] = ["le_id"]
@@ -252,6 +254,7 @@ def create_single_assessment():
   return assessment
 
 def create_single_submitted_assessment(assign_assessor=True):
+  """Function to create submitted assessment"""
   # create a submitted assessment
   sa_fields = SUBMITTED_ASSESSMENT_EXAMPLE_2
   sa_fields["assessment_id"] = SUBMITTED_ASSESSMENT_EXAMPLE["assessment_id"]
