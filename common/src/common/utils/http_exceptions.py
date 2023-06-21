@@ -49,6 +49,21 @@ def add_exception_handlers(_app: FastAPI):
       })
 
 
+class ClassroomHttpException(CustomHTTPException):
+  """Exception raised for any google HTTP errors.
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, status_code: int, message: str):
+    if status_code == 503:
+      super().__init__(
+          status_code=429, success=False, message=message, data=None)
+    else:
+      super().__init__(
+          status_code=status_code, success=False, message=message, data=None)
+
+
 class BadRequest(CustomHTTPException):
   """Exception raised for errors in the input request.
   This can contain following scenarios:
