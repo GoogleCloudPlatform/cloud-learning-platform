@@ -22,7 +22,7 @@ on:
       - main
     paths:
       # TODO: Add all microservice folders below.
-      - 'microservices/**'
+      - 'microservices/classroom_shim/**'
       - 'common/**'
       - '.github/workflows/unit_test_linter_classroom_shim.yaml'
       - '.pylintrc'

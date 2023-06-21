@@ -21,8 +21,7 @@ on:
     branches:
       - main
     paths:
-      # TODO: Add all microservice folders below.
-      - 'microservices/update_invitations_cronjob'
+      - 'microservices/update_invitations_cronjob/**'
       - 'common/**'
       - '.github/workflows/unit_test_linter_update_invitations_cronjob.yaml'
       - '.pylintrc'
@@ -40,7 +39,6 @@ jobs:
       matrix:
         python-version: [3.9]
         target-folder: [
-          # TODO: Add all microservice folders below.
           microservices/update_invitations_cronjob,
         ]
     steps:

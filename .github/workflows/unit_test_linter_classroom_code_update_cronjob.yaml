@@ -21,7 +21,7 @@ on:
     branches:
       - main
     paths:
-      - 'microservices/classroom_code_update_cronjob'
+      - 'microservices/classroom_code_update_cronjob/**'
       - 'common/**'
       - '.github/workflows/unit_test_linter_classroom_code_update_cronjob.yaml'
       - '.pylintrc'

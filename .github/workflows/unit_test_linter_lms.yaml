@@ -21,8 +21,7 @@ on:
     branches:
       - main
     paths:
-      # TODO: Add all microservice folders below.
-      - 'microservices/**'
+      - 'microservices/lms/**'
       - 'common/**'
       - '.github/workflows/unit_test_linter_lms.yaml'
       - '.pylintrc'
@@ -42,7 +41,6 @@ jobs:
       matrix:
         python-version: [3.9]
         target-folder: [
-          # TODO: Add all microservice folders below.
           microservices/lms,
         ]
     steps:

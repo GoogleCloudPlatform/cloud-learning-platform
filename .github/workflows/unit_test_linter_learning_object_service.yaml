@@ -21,9 +21,9 @@ on:
     branches: [ "main" ]
     paths:
       # TODO: Add all microservice folders below.
-      - 'microservices/**'
+      - 'microservices/learning_object_service/**'
       - 'common/**'
-      - '.github/workflows/unit_test_linter_learning object service.yaml'
+      - '.github/workflows/unit_test_linter_learning_object_service.yaml'
       - '.pylintrc'
   workflow_dispatch:
 

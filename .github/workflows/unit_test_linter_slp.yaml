@@ -21,7 +21,7 @@ on:
     branches: [ "main" ]
 
     paths:
-      - 'microservices/**'
+      - 'microservices/student_learner_profile/**'
       - 'common/**'
       - '.github/workflows/unit_test_linter_slp.yaml'
       - '.pylintrc'

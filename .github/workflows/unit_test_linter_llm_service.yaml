@@ -21,7 +21,7 @@ on:
     branches:
       - main
     paths:
-      - 'microservices/**'
+      - 'microservices/llm_service/**'
       - 'common/**'
       - '.github/workflows/unit_test_linter_llm_service.yaml'
       - '.pylintrc'

@@ -20,7 +20,7 @@ on:
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'microservices/**'
+      - 'microservices/user_management/**'
       - 'common/**'
       - '.github/workflows/unit_test_linter_user_management.yaml'
       - '.pylintrc'

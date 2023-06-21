@@ -21,7 +21,6 @@ on:
     branches:
       - main
     paths:
-      # TODO: Add all microservice folders below.
       - 'utils/**'
       - 'common/**'
       - '.github/workflows/unit_test_linter_utils.yaml'
@@ -41,7 +40,6 @@ jobs:
       matrix:
         python-version: [3.9]
         target-folder: [
-          # TODO: Add all microservice folders below.
           utils,
         ]
     steps:
