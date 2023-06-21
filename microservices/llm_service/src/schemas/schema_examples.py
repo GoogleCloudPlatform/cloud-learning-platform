@@ -30,6 +30,8 @@ LLM_QUERY_EXAMPLE = {
 LLM_QUERY_ENGINE_EXAMPLE = {
   "doc_url": "",
   "query_engine": "",
+  "llm_type": "",
+  "is_public": ""
 }
 
 CHAT_EXAMPLE = {

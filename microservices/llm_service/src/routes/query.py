@@ -17,7 +17,8 @@
 """ Query endpoints """
 import traceback
 from typing import Optional
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from common.utils.auth_service import validate_token
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
                                  ValidationError,
@@ -64,7 +65,8 @@ def get_query_list():
     "",
     name="Create a query engine",
     response_model=LLMQueryEngineResponse)
-async def query_engine_create(gen_config: LLMQueryEngineModel):
+async def query_engine_create(gen_config: LLMQueryEngineModel,
+                              user_data: dict = Depends(validate_token)):
   """
   Start a query engine build job
 
@@ -78,12 +80,17 @@ async def query_engine_create(gen_config: LLMQueryEngineModel):
 
   doc_url = genconfig_dict.get("doc_url")
   if doc_url is None or doc_url == "":
-    return BadRequest("Missing or invalid payload parameters")
+    return BadRequest("Missing or invalid payload parameters: doc_url")
 
   query_engine = genconfig_dict.get("query_engine")
+  if query_engine is None or query_engine == "":
+    return BadRequest("Missing or invalid payload parameters: query_engine")
+
+  user_id = user_data.get("user_id")
 
   try:
-    result = await query_engine_build(doc_url, query_engine)
+    result = await query_engine_build(doc_url, query_engine, user_id,
+                                      genconfig_dict)
 
     return {
         "success": True,

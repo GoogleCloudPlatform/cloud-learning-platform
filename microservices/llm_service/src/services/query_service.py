@@ -157,7 +157,7 @@ async def _query_doc_matches(q_engine: QueryEngine,
   return query_references
 
 
-def query_engine_build(doc_url: str, query_engine: str,
+def query_engine_build(doc_url: str, query_engine: str, user_id: str,
                        params: Dict) -> QueryEngine:
   """
   Build a new query engine.
@@ -182,7 +182,6 @@ def query_engine_build(doc_url: str, query_engine: str,
 
   # create model
   is_public = params.get("is_public", True)
-  user_id = params.get("user_id")
   llm_type = params.get("llm_type", DEFAULT_QUERY_CHAT_MODEL)
   q_engine = QueryEngine(name=query_engine,
                          created_by=user_id,
@@ -191,7 +190,12 @@ def query_engine_build(doc_url: str, query_engine: str,
   q_engine.save()
 
   # build document index
-  build_doc_index(doc_url, query_engine)
+  try:
+    build_doc_index(doc_url, query_engine)
+  except Exception as e:
+    # delete query engine model if build unsuccessful
+    q_engine.delete()
+    raise InternalServerError(e) from e
 
   return q_engine
 
