@@ -138,7 +138,6 @@ def get_workspace_student_email_and_token():
     """
   client = secretmanager.SecretManagerServiceClient()
   users_dict = {
-    "lms-service-user" : "lms_user_student_token",
     "org-test-user-3-username" : "org-test-user-3-student-token",
     "org-test-user-4-username" : "org-test-user-4-student-token"
   }
