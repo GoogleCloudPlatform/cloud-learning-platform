@@ -20,6 +20,7 @@ on:
   pull_request:
     branches:
       - main
+      - e2e_flow_fix
     paths:
       - 'microservices/classroom_notification_service/**'
       - 'common/**'
