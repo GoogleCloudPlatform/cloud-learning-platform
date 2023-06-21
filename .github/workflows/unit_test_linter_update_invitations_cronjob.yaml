@@ -15,14 +15,13 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Unit test & lint for update invitations cronjob
+name: Unit test & lint for Update Invitations Cronjob
 on:
   pull_request:
     branches:
       - main
     paths:
-      # TODO: Add all microservice folders below.
-      - 'microservices/update_invitations_cronjob'
+      - 'microservices/update_invitations_cronjob/**'
       - 'common/**'
       - '.github/workflows/unit_test_linter_update_invitations_cronjob.yaml'
       - '.pylintrc'
@@ -40,7 +39,6 @@ jobs:
       matrix:
         python-version: [3.9]
         target-folder: [
-          # TODO: Add all microservice folders below.
           microservices/update_invitations_cronjob,
         ]
     steps:
