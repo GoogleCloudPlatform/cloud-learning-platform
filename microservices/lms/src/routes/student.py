@@ -359,14 +359,12 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
         student_email=input_data.email,
         course_id=section.classroom_id,
         course_code=section.classroom_code)
-    Logger.info(f"Section to updated {section.id} {section.enrolled_students_count} {section.cohort.enrolled_students_count}")
     latest_section = Section.find_by_id(section.id)
     latest_cohort = latest_section.cohort
     latest_cohort.enrolled_students_count += 1
     latest_cohort.update()
     latest_section.enrolled_students_count += 1
     latest_section.update()
-    Logger.info(f"Section to updated {latest_section.id} {latest_section.enrolled_students_count} {latest_section.cohort.enrolled_students_count}")
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = User.find_by_user_id(
@@ -466,18 +464,13 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
         student_email=input_data.email,
         course_id=section.classroom_id,
         course_code=section.classroom_code)
-    # cohort = section.cohort
-    # cohort.enrolled_students_count += 1
-    # cohort.update()
-    # section.enrolled_students_count += 1
-    # section.update()
+    
     latest_section = Section.find_by_id(section.id)
     latest_cohort = latest_section.cohort
     latest_cohort.enrolled_students_count += 1
     latest_cohort.update()
     latest_section.enrolled_students_count += 1
     latest_section.update()
-
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = User.find_by_user_id(
@@ -567,11 +560,7 @@ def invite_student(section_id: str, student_email: str, request: Request):
       raise Conflict(f"User {student_email} is already\
                       registered for cohort {section.cohort.id}")
     invitation_details = student_service.invite_student(
-        section=section, student_email=student_email, headers=headers)
-    # section.enrolled_students_count +=1
-    # section.update()
-    # cohort.enrolled_students_count +=1
-    # cohort.update()
+        section=section, student_email=student_email, headers=headers)    
     latest_section = Section.find_by_id(section.id)
     latest_cohort = latest_section.cohort
     latest_cohort.enrolled_students_count += 1
@@ -644,10 +633,6 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     headers = {"Authorization": request.headers.get("Authorization")}
     invitation_details = student_service.invite_student(
         section=section, student_email=student_email, headers=headers)
-    # section.enrolled_students_count +=1
-    # section.update()
-    # cohort.enrolled_students_count +=1
-    # cohort.update()
     latest_section = Section.find_by_id(section.id)
     latest_cohort = latest_section.cohort
     latest_cohort.enrolled_students_count += 1
