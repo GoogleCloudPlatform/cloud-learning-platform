@@ -1,0 +1,6 @@
+kustomize
+skaffold.yaml
+cloudbuild.yaml
+Dockerfile
+README.md
+.coveragerc

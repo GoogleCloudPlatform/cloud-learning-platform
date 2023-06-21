@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deep-knowledge-tracing
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: deep-knowledge-tracing
+        image: gcr.io/aitutor-dev/deep-knowledge-tracing
+        imagePullPolicy: Always
+        env:
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: MODEL_WEIGHTS_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DKT_MODEL_WEIGHTS_PATH
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX
