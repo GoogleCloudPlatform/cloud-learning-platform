@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deep-knowledge-tracing
+spec:
+  template:
+    spec:
+      containers:
+      - name: deep-knowledge-tracing
+        image: deep-knowledge-tracing
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: MODEL_WEIGHTS_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DKT_MODEL_WEIGHTS_PATH

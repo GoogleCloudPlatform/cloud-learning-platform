@@ -61,6 +61,9 @@ requires:
 - path: ./microservices/item_response_theory
   configs: [item-response-theory]
 
+- path: ./microservices/deep_knowledge_tracing
+  configs: [deep-knowledge-tracing]
+
 # TODO: Activate when all services from ailearning-backend have been moved
 - path: ./microservices/student_learner_profile
   configs: [student-learner-profile]
