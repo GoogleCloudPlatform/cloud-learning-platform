@@ -62,7 +62,7 @@ DIMENSIONS = 768
 async def query_generate(
             user_id: str,
             prompt: str,
-            query_engine: str,
+            q_engine: QueryEngine,
             user_query: Optional[UserQuery] = None) -> \
                 Tuple[QueryResult, List[QueryReference]]:
   """
@@ -81,10 +81,6 @@ async def query_generate(
   Raises:
     ResourceNotFoundException if the named query engine doesn't exist
   """
-  q_engine = QueryEngine.find_by_name(query_engine)
-  if q_engine is None:
-    raise ResourceNotFoundException(f"cant find query engine {query_engine}")
-
   # get doc context for question
   query_references = await _query_doc_matches(q_engine, prompt)
 

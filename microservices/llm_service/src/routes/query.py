@@ -102,10 +102,12 @@ async def query_engine_create(gen_config: LLMQueryEngineModel,
 
 
 @router.post(
-    "/{queryid}",
+    "/{query_engine_id}",
     name="Make a query to a query engine",
     response_model=LLMQueryResponse)
-async def query(gen_config: LLMQueryModel):
+async def query(query_engine_id: str,
+                gen_config: LLMQueryModel, 
+                user_data: dict = Depends(validate_token)):
   """
   Send a query to a query engine and return the response
 
@@ -125,10 +127,12 @@ async def query(gen_config: LLMQueryModel):
     return PayloadTooLargeError(
       f"Prompt must be less than {PAYLOAD_FILE_SIZE}")
 
-  query_engine = genconfig_dict.get("query_engine")
+  q_engine = QueryEngine.get_by_id(query_engine_id)
+
+  user_id = user_data.get("user_id")
 
   try:
-    query_result, query_references = await query_generate(prompt, query_engine)
+    query_result, query_references = await query_generate(user_id, prompt, q_engine)
 
     return {
         "success": True,
@@ -143,10 +147,10 @@ async def query(gen_config: LLMQueryModel):
 
 
 @router.post(
-    "/user/{user_queryid}",
+    "/user/{user_query_id}",
     name="Make a query to a query engine based on a prior user query",
     response_model=LLMQueryEngineResponse)
-async def query_continue(user_queryid: str, gen_config: LLMQueryModel):
+async def query_continue(user_query_id: str, gen_config: LLMQueryModel):
   """
   Send a query to a query engine with a prior user query as context
 
@@ -167,10 +171,10 @@ async def query_continue(user_queryid: str, gen_config: LLMQueryModel):
       f"Prompt must be less than {PAYLOAD_FILE_SIZE}")
 
   try:
-    user_query = UserQuery.find_by_id(user_queryid)
-    query_engine = user_query.query_engine
+    user_query = UserQuery.find_by_id(user_query_id)
+    q_engine = QueryEngine.find_by_id(user_query.query_engine_id)
 
-    query_result, query_references = await query_generate(prompt, query_engine)
+    query_result, query_references = await query_generate(user_id, prompt, q_engine)
 
     return {
         "success": True,
