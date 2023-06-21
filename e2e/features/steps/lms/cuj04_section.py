@@ -5,7 +5,6 @@ import datetime
 from datetime import timedelta
 from common.models import Section
 from testing_objects.test_config import API_URL,e2e_google_form_id,e2e_drive_folder_id
-from testing_objects.course_template import emails
 from e2e.gke_api_tests.secrets_helper import (get_student_email_and_token,
   get_workspace_student_email_and_token,create_coursework_submission,
 list_coursework_submission_user)
@@ -368,7 +367,7 @@ def step_impl_48(context):
 )
 def step_impl_49(context):
   context.url = f'{API_URL}/sections/{context.sections.id}/teachers'
-  context.payload = {"email":emails["teacher"]}
+  context.payload = {"email":get_workspace_student_email_and_token()["email"]}
 
 
 @behave.when(
