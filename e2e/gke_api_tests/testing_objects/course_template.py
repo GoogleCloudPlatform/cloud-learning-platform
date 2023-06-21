@@ -1,6 +1,6 @@
 import os
 import uuid
-from secrets_helper import get_required_emails_from_secret_manager
+from e2e.gke_api_tests.secrets_helper import get_required_emails_from_secret_manager
 
 DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 emails = get_required_emails_from_secret_manager()

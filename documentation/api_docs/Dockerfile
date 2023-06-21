@@ -1,13 +1,15 @@
-FROM node:alpine
+FROM node:16.17.0-alpine as builder
+ARG API_DOMAIN
+ARG FIREBASE_API_KEY
+ARG FIREBASE_AUTH_DOMAIN
+ARG PROJECT_ID
 
 WORKDIR /opt
-
-COPY ./package.json ./
-
-RUN npm install --legacy-peer-deps
-
 COPY . .
+RUN npm install --legacy-peer-deps
+RUN npm run build
 
-EXPOSE 8888
-
-ENTRYPOINT ["npm", "run", "serve", "--", "--port", "8888", "--host", "0.0.0.0"]
+FROM nginx:1.21.1-alpine
+RUN rm -rf /usr/share/nginx/html/* && rm -rf /etc/nginx/nginx.conf
+COPY --from=builder /opt/nginx.conf /etc/nginx/nginx.conf
+COPY --from=builder /opt/build /usr/share/nginx/html/docs

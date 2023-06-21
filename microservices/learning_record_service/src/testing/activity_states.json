@@ -1,0 +1,17 @@
+[
+  {
+    "agent_id": "agent_id_1",
+    "activity_id": "activity_id_1",
+    "canonical_data": {}
+  },
+  {
+    "agent_id": "agent_id_2",
+    "activity_id": "activity_id_2",
+    "canonical_data": {}
+  },
+  {
+    "agent_id": "agent_id_3",
+    "activity_id": "activity_id_3",
+    "canonical_data": {}
+  }
+]

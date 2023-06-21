@@ -1,5 +1,30 @@
 [
     {
+        "spec": "/authentication/api/v1/openapi.json",
+        "route": "/authentication/api/v1/redoc",
+        "label": "Authentication Service"
+    },
+    {
+        "spec": "/user-management/api/v1/openapi.json",
+        "route": "/user-management/api/v1/redoc",
+        "label": "User Management"
+    },
+    {
+        "spec": "/learner-profile-service/api/v1/openapi.json",
+        "route": "/learner-profile-service/api/v1/redoc",
+        "label": "Student Learner Profile"
+    },
+    {
+        "spec": "/learning-object-service/api/v1/openapi.json",
+        "route": "/learning-object-service/api/v1/redoc",
+        "label": "Learning Object Service"
+    },
+    {
+        "spec": "/learning-record-service/api/v1/openapi.json",
+        "route": "/learning-record-service/api/v1/redoc",
+        "label": "Learning Record Service"
+    },
+    {
         "spec": "/llm-service/api/v1/openapi.json",
         "route": "/llm-service/api/v1/redoc",
         "label": "LLM Service"

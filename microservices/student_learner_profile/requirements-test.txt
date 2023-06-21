@@ -1,0 +1,10 @@
+mock==5.0.2
+redis==4.5.4
+pytest==7.3.1
+Faker==18.8.0
+pylint==2.15.10
+protobuf==3.19.5
+google-cloud-core==1.7.3
+google-cloud-logging==3.1.2
+backports.unittest-mock==1.5
+regex==2022.10.31
