@@ -137,8 +137,13 @@ def get_workspace_student_email_and_token():
         dict: returns a dict which contains student email and token
     """
   client = secretmanager.SecretManagerServiceClient()
-  student_email_secret_id = "lms-service-user"
-  student_token_secret_id = "lms_user_student_token"
+  users_dict = {
+    "org-test-user-3-username" : "org-test-user-3-student-token",
+    "org-test-user-4-username" : "org-test-user-4-student-token"
+  }
+  student_email_secret_id = random.choice(list(users_dict.keys()))
+  student_token_secret_id = users_dict.get(student_email_secret_id)
+  print(f"----------------------{student_email_secret_id}:{student_token_secret_id}-----------------")
   student_email_name = f"projects/{PROJECT_ID}/secrets/{student_email_secret_id}/versions/latest"
   student_token_name = f"projects/{PROJECT_ID}/secrets/{student_token_secret_id}/versions/latest"
   student_email_response = client.access_secret_version(
@@ -153,11 +158,10 @@ def get_workspace_student_email_and_token():
     if creds and creds.expired and creds.refresh_token:
       creds.refresh(Request())
       credentials_dict = json.loads(creds.to_json())
-  data = {
+  return {
       "email": student_email_response.payload.data.decode("UTF-8"),
       "access_token": credentials_dict["token"]
   }
-  return data
 
 def get_user_email_and_password_for_e2e():
   client = secretmanager.SecretManagerServiceClient()
