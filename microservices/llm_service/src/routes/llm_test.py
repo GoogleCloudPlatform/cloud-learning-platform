@@ -63,10 +63,8 @@ app.include_router(router, prefix="/llm-service/api/v1")
 
 FAKE_GENERATE_PARAMS = {
     "llm_type": "LLM Test",
-    "prompt": {
-        "HumanInput": "test prompt"
-    }
-}
+    "prompt": "test prompt"
+  }
 
 FAKE_GENERATE_RESPONSE = "test generation"
 
