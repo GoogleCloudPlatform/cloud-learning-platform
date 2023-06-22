@@ -248,7 +248,7 @@ jobs:
     
     - name: Run behave
       run: |
-        PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m behave e2e/features/ --tags=~@test --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode --tags=~@inspace
+        PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m behave e2e/features/ --tags=~@test --tags=~@auth-api --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode --tags=~@inspace
 
   dataset-cleanup:
     runs-on: ubuntu-latest
