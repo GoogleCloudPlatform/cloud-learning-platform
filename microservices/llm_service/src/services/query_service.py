@@ -193,7 +193,10 @@ def query_engine_build(doc_url: str, query_engine: str, user_id: str,
     build_doc_index(doc_url, query_engine)
   except Exception as e:
     # delete query engine model if build unsuccessful
-    q_engine.delete()
+    QueryEngine.collection.delete(q_engine.id)
+    # TODO
+    #QueryDocument.collection.delete()
+    #QueryDocumentChunk.collection.delete()
     raise InternalServerError(e) from e
 
   return q_engine
@@ -360,11 +363,11 @@ def _process_documents(doc_url: str, bucket_name: str,
                                 index_end = new_index_base)
       query_doc.save()
 
-      for i in range(index_base, new_index_base):
+      for i in range(0, len(text_chunks)):
         query_doc_chunk = QueryDocumentChunk(
                                   query_engine_id = q_engine.id,
                                   query_document_id = query_doc.id,
-                                  index = i,
+                                  index = i + index_base,
                                   text = text_chunks[i])
         query_doc_chunk.save()
 
@@ -410,10 +413,10 @@ def _read_doc(doc_name:str, doc_filepath: str) -> List[str]:
     with open(doc_filepath, "rb") as f:
       reader = PdfReader(f)
       num_pages = len(reader.pages)
-      Logger.info("Reading pdf file {doc_name} with {num_pages} pages")
+      Logger.info(f"Reading pdf file {doc_name} with {num_pages} pages")
       for page in range(num_pages):
         doc_text_list.append(reader.pages[page].extract_text())
-      Logger.info("Finished reading pdf file {doc_name}")
+      Logger.info(f"Finished reading pdf file {doc_name}")
   else:
     # return None if doc type not supported
     pass
