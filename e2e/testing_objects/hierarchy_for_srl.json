@@ -1,0 +1,139 @@
+{
+    "curriculum_pathways":{
+      "name": "Level Up Program",
+      "display_name": "Level Up Program",
+      "description": "Level Up Program Pathway",
+      "alias": "program",
+      "type": "pathway",
+      "parent_nodes":{
+        "learning_opportunities":[],
+        "curriculum_pathways":[]
+      },
+      "child_nodes": {
+        "curriculum_pathways": [
+          {
+            "name": "Level 1",
+            "display_name": "Level 1",
+            "description": "",
+            "order": 1,
+            "alias": "level",
+            "type": "pathway",
+            "achievements": [],
+            "child_nodes": {
+                "curriculum_pathways": [
+                  {
+                    "name": "Discipline 1",
+                    "display_name": "Discipline 1",
+                    "description": "",
+                    "order": 1,
+                    "alias": "discipline",
+                    "type": "pathway",
+                    "achievements": [],
+                    "child_nodes": {
+                        "curriculum_pathways": [
+                          {
+                            "name": "Unit 1",
+                            "display_name": "Unit 1",
+                            "description": "",
+                            "order": 1,
+                            "alias": "unit",
+                            "type": "pathway",
+                            "achievements": [],
+                            "child_nodes": {
+                                "curriculum_pathways": [],
+                                "learning_experiences": [
+                                  {
+                                    "description": "Experience 1",
+                                    "display_name": "Experience 1",
+                                    "name": "Experience 1",
+                                    "order": 1,
+                                    "alias": "learning_experience",
+                                    "type": "learning_experience",
+                                    "srl_resource_path": "",
+                                    "resource_path": "",
+                                    "metadata": {},
+                                    "child_nodes": {
+                                      "learning_objects": [
+                                        {
+                                          "description": "srl module 1",
+                                          "display_name": "srl module 1",
+                                          "name": "srl module 1",
+                                          "order": 1,
+                                          "type": "srl",
+                                          "alias": "module",
+                                          "is_optional": true,
+                                          "references": {
+                                            "skills": []
+                                          },
+                                          "child_nodes": {
+                                            "learning_resources": [
+                                              {
+                                                "name": "slr resource 1",
+                                                "display_name": "srl resource 1",
+                                                "type": "html",
+                                                "alias": "lesson",
+                                                "resource_path": "",
+                                                "duration": 15,
+                                                "order": 1,
+                                                "child_nodes": {}
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "description": "Experience 2",
+                                    "display_name": "Experience 2",
+                                    "name": "Experience 2",
+                                    "order": 1,
+                                    "alias": "learning_experience",
+                                    "srl_resource_path": "",
+                                    "resource_path": "",
+                                    "metadata": {},
+                                    "child_nodes": {
+                                      "learning_objects": [
+                                        {
+                                          "description": "srl module 2",
+                                          "display_name": "srl module 2",
+                                          "name": "srl module 2",
+                                          "order": 1,
+                                          "type": "srl",
+                                          "alias": "module",
+                                          "is_optional": true,
+                                          "references": {
+                                            "skills": []
+                                          },
+                                          "child_nodes": {
+                                            "learning_resources": [
+                                              {
+                                                "name": "srl resource 2",
+                                                "display_name": "srl resource 2",
+                                                "type": "html",
+                                                "alias": "lesson",
+                                                "resource_path": "",
+                                                "duration": 15,
+                                                "order": 1,
+                                                "child_nodes": {}
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            
+                          }
+                        ]
+                      }
+                  }
+                ]
+            }
+          }
+        ]
+      }
+    }
+}

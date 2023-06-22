@@ -1,0 +1,4 @@
+subject_code,level,id,name,description,course_code,course_title,aligned_domain,aligned_sub_domain,aligned_category,major_occupation,minor_occupation,broad_occupation,detailed_occupation,onet_alignment,standard_alignment,credential_alignment,aligned_competency,organization_alignment
+ENG,1,ENG-10001,Select Information,Select relevant and authoritative information to fulfill an information need,SNHU-107,Success Strategies for Online Learning,"General Education, Healthcare","AA.GST, AA.HMA","AA.GST.CFA, AA.HMA.CFA",,,,,,,,,
+COM,1,COM-10002,Present Information,Present information in a variety of professional formats,SNHU-107,Success Strategies for Online Learning,"General Education, Healthcare","AA.GST, AA.HMA","AA.GST.CFA, AA.HMA.CFA",,,,,,,,,
+

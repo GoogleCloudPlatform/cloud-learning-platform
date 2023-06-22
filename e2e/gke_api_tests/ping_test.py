@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import requests
-from endpoint_proxy import get_baseurl
+from e2e.gke_api_tests.endpoint_proxy import get_baseurl
 from common.utils.errors import ResourceNotFoundException
 
 def test_api_ping():

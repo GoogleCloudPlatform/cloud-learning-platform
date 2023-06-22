@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: batch-job
+subjects:
+- kind: ServiceAccount
+  name: ksa # Name of the ServiceAccount
+roleRef:
+  kind: Role # This must be Role or ClusterRole
+  name: batch-job # This must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io

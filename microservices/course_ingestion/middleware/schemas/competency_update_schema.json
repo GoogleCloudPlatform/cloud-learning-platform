@@ -1,0 +1,36 @@
+{ 
+    "$schema":"http://json-schema.org/draft-04/schema#",
+    "title":"Schema for updating Competency",
+    "type":"object",
+    "properties":{ 
+        "title":{ 
+            "type":"string",
+            "minLength":1,
+            "maxLength":1000
+        },
+        "description":{ 
+            "type":"string",
+            "minLength":0,
+            "maxLength":10000
+        },
+        "label":{ 
+            "type":"string",
+            "minLength":0,
+            "maxLength":10000
+        },
+        "is_valid":{
+            "type":"boolean"
+        },
+        "created_by":{ 
+            "type":"string",
+            "minLength":0,
+            "maxLength":1000
+        },
+        "last_modified_by":{ 
+            "type":"string",
+            "minLength":0,
+            "maxLength":1000
+        }
+        
+    }
+}
