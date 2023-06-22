@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: item-response-theory
+spec:
+  template:
+    spec:
+      containers:
+      - name: item-response-theory
+        image: gcr.io/aitutor-dev/item-response-theory
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "1000Mi"
+

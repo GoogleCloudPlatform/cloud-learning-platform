@@ -16,7 +16,8 @@ describe('ShowMoreComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ShowMoreComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    component.descText = "Dscripton Text"
+    fixture.detectChanges()
   });
 
   it('should create', () => {
