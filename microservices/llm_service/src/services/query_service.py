@@ -524,7 +524,7 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
     ]
 
     # Create output file
-    doc_stem = Path(f"doc_name_{index_base}").stem
+    doc_stem = Path(f"{doc_name}_{index_base}").stem
     chunk_path = embeddings_dir.joinpath(f"{doc_stem}_index.json")
 
     # write embeddings for chunk to file
