@@ -2,7 +2,7 @@ import sys
 sys.path.append("microservices/llm_service/src")
 sys.path.append("common/src")
 import logging
-logging.basicConfig(level=logging.INFO, stream=sys.error)
+logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 
 from services.query_service import query_engine_build
 
