@@ -57,9 +57,6 @@ requires:
 - path: ./microservices/update_invitations_cronjob
   configs: [update-invitations-cronjob]
 
-- path: .microservices/credential_pathway_service
-  configs: [credential-pathway-service]
-
 # Migrated microservices from ailearning-backend
 - path: ./microservices/item_response_theory
   configs: [item-response-theory]
