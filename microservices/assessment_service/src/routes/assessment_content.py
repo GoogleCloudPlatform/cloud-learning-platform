@@ -44,7 +44,6 @@ from typing import Optional
 # pylint: disable = line-too-long
 # pylint: disable = broad-except
 router = APIRouter(tags=["Content Serving"], responses=ERROR_RESPONSES)
-
 contentValidator = ContentValidator()
 fileHandler = FileUtils()
 
