@@ -1,3 +1,4 @@
+grpcio==1.47.0
 fireo==1.6.2
 google-cloud-logging==3.5.0
 google-cloud-secret-manager==2.16.1
