@@ -44,6 +44,9 @@ from services import query_prompts
 
 from config import PROJECT_ID, DEFAULT_QUERY_CHAT_MODEL, REGION
 
+# number of text chunks to process into a file
+NUM_TEXT_CHUNK_PROCESS = 100
+
 # number of document match results to retrieve
 NUM_MATCH_RESULTS = 5
 
@@ -478,42 +481,59 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
                          index_base: int) -> Tuple[int, str]:
   """ generate matching engine index data files in a local directory """
 
-  doc_stem = Path(doc_name).stem
+  chunk_index = 0
+  num_chunks = len(text_chunks)
 
-  # generate an np array of chunk IDs starting from index base
-  ids = np.arange(index_base, index_base + len(text_chunks))
+  # create a list of chunks to process
+  while (chunk_index < num_chunks):
+    remaining_chunks = num_chunks - chunk_index
+    chunk_size = max(NUM_TEXT_CHUNK_PROCESS, remaining_chunks)
+    end_chunk_index = chunk_index + chunk_size
+    process_chunks = text_chunks[chunk_index:end_chunk_index]
+  
+    Logger.info(f"processing {chunk_size} chunks for file {doc_name} remaining chunks {remaining_chunks}")
+  
+    # generate an np array of chunk IDs starting from index base
+    ids = np.arange(index_base, index_base + len(process_chunks))
 
-  # Create temporary folder to write embeddings to
-  embeddings_dir = Path(tempfile.mkdtemp())
+    # Create temporary folder to write embeddings to
+    embeddings_dir = Path(tempfile.mkdtemp())
 
-  # Convert chunks to embeddings in batches, to manage API throttling
-  is_successful, chunk_embeddings = _get_embedding_batched(
-      text_chunks=text_chunks,
-      api_calls_per_second=API_CALLS_PER_SECOND,
-      batch_size=ITEMS_PER_REQUEST,
-  )
-  # create JSON
-  embeddings_formatted = [
-    json.dumps(
-      {
-        "id": str(idx),
-        "embedding": [str(value) for value in embedding],
-      }
+    # Convert chunks to embeddings in batches, to manage API throttling
+    is_successful, chunk_embeddings = _get_embedding_batched(
+        text_chunks=process_chunks,
+        api_calls_per_second=API_CALLS_PER_SECOND,
+        batch_size=ITEMS_PER_REQUEST,
     )
-    + "\n"
-    for idx, embedding in zip(ids[is_successful], chunk_embeddings)
-  ]
 
-  # Create output file
-  chunk_path = embeddings_dir.joinpath(f"{doc_stem}_index.json")
+    Logger.info(f"generated embeddings for chunks {chunk_index} to {end_chunk_index}")
+    
+    # create JSON
+    embeddings_formatted = [
+      json.dumps(
+        {
+          "id": str(idx),
+          "embedding": [str(value) for value in embedding],
+        }
+      )
+      + "\n"
+      for idx, embedding in zip(ids[is_successful], chunk_embeddings)
+    ]
 
-  # write embeddings for chunk to file
-  with open(chunk_path, "w", encoding="utf-8") as f:
-    f.writelines(embeddings_formatted)
+    # Create output file
+    doc_stem = Path(f"doc_name_{index_base}").stem
+    chunk_path = embeddings_dir.joinpath(f"{doc_stem}_index.json")
 
-  # clean up any large data structures
-  gc.collect()
+    # write embeddings for chunk to file
+    with open(chunk_path, "w", encoding="utf-8") as f:
+      f.writelines(embeddings_formatted)
 
-  index_base = index_base + len(text_chunks)
+    Logger.info(f"wrote embeddings file for chunks {chunk_index} to {end_chunk_index}")
+    
+    # clean up any large data structures
+    gc.collect()
+
+    index_base = index_base + len(process_chunks)
+    chunk_index = chunk_index + len(process_chunks)
 
   return index_base, embeddings_dir

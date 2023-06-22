@@ -13,3 +13,4 @@ shapely==1.8.5.post1
 google-cloud-aiplatform==1.25.0
 cohere==4.1.4
 PyPDF2==3.0.1
+numpy==1.25.0
