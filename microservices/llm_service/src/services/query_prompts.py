@@ -21,8 +21,6 @@ from services.query_prompt_config import QUESTION_PROMPT
 def question_prompt(prompt: str, query_context: List[dict]) -> str:
   """ Create question prompt with context for LLM """
   context_list = [ref["document_text"] for ref in query_context]
-  text_context = context_list.join("\n\n")
-  question = QUESTION_PROMPT.format(
-      {"question": prompt, "context": text_context}
-  )
+  text_context = "\n\n".join(context_list)
+  question = QUESTION_PROMPT.format(question=prompt, context=text_context)
   return question

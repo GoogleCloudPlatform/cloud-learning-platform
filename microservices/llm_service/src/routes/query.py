@@ -127,7 +127,7 @@ async def query(query_engine_id: str,
     return PayloadTooLargeError(
       f"Prompt must be less than {PAYLOAD_FILE_SIZE}")
 
-  q_engine = QueryEngine.get_by_id(query_engine_id)
+  q_engine = QueryEngine.find_by_id(query_engine_id)
 
   user_id = user_data.get("user_id")
 

@@ -75,8 +75,7 @@ async def llm_chat(prompt: str, llm_type: str) -> str:
     the text result
   """
   Logger.info(f"generating chat with llm_type {llm_type}")
-  llm = CHAT_LLM_TYPES.get(llm_type)
-  if llm is None:
+  if not llm_type in CHAT_LLM_TYPES:
     raise ResourceNotFoundException(f"Cannot find chat llm type '{llm_type}'")
 
   try:

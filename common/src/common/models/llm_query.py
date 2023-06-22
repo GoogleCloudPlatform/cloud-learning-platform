@@ -82,7 +82,7 @@ class QueryEngine(BaseModel):
   """
   id = IDField()
   name = TextField(required=True)
-  llm_type: TextField(required=True)
+  llm_type = TextField(required=True)
   created_by = TextField(required=True)
   is_public = BooleanField(default=False)
   index_id = TextField(required=False)

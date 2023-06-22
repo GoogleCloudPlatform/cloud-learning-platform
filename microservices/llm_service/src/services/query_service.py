@@ -129,12 +129,12 @@ async def _query_doc_matches(q_engine: QueryEngine,
   from matching documents.
   """
   # generate embeddings for prompt
-  query_embeddings = _encode_texts_to_embeddings(query_prompt)
+  query_embeddings = _encode_texts_to_embeddings([query_prompt])
 
   # retrieve text matches for query
   index_endpoint = aiplatform.MatchingEngineIndexEndpoint(q_engine.endpoint)
 
-  match_indexes = index_endpoint.find_neighbors(
+  match_indexes_list = index_endpoint.find_neighbors(
       queries=query_embeddings,
       deployed_index_id=q_engine.deployed_index_name,
       num_neighbors=NUM_MATCH_RESULTS
@@ -142,12 +142,19 @@ async def _query_doc_matches(q_engine: QueryEngine,
 
   # assemble document chunk matches from match indexes
   query_references = []
-  for match_index in match_indexes:
-    doc_chunk = QueryDocumentChunk.find_by_index(q_engine.id, match_index)
+  match_indexes = match_indexes_list[0]
+  for match in match_indexes:
+    doc_chunk = QueryDocumentChunk.find_by_index(q_engine.id, int(match.id))
+    if doc_chunk is None:
+      raise ResourceNotFoundException(
+        f"Missing doc chunk match index {match.id} q_engine {q_engine.name}")
     query_doc = QueryDocument.find_by_id(doc_chunk.query_document_id)
+    if query_doc is None:
+      raise ResourceNotFoundException(
+        f"Query doc {doc_chunk.query_document_id} q_engine {q_engine.name}")
     query_ref = {
       "document_id": query_doc.id,
-      "document_url": query_doc.document_url,
+      "document_url": query_doc.doc_url,
       "document_text": doc_chunk.text,
       "chunk_id": doc_chunk.id
     }
