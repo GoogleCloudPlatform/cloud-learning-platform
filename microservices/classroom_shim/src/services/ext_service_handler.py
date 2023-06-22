@@ -104,7 +104,7 @@ def get_section_details(context_id):
   section_res = get_method(url=get_section_url, use_bot_account=True)
 
   if section_res.status_code == 200:
-    context_data = section_res.json()
+    context_data = section_res.json().get("data")
     context_data["description"] = context_data["section"]
     context_data["context_type"] = "section"
     return context_data
