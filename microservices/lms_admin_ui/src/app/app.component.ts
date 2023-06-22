@@ -13,7 +13,7 @@ export class AppComponent {
     this.router.events.subscribe(
       (event: NavigationEvent) => {
         if (event instanceof NavigationEnd) {
-          if (event.url == '/login') {
+          if (event.url == '/login' || event.url == '/login/e2e') {
             this.showTopNav = false
           }
           else {

@@ -1,0 +1,356 @@
+paths:
+  /ping:
+    get:
+      summary: Health Check
+      operationId: health_check_ping_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+        - api_key: []
+
+  /deep_knowledge_tracing/api/v1/fake_data/:
+    get:
+      tags:
+        - Student Mastery - Deep Knowledge Tracing
+      summary: Test Fake Data
+      operationId: test_fake_data_deep_knowledge_tracing_api_v1_fake_data__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+        - api_key: []
+  
+    post:
+      tags:
+        - Student Mastery - Deep Knowledge Tracing
+      summary: Create Fake Data
+      operationId: create_fake_data_deep_knowledge_tracing_api_v1_fake_data__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDataDKTRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDataDKTResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - api_key: []
+
+  /deep_knowledge_tracing/api/v1/train/:
+    post:
+      tags:
+        - Student Mastery - Deep Knowledge Tracing
+      summary: Train Dkt
+      description: Starts training DKT model for a given course
+      operationId: train_dkt_deep_knowledge_tracing_api_v1_train__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrainDKTRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainDKTResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - api_key: []
+
+  /deep_knowledge_tracing/api/v1/predict/:
+    post:
+      tags:
+        - Student Mastery - Deep Knowledge Tracing
+      summary: Predict Dkt
+      operationId: predict_dkt_deep_knowledge_tracing_api_v1_predict__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PredictDKTRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PredictDKTResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - api_key: []
+
+  /deep_knowledge_tracing/api/v1/jobs/{job_name}:
+    get:
+      tags:
+        - Job Status - Deep Knowledge Tracing
+      summary: Get Job Status
+      description: Return Job Status
+      operationId: get_job_status_deep_knowledge_tracing_api_v1_jobs__job_name__get
+      parameters:
+        - required: true
+          schema:
+            title: Job Name
+            type: string
+          name: job_name
+          in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - api_key: []
+
+    put:
+      tags:
+        - Job Status - Deep Knowledge Tracing
+      summary: Update State And Remove Job Route
+      description: Return Job Status
+      operationId: update_state_and_remove_job_route_deep_knowledge_tracing_api_v1_jobs__job_name__put
+      parameters:
+        - required: true
+          schema:
+            title: Job Name
+            type: string
+          name: job_name
+          in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+       - api_key: []
+
+    delete:
+      tags:
+        - Job Status - Deep Knowledge Tracing
+      summary: Delete Batch Job Route
+      description: Return Job Status
+      operationId: delete_batch_job_route_deep_knowledge_tracing_api_v1_jobs__job_name__delete
+      parameters:
+        - required: true
+          schema:
+            title: Job Name
+            type: string
+          name: job_name
+          in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - api_key: []
+
+  /deep_knowledge_tracing/api/v1/jobs/:
+    get:
+      tags:
+        - Job Status - Deep Knowledge Tracing
+      summary: Get All Job Status
+      description: Return all Job Status
+      operationId: get_all_job_status_deep_knowledge_tracing_api_v1_jobs__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+        - api_key: []
+
+components:
+  securitySchemes:
+    api_key:
+      type: "apiKey"
+      name: "key"
+      in: "query"
+  schemas:
+    CreateDataDKTRequest:
+      title: CreateDataDKTRequest
+      required:
+        - num_users
+        - num_lus
+      type: object
+      properties:
+        num_users:
+          title: Num Users
+          type: integer
+        num_lus:
+          title: Num Lus
+          type: integer
+        item_type:
+          title: Item Type
+          type: string
+          default: ctf
+      example:
+        num_users: 50
+        num_lus: 10
+        item_type: ctf
+    CreateDataDKTResponse:
+      title: CreateDataDKTResponse
+      required:
+        - success
+        - message
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+        message:
+          title: Message
+          type: string
+      example:
+        success: true
+        message: Successfully created the fake data
+    HTTPValidationError:
+      title: HTTPValidationError
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+    PredictDKTRequest:
+      title: PredictDKTRequest
+      required:
+        - course_id
+        - user_id
+        - session_id
+      type: object
+      properties:
+        course_id:
+          title: Course Id
+          type: string
+        user_id:
+          title: User Id
+          type: string
+        session_id:
+          title: Session Id
+          type: string
+      example:
+        course_id: sample_course_id
+        user_id: sample_user_id
+        session_id: sample_session_id
+    PredictDKTResponse:
+      title: PredictDKTResponse
+      required:
+        - success
+        - message
+        - data
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+        message:
+          title: Message
+          type: string
+        data:
+          title: Data
+          type: object
+          additionalProperties:
+            type: number
+      example:
+        success: true
+        message: Successfully generated predictions from dkt model
+        data:
+          sample_lu_id: 0.91
+    TrainDKTRequest:
+      title: TrainDKTRequest
+      type: object
+      properties:
+        course_id:
+          title: Course Id
+          type: string
+      example:
+        course_id: sample_course_id
+    TrainDKTResponse:
+      title: TrainDKTResponse
+      required:
+        - success
+        - message
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+        message:
+          title: Message
+          type: string
+      example:
+        success: true
+        message: Successfully trained dkt model
+    ValidationError:
+      title: ValidationError
+      required:
+        - loc
+        - msg
+        - type
+      type: object
+      properties:
+        loc:
+          title: Location
+          type: array
+          items:
+            type: string
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string

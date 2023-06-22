@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { BreadcrumComponent } from './breadcrum.component';
+import {} from 'jasmine';
+import { By } from '@angular/platform-browser';
 
 describe('BreadcrumComponent', () => {
   let component: BreadcrumComponent;
@@ -22,4 +23,11 @@ describe('BreadcrumComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('Should have home breadcrumb', () =>{ 
+    const breadcrumbText = 'Home /'
+    fixture.detectChanges();
+    const span = fixture.debugElement.query(By.css('.text'));
+    expect(span.nativeElement.textContent.trim()).toBe(breadcrumbText)
+  })
 });

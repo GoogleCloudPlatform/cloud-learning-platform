@@ -1,0 +1,8 @@
+kustomize
+skaffold.yaml
+cloudbuild.yaml
+Dockerfile
+README.md
+.coveragerc
+.pytest_cache
+__pycache__
