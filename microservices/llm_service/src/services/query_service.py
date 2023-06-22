@@ -44,8 +44,8 @@ from services import query_prompts
 
 from config import PROJECT_ID, DEFAULT_QUERY_CHAT_MODEL, REGION
 
-# number of text chunks to process into a file
-NUM_TEXT_CHUNK_PROCESS = 100
+# number of text chunks to process into an embeddings file
+MAX_NUM_TEXT_CHUNK_PROCESS = 1000
 
 # number of document match results to retrieve
 NUM_MATCH_RESULTS = 5
@@ -490,7 +490,7 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
   # create a list of chunks to process
   while (chunk_index < num_chunks):
     remaining_chunks = num_chunks - chunk_index
-    chunk_size = max(NUM_TEXT_CHUNK_PROCESS, remaining_chunks)
+    chunk_size = min(MAX_NUM_TEXT_CHUNK_PROCESS, remaining_chunks)
     end_chunk_index = chunk_index + chunk_size
     process_chunks = text_chunks[chunk_index:end_chunk_index]
   
