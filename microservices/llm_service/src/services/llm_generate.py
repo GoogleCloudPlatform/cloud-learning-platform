@@ -80,11 +80,11 @@ async def llm_chat(prompt: str, llm_type: str) -> str:
 
   try:
     if llm_type in LANGCHAIN_LLM.keys():
-      result = langchain_llm_generate(prompt, llm_type)
+      result = await langchain_llm_generate(prompt, llm_type)
     elif llm_type in GOOGLE_LLM.keys():
       google_llm = GOOGLE_LLM.get(llm_type)
       is_chat = True
-      result = google_llm_predict(prompt, is_chat, google_llm)
+      result = await google_llm_predict(prompt, is_chat, google_llm)
     return result
   except Exception as e:
     raise InternalServerError(str(e)) from e

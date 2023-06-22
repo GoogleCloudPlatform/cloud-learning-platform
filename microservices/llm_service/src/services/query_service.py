@@ -117,7 +117,7 @@ async def query_generate(
     user_query = UserQuery(user_id=user_id,
                            query_engine_id=q_engine.id)
     user_query.save()
-  user_query.update_history(prompt, question_response)
+  user_query.update_history(prompt, question_response, query_references)
 
   return query_result, query_references
 

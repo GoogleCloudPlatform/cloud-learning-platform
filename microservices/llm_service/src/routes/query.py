@@ -132,14 +132,15 @@ async def query(query_engine_id: str,
   user_id = user_data.get("user_id")
 
   try:
-    query_result, query_references = await query_generate(user_id, prompt, q_engine)
-
+    query_result, query_references = await query_generate(user_id, prompt, q_engine)    
+    query_result_data = query_result.get_fields(reformat_datetime=True)
+    
     return {
         "success": True,
         "message": "Successfully generated text",
         "data": {
-            "query_result": str(query_result),
-            "query_references": str(query_references)
+            "query_result": query_result_data,
+            "query_references": query_references
         }
     }
   except Exception as e:

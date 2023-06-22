@@ -126,7 +126,7 @@ class LLMQueryResponse(BaseModel):
   """LLM Query Response model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully performed query"
-  data: Optional[str] = ""
+  data: Optional[dict] = {}
 
   class Config():
     orm_mode = True
