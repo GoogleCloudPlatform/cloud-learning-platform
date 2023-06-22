@@ -96,7 +96,7 @@ def invite_user(course_id, email, role):
   Returns:
       dict: response from create invitation method
   """
-  service = build("classroom", "v1", credentials=get_creds())
+  service = build("classroom", "v1", credentials=get_creds(True))
   body = {"courseId": course_id, "role": role, "userId": email}
   invitation = service.invitations().create(body=body).execute()
   return invitation
