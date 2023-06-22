@@ -70,6 +70,9 @@ requires:
 - path: ./microservices/course_ingestion
   configs: [course-ingestion]
 
+- path: ./microservices/utils
+  configs: [utils]
+
 # TODO: Activate when all services from ailearning-backend have been moved
 - path: ./microservices/student_learner_profile
   configs: [student-learner-profile]
