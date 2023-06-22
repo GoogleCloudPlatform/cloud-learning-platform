@@ -102,7 +102,7 @@ async def query_engine_create(gen_config: LLMQueryEngineModel,
 
 
 @router.post(
-    "/{query_engine_id}",
+    "/engine/{query_engine_id}",
     name="Make a query to a query engine",
     response_model=LLMQueryResponse)
 async def query(query_engine_id: str,
@@ -148,7 +148,7 @@ async def query(query_engine_id: str,
 
 
 @router.post(
-    "/user/{user_query_id}",
+    "/{user_query_id}",
     name="Make a query to a query engine based on a prior user query",
     response_model=LLMQueryEngineResponse)
 async def query_continue(user_query_id: str, gen_config: LLMQueryModel):
