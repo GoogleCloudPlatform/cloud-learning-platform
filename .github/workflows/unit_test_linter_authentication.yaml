@@ -20,8 +20,7 @@ on:
   pull_request:
     branches: [ "main" ]
     paths:
-      # TODO: Add all microservice folders below.
-      - 'microservices/**'
+      - 'microservices/authentication/**'
       - 'common/**'
       - '.github/workflows/unit_test_linter_lti.yaml'
       - '.pylintrc'
@@ -40,7 +39,6 @@ jobs:
       matrix:
         python-version: [3.9]
         target-folder: [
-          # TODO: Add all microservice folders below.
           microservices/authentication,
         ]
     steps:
