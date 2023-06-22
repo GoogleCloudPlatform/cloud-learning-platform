@@ -18,7 +18,7 @@ spec:
               cpu: "200m"
         env:
           - name: GCP_LEARNING_RESOURCE_BUCKET
-            value: aitutor-dev
+            value: core-learning-services-dev
           - name: DATABASE_PREFIX
             valueFrom:
               configMapKeyRef:
