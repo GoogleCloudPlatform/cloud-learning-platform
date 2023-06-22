@@ -70,7 +70,7 @@ requires:
 - path: ./microservices/course_ingestion
   configs: [course-ingestion]
 
-- path: .microservices/credential_pathway_service
+- path: ./microservices/credential_pathway_service
   configs: [credential-pathway-service]
 
 # TODO: Activate when all services from ailearning-backend have been moved
