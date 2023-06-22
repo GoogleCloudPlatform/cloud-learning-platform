@@ -5,11 +5,14 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest)
-from utils.request_handler import get_method
 from schemas.context_schema import ContextResponseModel, ContextMembersResponseModel
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
+from services.ext_service_handler import (get_instructional_designers,
+                                          get_teachers, get_students,
+                                          get_section_details,
+                                          get_course_template_details)
 # pylint: disable=line-too-long
 
 router = APIRouter(
@@ -44,32 +47,10 @@ def get_context_details(context_id: str):
         InternalServerErrorResponseModel: if the get Context raises an exception
     """
   try:
-    get_section_url = f"http://lms/lms/api/v1/sections/{context_id}"
-    section_res = get_method(url=get_section_url, use_bot_account=True)
+    context_data = get_section_details(context_id)
 
-    if section_res.status_code == 200:
-      context_data = section_res.json().get("data")
-      context_data["description"] = context_data["section"]
-      context_data["context_type"] = "section"
-
-    elif section_res.status_code == 404:
-      get_template_url = f"http://lms/lms/api/v1/course_templates/{context_id}"
-      template_res = get_method(url=get_template_url, use_bot_account=True)
-
-      if template_res.status_code == 200:
-        context_data = template_res.json()
-        context_data["context_type"] = "course_template"
-      else:
-        Logger.error(
-            f"Error 1110: Internal error from LMS course template API with \
-              Status code: {template_res.status_code}; Response: {template_res.text}"
-        )
-        raise Exception("Request failed with error code 1110")
-    else:
-      Logger.error(f"Error 1120:  Internal error from LMS section API with \
-            Status code: {section_res.status_code}; Response: {section_res.text}"
-                  )
-      raise Exception("Request failed with error code 1120")
+    if context_data is None:
+      context_data = get_course_template_details(context_id)
 
     return {
         "success": True,
@@ -111,50 +92,13 @@ def get_context_members(context_id: str, context_type: str):
 
     members_data = []
     if context_type == "course_template":
-      get_ids_url = f"http://lms/lms/api/v1/course_templates/{context_id}/instructional_designers"
-      get_ids_res = get_method(url=get_ids_url, use_bot_account=True)
-
-      if get_ids_res.status_code == 200:
-        members_data = get_ids_res.json().get("data")
-
-      else:
-        Logger.error(
-            f"Error 1130 response: Internal error from LMS get IDs API with \
-              Status code: {get_ids_res.status_code}; Response: {get_ids_res.text}"
-        )
-        raise Exception("Request failed with error code 1130")
+      members_data = get_instructional_designers(context_id)
 
     else:
-      get_teachers_members_url = f"http://lms/lms/api/v1/sections/{context_id}/teachers"
-
-      teachers_res = get_method(
-          url=get_teachers_members_url, use_bot_account=True)
-
-      if teachers_res.status_code == 200:
-        teachers_data = teachers_res.json().get("data")
-      else:
-        Logger.error(
-            f"Error 1140 response: Internal error from LMS get students API with \
-               Status code: {teachers_res.status_code}; Response: {teachers_res.text}"
-        )
-        raise Exception("Request failed with error code 1140")
-
+      teachers_data = get_teachers(context_id)
       members_data.extend(teachers_data)
 
-      get_student_members_url = f"http://lms/lms/api/v1/sections/{context_id}/students"
-
-      student_res = get_method(
-          url=get_student_members_url, use_bot_account=True)
-
-      if student_res.status_code == 200:
-        student_data = student_res.json().get("data")
-      else:
-        Logger.error(
-            f"Error 1150 response: Internal error from LMS get students API \
-              Status code: {student_res.status_code}; Response: {student_res.text}"
-        )
-        raise Exception("Request failed with error code 1150")
-
+      student_data = get_students(context_id)
       members_data.extend(student_data)
 
     return {
