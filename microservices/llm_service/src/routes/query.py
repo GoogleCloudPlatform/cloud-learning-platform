@@ -67,8 +67,7 @@ def get_engine_list():
     "/user/{user_id}",
     name="Get all Queries for a user",
     response_model=LLMUserAllQueriesResponse)
-def get_query_list(skip: int = 0, limit: int = 20,
-                  user_data: dict = Depends(validate_token)):
+def get_query_list(user_id: str, skip: int = 0, limit: int = 20):
   """
   Get user queries for authenticated user.  Query data does not include
   history to slim payload.  To retrieve query history use the
@@ -90,8 +89,13 @@ def get_query_list(skip: int = 0, limit: int = 20,
     if limit < 1:
       raise ValidationError("Invalid value passed to \"limit\" query parameter")
 
-    user = User.find_by_email(user_data.get("email"))
-    user_queries = UserQuery.find_by_user(user.user_id)
+    # TODO: RBAC check. This call allows the authenticated user to access
+    # other user queries
+    user = User.collection.filter("user_id", "==", user_id).get()
+    if user is None:
+      raise ResourceNotFoundException(f"User {user_id} not found ")
+
+    user_queries = UserQuery.find_by_user(user.user_id, skip=skip, limit=limit)
 
     query_list = []
     for i in user_queries:
@@ -250,10 +254,10 @@ async def query(query_engine_id: str,
 
   q_engine = QueryEngine.find_by_id(query_engine_id)
 
-  user_id = user_data.get("user_id")
+  user = User.find_by_email(user_data.get("email"))
 
   try:
-    query_result, query_references = await query_generate(user_id, prompt,
+    query_result, query_references = await query_generate(user.id, prompt,
                                                           q_engine)
     query_result_data = query_result.get_fields(reformat_datetime=True)
 
