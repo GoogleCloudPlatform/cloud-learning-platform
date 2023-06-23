@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard
+spec:
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: dashboard
+        image: gcr.io/core-learning-services-dev/dashboard
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+          limits:
+            memory: "500Mi"
+            cpu: "200m" 
+        env:
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX

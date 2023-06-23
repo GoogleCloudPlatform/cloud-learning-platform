@@ -70,6 +70,9 @@ requires:
 - path: ./microservices/learning_object_service
   configs: [learning-object-service]
 
+- path: ./microservices/dashboard
+  configs: [dashboard]
+
 - path: ./microservices/delete_sections_cronjob
   configs: [delete-sections-cronjob]
 
