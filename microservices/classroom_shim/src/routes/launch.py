@@ -1,10 +1,9 @@
-"""Tool Registration Endpoints"""
+"""Launch Endpoints"""
 import traceback
-import requests
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from config import ERROR_RESPONSES, API_DOMAIN, FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, PROJECT_ID, auth_client
+from config import ERROR_RESPONSES, API_DOMAIN, FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, PROJECT_ID
 from common.models import LTIAssignment
 from common.utils.auth_service import validate_token
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
@@ -12,6 +11,10 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError,
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
                                           BadRequest, Unauthenticated)
 from common.utils.logging_handler import Logger
+from services.ext_service_handler import (get_content_item, get_lti_tool,
+                                          get_instruction_designer_details,
+                                          get_student_details, get_user_details,
+                                          get_teacher_details)
 # pylint: disable=line-too-long, unused-variable, broad-exception-raised
 
 templates = Jinja2Templates(directory="templates")
@@ -32,23 +35,12 @@ def login(request: Request, lti_assignment_id: str):
     url = f"{API_DOMAIN}/classroom-shim/api/v1/launch-assignment?lti_assignment_id={lti_assignment_id}"
 
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
-    content_item_url = f"http://lti/lti/api/v1/content-item/{lti_assignment.lti_content_item_id}"
-    res = requests.get(
-        url=content_item_url,
-        headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
-        timeout=60)
-    data = res.json()
-    lti_content_item = data.get("data")
+    lti_content_item = get_content_item(lti_assignment.lti_content_item_id)
 
     content_item_info = lti_content_item.get("content_item_info")
     title = content_item_info.get("title")
     if title is None:
-      tool_url = f"http://lti/lti/api/v1/tool/{lti_assignment.tool_id}"
-      res = requests.get(
-          url=tool_url,
-          headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
-          timeout=60)
-      lti_tool = res.json().get("data")
+      lti_tool = get_lti_tool(lti_assignment.tool_id)
       title = lti_tool.get("name", "")
     return templates.TemplateResponse(
         "login.html", {
@@ -83,21 +75,13 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
   try:
     # verify user if it exists
     user_email = user_details.get("email")
-    headers = {"Authorization": f"Bearer {auth_client.get_id_token()}"}
-    fetch_user_request = requests.get(
-        "http://user-management/user-management/api/v1/user/search/email",
-        params={"email": user_email},
-        headers=headers,
-        timeout=60)
-
-    if fetch_user_request.status_code == 200:
-      user_data = fetch_user_request.json().get("data")[0]
-    elif fetch_user_request.status_code == 404:
+    user_resp = get_user_details(user_email)
+    user_res_data = user_resp.get("data")
+    if user_res_data:
+      user_data = user_res_data[0]
+    else:
       raise UnauthorizedUserError(
           "Access Denied with code 1001, Please contact administrator")
-    else:
-      raise Exception(
-          "Request Denied with code 1002, Please contact administrator")
 
     user_id = user_data.get("user_id")
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
@@ -156,54 +140,29 @@ def launch_assignment(lti_assignment_id: Optional[str] = "",
             "Access Denied with code 1011, Please contact administrator")
 
       elif user_type in ("faculty", "admin"):
-        course_template_url = f"http://lms/lms/api/v1/course_templates/{context_id}/instructional_designers/{user_email}"
-
-        course_template_resp = requests.get(
-            course_template_url, headers=headers, timeout=60)
-
-        if course_template_resp.status_code == 200:
-          course_template_faculty_resp_data = course_template_resp.json()
-        else:
-          raise Exception(
-              "Request failed with code 1013, Please contact administrator")
+        id_resp_data = get_instruction_designer_details(context_id, user_email)
       else:
         raise UnauthorizedUserError(
             "Access Denied with code 1014, Please contact administrator")
 
     else:
       if user_type == "learner":
-        api_url = f"http://lms/lms/api/v1/sections/{context_id}/students/{user_email}"
-        fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
+        learner_data = get_student_details(context_id, user_email)
 
-        if fetch_user_mapping.status_code == 200:
-          learner_data = fetch_user_mapping.json().get("data")
-
+        if learner_data is None:
+          raise UnauthorizedUserError(
+              "Access Denied with code 1003, Please contact administrator")
+        elif learner_data:
           if learner_data.get("enrollment_status") == "invited":
             raise UnauthorizedUserError(
                 "Enrollment in progress, please retry again after 20 minutes")
 
-        elif fetch_user_mapping.status_code == 404:
-          raise UnauthorizedUserError(
-              "Access Denied with code 1003, Please contact administrator")
-        else:
-          raise Exception(
-              "Request failed with code 1004, Please contact administrator")
-
       elif user_type in ("faculty", "admin"):
-        api_url = f"http://lms/lms/api/v1/sections/{context_id}/teachers/{user_email}"
-        fetch_user_mapping = requests.get(api_url, headers=headers, timeout=60)
+        faculty_data = get_teacher_details(context_id, user_email)
 
-        print("fetch_user_mapping.status_code", fetch_user_mapping.status_code)
-
-        if fetch_user_mapping.status_code == 200:
-          faculty_data = fetch_user_mapping.json().get("data")
-        elif fetch_user_mapping.status_code == 404:
+        if faculty_data is None:
           raise UnauthorizedUserError(
               "Access Denied with code 1005, Please contact administrator")
-        else:
-          raise Exception(
-              "Request failed with code 1006, Please contact administrator")
-
       else:
         raise UnauthorizedUserError(
             "Access Denied with code 1007, Please contact administrator")

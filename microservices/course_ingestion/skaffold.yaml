@@ -70,12 +70,12 @@ profiles:
       machineType: N1_HIGHCPU_8
       timeout: '3000s'
     artifacts:
-    - image: gcr.io/aitutor-dev/course-ingestion
+    - image: gcr.io/core-learning-services-dev/course-ingestion
       docker:
           cacheFrom:
-            - gcr.io/aitutor-dev/course-ingestion:latest
+            - gcr.io/core-learning-services-dev/course-ingestion:latest
       requires:
-        - image: gcr.io/aitutor-dev/common
+        - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG
       sync:
         infer:
@@ -94,14 +94,14 @@ profiles:
       machineType: N1_HIGHCPU_8
       timeout: '3000s'
     artifacts:
-    - image: gcr.io/aitutor-dev/course-ingestion
+    - image: gcr.io/core-learning-services-dev/course-ingestion
       docker:
           cacheFrom:
             - course-ingestion
             - course-ingestion:latest
-            - gcr.io/aitutor-dev/course-ingestion:latest
+            - gcr.io/core-learning-services-dev/course-ingestion:latest
       requires:
-        - image: gcr.io/aitutor-dev/common
+        - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG
       sync:
         infer:
