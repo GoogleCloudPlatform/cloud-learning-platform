@@ -55,7 +55,7 @@ class LLMGetQueryEnginesResponse(BaseModel):
   """LLM Get types model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully retrieved query engine types"
-  data: Optional[list[str]] = []
+  data: Optional[list[dict]] = []
 
   class Config():
     orm_mode = True
