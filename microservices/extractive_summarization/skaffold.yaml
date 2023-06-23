@@ -44,10 +44,10 @@ profiles:
       machineType: N1_HIGHCPU_8
       timeout: '900s'
     artifacts:
-    - image: gcr.io/aitutor-dev/extractive-summarization
+    - image: gcr.io/core-learning-services-dev/extractive-summarization
       docker:
         cacheFrom:
-          - gcr.io/aitutor-dev/extractive-summarization:latest
+          - gcr.io/core-learning-services-dev/extractive-summarization:latest
       sync:
         infer:
           - '**/*.py'
@@ -64,12 +64,12 @@ profiles:
       machineType: N1_HIGHCPU_8
       timeout: '900s'
     artifacts:
-    - image: gcr.io/aitutor-dev/extractive-summarization
+    - image: gcr.io/core-learning-services-dev/extractive-summarization
       docker:
         cacheFrom:
           - extractive-summarization
           - extractive-summarization:latest
-          - gcr.io/aitutor-dev/extractive-summarization:latest
+          - gcr.io/core-learning-services-dev/extractive-summarization:latest
       sync:
         infer:
           - '**/*.py'

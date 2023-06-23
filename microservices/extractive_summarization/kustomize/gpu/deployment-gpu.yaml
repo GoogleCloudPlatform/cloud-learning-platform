@@ -12,7 +12,7 @@ spec:
         effect: "NoSchedule"
       containers:
       - name: extractive-summarization
-        image: gcr.io/aitutor-dev/extractive-summarization
+        image: gcr.io/core-learning-services-dev/extractive-summarization
         imagePullPolicy: Always
         resources:
           limits:

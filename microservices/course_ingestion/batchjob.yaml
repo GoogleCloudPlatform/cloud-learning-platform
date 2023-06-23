@@ -9,7 +9,7 @@ spec:
     spec:
       containers:
       - name: batch-course-ingestion
-        image: gcr.io/aitutor-dev/batch-course-ingestion:latest
+        image: gcr.io/core-learning-services-dev/batch-course-ingestion:latest
         command: 
           - "python"
           - "services/course_inference.py"
