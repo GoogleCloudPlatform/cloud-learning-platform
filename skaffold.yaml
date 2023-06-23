@@ -22,7 +22,7 @@ requires:
   configs: [common]
 
 - path: ./common_ml
-  configs: [common_ml]
+  configs: [common-ml]
 
 - path: ./microservices/redis
   configs: [redis]
@@ -78,28 +78,28 @@ requires:
 
 build:
   googleCloudBuild: {}
-#---
-# # Master Skaffold for AI services
-# apiVersion: skaffold/v2beta12
-# kind: Config
-# metadata:
-#   name: ai_backends
-# requires:
-# # Migrated microservices from ailearning-backend
-# - path: ./microservices/item_response_theory
-#   configs: [item-response-theory]
+---
+# Master Skaffold for AI services
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: ai_backends
+requires:
+# Migrated microservices from ailearning-backend
+- path: ./microservices/item_response_theory
+  configs: [item-response-theory]
 
-# - path: ./microservices/deep_knowledge_tracing
-#   configs: [deep-knowledge-tracing]
+- path: ./microservices/deep_knowledge_tracing
+  configs: [deep-knowledge-tracing]
 
-# - path: ./microservices/extractive_summarization
-#   configs: [extractive-summarization]
+- path: ./microservices/extractive_summarization
+  configs: [extractive-summarization]
 
-# - path: ./microservices/course_ingestion
-#   configs: [course-ingestion]
+- path: ./microservices/course_ingestion
+  configs: [course-ingestion]
 
-# build:
-#   googleCloudBuild: {}
+build:
+  googleCloudBuild: {}
 ---
 # Master Skaffold for API Docs
 apiVersion: skaffold/v2beta12
