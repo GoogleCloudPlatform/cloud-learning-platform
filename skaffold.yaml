@@ -78,7 +78,7 @@ requires:
 
 build:
   googleCloudBuild: {}
----
+#---
 # # Master Skaffold for AI services
 # apiVersion: skaffold/v2beta12
 # kind: Config
