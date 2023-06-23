@@ -105,7 +105,7 @@ async def google_llm_predict(prompt: str, is_chat: bool,
   """
   prompt_list = []
   if user_chat is not None:
-    history = user_chat.get("history", [])
+    history = user_chat.history
     for entry in history:
       content = UserChat.entry_content(entry)
       if UserChat.is_human(entry):

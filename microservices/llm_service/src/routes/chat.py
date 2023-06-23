@@ -89,10 +89,10 @@ def get_chat_list(skip: int = 0, limit: int = 20,
 
 
 @router.get(
-    "/{chatid}",
+    "/{chat_id}",
     name="Get user chat",
     response_model=LLMUserChatResponse)
-def get_chat(chatid: str):
+def get_chat(chat_id: str):
   """
   Get a specific user chat by id
 
@@ -100,13 +100,13 @@ def get_chat(chatid: str):
       LLMUserChatResponse
   """
   try:
-    user_chat = UserChat.find_by_id(chatid)
+    user_chat = UserChat.find_by_id(chat_id)
     chat_data = user_chat.get_fields(reformat_datetime=True)
     chat_data["id"] = user_chat.id
 
     return {
       "success": True,
-      "message": f"Successfully retrieved user chat {chatid}",
+      "message": f"Successfully retrieved user chat {chat_id}",
       "data": chat_data
     }
   except ValidationError as e:
@@ -118,10 +118,10 @@ def get_chat(chatid: str):
 
 
 @router.put(
-  "/{chatid}",
+  "/{chat_id}",
   name="Update user chat"
 )
-def update_chat(chatid: str, input_chat: ChatUpdateModel):
+def update_chat(chat_id: str, input_chat: ChatUpdateModel):
   """Update a user chat
 
   Args:
@@ -140,7 +140,7 @@ def update_chat(chatid: str, input_chat: ChatUpdateModel):
   try:
     input_chat_dict = {**input_chat.dict()}
 
-    existing_chat = UserChat.find_by_id(chatid)
+    existing_chat = UserChat.find_by_id(chat_id)
     for key in input_chat_dict:
       if input_chat_dict.get(key) is not None:
         setattr(existing_chat, key, input_chat_dict.get(key))
@@ -148,7 +148,7 @@ def update_chat(chatid: str, input_chat: ChatUpdateModel):
 
     return {
       "success": True,
-      "message": f"Successfully updated user chat {chatid}",
+      "message": f"Successfully updated user chat {chat_id}",
     }
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
@@ -158,14 +158,14 @@ def update_chat(chatid: str, input_chat: ChatUpdateModel):
 
 
 @router.delete(
-  "/{chatid}",
+  "/{chat_id}",
   name="Delete user chat"
 )
-def delete_chat(chatid: str):
+def delete_chat(chat_id: str):
   """Delete a user chat.
 
   Args:
-    chatid: id of user chat to delete.  We do a soft delete.
+    chat_id: id of user chat to delete.  We do a soft delete.
 
   Raises:
     ResourceNotFoundException: If the Chat does not exist
@@ -177,11 +177,11 @@ def delete_chat(chatid: str):
     InternalServerErrorResponseModel if the chat deletion raises an exception
   """
   try:
-    UserChat.soft_delete_by_id(chatid)
+    UserChat.soft_delete_by_id(chat_id)
 
     return {
       "success": True,
-      "message": f"Successfully deleted user chat {chatid}",
+      "message": f"Successfully deleted user chat {chat_id}",
     }
   except ResourceNotFoundException as re:
     raise ResourceNotFound(str(re)) from re
@@ -243,16 +243,15 @@ async def create_user_chat(gen_config: LLMGenerateModel,
 
 
 @router.post(
-    "/{chatid}/generate",
+    "/{chat_id}/generate",
     name="Generate new chat response",
     response_model=LLMUserChatResponse)
-async def user_chat_generate(chatid: str, gen_config: LLMGenerateModel):
+async def user_chat_generate(chat_id: str, gen_config: LLMGenerateModel):
   """
   Continue chat based on context of user chat
 
   Args:
       prompt(str): Input prompt for model
-      llm_type(str): LLM type
 
   Returns:
       LLMUserChatResponse
@@ -265,12 +264,11 @@ async def user_chat_generate(chatid: str, gen_config: LLMGenerateModel):
   if prompt is None or prompt == "":
     return BadRequest("Missing or invalid payload parameters")
 
-  llm_type = genconfig_dict.get("llm_type")
-
   # fetch user chat
-  user_chat = UserChat.find_by_id(chatid)
+  user_chat = UserChat.find_by_id(chat_id)
   if user_chat is None:
-    raise ResourceNotFoundException(f"Chat {chatid} not found ")
+    raise ResourceNotFoundException(f"Chat {chat_id not found ")
+  llm_type = user_chat.llm_type
 
   try:
     response = await llm_generate(prompt, llm_type, user_chat)
