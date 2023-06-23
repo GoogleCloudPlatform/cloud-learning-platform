@@ -495,14 +495,15 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
   num_chunks = len(text_chunks)
 
   # create a list of chunks to process
-  while (chunk_index < num_chunks):
+  while chunk_index < num_chunks:
     remaining_chunks = num_chunks - chunk_index
     chunk_size = min(MAX_NUM_TEXT_CHUNK_PROCESS, remaining_chunks)
     end_chunk_index = chunk_index + chunk_size
     process_chunks = text_chunks[chunk_index:end_chunk_index]
-  
-    Logger.info(f"processing {chunk_size} chunks for file {doc_name} remaining chunks {remaining_chunks}")
-  
+
+    Logger.info(f"processing {chunk_size} chunks for file {doc_name} " \
+        f"remaining chunks {remaining_chunks}")
+
     # generate an np array of chunk IDs starting from index base
     ids = np.arange(index_base, index_base + len(process_chunks))
 
@@ -516,8 +517,9 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
         batch_size=ITEMS_PER_REQUEST,
     )
 
-    Logger.info(f"generated embeddings for chunks {chunk_index} to {end_chunk_index}")
-    
+    Logger.info(f"generated embeddings for chunks" \
+        f" {chunk_index} to {end_chunk_index}")
+
     # create JSON
     embeddings_formatted = [
       json.dumps(
@@ -538,8 +540,9 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
     with open(chunk_path, "w", encoding="utf-8") as f:
       f.writelines(embeddings_formatted)
 
-    Logger.info(f"wrote embeddings file for chunks {chunk_index} to {end_chunk_index}")
-    
+    Logger.info(f"wrote embeddings file for chunks {chunk_index} " \
+        f"to {end_chunk_index}")
+
     # clean up any large data structures
     gc.collect()
 
