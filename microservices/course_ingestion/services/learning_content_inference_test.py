@@ -4,7 +4,7 @@ import pytest
 # pylint: disable=unused-import
 # pylint: disable=wrong-import-position
 # pylint: disable=line-too-long
-from config import GCP_PROJECT
+from config import PROJECT_ID
 import sys
 
 sys.path.append("../../common/src")
@@ -122,7 +122,7 @@ class AsyncMock(MagicMock):  #pylint: disable=invalid-overridden-method
     "gcs_path":
         "gs://{}/learning_content-resources/Research Design "
           "The Scholar-Practitioner’s Guide to Research "
-            "Design.pdf".format(GCP_PROJECT),
+            "Design.pdf".format(PROJECT_ID),
     "doc_type":
         "custom",
     "format":
@@ -160,7 +160,7 @@ async def test_create_learning_content_using_clustering(
     "gcs_path":
         "gs://{}/learning_content-resources/Research "
           "Design/The Scholar-Practitioner’s Guide to Research Design.pdf" \
-            .format(GCP_PROJECT),
+            .format(PROJECT_ID),
     "doc_type":
         "custom",
     "format":
@@ -194,7 +194,7 @@ def test_create_learning_content_using_parser(
       "gcs_path":
           "gs://{}/learning_content-resources/Research Design/"
           "The Scholar-Practitioner’s Guide to Research Design.pdf" \
-              .format(GCP_PROJECT),
+              .format(PROJECT_ID),
       "doc_type":
           "others",
       "format":

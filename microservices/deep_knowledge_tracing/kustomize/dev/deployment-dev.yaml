@@ -11,11 +11,11 @@ spec:
         image: gcr.io/core-learning-services-dev/deep-knowledge-tracing
         imagePullPolicy: Always
         env:
-        - name: GCP_PROJECT
+        - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: GCP_PROJECT
+              key: PROJECT_ID
         - name: MODEL_WEIGHTS_PATH
           valueFrom:
             configMapKeyRef:

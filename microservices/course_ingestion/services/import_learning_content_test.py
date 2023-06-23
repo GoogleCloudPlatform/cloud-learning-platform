@@ -20,7 +20,7 @@ from testing.example_objects import (TEST_COMPETENCY, TEST_LEARNING_CONTENT,
                                      TEST_LEARNING_OBJECTIVE,
                                      TEST_LEARNING_UNIT, TEST_SUB_COMPETENCY)
 from unittest.mock import MagicMock
-from config import GCP_PROJECT
+from config import PROJECT_ID
 
 
 # disabling these rules, as they cause issues with pytest fixtures
@@ -41,7 +41,7 @@ class AsyncMock(MagicMock):  #pylint: disable=invalid-overridden-method
 @pytest.mark.parametrize(
     "learning_content_title,gcs_path,learning_content_label, \
     start_page,end_page,parsed_output_json",
-    [("test_learning_content", "gs://" + GCP_PROJECT + "/abc", "test_label",1, 2, "testing/test_output.json")])
+    [("test_learning_content", "gs://" + PROJECT_ID + "/abc", "test_label",1, 2, "testing/test_output.json")])
 def test_create_learning_content_collections(clean_firestore,
                                              learning_content_title,
                                              gcs_path,
@@ -59,7 +59,7 @@ def test_create_learning_content_collections(clean_firestore,
 @pytest.mark.parametrize(
     "learning_content_title, gcs_path, learning_content_label, \
     start_page, end_page, parsed_output_json",
-    [("test_learning_content", "gs://" + GCP_PROJECT + "/abc", "test_label",
+    [("test_learning_content", "gs://" + PROJECT_ID + "/abc", "test_label",
       1, 2, "testing/sample_clustering_output.json")])
 def test_create_clustering_learning_content_collections(clean_firestore,
                                                         learning_content_title,

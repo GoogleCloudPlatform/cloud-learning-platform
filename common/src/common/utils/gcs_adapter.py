@@ -13,7 +13,7 @@ from common.utils.logging_handler import Logger
 # pylint: disable=consider-using-f-string, logging-format-interpolation
 # pylint: disable = broad-exception-raised
 
-gcs_bucket = os.environ.get("GCP_PROJECT")
+gcs_bucket = os.environ.get("PROJECT_ID")
 
 
 class GcsCrudService:

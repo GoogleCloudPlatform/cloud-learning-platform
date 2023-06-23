@@ -26,11 +26,11 @@ spec:
             cpu: "4000m" 
         env:
         # Define the environment variable
-        - name: GCP_PROJECT
+        - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: GCP_PROJECT
+              key: PROJECT_ID
         - name: API_BASE_URL
           # Required format: api/version
           value: api/v1

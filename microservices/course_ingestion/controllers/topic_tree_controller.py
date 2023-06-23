@@ -7,7 +7,7 @@ from services.validations import check_valid_request
 from common.utils.kf_job_app import (kube_create_job,
                                      kube_get_namespaced_deployment_image_path)
 from common.utils.logging_handler import Logger
-from config import (JOB_NAMESPACE, GCP_PROJECT,
+from config import (JOB_NAMESPACE, PROJECT_ID,
                     CONTAINER_NAME, DEPLOYMENT_NAME,
                     BATCH_JOB_LIMITS, BATCH_JOB_REQUESTS)
 
@@ -22,7 +22,7 @@ class TopicTreeController():
     image_path = kube_get_namespaced_deployment_image_path(DEPLOYMENT_NAME,
                                                            CONTAINER_NAME,
                                                            JOB_NAMESPACE,
-                                                           GCP_PROJECT)
+                                                           PROJECT_ID)
     request_body["title"] = "level_{}-id_{}".format(request_body["level"],
                                                     request_body["id"])
     job_specs = {
@@ -32,7 +32,7 @@ class TopicTreeController():
       "limits": BATCH_JOB_LIMITS,
       "requests": BATCH_JOB_REQUESTS
     }
-    env_vars = {"GCP_PROJECT": GCP_PROJECT,
+    env_vars = {"PROJECT_ID": PROJECT_ID,
                 "DATABASE_PREFIX": os.getenv("DATABASE_PREFIX", "")}
     return kube_create_job(job_specs, JOB_NAMESPACE, env_vars)
 

@@ -10,7 +10,7 @@ from google.api_core.exceptions import BadRequest
 # pylint: disable = broad-exception-raised
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
-GCP_PROJECT = os.getenv("PROJECT_ID", None)
+PROJECT_ID = os.getenv("PROJECT_ID", None)
 
 BQ_REGION = os.getenv("BQ_REGION", "US")
 
@@ -22,7 +22,7 @@ bq_client = bigquery.Client(location=BQ_REGION)
 
 def create_bigquery_dataset(dataset):
   """Create a dataset in the bigquery"""
-  dataset_id = f"{GCP_PROJECT}.{dataset}"
+  dataset_id = f"{PROJECT_ID}.{dataset}"
   print("Dataset_id", dataset_id)
   dataset = bigquery.Dataset(dataset_id)
   try:
@@ -34,7 +34,7 @@ def create_bigquery_dataset(dataset):
 
 def create_table_using_sql_file(dataset, file_name):
   """Create a table using the query from the given file in the BQ dataset"""
-  dataset_id = f"{GCP_PROJECT}.{dataset}"
+  dataset_id = f"{PROJECT_ID}.{dataset}"
   print("Dataset_id", dataset_id)
   old_dataset = os.getenv("BQ_DATASET", "lms_analytics")
   job_config = bigquery.QueryJobConfig(default_dataset=dataset_id)
@@ -42,7 +42,7 @@ def create_table_using_sql_file(dataset, file_name):
     query = file.read()
   query = query.replace(old_dataset, dataset)
   query_job = bq_client.query(query,
-                              project=GCP_PROJECT,
+                              project=PROJECT_ID,
                               job_config=job_config)
   error = ""
   try:
@@ -89,7 +89,7 @@ def create_views(dataset):
 
 def alter_table_using_sql_file(dataset, file_name):
   """Alter a table using the query from the given file in the BQ dataset"""
-  dataset_id = f"{GCP_PROJECT}.{dataset}"
+  dataset_id = f"{PROJECT_ID}.{dataset}"
   print("Dataset_id", dataset_id)
   old_dataset = os.getenv("BQ_DATASET", "lms_analytics")
   job_config = bigquery.QueryJobConfig(default_dataset=dataset_id)
@@ -97,7 +97,7 @@ def alter_table_using_sql_file(dataset, file_name):
     query = file.read()
   query = query.replace(old_dataset, dataset)
   query_job = bq_client.query(query,
-                              project=GCP_PROJECT,
+                              project=PROJECT_ID,
                               job_config=job_config)
   error = ""
   try:
@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
   # Set the following environment variables
   # BQ_DATASET -<dataset-name> (default -> lms_analytics),
-  # GCP_PROJECT -<project_id>
+  # PROJECT_ID -<project_id>
   # Run the following command with the required arguments to trigger the script
   # cd utils
   # PYTHONPATH=../common/src python3 bq_setup.py
@@ -173,8 +173,8 @@ if __name__ == "__main__":
 
   args = parse_arguments()
 
-  if not GCP_PROJECT:
-    raise Exception("Please set 'GCP_PROJECT' environment variable")
+  if not PROJECT_ID:
+    raise Exception("Please set 'PROJECT_ID' environment variable")
 
   if args.create_dataset == "true":
     create_bigquery_dataset(BQ_DATASET)

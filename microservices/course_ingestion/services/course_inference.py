@@ -9,7 +9,7 @@ from common.utils.errors import ResourceNotFoundException, PayloadTooLargeError
 from common.models import Course, Competency, LearningContentItem
 from common.utils.cache_service import set_key, get_key, delete_key, \
   set_key_normal, get_key_normal
-from config import GCP_PROJECT, PAYLOAD_FILE_SIZE
+from config import PROJECT_ID, PAYLOAD_FILE_SIZE
 
 
 # pylint: disable=redefined-builtin,broad-exception-raised,protected-access
@@ -203,7 +203,7 @@ class CourseService():
     :return: string
     """
     file = course_pdf[0]
-    gcs_service = GcsCrudService(GCP_PROJECT)
+    gcs_service = GcsCrudService(PROJECT_ID)
 
     try:
       search = re.search(".pdf$", file["filename"].lower())
@@ -252,7 +252,7 @@ class CourseService():
     """
     file_name = get_key(key=f"{user_id}_file_name")
     file_body = get_key_normal(key=f"{user_id}_file_body")
-    res = GcsCrudService(GCP_PROJECT).upload_file_to_gcs_bucket(
+    res = GcsCrudService(PROJECT_ID).upload_file_to_gcs_bucket(
       file_name=file_name, file_body=file_body,
       parent_folder_name="course-resources")
     res["file_name"] = file_name
@@ -269,10 +269,10 @@ class CourseService():
     :return: list
     """
     gs_path = []
-    gcs_service = GcsCrudService(GCP_PROJECT)
+    gcs_service = GcsCrudService(PROJECT_ID)
     blobs = gcs_service.fetch_all_blobs(prefix="course-resources")
     for blob in blobs:
-      path = f"gs://{GCP_PROJECT}/{blob.name}"
+      path = f"gs://{PROJECT_ID}/{blob.name}"
       file_name = blob.name.lower()
       if ".pdf" in file_name.lower():
         if search_query is None:
@@ -297,7 +297,7 @@ class CourseService():
     :param gs_path: string
     :return: str
     """
-    gcs_service = GcsCrudService(GCP_PROJECT)
+    gcs_service = GcsCrudService(PROJECT_ID)
     res = gcs_service.delete_file_from_gcs_bucket(blob_name=gs_path)
 
     return res
