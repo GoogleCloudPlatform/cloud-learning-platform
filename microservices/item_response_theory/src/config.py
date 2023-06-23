@@ -3,7 +3,7 @@ import os
 from common.utils.logging_handler import Logger
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
-GCP_PROJECT = os.environ.get("GCP_PROJECT", "aitutor-dev")
+GCP_PROJECT = os.environ.get("GCP_PROJECT", "core-learning-services-dev")
 os.environ["GOOGLE_CLOUD_PROJECT"] = GCP_PROJECT
 
 

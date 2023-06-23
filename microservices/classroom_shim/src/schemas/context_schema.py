@@ -3,7 +3,7 @@ Pydantic Model for Context API's
 """
 from typing import Optional, List
 from pydantic import BaseModel
-from schemas.schema_examples import CONTEXT_EXAMPLE
+from schemas.schema_examples import CONTEXT_EXAMPLE, CONTEXT_MEMBERS_EXAMPLE
 
 
 class ContextModel(BaseModel):
@@ -56,7 +56,7 @@ class ContextMembersModel(BaseModel):
 
   class Config():
     orm_mode = True
-    schema_extra = {"example": CONTEXT_EXAMPLE}
+    schema_extra = {"example": CONTEXT_MEMBERS_EXAMPLE}
 
 
 class ContextMembersResponseModel(BaseModel):
@@ -71,6 +71,6 @@ class ContextMembersResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully fetched the context details",
-            "data": CONTEXT_EXAMPLE
+            "data": CONTEXT_MEMBERS_EXAMPLE
         }
     }

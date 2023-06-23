@@ -1,12 +1,12 @@
 """ User Shim APIs """
-import requests
-import config
-from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
-from common.utils.http_exceptions import InternalServerError
+from fastapi import APIRouter
+from common.utils.http_exceptions import InternalServerError, ResourceNotFound
+from common.utils.errors import ResourceNotFoundException
+from common.utils.logging_handler import Logger
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
+from services.ext_service_handler import get_user_details
 # pylint: disable=line-too-long, broad-exception-raised
 
 router = APIRouter(
@@ -25,7 +25,7 @@ router = APIRouter(
 
 
 @router.get("/user/search/email")
-def search_user_by_email(email: str, request: Request):
+def search_user_by_email(email: str):
   """Search for users based on the user first name
 
   ### Args:
@@ -35,12 +35,13 @@ def search_user_by_email(email: str, request: Request):
       UserSearchResponseModel: List of user objects
   """
   try:
-    headers = {"Authorization": request.headers.get("Authorization")}
-    response = requests.get(
-        f"{config.USER_MANAGEMENT_BASE_URL}/user/search/email?email={email.lower()}",
-        headers=headers,
-        timeout=60)
-    return JSONResponse(
-        content=response.json(), status_code=response.status_code)
+    user_data = get_user_details(email.lower())
+    if user_data is None:
+      raise ResourceNotFoundException(f"User with email '{email}' not found")
+    elif user_data:
+      return user_data
+  except ResourceNotFoundException as e:
+    Logger.error(e)
+    raise ResourceNotFound(str(e)) from e
   except Exception as e:
     raise InternalServerError(str(e)) from e
