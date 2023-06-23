@@ -15,15 +15,14 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Unit test & lint for all services
+name: Unit test & lint for Classroom Notifications Cronjob
 on:
   pull_request:
     branches:
       - main
       - e2e_flow_fix
     paths:
-      # TODO: Add all microservice folders below.
-      - 'microservices/classroom_notifications_cronjob'
+      - 'microservices/classroom_notifications_cronjob/**'
       - 'common/**'
       - '.github/workflows/unit_test_linter_classroom_notifications_cronjob.yaml'
       - '.pylintrc'
@@ -41,7 +40,6 @@ jobs:
       matrix:
         python-version: [3.9]
         target-folder: [
-          # TODO: Add all microservice folders below.
           microservices/classroom_notifications_cronjob,
         ]
     steps:

@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learning-record-service
+spec:
+  replicas: 3
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: learning-record-service
+        image: learning-record-service
+        imagePullPolicy: Always
+        env:
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID

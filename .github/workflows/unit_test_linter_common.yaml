@@ -18,9 +18,7 @@
 name: Unit test & lint for Common
 on:
   pull_request:
-    branches:
-      - main
-      - e2e_flow_fix
+    branches: [ "main" ]
     paths:
       - 'common/**'
       - '.github/workflows/unit_test_linter_common.yaml'

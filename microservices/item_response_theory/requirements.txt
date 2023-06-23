@@ -1,0 +1,9 @@
+fastapi==0.65.2
+uvicorn==0.14.0
+py-irt==0.3.3
+torch==1.13.1
+pyro-ppl==1.7.0
+girth_mcmc==0.2.1
+absl-py==1.3.0
+protobuf==3.19.5
+typing-extensions==3.7.4.3

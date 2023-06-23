@@ -1,4 +1,4 @@
-from endpoint_proxy import get_baseurl
+from e2e.gke_api_tests.endpoint_proxy import get_baseurl
 from common.utils.errors import ResourceNotFoundException
 
 base_url = get_baseurl("lms")

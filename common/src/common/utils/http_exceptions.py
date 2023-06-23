@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 
+
 # pylint: disable=unused-argument
 
 
@@ -32,39 +33,45 @@ def add_exception_handlers(app: FastAPI):
   Returns:
       _type_: _description_
   """
+
   @app.exception_handler(CustomHTTPException)
   async def generic_exception_handler(req: Request, exc: CustomHTTPException):
     return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "success": False,
-            "message": exc.message,
-            "data": exc.data
-        })
+      status_code=exc.status_code,
+      content={
+        "success": False,
+        "message": exc.message,
+        "data": exc.data
+      })
 
   @app.exception_handler(RequestValidationError)
   async def pydantic_exception_handler(req: Request,
                                        exc: RequestValidationError):
     return JSONResponse(
-        status_code=422,
-        content={
-            "success": False,
-            "message": "Validation Failed",
-            "data": exc.errors()
-        })
+      status_code=422,
+      content={
+        "success": False,
+        "message": "Validation Failed",
+        "data": exc.errors()
+      })
+
+
+
 
 class ClassroomHttpException(CustomHTTPException):
   """Exception raised for any google HTTP errors.
   Attributes:
     message -- explanation of the error
   """
+
   def __init__(self, status_code: int, message: str):
-    if status_code==503:
-      super().__init__(status_code=429, success=False,
-                      message=message, data=None)
+    if status_code == 503:
+      super().__init__(
+          status_code=429, success=False, message=message, data=None)
     else:
-      super().__init__(status_code=status_code, success=False,
-                       message=message, data=None)
+      super().__init__(
+          status_code=status_code, success=False, message=message, data=None)
+
 
 class InvalidToken(CustomHTTPException):
   """Exception raised when permission is denied.
@@ -102,8 +109,7 @@ class ResourceNotFound(CustomHTTPException):
   """
 
   def __init__(self, message: str = "Resource Not Found"):
-    super().__init__(status_code=404, message=message, \
-      success=False, data=None)
+    super().__init__(status_code=404, message=message, success=False, data=None)
 
 
 class InternalServerError(CustomHTTPException):
@@ -117,9 +123,8 @@ class InternalServerError(CustomHTTPException):
     message -- explanation of the error
   """
 
-  def __init__(self, message: Any = "Internal Server Error"):
-    super().__init__(status_code=500, message=message, \
-      success=False, data=None)
+  def __init__(self, message: str = "Internal Server Error"):
+    super().__init__(status_code=500, message=message, success=False, data=None)
 
 
 class Conflict(CustomHTTPException):
@@ -132,9 +137,8 @@ class Conflict(CustomHTTPException):
     message -- explanation of the error
   """
 
-  def __init__(self, message: Any = "Conflict"):
-    super().__init__(status_code=409, message=message, \
-      success=False, data=None)
+  def __init__(self, message: str = "Conflict"):
+    super().__init__(status_code=409, message=message, success=False, data=None)
 
 
 class Unauthenticated(CustomHTTPException):
@@ -146,10 +150,7 @@ class Unauthenticated(CustomHTTPException):
   """
 
   def __init__(self, message: str = "Unauthenticated"):
-    super().__init__(status_code=401,
-                     message=message,
-                     success=False,
-                     data=None)
+    super().__init__(status_code=401, message=message, success=False, data=None)
 
 
 class PermissionDenied(CustomHTTPException):
@@ -161,10 +162,7 @@ class PermissionDenied(CustomHTTPException):
   """
 
   def __init__(self, message: str = "Permission Denied"):
-    super().__init__(status_code=403,
-                     message=message,
-                     success=False,
-                     data=None)
+    super().__init__(status_code=403, message=message, success=False, data=None)
 
 
 class Unauthorized(CustomHTTPException):
@@ -174,10 +172,7 @@ class Unauthorized(CustomHTTPException):
   """
 
   def __init__(self, message: str = "Unauthorized"):
-    super().__init__(status_code=401,
-                     message=message,
-                     success=False,
-                     data=None)
+    super().__init__(status_code=401, message=message, success=False, data=None)
 
 
 class PayloadTooLarge(CustomHTTPException):
@@ -188,8 +183,37 @@ class PayloadTooLarge(CustomHTTPException):
   """
 
   def __init__(self, message: str = "Content too large"):
-    super().__init__(status_code=413,
-                     message=message,
-                     success=False,
-                     data=None)
+    super().__init__(status_code=413, message=message, success=False, data=None)
 
+
+class ConnectionTimeout(CustomHTTPException):
+  """Exception raised for connection timeout error.
+
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "Connection Timed-out"):
+    super().__init__(status_code=408, message=message, success=False, data=None)
+
+
+class ServiceUnavailable(CustomHTTPException):
+  """Exception raised for connection error due to service being unavailable.
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "Connection Error"):
+    super().__init__(status_code=503, message=message, success=False, data=None)
+
+
+class APINotImplemented(CustomHTTPException):
+  """Exception raised for not implemented methods.
+  API method not implemented on the server.
+
+  Attributes:
+    message -- explanation of the error
+  """
+
+  def __init__(self, message: str = "API Not Implemented"):
+    super().__init__(status_code=501, message=message, success=False, data=None)

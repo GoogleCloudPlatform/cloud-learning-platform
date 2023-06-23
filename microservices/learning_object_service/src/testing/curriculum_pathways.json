@@ -1,0 +1,26 @@
+[{
+    "name": "Skaffold",
+    "display_name": "Introduction to Skaffold",
+    "description": "",
+    "author": "",
+    "alignments": {
+        "competency_alignments": [],
+        "skill_alignments": []
+    },
+    "child_nodes": {
+        "learning_experiences": [],
+        "curriculum_pathways": []
+    },
+    "parent_nodes": {
+        "learning_opportunities": [],
+        "curriculum_pathways": []
+    },
+    "metadata": {
+        "design_config":{
+            "theme": "blue",
+            "illustration": "U1C1"
+        }
+    },
+    "duration": 0,
+    "equivalent_credits": 0
+}]

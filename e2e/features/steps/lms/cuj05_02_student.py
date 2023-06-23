@@ -1,7 +1,7 @@
 import uuid
 import behave
 import requests
-from testing_objects.test_config import API_URL
+from e2e.test_config import API_URL
 from common.models import CourseEnrollmentMapping
 
 # ------------------------------Delete student to Section-------------------------------------

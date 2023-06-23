@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: extractive-summarization
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: extractive-summarization
+  template:
+    metadata:
+      labels:
+        app: extractive-summarization
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: extractive-summarization
+        image: extractive-summarization
+        imagePullPolicy: IfNotPresent
+        env:
+        # Define the environment variable
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: BASE_URL
+          # Required format: api/version
+          value: api/v1
+        - name: SERVICE_NAME
+          value: extractive-summarization
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT
+          
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "700Mi"
+            cpu: "1000m"
+          limits:
+            memory: "3000Mi"
+            cpu: "8000m"
+        livenessProbe:
+          initialDelaySeconds: 10
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 30
+        readinessProbe:
+          initialDelaySeconds: 10
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 30
