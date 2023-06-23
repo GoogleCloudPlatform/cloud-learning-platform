@@ -86,6 +86,12 @@ metadata:
   name: ai_backends
 requires:
 # Migrated microservices from ailearning-backend
+- path: ./common
+  configs: [common]
+
+- path: ./common_ml
+  configs: [common-ml]
+
 - path: ./microservices/item_response_theory
   configs: [item-response-theory]
 
