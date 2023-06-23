@@ -5,8 +5,8 @@ from schemas.error_schema import (InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel,
                                   NotFoundErrorResponseModel)
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
-PROJECT_ID = os.environ.get("PROJECT_ID", "core-learning-services-dev")
-os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
+GCP_PROJECT = os.environ.get("GCP_PROJECT", "core-learning-services-dev")
+os.environ["GOOGLE_CLOUD_PROJECT"] = GCP_PROJECT
 
 
 SCOPES = [
@@ -31,7 +31,7 @@ CONTAINER_NAME = os.getenv("CONTAINER_NAME")
 DEPLOYMENT_NAME = os.getenv("DEPLOYMENT_NAME")
 MODEL_WEIGHTS_PATH = os.getenv(
   "MODEL_WEIGHTS_PATH","gs://core-learning-services-dev/ml-models/dkt")
-GCS_BUCKET = os.environ.get("PROJECT_ID", "core-learning-services-dev")
+GCS_BUCKET = os.environ.get("GCP_PROJECT", "core-learning-services-dev")
 MODEL_PARAMS_DIR = "model_params"
 IS_DEVELOPMENT = bool(os.getenv("IS_DEVELOPMENT", "").lower() \
     in ("True", "true"))
@@ -65,7 +65,7 @@ REQUIRED_FIELDS = {
   "session_id": str
 }
 
-GCP_BUCKET = os.environ.get("PROJECT_ID", "core-learning-services-dev")
+GCP_BUCKET = os.environ.get("GCP_PROJECT", "core-learning-services-dev")
 
 ERROR_RESPONSES = {
     500: {

@@ -9,7 +9,7 @@ from google.cloud import bigquery
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
-PROJECT_ID = os.getenv("PROJECT_ID", None)
+GCP_PROJECT = os.getenv("PROJECT_ID", None)
 
 BQ_REGION= os.getenv("BQ_REGION", "US")
 
@@ -19,7 +19,7 @@ BQ_DATASET = DATABASE_PREFIX + os.getenv("BQ_DATASET", "lms_analytics")
 bq_client = bigquery.Client(location=BQ_REGION)
 
 def delete_bigquery_dataset(dataset):
-  dataset_id = f"{PROJECT_ID}.{dataset}"
+  dataset_id = f"{GCP_PROJECT}.{dataset}"
   print("Deleting BQ dataset: " + dataset_id)
   bq_client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
 
@@ -29,13 +29,13 @@ if __name__ == "__main__":
   # appropriate BQ permissions should be there and
   # be logged in to the respective GCP project using google sdk
 
-  # Set the environment variables BQ_LRS_DATASET, PROJECT_ID
+  # Set the environment variables BQ_LRS_DATASET, GCP_PROJECT
   # Run the following commands
   # cd utils
   # PYTHONPATH=../common/src python3 bq_cleanup.py
 
-  if not PROJECT_ID:
-    raise Exception("Please set 'PROJECT_ID' environment variable")
+  if not GCP_PROJECT:
+    raise Exception("Please set 'GCP_PROJECT' environment variable")
 
   if not DATABASE_PREFIX:
     raise Exception(

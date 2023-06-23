@@ -40,12 +40,12 @@ BATCH_JOB_PENDING_TIME_THRESHOLD = 10  # in minutes
 
 GCLOUD_LOG_URL = "https://console.cloud.google.com/logs/query;" +\
 "query=resource.type%3D%22k8s_container%22%0Aresource.labels." +\
-"project_id%3D%22{PROJECT_ID}%22%0Aresource.labels.location" +\
+"project_id%3D%22{GCP_PROJECT}%22%0Aresource.labels.location" +\
 "%3D%22{GCP_ZONE}%22%0Aresource.labels.cluster_name%3D%22" +\
 "{GKE_CLUSTER}%22%0Aresource.labels.namespace_name%3D%22" +\
 "{SKAFFOLD_NAMESPACE}%22%0Alabels.k8s-pod%2Fapp%3D%22" +\
 "{MICROSERVICE}%22%20severity%3E%3DDEFAULT;timeRange=" +\
-"{INIT_TIMESTAMP}%2F{FINAL_TIMESTAMP}?project={PROJECT_ID}"
+"{INIT_TIMESTAMP}%2F{FINAL_TIMESTAMP}?project={GCP_PROJECT}"
 
 SERVICES = {
   "authentication": {

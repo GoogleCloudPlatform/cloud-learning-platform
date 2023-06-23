@@ -5,7 +5,7 @@ from common.utils.kf_job_app import (kube_delete_job, kube_create_job,
                                      kube_get_namespaced_deployment_image_path)
 import json
 from common.utils.errors import ResourceNotFoundException, ConflictError
-from config import (DEPLOYMENT_NAME, CONTAINER_NAME, JOB_NAMESPACE, PROJECT_ID,
+from config import (DEPLOYMENT_NAME, CONTAINER_NAME, JOB_NAMESPACE, GCP_PROJECT,
                     BATCH_JOB_LIMITS, BATCH_JOB_REQUESTS)
 # pylint: disable = dangerous-default-value,broad-exception-raised
 
@@ -21,7 +21,7 @@ def initiate_batch_job(request_body, job_type, env_vars={}):
                   or not.
   """
   image_path = kube_get_namespaced_deployment_image_path(
-      DEPLOYMENT_NAME, CONTAINER_NAME, JOB_NAMESPACE, PROJECT_ID)
+      DEPLOYMENT_NAME, CONTAINER_NAME, JOB_NAMESPACE, GCP_PROJECT)
   job_specs = {
       "container_image": image_path,
       "type": job_type,
@@ -29,7 +29,7 @@ def initiate_batch_job(request_body, job_type, env_vars={}):
       "limits": BATCH_JOB_LIMITS,
       "requests": BATCH_JOB_REQUESTS
   }
-  env_vars.update({"PROJECT_ID": PROJECT_ID})
+  env_vars.update({"GCP_PROJECT": GCP_PROJECT})
   job_status = kube_create_job(job_specs, JOB_NAMESPACE, env_vars)
   response = {}
   if job_status.get("status"):

@@ -222,7 +222,7 @@ def get_cloud_link(microservice_name):
   """Creates a query which can be used to directly view the logs of
   the required microservice"""
   # Fetching the required ENV variables to create the log query
-  PROJECT_ID = os.getenv("PROJECT_ID")
+  GCP_PROJECT = os.getenv("GCP_PROJECT")
   SKAFFOLD_NAMESPACE = os.getenv("SKAFFOLD_NAMESPACE")
   GKE_CLUSTER = os.getenv("GKE_CLUSTER")
   GCP_ZONE = os.getenv("GCP_ZONE")
@@ -234,7 +234,7 @@ def get_cloud_link(microservice_name):
     timedelta(hours=-1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
   INIT_TIMESTAMP = INIT_TIMESTAMP.strftime("%Y-%m-%dT%H:%M:%S.000Z")
   # Replacing the values to get the correct URL
-  url = url.replace("{PROJECT_ID}", PROJECT_ID)
+  url = url.replace("{GCP_PROJECT}", GCP_PROJECT)
   url = url.replace("{SKAFFOLD_NAMESPACE}", SKAFFOLD_NAMESPACE)
   url = url.replace("{GKE_CLUSTER}", GKE_CLUSTER)
   url = url.replace("{GCP_ZONE}", GCP_ZONE)

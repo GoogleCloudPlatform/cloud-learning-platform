@@ -26,11 +26,11 @@ spec:
             cpu: "1500m" 
         env:
         # Define the environment variable
-        - name: PROJECT_ID
+        - name: GCP_PROJECT
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: PROJECT_ID
+              key: GCP_PROJECT
         - name: SKAFFOLD_NAMESPACE
           valueFrom:
             configMapKeyRef:

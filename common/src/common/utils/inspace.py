@@ -15,26 +15,26 @@ from common.utils.jwt_token_generator import TokenGenerator
 
 secrets = secretmanager.SecretManagerServiceClient()
 
-PROJECT_ID = os.environ.get("PROJECT_ID")
+GCP_PROJECT = os.environ.get("PROJECT_ID")
 INSPACE_BASE_URL = os.getenv("INSPACE_BASE_URL", default=None)
 
 if INSPACE_BASE_URL is not None:
   try:
     INSPACE_CLIENT_ID = secrets.access_secret_version(
       request={
-        "name": "projects/" + PROJECT_ID +
+        "name": "projects/" + GCP_PROJECT +
                 "/secrets/inspace_client_id/versions/latest"
       }).payload.data.decode("utf-8")
 
     INSPACE_CLIENT_SECRET = secrets.access_secret_version(
       request={
-        "name": "projects/" + PROJECT_ID +
+        "name": "projects/" + GCP_PROJECT +
                 "/secrets/inspace_client_secret/versions/latest"
       }).payload.data.decode("utf-8")
 
     INSPACE_AUTH_GROUP_ID = secrets.access_secret_version(
       request={
-        "name": "projects/" + PROJECT_ID +
+        "name": "projects/" + GCP_PROJECT +
                 "/secrets/inspace_auth_group_id/versions/latest"
       }).payload.data.decode("utf-8")
   except Exception as e:

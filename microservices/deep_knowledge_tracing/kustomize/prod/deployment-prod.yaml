@@ -10,11 +10,11 @@ spec:
         image: deep-knowledge-tracing
         imagePullPolicy: IfNotPresent
         env:
-        - name: PROJECT_ID
+        - name: GCP_PROJECT
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: PROJECT_ID
+              key: GCP_PROJECT
         - name: MODEL_WEIGHTS_PATH
           valueFrom:
             configMapKeyRef:

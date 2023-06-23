@@ -15,8 +15,8 @@ from google.cloud import secretmanager
 secrets = secretmanager.SecretManagerServiceClient()
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
-PROJECT_ID = os.environ.get("PROJECT_ID", "core-learning-services-dev")
-os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
+GCP_PROJECT = os.environ.get("GCP_PROJECT", "aitutor-dev")
+os.environ["GOOGLE_CLOUD_PROJECT"] = GCP_PROJECT
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 USE_LEARNOSITY_SECRET = bool(os.getenv(
     "USE_LEARNOSITY_SECRET", "").lower() == "true")
@@ -24,7 +24,7 @@ print("USE_LEARNOSITY_SECRET: ", os.getenv(
     "USE_LEARNOSITY_SECRET", ""))
 
 CONTENT_SERVING_BUCKET = os.environ.get("CONTENT_SERVING_BUCKET", "")
-SIGNURL_SA_KEY_PATH = f"./keys/{PROJECT_ID}-signurl-sa-key.json"
+SIGNURL_SA_KEY_PATH = f"./keys/{GCP_PROJECT}-signurl-sa-key.json"
 
 try:
   with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace","r",
@@ -67,13 +67,13 @@ LEARNOSITY_URL = "https://data.learnosity.com/latest"
 if USE_LEARNOSITY_SECRET is True:
   LEARNOSITY_CONSUMER_KEY = secrets.access_secret_version(
     request={
-      "name": "projects/" + PROJECT_ID +
+      "name": "projects/" + GCP_PROJECT +
         "/secrets/learnosity_consumer_key/versions/latest"
           }).payload.data.decode("utf-8")
 
   LEARNOSITY_CONSUMER_SECRET = secrets.access_secret_version(
     request={
-      "name": "projects/" + PROJECT_ID +
+      "name": "projects/" + GCP_PROJECT +
         "/secrets/learnosity_consumer_secret/versions/latest"
           }).payload.data.decode("utf-8")
 else:
