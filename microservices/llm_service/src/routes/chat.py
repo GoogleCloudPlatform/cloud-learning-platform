@@ -267,7 +267,7 @@ async def user_chat_generate(chat_id: str, gen_config: LLMGenerateModel):
   # fetch user chat
   user_chat = UserChat.find_by_id(chat_id)
   if user_chat is None:
-    raise ResourceNotFoundException(f"Chat {chat_id not found ")
+    raise ResourceNotFoundException(f"Chat {chat_id} not found ")
   llm_type = user_chat.llm_type
 
   try:
