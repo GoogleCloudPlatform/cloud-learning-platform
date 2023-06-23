@@ -73,6 +73,9 @@ requires:
 - path: ./microservices/delete_sections_cronjob
   configs: [delete-sections-cronjob]
 
+- path: ./microservices/utils
+  configs: [utils]
+
 build:
   googleCloudBuild: {}
 ---
