@@ -25,8 +25,11 @@ from common.utils.errors import (ResourceNotFoundException,
                                  PayloadTooLargeError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, PayloadTooLarge)
-from common.models import QueryEngine, UserQuery
+from common.models import QueryEngine, User, UserQuery
 from schemas.llm_schema import (LLMQueryModel,
+                                LLMUserAllQueriesResponse,
+                                LLMUserQueryResponse,
+                                UserQueryUpdateModel,
                                 LLMQueryEngineModel,
                                 LLMQueryEngineResponse,
                                 LLMGetQueryEnginesResponse,
@@ -42,7 +45,7 @@ router = APIRouter(prefix="/query", tags=["LLMs"], responses=ERROR_RESPONSES)
     "",
     name="Get all Query engines",
     response_model=LLMGetQueryEnginesResponse)
-def get_query_list():
+def get_engine_list():
   """
   Get available Query engines
 
@@ -58,6 +61,124 @@ def get_query_list():
       "data": query_engine_data
     }
   except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+@router.get(
+    "/user/{user_id}",
+    name="Get all Queries for a user",
+    response_model=LLMUserAllQueriesResponse)
+def get_query_list(skip: int = 0, limit: int = 20,
+                  user_data: dict = Depends(validate_token)):
+  """
+  Get user queries for authenticated user.  Query data does not include
+  history to slim payload.  To retrieve query history use the
+  get single query endpoint.
+
+  Args:
+    skip: `int`
+      Number of tools to be skipped <br/>
+    limit: `int`
+      Size of tools array to be returned <br/>
+
+  Returns:
+      LLMUserAllQueriesResponse
+  """
+  try:
+    if skip < 0:
+      raise ValidationError("Invalid value passed to \"skip\" query parameter")
+
+    if limit < 1:
+      raise ValidationError("Invalid value passed to \"limit\" query parameter")
+
+    user = User.find_by_email(user_data.get("email"))
+    user_queries = UserQuery.find_by_user(user.user_id)
+
+    query_list = []
+    for i in user_queries:
+      query_data = i.get_fields(reformat_datetime=True)
+      query_data["id"] = i.id
+      # don't inculde chat history to slim return payload
+      del query_data["history"]
+      query_list.append(query_data)
+
+    return {
+      "success": True,
+      "message": f"Successfully retrieved user queries for user {user.user_id}",
+      "data": query_list
+    }
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
+  except ResourceNotFoundException as e:
+    raise ResourceNotFound(str(e)) from e
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+@router.get(
+    "/{query_id}",
+    name="Get user query",
+    response_model=LLMUserQueryResponse)
+def get_chat(query_id: str):
+  """
+  Get a specific user query by id
+
+  Returns:
+      LLMUserQueryResponse
+  """
+  try:
+    user_query = UserQuery.find_by_id(query_id)
+    query_data = user_query.get_fields(reformat_datetime=True)
+    query_data["id"] = user_query.id
+
+    return {
+      "success": True,
+      "message": f"Successfully retrieved user query {query_id}",
+      "data": query_data
+    }
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
+  except ResourceNotFoundException as e:
+    raise ResourceNotFound(str(e)) from e
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+
+@router.put(
+  "/{query_id}",
+  name="Update user query"
+)
+def update_query(query_id: str, input_query: UserQueryUpdateModel):
+  """Update a user query
+
+  Args:
+    input_query (UserQueryUpdateModel): fields in body of query to update.
+      The only field that can be updated is the title.
+
+  Raises:
+    ResourceNotFoundException: If the UserQuery does not exist
+    HTTPException: 500 Internal Server Error if something fails
+
+  Returns:
+    [JSON]: {'success': 'True'} if the user query is updated,
+    NotFoundErrorResponseModel if the user query not found,
+    InternalServerErrorResponseModel if the update raises an exception
+  """
+  try:
+    input_query_dict = {**input_query.dict()}
+
+    existing_query = UserQuery.find_by_id(query_id)
+    for key in input_query_dict:
+      if input_query_dict.get(key) is not None:
+        setattr(existing_query, key, input_query_dict.get(key))
+    existing_query.update()
+
+    return {
+      "success": True,
+      "message": f"Successfully updated user query {query_id}",
+    }
+  except ResourceNotFoundException as re:
+    raise ResourceNotFound(str(re)) from re
+  except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -106,7 +227,7 @@ async def query_engine_create(gen_config: LLMQueryEngineModel,
     name="Make a query to a query engine",
     response_model=LLMQueryResponse)
 async def query(query_engine_id: str,
-                gen_config: LLMQueryModel, 
+                gen_config: LLMQueryModel,
                 user_data: dict = Depends(validate_token)):
   """
   Send a query to a query engine and return the response
@@ -132,9 +253,10 @@ async def query(query_engine_id: str,
   user_id = user_data.get("user_id")
 
   try:
-    query_result, query_references = await query_generate(user_id, prompt, q_engine)    
+    query_result, query_references = await query_generate(user_id, prompt,
+                                                          q_engine)
     query_result_data = query_result.get_fields(reformat_datetime=True)
-    
+
     return {
         "success": True,
         "message": "Successfully generated text",
@@ -175,7 +297,8 @@ async def query_continue(user_query_id: str, gen_config: LLMQueryModel):
     user_query = UserQuery.find_by_id(user_query_id)
     q_engine = QueryEngine.find_by_id(user_query.query_engine_id)
 
-    query_result, query_references = await query_generate(user_id, prompt, q_engine)
+    query_result, query_references = await query_generate(user_query.user_id,
+                                                          prompt, q_engine)
 
     return {
         "success": True,

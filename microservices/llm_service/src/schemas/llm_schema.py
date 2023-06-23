@@ -33,6 +33,8 @@ class ChatModel(BaseModel):
 class ChatUpdateModel(BaseModel):
   title: str
 
+class UserQueryUpdateModel(BaseModel):
+  title: str
 
 class LLMGetTypesResponse(BaseModel):
   """LLM Get types model"""
@@ -138,6 +140,40 @@ class LLMQueryResponse(BaseModel):
         }
     }
 
+class LLMUserQueryResponse(BaseModel):
+  """LLM Retrieve User Query Response model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully retrieved query"
+  data: Optional[dict] = {}
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully retrieved query",
+            "data": None
+        }
+    }
+
+
+class LLMUserAllQueriesResponse(BaseModel):
+  """LLM Get Queries Response model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully retrieved queries"
+  data: List[dict] = []
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully retrieved queries",
+            "data": None
+        }
+    }
+
+
 class LLMGenerateResponse(BaseModel):
   """LLM Generate Response model"""
   success: Optional[bool] = True
@@ -181,7 +217,7 @@ class LLMUserAllChatsResponse(BaseModel):
     schema_extra = {
         "example": {
             "success": True,
-            "message": "Successfully generated text",
+            "message": "Successfully retrieved chats",
             "data": None
         }
     }
