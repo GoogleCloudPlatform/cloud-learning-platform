@@ -220,12 +220,13 @@ async def create_user_chat(gen_config: LLMGenerateModel,
     user = User.find_by_email(user_data.get("email"))
 
     # generate text from prompt
-    result = await llm_generate(prompt, llm_type)
+    response = await llm_generate(prompt, llm_type)
 
     # create new chat for user
     user_chat = UserChat(user_id=user.user_id, llm_type=llm_type)
+    history = UserChat.get_history_entry(prompt, response)
+    user_chat.history = history
     user_chat.save()
-    user_chat.update_history(prompt, result)
 
     chat_data = user_chat.get_fields(reformat_datetime=True)
     chat_data["id"] = user_chat.id

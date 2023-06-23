@@ -14,6 +14,7 @@
 """
 Models for LLM generation and chat
 """
+from typing import List
 from fireo.fields import TextField, ListField, IDField
 from common.models import BaseModel
 
@@ -60,14 +61,22 @@ class UserChat(BaseModel):
             None).order(order_by).offset(skip).fetch(limit)
     return list(objects)
 
-  def update_history(self, prompt: str, response: str):
-    """ Update history with query and response """
-    self.history.append(
+  @classmethod
+  def get_history_entry(cls, prompt: str, response: str) -> List[dict]:
+    """ Get history entry for query and response """
+    entry = []
+    entry.append(
       {CHAT_HUMAN: prompt}
     )
-    self.history.append(
+    entry.append(
       {CHAT_AI: response}
     )
+    return entry
+
+  def update_history(self, prompt: str, response: str):
+    """ Update history with query and response """
+    entry = self.get_history_entry(prompt, response)
+    self.history.extend(entry)
     self.update()
 
   @classmethod
