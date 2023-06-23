@@ -10,6 +10,9 @@ from google.oauth2.credentials import Credentials
 CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
 WORKSPACE_ADMIN_EMAIL = os.environ.get("WORKSPACE_ADMIN_EMAIL")
+USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT = bool(
+    os.getenv("USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT", "false").lower() in (
+        "true", ))
 
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.courses",
@@ -96,7 +99,8 @@ def invite_user(course_id, email, role):
   Returns:
       dict: response from create invitation method
   """
-  service = build("classroom", "v1", credentials=get_creds(True))
+  service = build("classroom", "v1", credentials=get_creds(
+    USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT))
   body = {"courseId": course_id, "role": role, "userId": email}
   invitation = service.invitations().create(body=body).execute()
   return invitation
