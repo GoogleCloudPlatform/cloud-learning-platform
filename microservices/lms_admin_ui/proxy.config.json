@@ -1,24 +1,24 @@
 {
     "/lms/api/v1/*": {
-        "target": "https://core-learning-services-dev.cloudpssolutions.com",
+        "target": "http://localhost:8888",
         "secure": false,
         "logLevel": "debug",
         "changeOrigin": true
     },
     "/lti/api/v1/*": {
-        "target": "https://core-learning-services-dev.cloudpssolutions.com",
+        "target": "http://localhost:9030",
         "secure": false,
         "logLevel": "debug",
         "changeOrigin": true
     },
     "/classroom-shim/api/v1/*": {
-        "target": "https://core-learning-services-dev.cloudpssolutions.com",
+        "target": "http://localhost:9031",
         "secure": false,
         "logLevel": "debug",
         "changeOrigin": true
     },
     "/authentication/api/v1/*": {
-        "target": "https://core-learning-services-dev.cloudpssolutions.com",
+        "target": "http://localhost:8889",
         "secure": false,
         "logLevel": "debug",
         "changeOrigin": true
@@ -27,6 +27,18 @@
 
 // {
 //     "/lms/api/v1/*": {
+//         "target": "https://core-learning-services-dev.cloudpssolutions.com",
+//         "secure": false,
+//         "logLevel": "debug",
+//         "changeOrigin": true
+//     },
+//     "/lti/api/v1/*": {
+//         "target": "https://core-learning-services-dev.cloudpssolutions.com",
+//         "secure": false,
+//         "logLevel": "debug",
+//         "changeOrigin": true
+//     },
+//     "/classroom-shim/api/v1/*": {
 //         "target": "https://core-learning-services-dev.cloudpssolutions.com",
 //         "secure": false,
 //         "logLevel": "debug",

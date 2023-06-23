@@ -1,0 +1,550 @@
+tags:
+  - name: Train IRT Model
+    description: Routes for training IRT Models
+  - name: Fake Data
+    description: Creates fake data for training IRT
+  - name: User Ability
+    description: Fetches User Ability at different levels
+  - name: Next Item
+    description: Returns next Assessment Item 
+  - name: Job Status Check
+    description: Checks and returns status of long running jobs
+
+paths:
+  /item_response_theory/api/v1/train/level:
+    
+    post:
+      tags:
+        - Student Mastery - Item Response Theory
+      summary: Train IRT Model
+      description: This route start batch job for training IRT model at a given level.
+      parameters: []
+      operationId: ItemResponseTheoryApiV1TrainLevel_POST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/trainIRT"
+      responses:
+        "200":
+          description: Starting training of IRT Model at particular level
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trainIRTResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+      security:
+        - api_key: []
+                
+  
+  /item_response_theory/api/v1/fake_data:
+    
+    post:
+      tags:
+        - Student Mastery - Item Response Theory
+      summary: Fake Data
+      description: This route creates fake data at a Learning Unit level.
+      parameters: []
+      operationId: ItemResponseTheoryApiV1FakeData_POST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/fakeData"
+      responses:
+        "200":
+          description: Creates Fake data at a Learning Unit
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/fakeDataResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+      security:
+        - api_key: []
+  
+  
+  /item_response_theory/api/v1/fake_data/course:
+    
+    post:
+      tags:
+        - Student Mastery - Item Response Theory
+      summary: Fake Data
+      description: This route creates fake data at a Course level.
+      parameters: []
+      operationId: ItemResponseTheoryApiV1FakeDataCourse_POST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/fakeDataCourse"
+      responses:
+        "200":
+          description: Creates Fake data at a Course Level
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/fakeDataCourseResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+      security:
+        - api_key: []
+  
+  /item_response_theory/api/v1/ability:
+        
+    get:
+      tags:
+        - Student Mastery - Item Response Theory
+      summary: User Ability
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: string
+          required: true
+          description:  User Id
+        - in: query
+          name: level
+          schema:
+            type: string
+          required: true
+          description:  Available values are course, competency, sub_competency, learning_objective, learning_unit
+        - in: query
+          name: doc_id
+          schema:
+            type: string
+          required: true
+          description:  Firestore document ID
+      operationId: ItemResponseTheoryApiV1Ability_GET
+      description: This route fetches User Ability tree from a given level.
+      responses:
+        "200":
+          description: Returns ability of a user at a particular level
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/abilityResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+      security:
+        - api_key: []
+  
+  /item_response_theory/api/v1/item:
+        
+    get:
+      parameters:
+      - in: query
+        name: user_id
+        schema:
+          type: string
+        required: true
+        description:  User Id
+      - in: query
+        name: learning_unit_id
+        schema:
+          type: string
+        required: true
+        description: Learning Unit ID
+      - in: query
+        name: activity_type
+        schema:
+          type: string
+        required: true
+        description:  Available values are - choose_the_fact, answer_a_question, paraphrasing_practiccreate_knowledge_notes
+      - in: query
+        name: session_id
+        schema:
+          type: string
+        required: true
+        description: Current session ID
+      - in: query
+        name: prev_context_count
+        schema:
+          type: number
+        required: true
+        description: No of previous context to consider
+      tags:
+        - Student Mastery - Item Response Theory
+      summary: Next Item
+      description: This route fetches the next Assessment Id.
+      operationId: ItemResponseTheoryApiV1Item_GET
+      responses:
+        "200":
+          description: Returns aId of next Assessment as per IRT Model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/nextItemResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+      security:
+        - api_key: []
+                
+  /item_response_theory/api/v1/jobs/:
+    get:
+      tags:
+        - Job Status Check
+      description: This route fetches status of all jobs.
+      operationId: ItemResponseTheoryApiV1Jobs_GET
+      responses:
+        "200":
+          description: Returns the status of all jobs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/irtJobStatusCheck"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+      security:
+        - api_key: []
+
+  /item_response_theory/api/v1/jobs/{job_name}:
+  
+    get:
+      tags:
+        - Job Status Check
+      description: This route fetches status of given job name.
+      operationId: ItemResponseTheoryApiV1JobsJobname_GET
+      parameters:
+        - in: path
+          name: job_name
+          schema:
+            type: string
+          required: true
+          description:  Job name
+      responses:
+        "200":
+          description: Returns the status a single job given job_name or all jobs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/irtJobStatusCheck"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+      security:
+        - api_key: []
+                
+    put:
+      tags:
+        - Job Status Check
+      description: This route removes the job from the namespace and updates the stauts.
+      parameters:
+        - in: path
+          name: job_name
+          schema:
+            type: string
+          required: true
+          description:  Job name
+      operationId: ItemResponseTheoryApiV1JobsJobname_PUT
+      responses:
+        "200":
+          description: Removes the job from cluster and updates the status accordingly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobPutResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+      security:
+        - api_key: []
+    
+    delete:
+      tags:
+        - Job Status Check
+      description: This route removes the the particular job document from firestore.
+      parameters:
+        - in: path
+          name: job_name
+          schema:
+            type: string
+          required: true
+          description:  Job name
+      operationId: ItemResponseTheoryApiV1JobsJobname_DELETE
+      responses:
+        "200":
+          description: Deletes the job document from the firestore.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDeleteResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+      security:
+        - api_key: []
+
+components:
+  securitySchemes:
+    api_key:
+      type: "apiKey"
+      name: "key"
+      in: "query"
+
+  schemas:
+    defaultResponseSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "All good"
+        data:
+          type: object
+    
+    irtJobStatusCheck:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the job status"
+        data:
+          type: object
+          properties:
+            job_name:
+              type: string
+              example: "abcd-ajdf-sdfk-sdff"
+            created_by:
+              type: string
+              example: "Sample User"
+            created_time:
+              type: string
+              example: "2021-09-03 11:56:25.370711+00:00"
+            last_modified_by:
+              type: string
+              example: "Sample User"
+            last_modified_time:
+              type: string
+              example: "2021-09-03 11:56:25.370711+00:00"
+            input_data:
+              type: object
+              properties:
+                activity:
+                  type: string
+                  example: "paraphrasing_practice"
+                course_id:
+                  type: string
+                  example: "gjKlJ7cG72zEimRGQl0P"
+                learning_unit:
+                  type: string
+                  example: "0EMYZEw8g5v5Dqei7P6a"
+                save_csv:
+                  type: boolean
+                  example: true
+            status:
+              type: string
+              example: "succeeded"
+            type:
+              type: string
+              example: "assessment-items"
+            output_gcs_path:
+              type: string
+              example: gs://sample-bucket/assessment-items/paraphrasing_practice_2021-09-03 11:56:25.370711+00:00.csv
+    
+    JobPutResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Successfully updated the status and removed the job from namespace"
+        data:
+          type: object
+    
+    JobDeleteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "A job with name 1234-5678 has been deleted"
+        data:
+          type: object
+          
+    trainIRTResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully started IRT training" 
+        data:
+          type: object
+              
+    trainIRT:
+      type: object
+      properties:
+        level:
+          type: string
+          example: "course"
+        update_collections:
+          type: boolean
+          example: true
+        id:
+          type: string
+          example: "djfaksdfasdfa"
+          
+    fakeDataResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully generated fake data"
+        data:
+          type: object
+          properties:
+            lu_id:
+              type: string
+              example: "dsjakfdasfka"
+              
+    fakeData:
+      type: object
+      properties:
+        num_users:
+          type: number
+          example: 20
+        num_items:
+          type: number
+          example: 20
+        item_type:
+          type: string
+          example: "choose_the_fact"
+          
+          
+    fakeDataCourseResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully generated fake data"
+        data:
+          type: object
+              
+    fakeDataCourse:
+      type: object
+      properties:
+        num_users:
+          type: number
+          example: 20
+        course_id:
+          type: string
+          example: "fkdsajga495q4ks"
+          
+    
+    nextItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched next item ID"
+        data:
+          type: object
+          properties:
+            item_id:
+              type: string
+              example: "fdsajf45ajlsdfja"
+              
+    abilityResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched Ability tree"
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example : "dksafkjafsld"
+            title:
+              type: string
+              example: "Sample Level title"
+            ability:
+              type: number
+              example: 0.3
+          
+
+    errorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Something went wrong
+        data:
+          type: object
+          nullable: true
+          example: null
+    badRequestResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Validation failed
+        data:
+          type: object
+          nullable: true
+          example: null

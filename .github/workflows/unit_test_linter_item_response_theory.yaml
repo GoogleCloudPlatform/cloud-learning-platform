@@ -1,0 +1,83 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Unit test & lint for Item Response Theory
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'microservices/item_response_theory/**.py'
+  workflow_dispatch:
+jobs:
+  # unit-test:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       python-version: [3.9.14]
+  #       target-folder: [
+  #         item_response_theory,
+  #       ]
+
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Set up Python ${{ matrix.python-version }}
+  #     uses: actions/setup-python@v2
+  #     with:
+  #       python-version: ${{ matrix.python-version }}
+
+  #   - name: Install dependencies
+  #     run: |
+  #         cd microservices/${{ matrix.target-folder }}
+  #         python -m pip install --upgrade pip setuptools wheel
+  #         python -m pip install pytest pytest-custom_exit_code pytest-cov pylint pytest-mock mock pytest-asyncio
+  #         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+  #         if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
+    
+  #   - name: Test with pytest
+  #     run: |
+  #       cd microservices/${{ matrix.target-folder }}
+  #       PYTEST_ADDOPTS="--cache-clear --cov . " python -m pytest
+
+  linter:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9.14]
+        target-folder: [
+          item_response_theory,
+        ]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        cd microservices/${{ matrix.target-folder }}
+        python -m pip install --upgrade pip
+        python -m pip install pylint
+
+    - name: Lint with pylint
+      run: |
+        cd microservices/${{ matrix.target-folder }}
+        python -m pylint $(git ls-files '*.py') --rcfile=../../.pylintrc
