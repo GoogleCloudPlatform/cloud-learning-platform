@@ -63,12 +63,12 @@ profiles:
       machineType: N1_HIGHCPU_8
       timeout: '1500s'
     artifacts:
-    - image: gcr.io/aitutor-dev/item-response-theory
+    - image: gcr.io/core-learning-services-dev/item-response-theory
       docker:
           cacheFrom:
-            - gcr.io/aitutor-dev/item-response-theory:latest
+            - gcr.io/core-learning-services-dev/item-response-theory:latest
       requires:
-        - image: gcr.io/aitutor-dev/common-ml
+        - image: gcr.io/core-learning-services-dev/common-ml
           alias: ML_BASE_IMG
       sync:
         infer:
@@ -87,14 +87,14 @@ profiles:
       machineType: N1_HIGHCPU_8
       timeout: '1500s'
     artifacts:
-    - image: gcr.io/aitutor-dev/item-response-theory
+    - image: gcr.io/core-learning-services-dev/item-response-theory
       docker:
           cacheFrom:
             - item-response-theory
             - item-response-theory:latest
-            - gcr.io/aitutor-dev/item-response-theory:latest
+            - gcr.io/core-learning-services-dev/item-response-theory:latest
       requires:
-        - image: gcr.io/aitutor-dev/common-ml
+        - image: gcr.io/core-learning-services-dev/common-ml
           alias: ML_BASE_IMG
       sync:
         infer:

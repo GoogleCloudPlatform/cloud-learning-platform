@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: item-response-theory
-        image: gcr.io/aitutor-dev/item-response-theory
+        image: gcr.io/core-learning-services-dev/item-response-theory
         imagePullPolicy: Always
         resources:
           requests:
