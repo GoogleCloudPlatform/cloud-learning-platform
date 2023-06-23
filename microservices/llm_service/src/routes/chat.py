@@ -208,7 +208,7 @@ async def create_user_chat(gen_config: LLMGenerateModel,
   """
   genconfig_dict = {**gen_config.dict()}
 
-  result = []
+  response = []
 
   prompt = genconfig_dict.get("prompt")
   if prompt is None or prompt == "":
@@ -259,7 +259,7 @@ async def user_chat_generate(chatid: str, gen_config: LLMGenerateModel):
   """
   genconfig_dict = {**gen_config.dict()}
 
-  result = []
+  response = []
 
   prompt = genconfig_dict.get("prompt")
   if prompt is None or prompt == "":
@@ -273,10 +273,10 @@ async def user_chat_generate(chatid: str, gen_config: LLMGenerateModel):
     raise ResourceNotFoundException(f"Chat {chatid} not found ")
 
   try:
-    result = await llm_generate(prompt, llm_type, user_chat)
+    response = await llm_generate(prompt, llm_type, user_chat)
 
     # save chat history
-    user_chat.update_history(prompt, result)
+    user_chat.update_history(prompt, response)
 
     chat_data = user_chat.get_fields(reformat_datetime=True)
     chat_data["id"] = user_chat.id
