@@ -38,7 +38,7 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
     user_chat (optional): a user chat to use for context
 
   Returns:
-    the text result.
+    the text response.
   """
   Logger.info(f"generating text with langchain llm_type {llm_type}")
   try:
@@ -47,14 +47,14 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
     if llm is None:
       raise ResourceNotFoundException(f"Cannot find llm type '{llm_type}'")
 
-    result_text = ""
+    response_text = ""
     if llm_type in CHAT_LLM_TYPES:
       # use langchain chat interface for openai
 
       # create msg history for user chat if it exists
       msg = []
       if user_chat is not None:
-        history = user_chat.get("history", [])
+        history = user_chat.history
         for entry in history:
           content = UserChat.entry_content(entry)
           if UserChat.is_human(entry):
@@ -64,23 +64,23 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
       msg.append(HumanMessage(content=prompt))
 
       Logger.info(f"generating text for [{prompt}]")
-      result = await llm.agenerate([msg])
-      result_text = result.generations[0][0].message.content
-      Logger.info(f"result {result.generations[0][0].message.content}")
+      response = await llm.agenerate([msg])
+      response_text = response.generations[0][0].message.content
+      Logger.info(f"response {response_text}")
     else:
       msg = []
       if user_chat is not None:
         msg = user_chat.history
       msg.append(prompt)
       if llm_type in COHERE_LLM_TYPES:
-        result = llm.generate(msg)
-        result_text = result.generations[0][0].text
+        response = llm.generate(msg)
+        response_text = response.generations[0][0].text
       else:
         # we always use await for LLM calls if we can
-        result = await llm.agenerate(msg)
-        result_text = result.generations[0][0].message.content
+        response = await llm.agenerate(msg)
+        response_text = response.generations[0][0].message.content
 
-    return result_text
+    return response_text
   except Exception as e:
     raise InternalServerError(str(e)) from e
 

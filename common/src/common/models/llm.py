@@ -77,7 +77,7 @@ class UserChat(BaseModel):
     """ Update history with query and response """
     entry = self.get_history_entry(prompt, response)
     self.history.extend(entry)
-    self.update()
+    self.save(merge=True)
 
   @classmethod
   def is_human(cls, entry: dict) -> bool:
@@ -89,4 +89,4 @@ class UserChat(BaseModel):
 
   @classmethod
   def entry_content(cls, entry: dict) -> str:
-    return entry.value()
+    return list(entry.values())[0]
