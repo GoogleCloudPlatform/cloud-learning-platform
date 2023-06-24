@@ -41,7 +41,7 @@ async def llm_generate(prompt: str, llm_type: str,
     user_chat (optional): a user chat to use for context
 
   Returns:
-    the text result.
+    the text response.
   """
   # default to openai LLM
   if llm_type is None:
@@ -50,15 +50,15 @@ async def llm_generate(prompt: str, llm_type: str,
   Logger.info(f"generating text with llm_type {llm_type}")
   try:
     if llm_type in LANGCHAIN_LLM.keys():
-      result = await langchain_llm_generate(prompt, llm_type, user_chat)
+      response = await langchain_llm_generate(prompt, llm_type, user_chat)
     elif llm_type in GOOGLE_LLM.keys():
       google_llm = GOOGLE_LLM.get(llm_type, VERTEX_LLM_TYPE_BISON_TEXT)
       is_chat = llm_type in CHAT_LLM_TYPES
-      result = await google_llm_predict(prompt, is_chat, google_llm)
+      response = await google_llm_predict(prompt, is_chat, google_llm)
     else:
       raise ResourceNotFoundException(f"Cannot find llm type '{llm_type}'")
 
-    return result
+    return response
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
@@ -72,7 +72,7 @@ async def llm_chat(prompt: str, llm_type: str) -> str:
 
 
   Returns:
-    the text result
+    the text response
   """
   Logger.info(f"generating chat with llm_type {llm_type}")
   if not llm_type in CHAT_LLM_TYPES:
@@ -80,12 +80,12 @@ async def llm_chat(prompt: str, llm_type: str) -> str:
 
   try:
     if llm_type in LANGCHAIN_LLM.keys():
-      result = await langchain_llm_generate(prompt, llm_type)
+      response = await langchain_llm_generate(prompt, llm_type)
     elif llm_type in GOOGLE_LLM.keys():
       google_llm = GOOGLE_LLM.get(llm_type)
       is_chat = True
-      result = await google_llm_predict(prompt, is_chat, google_llm)
-    return result
+      response = await google_llm_predict(prompt, is_chat, google_llm)
+    return response
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
@@ -101,7 +101,7 @@ async def google_llm_predict(prompt: str, is_chat: bool,
     google_llm: name of the vertex llm model
 
   Returns:
-    the text result.
+    the text response.
   """
   prompt_list = []
   if user_chat is not None:
@@ -144,6 +144,6 @@ async def google_llm_predict(prompt: str, is_chat: bool,
     raise InternalServerError(str(e)) from e
 
   Logger.info(f"Response from Model: {response.text}")
-  result = response.text
+  response = response.text
 
-  return result
+  return response
