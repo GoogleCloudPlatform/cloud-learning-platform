@@ -60,12 +60,12 @@ profiles:
       machineType: N1_HIGHCPU_8
       timeout: '1500s'
     artifacts:
-    - image: gcr.io/aitutor-dev/deep-knowledge-tracing
+    - image: gcr.io/core-learning-services-dev/deep-knowledge-tracing
       docker:
           cacheFrom:
-            - gcr.io/aitutor-dev/deep-knowledge-tracing:latest
+            - gcr.io/core-learning-services-dev/deep-knowledge-tracing:latest
       requires:
-        - image: gcr.io/aitutor-dev/common
+        - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG
       sync:
         infer:
@@ -84,14 +84,14 @@ profiles:
       machineType: N1_HIGHCPU_8
       timeout: '3000s'
     artifacts:
-    - image: gcr.io/aitutor-dev/deep-knowledge-tracing
+    - image: gcr.io/core-learning-services-dev/deep-knowledge-tracing
       docker:
           cacheFrom:
             - deep-knowledge-tracing
             - deep-knowledge-tracing:latest
-            - gcr.io/aitutor-dev/deep-knowledge-tracing:latest
+            - gcr.io/core-learning-services-dev/deep-knowledge-tracing:latest
       requires:
-        - image: gcr.io/aitutor-dev/common
+        - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG
       sync:
         infer:
