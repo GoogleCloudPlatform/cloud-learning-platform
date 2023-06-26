@@ -461,7 +461,7 @@ def update_section(sections_details: UpdateSection):
       "sectionId":section.id,\
       "courseId":section.classroom_id,\
       "classroomUrl":section.classroom_url,\
-        "name":section.name,\
+        "name":section.section,\
         "description":section.description,\
           "cohortId":section.cohort.id,\
           "courseTemplateId":section.course_template.id,\
@@ -729,7 +729,7 @@ def update_enrollment_status(section_id:str,enrollment_status: str):
       "sectionId":section.id,\
       "courseId":section.classroom_id,\
       "classroomUrl":section.classroom_url,\
-        "name":section.name,\
+        "name":section.section,\
         "description":section.description,\
           "cohortId":section.cohort.id,\
           "courseTemplateId":section.course_template.id,\
