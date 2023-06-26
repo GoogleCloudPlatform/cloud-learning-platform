@@ -1,5 +1,6 @@
 const { config } = require('../../codecept-ui-tests.conf');
 let url = config.helpers.Puppeteer.url;
+credentials = JSON.parse(process.env.ACCOUNT)
 
 Feature('User Login');
 
@@ -10,8 +11,8 @@ Scenario('User opens login page and sees login button', async ({ I }) => {
 });
 
 Scenario('User sees Dashboard after logged in.', async ({ I }) => {
-  I.fillField('Email', 'e2e_7112f773_1a53_email@gmail.com');
-  I.fillField('Password', '!45RK&2L!m9%Ef');
+  I.fillField('Email', credentials['email']);
+  I.fillField('Password', credentials['password']);
   I.click('Login');
   I.wait(5)
   I.see('Course Template List');

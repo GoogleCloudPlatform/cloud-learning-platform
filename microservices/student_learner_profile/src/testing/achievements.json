@@ -1,0 +1,36 @@
+[
+  {
+    "type": "course equate",
+    "name": "Nursing",
+    "description": "",
+    "alignments": {
+      "competency_alignments": [],
+      "skill_alignments": []
+    },
+    "associations": {
+      "exact_match_of": [],
+      "exemplar": [],
+      "has_skill_level": [],
+      "is_child_of": [],
+      "is_parent_of": [],
+      "is_part_of": [],
+      "is_peer_of": [],
+      "is_related_to": [],
+      "precedes": [],
+      "replaced_by": []
+    },
+    "credits_available": 0,
+    "field_of_study": "",
+    "metadata": {
+      "design_config" : {
+        "shape" : "",
+        "theme": "",
+        "illustration": ""
+      }
+    },
+    "image": "",
+    "result_descriptions": [],
+    "tags": [],
+    "timestamp": ""
+  }
+]

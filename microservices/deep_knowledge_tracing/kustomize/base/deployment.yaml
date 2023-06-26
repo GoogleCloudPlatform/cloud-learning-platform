@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deep-knowledge-tracing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deep-knowledge-tracing
+  template:
+    metadata:
+      labels:
+        app: deep-knowledge-tracing
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: deep-knowledge-tracing
+        image: deep-knowledge-tracing
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1000Mi"
+          limits:
+            memory: "5000Mi"
+            cpu: "2000m"
+        env:
+        # Define the environment variable
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: API_BASE_URL
+          # Required format: api/version
+          value: api/v1
+        - name: SERVICE_NAME
+          value: deep_knowledge_tracing
+        - name: CONTAINER_NAME
+          value: deep-knowledge-tracing
+        - name: DEPLOYMENT_NAME
+          value: deep-knowledge-tracing
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT
+        - name: SKAFFOLD_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: SKAFFOLD_NAMESPACE
+        - name: GCP_ZONE
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_ZONE
+        - name: GKE_CLUSTER
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GKE_CLUSTER
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        readinessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 30

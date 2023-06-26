@@ -1,0 +1,29 @@
+{
+  "pronouns": [
+    "he/him/his",
+    "she/her/hers",
+    "they/them/theirs",
+    "ze/hir/hirs",
+    "xe/xem/xyr/xyrs",
+    "Use my name",
+    "None of these"
+  ],
+
+  "workdays": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday"
+  ],
+
+  "timezones": [
+     "Eastern (ET) - Washington, DC",
+     "Central (CT) - Chicago",
+     "Mountain (MT) - Denver",
+     "Mountain (MT) - Phoenix",
+     "Pacific (PT) - Los Angeles",
+     "Alaska (AT) - Anchorage",
+     "Hawaii (HT) - Honolulu"
+  ]
+}

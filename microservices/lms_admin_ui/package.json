@@ -7,6 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:prod": "ng test --browsers=ChromeHeadless --watch=false --code-coverage",
     "e2e-ui": "codeceptjs -c ./e2e/codecept-ui-tests.conf.js run --steps"
   },
   "private": true,

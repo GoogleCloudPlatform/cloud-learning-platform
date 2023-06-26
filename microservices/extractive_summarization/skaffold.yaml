@@ -1,0 +1,98 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: extractive-summarization
+build:
+  tagPolicy:
+    gitCommit: {}
+  artifacts:
+  - image: extractive-summarization
+    sync:
+      infer:
+        - '**/*.py'
+        - '**/*.json'
+portForward:
+- resourceType: service
+  resourceName: extractive-summarization
+  port: 80
+  localPort: 8601
+deploy:
+  kustomize:
+    paths:
+    - ./kustomize/minikube
+  statusCheckDeadlineSeconds: 1200
+profiles:
+- name: custom
+  build:
+    googleCloudBuild:
+      machineType: N1_HIGHCPU_8
+      timeout: '900s'
+    artifacts:
+    - image: extractive-summarization
+      docker:
+        cacheFrom:
+          - extractive-summarization
+          - extractive-summarization:latest
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/custom
+    statusCheckDeadlineSeconds: 1200
+- name: dev
+  build:
+    googleCloudBuild:
+      machineType: N1_HIGHCPU_8
+      timeout: '900s'
+    artifacts:
+    - image: gcr.io/core-learning-services-dev/extractive-summarization
+      docker:
+        cacheFrom:
+          - gcr.io/core-learning-services-dev/extractive-summarization:latest
+      sync:
+        infer:
+          - '**/*.py'
+          - '**/*.json'
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/dev
+    statusCheckDeadlineSeconds: 1200
+
+- name: gpu
+  build:
+    googleCloudBuild:
+      machineType: N1_HIGHCPU_8
+      timeout: '900s'
+    artifacts:
+    - image: gcr.io/core-learning-services-dev/extractive-summarization
+      docker:
+        cacheFrom:
+          - extractive-summarization
+          - extractive-summarization:latest
+          - gcr.io/core-learning-services-dev/extractive-summarization:latest
+      sync:
+        infer:
+          - '**/*.py'
+          - '**/*.json'
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/gpu
+    statusCheckDeadlineSeconds: 1200
+
+- name: prod
+  build:
+    googleCloudBuild:
+      machineType: N1_HIGHCPU_8
+      timeout: '900s'
+    artifacts:
+    - image: extractive-summarization
+      docker:
+        cacheFrom:
+          - extractive-summarization
+          - extractive-summarization:latest
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
+    statusCheckDeadlineSeconds: 1200

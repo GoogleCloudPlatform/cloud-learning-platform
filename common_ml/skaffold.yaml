@@ -1,0 +1,86 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: common-ml
+requires:
+  - path: ../common
+    configs: [common]
+    activeProfiles:
+    - name: custom
+      activatedBy: [custom]
+    - name: dev
+      activatedBy: [dev]
+    - name: prod
+      activatedBy: [prod]
+build:
+  tagPolicy:
+    sha256: {}
+  artifacts:
+  - image: common-ml
+    requires:
+      - image: common
+        alias: BASE_IMG
+    sync:
+      infer:
+        - 'src/**'
+
+profiles:
+- name: custom
+  build:
+    googleCloudBuild:
+      machineType: N1_HIGHCPU_8
+      timeout: '900s'
+    artifacts:
+    - image: common-ml
+      docker:
+        cacheFrom:
+          - common-ml
+          - common-ml:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+- name: prod
+  build:
+    googleCloudBuild:
+      machineType: N1_HIGHCPU_8
+      timeout: '900s'
+    artifacts:
+      - image: common-ml
+        docker:
+          cacheFrom:
+            - common-ml
+            - common-ml:latest
+        requires:
+          - image: common
+            alias: BASE_IMG
+- name: dev
+  build:
+    googleCloudBuild:
+      machineType: N1_HIGHCPU_8
+      timeout: '900s'
+    artifacts:
+    - image: gcr.io/core-learning-services-dev/common-ml
+      docker:
+        cacheFrom:
+          - gcr.io/core-learning-services-dev/common-ml
+          - gcr.io/core-learning-services-dev/common-ml:latest
+      requires:
+        - image: gcr.io/core-learning-services-dev/common
+          alias: BASE_IMG
+      sync:
+        infer:
+          - 'src/**'
