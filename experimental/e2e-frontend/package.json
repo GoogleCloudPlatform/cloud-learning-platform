@@ -10,6 +10,7 @@
   "license": "ISC",
   "devDependencies": {
     "cypress": "^12.14.0",
-    "cypress-firebase": "^3.0.1"
+    "cypress-firebase": "^3.0.1",
+    "cypress-iframe": "^1.0.1"
   }
 }
