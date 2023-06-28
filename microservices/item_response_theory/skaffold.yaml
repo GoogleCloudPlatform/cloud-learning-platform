@@ -5,15 +5,6 @@ metadata:
 requires:
   - path: ../../common_ml
     configs: [common-ml]
-    activeProfiles:
-    - name: custom
-      activatedBy: [custom]
-    - name: dev
-      activatedBy: [dev]
-    - name: prod
-      activatedBy: [prod]
-    - name: gpu
-      activatedBy: [gpu]
 build:
   tagPolicy:
     sha256: {}
