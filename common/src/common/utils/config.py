@@ -31,7 +31,8 @@ JOB_TYPES_WITH_PREDETERMINED_TITLES = [
     "course-ingestion_learning-units",
     "create_knowledge_graph_embedding",
     "deep-knowledge-tracing",
-    "validate_and_upload_zip"
+    "validate_and_upload_zip",
+    "build_query_engine"
 ]
 
 BATCH_JOB_FETCH_TIME = 24  # in hours
