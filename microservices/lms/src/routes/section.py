@@ -801,7 +801,7 @@ def failed_to_provision():
             CourseEnrollmentMapping.delete_by_id(course_enrollment.id)
           classroom_crud.delete_course_by_id(section.classroom_id)
           Section.delete_by_id(section.id)
-          Logger.info(f"Deleted section with id \
+          Logger.info(f"Deleted section with name {section.name} id \
                 {section.id} classroom_id {section.classroom_id} {folder_id}")
           count=count+1
       except HttpError as ae:
@@ -863,6 +863,11 @@ def update_invites(section_id:str):
               course_record.user.email)
           user_ref = course_record.user
           # Check if gaia_id is "" if yes so update personal deatils
+          if "familyName" not in user_profile["name"].keys() or "givenName" not in user_profile["name"].keys():
+            Logger.error(
+f"Cannot update invitation status for {user_ref.email} {course_record.section.id}because does not\
+    have first name or last name set in google profile")
+            continue
           if user_ref.gaia_id == "":
             user_ref.first_name = user_profile["name"]["givenName"]
             user_ref.last_name = user_profile["name"]["familyName"]
