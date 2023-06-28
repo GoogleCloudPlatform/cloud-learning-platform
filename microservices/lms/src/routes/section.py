@@ -801,7 +801,7 @@ def failed_to_provision():
             CourseEnrollmentMapping.delete_by_id(course_enrollment.id)
           classroom_crud.delete_course_by_id(section.classroom_id)
           Section.delete_by_id(section.id)
-          Logger.info(f"Deleted section with name {section.name} id \
+          Logger.info(f"Deleted section with name {section.name} {section.section} id \
                 {section.id} classroom_id {section.classroom_id} {folder_id}")
           count=count+1
       except HttpError as ae:
