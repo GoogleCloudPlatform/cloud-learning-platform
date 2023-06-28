@@ -15,39 +15,6 @@
 """ Schema examples and test objects for unit tests """
 # pylint: disable = line-too-long
 
-LLM_GENERATE_EXAMPLE = {
-  "llm_type": "",
-  "prompt": "",
-  "context": "",
-  "primer":  "",
-}
-
-LLM_QUERY_EXAMPLE = {
-  "prompt": "",
-  "query_engine": "",
-}
-
-LLM_QUERY_ENGINE_EXAMPLE = {
-  "doc_url": "",
-  "query_engine": "",
-  "llm_type": "",
-  "is_public": ""
-}
-
-CHAT_EXAMPLE = {
-  "id": "asd98798as7dhjgkjsdfh",
-  "user_id": "fake-user-id",
-  "title": "Test chat",
-  "llm_type": "VertexAI-Text-alpha",
-  "history": [
-    "test input 1",
-    "test response 1",
-    "test input 2",
-    "test response 2"
-  ],
-  "created_time": "2023-05-05 09:22:49.843674+00:00",
-  "last_modified_time": "2023-05-05 09:22:49.843674+00:00"
-}
 
 USER_EXAMPLE = {
     "id": "fake-user-id",

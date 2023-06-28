@@ -23,8 +23,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from unittest import mock
 from testing.test_config import API_URL, TESTING_FOLDER_PATH
-from schemas.schema_examples import (LLM_GENERATE_EXAMPLE, CHAT_EXAMPLE,
-                                     USER_EXAMPLE)
+from schemas.schema_examples import USER_EXAMPLE
 from common.models import UserChat, User
 from common.utils.http_exceptions import add_exception_handlers
 from common.testing.client_with_emulator import client_with_emulator

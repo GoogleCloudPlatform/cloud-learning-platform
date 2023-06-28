@@ -18,21 +18,20 @@
 import traceback
 from fastapi import APIRouter
 from typing_extensions import Literal
-from common.utils.batch_job import (get_all_jobs, get_job_status, 
-                                    delete_batch_job, 
+from common.utils.batch_job import (get_all_jobs, get_job_status,
+                                    delete_batch_job,
                                     remove_job_and_update_status)
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError, ResourceNotFound
 from schemas.error_schema import NotFoundErrorResponseModel
-from config import ERROR_RESPONSES
+from config import ERROR_RESPONSES, JOB_TYPES
 # pylint: disable = broad-except
 
 router = APIRouter(
     prefix="/jobs",
-    tags=["Batch Jobs"],
+    tags=["Jobs"],
     responses=ERROR_RESPONSES)
-
 
 @router.get(
     "/{job_type}/{job_name}",
@@ -40,6 +39,7 @@ router = APIRouter(
         "model": NotFoundErrorResponseModel
     }})
 def get_batch_job_status(job_type: JOB_TYPES, job_name: str):
+  """ Get status of job by type and name """
   try:
     if job_name:
       data = get_job_status(job_type, job_name)
@@ -59,6 +59,7 @@ def get_batch_job_status(job_type: JOB_TYPES, job_name: str):
 
 @router.get("/{job_type}")
 def get_all_job_status(job_type: JOB_TYPES):
+  """ Get status of all jobs by type """
   try:
     data = get_all_jobs(job_type)
     response = {
@@ -82,6 +83,7 @@ def get_all_job_status(job_type: JOB_TYPES):
         "model": NotFoundErrorResponseModel
     }})
 def delete_batch_job_status(job_type: JOB_TYPES, job_name: str):
+  """ Delete job by type and name """
   try:
     delete_batch_job(job_type, job_name)
     response = {
@@ -105,6 +107,7 @@ def delete_batch_job_status(job_type: JOB_TYPES, job_name: str):
         "model": NotFoundErrorResponseModel
     }})
 def update_batch_job_status(job_type: JOB_TYPES, job_name: str):
+  """ Remove job and update status by type and name """
   try:
     return remove_job_and_update_status(job_type, job_name)
   except ResourceNotFoundException as e:
