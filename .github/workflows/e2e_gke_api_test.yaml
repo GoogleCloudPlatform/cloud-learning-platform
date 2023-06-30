@@ -450,6 +450,7 @@ jobs:
     - name: Delete all deployments and namespace
       run: |
         NAMESPACE=$E2E_NAMESPACE_PREFIX
+        skaffold delete --namespace $NAMESPACE
         kubectl delete namespace $NAMESPACE
 
     - name: Cleaning up Pub/Sub
