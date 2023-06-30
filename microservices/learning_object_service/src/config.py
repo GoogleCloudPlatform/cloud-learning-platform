@@ -82,13 +82,13 @@ LO_ALIASES = Literal[tuple(LOS_LITERALS["LO_ALIASES"])]
 LR_TYPES = Literal[tuple(LOS_LITERALS["LR_TYPES"])]
 LR_TYPES_LIST = LOS_LITERALS["LR_TYPES"]
 LR_ALIASES = Literal[tuple(LOS_LITERALS["LR_ALIASES"])]
-ASSESSMENT_TYPES = Literal[tuple(ASSESSMENT_LITERALS["AS_TYPES"])]
-ASSESSMENT_ALIASES = Literal[tuple(ASSESSMENT_LITERALS["AS_ALIASES"])]
+ASSESSMENT_TYPES = Literal[tuple(ASSESSMENT_LITERALS["assessments"]["type"])]
+ASSESSMENT_ALIASES = Literal[tuple(ASSESSMENT_LITERALS["assessments"]["alias"])]
 ALL_ALIASES = LOS_LITERALS["CP_ALIASES"] + \
               LOS_LITERALS["LE_ALIASES"] + \
               LOS_LITERALS["LO_ALIASES"] + \
               LOS_LITERALS["LR_ALIASES"] + \
-              ASSESSMENT_LITERALS["AS_ALIASES"]
+              ASSESSMENT_LITERALS["assessments"]["alias"]
 ALLOWED_RESOURCE_STATUS = Literal["initial", "draft","published","unpublished"]
 MADCAP_PATTERNS_TO_EXCLUDE = ["/Templates/","Search.htm"]
 

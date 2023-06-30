@@ -29,7 +29,7 @@ def get_user_details(user_email):
 
 def get_student_details(context_id, user_email):
   """Get the details of the student for a given context"""
-  get_student_details_url = f"{LMS_BASE_URL}/v1/sections/{context_id}/students/{user_email}"
+  get_student_details_url = f"{LMS_BASE_URL}/sections/{context_id}/students/{user_email}"
   student_details_res = get_method(
       url=get_student_details_url, use_bot_account=True)
 
