@@ -33,7 +33,7 @@ export class ContentSelectorComponent {
     this.ltiService.contentSelectionLaunch(data.toolId, data.userId, data.contextId, data.contextType).subscribe(
       (response: any) => {
         this.loadingIframe = false
-        this.iframeUrl = response.url
+        this.iframeUrl = this.getUrl(response.url)
       }
     )
   }

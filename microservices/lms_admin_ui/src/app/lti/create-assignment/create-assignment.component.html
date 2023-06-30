@@ -17,7 +17,7 @@
                 <mat-form-field appearance="fill" style="width: 100%">
                     <mat-label>Select Tool</mat-label>
                     <input *ngIf="toolSelectDisabled" [value]="toolName" [disabled]="true" readonly="true" matInput>
-                    <input *ngIf="toolSelectDisabled" formControlName="tool_id" [disabled]="true" readonly="true"
+                    <input *ngIf="toolSelectDisabled" formControlName="tool_id" readonly="true"
                         type="hidden">
                     <mat-select *ngIf="!toolSelectDisabled" formControlName="tool_id"
                         (selectionChange)="onDropdownChange()">

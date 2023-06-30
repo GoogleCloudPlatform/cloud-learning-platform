@@ -26,11 +26,12 @@ from google.oauth2.credentials import Credentials
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
+CLASSROOM_ADMIN_EMAIL=os.environ.get("CLASSROOM_ADMIN_EMAIL")
 
 
 def delete_classroom_courses():
   GKE_POD_SA_KEY=json.loads(os.environ.get("GKE_POD_SA_KEY"))
-  CLASSROOM_ADMIN_EMAIL=os.environ.get("CLASSROOM_ADMIN_EMAIL")
+  print(CLASSROOM_ADMIN_EMAIL)
   print("Admin Email in cleanup")
   SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly",""]
@@ -59,7 +60,9 @@ def delete_classroom_courses():
 
 if __name__ == "__main__":
   if DATABASE_PREFIX is None:
-    raise Exception("DATABASE_PREFIX is not defined. Database cleanup skipped.")
+    raise Exception("DATABASE_PREFIX is not defined. Classroom cleanup skipped.")
+  if not CLASSROOM_ADMIN_EMAIL:
+    raise Exception("CLASSROOM_ADMIN_EMAIL is not defined. Classroom cleanup skipped.")
   print("Deleting Courses from classroom")
   result = delete_classroom_courses()
   print(result)
