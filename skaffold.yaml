@@ -22,7 +22,7 @@ requires:
   configs: [common]
 
 - path: ./common_ml
-  configs: [common_ml]
+  configs: [common-ml]
 
 - path: ./microservices/redis
   configs: [redis]
@@ -69,6 +69,9 @@ requires:
 
 - path: ./microservices/learning_object_service
   configs: [learning-object-service]
+
+- path: ./microservices/assessment_service
+  configs: [assessment-service]
 
 - path: ./microservices/delete_sections_cronjob
   configs: [delete-sections-cronjob]

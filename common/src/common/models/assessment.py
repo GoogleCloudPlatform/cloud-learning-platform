@@ -6,13 +6,15 @@ from fireo.fields import TextField, ListField, MapField, NumberField, BooleanFie
 
 
 ASSESSMENT_LITERALS = {
-  "AS_TYPES" : ["practice", "project", "pretest", "srl", "static_srl",
+  "assessments":{
+    "type" : ["practice", "project", "pretest", "srl", "static_srl",
                 "cognitive_wrapper"],
-  "AS_ALIASES" : ["assessment"],
+    "alias" : ["assessment"]
+  }
 }
 
 def check_type(level):
-  allowed_types = ASSESSMENT_LITERALS[level + "_TYPES"]
+  allowed_types = ASSESSMENT_LITERALS[level]["type"]
   def _check_type(field_val):
     """validator method for type field"""
     if field_val.lower() in allowed_types:
@@ -22,7 +24,7 @@ def check_type(level):
   return _check_type
 
 def check_alias(level):
-  allowed_aliases = ASSESSMENT_LITERALS[level + "_ALIASES"]
+  allowed_aliases = ASSESSMENT_LITERALS[level]["alias"]
   def _check_alias(field_val):
     """validator method for alias field"""
     if field_val.lower() in allowed_aliases:
@@ -34,11 +36,11 @@ def check_alias(level):
 
 class Rubric(NodeItem):
   """Rubric Class"""
-  uuid = TextField(required=True)
-  name = TextField(required=True)
-  description = TextField(required=True)
+  uuid = TextField()
+  name = TextField()
+  description = TextField()
   author = TextField()
-  performance_indicators = ListField()
+  evaluation_criteria = MapField()
   parent_nodes = MapField()
   child_nodes = MapField()
 
@@ -66,11 +68,12 @@ class Rubric(NodeItem):
 
 class RubricCriterion(NodeItem):
   """RubricCriterion Class"""
-  uuid = TextField(required=True)
-  name = TextField(required=True)
-  description = TextField(required=True)
+  uuid = TextField()
+  name = TextField()
+  description = TextField()
   author = TextField()
   parent_nodes = MapField()
+  performance_indicators = ListField()
 
   class Meta:
     collection_name = BaseModel.DATABASE_PREFIX + "rubric_criterions"
@@ -156,7 +159,7 @@ class Assessment(NodeItem):
   assessment_reference = MapField()
   instructor_id = TextField()
   assessor_id = TextField()
-  pass_threshold = NumberField(default=0.7)
+  pass_threshold = NumberField(default=0)
   max_attempts = NumberField()
   metadata = MapField()
   is_autogradable = BooleanField(default=False)
@@ -172,8 +175,8 @@ class Assessment(NodeItem):
   child_nodes = MapField()
   # meta fields
   order = NumberField()
-  alias = TextField(default="assessment", validator=check_alias("AS"))
-  type = TextField(required=True, validator=check_type("AS"))
+  alias = TextField(default="assessment", validator=check_alias("assessments"))
+  type = TextField(required=True, validator=check_type("assessments"))
   is_locked = BooleanField()
   is_optional = BooleanField(default=False)
   is_hidden = BooleanField(default=False)

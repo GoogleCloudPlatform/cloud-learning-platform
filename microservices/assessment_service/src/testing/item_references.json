@@ -1,0 +1,32 @@
+{
+  "HUM102_C1_S1_Q1": {
+    "skill": "S1",
+    "competency": "C1",
+    "pass": true
+  },
+  "HUM102_C1_S1_Q2": {
+    "skill": "S1",
+    "competency": "C1",
+    "pass": true
+  },
+  "HUM102_C1_S1_Q3": {
+    "skill": "S1",
+    "competency": "C1",
+    "pass": true
+  },
+  "HUM102_C1_S2_Q1": {
+    "skill": "S2",
+    "competency": "C1",
+    "pass": true
+  },
+  "HUM102_C1_S2_Q2": {
+    "skill": "S2",
+    "competency": "C1",
+    "pass": true
+  },
+  "HUM102_C1_S3_Q1": {
+    "skill": "S3",
+    "competency": "C1",
+    "pass": false
+  }
+}
