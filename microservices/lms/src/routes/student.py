@@ -382,7 +382,8 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
         "classroom_id": section.classroom_id,
         "classroom_url": section.classroom_url
     }
-    section_service.insert_section_enrollment_to_bq(course_enrollment_mapping,section)
+    section_service.insert_section_enrollment_to_bq(
+      course_enrollment_mapping, section)
     return {
         "message":
         f"Successfully Added the Student with email {input_data.email}",
@@ -485,7 +486,8 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
         "classroom_id": section.classroom_id,
         "classroom_url": section.classroom_url
     }
-    section_service.insert_section_enrollment_to_bq(course_enrollment_mapping,section)
+    section_service.insert_section_enrollment_to_bq(
+      course_enrollment_mapping, section)
     return {
         "message":
         f"Successfully Added the Student with email {input_data.email}",

@@ -230,7 +230,6 @@ def enroll_teacher(section_id: str, request: Request,
                      f" in this section {section.id} as a leaner or faculty")
 
     result=add_teacher(headers,section,teacher_email)
-    insert_section_enrollment_to_bq(result, section)
     if result.invitation_id:
       return {
         "message": f"Successfully invited the teacher using {teacher_email}",

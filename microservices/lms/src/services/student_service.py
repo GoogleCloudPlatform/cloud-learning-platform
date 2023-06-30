@@ -2,7 +2,7 @@
 import requests
 import traceback
 from config import USER_MANAGEMENT_BASE_URL
-from section_service import insert_section_enrollment_to_bq
+from services.section_service import insert_section_enrollment_to_bq
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.models import CourseEnrollmentMapping, User
