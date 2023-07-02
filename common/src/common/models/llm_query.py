@@ -138,8 +138,9 @@ class QueryEngine(BaseModel):
 
 class QueryReference(BaseModel):
   """
-  QueryReference ORM class.  Each reference consists of a text query
-  response and a link to a source query document.
+  QueryReference ORM class. This class represents a single query reference.
+  It points to a specific chunk of text in one of the indexed documents.
+  
   """
   id = IDField()
   query_engine_id = TextField(required=True)
@@ -154,8 +155,9 @@ class QueryReference(BaseModel):
 
 class QueryResult(BaseModel):
   """
-  QueryResult ORM class.  Results consist of a list of query reference
-  ids.
+  QueryResult ORM class.  Each query result consists of a text query
+  response and a list of links to source query documents, as a
+  list of query reference ids.
   """
   id = IDField()
   query_engine_id = TextField(required=True)
