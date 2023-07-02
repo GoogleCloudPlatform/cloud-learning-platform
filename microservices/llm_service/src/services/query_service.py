@@ -359,8 +359,9 @@ def _process_documents(doc_url: str, bucket_name: str,
 
       Logger.info(f"data uploaded for {doc_name}")
 
-      # clean up tmp data dir
+      # clean up tmp files
       shutil.rmtree(embeddings_dir)
+      shutil.remove(doc_filepath)
 
       # store QueryDocument and QueryDocumentChunk models
       query_doc = QueryDocument(query_engine_id = q_engine.id,
@@ -384,18 +385,14 @@ def _process_documents(doc_url: str, bucket_name: str,
 
 
 def _download_files_to_local(storage_client, local_dir, doc_url: str) -> \
-    List[Tuple[str, str, List[str]]]:
+    List[Tuple[str, str, str]]:
   """ Download files from GCS to a local tmp directory """
   docs = []
   bucket_name = doc_url.split("gs://")[1].split("/")[0]
   for blob in storage_client.list_blobs(bucket_name):
-    # skip directories for now
-    if blob.name.endswith("/"):
-      continue
-    # Create a blob object from the filepath
-    file_path = os.path.join(local_dir, blob.name)
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    # Download the file to a destination
+    # Download the file to the tmp folder flattening all directories
+    file_name = Path(blob.name).name
+    file_path = os.path.join(local_dir, file_name)
     blob.download_to_filename(file_path)
     docs.append((blob.name, blob.path, file_path))
   return docs
