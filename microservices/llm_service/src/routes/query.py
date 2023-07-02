@@ -19,6 +19,8 @@ import traceback
 from typing import Optional
 from fastapi import APIRouter, Depends
 from common.utils.auth_service import validate_token
+from common.utils.batch_jobs import initiate_batch_job
+from common.utils.config import JOB_TYPE_QUERY_ENGINE_BUILD
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException,
                                  ValidationError,
@@ -36,7 +38,8 @@ from schemas.llm_schema import (LLMQueryModel,
                                 LLMQueryResponse)
 
 from services.query_service import query_generate, query_engine_build
-from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES
+from config import (DATABASE_PREFIX, PAYLOAD_FILE_SIZE, ERROR_RESPONSES,
+                    DEFAULT_QUERY_CHAT_MODEL)
 
 router = APIRouter(prefix="/query", tags=["LLMs"], responses=ERROR_RESPONSES)
 
@@ -201,6 +204,7 @@ async def query_engine_create(gen_config: LLMQueryEngineModel,
   Returns:
       LLMQueryEngineResponse
   """
+
   genconfig_dict = {**gen_config.dict()}
 
   doc_url = genconfig_dict.get("doc_url")
@@ -214,15 +218,20 @@ async def query_engine_create(gen_config: LLMQueryEngineModel,
   user_id = user_data.get("user_id")
 
   try:
-    result = await query_engine_build(doc_url, query_engine, user_id,
-                                      genconfig_dict)
-
-    return {
-        "success": True,
-        "message": "Successfully generated text",
-        "content": result
+    data = {
+      "doc_url": doc_url,
+      "query_engine": query_engine,
+      "user_id": user_id,
+      "is_public": genconfig_dict.get("is_public", True),
+      "llm_type": genconfig_dict.get("llm_type", DEFAULT_QUERY_CHAT_MODEL)
     }
+    env_vars = {"DATABASE_PREFIX": DATABASE_PREFIX}
+    response = initiate_batch_job(data, JOB_TYPE_QUERY_ENGINE_BUILD, env_vars)
+    Logger.info(response)
+    return response
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 

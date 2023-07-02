@@ -162,6 +162,17 @@ async def _query_doc_matches(q_engine: QueryEngine,
 
   return query_references
 
+def batch_build_query_engine(request_body: Dict) -> Dict:
+  """ handle a batch job request for query engine build """
+  doc_url = request_body.get("doc_url")
+  query_engine = request_body.get("query_engine")
+  user_id = request_body.get("user_id")
+
+  q_engine = query_engine_build(doc_url, query_engine, user_id, request_body)
+  result = {
+    "query_engine_id": q_engine.id
+  }
+  return result
 
 def query_engine_build(doc_url: str, query_engine: str, user_id: str,
                        params: Dict) -> QueryEngine:
