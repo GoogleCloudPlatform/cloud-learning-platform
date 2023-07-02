@@ -140,7 +140,7 @@ class QueryReference(BaseModel):
   """
   QueryReference ORM class. This class represents a single query reference.
   It points to a specific chunk of text in one of the indexed documents.
-  
+
   """
   id = IDField()
   query_engine_id = TextField(required=True)

@@ -25,7 +25,7 @@ from config import (DEPLOYMENT_NAME, CONTAINER_NAME, JOB_NAMESPACE, GCP_PROJECT)
 
 
 def initiate_batch_job(request_body, job_type, env_vars={}):
-  """Triggers a batch job 
+  """Triggers a batch job
     Args:
       req_body: dict - dictionary containing metadata for running batch job
       job_type: "type of job"
