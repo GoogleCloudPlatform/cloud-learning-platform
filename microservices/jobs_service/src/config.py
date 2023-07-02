@@ -16,17 +16,12 @@
   Jobs Service config file
 """
 # pylint: disable=unspecified-encoding,line-too-long
-from typing_extensions import Literal
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
+from common.utils.config import JOB_TYPES_WITH_PREDETERMINED_TITLES
 
-JOB_TYPES = Literal["emsi_ingestion", "csv_ingestion", "unified_alignment",
-                    "credential_engine_ingestion", "skill_embedding_db_update",
-                    "role_skill_alignment", "knowledge_embedding_db_update",
-                    "wgu_ingestion", "e2e_test", "generic_csv_ingestion",
-                    "query_engine_build"]
-
+JOB_TYPES = JOB_TYPES_WITH_PREDETERMINED_TITLES
 
 ERROR_RESPONSES = {
     500: {
