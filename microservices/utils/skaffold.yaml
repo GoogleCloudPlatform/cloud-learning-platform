@@ -5,25 +5,11 @@ metadata:
 requires:
   - path: ../../common
     configs: [common]
-    activeProfiles:
-    - name: custom
-      activatedBy: [custom]
-    - name: dev
-      activatedBy: [dev]
-  - path: ../authentication
-    configs: [authentication]
-    activeProfiles:
-    - name: custom
-      activatedBy: [custom]
-    - name: dev
-      activatedBy: [dev]
-    - name: prod
-      activatedBy: [prod]
 build:
   tagPolicy:
     gitCommit: {}
   local:
-    concurrency: 1
+    concurrency: 0
   artifacts:
   - image: utils
     requires:
@@ -37,12 +23,11 @@ portForward:
 - resourceType: service
   resourceName: utils
   port: 80
-  localPort: 8891
+  localPort: 9011
 deploy:
   kustomize:
     paths:
     - ./kustomize/minikube
-  statusCheckDeadlineSeconds: 1200
 profiles:
 - name: custom
   build:
@@ -60,14 +45,21 @@ profiles:
     kustomize:
       paths:
       - ./kustomize/custom
-    statusCheckDeadlineSeconds: 1200
+- name: prod_non_cloudbuild
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
 - name: dev
+  activation:
+  - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
     googleCloudBuild: {}
     artifacts:
     - image: gcr.io/core-learning-services-dev/utils
       docker:
         cacheFrom:
+          - gcr.io/core-learning-services-dev/utils
           - gcr.io/core-learning-services-dev/utils:latest
       requires:
         - image: gcr.io/core-learning-services-dev/common
@@ -80,8 +72,6 @@ profiles:
     kustomize:
       paths:
       - ./kustomize/dev
-    statusCheckDeadlineSeconds: 1200
-
 - name: prod
   build:
     googleCloudBuild: {}
@@ -98,4 +88,3 @@ profiles:
     kustomize:
       paths:
       - ./kustomize/prod
-    statusCheckDeadlineSeconds: 1200
