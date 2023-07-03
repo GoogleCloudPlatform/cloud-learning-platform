@@ -3,16 +3,21 @@ kind: Deployment
 metadata:
   name: utils
 spec:
+  replicas: 3
   template:
     spec:
-      serviceAccountName: ksa
       containers:
       - name: utils
         image: utils
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
-        - name: GCP_LEARNING_RESOURCE_BUCKET
+        - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:
               name: env-vars
-              key: GCP_LEARNING_RESOURCE_BUCKET
+              key: PROJECT_ID
+        - name: EXTERNAL_DATA_GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: EXTERNAL_DATA_GCP_PROJECT

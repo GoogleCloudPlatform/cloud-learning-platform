@@ -3,25 +3,21 @@ kind: Deployment
 metadata:
   name: utils
 spec:
+  replicas: 1
   template:
     spec:
-      serviceAccountName: ksa
       containers:
       - name: utils
         image: gcr.io/core-learning-services-dev/utils
         imagePullPolicy: Always
-        resources:
-            requests:
-              cpu: "100m"
-              memory: "100Mi"
-            limits:
-              memory: "500Mi"
-              cpu: "200m"
         env:
-          - name: GCP_LEARNING_RESOURCE_BUCKET
-            value: core-learning-services-dev
-          - name: DATABASE_PREFIX
-            valueFrom:
-              configMapKeyRef:
-                name: env-vars
-                key: DATABASE_PREFIX
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX

@@ -12,68 +12,56 @@ spec:
       labels:
         app: utils
     spec:
+      serviceAccountName: ksa
       containers:
-        - name: utils
-          image: utils
-          imagePullPolicy: IfNotPresent
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "250Mi"
-            limits:
-              memory: "500Mi"
-              cpu: "200m"
-          env:
-            # Define the environment variable
-            - name: PROJECT_ID
-              valueFrom:
-                configMapKeyRef:
-                  name: env-vars
-                  key: PROJECT_ID
-            - name: API_BASE_URL
-              # Required format: api/version
-              value: api/v1
-            - name: SERVICE_NAME
-              value: utils
-            - name: FEEDBACK_COLLECTION
-              value: feedback
-            - name: GET_HELP_COLLECTION
-              value: help-faqs
-            - name: GET_TOPICS_COLLECTION
-              value: topics
-            - name: USER_COLLECTION
-              value: users
-            - name: USER_SUBCOLLECTION
-              value: user-feedback
-            - name: IS_DEVELOPMENT
-              valueFrom:
-                configMapKeyRef:
-                  name: env-vars
-                  key: IS_DEVELOPMENT
-          ports:
-            - containerPort: 80
-          livenessProbe:
-            failureThreshold: 5
-            httpGet:
-              path: /ping
-              port: 80
-              scheme: HTTP
-            periodSeconds: 30
-            successThreshold: 1
-            timeoutSeconds: 10
-          readinessProbe:
-            failureThreshold: 5
-            httpGet:
-              path: /ping
-              port: 80
-              scheme: HTTP
-            periodSeconds: 30
-            successThreshold: 1
-            timeoutSeconds: 10
-          volumeMounts:
-            - mountPath: /opt/keys
-              name: gcp-sa-key
-      volumes:
-        - name: gcp-sa-key
-          secret:
-            secretName: signurl-sa-key
+      - name: utils
+        image: utils
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1000Mi"
+          limits:
+            memory: "5000Mi"
+            cpu: "2000m"
+        env:
+        # Define the environment variable
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID
+        - name: API_BASE_URL
+          # Required format: api/version
+          value: api/v1
+        - name: CONTAINER_NAME
+          value: utils
+        - name: DEPLOYMENT_NAME
+          value: utils
+        - name: SERVICE_NAME
+          value: utils
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT 
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60
