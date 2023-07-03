@@ -19,15 +19,6 @@ requires:
       activatedBy: [dev]
     - name: prod
       activatedBy: [prod]
-  - path: ../dashboard
-    configs: [dashboard]
-    activeProfiles:
-    - name: custom
-      activatedBy: [custom]
-    - name: dev
-      activatedBy: [dev]
-    - name: prod
-      activatedBy: [prod]
 build:
   tagPolicy:
     gitCommit: {}
@@ -74,12 +65,12 @@ profiles:
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: gcr.io/aitutor-dev/utils
+    - image: gcr.io/core-learning-services-dev/utils
       docker:
         cacheFrom:
-          - gcr.io/aitutor-dev/utils:latest
+          - gcr.io/core-learning-services-dev/utils:latest
       requires:
-        - image: gcr.io/aitutor-dev/common
+        - image: gcr.io/core-learning-services-dev/common
           alias: BASE_IMG
       sync:
         infer:
