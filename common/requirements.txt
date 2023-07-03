@@ -2,7 +2,7 @@ fireo==1.6.2
 google-cloud-logging==3.5.0
 google-cloud-secret-manager==2.15.0
 jsonschema==4.17.3
-fastapi==0.85.1
+fastapi==0.99.1
 google-crc32c==1.5.0
 google-auth==2.15.0
 google-api-python-client==2.69.0
