@@ -5,11 +5,6 @@ metadata:
 requires:
   - path: ../../common
     configs: [common]
-    activeProfiles:
-    - name: custom
-      activatedBy: [custom]
-    - name: dev
-      activatedBy: [dev]
 build:
   tagPolicy:
     gitCommit: {}
@@ -41,6 +36,7 @@ profiles:
     - image: credential-pathway-service
       docker:
         cacheFrom:
+          - credential-pathway-service
           - credential-pathway-service:latest
       requires:
         - image: common
@@ -50,12 +46,15 @@ profiles:
       paths:
       - ./kustomize/custom
 - name: dev
+  activation:
+    - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
     googleCloudBuild: {}
     artifacts:
     - image: gcr.io/core-learning-services-dev/credential-pathway-service
       docker:
         cacheFrom:
+          - gcr.io/core-learning-services-dev/credential-pathway-service
           - gcr.io/core-learning-services-dev/credential-pathway-service:latest
       requires:
         - image: gcr.io/core-learning-services-dev/common
@@ -68,3 +67,19 @@ profiles:
     kustomize:
       paths:
       - ./kustomize/dev
+- name: prod
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: credential-pathway-service
+      docker:
+        cacheFrom:
+          - credential-pathway-service
+          - credential-pathway-service:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
