@@ -218,7 +218,7 @@ def query_engine_build(doc_url: str, query_engine: str, user_id: str,
     QueryDocumentChunk.collection.filter(
       "query_engine_id", "==", q_engine.id
     ).delete()
-    QueryEngine.collection.delete_by_id(q_engine.id)
+    QueryEngine.delete_by_id(q_engine.id)
     raise InternalServerError(e) from e
 
   return q_engine
@@ -551,8 +551,9 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
     ]
 
     # Create output file
+    doc_stem = Path(doc_name).stem
     chunk_path = embeddings_dir.joinpath(
-        f"{doc_name}_{index_base}_index.json")
+        f"{doc_stem}_{index_base}_index.json")
 
     # write embeddings for chunk to file
     with open(chunk_path, "w", encoding="utf-8") as f:
