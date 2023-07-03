@@ -386,7 +386,7 @@ def test_invite_student_to_section_api(client_with_emulator,create_fake_data):
       "routes.student.student_service.check_student_can_enroll_in_cohort",
                     return_value=True):
       with mock.patch(
-        "services.section_service" + 
+        "services.section_service" +
         ".insert_section_enrollment_to_bq"):
         resp = client_with_emulator.post(url)
   assert resp.status_code == 200
@@ -407,7 +407,7 @@ def test_invite_student_to_cohort_api(client_with_emulator,create_fake_data):
       "services.student_service.check_student_can_enroll_in_cohort",
     return_value =True):
       with mock.patch(
-        "services.section_service" 
+        "services.section_service"
         + ".insert_section_enrollment_to_bq"):
         resp = client_with_emulator.post(url)
   assert resp.status_code == 200

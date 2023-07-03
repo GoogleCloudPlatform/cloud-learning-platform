@@ -175,7 +175,7 @@ def test_create_section(client_with_emulator, create_fake_data):
                                   "services.section_service.insert_rows_to_bq"
                               ):
                                 with mock.patch(
-                                  "services.section_service" + 
+                                  "services.section_service" +
                                   ".insert_section_enrollment_to_bq"
                                   ):
                                   resp = client_with_emulator.post(
