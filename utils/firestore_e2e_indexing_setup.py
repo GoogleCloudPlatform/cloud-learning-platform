@@ -38,8 +38,8 @@ if __name__ == "__main__":
     # raise Exception("DATABASE_PREFIX is not defined. Indexing skipped.")
     DATABASE_PREFIX = ""
 
-  with open("indexe_rules.json", encoding="utf-8") as indexs_file:
-    indexes = json.load(indexs_file)
+  with open("index_rules.json", encoding="utf-8") as index_file:
+    indexes = json.load(index_file)
 
   for index in indexes:
     create_index(index)

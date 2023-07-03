@@ -27,8 +27,8 @@ from schemas.section import (
     UpdateEnrollmentStatusSectionModel,
     DeleteFailedSectionSectionModel,UpdateInviteResponseModel)
 from schemas.update_section import UpdateSection
-from services.section_service import copy_course_background_task,\
-update_grades,add_teacher
+from services.section_service import (copy_course_background_task,
+update_grades,add_teacher, insert_section_enrollment_to_bq)
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model, FEED_TYPES,
                           convert_coursework_to_short_coursework_model)
@@ -325,6 +325,7 @@ def delete_teacher(section_id: str, teacher: str, request: Request):
     classroom_crud.delete_teacher(section.classroom_id, result.user.email)
     result.status = "inactive"
     result.update()
+    insert_section_enrollment_to_bq(result, section)
     return {
         "message": ("Successfully deleted the teacher from the section" +
                     f" {section_id} using {teacher}")
@@ -798,6 +799,20 @@ def failed_to_provision():
             section.key)
           Logger.info(f"Course enrollments {course_enrollments}")
           for course_enrollment in course_enrollments:
+            rows=[{
+              "enrollment_id" : course_enrollment.id,
+              "email" : course_enrollment.user.email,
+              "role" : course_enrollment.role,
+              "status" : "inactive",
+              "invitation_id" : course_enrollment.invitation_id,
+              "section_id" : section.id,
+              "cohort_id" : section.cohort.id,
+              "course_id" : section.classroom_id,
+              "timestamp" : datetime.datetime.utcnow()
+            }]
+            insert_rows_to_bq(
+              rows=rows, dataset=BQ_DATASET,
+              table_name=BQ_TABLE_DICT["BQ_ENROLLMENT_RECORD"])
             CourseEnrollmentMapping.delete_by_id(course_enrollment.id)
           classroom_crud.delete_course_by_id(section.classroom_id)
           Section.delete_by_id(section.id)
@@ -836,9 +851,10 @@ def update_invites(section_id:str):
     InternalServerErrorResponseModel: if the add student raises an exception
   """
   try:
+    section = Section.find_by_id(section_id)
     course_records = CourseEnrollmentMapping.collection.filter(
         "status", "==", "invited").filter(
-      "section", "==", "sections/"+section_id).fetch()
+      "section", "==", section.key).fetch()
     updated_list_inviations = []
     for course_record in course_records:
       Logger.info(f"course_record {course_record.section.id}, " +
@@ -871,6 +887,7 @@ def update_invites(section_id:str):
             user_ref.update()
           course_record.status = "active"
           course_record.update()
+          insert_section_enrollment_to_bq(course_record, section)
           updated_list_inviations.append(course_record.key)
           Logger.info(
               f"Successfully  updated the invitations {updated_list_inviations}"
