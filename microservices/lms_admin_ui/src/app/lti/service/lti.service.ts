@@ -21,16 +21,24 @@ export class LtiService {
     return this.http.get(`${environment.ltiUrl}tools`)
   }
 
+  getContentItems(tool_id: string, context_id: string) {
+    return this.http.get(`${environment.classroomShimUrl}context/${context_id}/content-items?tool_id=${tool_id}`)
+  }
+
   postTool(data: object) {
     return this.http.post(`${environment.ltiUrl}tool`, data)
   }
-
+  
   updateTool(id: string, data: object) {
     return this.http.put(`${environment.ltiUrl}tool/${id}`, data)
   }
-
+  
   contentSelectionLaunch(tool_id: string, user_id: string, context_id: string, context_type: string) {
     return this.http.get(`${environment.ltiUrl}content-selection-launch-init?tool_id=${tool_id}&user_id=${user_id}&context_id=${context_id}&context_type=${context_type}`)
+  }
+
+  postContentItem(data: object) {
+    return this.http.post(`${environment.ltiUrl}content-item`, data)
   }
 
 }

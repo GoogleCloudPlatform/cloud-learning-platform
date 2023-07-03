@@ -1,0 +1,64 @@
+{ 
+    "$schema":"http://json-schema.org/draft-04/schema#",
+    "title":"Schema for creating Learning Unit",
+    "type":"object",
+    "properties":{ 
+        "title":{ 
+            "type":"string",
+            "minLength":1,
+            "maxLength":1000
+        },
+        "coref_text":{
+            "type":"string",
+            "minLength":1,
+            "maxLength":1000
+        },
+        "text":{
+            "type": "array",
+            "items": {
+                "type": "string",
+                "minLength":1
+            },
+            "minLength": 1
+        },
+        "pdf_title":{ 
+            "type":"string",
+            "minLength":0,
+            "maxLength":1000
+        },
+        "is_valid":{
+            "type":"boolean"
+        },
+        "topics":{
+            "type":"array",
+            "items": {
+                "type":"object",
+                "properties": {
+                    "entity": {
+                        "type": "string"
+                    },
+                    "salience": {
+                        "type": "number"
+                    }
+                },
+                "required": ["entity", "salience"]
+            }
+        },
+        "parent_node":{ 
+            "type":"string",
+            "minLength":0,
+            "maxLength":1000
+        },
+        "created_by":{ 
+            "type":"string",
+            "minLength":0,
+            "maxLength":1000
+        },
+        "last_modified_by":{ 
+            "type":"string",
+            "minLength":0,
+            "maxLength":1000
+        }
+        
+    }
+}

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: assessment-service
+spec:
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: assessment-service
+        image: assessment-service
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "500Mi"
+        env:
+          - name: DATABASE_PREFIX
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: DATABASE_PREFIX
+          - name: USE_LEARNOSITY_SECRET
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: USE_LEARNOSITY_SECRET
+          - name: CONTENT_SERVING_BUCKET
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: CONTENT_SERVING_BUCKET

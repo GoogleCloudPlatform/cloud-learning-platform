@@ -1,0 +1,52 @@
+{ 
+  "$schema":"http://json-schema.org/draft-04/schema#",
+  "title":"Create Learning Content",
+  "type":"object",
+  "properties":{ 
+      "title":{ 
+          "type":"string",
+          "minLength":1,
+          "maxLength":1000
+      },
+      "format":{ 
+          "type":"string",
+          "minLength":0,
+          "maxLength":100
+      },
+      "description":{ 
+        "type":"string",
+        "minLength":0,
+        "maxLength":1000
+    },
+    "competency_ids":{
+        "type":"array",
+        "items": {
+            "type":"string"
+        }
+    },
+    "created_by":{ 
+        "type":"string",
+        "minLength":0,
+        "maxLength":1000
+    },
+    "last_modified_by":{ 
+        "type":"string",
+        "minLength":0,
+        "maxLength":1000
+    },
+    "override_existing_competencies":{
+        "type":"boolean"
+    },
+    "gcs_path":{
+        "type":"string",
+        "minLength":0,
+        "maxLength":1000
+    },
+    "course_category":{
+        "enum": [
+            "default",
+            "bio"
+        ]
+    }
+  }
+}

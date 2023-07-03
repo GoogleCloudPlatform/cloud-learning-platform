@@ -57,7 +57,7 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
   context_id = lti_message_hint.get("context_id")
   context_type = lti_message_hint.get("context_type")
 
-  get_context_url = f"http://classroom-shim/classroom-shim/api/v1/contexts/{context_id}?context_type={context_type}"
+  get_context_url = f"http://classroom-shim/classroom-shim/api/v1/contexts/{context_id}"
   context_res = get_method(url=get_context_url, use_bot_account=True)
 
   if context_res.status_code == 200:
@@ -68,12 +68,17 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
     )
     raise Exception("Request failed with error code 1009")
 
+  if context_type.lower() == "course_template":
+    lti_context_type = "http://purl.imsglobal.org/vocab/lis/v2/course#CourseTemplate"
+  else:
+    lti_context_type = "http://purl.imsglobal.org/vocab/lis/v2/course#CourseSection"
+
   lti_context_id = context_data.get("id")
   token_claims[lti_claim_field("claim", "context")] = {
       "id": lti_context_id,
       "label": context_data.get("description"),
       "title": context_data.get("name"),
-      "type": ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseSection"]
+      "type": [lti_context_type]
   }
 
   if lti_request_type == "deep_link":

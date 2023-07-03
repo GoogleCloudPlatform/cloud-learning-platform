@@ -1,0 +1,1226 @@
+{
+    "curriculum_pathways": {
+        "name": "Level Up Program",
+        "display_name": "Level Up Program",
+        "description": "Level Up Program Pathway",
+        "alias": "program",
+        "child_nodes": {
+            "curriculum_pathways": [
+                {
+                    "name": "Level 1",
+                    "display_name": "Level 1",
+                    "description": "",
+                    "order": 1,
+                    "alias": "level",
+                    "achievements": [
+                        {
+                            "type": "level",
+                            "name": "Level 1",
+                            "description": "Level 1"
+                        }
+                    ],
+                    "child_nodes": {
+                        "curriculum_pathways": [
+                            {
+                                "name": "Humanity",
+                                "display_name": "Humanity",
+                                "description": "Understanding Your World",
+                                "order": 1,
+                                "alias": "discipline",
+                                "achievements": [
+                                    {
+                                        "type": "course equate",
+                                        "name": "HUM102 Badge (course)",
+                                        "description": "HUM102 Badge (course)"
+                                    }
+                                ],
+                                "child_nodes": {
+                                    "curriculum_pathways": [
+                                        {
+                                            "name": "HUM13507",
+                                            "display_name": "HUM13507",
+                                            "description": "Unit 1:HUM13507",
+                                            "alias": "unit",
+                                            "order": 1,
+                                            "achievements": [
+                                                {
+                                                    "type": "competency",
+                                                    "name": "Competency",
+                                                    "description": "Competency"
+                                                }
+                                            ],
+                                            "child_nodes": {
+                                                "learning_experiences": [
+                                                    {
+                                                        "description": "",
+                                                        "display_name": "Humanities, Self & Society",
+                                                        "name": "Humanities, Self & Society",
+                                                        "order": 1,
+                                                        "alias": "learning_experience",
+                                                        "child_nodes": {
+                                                            "learning_objects": [
+                                                                {
+                                                                    "description": "pre-test module",
+                                                                    "display_name": "HUM102.1 Pre-test",
+                                                                    "name": "HUM102.1 Pre-test",
+                                                                    "order": 1,
+                                                                    "type": "pretest",
+                                                                    "alias": "module",
+                                                                    "is_optional": true,
+                                                                    "references": {
+                                                                        "skills": [
+                                                                            {
+                                                                                "name": "C1_S1",
+                                                                                "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                            },
+                                                                            {
+                                                                                "name": "C1_S2",
+                                                                                "description": "Determine the utility of each of the humanities perspectives"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "child_nodes": {
+                                                                        "assessments": [
+                                                                            {
+                                                                                "name": "Pre-test Assessment",
+                                                                                "display_name": "Pre-test Assessment",
+                                                                                "type": "pretest",
+                                                                                "assessment_reference": {
+                                                                                    "activity_template_id": "HUM-102-pretest-dev"
+                                                                                },
+                                                                                "order": 2,
+                                                                                "alias": "assessment",
+                                                                                "pass_threshold": 0.7,
+                                                                                "is_autogradable": true
+                                                                            }
+                                                                        ],
+                                                                        "learning_resources": [
+                                                                            {
+                                                                                "name": "Pre-Test Introduction",
+                                                                                "display_name": "Pre-Test Introduction",
+                                                                                "type": "html",
+                                                                                "order": 1
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "name": "Unit Overview",
+                                                                    "display_name": "Unit Overview",
+                                                                    "description": "Module 1",
+                                                                    "order": 2,
+                                                                    "type": "unit_overview",
+                                                                    "alias": "module",
+                                                                    "child_nodes": {
+                                                                        "learning_resources": [
+                                                                            {
+                                                                                "name": "Unit Overview",
+                                                                                "display_name": "Unit Overview",
+                                                                                "type": "html",
+                                                                                "order": 1
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "name": "What Are the Humanities?",
+                                                                    "display_name": "What Are the Humanities?",
+                                                                    "description": "Module 2",
+                                                                    "order": 3,
+                                                                    "references": {
+                                                                        "skills": [
+                                                                            {
+                                                                                "name": "C1_S1",
+                                                                                "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "child_nodes": {
+                                                                        "learning_resources": [
+                                                                            {
+                                                                                "name": "Moduel Overview",
+                                                                                "display_name": "Module Overview",
+                                                                                "type": "html",
+                                                                                "alias": "lesson",
+                                                                                "order": 1
+                                                                            },
+                                                                            {
+                                                                                "name": "Overview of the Humanities",
+                                                                                "display_name": "Overview of the Humanities",
+                                                                                "alias": "lesson",
+                                                                                "type": "html",
+                                                                                "order": 2
+                                                                            },
+                                                                            {
+                                                                                "name": "The Four Humanities Categories",
+                                                                                "display_name": "The Four Humanities Categories",
+                                                                                "alias": "lesson",
+                                                                                "type": "html",
+                                                                                "order": 2
+                                                                            },
+                                                                            {
+                                                                                "name": "The Humanities Approach",
+                                                                                "display_name": "The Humanities Approach",
+                                                                                "alias": "lesson",
+                                                                                "type": "html",
+                                                                                "order": 2
+                                                                            }
+                                                                        ],
+                                                                        "assessments": [
+                                                                            {
+                                                                                "name": "Multiple Choice Quiz - Knowledge Check",
+                                                                                "display_name": "Multiple Choice Quiz - Knowledge Check",
+                                                                                "type": "practice",
+                                                                                "order": 2,
+                                                                                "alias": "assessment",
+                                                                                "assessment_reference": {
+                                                                                    "activity_template_id": "HUM-102-pretest-dev"
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "name": "Humanities in everyday life",
+                                                                    "display_name": "Humanities in everyday life",
+                                                                    "description": "Module 3",
+                                                                    "order": 4,
+                                                                    "references": {
+                                                                        "skills": [
+                                                                            {
+                                                                                "name": "C1_S2",
+                                                                                "description": "Determine the utility of each of the humanities perspectives"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "child_nodes": {
+                                                                        "learning_resources": [
+                                                                            {
+                                                                                "name": "Major Categories and Academic Programs of the Humanities",
+                                                                                "display_name": "Major Categories and Academic Programs of the Humanities",
+                                                                                "type": "html",
+                                                                                "alias": "lesson",
+                                                                                "order": 1
+                                                                            },
+                                                                            {
+                                                                                "name": "Utility of Humanities Perspectives",
+                                                                                "display_name": "Utility of Humanities Perspectives",
+                                                                                "alias": "lesson",
+                                                                                "type": "html",
+                                                                                "order": 2
+                                                                            },
+                                                                            {
+                                                                                "name": "Utility of the Creative Humanities",
+                                                                                "display_name": "Utility of the Creative Humanities",
+                                                                                "alias": "lesson",
+                                                                                "type": "html",
+                                                                                "order": 3
+                                                                            },
+                                                                            {
+                                                                                "name": "Utility of the Scientific Humanities ",
+                                                                                "display_name": "Utility of the Scientific Humanities ",
+                                                                                "alias": "lesson",
+                                                                                "type": "html",
+                                                                                "order": 3
+                                                                            },
+                                                                            {
+                                                                                "name": "Utility of Cultural and Historical Humanities",
+                                                                                "display_name": "Utility of Cultural and Historical Humanities",
+                                                                                "alias": "lesson",
+                                                                                "type": "html",
+                                                                                "order": 3
+                                                                            }
+                                                                        ],
+                                                                        "assessments": [
+                                                                            {
+                                                                                "name": "Multiple Choice Quiz",
+                                                                                "display_name": "Multiple Choice Quiz",
+                                                                                "type": "practice",
+                                                                                "order": 4,
+                                                                                "alias": "assessment",
+                                                                                "assessment_reference": {
+                                                                                    "activity_template_id": "HUM-102-pretest-dev"
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "name": "Understanding sources in the humanities",
+                                                                    "display_name": "Understanding sources in the humanities",
+                                                                    "description": "Module 4",
+                                                                    "alias": "module",
+                                                                    "order": 5,
+                                                                    "references": {
+                                                                        "skills": [
+                                                                            {
+                                                                                "name": "C1_S3",
+                                                                                "description": "Determine sources on a topic pertinent to the perspective of the humanities"
+                                                                            },
+                                                                            {
+                                                                                "name": "C1_S4",
+                                                                                "description": "Summarize relevant information from a variety of sources"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "child_nodes": {
+                                                                        "learning_resources": [
+                                                                            {
+                                                                                "name": "Sources: Credible or not?",
+                                                                                "display_name": "Sources: Credible or not?",
+                                                                                "type": "html",
+                                                                                "alias": "lesson",
+                                                                                "order": 1
+                                                                            },
+                                                                            {
+                                                                                "name": "Sources for Study: Primary, Secondary, Tertiary",
+                                                                                "display_name": "Sources for Study: Primary, Secondary, Tertiary",
+                                                                                "alias": "lesson",
+                                                                                "type": "html",
+                                                                                "order": 1
+                                                                            },
+                                                                            {
+                                                                                "name": "Sumarizing vs. Paraphrasing",
+                                                                                "display_name": "Sumarizing vs. Paraphrasing",
+                                                                                "type": "html",
+                                                                                "alias": "lesson",
+                                                                                "order": 1
+                                                                            },
+                                                                            {
+                                                                                "name": "Citing Source Material and Avoiding Plagiarism",
+                                                                                "display_name": "Citing Source Material and Avoiding Plagiarism",
+                                                                                "type": "html",
+                                                                                "alias": "lesson",
+                                                                                "order": 1
+                                                                            },
+                                                                            {
+                                                                                "name": "Understanding and Unlocking Your Source",
+                                                                                "display_name": "Understanding and Unlocking Your Source",
+                                                                                "type": "html",
+                                                                                "alias": "lesson",
+                                                                                "order": 1
+                                                                            }
+                                                                        ],
+                                                                        "assessments": [
+                                                                            {
+                                                                                "name": "Multiple Choice Quiz",
+                                                                                "display_name": "Multiple Choice Quiz",
+                                                                                "type": "practice",
+                                                                                "order": 2,
+                                                                                "alias": "assessment",
+                                                                                "assessment_reference": {
+                                                                                    "activity_template_id": "HUM-102-pretest-dev"
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "name": "Interpreting the humanities",
+                                                                    "display_name": "Interpreting the humanities",
+                                                                    "description": "Module 5",
+                                                                    "order": 6,
+                                                                    "alias": "module",
+                                                                    "references": {
+                                                                        "skills": [
+                                                                            {
+                                                                                "name": "C1_S3",
+                                                                                "description": "Determine sources on a topic pertinent to the perspective of the humanities"
+                                                                            },
+                                                                            {
+                                                                                "name": "C1_S5",
+                                                                                "description": "Identify potential biases and assumptions related to the information about a topic"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "child_nodes": {
+                                                                        "learning_resources": [
+                                                                            {
+                                                                                "name": "Searching for Credible Internet Sources",
+                                                                                "display_name": "Searching for Credible Internet Sources",
+                                                                                "type": "html",
+                                                                                "alias": "lesson",
+                                                                                "order": 1
+                                                                            },
+                                                                            {
+                                                                                "name": "Identifying Bias, Secondary, Tertiary",
+                                                                                "display_name": "Identifying Bias, Tertiary",
+                                                                                "type": "html",
+                                                                                "alias": "lesson",
+                                                                                "order": 1
+                                                                            },
+                                                                            {
+                                                                                "name": "Bias and Assumption",
+                                                                                "display_name": "Bias and Assumption",
+                                                                                "type": "html",
+                                                                                "alias": "lesson",
+                                                                                "order": 1
+                                                                            }
+                                                                        ],
+                                                                        "assessments": [
+                                                                            {
+                                                                                "name": "Multiple Choice Quiz",
+                                                                                "display_name": "Multiple Choice Quiz",
+                                                                                "type": "practice",
+                                                                                "order": 2,
+                                                                                "alias": "assessment",
+                                                                                "assessment_reference": {
+                                                                                    "activity_template_id": "HUM-102-pretest-dev"
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "name": "Final Project",
+                                                                    "display_name": "Final Project",
+                                                                    "description": "Module 6",
+                                                                    "order": 7,
+                                                                    "alias": "module",
+                                                                    "type": "project",
+                                                                    "child_nodes": {
+                                                                        "assessments": [
+                                                                            {
+                                                                                "description": "HUM102.1 Exam",
+                                                                                "display_name": "Summative Assessment",
+                                                                                "name": "Summative Assessment",
+                                                                                "alias": "assessment",
+                                                                                "type": "project",
+                                                                                "references": {
+                                                                                    "competencies": [
+                                                                                        {
+                                                                                            "name": "C1",
+                                                                                            "description": "Differentiate the various perspectives of the humanities in relation to a topic"
+                                                                                        }
+                                                                                    ],
+                                                                                    "skills": [
+                                                                                        {
+                                                                                            "name": "C1_S1",
+                                                                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "C1_S2",
+                                                                                            "description": "Determine the utility of each of the humanities perspectives"
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "C1_S3",
+                                                                                            "description": "Determine sources on a topic pertinent to the perspective of the humanities"
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "C1_S4",
+                                                                                            "description": "Summarize relevant information from a variety of sources"
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "C1_S5",
+                                                                                            "description": "Identify potential biases and assumptions related to the information about a topic"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "English",
+                                "display_name": "English",
+                                "description": "Improving Your Writing",
+                                "order": 1,
+                                "alias": "discipline",
+                                "achievements": [
+                                    {
+                                        "type": "course equate",
+                                        "name": "ENG130 Badge (course)",
+                                        "description": "ENG130 Badge (course)Competency"
+                                    }
+                                ],
+                                "child_nodes": {
+                                    "curriculum_pathways": [
+                                        {
+                                            "name": "Unit 1",
+                                            "display_name": "Unit 1",
+                                            "description": "Unit 1:HUM13507",
+                                            "alias": "unit",
+                                            "order": 1,
+                                            "achievements": [
+                                                {
+                                                    "type": "competency",
+                                                    "name": "Competency",
+                                                    "description": "Competency"
+                                                }
+                                            ],
+                                            "child_nodes": {
+                                                "learning_experiences": [
+                                                    {
+                                                        "description": "",
+                                                        "display_name": "Analyze Written Works",
+                                                        "name": "Analyze Written Works",
+                                                        "order": 1,
+                                                        "alias": "learning_experience",
+                                                        "child_nodes": {
+                                                            "learning_objects": [
+                                                                {
+                                                                    "description": "Module 1",
+                                                                    "display_name": "Audience and Purpose",
+                                                                    "name": "Audience and Purpose",
+                                                                    "alias": "module",
+                                                                    "order": 1,
+                                                                    "child_nodes": {
+                                                                        "learning_resources": [
+                                                                          {
+                                                                            "name": "Pretest reading",
+                                                                            "display_name": "Pretest reading",
+                                                                            "type": "html",
+                                                                            "alias": "lesson",
+                                                                            "order": 1
+                                                                          }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Level 2",
+                    "display_name": "Level 2",
+                    "description": "",
+                    "order": 2,
+                    "alias": "level",
+                    "achievements": [
+                      {
+                        "type": "level",
+                        "name": "Level 2",
+                        "description": "Level 2",
+                        "metadata": {
+                          "design_config": {
+                            "shape": "",
+                            "theme": "",
+                            "illustration": ""
+                          }
+                        }
+                      }
+                    ],
+                    "child_nodes": {
+                      "curriculum_pathways": [
+                        {
+                          "name": "Math",
+                          "display_name": "Math",
+                          "description": "Solving Problems with Math",
+                          "order": 1,
+                          "alias": "discipline",
+                          "achievements": [
+                            {
+                              "type": "course equate",
+                              "name": "",
+                              "description": "Solving Problems with Math",
+                              "metadata": {
+                                "design_config": {
+                                  "shape": "",
+                                  "theme": "",
+                                  "illustration": ""
+                                }
+                              }
+                            }
+                          ],
+                          "child_nodes": {
+                            "curriculum_pathways": [
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "description": "Unit 1",
+                                "alias": "unit",
+                                "order": 1,
+                                "metadata": {
+                                  "design_config": {
+                                    "illustration": "L1_U2",
+                                    "theme": "red-primary-light"
+                                  }
+                                },
+                                "achievements": [
+                                  {
+                                    "type": "competency",
+                                    "name": "Analyze Quantitative Elements",
+                                    "description": "Analyze Quantitative Elements",
+                                    "metadata": {
+                                      "design_config": {
+                                        "shape": "circle",
+                                        "theme": "",
+                                        "illustration": "L1_A2"
+                                      }
+                                    }
+                                  }
+                                ],
+                                "child_nodes": {
+                                  "learning_experiences": [
+                                    {
+                                      "description": "",
+                                      "display_name": "Analyze Quantitative Elements",
+                                      "name": "Analyze Quantitative Elements",
+                                      "order": 1,
+                                      "alias": "learning_experience",
+                                      "metadata": {
+                                        "design_config": {
+                                          "illustration": "L1_U2",
+                                          "theme": "red-primary-light"
+                                        }
+                                      },
+                                      "child_nodes": {
+                                        "learning_objects": [
+                                          {
+                                            "name": "Unit Overview",
+                                            "display_name": "Unit Overview",
+                                            "description": "Module 1",
+                                            "order": 1,
+                                            "type": "unit_overview",
+                                            "alias": "module",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Unit Overview",
+                                                  "display_name": "Unit Overview",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "order": 1
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "name": "Exam",
+                                            "display_name": "Exam",
+                                            "description": "Module 2",
+                                            "order": 2,
+                                            "alias": "module",
+                                            "type": "project",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Project Instructions",
+                                                  "display_name": "Project Instructions",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 1
+                                                },
+                                                {
+                                                  "name": "Unit Wrap-up",
+                                                  "display_name": "Unit Wrap-up",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 3
+                                                }
+                                              ],
+                                              "assessments": [
+                                                {
+                                                  "name": "Project Submission",
+                                                  "display_name": "Project Submission",
+                                                  "type": "project",
+                                                  "max_attempts": 3,
+                                                  "assessment_reference": {
+                                                    "activity_template_id": ""
+                                                  },
+                                                  "order": 2,
+                                                  "alias": "assessment"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "description": "Unit 2",
+                                "alias": "unit",
+                                "order": 2,
+                                "metadata": {
+                                  "design_config": {
+                                    "illustration": "L1_U1",
+                                    "theme": "purple-primary"
+                                  }
+                                },
+                                "achievements": [
+                                  {
+                                    "type": "competency",
+                                    "name": "Apply Math & Quantitative Reasoning",
+                                    "description": "Apply Math & Quantitative Reasoning",
+                                    "metadata": {
+                                      "design_config": {
+                                        "shape": "circle",
+                                        "theme": "",
+                                        "illustration": "L1_A1"
+                                      }
+                                    }
+                                  }
+                                ],
+                                "child_nodes": {
+                                  "learning_experiences": [
+                                    {
+                                      "description": "",
+                                      "display_name": "Apply Math & Quantitative Reasoning",
+                                      "name": "Apply Math & Quantitative Reasoning",
+                                      "order": 1,
+                                      "alias": "learning_experience",
+                                      "metadata": {
+                                        "design_config": {
+                                          "illustration": "L1_U1",
+                                          "theme": "purple-primary"
+                                        }
+                                      },
+                                      "child_nodes": {
+                                        "learning_objects": [
+                                          {
+                                            "name": "Unit Overview",
+                                            "display_name": "Unit Overview",
+                                            "description": "Module 1",
+                                            "order": 1,
+                                            "type": "unit_overview",
+                                            "alias": "module",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Unit Overview",
+                                                  "display_name": "Unit Overview",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "order": 1
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "name": "Exam",
+                                            "display_name": "Exam",
+                                            "description": "Module 2",
+                                            "order": 2,
+                                            "alias": "module",
+                                            "type": "project",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Project Instructions",
+                                                  "display_name": "Project Instructions",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 1
+                                                },
+                                                {
+                                                  "name": "Unit Wrap-up",
+                                                  "display_name": "Unit Wrap-up",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 3
+                                                }
+                                              ],
+                                              "assessments": [
+                                                {
+                                                  "name": "Project Submission",
+                                                  "display_name": "Project Submission",
+                                                  "type": "project",
+                                                  "max_attempts": 3,
+                                                  "assessment_reference": {
+                                                    "activity_template_id": ""
+                                                  },
+                                                  "order": 2,
+                                                  "alias": "assessment"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "description": "Unit 3",
+                                "alias": "unit",
+                                "order": 3,
+                                "metadata": {
+                                  "design_config": {
+                                    "illustration": "L1_U3",
+                                    "theme": "yellow-primary"
+                                  }
+                                },
+                                "achievements": [
+                                  {
+                                    "type": "competency",
+                                    "name": "Explain Data-Informed Decisions",
+                                    "description": "Explain Data-Informed Decisions",
+                                    "metadata": {
+                                      "design_config": {
+                                        "shape": "circle",
+                                        "theme": "",
+                                        "illustration": "L1_A3"
+                                      }
+                                    }
+                                  }
+                                ],
+                                "child_nodes": {
+                                  "learning_experiences": [
+                                    {
+                                      "description": "",
+                                      "display_name": "Explain Data-Informed Decisions",
+                                      "name": "Explain Data-Informed Decisions",
+                                      "order": 1,
+                                      "alias": "learning_experience",
+                                      "metadata": {
+                                        "design_config": {
+                                          "illustration": "L1_U3",
+                                          "theme": "yellow-primary"
+                                        }
+                                      },
+                                      "child_nodes": {
+                                        "learning_objects": [
+                                          {
+                                            "name": "Unit Overview",
+                                            "display_name": "Unit Overview",
+                                            "description": "Module 1",
+                                            "order": 1,
+                                            "type": "unit_overview",
+                                            "alias": "module",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Unit Overview",
+                                                  "display_name": "Unit Overview",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "order": 1
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "name": "Exam",
+                                            "display_name": "Exam",
+                                            "description": "Module 2",
+                                            "order": 2,
+                                            "alias": "module",
+                                            "type": "project",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Project Instructions",
+                                                  "display_name": "Project Instructions",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 1
+                                                },
+                                                {
+                                                  "name": "Unit Wrap-up",
+                                                  "display_name": "Unit Wrap-up",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 3
+                                                }
+                                              ],
+                                              "assessments": [
+                                                {
+                                                  "name": "Project Submission",
+                                                  "display_name": "Project Submission",
+                                                  "type": "project",
+                                                  "max_attempts": 3,
+                                                  "assessment_reference": {
+                                                    "activity_template_id": ""
+                                                  },
+                                                  "order": 2,
+                                                  "alias": "assessment"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "IDS",
+                          "display_name": "IDS",
+                          "description": "Intercultural Communication",
+                          "order": 1,
+                          "alias": "discipline",
+                          "achievements": [
+                            {
+                              "type": "course equate",
+                              "name": "",
+                              "description": "Intercultural Communication",
+                              "metadata": {
+                                "design_config": {
+                                  "shape": "",
+                                  "theme": "",
+                                  "illustration": ""
+                                }
+                              }
+                            }
+                          ],
+                          "child_nodes": {
+                            "curriculum_pathways": [
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "description": "Unit 1",
+                                "alias": "unit",
+                                "order": 1,
+                                "metadata": {
+                                  "design_config": {
+                                    "illustration": "L1_U5",
+                                    "theme": "yellow-secondary-two"
+                                  }
+                                },
+                                "achievements": [
+                                  {
+                                    "type": "competency",
+                                    "name": "Balance Needs & Sustainability ",
+                                    "description": "Balance Needs & Sustainability ",
+                                    "metadata": {
+                                      "design_config": {
+                                        "shape": "circle",
+                                        "theme": "",
+                                        "illustration": "L1_A2"
+                                      }
+                                    }
+                                  }
+                                ],
+                                "child_nodes": {
+                                  "learning_experiences": [
+                                    {
+                                      "description": "",
+                                      "display_name": "Balance Needs & Sustainability ",
+                                      "name": "Balance Needs & Sustainability ",
+                                      "order": 1,
+                                      "alias": "learning_experience",
+                                      "metadata": {
+                                        "design_config": {
+                                          "illustration": "L1_U5",
+                                          "theme": "yellow-secondary-two"
+                                        }
+                                      },
+                                      "child_nodes": {
+                                        "learning_objects": [
+                                          {
+                                            "name": "Unit Overview",
+                                            "display_name": "Unit Overview",
+                                            "description": "Module 1",
+                                            "order": 1,
+                                            "type": "unit_overview",
+                                            "alias": "module",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Unit Overview",
+                                                  "display_name": "Unit Overview",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "order": 1
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "name": "Exam",
+                                            "display_name": "Exam",
+                                            "description": "Module 2",
+                                            "order": 2,
+                                            "alias": "module",
+                                            "type": "project",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Project Instructions",
+                                                  "display_name": "Project Instructions",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 1
+                                                },
+                                                {
+                                                  "name": "Unit Wrap-up",
+                                                  "display_name": "Unit Wrap-up",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 3
+                                                }
+                                              ],
+                                              "assessments": [
+                                                {
+                                                  "name": "Project Submission",
+                                                  "display_name": "Project Submission",
+                                                  "type": "project",
+                                                  "max_attempts": 3,
+                                                  "assessment_reference": {
+                                                    "activity_template_id": ""
+                                                  },
+                                                  "order": 2,
+                                                  "alias": "assessment"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "description": "Unit 2",
+                                "alias": "unit",
+                                "order": 2,
+                                "metadata": {
+                                  "design_config": {
+                                    "illustration": "L1_U4",
+                                    "theme": "teal-primary"
+                                  }
+                                },
+                                "achievements": [
+                                  {
+                                    "type": "competency",
+                                    "name": "Perception of Social Justice ",
+                                    "description": "Perception of Social Justice ",
+                                    "metadata": {
+                                      "design_config": {
+                                        "shape": "circle",
+                                        "theme": "",
+                                        "illustration": "L1_A1"
+                                      }
+                                    }
+                                  }
+                                ],
+                                "child_nodes": {
+                                  "learning_experiences": [
+                                    {
+                                      "description": "",
+                                      "display_name": "Perception of Social Justice ",
+                                      "name": "Perception of Social Justice ",
+                                      "order": 1,
+                                      "alias": "learning_experience",
+                                      "metadata": {
+                                        "design_config": {
+                                          "illustration": "L1_U4",
+                                          "theme": "teal-primary"
+                                        }
+                                      },
+                                      "child_nodes": {
+                                        "learning_objects": [
+                                          {
+                                            "name": "Unit Overview",
+                                            "display_name": "Unit Overview",
+                                            "description": "Module 1",
+                                            "order": 1,
+                                            "type": "unit_overview",
+                                            "alias": "module",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Unit Overview",
+                                                  "display_name": "Unit Overview",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "order": 1
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "name": "Exam",
+                                            "display_name": "Exam",
+                                            "description": "Module 2",
+                                            "order": 2,
+                                            "alias": "module",
+                                            "type": "project",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Project Instructions",
+                                                  "display_name": "Project Instructions",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 1
+                                                },
+                                                {
+                                                  "name": "Unit Wrap-up",
+                                                  "display_name": "Unit Wrap-up",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 3
+                                                }
+                                              ],
+                                              "assessments": [
+                                                {
+                                                  "name": "Project Submission",
+                                                  "display_name": "Project Submission",
+                                                  "type": "project",
+                                                  "max_attempts": 3,
+                                                  "assessment_reference": {
+                                                    "activity_template_id": ""
+                                                  },
+                                                  "order": 2,
+                                                  "alias": "assessment"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "description": "Unit 3",
+                                "alias": "unit",
+                                "order": 3,
+                                "metadata": {
+                                  "design_config": {
+                                    "illustration": "L1_U6",
+                                    "theme": "teal-primary-dark"
+                                  }
+                                },
+                                "achievements": [
+                                  {
+                                    "type": "competency",
+                                    "name": "Intercultural Competence & Collaboration",
+                                    "description": "Intercultural Competence & Collaboration",
+                                    "metadata": {
+                                      "design_config": {
+                                        "shape": "circle",
+                                        "theme": "",
+                                        "illustration": "L1_A3"
+                                      }
+                                    }
+                                  }
+                                ],
+                                "child_nodes": {
+                                  "learning_experiences": [
+                                    {
+                                      "description": "",
+                                      "display_name": "Intercultural Competence & Collaboration",
+                                      "name": "Intercultural Competence & Collaboration",
+                                      "order": 1,
+                                      "alias": "learning_experience",
+                                      "metadata": {
+                                        "design_config": {
+                                          "illustration": "L1_U6",
+                                          "theme": "teal-primary-dark"
+                                        }
+                                      },
+                                      "child_nodes": {
+                                        "learning_objects": [
+                                          {
+                                            "name": "Unit Overview",
+                                            "display_name": "Unit Overview",
+                                            "description": "Module 1",
+                                            "order": 1,
+                                            "type": "unit_overview",
+                                            "alias": "module",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Unit Overview",
+                                                  "display_name": "Unit Overview",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "order": 1
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "name": "Exam",
+                                            "display_name": "Exam",
+                                            "description": "Module 2",
+                                            "order": 2,
+                                            "alias": "module",
+                                            "type": "project",
+                                            "child_nodes": {
+                                              "learning_resources": [
+                                                {
+                                                  "name": "Project Instructions",
+                                                  "display_name": "Project Instructions",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 1
+                                                },
+                                                {
+                                                  "name": "Unit Wrap-up",
+                                                  "display_name": "Unit Wrap-up",
+                                                  "type": "html",
+                                                  "alias": "lesson",
+                                                  "duration": 15,
+                                                  "order": 3
+                                                }
+                                              ],
+                                              "assessments": [
+                                                {
+                                                  "name": "Project Submission",
+                                                  "display_name": "Project Submission",
+                                                  "type": "project",
+                                                  "max_attempts": 3,
+                                                  "assessment_reference": {
+                                                    "activity_template_id": ""
+                                                  },
+                                                  "order": 2,
+                                                  "alias": "assessment"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                }
+            ]
+        }
+    }
+}

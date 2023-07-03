@@ -27,12 +27,11 @@ export class AuthService {
     private http: HttpClient,
     private _snackBar: MatSnackBar,
   ) {
-
     this.user$ = this.afAuth.authState.pipe(
       switchMap(user => {
         // Logged in
         if (user) {
-          console.log('user', user)
+          localStorage.setItem('userEmail', user.email)
           user.getIdToken().then(idToken => {
             console.log('id token', idToken)
             localStorage.setItem('idToken', idToken)
@@ -47,19 +46,18 @@ export class AuthService {
         }
       })
     )
-
   }
 
 
   async googleSignin() {
     const provider = new auth.GoogleAuthProvider();
     const credential = await this.afAuth.signInWithPopup(provider);
-    console.log('user', credential.user.displayName)
     localStorage.setItem('user', credential.user.displayName)
+    localStorage.setItem('userEmail', credential.user.email)
     credential.user?.getIdToken().then(idToken => {
       localStorage.setItem('idToken', idToken)
+      this.setUserId(credential.user.email)
       this.validate().subscribe((res: any) => {
-        // console.log(res)
         if (res.success == true) {
           if (idToken) {
             this.router.navigate(['/home'])
@@ -71,8 +69,39 @@ export class AuthService {
       }, (error: any) => {
         this.openFailureSnackBar('Authentication Failed', 'Close')
       })
-
     });
+  }
+
+  async emaiAndPasswordSignIn(email:string,password:string) {
+    const provider = new auth.GoogleAuthProvider();
+    const credential = await this.afAuth.signInWithEmailAndPassword(email,password)
+console.log("credential",credential)
+    console.log('user', credential.user.displayName)
+    localStorage.setItem('user', credential.user.displayName)
+
+    credential.user?.getIdToken().then(idToken => {
+      localStorage.setItem('idToken', idToken)
+      // this.openFailureSnackBar('idToken :' +idToken, 'Close')
+      
+      this.validate().subscribe((res: any) => {
+        // console.log(res)
+        if (res.success == true) {
+          if (idToken) {
+            this.router.navigate(['/home'])
+          }
+        }
+        else {
+          this.openFailureSnackBar(res.message, 'Close')
+          // this.openFailureSnackBar(environment.auth_apiUrl,'Close')
+        }
+      }, (error: any) => {
+        this.openFailureSnackBar("504 error", 'Close')
+      })
+
+    })
+    .catch(error => {
+      console.log('Something is wrong:', error.message);
+      });
   }
 
   private updateUserData(user: any) {
@@ -85,9 +114,7 @@ export class AuthService {
       displayName: user.displayName,
       photoURL: user.photoURL
     }
-
     return userRef.set(data, { merge: true })
-
   }
 
   async signOut() {
@@ -98,9 +125,35 @@ export class AuthService {
   validate() {
     return this.http.get(`${environment.auth_apiUrl}validate`)
   }
+
+  setUserId(email) {
+    this.searchUser(email).subscribe((res: any) => {
+      localStorage.setItem("userId", res.data[0].user_id)
+    })
+  }
+
+  searchUser(email) {
+    return this.http.get(`${environment.classroomShimUrl}user/search/email?email=${email}`)
+  }
+
+
+  findEmailSetId() {
+    this.afAuth.authState.subscribe(user => {
+      // Logged in
+      if (user) {
+        localStorage.setItem('userEmail', user.email)
+        this.setUserId(user.email)
+        return true
+      } else {
+        // Logged out
+        return of(null);
+      }
+    })
+  }
+
   openFailureSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
-      duration: 6000,
+      duration: 100000,
       panelClass: ['red-snackbar'],
     });
   }

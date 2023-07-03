@@ -46,5 +46,17 @@ LTI_POST_GRADE_MODEL = {
 CONTEXT_EXAMPLE = {
     "id": "BOqh34378v3qGir",
     "name": "Context name",
-    "description": "Context description"
+    "description": "Context description",
+    "context_type": "section"
+}
+
+CONTEXT_MEMBERS_EXAMPLE = {
+    "user_id": "Ka1OyrOb9YuQ34",
+    "email": "test@email.com",
+    "user_type": "learner",
+    "first_name": "Test",
+    "last_name": "User1",
+    "photo_url": "https://lh3.googleusercontent.com/a/test",
+    "status": "active",
+    "enrollment_status": "active"
 }

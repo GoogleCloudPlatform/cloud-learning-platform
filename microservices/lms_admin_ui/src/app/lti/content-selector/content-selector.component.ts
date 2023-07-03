@@ -1,8 +1,8 @@
-import { Component, ViewChild, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { LtiService } from '../service/lti.service';
-import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { DomSanitizer } from '@angular/platform-browser';
-
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 
 @Component({
   selector: 'app-content-selector',
@@ -12,38 +12,55 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class ContentSelectorComponent {
   loadingIframe = true
   iframeUrl: any = null
+  urlAlreadyLoaded: boolean = false
+
   constructor(
+    private _snackBar: MatSnackBar,
     private sanitizer: DomSanitizer,
     public dialogRef: MatDialogRef<ContentSelectorComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: any, public ltiService: LtiService
   ) {
-    console.log(dialogData)
     this.getToolUrl()
     window.addEventListener('message', (e: MessageEvent) => {
       // Get the sent data
-      console.log("coded", e.data)
       const data = e.data;
       const decoded = JSON.parse(data);
-      console.log("decoded", decoded)
       this.dialogRef.close({ data: decoded });
     });
   }
-
   getToolUrl() {
     let data = this.dialogData.extra_data
     this.ltiService.contentSelectionLaunch(data.toolId, data.userId, data.contextId, data.contextType).subscribe(
       (response: any) => {
         this.loadingIframe = false
-        this.iframeUrl = response.url
+        this.iframeUrl = this.getUrl(response.url)
       }
     )
   }
+
+  openFailureSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 6000,
+      panelClass: ['red-snackbar'],
+    });
+  }
+
+  openSuccessSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 6000,
+      panelClass: ['green-snackbar'],
+    });
+  }
+
   onNoClick(): void {
     this.dialogRef.close({ data: 'closed' });
   }
 
-  getUrl(url) {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url)
+  getUrl(url): any {
+    if (!this.urlAlreadyLoaded) {
+      this.urlAlreadyLoaded = true
+      return this.sanitizer.bypassSecurityTrustResourceUrl(url)
+    }
   }
 
 }

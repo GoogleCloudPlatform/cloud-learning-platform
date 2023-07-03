@@ -31,8 +31,15 @@
                 <div style="width:50%;">
                     <div class="element"><span class="element-heading">Cohort Description : </span> <span
                             class="element-content">{{cohortDetails.description}}</span></div>
-                    <div class="element"><span class="element-heading">Instructional Designer : </span> <span
-                            class="element-content">{{courseTemplateDetails.instructional_designer}}</span></div>
+                    <div class="element">
+                        <span class="element-heading">Instructional Designer : </span>
+                        <span class="element-content">
+                            <div  [matTooltip]="getMattooltipText(instructionalDesignerList)" contentType="template" [matBadge]="getIdTotal(instructionalDesignerList)" 
+                        [matBadgeHidden]="checkIfBadgeHidden(instructionalDesignerList)" matBadgeOverlap="false" matBadgeSize="medium" class="content">
+                    {{instructionalDesignerList[0] ? instructionalDesignerList[0]['email'] : ''}}
+                        </div>
+                        </span>
+                    </div>
                     <div class="element"><span class="element-heading">Course Admin : </span> <span
                             class="element-content">{{courseTemplateDetails.admin}}</span></div>
                     <div class="element"><span class="element-heading">Course Template : </span> <span
@@ -136,7 +143,7 @@
                                 <mat-icon *ngIf="enrollmentLoader" style="margin-left:8px;">
                                     <mat-spinner diameter="20"></mat-spinner>
                                 </mat-icon>
-                                <span *ngIf="!enrollmentLoader" style="margin-left: 8px;font-size: 1.3rem;" class="material-symbols-rounded">
+                                <span *ngIf="!enrollmentLoader" style="margin-left: 8px;font-size: 1.1rem;" class="material-symbols-rounded">
                                     rule_settings
                                 </span>
                             </mat-chip>
@@ -488,3 +495,7 @@
     </ng-container>
 
 </div>
+
+<ng-template #HtmlContent>
+    <b>abcdef</b>
+  </ng-template>
