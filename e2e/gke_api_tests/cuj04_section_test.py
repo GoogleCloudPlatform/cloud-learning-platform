@@ -17,7 +17,6 @@ DATABASE_PREFIX = os.environ.get("DATABASE_PREFIX")
 EMAILS = get_required_emails_from_secret_manager()
 
 
-
 def create_course(name, description, section, owner_id):
   """Create course Function in classroom
 
@@ -25,15 +24,15 @@ def create_course(name, description, section, owner_id):
   Returns:
     new created course details
     """ ""
-  SCOPES = [
+  scopes = [
       "https://www.googleapis.com/auth/classroom.courses",
       "https://www.googleapis.com/auth/classroom.courses.readonly"
   ]
-  CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
-  CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
+  classroom_key = json.loads(os.environ.get("GKE_POD_SA_KEY"))
+  classroom_admin_email = os.environ.get("CLASSROOM_ADMIN_EMAIL")
   a_creds = service_account.Credentials.from_service_account_info(
-      CLASSROOM_KEY, scopes=SCOPES)
-  creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
+      classroom_key, scopes=scopes)
+  creds = a_creds.with_subject(classroom_admin_email)
   service = build("classroom", "v1", credentials=creds)
   new_course = {}
   new_course["name"] = name
@@ -45,7 +44,7 @@ def create_course(name, description, section, owner_id):
   course = service.courses().create(body=new_course).execute()
   course_name = course.get("name")
   course_id = course.get("id")
-  print("___________Course creaated___________________",course)
+  print("___________Course created___________________",course)
   return course
 
 def test_create_section(get_token):
@@ -57,10 +56,10 @@ def test_create_section(get_token):
   and list of teachers .A record is created in database and a course
   with details of course template is created in classroom
   """
-  # Create fake classroom in google classroom
+  # Create fake classroom in Google Classroom
   course = create_course(DATABASE_PREFIX + "test_course", "This is test",
                          "test", "me")
-  # Create fake Mastr course in Firestore
+  # Create fake Master course in Firestore
   classroom_id = course["id"]
   test_course_template_dict = TEST_COURSE_TEMPLATE2
   test_course_template_dict["name"] = DATABASE_PREFIX + "test_course"
@@ -78,21 +77,21 @@ def test_create_section(get_token):
   }
   resp = requests.post(url=url, json=data, headers=get_token)
   resp_json = resp.json()
+  print("Response Json create section", resp_json)
   assert resp.status_code == 202, "Status 202"
-
 
 def test_create_section_course_template_not_found(get_token):
   """ 
-  create a Course template and cohort is created  by  user  
+  create a Course template and cohort is created by user
   then user clicks on create section button and makes a section 
-  by providing section name ,description,course_template_id,cohort_id
-  and list of teachers .Given course template id is wrong and course template 
+  by providing section name,description,course_template_id,cohort_id
+  and list of teachers. Given course template id is wrong and course template
   id not found error is thrown
   """
-  # Create fake classroom in google classroom
+  # Create fake classroom in Google Classroom
   course = create_course(DATABASE_PREFIX + "test_course", "This is test",
                          "test", "me")
-  # Create fake Mastr course in Firestore
+  # Create fake Master course in Firestore
   classroom_id = course["id"]
   fake_data = create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2,
                                TEST_SECTION2, classroom_id)
@@ -107,13 +106,11 @@ def test_create_section_course_template_not_found(get_token):
   }
 
   resp = requests.post(url=url, json=data, headers=get_token)
-  resp_json = resp.json()
   assert resp.status_code == 404
-
 
 def test_get_section(get_token):
   """
-    Get a sections details for a  section by giving section_id as query paramter
+    Get a sections details for a section by giving section_id as query parameter
   """
   course = create_course(DATABASE_PREFIX + "test_course", "This is test",
                          "test", "me")
@@ -123,6 +120,7 @@ def test_get_section(get_token):
   url = f"{API_URL}/sections/{fake_data[2].id}"
   resp = requests.get(url=url, headers=get_token)
   resp_json = resp.json()
+  print("Response Json get section details", resp_json)
   assert resp.status_code == 200, "Status 200"
 
 
@@ -139,9 +137,8 @@ def test_list_sections(get_token):
   print("List sections API url----",url)
   resp = requests.get(url=url, headers=get_token)
   resp_json = resp.json()
-  print("This is response JSo list secctions",resp_json)
+  print("This is response Json list sections", resp_json)
   assert resp.status_code == 200, "Status 200"
-
 
 def test_update_section(get_token):
   """ 
@@ -149,10 +146,10 @@ def test_update_section(get_token):
   User Updates the section name ,description,course_state by providing expected 
   values and details get updated in firestore and classroom course
   """
-  # Create fake classroom in google classroom
+  # Create fake classroom in Google Classroom
   course = create_course(DATABASE_PREFIX + "test_course", "This is test",
                          "test", "me")
-  # Create fake Mastr course in Firestore
+  # Create fake Master course in Firestore
   classroom_id = course["id"]
   fake_data = create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2,
                                TEST_SECTION2, classroom_id)
@@ -167,19 +164,19 @@ def test_update_section(get_token):
   }
   resp = requests.patch(url=url, json=data, headers=get_token)
   resp_json = resp.json()
+  print("Response Json update section", resp_json)
   assert resp.status_code == 200, "Status 200"
-
 
 def test_update_section_course_not_found_in_classroom(get_token):
   """
   User click on edit button for a section
   User Updates the section name ,description,course_state by providing expected
-  values but given course_id of classroom is incorrect so it gives course not found error
+  values but given course_id of classroom is incorrect, so it gives course not found error
   """
-  # Create fake classroom in google classroom
+  # Create fake classroom in Google Classroom
   course = create_course(DATABASE_PREFIX + "test_course", "This is test",
                          "test", "me")
-  # Create fake Mastr course in Firestore
+  # Create fake Master course in Firestore
   classroom_id = course["id"]
   fake_data = create_fake_data(TEST_COURSE_TEMPLATE2, TEST_COHORT2,
                                TEST_SECTION2, classroom_id)

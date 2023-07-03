@@ -29,7 +29,6 @@ SCOPES = [
 ]
 def get_creds(use_teacher=False):
   """_summary_
-
   Returns:
       _type_: _description_
   """
@@ -89,13 +88,12 @@ def accept_invite(invitation_id, access_token=None, teacher_email=None):
   data = service.invitations().accept(id=invitation_id).execute()
   return data
 
-
 def invite_user(course_id, email, role):
   """Invite teacher to google classroom using course id and email
 
   Args:
-      course_id (str): google classroom unique id
-      teacher_email (str): teacher email id
+      course_id (str): Google Classroom unique id
+      email (str): teacher email id
   Returns:
       dict: response from create invitation method
   """
@@ -109,6 +107,7 @@ def create_course_work(classroom_id,body):
   service = build("classroom", "v1", credentials=get_creds(True))
   return service.courses().courseWork().create(courseId=classroom_id,
                                                  body=body).execute()
+
 def get_course_work_submission_list(classroom_id,course_work_id,user_id):
   service = build("classroom", "v1", credentials=get_creds(True))
   return service.courses().courseWork().studentSubmissions().list(
@@ -135,15 +134,16 @@ def patch_course_work_submission(classroom_id,course_work_id,submission_id,updat
       id=submission_id,
       updateMask=update_mask,
       body=body).execute()
+
 def list_coursework_submission_user(access_token,course_id,coursework_id,user_id):
   creds = Credentials(token=access_token)
-  print("Credentialss ",creds)
+  print("Credentials ",creds)
   service = build("classroom", "v1", credentials=creds)
   result = service.courses().courseWork().studentSubmissions().list(
     courseId=course_id,
     courseWorkId=coursework_id,
     userId=user_id).execute()
-  print("This is result list assignrmt ",result["studentSubmissions"])
+  print("This is result list assignment ",result["studentSubmissions"])
   return result["studentSubmissions"]
 
 def create_google_form(title):
@@ -176,7 +176,6 @@ def enroll_student_classroom(access_token, course_id, student_email,
                              course_code):
   """Add student to the classroom using student google auth token
   Args:
-    headers :Bearer token
     access_token(str): Oauth access token which contains student credentials
     course_id(str): unique classroom id which is required to get the classroom
     student_email(str): student email id
