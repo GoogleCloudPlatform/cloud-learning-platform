@@ -17,6 +17,7 @@
 """
 # pylint: disable=unspecified-encoding,line-too-long
 import os
+import logging
 from common.utils.logging_handler import Logger
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
@@ -24,6 +25,10 @@ from schemas.error_schema import (UnauthorizedResponseModel,
 from google.cloud import secretmanager
 from langchain.chat_models import ChatOpenAI
 from langchain.llms import Cohere
+
+# overridde default logging format
+logging.basicConfig(
+      format='%(asctime)s:%(levelname)s:%(message)s',level=logging.INFO)
 
 secrets = secretmanager.SecretManagerServiceClient()
 
