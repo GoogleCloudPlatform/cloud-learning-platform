@@ -79,6 +79,9 @@ requires:
 - path: ./microservices/utils
   configs: [utils]
 
+- path: ./microservices/credential_pathway_service
+  configs: [credential-pathway-service]
+
 build:
   googleCloudBuild: {}
 ---

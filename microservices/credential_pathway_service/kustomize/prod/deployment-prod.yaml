@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: credential-pathway-service
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: credential-pathway-service
+        image: credential-pathway-service
+        imagePullPolicy: Always
+        env:
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID
+        - name: EXTERNAL_DATA_GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: EXTERNAL_DATA_GCP_PROJECT
