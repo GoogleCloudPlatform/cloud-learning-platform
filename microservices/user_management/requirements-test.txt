@@ -1,0 +1,13 @@
+pytest==7.2.0
+pylint==2.15.10
+mock==4.0.3
+faker
+google-cloud-logging==3.1.2
+protobuf==3.19.5
+PyJWT==2.6.0
+google-cloud-secret-manager==2.11.1
+backports-unittest-mock==1.5
+pytest-cov==4.0.0
+pytest-custom_exit_code==0.3.0
+pytest-mock==3.10.0
+redis==4.5.4

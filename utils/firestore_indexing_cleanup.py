@@ -45,7 +45,7 @@ if __name__ == "__main__":
   print("DATABASE_PREFIX:", DATABASE_PREFIX)
 
   # collection_groups whose indexes needs to be deleted
-  with open("indexe_rules.json", encoding="utf-8") as indexes_file:
+  with open("index_rules.json", encoding="utf-8") as indexes_file:
     indexes = json.load(indexes_file)
 
   collection_groups = [i["collection_group"] for i in indexes]

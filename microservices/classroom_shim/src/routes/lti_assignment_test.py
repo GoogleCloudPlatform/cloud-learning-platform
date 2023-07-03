@@ -19,7 +19,8 @@ with mock.patch(
     side_effect=mock.MagicMock()) as mok:
   with mock.patch("routes.lti_assignment.Logger"):
     from routes.lti_assignment import router
-    from schemas.schema_examples import INSERT_LTI_ASSIGNMENT_EXAMPLE
+    from schemas.schema_examples import (INSERT_LTI_ASSIGNMENT_EXAMPLE,
+                                         COPY_LTI_ASSIGNMENT_EXAMPLE)
     from testing.test_config import API_URL
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
@@ -206,3 +207,50 @@ def test_delete_lti_assignment_negative():
 
   assert resp.status_code == 404, "Status should be 404"
   assert json_response.get("success") is False, "Response is incorrect"
+
+
+@mock.patch("routes.lti_assignment.create_content_item")
+@mock.patch("routes.lti_assignment.get_content_item")
+def test_copy_lti_assignment(mock_get_content_item, mock_create_content_item,
+                             create_lti_assignment):
+  content_item_details = {
+      "id": "aC72Vos31iFQt09c",
+      "created_time": "2022-03-03 09:22:49.843674+00:00",
+      "last_modified_time": "2022-03-03 09:22:49.843674+00:00",
+      "tool_id": "A6cS8vaCsOavO",
+      "content_item_type": "ltiResourceLink",
+      "content_item_info": {
+          "custom": {
+              "resourceid": "d83dd1d0-a937-3341-8e9a-eb3cf1146bff"
+          },
+          "text": "test-image.jpg",
+          "title": "test-image.jpg",
+          "type": "ltiResourceLink",
+          "url": "https://testtool.com/api/ltilaunch/ltitoollaunch"
+      },
+      "context_id": "F2j4v5b3Vk96b2B"
+  }
+
+  mock_get_content_item.return_value = content_item_details
+  mock_create_content_item.return_value = {
+      **content_item_details, "id": "Ob8Qb2Bn1V7j3"
+  }
+
+  lti_assignment_details = create_lti_assignment
+  url = f"{api_url}/copy"
+  req_body = {
+      **COPY_LTI_ASSIGNMENT_EXAMPLE, "lti_assignment_id":
+          lti_assignment_details.id,
+      "start_date":
+          str(COPY_LTI_ASSIGNMENT_EXAMPLE["start_date"]),
+      "end_date":
+          str(COPY_LTI_ASSIGNMENT_EXAMPLE["end_date"]),
+      "due_date":
+          str(COPY_LTI_ASSIGNMENT_EXAMPLE["due_date"])
+  }
+  resp = client_with_emulator.post(url, json=req_body)
+  print("resp", resp.status_code, resp.text)
+  assert resp.status_code == 200, "Status should be 200"
+  json_resp = resp.json()
+  assert lti_assignment_details.lti_assignment_title == json_resp.get(
+      "data").get("lti_assignment_title")

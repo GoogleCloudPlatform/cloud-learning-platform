@@ -1,0 +1,46 @@
+{
+  "keywords": ["regression", "analysis"],
+  "author":
+    "https://credentialengineregistry.org/resources/ce-0f0d84f5-5c32-4526-ad39-1db0adbdbe93",
+  "creator":
+    "https://credentialengineregistry.org/resources/ce-0f0d84f5-5c32-4526-ad39-1db0adbdbe93",
+  "alignments": {
+    "standard_alignment": {},
+    "credential_alignment": {},
+    "skill_alignment": {
+      "emsi": {
+        "aligned": [
+            {
+                "id": "124hsgxR77QKS8uS7Zgm",
+                "name": "Cyber Security",
+                "score": 1.0
+            }
+        ],
+        "suggested": []
+      }
+    },
+    "knowledge_alignment": {},
+    "role_alignment": {},
+    "organizational_alignment": {}
+  },
+  "organizations": [],
+  "certifications": [],
+  "occupations": {
+    "occupations_major_group": ["15-1212.00"],
+    "occupations_minor_group": [],
+    "broad_occupation": [],
+    "detailed_occupation": []
+  },
+  "onet_job":
+    "",
+  "parent_nodes": {
+    "competencies": [
+      "MAT-243: Applied Statistics for Science, Technology, Engineering, and Mathematics (STEM)"]
+  },
+  "reference_id":
+    "ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b",
+  "source_uri":
+    "https://credentialengineregistry.org/resources/ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b",
+  "source_name":
+    "Credentialengine"
+}

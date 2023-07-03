@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: batch-course-ingestion
+spec:
+  ttlSecondsAfterFinished: 100
+  backoffLimit: 4
+  template:
+    spec:
+      containers:
+      - name: batch-course-ingestion
+        image: gcr.io/core-learning-services-dev/batch-course-ingestion:latest
+        command: 
+          - "python"
+          - "services/course_inference.py"
+      restartPolicy: Never
+
+      
+  
