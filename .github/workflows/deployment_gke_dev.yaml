@@ -170,7 +170,7 @@ jobs:
           gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
 
       - name: Use Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16
 

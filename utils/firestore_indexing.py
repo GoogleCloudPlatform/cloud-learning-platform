@@ -40,7 +40,7 @@ if __name__ == "__main__":
     raise Exception("PROJECT_ID is not defined. Indexing skipped.")
 
   index_files = [
-        "indexe_rules.json", "v3_filter_api_indexes.json", "index_llms.json"
+        "index_rules.json", "v3_filter_api_indexes.json"
   ]
   for file_name in index_files:
     process_indexes_file(file_name)

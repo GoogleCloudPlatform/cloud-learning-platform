@@ -5,22 +5,8 @@ metadata:
 requires:
   - path: ../../common
     configs: [common]
-    activeProfiles:
-    - name: custom
-      activatedBy: [custom]
-    - name: dev
-      activatedBy: [dev]
-    - name: prod
-      activatedBy: [prod]
   - path: ../extractive_summarization
     configs: [extractive-summarization]
-    activeProfiles:
-    - name: custom
-      activatedBy: [custom]
-    - name: dev
-      activatedBy: [dev]
-    - name: prod
-      activatedBy: [prod]
 build:
   tagPolicy:
     gitCommit:
@@ -65,6 +51,8 @@ profiles:
       - ./kustomize/custom
     statusCheckDeadlineSeconds: 1200
 - name: dev
+  activation:
+  - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
   build:
     googleCloudBuild:
       machineType: N1_HIGHCPU_8
