@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: credential-pathway-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: credential-pathway-service
+  template:
+    metadata:
+      labels:
+        app: credential-pathway-service
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: credential-pathway-service
+        image: credential-pathway-service
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1000Mi"
+          limits:
+            memory: "5000Mi"
+            cpu: "2000m"
+        env:
+        # Define the environment variable
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID
+        - name: API_BASE_URL
+          # Required format: api/version
+          value: api/v1
+        - name: CONTAINER_NAME
+          value: credential-pathway-service
+        - name: DEPLOYMENT_NAME
+          value: credential-pathway-service
+        - name: SERVICE_NAME
+          value: credential-pathway-service
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT 
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60
