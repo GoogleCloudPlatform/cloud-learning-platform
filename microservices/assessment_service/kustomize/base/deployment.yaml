@@ -12,7 +12,6 @@ spec:
       labels:
         app: assessment-service
     spec:
-      serviceAccountName: ksa
       # TODO: un-comment the below steps while updating workflows
       # volumes:	
       #   - name: signurl-sa-key	

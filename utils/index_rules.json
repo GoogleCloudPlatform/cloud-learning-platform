@@ -864,5 +864,103 @@
                 "order": "DESCENDING"
             }
         ]
+    },
+    {
+        "collection_group": "assessments",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_archived",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },{
+        "collection_group": "assessments",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_autogradable",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
+        "collection_group": "submitted_assessments",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_deleted",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "learner_id",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
+        "collection_group": "submitted_assessments",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "assessment_id",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
+        "collection_group": "submitted_assessments",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "assessment_id",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "is_deleted",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "learner_id",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
+    },{
+        "collection_group": "assessments",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_archived",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "is_autogradable",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     }
 ]
