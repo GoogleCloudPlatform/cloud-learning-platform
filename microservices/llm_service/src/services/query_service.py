@@ -35,6 +35,7 @@ from common.utils.errors import (ResourceNotFoundException,
 from common.utils.http_exceptions import InternalServerError
 from utils.errors import NoDocumentsIndexedException
 from google.cloud import aiplatform, storage
+from google.cloud.exceptions import Conflict
 from vertexai.preview.language_models import TextEmbeddingModel
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders import CSVLoader
@@ -211,10 +212,13 @@ def query_engine_build(doc_url: str, query_engine: str, user_id: str,
     build_doc_index(doc_url, query_engine)
   except Exception as e:
     # delete query engine model if build unsuccessful
-    QueryEngine.collection.delete(q_engine.id)
-    # TODO
-    #QueryDocument.collection.delete()
-    #QueryDocumentChunk.collection.delete()
+    QueryDocument.collection.filter(
+      "query_engine_id", "==", q_engine.id
+    ).delete()
+    QueryDocumentChunk.collection.filter(
+      "query_engine_id", "==", q_engine.id
+    ).delete()
+    QueryEngine.collection.delete_by_id(q_engine.id)
     raise InternalServerError(e) from e
 
   return q_engine
@@ -239,9 +243,15 @@ def build_doc_index(doc_url:str, query_engine: str):
   try:
     storage_client = storage.Client(project=PROJECT_ID)
 
-    # bucket for ME index data
+    # create bucket for ME index data
     bucket_name = f"{query_engine}-me-data"
-    bucket = storage_client.create_bucket(bucket_name, location=REGION)
+    try:
+      bucket = storage_client.create_bucket(bucket_name, location=REGION)
+    except Conflict:
+      # if bucket alredy exists, delete and recreate
+      bucket = storage_client.bucket(bucket_name)
+      bucket.delete(force=True)
+      buket = storage_client.create_bucket(bucket_name, location=REGION)
     bucket_uri = f"gs://{bucket.name}"
 
     # process docs at url and upload embeddings to GCS for indexing
@@ -372,7 +382,7 @@ def _process_documents(doc_url: str, bucket_name: str,
 
       # clean up tmp files
       shutil.rmtree(embeddings_dir)
-      shutil.remove(doc_filepath)
+      os.remove(doc_filepath)
 
       # store QueryDocument and QueryDocumentChunk models
       query_doc = QueryDocument(query_engine_id = q_engine.id,
@@ -541,8 +551,8 @@ def _generate_index_data(doc_name: str, text_chunks: List[str],
     ]
 
     # Create output file
-    doc_stem = Path(f"{doc_name}_{index_base}").stem
-    chunk_path = embeddings_dir.joinpath(f"{doc_stem}_index.json")
+    chunk_path = embeddings_dir.joinpath(
+        f"{doc_name}_{index_base}_index.json")
 
     # write embeddings for chunk to file
     with open(chunk_path, "w", encoding="utf-8") as f:
