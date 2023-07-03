@@ -1,0 +1,15 @@
+[
+    {
+      "entity_type": "issuer",
+      "entity_id": "987",
+      "open_badge_id": "13",
+      "name": "Jon",
+      "image": "string",
+      "email": "jon@example.com",
+      "description": "issuer added",
+      "url": "https://www.example.com",
+      "staff": [{}],
+      "extensions": "string",
+      "badgr_domain": "string"
+    }
+  ]
