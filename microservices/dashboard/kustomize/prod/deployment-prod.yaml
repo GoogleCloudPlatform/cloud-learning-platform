@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard
+spec:
+  replicas: 3
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: dashboard
+        image: dashboard
+        imagePullPolicy: Always
+        

@@ -70,6 +70,9 @@ requires:
 - path: ./microservices/learning_object_service
   configs: [learning-object-service]
 
+- path: ./microservices/dashboard
+  configs: [dashboard]
+
 - path: ./microservices/assessment_service
   configs: [assessment-service]
 
