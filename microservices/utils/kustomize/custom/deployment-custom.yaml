@@ -9,6 +9,15 @@ spec:
       - name: utils
         image: utils
         imagePullPolicy: IfNotPresent
-        resources:
-          requests:
-            memory: "500Mi"
+        env:
+        - name: GCP_LEARNING_RESOURCE_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_LEARNING_RESOURCE_BUCKET
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID
+
