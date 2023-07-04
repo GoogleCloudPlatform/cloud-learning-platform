@@ -31,7 +31,7 @@ from schemas.llm_schema import (ChatModel, ChatUpdateModel,
                                 LLMGenerateResponse,
                                 LLMUserChatResponse,
                                 LLMUserAllChatsResponse)
-from services.llm_generate import llm_generate
+from services.llm_generate import llm_chat
 from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, LLM_TYPES
 
 router = APIRouter(prefix="/chat", tags=["LLMs"], responses=ERROR_RESPONSES)
@@ -220,7 +220,7 @@ async def create_user_chat(gen_config: LLMGenerateModel,
     user = User.find_by_email(user_data.get("email"))
 
     # generate text from prompt
-    response = await llm_generate(prompt, llm_type)
+    response = await llm_chat(prompt, llm_type)
 
     # create new chat for user
     user_chat = UserChat(user_id=user.user_id, llm_type=llm_type)
@@ -271,7 +271,7 @@ async def user_chat_generate(chat_id: str, gen_config: LLMGenerateModel):
   llm_type = user_chat.llm_type
 
   try:
-    response = await llm_generate(prompt, llm_type, user_chat)
+    response = await llm_chat(prompt, llm_type, user_chat)
 
     # save chat history
     user_chat.update_history(prompt, response)
