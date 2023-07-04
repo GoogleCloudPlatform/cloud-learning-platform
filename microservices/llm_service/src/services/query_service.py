@@ -498,9 +498,8 @@ def _get_embedding_batched(
       embedding is not None for sentence, embedding in zip(
         text_chunks, embeddings_list)
   ]
-  embeddings_list_successful = np.squeeze(
-      np.stack([embedding for embedding in embeddings_list
-                if embedding is not None])
+  embeddings_list_successful = np.stack(
+    [embedding for embedding in embeddings_list if embedding is not None]
   )
   return is_successful, embeddings_list_successful
 
