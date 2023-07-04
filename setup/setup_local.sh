@@ -71,6 +71,31 @@ setup_namespace() {
   fi
 }
 
+add_service_account_key() {
+  SA_ACCOUNT_ID=$1
+
+  printf "\n${BLUE}Adding Service Account '$SA_ACCOUNT_ID' to cluster ...${NORMAL}\n"
+
+  declare EXISTING_SECRET=`kubectl get secrets -n $SKAFFOLD_NAMESPACE | grep "$SA_ACCOUNT_ID-sa-key"`
+  if [[ "$EXISTING_SECRET" != "" ]]; then
+    printf "Removing previous created secret '$SA_ACCOUNT_ID-sa-key' in namespace $SKAFFOLD_NAMESPACE.\n"
+    kubectl delete secret $SA_ACCOUNT_ID-sa-key -n $SKAFFOLD_NAMESPACE
+  fi
+
+  printf "\n${BLUE}Retrieving latest '$SA_ACCOUNT_ID-sa-key' from Secret Manager ...${NORMAL}\n"
+  mkdir -p .tmp
+  gcloud secrets versions access latest --secret "$SA_ACCOUNT_ID-sa-key" > ./.tmp/$PROJECT_ID-$SA_ACCOUNT_ID-sa-key.json
+
+  printf "\n${BLUE}Adding Service Account key as '$SA_ACCOUNT_ID-sa-key' to cluster, namespace=$SKAFFOLD_NAMESPACE ...${NORMAL}\n"
+  kubectl create secret generic $SA_ACCOUNT_ID-sa-key --from-file=./.tmp/${PROJECT_ID}-$SA_ACCOUNT_ID-sa-key.json --namespace=$SKAFFOLD_NAMESPACE
+
+  printf "\n${BLUE}Service Account key added as '$SA_ACCOUNT_ID-sa-key' in cluster, namespace=$SKAFFOLD_NAMESPACE ...${NORMAL}\n"
+  printf "Please make sure the key content is greater than 0 byte:\n"
+  kubectl describe secrets $SA_ACCOUNT_ID-sa-key -n $SKAFFOLD_NAMESPACE | grep bytes
+
+  rm ./.tmp/$PROJECT_ID-$SA_ACCOUNT_ID-sa-key.json
+}
+
 read -p  "${BLUE}This will set up for local development using namespace \
 \"${SKAFFOLD_NAMESPACE}\" in \"$CLUSTER_NAME\" in project \"$PROJECT_ID\". \
 Continue? (y/n) ${NORMAL}" -n 1 -r
@@ -83,7 +108,7 @@ else
 fi
 
 init
-add_service_account_keys
 setup_namespace
+add_service_account_key "signurl"
 
 printf "\n${BLUE}Done. ${NORMAL}\n"
