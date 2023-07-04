@@ -29,11 +29,17 @@ QUERY_EXAMPLE = {
   "llm_type": "VertexAI-Chat",
   "query_engine_id": "qwerty1234asdf",
   "history": [
-    {"HumanInput": "test input 1"},
-    {"AIOutput": "test response 1"},
-    {"HumanInput": "test input 2"},
-    {"AIOutput": "test response 2"}
-  ],
+    {"HumanQuestion": "test input 1"},
+    {
+      "AIResponse": "test response 1",
+      "AIReferences": "test reference 1"
+    },
+    {"HumanQuestion": "test input 2"},
+    {
+      "AIResponse": "test response 2",
+      "AIReferences": "test reference 2"
+    }
+  ]
 }
 
 QUERY_ENGINE_EXAMPLE = {

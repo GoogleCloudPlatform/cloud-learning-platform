@@ -24,18 +24,13 @@ from fastapi.testclient import TestClient
 from unittest import mock
 from testing.test_config import API_URL, TESTING_FOLDER_PATH
 from schemas.schema_examples import (LLM_GENERATE_EXAMPLE, QUERY_EXAMPLE,
-                                     USER_EXAMPLE, query data)
+                                     USER_EXAMPLE, QUERY_ENGINE_EXAMPLE)
 from common.models import UserQuery, QueryEngine, User
-from common.models.llm import CHAT_HUMAN, CHAT_AI
+from common.models.llm_query import QUERY_HUMAN, QUERY_AI_RESPONSE, QUERY_AI_REFERENCES
 from common.utils.http_exceptions import add_exception_handlers
 from common.utils.auth_service import validate_user
 from common.utils.auth_service import validate_token
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
-
-QUERY_HUMAN
-QUERY_AI_RESPONSE
-QUERY_AI_REFERENCES
-
 
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
@@ -103,7 +98,8 @@ def client_with_emulator(clean_firestore, scope="module"):
   test_client = TestClient(app)
   yield test_client
 
-@pytest.fixquery data(client_with_emulator):
+@pytest.fixture
+def create_user(client_with_emulator):
   user_dict = USER_EXAMPLE
   user = User.from_dict(user_dict)
   user.save()
@@ -118,7 +114,7 @@ def test_get_query_engine_list(client_with_emulator):
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  saved_ids = [i.get("id") for i query data("data")]
+  saved_ids = [i.get("id") for i in json_response.get("data")]
   assert query_engine_dict["id"] in saved_ids, "all data not retrieved"
 
 
@@ -159,11 +155,14 @@ def test_query(client_with_emulator):
   assert len(user_queries) == 1, "retreieved new user query"
   user_query = user_queries[0]
   assert user_query.history[0] == \
-    {CHAT_HUMAN: FAKE_GENERATE_PARAMS["prompt"]}, \
-    "retrieved user query prompt"
+    {QUERY_HUMAN: FAKE_GENERATE_PARAMS["prompt"]}, \
+    "got user query prompt"
   assert user_query.history[1] == \
-    {CHAT_AI: FAKE_GENERATE_RESPONSE}, \
-    "retrieved user query response"
+    {
+      QUERY_AI_RESPONSE: FAKE_GENERATE_RESPONSE,
+      QUERY_AI_REFERENCES: QUERY_EXAMPLE["history"][1][QUERY_AI_REFERENCES]
+    }, \
+    "got user query response"
 
 
 def test_query_generate(client_with_emulator):
