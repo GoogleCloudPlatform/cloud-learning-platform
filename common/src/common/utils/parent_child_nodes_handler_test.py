@@ -37,7 +37,7 @@ def test_insert_data_to_db():
     child_ids.append(lo.id)
     ids.append(lo.id)
 
-  parent_lo = LearningObject.find_by_id(parent_id)
+  parent_lo = LearningObject.find_by_uuid(parent_id)
   parent_lo.child_nodes["learning_objects"].extend(child_ids)
   parent_lo.uuid = parent_id
   parent_lo.update()
@@ -75,7 +75,7 @@ def test_insert_cirriculum_data_to_db():
     child_ids.append(lo.id)
     ids.append(lo.id)
 
-  parent_cp = CurriculumPathway.find_by_id(parent_cp_id)
+  parent_cp = CurriculumPathway.find_by_uuid(parent_cp_id)
   parent_cp.child_nodes["curriculum_pathways"].extend(child_ids)
   parent_cp.uuid = parent_cp_id
   parent_cp.update()
