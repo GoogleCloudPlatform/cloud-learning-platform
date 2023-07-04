@@ -104,23 +104,31 @@ def create_user(client_with_emulator):
   user = User.from_dict(user_dict)
   user.save()
 
-
-def test_get_query_engine_list(client_with_emulator):
-  query_engine_dict = {**QUERY_ENGINE_EXAMPLE}
+@pytest.fixture
+def create_engine(client_with_emulator):
+  query_engine_dict = QUERY_ENGINE_EXAMPLE
   q_engine = QueryEngine.from_dict(query_engine_dict)
   q_engine.save()
-  
+
+@pytest.fixture
+def create_query(client_with_emulator):
+  query_dict = QUERY_EXAMPLE
+  query = UserQuery.from_dict(query_dict)
+  query.save()
+
+
+def test_get_query_engine_list(create_engine, client_with_emulator):  
   url = f"{api_url}"
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   saved_ids = [i.get("id") for i in json_response.get("data")]
-  assert query_engine_dict["id"] in saved_ids, "all data not retrieved"
+  assert QUERY_ENGINE_EXAMPLE["id"] in saved_ids, "all data not retrieved"
 
 
 def test_create_query_engine(create_user, client_with_emulator):
   url = f"{api_url}"
-  params = QUERY_ENGINE_EXAMPLE
+  params = QUERY_ENGINE_EXAMPLE.copy()
   del params["id"]
   with mock.patch("routes.query.initiate_batch_job",
                   return_value = FAKE_QE_BUILD_RESPONSE):
@@ -132,12 +140,9 @@ def test_create_query_engine(create_user, client_with_emulator):
   assert query_engine_data == FAKE_QE_BUILD_RESPONSE
 
 
-def test_query(client_with_emulator):
-  query_engine_dict = {**QUERY_ENGINE_EXAMPLE}
-  q_engine = QueryEngine.from_dict(query_engine_dict)
-  q_engine.save()
-
-  url = f"{api_url}/engine/{q_engine.id}"
+def test_query(create_user, create_engine, client_with_emulator):
+  q_engine_id = QUERY_ENGINE_EXAMPLE["id"]
+  url = f"{api_url}/engine/{q_engine_id}"
 
   with mock.patch("routes.query.query_generate",
                   return_value = FAKE_GENERATE_RESPONSE):
@@ -165,14 +170,10 @@ def test_query(client_with_emulator):
     "got user query response"
 
 
-def test_query_generate(client_with_emulator):
-  query_dict = {**QUERY_EXAMPLE}
-  query = UserQuery.from_dict(query_dict)
-  query.save()
+def test_query_generate(create_query, client_with_emulator):
+  queryid = QUERY_EXAMPLE["id"]
 
-  queryid = query.id
-
-  url = f"{api_url}/query/{queryid}/generate"
+  url = f"{api_url}/{queryid}"
 
   with mock.patch("routes.query.query_generate",
                   return_value = FAKE_GENERATE_RESPONSE):
@@ -187,43 +188,45 @@ def test_query_generate(client_with_emulator):
     "returned query history 1"
   assert query_data["history"][-2] == FAKE_QUERY_PARAMS["prompt"], \
     "returned query data prompt"
-  assert query_data["history"][-1] == FAKE_GENERATE_RESPONSE, \
-    "returned query data generated text"
-
+  assert query_data["history"][-1] ==  \
+    {
+      QUERY_AI_RESPONSE: FAKE_GENERATE_RESPONSE,
+      QUERY_AI_REFERENCES: QUERY_EXAMPLE["history"][1][QUERY_AI_REFERENCES]
+    }, \
+    "retured user query response"
+    
   user_query = UserQuery.find_by_id(queryid)
   assert user_query is not None, "retrieved user query"
-  assert len(user_query.history) == len(chat.history) + 2, \
+  assert len(user_query.history) == len(query.history) + 2, \
     "user query history updated"
-  assert user_query.history[-2] == FAKE_QUERY_PARAMS["prompt"], \
-    "retrieved user chat prompt"
-  assert user_query.history[-1] == FAKE_GENERATE_RESPONSE, \
-    "retrieved user chat response"
+  assert user_query.history[2] == \
+    {QUERY_HUMAN: FAKE_GENERATE_PARAMS["prompt"]}, \
+    "got user query prompt"
+  assert user_query.history[3] == \
+    {
+      QUERY_AI_RESPONSE: FAKE_GENERATE_RESPONSE,
+      QUERY_AI_REFERENCES: QUERY_EXAMPLE["history"][1][QUERY_AI_REFERENCES]
+    }, \
+    "got user query response"
 
 
-def test_get_query(create_user, client_with_emulator):
-  query_dict = {**QUERY_EXAMPLE}
-  query = UserQuery.from_dict(query_dict)
-  query.save()
-
-  url = f"{api_url}/{query.id}"
+def test_get_query(create_user, create_query, client_with_emulator):
+  queryid = QUERY_EXAMPLE["id"]
+  url = f"{api_url}/{queryid}"
   resp = client_with_emulator.get(url)
   json_response = resp.json()
 
   assert resp.status_code == 200, "Status 200"
   saved_id = json_response.get("data").get("id")
-  assert query.id == saved_id, "all data not retrieved"
+  assert QUERY_EXAMPLE["id"] == saved_id, "all data not retrieved"
 
 
-def test_get_queries(create_user, client_with_emulator):
-  query_dict = {**QUERY_EXAMPLE}
-  query = UserQuery.from_dict(query_dict)
-  query.save()
-
-  userid = query.user_id
+def test_get_queries(create_user, create_query, client_with_emulator):
+  userid = USER_EXAMPLE["id"]
   url = f"{api_url}/user/{userid}"
   resp = client_with_emulator.get(url)
   json_response = resp.json()
 
   assert resp.status_code == 200, "Status 200"
   saved_ids = [i.get("id") for i in json_response.get("data")]
-  assert query_dict["id"] in saved_ids, "all data not retrieved"
+  assert QUERY_EXAMPLE["id"] in saved_ids, "all data not retrieved"

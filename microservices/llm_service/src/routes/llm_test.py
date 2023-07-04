@@ -86,12 +86,6 @@ def client_with_emulator(clean_firestore, scope="module"):
   test_client = TestClient(app)
   yield test_client
 
-@pytest.fixture
-def create_user(client_with_emulator):
-  user_dict = USER_EXAMPLE
-  user = User.from_dict(user_dict)
-  user.save()
-
 
 def test_get_llm_list(client_with_emulator):
   url = f"{api_url}"

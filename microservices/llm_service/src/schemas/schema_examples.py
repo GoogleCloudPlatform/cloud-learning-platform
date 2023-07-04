@@ -47,7 +47,7 @@ QUERY_ENGINE_EXAMPLE = {
   "name": "query-engine-test",
   "llm_type": "VertexAI-Chat",
   "created_by": "fake-user-id",
-  "is_public": "True",
+  "is_public": True,
   "index_id": "projects/83285581741/locations/us-central1/indexes/682347240495461171",
   "index_name": "query_engine_test_MEindex",
   "endpoint": "projects/83285581741/locations/us-central1/indexEndpoints/420294037177840435"

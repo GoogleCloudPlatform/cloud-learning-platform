@@ -95,12 +95,13 @@ def create_user(client_with_emulator):
   user = User.from_dict(user_dict)
   user.save()
 
-def test_get_chats(create_user, client_with_emulator):
-  chat_dict = {**CHAT_EXAMPLE}
+@pytest.fixture
+def create_chat(client_with_emulator):
+  chat_dict = CHAT_EXAMPLE
   chat = UserChat.from_dict(chat_dict)
   chat.save()
 
-  userid = chat.user_id
+def test_get_chats(create_user, create_chat, client_with_emulator):
   params = {"skip": 0, "limit": "30"}
   url = f"{api_url}"
   resp = client_with_emulator.get(url, params=params)
@@ -108,15 +109,11 @@ def test_get_chats(create_user, client_with_emulator):
 
   assert resp.status_code == 200, "Status 200"
   saved_ids = [i.get("id") for i in json_response.get("data")]
-  assert chat_dict["id"] in saved_ids, "all data not retrieved"
+  assert CHAT_EXAMPLE["id"] in saved_ids, "all data not retrieved"
 
 
-def test_get_chat(create_user, client_with_emulator):
-  chat_dict = {**CHAT_EXAMPLE}
-  chat = UserChat.from_dict(chat_dict)
-  chat.save()
-
-  chatid = chat.id
+def test_get_chat(create_user, create_chat, client_with_emulator):
+  chatid = CHAT_EXAMPLE["id"]
   url = f"{api_url}/{chatid}"
 
   resp = client_with_emulator.get(url)
@@ -156,14 +153,9 @@ def test_create_chat(create_user, client_with_emulator):
     "retrieved user chat response"
 
 
-def test_delete_chat(create_user, client_with_emulator):
+def test_delete_chat(create_user, create_chat, client_with_emulator):
   userid = CHAT_EXAMPLE["user_id"]
-
-  chat_dict = {**CHAT_EXAMPLE}
-  chat = UserChat.from_dict(chat_dict)
-  chat.save()
-
-  chatid = chat.id
+  chatid = CHAT_EXAMPLE["id"]
   url = f"{api_url}/{chatid}"
 
   resp = client_with_emulator.delete(url)
@@ -175,14 +167,10 @@ def test_delete_chat(create_user, client_with_emulator):
   assert len(user_chats) == 0, "user chat deleted"
 
 
-def test_update_chat(create_user, client_with_emulator):
+def test_update_chat(create_user, create_chat, client_with_emulator):
   userid = CHAT_EXAMPLE["user_id"]
+  chatid = CHAT_EXAMPLE["id"]
 
-  chat_dict = {**CHAT_EXAMPLE}
-  chat = UserChat.from_dict(chat_dict)
-  chat.save()
-
-  chatid = chat.id
   url = f"{api_url}/{chatid}"
 
   update_params = {
@@ -197,12 +185,8 @@ def test_update_chat(create_user, client_with_emulator):
   assert updated_chat.title == "updated title", "user chat updated"
 
 
-def test_chat_generate(client_with_emulator):
-  chat_dict = {**CHAT_EXAMPLE}
-  chat = UserChat.from_dict(chat_dict)
-  chat.save()
-
-  chatid = chat.id
+def test_chat_generate(create_chat, client_with_emulator):
+  chatid = CHAT_EXAMPLE["id"]
 
   url = f"{api_url}/{chatid}/generate"
 
@@ -226,7 +210,7 @@ def test_chat_generate(client_with_emulator):
 
   user_chat = UserChat.find_by_id(chatid)
   assert user_chat is not None, "retrieved user chat"
-  assert len(user_chat.history) == len(chat.history) + 2, \
+  assert len(user_chat.history) == len(CHAT_EXAMPLE["history"]) + 2, \
     "user chat history updated"
   assert user_chat.history[-2] == \
     {CHAT_HUMAN: FAKE_GENERATE_PARAMS["prompt"]}, \
