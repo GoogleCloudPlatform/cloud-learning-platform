@@ -18,7 +18,8 @@ from typing import List, Optional
 from pydantic import BaseModel
 from schemas.schema_examples import (LLM_GENERATE_EXAMPLE,
                                      QUERY_EXAMPLE,
-                                     QUERY_ENGINE_EXAMPLE)
+                                     QUERY_ENGINE_EXAMPLE,
+                                     QUERY_RESULT_EXAMPLE)
 
 class ChatModel(BaseModel):
   id: Optional[str] = None
@@ -136,7 +137,7 @@ class LLMQueryResponse(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully performed query",
-            "data": None
+            "data": QUERY_RESULT_EXAMPLE
         }
     }
 

@@ -279,6 +279,8 @@ async def query(query_engine_id: str,
         }
     }
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -317,11 +319,13 @@ async def query_continue(user_query_id: str, gen_config: LLMQueryModel):
         "success": True,
         "message": "Successfully generated text",
         "data": {
-            "query_result": str(query_result),
-            "query_references": str(query_references)
+            "query_result": query_result,
+            "query_references": query_references
         }
     }
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 

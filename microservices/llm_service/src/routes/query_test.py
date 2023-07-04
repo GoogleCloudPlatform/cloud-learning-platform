@@ -24,8 +24,9 @@ from fastapi.testclient import TestClient
 from unittest import mock
 from testing.test_config import API_URL, TESTING_FOLDER_PATH
 from schemas.schema_examples import (LLM_GENERATE_EXAMPLE, QUERY_EXAMPLE,
-                                     USER_EXAMPLE, QUERY_ENGINE_EXAMPLE)
-from common.models import UserQuery, QueryEngine, User
+                                     USER_EXAMPLE, QUERY_ENGINE_EXAMPLE,
+                                     QUERY_RESULT_EXAMPLE)
+from common.models import UserQuery, QueryResult, QueryEngine, User
 from common.models.llm_query import QUERY_HUMAN, QUERY_AI_RESPONSE, QUERY_AI_REFERENCES
 from common.utils.http_exceptions import add_exception_handlers
 from common.utils.auth_service import validate_user
@@ -77,7 +78,11 @@ FAKE_QE_BUILD_RESPONSE = {
   }
 }
 
+FAKE_REFERENCES = QUERY_EXAMPLE["history"][1]["AIReferences"]
+
 FAKE_GENERATE_RESPONSE = "test generation"
+
+FAKE_QUERY_RESPONSE = (QUERY_RESULT_EXAMPLE, FAKE_REFERENCES)
 
 FAKE_QUERY_PARAMS = {
     "prompt": "test prompt"
@@ -116,6 +121,12 @@ def create_query(client_with_emulator):
   query = UserQuery.from_dict(query_dict)
   query.save()
 
+@pytest.fixture
+def create_query_result(client_with_emulator):
+  query_result_dict = QUERY_RESULT_EXAMPLE
+  query_result = QueryResult.from_dict(query_result_dict)
+  query_result.save()
+
 
 def test_get_query_engine_list(create_engine, client_with_emulator):  
   url = f"{api_url}"
@@ -140,21 +151,24 @@ def test_create_query_engine(create_user, client_with_emulator):
   assert query_engine_data == FAKE_QE_BUILD_RESPONSE
 
 
-def test_query(create_user, create_engine, client_with_emulator):
+def test_query(create_user, create_engine, create_query_result,
+               client_with_emulator):
   q_engine_id = QUERY_ENGINE_EXAMPLE["id"]
   url = f"{api_url}/engine/{q_engine_id}"
 
+  query_result = QueryResult.find_by_id(QUERY_RESULT_EXAMPLE["id"])
+  fake_query_response = (query_result, FAKE_REFERENCES)
   with mock.patch("routes.query.query_generate",
-                  return_value = FAKE_GENERATE_RESPONSE):
+                  return_value = fake_query_response):
     resp = client_with_emulator.post(url, json=FAKE_QUERY_PARAMS)
 
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   query_data = json_response.get("data")
-  assert query_data["history"][0] == QUERY_EXAMPLE["history"][0], \
-    "returned query history 0"
-  assert query_data["history"][1] == QUERY_EXAMPLE["history"][1], \
-    "returned query history 1"
+  assert query_data["query_result"] == QUERY_RESULT_EXAMPLE, \
+    "returned query result"
+  assert query_data["query_references"] == FAKE_REFERENCES, \
+    "returned query references"
 
   user_queries = UserQuery.find_by_user(userid)
   assert len(user_queries) == 1, "retreieved new user query"
@@ -170,13 +184,16 @@ def test_query(create_user, create_engine, client_with_emulator):
     "got user query response"
 
 
-def test_query_generate(create_query, client_with_emulator):
+def test_query_generate(create_user, create_engine, create_query, 
+                        create_query_result, client_with_emulator):
   queryid = QUERY_EXAMPLE["id"]
 
   url = f"{api_url}/{queryid}"
 
+  query_result = QueryResult.find_by_id(QUERY_RESULT_EXAMPLE["id"])
+  fake_query_response = (query_result, FAKE_REFERENCES)
   with mock.patch("routes.query.query_generate",
-                  return_value = FAKE_GENERATE_RESPONSE):
+                  return_value = fake_query_response):
     resp = client_with_emulator.post(url, json=FAKE_QUERY_PARAMS)
 
   json_response = resp.json()
@@ -210,7 +227,7 @@ def test_query_generate(create_query, client_with_emulator):
     "got user query response"
 
 
-def test_get_query(create_user, create_query, client_with_emulator):
+def test_get_query(create_user, create_engine, create_query, client_with_emulator):
   queryid = QUERY_EXAMPLE["id"]
   url = f"{api_url}/{queryid}"
   resp = client_with_emulator.get(url)

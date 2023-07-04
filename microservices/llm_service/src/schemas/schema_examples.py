@@ -27,17 +27,31 @@ QUERY_EXAMPLE = {
   "user_id": "fake-user-id",
   "title": "Test query",
   "llm_type": "VertexAI-Chat",
-  "query_engine_id": "qwerty1234asdf",
+  "query_engine_id": "asd98798as7dhjgkjsdfh",
   "history": [
     {"HumanQuestion": "test input 1"},
     {
       "AIResponse": "test response 1",
-      "AIReferences": "test reference 1"
+      "AIReferences": [
+        {
+          "query_engine_id": "asd98798as7dhjgkjsdfh",
+          "query_engine": "query-engine-test",
+          "document_id": "efghxxzzyy1234",
+          "chunk_id": "abcdxxzzyy1234"
+        }
+      ]
     },
     {"HumanQuestion": "test input 2"},
     {
       "AIResponse": "test response 2",
-      "AIReferences": "test reference 2"
+      "AIReferences": [
+        {
+          "query_engine_id": "asd98798as7dhjgkjsdfh",
+          "query_engine": "query-engine-test",
+          "document_id": "efghxxzzyy5678",
+          "chunk_id": "abcdxxzzyy5678"
+        }
+      ]
     }
   ]
 }
@@ -51,6 +65,14 @@ QUERY_ENGINE_EXAMPLE = {
   "index_id": "projects/83285581741/locations/us-central1/indexes/682347240495461171",
   "index_name": "query_engine_test_MEindex",
   "endpoint": "projects/83285581741/locations/us-central1/indexEndpoints/420294037177840435"
+}
+
+QUERY_RESULT_EXAMPLE = {
+  "id": "asd98798as7dhjgkjsdfh",
+  "query_engine_id": "asd98798as7dhjgkjsdfh",
+  "query_engine": "query-engine-test",
+  "response": "test response",
+  "query_refs": ["abcd1234", "defg5678"]
 }
 
 CHAT_EXAMPLE = {
