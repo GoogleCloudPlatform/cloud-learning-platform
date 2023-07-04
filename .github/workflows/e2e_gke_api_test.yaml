@@ -170,7 +170,7 @@ jobs:
     - name: Local setup
       run: |
         NAMESPACE=$E2E_NAMESPACE_PREFIX
-        NAMESPACE=${NAMESPACE} bash setup/setup_local.sh
+        SKAFFOLD_NAMESPACE=${NAMESPACE} REGION=us-central1 bash setup/setup_local.sh
 
     - name: Build and deploy to cluster
       run: |

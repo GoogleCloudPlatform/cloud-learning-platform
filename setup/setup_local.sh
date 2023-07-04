@@ -96,17 +96,6 @@ add_service_account_key() {
   rm ./.tmp/$PROJECT_ID-$SA_ACCOUNT_ID-sa-key.json
 }
 
-read -p  "${BLUE}This will set up for local development using namespace \
-\"${SKAFFOLD_NAMESPACE}\" in \"$CLUSTER_NAME\" in project \"$PROJECT_ID\". \
-Continue? (y/n) ${NORMAL}" -n 1 -r
-
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-  echo
-else
-  printf "\nTerminated.\n"
-  exit 0
-fi
-
 init
 setup_namespace
 add_service_account_key "signurl"
