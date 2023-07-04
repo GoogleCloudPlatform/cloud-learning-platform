@@ -22,28 +22,41 @@ LLM_GENERATE_EXAMPLE = {
   "primer":  "",
 }
 
-LLM_QUERY_EXAMPLE = {
-  "prompt": "",
-  "query_engine": "",
+QUERY_EXAMPLE = {
+  "id": "asd98798as7dhjgkjsdfh",
+  "user_id": "fake-user-id",
+  "title": "Test query",
+  "llm_type": "VertexAI-Chat",
+  "query_engine_id": "qwerty1234asdf",
+  "history": [
+    {"HumanInput": "test input 1"},
+    {"AIOutput": "test response 1"},
+    {"HumanInput": "test input 2"},
+    {"AIOutput": "test response 2"}
+  ],
 }
 
-LLM_QUERY_ENGINE_EXAMPLE = {
-  "doc_url": "",
-  "query_engine": "",
-  "llm_type": "",
-  "is_public": ""
+QUERY_ENGINE_EXAMPLE = {
+  "id": "asd98798as7dhjgkjsdfh",
+  "name": "query-engine-test",
+  "llm_type": "VertexAI-Chat",
+  "created_by": "fake-user-id",
+  "is_public": "True",
+  "index_id": "projects/83285581741/locations/us-central1/indexes/682347240495461171",
+  "index_name": "query_engine_test_MEindex",
+  "endpoint": "projects/83285581741/locations/us-central1/indexEndpoints/420294037177840435"
 }
 
 CHAT_EXAMPLE = {
   "id": "asd98798as7dhjgkjsdfh",
   "user_id": "fake-user-id",
   "title": "Test chat",
-  "llm_type": "VertexAI-Text-alpha",
+  "llm_type": "VertexAI-Chat",
   "history": [
-    "test input 1",
-    "test response 1",
-    "test input 2",
-    "test response 2"
+    {"HumanInput": "test input 1"},
+    {"AIOutput": "test response 1"},
+    {"HumanInput": "test input 2"},
+    {"AIOutput": "test response 2"}
   ],
   "created_time": "2023-05-05 09:22:49.843674+00:00",
   "last_modified_time": "2023-05-05 09:22:49.843674+00:00"

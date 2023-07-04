@@ -17,8 +17,8 @@ Pydantic Model for LLM API's
 from typing import List, Optional
 from pydantic import BaseModel
 from schemas.schema_examples import (LLM_GENERATE_EXAMPLE,
-                                     LLM_QUERY_EXAMPLE,
-                                     LLM_QUERY_ENGINE_EXAMPLE)
+                                     QUERY_EXAMPLE,
+                                     QUERY_ENGINE_EXAMPLE)
 
 class ChatModel(BaseModel):
   id: Optional[str] = None
@@ -90,7 +90,7 @@ class LLMQueryModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-        "example": LLM_QUERY_EXAMPLE
+        "example": QUERY_EXAMPLE
     }
 
 
@@ -104,7 +104,7 @@ class LLMQueryEngineModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-        "example": LLM_QUERY_ENGINE_EXAMPLE
+        "example": QUERY_ENGINE_EXAMPLE
     }
 
 
