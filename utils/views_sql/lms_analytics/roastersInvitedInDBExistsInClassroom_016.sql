@@ -15,5 +15,5 @@ FROM `lms_analytics.sectionEnrollmentRecordView` enrollmentView LEFT OUTER JOIN
 `lms_analytics.courseRosterEnrichmentView` roasterView
 ON enrollmentView.section_id=roasterView.section_id
 AND roasterView.user_emailAddress=enrollmentView.user_email)
-SELECT * FROM sectionClassroomRoasterView WHERE 
+SELECT * FROM classroomSectionRoasterView WHERE 
 user_gaia_id IS NOT NULL and enrollment_status="invited");
