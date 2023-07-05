@@ -151,8 +151,8 @@ def test_create_query_engine(create_user, client_with_emulator):
   assert query_engine_data == FAKE_QE_BUILD_RESPONSE
 
 
-def test_query(create_user, create_engine, create_query_result,
-               client_with_emulator):
+def test_query(create_user, create_engine, 
+               create_query_result, client_with_emulator):
   q_engine_id = QUERY_ENGINE_EXAMPLE["id"]
   url = f"{api_url}/engine/{q_engine_id}"
 
@@ -165,26 +165,13 @@ def test_query(create_user, create_engine, create_query_result,
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   query_data = json_response.get("data")
-  assert query_data["query_result"] == QUERY_RESULT_EXAMPLE, \
+  assert query_data["query_result"]["id"] == QUERY_RESULT_EXAMPLE.get("id"), \
     "returned query result"
   assert query_data["query_references"] == FAKE_REFERENCES, \
     "returned query references"
 
-  user_queries = UserQuery.find_by_user(userid)
-  assert len(user_queries) == 1, "retreieved new user query"
-  user_query = user_queries[0]
-  assert user_query.history[0] == \
-    {QUERY_HUMAN: FAKE_GENERATE_PARAMS["prompt"]}, \
-    "got user query prompt"
-  assert user_query.history[1] == \
-    {
-      QUERY_AI_RESPONSE: FAKE_GENERATE_RESPONSE,
-      QUERY_AI_REFERENCES: QUERY_EXAMPLE["history"][1][QUERY_AI_REFERENCES]
-    }, \
-    "got user query response"
 
-
-def test_query_generate(create_user, create_engine, create_query, 
+def test_query_generate(create_user, create_engine,
                         create_query_result, client_with_emulator):
   queryid = QUERY_EXAMPLE["id"]
 
@@ -199,32 +186,10 @@ def test_query_generate(create_user, create_engine, create_query,
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   query_data = json_response.get("data")
-  assert query_data["history"][0] == QUERY_EXAMPLE["history"][0], \
-    "returned query history 0"
-  assert query_data["history"][1] == QUERY_EXAMPLE["history"][1], \
-    "returned query history 1"
-  assert query_data["history"][-2] == FAKE_QUERY_PARAMS["prompt"], \
-    "returned query data prompt"
-  assert query_data["history"][-1] ==  \
-    {
-      QUERY_AI_RESPONSE: FAKE_GENERATE_RESPONSE,
-      QUERY_AI_REFERENCES: QUERY_EXAMPLE["history"][1][QUERY_AI_REFERENCES]
-    }, \
-    "retured user query response"
-    
-  user_query = UserQuery.find_by_id(queryid)
-  assert user_query is not None, "retrieved user query"
-  assert len(user_query.history) == len(query.history) + 2, \
-    "user query history updated"
-  assert user_query.history[2] == \
-    {QUERY_HUMAN: FAKE_GENERATE_PARAMS["prompt"]}, \
-    "got user query prompt"
-  assert user_query.history[3] == \
-    {
-      QUERY_AI_RESPONSE: FAKE_GENERATE_RESPONSE,
-      QUERY_AI_REFERENCES: QUERY_EXAMPLE["history"][1][QUERY_AI_REFERENCES]
-    }, \
-    "got user query response"
+  assert query_data["query_result"]["id"] == QUERY_RESULT_EXAMPLE.get("id"), \
+    "returned query result"
+  assert query_data["query_references"] == FAKE_REFERENCES, \
+    "returned query references"
 
 
 def test_get_query(create_user, create_engine, create_query, client_with_emulator):

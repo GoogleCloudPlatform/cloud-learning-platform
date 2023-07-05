@@ -268,13 +268,11 @@ async def query(query_engine_id: str,
   try:
     query_result, query_references = await query_generate(user.id, prompt,
                                                           q_engine)
-    query_result_data = query_result.get_fields(reformat_datetime=True)
-
     return {
         "success": True,
         "message": "Successfully generated text",
         "data": {
-            "query_result": query_result_data,
+            "query_result": query_result,
             "query_references": query_references
         }
     }
@@ -287,7 +285,7 @@ async def query(query_engine_id: str,
 @router.post(
     "/{user_query_id}",
     name="Make a query to a query engine based on a prior user query",
-    response_model=LLMQueryEngineResponse)
+    response_model=LLMQueryResponse)
 async def query_continue(user_query_id: str, gen_config: LLMQueryModel):
   """
   Send a query to a query engine with a prior user query as context
@@ -314,7 +312,6 @@ async def query_continue(user_query_id: str, gen_config: LLMQueryModel):
 
     query_result, query_references = await query_generate(user_query.user_id,
                                                           prompt, q_engine)
-
     return {
         "success": True,
         "message": "Successfully generated text",
