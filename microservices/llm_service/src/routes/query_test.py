@@ -38,7 +38,7 @@ with mock.patch(
     side_effect=mock.MagicMock()) as mok:
   with mock.patch("langchain.chat_models.ChatOpenAI"):
     with mock.patch("langchain.llms.Cohere"):
-      from config import LLM_TYPES
+      from config import DEFAULT_QUERY_CHAT_MODEL
 
 # assigning url
 api_url = f"{API_URL}/query"
@@ -76,6 +76,13 @@ FAKE_QE_BUILD_RESPONSE = {
     "job_name": "fake_job_name",
     "status": "fake_job_status"
   }
+}
+
+FAKE_QUERY_ENGINE_BUILD = {
+  "doc_url": "fake-url",
+  "query_engine": "query-engine-test",
+  "llm_type": DEFAULT_QUERY_CHAT_MODEL,
+  "is_public": True
 }
 
 FAKE_REFERENCES = QUERY_EXAMPLE["history"][1]["AIReferences"]
@@ -139,8 +146,7 @@ def test_get_query_engine_list(create_engine, client_with_emulator):
 
 def test_create_query_engine(create_user, client_with_emulator):
   url = f"{api_url}"
-  params = QUERY_ENGINE_EXAMPLE.copy()
-  del params["id"]
+  params = FAKE_QUERY_ENGINE_BUILD
   with mock.patch("routes.query.initiate_batch_job",
                   return_value = FAKE_QE_BUILD_RESPONSE):
     resp = client_with_emulator.post(url, json=params)
@@ -148,7 +154,7 @@ def test_create_query_engine(create_user, client_with_emulator):
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   query_engine_data = json_response.get("data")
-  assert query_engine_data == FAKE_QE_BUILD_RESPONSE
+  assert query_engine_data == FAKE_QE_BUILD_RESPONSE["data"]
 
 
 def test_query(create_user, create_engine, 
@@ -171,7 +177,7 @@ def test_query(create_user, create_engine,
     "returned query references"
 
 
-def test_query_generate(create_user, create_engine,
+def test_query_generate(create_user, create_engine, create_query,
                         create_query_result, client_with_emulator):
   queryid = QUERY_EXAMPLE["id"]
 
