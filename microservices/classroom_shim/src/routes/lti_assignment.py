@@ -393,24 +393,34 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
 
     content_item_data = get_content_item(content_item_id)
 
+    print("1")
     # create a copy of above content item
     content_item_data["context_id"] = input_data_dict.get("context_id")
     del content_item_data["id"]
     del content_item_data["created_time"]
     del content_item_data["last_modified_time"]
 
+    print("2")
     content_items_res = list_content_items(
-        input_data_dict.get("context_id"), lti_assignment.get("tool_id"))
+        input_data_dict.get("context_id"), lti_assignment.tool_id)
+    print("3", content_items_res)
 
-    tool_data = get_lti_tool(lti_assignment.get("tool_id"))
+    tool_data = get_lti_tool(lti_assignment.tool_id)
+    print("3.5")
+
     if tool_data.get("deeplink_type") in ("Allow once per context",
                                           "Not required"):
+      print("4")
       if content_items_res:
+        print("5")
         copy_content_item_data = content_items_res[0]
       else:
+        print("6")
         copy_content_item_data = create_content_item(content_item_data)
     else:
+      print("7")
       copy_content_item_data = create_content_item(content_item_data)
+    print("8")
 
     prev_context_ids = lti_assignment_data["prev_context_ids"]
     prev_content_item_ids = lti_assignment_data["prev_content_item_ids"]
