@@ -18,6 +18,7 @@
 import traceback
 from typing import Optional
 from fastapi import APIRouter, Depends
+from common.schemas.batch_job_schemas import BatchJobModel
 from common.utils.auth_service import validate_token
 from common.utils.batch_jobs import initiate_batch_job
 from common.utils.config import JOB_TYPE_QUERY_ENGINE_BUILD
@@ -192,7 +193,7 @@ def update_query(query_id: str, input_query: UserQueryUpdateModel):
 @router.post(
     "",
     name="Create a query engine",
-    response_model=LLMQueryEngineResponse)
+    response_model=BatchJobModel)
 async def query_engine_create(gen_config: LLMQueryEngineModel,
                               user_data: dict = Depends(validate_token)):
   """
