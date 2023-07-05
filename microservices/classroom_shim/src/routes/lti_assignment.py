@@ -19,7 +19,8 @@ from schemas.lti_assignment_schema import (
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
-from services.ext_service_handler import get_content_item, create_content_item
+from services.ext_service_handler import (get_content_item, create_content_item,
+                                          list_content_items, get_lti_tool)
 # pylint: disable=line-too-long
 
 router = APIRouter(
@@ -398,7 +399,18 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     del content_item_data["created_time"]
     del content_item_data["last_modified_time"]
 
-    copy_content_item_data = create_content_item(content_item_data)
+    content_items_res = list_content_items(
+        input_data_dict.get("context_id"), lti_assignment.get("tool_id"))
+
+    tool_data = get_lti_tool(lti_assignment.get("tool_id"))
+    if tool_data.get("deeplink_type") in ("Allow once per context",
+                                          "Not required"):
+      if content_items_res:
+        copy_content_item_data = content_items_res[0]
+      else:
+        copy_content_item_data = create_content_item(content_item_data)
+    else:
+      copy_content_item_data = create_content_item(content_item_data)
 
     prev_context_ids = lti_assignment_data["prev_context_ids"]
     prev_content_item_ids = lti_assignment_data["prev_content_item_ids"]
