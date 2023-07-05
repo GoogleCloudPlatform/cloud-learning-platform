@@ -39,7 +39,7 @@ from google.cloud.exceptions import Conflict
 from vertexai.preview.language_models import TextEmbeddingModel
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders import CSVLoader
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 from services import llm_generate
 from services import query_prompts
 
