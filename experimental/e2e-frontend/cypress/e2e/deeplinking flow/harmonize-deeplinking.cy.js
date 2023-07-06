@@ -72,6 +72,13 @@ describe("Test Harmonize Deeplinking", () => {
     getIframeBody().contains("Discussion").click();
     getIframeBody().contains("Create New").click();
 
+    // cy.get('iframe[id="ltiIframe"]').as('myIframe');
+    // cy.get('@myIframe').iframe().as('iframeContents');
+    // cy.get('@iframeContents').contains('Discussion').click();
+    // cy.get('@iframeContents').contains('Create New').click();
+
+
+
     // check if we are on create discussion page
     // cy.wait(5000);
     // cy.frameLoaded("#ltiIframe");
@@ -82,11 +89,20 @@ describe("Test Harmonize Deeplinking", () => {
 
     // type text in discussion title inputbox
     cy.wait(5000);
-    let btn = getIframeBody()
-      .get('input[type="text"]')
+    getIframeBody().find('.highlight-box').as('parentElement')
+    cy.get('@parentElement')
+      .find('input[type="text"]')
       .type("Hello, World! Testing Discussions");
-    console.log("btn", btn);
-    getIframeBody().get('input[type="number"]').type(50);
-    getIframeBody().contains("Create Discussion").click();
+    cy.get('@parentElement').find('input[type="number"]').type(50);
+    cy.get('@parentElement').contains("Create Discussion").click();
+
+    // cy.get('iframe[id="ltiIframe"]').as('newIframe');
+    // cy.get('@newIframe').iframe().as('newiframeContents');
+    // cy.get('@newiframeContents').find('.highlight-box').as('element');
+    // cy.get('@element').find('input[type="text"]').type('test')
+    // cy.get('@element').contains("Create Discussion").click()
+    // console.log(cy.get('@newiframeContents').first())
+    // cy.get('@newiframeContents').get('input[type="text"]').type('test')
+    // cy.get('@newiframeContents').contains("Create Discussion").click();
   });
 });
