@@ -79,6 +79,9 @@ requires:
 - path: ./microservices/delete_sections_cronjob
   configs: [delete-sections-cronjob]
 
+- path: ./microservices/utils
+  configs: [utils]
+
 - path: ./microservices/credential_pathway_service
   configs: [credential-pathway-service]
 
