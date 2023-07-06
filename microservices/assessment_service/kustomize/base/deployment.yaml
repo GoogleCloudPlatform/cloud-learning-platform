@@ -12,19 +12,17 @@ spec:
       labels:
         app: assessment-service
     spec:
-      serviceAccountName: ksa
-      # TODO: un-comment the below steps while updating workflows
-      # volumes:	
-      #   - name: signurl-sa-key	
-      #     secret:	
-      #       secretName: signurl-sa-key
+      volumes:
+        - name: signurl-sa-key
+          secret:
+            secretName: signurl-sa-key
       containers:
       - name: assessment-service
         image: assessment-service
-        # volumeMounts:	
-        #   - mountPath: /opt/keys	
-        #     name: signurl-sa-key	
-        #     readOnly: true
+        volumeMounts:
+          - mountPath: /opt/keys
+            name: signurl-sa-key
+            readOnly: true
         imagePullPolicy: IfNotPresent
         resources:
           requests:

@@ -74,6 +74,7 @@ env:
   USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT }}
   E2E_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr' || 'e2e_pr' }}${{  github.event.pull_request.number }}_
   E2E_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-' }}${{  github.event.pull_request.number }}
+  CONTENT_SERVING_BUCKET: core-learning-services-dev-content-serving-bucket
 # cookiecutter:raw 
 jobs:
   admin-teacher:
@@ -166,6 +167,11 @@ jobs:
         python -m pip install -r requirements.txt
         BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_setup.py --create-dataset=true
         BQ_DATASET=lrs DATABASE_PREFIX=$E2E_PREFIX python bq_setup.py --create-dataset=true
+
+    - name: Local setup
+      run: |
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        SKAFFOLD_NAMESPACE=${NAMESPACE} REGION=us-central1 bash setup/setup_local.sh
 
     - name: Build and deploy to cluster
       run: |

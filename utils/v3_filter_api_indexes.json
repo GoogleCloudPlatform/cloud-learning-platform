@@ -407,6 +407,698 @@
             ]
         }
     ],
+    "assessment-service": [
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_deleted",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "type",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "result",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "assessor_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_flagged",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_autogradable",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_deleted",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "type",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "result",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "assessor_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_flagged",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_autogradable",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_deleted",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "type",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "result",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "assessor_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_flagged",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_autogradable",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_deleted",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "type",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "result",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "assessor_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_flagged",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_autogradable",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_deleted",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "type",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "assessor_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_flagged",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_autogradable",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_deleted",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "type",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "assessor_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "status",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_flagged",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_autogradable",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_autogradable",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "learner_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "created_time",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "learner_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "learner_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "result",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "learner_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "learner_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "attempt_no",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "learner_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "learner_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "timer_start_time",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "is_deleted",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "created_time",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collection_group": "submitted_assessments",
+            "query_scope": "COLLECTION",
+            "fields": [
+                {
+                    "field_path": "learner_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "field_path": "created_time",
+                    "order": "DESCENDING"
+                }
+            ]
+        }
+    ],
     "default": [
         {
             "collection_group": "achievements",

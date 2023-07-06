@@ -23,4 +23,5 @@ data:
   student-learner-profile.PORT : "9014"
   learning-record-service.PORT : "9020"
   learning-object-service.PORT : "9019"
+  assessment-service.PORT : "9022"
     
