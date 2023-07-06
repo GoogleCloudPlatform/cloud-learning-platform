@@ -9,7 +9,7 @@ from common.utils.config import SERVICES
 
 auth_scheme = HTTPBearer(auto_error=False)
 
-
+# pylint: disable = consider-using-f-string
 def validate_token(token: auth_scheme = Depends()):
   """_summary_
 

@@ -7,7 +7,7 @@ from common.utils.errors import InvalidTokenError
 from common.utils.auth_service import user_verification
 
 
-
+# pylint: disable = consider-using-f-string
 def get_user_identity(req: Request) -> dict:
   """
   Get user identity from firebase token
