@@ -1,0 +1,6 @@
+pytest==7.1.2 
+mock
+faker
+backports-unittest-mock
+regex==2022.10.31
+redis==4.5.4
