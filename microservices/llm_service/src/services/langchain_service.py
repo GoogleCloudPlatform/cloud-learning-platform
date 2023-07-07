@@ -72,13 +72,8 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
       if user_chat is not None:
         msg = user_chat.history
       msg.append(prompt)
-      if llm_type in COHERE_LLM_TYPES:
-        response = llm.generate(msg)
-        response_text = response.generations[0][0].text
-      else:
-        # we always use await for LLM calls if we can
-        response = await llm.agenerate(msg)
-        response_text = response.generations[0][0].message.content
+      response = await llm.agenerate(msg)
+      response_text = response.generations[0][0].text
 
     return response_text
   except Exception as e:
