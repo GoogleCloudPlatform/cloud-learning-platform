@@ -12,7 +12,6 @@ spec:
       labels:
         app: prior-learning-assessment
     spec:
-      serviceAccountName: ksa
       containers:
       - name: prior-learning-assessment
         image: prior-learning-assessment

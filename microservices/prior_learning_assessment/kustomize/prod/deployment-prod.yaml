@@ -6,6 +6,7 @@ spec:
   replicas: 3
   template:
     spec:
+      serviceAccountName: ksa
       containers:
       - name: prior-learning-assessment
         image: prior-learning-assessment
