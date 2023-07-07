@@ -916,3 +916,58 @@ def update_invites(section_id:str):
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
+
+@router.post("/{section_id}/post_null_value/{course_id}/{coursework_id}", response_model=GetTeacherResponseModel)
+def post_null_value(section_id: str, course_id:str,coursework_id:str, request: Request):
+  """_summary_
+
+  Args:
+      section_id (str): _description_
+      request (Request): _description_
+      teacher_details (EnrollTeacherSection): _description_
+
+  Raises:
+      Conflict: _description_
+      ResourceNotFound: _description_
+      Conflict: _description_
+      ClassroomHttpException: _description_
+      InternalServerError: _description_
+
+  Returns:
+      _type_: _description_
+  """
+  try:
+    # teacher_email = teacher_details.email
+    # headers = {"Authorization": request.headers.get("Authorization")}
+    # section = Section.find_by_id(section_id)
+    # if not check_user_can_enroll_in_section(teacher_email, headers, section):
+    #   raise Conflict(f"User {teacher_email} is already" +
+    #                  f" in this section {section.id} as a leaner or faculty")
+
+    # result=add_teacher(headers,section,teacher_email)
+    # if result.invitation_id:
+    #   return {
+    #     "message": f"Successfully invited the teacher using {teacher_email}",
+    #     "data": course_enrollment_user_model(result)
+    # }
+    # return {
+    #     "message": f"Successfully enrolled the teacher using {teacher_email}",
+    #     "data": course_enrollment_user_model(result)
+    # }
+
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    Logger.error(conflict)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    Logger.error(ae)
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                                 message=str(ae)) from ae
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+  
