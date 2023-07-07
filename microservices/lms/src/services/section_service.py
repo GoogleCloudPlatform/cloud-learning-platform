@@ -695,6 +695,7 @@ def insert_section_enrollment_to_bq(enrollment_record,section):
   rows=[{
         "enrollment_id" : enrollment_record.id,
         "email" : enrollment_record.user.email,
+        "user_id" : enrollment_record.user.user_id,
         "role" : enrollment_record.role,
         "status" : enrollment_record.status,
         "invitation_id" : enrollment_record.invitation_id,
