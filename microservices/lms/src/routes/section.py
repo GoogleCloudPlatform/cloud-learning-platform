@@ -802,6 +802,7 @@ def failed_to_provision():
             rows=[{
               "enrollment_id" : course_enrollment.id,
               "email" : course_enrollment.user.email,
+              "user_id" : course_enrollment.user.user_id,
               "role" : course_enrollment.role,
               "status" : "inactive",
               "invitation_id" : course_enrollment.invitation_id,
