@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
+# pylint: disable=invalid-name
 import os
 import re
 from datetime import datetime
@@ -63,6 +63,15 @@ def update_confidence(dupp, without_noise):
 
 
 def check_duplicate_keys(dictme, without_noise):
+  """
+  Function to check duplicate keys
+  Args:
+     dictme: string
+     without_noise: dict
+  Returns:
+    bool
+
+  """
   # dictme is the mapping dictionary
   # without_noise is the raw dictionary which comes from Form parser
   dupp = {}

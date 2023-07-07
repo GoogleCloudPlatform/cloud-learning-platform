@@ -1,4 +1,5 @@
 """script for loading configuration."""
+# pylint: disable=invalid-name
 import os
 from typing_extensions import Literal
 from schemas.error_schema import (UnauthorizedResponseModel,
