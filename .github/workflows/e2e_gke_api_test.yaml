@@ -456,7 +456,6 @@ jobs:
     - name: Delete all deployments and namespace
       run: |
         NAMESPACE=$E2E_NAMESPACE_PREFIX
-        echo $NAMESPACE
         skaffold delete --namespace $NAMESPACE
         kubectl delete namespace $NAMESPACE
 
