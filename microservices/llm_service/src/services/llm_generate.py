@@ -29,9 +29,7 @@ from vertexai.preview.language_models import (ChatModel,
 async def llm_generate(prompt: str, llm_type: str,
                        user_chat: Optional[UserChat] = None) -> str:
   """
-  Generate text with an LLM given a prompt.  This is
-    always done asychronously, and so must be used in a route defined with
-    async def.
+  Generate text with an LLM given a prompt.
 
   Args:
     prompt: the text prompt to pass to the LLM
@@ -41,7 +39,7 @@ async def llm_generate(prompt: str, llm_type: str,
     user_chat (optional): a user chat to use for context
 
   Returns:
-    the text response.
+    the text response: str
   """
   # default to openai LLM
   if llm_type is None:
@@ -64,7 +62,7 @@ async def llm_generate(prompt: str, llm_type: str,
 
 async def llm_chat(prompt: str, llm_type: str) -> str:
   """
-  Send a prompt to a chat model and return response
+  Send a prompt to a chat model and return response.
 
   Args:
     prompt: the text prompt to pass to the LLM
@@ -72,7 +70,7 @@ async def llm_chat(prompt: str, llm_type: str) -> str:
 
 
   Returns:
-    the text response
+    the text response: str
   """
   Logger.info(f"generating chat with llm_type {llm_type}")
   if not llm_type in CHAT_LLM_TYPES:
