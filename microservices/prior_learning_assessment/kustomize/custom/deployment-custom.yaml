@@ -5,7 +5,6 @@ metadata:
 spec:
   template:
     spec:
-      serviceAccountName: ksa
       containers:
       - name: prior-learning-assessment
         image: prior-learning-assessment
@@ -13,9 +12,3 @@ spec:
         resources:
           requests:
             memory: "500Mi"
-        env:
-        - name: DATABASE_PREFIX
-          valueFrom:
-            configMapKeyRef:
-              name: env-vars
-              key: DATABASE_PREFIX

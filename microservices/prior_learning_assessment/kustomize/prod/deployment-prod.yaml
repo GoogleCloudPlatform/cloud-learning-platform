@@ -6,7 +6,6 @@ spec:
   replicas: 3
   template:
     spec:
-      serviceAccountName: ksa
       containers:
       - name: prior-learning-assessment
         image: prior-learning-assessment
@@ -22,3 +21,9 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: EXTERNAL_DATA_GCP_PROJECT
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT
+
