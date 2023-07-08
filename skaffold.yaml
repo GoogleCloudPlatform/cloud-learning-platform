@@ -85,9 +85,6 @@ requires:
 - path: ./microservices/credential_pathway_service
   configs: [credential-pathway-service]
 
-- path: ./microservices/prior_learning_assessment
-  configs: [prior-learning-assessment]
-
 build:
   googleCloudBuild: {}
 ---
