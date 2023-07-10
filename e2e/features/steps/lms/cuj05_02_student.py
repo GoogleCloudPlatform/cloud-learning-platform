@@ -80,10 +80,12 @@ def step_impl_11(context):
 
 @behave.then("List of students details will be fetched from bq views")
 def step_impl_12(context):
+  print(f'--------------Status: {context.status}--------------------')
+  print(f'--------------Data: {context.response}--------------------')
   assert context.status == 200, "Status 200"
-  assert context.response["data"] !=[] 
+  assert context.response["data"] !=[]
 
-# ---exists in db not in classroom-----------  
+# ---exists in db not in classroom-----------
 @behave.given("A user has access to portal and wants to fetch the list of students exists in DB not in classroom")
 def step_impl_13(context):
   context.url = f'{API_URL}/student/exists_in_db_not_in_classroom'
@@ -98,5 +100,7 @@ def step_impl_14(context):
 
 @behave.then("List of student records will be fected from bq views")
 def step_impl_15(context):
+  print(f'--------------Status: {context.status}--------------------')
+  print(f'--------------Data: {context.response}--------------------')
   assert context.status == 200, "Status 200"
   assert context.response["data"] !=[]
