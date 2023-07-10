@@ -484,6 +484,140 @@ def wait(secs):
 
   return decorator
 
+@fixture
+def enroll_student_in_classroom_not_in_db(context):
+  section = use_fixture(create_section, context)
+  student_email_and_token = get_student_email_and_token()
+  enroll_student_classroom(
+      student_email_and_token["access_token"], section.classroom_id,
+      student_email_and_token["email"].lower(), section.classroom_code)
+  section_rows = [{
+      "sectionId": section.id,
+      "courseId": section.classroom_id,
+      "classroomUrl": section.classroom_url,
+      "name": section.section,
+      "description": section.description,
+      "status": section.status,
+      "cohortId": section.cohort.id,
+      "courseTemplateId": section.course_template.id,
+      "timestamp": datetime.datetime.utcnow()
+  }]
+  cohort = section.cohort
+  cohort_rows=[{
+      "cohortId":cohort.id,
+      "name":cohort.name,
+      "description":cohort.description,\
+      "startDate":cohort.start_date,\
+      "endDate":cohort.end_date,
+      "registrationStartDate":cohort.registration_start_date,
+      "registrationEndDate":cohort.registration_end_date,
+      "maxStudents":cohort.max_students,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+  course_template = section.course_template
+  instructional_designers = [
+      i.user.email
+      for i in CourseTemplateEnrollmentMapping.fetch_all_by_course_template(
+          course_template.key)
+  ]
+  course_template_rows = [{
+      "courseTemplateId": course_template.id,
+      "classroomId": course_template.classroom_id,
+      "name": course_template.name,
+      "description": course_template.description,
+      "timestamp": datetime.datetime.utcnow(),
+      "instructionalDesigners": instructional_designers
+  }]
+  insert_rows_to_bq(rows=course_template_rows,
+                    dataset=BQ_DATASET,
+                    table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
+  insert_rows_to_bq(rows=cohort_rows,
+                    dataset=BQ_DATASET,
+                    table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"])
+  insert_rows_to_bq(rows=section_rows,
+                    dataset=BQ_DATASET,
+                    table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
+@fixture
+def enroll_student_in_db_not_in_classroom(context):
+  section = use_fixture(create_section, context)
+  student_email_and_token = get_student_email_and_token()
+  data = {
+      "first_name": student_email_and_token["email"].split("@")[0],
+      "last_name": student_email_and_token["email"].split("@")[0]+"_last_name",
+      "email": student_email_and_token["email"],
+      "user_type": "learner",
+      "user_groups": [],
+      "status": "active",
+      "is_registered": True,
+      "failed_login_attempts_count": 0,
+      "access_api_docs": False,
+      "gaia_id": "",
+      "photo_url": ""
+  }
+  enrollment_dict=create_student_enrollment_record(data,section)
+  enrollment_record=CourseEnrollmentMapping.find_by_id(
+    enrollment_dict["course_enrollment_mapping_id"])
+  enrollment_rows=[{
+        "enrollment_id" : enrollment_record.id,
+        "email" : enrollment_record.user.email,
+        "user_id" : enrollment_record.user.user_id,
+        "role" : enrollment_record.role,
+        "status" : enrollment_record.status,
+        "invitation_id" : enrollment_record.invitation_id,
+        "section_id" : section.id,
+        "cohort_id" : section.cohort.id,
+        "course_id" : section.classroom_id,
+        "timestamp" : datetime.datetime.utcnow()
+      }]
+  section_rows = [{
+      "sectionId": section.id,
+      "courseId": section.classroom_id,
+      "classroomUrl": section.classroom_url,
+      "name": section.section,
+      "description": section.description,
+      "status": section.status,
+      "cohortId": section.cohort.id,
+      "courseTemplateId": section.course_template.id,
+      "timestamp": datetime.datetime.utcnow()
+  }]
+  cohort = section.cohort
+  cohort_rows=[{
+      "cohortId":cohort.id,
+      "name":cohort.name,
+      "description":cohort.description,\
+      "startDate":cohort.start_date,\
+      "endDate":cohort.end_date,
+      "registrationStartDate":cohort.registration_start_date,
+      "registrationEndDate":cohort.registration_end_date,
+      "maxStudents":cohort.max_students,
+      "timestamp":datetime.datetime.utcnow()
+    }]
+  course_template = section.course_template
+  instructional_designers = [
+      i.user.email
+      for i in CourseTemplateEnrollmentMapping.fetch_all_by_course_template(
+          course_template.key)
+  ]
+  course_template_rows = [{
+      "courseTemplateId": course_template.id,
+      "classroomId": course_template.classroom_id,
+      "name": course_template.name,
+      "description": course_template.description,
+      "timestamp": datetime.datetime.utcnow(),
+      "instructionalDesigners": instructional_designers
+  }]
+  insert_rows_to_bq(rows=course_template_rows,
+                    dataset=BQ_DATASET,
+                    table_name=BQ_TABLE_DICT["BQ_COLL_COURSETEMPLATE_TABLE"])
+  insert_rows_to_bq(rows=cohort_rows,
+                    dataset=BQ_DATASET,
+                    table_name=BQ_TABLE_DICT["BQ_COLL_COHORT_TABLE"])
+  insert_rows_to_bq(rows=section_rows,
+                    dataset=BQ_DATASET,
+                    table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
+  insert_rows_to_bq(
+            rows=enrollment_rows, dataset=BQ_DATASET,
+            table_name=BQ_TABLE_DICT["BQ_ENROLLMENT_RECORD"])
 
 @fixture
 def invite_student(context):
@@ -549,7 +683,11 @@ fixture_registry = {
     "fixture.create.assignment": create_assignment,
     "fixture.invite.student": invite_student,
     "fixture.create.analytics.data": create_analytics_data,
-    "fixture.import.google_form_grade": import_google_form_grade
+    "fixture.import.google_form_grade": import_google_form_grade,
+    "fixture.enroll.student.in_classroom.not_in_db":
+      enroll_student_in_classroom_not_in_db,
+    "fixture.enroll.student.in_db.not_in_classroom":
+      enroll_student_in_db_not_in_classroom
 }
 
 def after_all(context):

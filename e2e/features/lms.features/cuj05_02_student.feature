@@ -18,3 +18,15 @@ Feature: Delete student in a section
     Given A user has access to portal and wants to remove a student from a section using invalid email id
     When API request with valid section Id and Invalid email is sent to delete student
     Then API returns student not found in this section error
+
+  @fixture.enroll.student.in_classroom.not_in_db
+  Scenario: Retrive list of students exists in classroom not in DB
+    Given A user has access to portal and wants to fetch the list of students exists in Classroom not in DB
+    When API request is sent to get the list of students
+    Then List of students details will be fetched from bq views
+
+  @fixture.enroll.student.in_db.not_in_classroom
+  Scenario: Retrive list of students exists in DB not in classroom
+    Given A user has access to portal and wants to fetch the list of students exists in DB not in classroom
+    When API request is sent to fetch the list of students records
+    Then List of student records will be fected from bq views

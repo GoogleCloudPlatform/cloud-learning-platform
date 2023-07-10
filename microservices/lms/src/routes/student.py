@@ -5,6 +5,8 @@ from googleapiclient.errors import HttpError
 from services import student_service,section_service
 from utils.user_helper import (
   course_enrollment_user_model,get_user_id)
+from utils.helper import bq_query_results_to_dict_list
+from common.utils.bq_helper import run_query
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  InvalidTokenError)
@@ -22,8 +24,11 @@ from schemas.section import(StudentListResponseModel,\
    DeleteStudentFromSectionResponseModel)
 from schemas.student import(AddStudentResponseModel,
   AddStudentModel,GetStudentDetailsResponseModel,
-    GetProgressPercentageResponseModel,InviteStudentToSectionResponseModel
+    GetProgressPercentageResponseModel,
+    InviteStudentToSectionResponseModel,
+    StudentsRecordsResponseModel
 )
+from config import BQ_TABLE_DICT,BQ_DATASET,PROJECT_ID
 
 router = APIRouter(prefix="/student",
                    tags=["Students"],
@@ -81,6 +86,11 @@ cohort_student_router = APIRouter(prefix="/cohorts",
                                           "model": ValidationErrorResponseModel
                                       }
                                   })
+NOT_DB_TABLE_ID=(f"`{PROJECT_ID}.{BQ_DATASET}."
++ f"{BQ_TABLE_DICT['EXISTS_IN_CLASSROOM_NOT_IN_DB_VIEW']}`")
+NOT_CLASSROOM_TABLE_ID=(
+  f"`{PROJECT_ID}.{BQ_DATASET}"
+  + f".{BQ_TABLE_DICT['EXISTS_IN_DB_NOT_IN_CLASSROOM_VIEW']}`")
 
 
 @section_student_router.get("/{section_id}/get_progress_percentage/{user}",
@@ -647,6 +657,75 @@ def invite_student_cohort(cohort_id: str, student_email: str,
   except HttpError as ae:
     raise ClassroomHttpException(status_code=ae.resp.status,
                                  message=str(ae)) from ae
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+@router.get("/exists_in_classroom_not_in_db",
+            response_model=StudentsRecordsResponseModel)
+def get_list_of_students_not_in_db():
+  """Get list of students who doesn't exists in db
+
+  Raises:
+      BadRequest: Custom exception raised when any bad request occurs
+      ResourceNotFound: Resource not found exception
+      InternalServerError: Internal server error
+
+  Returns:
+      _type_: _description_
+  """
+  try:
+    result= run_query(
+      query=(f"Select * from {NOT_DB_TABLE_ID} "
+             + "where roster_collection=\"courses.students\""))
+    return {
+      "data":bq_query_results_to_dict_list(result),
+      "message":
+        "Successfully fetched list of students exists in DB not in Classroom"
+        }
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+@router.get("/exists_in_db_not_in_classroom",
+            response_model=StudentsRecordsResponseModel)
+def get_list_of_students_not_in_classroom():
+  """Get list of students who doesn't exists in Classroom
+
+  Raises:
+      BadRequest: Custom exception raised when any bad request occurs
+      ResourceNotFound: Resource not found exception
+      InternalServerError: Internal server error
+
+  Returns:
+      _type_: _description_
+  """
+  try:
+    result= run_query(
+      query=(f"Select * from {NOT_CLASSROOM_TABLE_ID} "
+             + "where enrollment_role=\"learner\""))
+    data=bq_query_results_to_dict_list(result)
+    return {
+      "data":data,
+      "message":
+        "Successfully fetched list of students exists in DB not in Classroom"
+        }
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")

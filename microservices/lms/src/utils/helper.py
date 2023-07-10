@@ -226,3 +226,14 @@ def convert_course_dict_to_classroom_model(dict_object):
     dict_object["gradebook_settings"]=dict_keys_from_camel_to_snake_case(
       dict_object["gradebookSettings"])
   return dict_object
+
+def bq_query_results_to_dict_list(result):
+    data=[]
+    for row in result:
+      row=dict(row)
+      if "user_email" in row.keys():
+        row["email"]=row.get("user_email")
+      if "user_emailAddress" in row.keys():
+        row["email"]=row["user_emailAddress"]
+      data.append(row)
+    return data
