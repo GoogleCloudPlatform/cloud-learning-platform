@@ -48,7 +48,6 @@ def delete_classroom_courses():
     response = service.courses().list(pageToken=next_page_token).execute()
     courses.extend(response.get('courses', []))
     next_page_token= response.get('nextPageToken', None)
-    print(next_page_token)
     if not next_page_token:
       break
     else:
@@ -56,7 +55,6 @@ def delete_classroom_courses():
   count = 0
   save_classroom_ids = []
   for course in courses:
-    print("Classromm ID for deletion is ",course["id"])
     if course["id"] not in save_classroom_ids:
       count+=1
       print("For deletion Course_name "+course["name"]+" ID ",course["id"])

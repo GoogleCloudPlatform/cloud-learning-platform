@@ -30,8 +30,6 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
 CLASSROOM_ADMIN_EMAIL=os.environ.get("CLASSROOM_ADMIN_EMAIL")
 GKE_POD_SA_KEY=json.loads(os.environ.get("GKE_POD_SA_KEY"))
-print(CLASSROOM_ADMIN_EMAIL)
-print("Admin Email in cleanup")
 SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly",
     "https://www.googleapis.com/auth/drive",
@@ -61,14 +59,12 @@ def delete_classroom_courses():
   response = service.courses().list().execute()
   courses.extend(response.get('courses', []))
   count = 0
-  print("Course Names to be deleted",DATABASE_PREFIX,len(DATABASE_PREFIX))
   for course in courses:
-    print("Course_name "+course["name"]+" ID ",course["id"])
     if DATABASE_PREFIX in course["name"]:
       if not (count %25):
         print("Wait for delete courses",count)
         time.sleep(60)
-      print("Inside IF for delete ")
+      print("Deleting Course_name "+course["name"]+" ID ",course["id"])
       final_list.append(course["name"])
       file_id = course["teacherFolder"]["id"]
       classroom_delete_drive_folder(file_id,course["id"])
@@ -77,7 +73,7 @@ def delete_classroom_courses():
       course = service.courses().update(id=course["id"], body=course).execute()
       print(f" Updated Course and state  is :  {course.get('name')},{course.get('courseState')}")
       course = service.courses().delete(id=course["id"]).execute()
-      print("AFter delete")
+      print("Course deleted")
       count = count +1
   print("Total classrooms deleted are ",count)
   return final_list
