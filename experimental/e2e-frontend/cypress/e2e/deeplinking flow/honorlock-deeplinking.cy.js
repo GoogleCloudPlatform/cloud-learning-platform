@@ -1,5 +1,3 @@
-import "cypress-iframe";
-
 describe("Test Harmonize Deeplinking", () => {
   it("should visit the login page with username password", () => {
     const domain =
