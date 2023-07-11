@@ -487,6 +487,11 @@ def wait(secs):
 @fixture
 def enroll_student_in_classroom_not_in_db(context):
   section = use_fixture(create_section, context)
+  header = use_fixture(get_header, context)
+  res = requests.post(
+      url=f"{API_URL}/sections/{section.id}/enable_notifications",
+      headers=header)
+  res.raise_for_status()
   student_email_and_token = get_student_email_and_token()
   enroll_student_classroom(
       student_email_and_token["access_token"], section.classroom_id,

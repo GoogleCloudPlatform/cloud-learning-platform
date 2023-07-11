@@ -1,8 +1,8 @@
-import uuid
 import behave
 import requests
 from e2e.test_config import API_URL
 from common.models import CourseEnrollmentMapping
+from environment import wait
 
 # ------------------------------Delete student to Section-------------------------------------
 
@@ -67,6 +67,7 @@ def step_impl_9(context):
 # -----------------------------------------Student difference detailed report---------------------------------
 # ---exists in classrooom not in db-----------
 @behave.given("A user has access to portal and wants to fetch the list of students exists in Classroom not in DB")
+@wait(60)
 def step_impl_10(context):
   context.url = f'{API_URL}/student/exists_in_classroom_not_in_db'
 
