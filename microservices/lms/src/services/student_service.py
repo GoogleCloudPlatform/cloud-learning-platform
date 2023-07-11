@@ -27,7 +27,6 @@ def get_section_with_minimum_student(sections):
         min_sections_count_mapping = section
         min_student = section.enrolled_students_count
     else:
-      
       if section.enrolled_students_count < min_student and\
         section.enrolled_students_count < section.max_students and\
         section.status =="ACTIVE" and section.enrollment_status=="OPEN":

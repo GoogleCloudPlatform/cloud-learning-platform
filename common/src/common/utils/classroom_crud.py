@@ -1,14 +1,17 @@
 """ Helper functions for classroom crud API """
 import requests
+import traceback
 from asyncio.log import logger
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from common.utils.jwt_creds import JwtCredentials
-from common.utils.errors import InvalidTokenError, UserManagementServiceError, ResourceNotFoundException
+from common.utils.errors import InvalidTokenError, UserManagementServiceError, \
+  ResourceNotFoundException,ValidationError
 from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
 from common.models import Section
+
 
 from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL, PUB_SUB_PROJECT_ID, DATABASE_PREFIX
 # pylint: disable=line-too-long
@@ -547,25 +550,33 @@ def enroll_student(headers, access_token, course_id, student_email,
   Logger.info(
       f"Enroll{student_email},classroom_id {course_id},classroom_code {course_code}{access_token_details.json()}"
   )
+  try:
+    # Get the gaia ID, first name, last_name of the student
+    # Call_people api function
+    profile = get_person_information(access_token)
+    gaia_id = profile["metadata"]["sources"][0]["id"]
+    # Call user API
+    data = {
+        "first_name": profile["names"][0]["givenName"],
+        "last_name": profile["names"][0]["familyName"],
+        "email": student_email,
+        "user_type": "learner",
+        "user_groups": [],
+        "status": "active",
+        "is_registered": True,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": False,
+        "gaia_id": gaia_id,
+        "photo_url": profile["photos"][0]["url"]
+    }
+  except Exception as e:
+    err= traceback.format_exc().replace("\n", " ")
+    Logger.error(e)
+    Logger.error(err)
+    raise ValidationError(
+  "Please set first name and last name in your google profile or check access token is valid"
+  ) from e
   create_student_in_course(access_token, student_email, course_id, course_code)
-  # Get the gaia ID, first name, last_name of the student
-  # Call_people api function
-  profile = get_person_information(access_token)
-  gaia_id = profile["metadata"]["sources"][0]["id"]
-  # Call user API
-  data = {
-      "first_name": profile["names"][0]["givenName"],
-      "last_name": profile["names"][0]["familyName"],
-      "email": student_email,
-      "user_type": "learner",
-      "user_groups": [],
-      "status": "active",
-      "is_registered": True,
-      "failed_login_attempts_count": 0,
-      "access_api_docs": False,
-      "gaia_id": gaia_id,
-      "photo_url": profile["photos"][0]["url"]
-  }
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user user-management API and return user data else
   # return searched user data
