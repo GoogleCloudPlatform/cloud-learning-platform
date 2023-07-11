@@ -1,0 +1,593 @@
+tags:
+  - name: dashboard
+    description: APIs of Dashboard microservice are used fetch details of student activity in that paricular course.This microservice also manages all session related operations like create session, fetch session and update session.  While creating a session for user, we get session ID in response. The ID holds information about user and course_details. This session ID can be used to get details of a particular session.
+
+paths:
+  /dashboard/api/v1/session:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - dashboard
+      summary: Creates new session for user and returns session ID / Returns ID of active session under that context
+      description: Uses context of type SubCompetency or Modules to create a new session for user
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sessionPostApiRequest"
+        description: id, title, description and ref_details of the course and competency to be provided for creating a new session.
+        required: true
+      responses:
+        "200":
+          description: Session details of newly created session or existing session of same context
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/sessionPostApiResponse"
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/badRequestResponse"
+        "401":
+          description: Token Expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenExpiredResponse"
+        "403":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenNotFoundResponse"
+
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorApiResponse"
+
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - dashboard
+      summary: Update an existing user session
+      description: Uses session_id and completed_percentage, is_active to update an existing session
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sessionPutApiRequest"
+        description: session_id and completed_percentage / is_active to be provided for updating an existing  session
+        required: true
+      responses:
+        "200":
+          description: Session Update details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/sessionPutApiResponse"
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/badRequestResponse"
+        "401":
+          description: Token Expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenExpiredResponse"
+        "403":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenNotFoundResponse"
+
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorApiResponse"
+
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - dashboard
+      summary: Retrieve Details of a particular Session based on Session Id
+      description: Uses session_id to fetch session details of a previously created session from database
+
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Session Id
+
+      responses:
+        "200":
+          description: Session Data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/sessionGetApiResponse"
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/badRequestResponse"
+
+        "401":
+          description: Token Expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenExpiredResponse"
+        "403":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenNotFoundResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorApiResponse"
+
+  /dashboard/api/v1/courseContexts:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - dashboard
+      summary: Retrieves all Course related contexts
+      description: Retrieves all Course contexts which are further used to fetch Competencies/ Subcompetencies
+
+      responses:
+        "200":
+          description: Session Data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/contextsGetApiResponse"
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/badRequestResponse"
+
+        "401":
+          description: Token Expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenExpiredResponse"
+        "403":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenNotFoundResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorApiResponse"
+
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - dashboard
+      summary: Fetches Competency / Unit and list of Sub-Competencies / Modules based on context passed
+      description: Uses context of type Course / Program, Compentency / Unit, SubCompetency / Module to fetch details of student progress SubCompetency / Module  wise
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/contextsPostApiRequest"
+        description: Given request body fetches all the Competencies. And to fetch all the active Subcompetencies of a particular competency, the request body and response are mentioned below in the schemas section.
+        required: true
+      responses:
+        "200":
+          description: Dashboard Items Details along with context passed in request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/contextsPostApiResponse"
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/badRequestResponse"
+        "401":
+          description: Token Expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenExpiredResponse"
+        "403":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenNotFoundResponse"
+
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorApiResponse"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    sessionPostApiRequest:
+      type: object
+      required:
+        - id
+        - description
+        - title
+        - ref_details
+      properties:
+        id:
+          type: string
+          example: "8TsjZBZXiA6laSLWvlnm"
+        description:
+          type: string
+          example: "An Introduction to Sociology"
+        title:
+          type: string
+          example: "An Introduction to Sociology"
+        ref_details:
+          type: object
+          properties:
+            course_ref:
+              type: string
+              example: "course/ukPVua27rFrjXk8GDD14"
+            competency_ref:
+              type: string
+              example: "competencies/Ksf0Y2bduhtbfUWGvyW4"
+
+    sessionPutApiRequest:
+      type: object
+      required:
+        - session_id
+        - completed_percentage
+        - is_active
+      properties:
+        session_id:
+          type: string
+          example: "c1d887f0-a1a3-4bca-ae25-c375edcc131a"
+        completed_percentage:
+          type: number
+          example: 15.7
+        is_active:
+          type: boolean
+          example: false
+
+    contextsPostApiRequest:
+      type: object
+      required:
+        - course_id
+        - competency_id
+      properties:
+        course_id:
+          type: string
+          example: "ukPVua27rFrjXk8GDD14"
+        competency_id:
+          type: string
+          example: ""
+
+    subcompetenciesPostApiRequest:
+      type: object
+      required:
+        - course_id
+        - competency_id
+        - subcompetency_id
+        - completed
+      properties:
+        course_id:
+          type: string
+          example: "ukPVua27rFrjXk8GDD14"
+        competency_id:
+          type: string
+          example: "Ksf0Y2bduhtbfUWGvyW4"
+        subcompetency_id:
+          type: string
+          example: ""
+        completed:
+          type: boolean
+          example: false
+
+    sessionPostApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Session created successfully
+        data:
+          type: object
+          properties:
+            session_id:
+              type: string
+              example: "4e7ea201-9193-45f9-a0ac-0b9ae4ff6520"
+            activity_id:
+              type: string
+              example: "teachme"
+            completed_percentage:
+              type: string
+              example: 1
+            is_active:
+              type: boolean
+              example: true,
+            context_ref:
+              type: string
+              example: "sub_competencies/8TsjZBZXiA6laSLWvlnm"
+            course_ref:
+              type: string
+              example: "course/ukPVua27rFrjXk8GDD14"
+            competency_ref:
+              type: string
+              example: "competencies/Ksf0Y2bduhtbfUWGvyW4"
+            start_time:
+              type: number
+              example: 1589475371.6498435
+            user_id:
+              type: string
+              example: "fiurc756IqcdRSs19upxiVLt1Gr2"
+
+    sessionPutApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Session updated successfully
+        data:
+          type: string
+          example: "c1d887f0-a1a3-4bca-ae25-c375edcc131a"
+
+    sessionGetApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Session data fetched successfully
+        data:
+          type: object
+          properties:
+            activity_id:
+              type: string
+              example: teachme
+            completed_percentage:
+              type: integer
+              example: 1
+            is_active:
+              type: boolean
+              example: true
+            context_ref:
+              type: string
+              example: "level0/K1JIJIAB5UcuCOLVG3DD/level1/DtjAdlzhUIQ7sSbBD46z/level2/AjpPOsvAEEHbsQp4zR6J"
+            start_time:
+              type: number
+              example: 1588856964.5381594
+            user_id:
+              type: string
+              example: fiurc756IqcdRSs19upxiVLt1Gr2
+            course_details:
+              type: array
+              items:
+                type: object
+              example:
+                - level0:
+                    id: "4RJIJIgsdfcuCOLVG3ws"
+                    label: "SOCI-1001S"
+                    type: "Program"
+                    is_valid: true
+                    title: "Introduction to Sociology"
+                    display_title: "Introduction to Sociology"
+                - level1:
+                    description: "Unit 1: Foundations of Sociology"
+                    display_title: "Week 1 Unit 1: Foundations of Sociology"
+                    id: "Ksf0Y2bduhtbfUWGvyW4"
+                    is_valid: true
+                    label: null
+                    parent_node: "courses/ukPVua27rFrjXk8GDD14"
+                    title: "Unit 1: Foundations of Sociology"
+                    type: "Units"
+                - level2:
+                    all_learning_resource: "Foundations of Sociology"
+                    description: "An Introduction to Sociology"
+                    display_title: "An Introduction to Sociology"
+                    id: "8TsjZBZXiA6laSLWvlnm"
+                    is_valid: true
+                    label: ""
+                    parent_node: "competencies/Ksf0Y2bduhtbfUWGvyW4"
+                    title: "An Introduction to Sociology"
+
+    contextsGetApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Successfully fetched course related contexts
+        data:
+          type: array
+          items:
+            type: object
+          example:
+            - id: "K1JIJIAB5UcuCOLVG3DD"
+              label: "EDUC 6005"
+              type: "Course"
+              is_valid: true
+              title: "MSECS"
+              display_title: "MSECS : MS in Early Childhood Studies"
+            - id: "4RJIJIgsdfcuCOLVG3ws"
+              label: "SOCI-1001S"
+              type: "Program"
+              is_valid: true
+              title: "Introduction to Sociology"
+              display_title: "Introduction to Sociology"
+
+    contextsPostApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Successfully fetched course related contexts
+        data:
+          type: array
+          items:
+            type: object
+          example:
+            - description: "Unit 1: Foundations of Sociology"
+              display_title: "Week 1 Unit 1: Foundations of Sociology"
+              id: "Ksf0Y2bduhtbfUWGvyW4"
+              is_valid: true
+              label: null
+              parent_node: "courses/ukPVua27rFrjXk8GDD14"
+              title: "Unit 1: Foundations of Sociology"
+              type: "Units"
+            - description: "Unit 2: Individuals in Society"
+              display_title: "Week 2 Unit 2: Individuals in Society"
+              id: "xzhq6hcQFYgXBY0wrIIU"
+              is_valid: null
+              label: null
+              parent_node: "courses/ukPVua27rFrjXk8GDD14"
+              title: "Unit 2: Individuals in Society"
+              type: "Units"
+
+    subcomptenciesPostApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Successfully fetched course related contexts
+        data:
+          type: array
+          items:
+            type: object
+          example:
+            - all_learning_resource: "Foundations of Sociology"
+              description: "An Introduction to Sociology"
+              display_title: "An Introduction to Sociology"
+              id: "8TsjZBZXiA6laSLWvlnm"
+              is_valid: null
+              label: null
+              parent_node: "competencies/Ksf0Y2bduhtbfUWGvyW4"
+              session_details:
+                type: object
+                example:
+                  - activity_id: "teachme"
+                    competency_ref: "competencies/Ksf0Y2bduhtbfUWGvyW4"
+                    completed_percentage: 7
+                    context_ref: "sub_competencies/8TsjZBZXiA6laSLWvlnm"
+                    course_ref: "course/ukPVua27rFrjXk8GDD14"
+                    is_active: true
+                    session_id: "8a1ceee6-65eb-467f-9dfd-caf86d0fdcbe"
+                    start_time: 1627553657.8249762
+                    user_id: "x213zvK63PMbkdK50Uuu7hV6b2y2"
+              title: "An Introduction to Sociology"
+
+    tokenExpiredResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Token expired
+        data:
+          type: object
+          nullable: true
+          example: null
+
+    tokenNotFoundResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Token not found
+        data:
+          type: object
+          nullable: true
+          example: null
+
+    errorApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Something went wrong
+        data:
+          type: object
+          nullable: true
+          example: null
+
+    badRequestResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Validation failed
+        data:
+          type: object
+          nullable: true
+          example: null

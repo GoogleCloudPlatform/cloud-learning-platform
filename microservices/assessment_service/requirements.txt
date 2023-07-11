@@ -1,0 +1,14 @@
+fastapi==0.85.1
+uvicorn==0.19.0
+python-multipart==0.0.5
+fireo==1.6.2
+typing==3.7.4.3
+kubernetes==11.0.0
+google-cloud-storage==2.0.0
+google-cloud-logging==3.1.2
+typing-extensions==4.4.0
+firebase-admin==4.5.2
+protobuf==3.19.5
+learnosity-sdk==0.3.2
+google-cloud-secret-manager==2.11.1
+aiofiles==23.1.0

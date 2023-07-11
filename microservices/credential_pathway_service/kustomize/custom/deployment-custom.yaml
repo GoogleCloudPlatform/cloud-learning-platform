@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: credential-pathway-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: credential-pathway-service
+        image: credential-pathway-service
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "500Mi"

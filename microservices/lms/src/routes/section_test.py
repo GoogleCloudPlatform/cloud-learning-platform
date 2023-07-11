@@ -174,7 +174,11 @@ def test_create_section(client_with_emulator, create_fake_data):
                               with mock.patch(
                                   "services.section_service.insert_rows_to_bq"
                               ):
-                                resp = client_with_emulator.post(
+                                with mock.patch(
+                                  "services.section_service" +
+                                  ".insert_section_enrollment_to_bq"
+                                  ):
+                                  resp = client_with_emulator.post(
                                     url, json=section_details)
   assert resp.status_code == 202
 
@@ -414,8 +418,10 @@ def test_enroll_teachers(client_with_emulator, create_fake_data):
                       "familyName": TEMP_USER["last_name"]
                   }
               }):
-            resp = client_with_emulator.post(
-                url, json={"email": TEMP_USER["email"]})
+            with mock.patch(
+              "services.section_service.insert_section_enrollment_to_bq"):
+              resp = client_with_emulator.post(
+                  url, json={"email": TEMP_USER["email"]})
   print(resp.json())
   assert resp.status_code == 200
   assert resp.json()["success"] is True
@@ -451,7 +457,9 @@ def test_delete_teacher(client_with_emulator, enroll_teacher_data):
       "routes.section.get_user_id",
       return_value=enroll_teacher_data["enrollment_mapping"].user.user_id):
     with mock.patch("routes.section.classroom_crud.delete_teacher"):
-      resp = client_with_emulator.delete(url)
+      with mock.patch(
+        "routes.section.insert_section_enrollment_to_bq"):
+        resp = client_with_emulator.delete(url)
     print("Get User response___", resp)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True, "check status"
@@ -462,7 +470,9 @@ def test_negative_delete_teacher(client_with_emulator, create_fake_data):
   url = BASE_URL + f"/sections/{section_id}/teachers/xyz@gmail.com"
   with mock.patch("routes.section.get_user_id", return_value="123456"):
     with mock.patch("routes.section.classroom_crud.delete_teacher"):
-      resp = client_with_emulator.get(url)
+      with mock.patch(
+        "routes.section.insert_section_enrollment_to_bq"):
+        resp = client_with_emulator.get(url)
     print("Get User response___", resp)
   assert resp.status_code == 404, "Status 404"
 
@@ -691,7 +701,8 @@ def test_delete_section_cronjob(client_with_emulator,create_fake_data):
 "routes.section.classroom_crud.delete_drive_folder"):
         with mock.patch(
         "routes.section.classroom_crud.delete_course_by_id"):
-          resp = client_with_emulator.delete(url)
+          with mock.patch("routes.section.insert_section_enrollment_to_bq"):
+            resp = client_with_emulator.delete(url)
   resp_json = resp.json()
   assert resp.status_code == 200, "Status 200"
   assert resp_json[
@@ -731,6 +742,8 @@ def test_update_invites(client_with_emulator,create_fake_data):
     with mock.patch(
     "routes.section.classroom_crud.get_user_profile_information"):
       with mock.patch("routes.section.Logger"):
-        resp = client_with_emulator.patch(url)
+        with mock.patch(
+          "routes.section.insert_section_enrollment_to_bq"):
+          resp = client_with_emulator.patch(url)
   print("Update invitest status code",resp.status_code,resp.json())
   assert resp.status_code == 200

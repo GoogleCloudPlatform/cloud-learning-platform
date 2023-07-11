@@ -1,0 +1,85 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: credential-pathway-service
+requires:
+  - path: ../../common
+    configs: [common]
+build:
+  tagPolicy:
+    gitCommit: {}
+  local:
+    concurrency: 0
+  artifacts:
+  - image: credential-pathway-service
+    requires:
+      - image: common
+        alias: BASE_IMG
+    sync:
+      infer:
+        - '**/*.py'
+        - '**/*.json'
+portForward:
+- resourceType: service
+  resourceName: credential-pathway-service
+  port: 80
+  localPort: 8888
+deploy:
+  kustomize:
+    paths:
+    - ./kustomize/minikube
+profiles:
+- name: custom
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: credential-pathway-service
+      docker:
+        cacheFrom:
+          - credential-pathway-service
+          - credential-pathway-service:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/custom
+- name: dev
+  activation:
+    - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: gcr.io/core-learning-services-dev/credential-pathway-service
+      docker:
+        cacheFrom:
+          - gcr.io/core-learning-services-dev/credential-pathway-service
+          - gcr.io/core-learning-services-dev/credential-pathway-service:latest
+      requires:
+        - image: gcr.io/core-learning-services-dev/common
+          alias: BASE_IMG
+      sync:
+        infer:
+          - '**/*.py'
+          - '**/*.json'
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/dev
+- name: prod
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: credential-pathway-service
+      docker:
+        cacheFrom:
+          - credential-pathway-service
+          - credential-pathway-service:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod

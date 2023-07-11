@@ -2,6 +2,7 @@
 import requests
 import traceback
 from config import USER_MANAGEMENT_BASE_URL
+from services.section_service import insert_section_enrollment_to_bq
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.models import CourseEnrollmentMapping, User
@@ -132,6 +133,7 @@ def invite_student(section, student_email, headers):
   course_enrollment_mapping.role = "learner"
   course_enrollment_mapping.invitation_id = invitation["id"]
   course_enrollment_id = course_enrollment_mapping.save().id
+  insert_section_enrollment_to_bq(course_enrollment_mapping,section)
   return {
       "invitation_id": invitation["id"],
       "course_enrollment_id": course_enrollment_id,

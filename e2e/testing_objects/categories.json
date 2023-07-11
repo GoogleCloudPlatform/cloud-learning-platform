@@ -1,0 +1,59 @@
+[
+  {
+    "name": "Regression Analysis one",
+    "description": "Perform regression analysis one to address an authentic problem",
+    "keywords": [
+      "regression",
+      "analysis",
+      "one"
+    ],
+    "parent_nodes": {
+      "sub_domains": [
+        "MAT-243: Applied Statistics for Science, Technology, Engineering, and Mathematics (STEM)"]
+    },
+    "child_nodes": {
+      "competencies": []
+    },
+    "reference_id": "ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-one",
+    "source_uri": "https://credentialengineregistry.org/resources/ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-two",
+    "source_name": "Credentialengine"
+  },
+  {
+    "name": "Regression Analysis two",
+    "description": "Perform regression analysis two to address an authentic problem",
+    "keywords": [
+      "regression",
+      "analysis",
+      "two"
+    ],
+    "parent_nodes": {
+      "sub_domains": [
+        "MAT-243: Applied Statistics for Science, Technology, Engineering, and Mathematics (STEM)"]
+    },
+    "child_nodes": {
+      "competencies": []
+    },
+    "reference_id": "ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-two",
+    "source_uri": "https://credentialengineregistry.org/resources/ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-two",
+    "source_name": "Credentialengine"
+  },
+  {
+    "name": "Regression Analysis three",
+    "description": "Perform regression analysis three to address an authentic problem",
+    "keywords": [
+      "regression",
+      "analysis",
+      "three"
+    ],
+    "parent_nodes": {
+      "sub_domains": [
+        "MAT-243: Applied Statistics for Science, Technology, Engineering, and Mathematics (STEM)"]
+    },
+    "child_nodes": {
+      "competencies": []
+    },
+    "reference_id": "ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-three",
+    "source_uri": "https://credentialengineregistry.org/resources/ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b-three",
+    "source_name": "Credentialengine"
+  }
+]

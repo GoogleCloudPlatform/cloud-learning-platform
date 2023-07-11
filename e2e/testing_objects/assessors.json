@@ -1,0 +1,80 @@
+[
+    {
+        "first_name": "User1",
+        "last_name": "Test",
+        "email": "user1@example.com",
+        "user_type": "assessor",
+        "status": "active",
+        "is_registered": true,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": false
+        
+      },
+      {
+        "first_name": "User2",
+        "last_name": "Test",
+        "email": "user2@example.com",
+        "user_type": "assessor",
+        "status": "active",
+        "is_registered": true,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": false
+        
+      },
+      {
+        "first_name": "User3",
+        "last_name": "Test",
+        "email": "user3@example.com",
+        "user_type": "assessor",
+        "status": "active",
+        "is_registered": true,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": false
+        
+      },
+      {
+        "first_name": "User4",
+        "last_name": "Test",
+        "email": "user4@example.com",
+        "user_type": "assessor",
+        "status": "active",
+        "is_registered": true,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": false
+        
+      },
+      {
+        "first_name": "User5",
+        "last_name": "Test",
+        "email": "user5@example.com",
+        "user_type": "assessor",
+        "status": "active",
+        "is_registered": true,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": false
+        
+      },
+      {
+        "first_name": "User6",
+        "last_name": "Test",
+        "email": "user6@example.com",
+        "user_type": "assessor",
+        "status": "active",
+        "is_registered": true,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": false
+        
+      },
+      {
+        "first_name": "User7",
+        "last_name": "Test",
+        "email": "user7@example.com",
+        "user_type": "assessor",
+        "status": "active",
+        "is_registered": true,
+        "failed_login_attempts_count": 0,
+        "access_api_docs": false
+        
+      }
+      
+]

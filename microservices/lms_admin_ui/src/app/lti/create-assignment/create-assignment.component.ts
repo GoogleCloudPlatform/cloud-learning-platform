@@ -47,7 +47,7 @@ export class CreateAssignmentComponent {
         });
       } else {
         this.ltiAssignmentForm = this.fb.group({
-          "tool_id": [this.dialogData.extra_data.assignment.tool_id, Validators.required],
+          "tool_id": [{value:this.dialogData.extra_data.assignment.tool_id, disabled: true} , Validators.required],
           "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title, Validators.required],
           "lti_content_item_id": [this.dialogData.extra_data.assignment.lti_content_item_id],
           "start_date": [this.dialogData.extra_data.assignment.start_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.start_date) : null],

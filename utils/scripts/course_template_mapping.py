@@ -57,10 +57,12 @@ def main():
   for doc in docs:
     course_template_dict = doc.to_dict()
     if "instructional_designer" in course_template_dict.keys():
-      course_template = CourseTemplate.find_by_id(doc.id)
-      create_course_template_enrollment_mapping(
+      try:
+        course_template = CourseTemplate.find_by_id(doc.id)
+        create_course_template_enrollment_mapping(
           course_template_dict["instructional_designer"], course_template)
-
+      except Exception as e:
+        print(e)
 
 if __name__ == "__main__":
   main()

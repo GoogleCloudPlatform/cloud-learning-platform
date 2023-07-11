@@ -641,6 +641,7 @@ def add_teacher(headers, section, teacher_email):
   course_enrollment_mapping.status = status
   course_enrollment_mapping.invitation_id = invitation_id
   course_enrollment_mapping.save()
+  insert_section_enrollment_to_bq(course_enrollment_mapping,section)
   return course_enrollment_mapping
 
 def validate_section(section):
@@ -681,4 +682,28 @@ def add_instructional_designer_into_section(section, course_template_mapping):
   course_enrollment_mapping.user = course_template_mapping.user
   course_enrollment_mapping.status = status
   course_enrollment_mapping.save()
+  insert_section_enrollment_to_bq(course_enrollment_mapping,section)
   return course_enrollment_mapping
+
+def insert_section_enrollment_to_bq(enrollment_record,section):
+  """helper function to insert enrollment record to BQ
+
+  Args:
+    enrollment_record (CourseEnrollmentMapping): enrollment object
+    section (Section): section object
+  """
+  rows=[{
+        "enrollment_id" : enrollment_record.id,
+        "email" : enrollment_record.user.email,
+        "user_id" : enrollment_record.user.user_id,
+        "role" : enrollment_record.role,
+        "status" : enrollment_record.status,
+        "invitation_id" : enrollment_record.invitation_id,
+        "section_id" : section.id,
+        "cohort_id" : section.cohort.id,
+        "course_id" : section.classroom_id,
+        "timestamp" : datetime.datetime.utcnow()
+      }]
+  insert_rows_to_bq(
+            rows=rows, dataset=BQ_DATASET,
+            table_name=BQ_TABLE_DICT["BQ_ENROLLMENT_RECORD"])

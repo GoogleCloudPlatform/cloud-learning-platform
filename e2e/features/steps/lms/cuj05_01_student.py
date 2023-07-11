@@ -1,7 +1,7 @@
 import uuid
 import behave
 import requests
-from testing_objects.test_config import API_URL
+from e2e.test_config import API_URL
 from e2e.gke_api_tests.secrets_helper import get_student_email_and_token
 
 # ------------------------------list student to Section-------------------------------------
