@@ -24,7 +24,7 @@ describe("Test Harmonize Deeplinking", () => {
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e"
     );
 
-    // signin with a account
+    // sign-in with a account
     cy.get('[type="email"]').type("e2e_7112f773_1a53_email@gmail.com");
     cy.get('[type="password"]').type("!45RK&2L!m9%Ef");
     cy.contains("Login").click();
@@ -40,30 +40,25 @@ describe("Test Harmonize Deeplinking", () => {
     cy.get("a.text").first().click();
     cy.contains(" Add LTI Assignment").click();
     cy.get('mat-select[formcontrolname="tool_id"]').click();
-    cy.get("mat-option").contains("Harmonize Google Dev").click();
-    cy.get('[formcontrolname="lti_assignment_title"]').type(
-      "Harmonize Google Dev testing"
-    );
-    cy.contains("Select Content").click();
-    cy.wait(20000);
-
-    // check if we are on home page of harmonize
-    getIframeBody()
-      .contains("Which component would you like to add?")
-      .should("be.visible");
-    getIframeBody().contains("Discussion").click();
-    getIframeBody().contains("Create New").click();
-
-    // type text in discussion title inputbox
+    cy.get("mat-option").contains("ALEKS").click();
+    cy.get('[formcontrolname="lti_assignment_title"]').type("ALEKS testing");
     cy.wait(5000);
-    getIframeBody().find(".highlight-box").as("parentElement");
-    cy.get("@parentElement")
-      .find('input[type="text"]')
-      .type("Hello, World! Testing Discussions");
-    cy.get("@parentElement").find('input[type="number"]').type(50);
-    cy.get("@parentElement").contains("Create Discussion").click();
+    cy.contains("Select Content").then(($button) => {
+      if ($button.is(":disabled")) {
+        cy.log("found existing content item");
+      } else {
+        cy.log("no existing content item was found");
+        cy.contains("Select Content").click();
+        cy.wait(15000);
 
-    // type text in discussion title inputbox
+        // check if we are on home page of aleks deeplinking
+        getIframeBody().contains("ALEKS").should("be.visible");
+        getIframeBody().find("form[name='lti_ci']").as("parentElement");
+        cy.get("@parentElement").find(".mhe_but").click();
+      }
+    });
+
+    // validate if modal/dialogue-box is closed and click on save button and verify if save is successful
     cy.wait(10000);
     cy.get("#ltiIframe").should("not.exist");
 
@@ -73,6 +68,7 @@ describe("Test Harmonize Deeplinking", () => {
     ).as("apiRequest");
 
     cy.get('button[type="submit"]').contains("Save").click();
+
     // Assert that the API call was made and wait for the response
     cy.wait("@apiRequest").then((interception) => {
       const response = interception.response;

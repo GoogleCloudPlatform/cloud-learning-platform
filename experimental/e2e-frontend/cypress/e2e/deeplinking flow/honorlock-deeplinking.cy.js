@@ -1,19 +1,6 @@
 import "cypress-iframe";
 
 describe("Test Harmonize Deeplinking", () => {
-  const getIframeDocument = () => {
-    console.log(cy.get("#ltiIframe"));
-    return cy.get("#ltiIframe").its("0.contentDocument").should("exist");
-  };
-
-  const getIframeBody = () => {
-    console.log("body", getIframeDocument().its("body"));
-    return getIframeDocument()
-      .its("body")
-      .should("not.be.undefined")
-      .then(cy.wrap);
-  };
-
   it("should visit the login page with username password", () => {
     const domain =
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e";
@@ -24,7 +11,7 @@ describe("Test Harmonize Deeplinking", () => {
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e"
     );
 
-    // signin with a account
+    // sign-in with a account
     cy.get('[type="email"]').type("e2e_7112f773_1a53_email@gmail.com");
     cy.get('[type="password"]').type("!45RK&2L!m9%Ef");
     cy.contains("Login").click();
@@ -40,32 +27,21 @@ describe("Test Harmonize Deeplinking", () => {
     cy.get("a.text").first().click();
     cy.contains(" Add LTI Assignment").click();
     cy.get('mat-select[formcontrolname="tool_id"]').click();
-    cy.get("mat-option").contains("Harmonize Google Dev").click();
+    cy.get("mat-option").contains("Honorlock QA Tool").click();
     cy.get('[formcontrolname="lti_assignment_title"]').type(
-      "Harmonize Google Dev testing"
+      "Honorlock QA Tool testing"
     );
-    cy.contains("Select Content").click();
-    cy.wait(20000);
-
-    // check if we are on home page of harmonize
-    getIframeBody()
-      .contains("Which component would you like to add?")
-      .should("be.visible");
-    getIframeBody().contains("Discussion").click();
-    getIframeBody().contains("Create New").click();
-
-    // type text in discussion title inputbox
-    cy.wait(5000);
-    getIframeBody().find(".highlight-box").as("parentElement");
-    cy.get("@parentElement")
-      .find('input[type="text"]')
-      .type("Hello, World! Testing Discussions");
-    cy.get("@parentElement").find('input[type="number"]').type(50);
-    cy.get("@parentElement").contains("Create Discussion").click();
-
-    // type text in discussion title inputbox
-    cy.wait(10000);
-    cy.get("#ltiIframe").should("not.exist");
+    cy.wait(3000);
+    cy.contains("Create Content Item").then(($button) => {
+      if ($button.is(":disabled")) {
+        cy.log("found existing content item");
+      } else {
+        cy.log("no existing content item was found");
+        cy.contains("Create Content Item").click();
+        cy.wait(3000);
+        cy.get("button").contains("Create Content Item").should("be.disabled");
+      }
+    });
 
     cy.intercept(
       "POST",
@@ -73,6 +49,7 @@ describe("Test Harmonize Deeplinking", () => {
     ).as("apiRequest");
 
     cy.get('button[type="submit"]').contains("Save").click();
+
     // Assert that the API call was made and wait for the response
     cy.wait("@apiRequest").then((interception) => {
       const response = interception.response;
