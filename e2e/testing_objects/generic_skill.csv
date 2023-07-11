@@ -1,0 +1,4 @@
+name,description,aligned_competency,id,aligned_domain,aligned_sub_domain,aligned_category,keywords,major_occupation,minor_occupation,broad_occupation,detailed_occupation,onet_alignment,standard_alignment,credential_alignment,organization_alignment,emsi_skill_alignment_name,certifications,author,creator
+Securing Systems & Networks,Explain methods for securing computer systems and networks,IDS-20252,IDS-20252-01,STEM,BS.ITE,,,15-1212.00,,,,,,,,Cyber Security,,,
+Operating System Components,Explain the purpose of and relationship between common components of an operating system ,IDS-20252,IDS-20252-02,STEM,BS.ITE,,,15-1212.00,,,,,,,,Information Systems,,,
+

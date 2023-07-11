@@ -287,6 +287,7 @@ def delete_student(section_id: str, user: str, request: Request):
         raise HttpError(hte.resp,hte.content,hte.uri) from hte
     result.status = "inactive"
     result.update()
+    section_service.insert_section_enrollment_to_bq(result,section_details)
     # Update enrolled student count in section
     section_details.enrolled_students_count = section_details.\
       enrolled_students_count-1
@@ -381,6 +382,8 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
         "classroom_id": section.classroom_id,
         "classroom_url": section.classroom_url
     }
+    section_service.insert_section_enrollment_to_bq(
+      course_enrollment_mapping, section)
     return {
         "message":
         f"Successfully Added the Student with email {input_data.email}",
@@ -483,6 +486,8 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
         "classroom_id": section.classroom_id,
         "classroom_url": section.classroom_url
     }
+    section_service.insert_section_enrollment_to_bq(
+      course_enrollment_mapping, section)
     return {
         "message":
         f"Successfully Added the Student with email {input_data.email}",

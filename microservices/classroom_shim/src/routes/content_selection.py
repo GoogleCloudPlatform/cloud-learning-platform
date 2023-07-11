@@ -1,7 +1,6 @@
 """Content Selection APIs"""
 import traceback
 from fastapi import APIRouter
-from common.models import LTIContentItem
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
@@ -9,6 +8,7 @@ from common.utils.http_exceptions import (ResourceNotFound, InternalServerError,
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
+from services.ext_service_handler import list_content_items
 # pylint: disable=line-too-long
 
 router = APIRouter(
@@ -30,8 +30,7 @@ router = APIRouter(
 def get_tool_and_context_list(context_id: str, tool_id: str):
   """API to return content items for give tool id and context id"""
   try:
-    content_items = LTIContentItem.filter_with_context_id_and_tool_id(
-        tool_id, context_id)
+    content_items = list_content_items(context_id, tool_id)
     return {
         "success": True,
         "message": "Data fetched successfully",

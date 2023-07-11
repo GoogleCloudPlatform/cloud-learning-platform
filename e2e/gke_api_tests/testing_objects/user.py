@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from secrets_helper import get_user_email_and_password_for_e2e
+from e2e.gke_api_tests.secrets_helper import get_user_email_and_password_for_e2e
 
 email = get_user_email_and_password_for_e2e()["email"]
 user_name = email.split("@")[0]

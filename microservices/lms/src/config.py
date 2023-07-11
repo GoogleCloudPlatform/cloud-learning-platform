@@ -33,7 +33,8 @@ BQ_TABLE_DICT = {
     "BQ_COLL_SECTION_TABLE": "section",
     "BQ_COLL_COHORT_TABLE": "cohort",
     "BQ_COLL_COURSETEMPLATE_TABLE": "courseTemplate",
-    "BQ_ANALYTICS_VIEW": "gradeBookEnrichedView"
+    "BQ_ANALYTICS_VIEW": "gradeBookEnrichedView",
+    "BQ_ENROLLMENT_RECORD" : "sectionEnrollmentRecord"
 }
 
 ENABLE_UVICORN_LOGS = bool(

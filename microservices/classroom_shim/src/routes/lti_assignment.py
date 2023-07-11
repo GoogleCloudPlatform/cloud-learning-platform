@@ -14,10 +14,13 @@ from schemas.lti_assignment_schema import (
     LTIAssignmentListResponseModel, GetLTIAssignmentResponseModel,
     CreateLTIAssignmentResponseModel, InputLTIAssignmentModel,
     DeleteLTIAssignmentResponseModel, UpdateLTIAssignmentResponseModel,
-    UpdateLTIAssignmentModel)
+    UpdateLTIAssignmentModel, InputCopyLTIAssignmentModel,
+    CopyLTIAssignmentResponseModel)
 from schemas.error_schema import (InternalServerErrorResponseModel,
                                   NotFoundErrorResponseModel,
                                   ValidationErrorResponseModel)
+from services.ext_service_handler import (get_content_item, create_content_item,
+                                          list_content_items, get_lti_tool)
 # pylint: disable=line-too-long
 
 router = APIRouter(
@@ -350,6 +353,135 @@ def delete_lti_assignment(lti_assignment_id: str):
         "message":
             f"Successfully deleted the LTI Assignment with id {lti_assignment_id}"
     }
+  except ResourceNotFoundException as e:
+    Logger.error(e)
+    raise ResourceNotFound(str(e)) from e
+  except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise InternalServerError(str(e)) from e
+
+
+@router.post(
+    "/lti-assignment/copy", response_model=CopyLTIAssignmentResponseModel)
+def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
+  """Copy an LTI Assignment endpoint
+
+  Args:
+      input_copy_lti_assignment (InputCopyLTIAssignmentModel):
+          Details of new LTI Assignment and old one to be copied from
+
+  Raises:
+      ResourceNotFoundException: If the Course Template does not exist.
+      Exception: 500 Internal Server Error if something went wrong
+
+  Returns:
+      CopyLTIAssignmentResponseModel: LTI Assignment Object,
+      NotFoundErrorResponseModel: if the Course template not found,
+      InternalServerErrorResponseModel:
+          if the LTI Assignment creation raises an exception
+  """
+  try:
+    # fetch content_item and related line_items
+    input_data_dict = {**input_copy_lti_assignment.dict()}
+
+    lti_assignment = LTIAssignment.find_by_id(
+        input_data_dict.get("lti_assignment_id"))
+    lti_assignment_data = lti_assignment.to_dict()
+    content_item_id = lti_assignment_data.get("lti_content_item_id")
+    prev_context_id = lti_assignment_data.get("context_id")
+
+    content_item_data = get_content_item(content_item_id)
+
+    # create a copy of above content item
+    content_item_data["context_id"] = input_data_dict.get("context_id")
+    del content_item_data["id"]
+    del content_item_data["created_time"]
+    del content_item_data["last_modified_time"]
+
+    content_items_res = list_content_items(
+        input_data_dict.get("context_id"), lti_assignment.tool_id)
+
+    tool_data = get_lti_tool(lti_assignment.tool_id)
+
+    if tool_data.get("deeplink_type") in ("Allow once per context",
+                                          "Not required"):
+      if content_items_res:
+        copy_content_item_data = content_items_res[0]
+      else:
+        copy_content_item_data = create_content_item(content_item_data)
+    else:
+      copy_content_item_data = create_content_item(content_item_data)
+
+    prev_context_ids = lti_assignment_data["prev_context_ids"]
+    prev_content_item_ids = lti_assignment_data["prev_content_item_ids"]
+
+    if prev_context_ids:
+      prev_context_ids.insert(0, prev_context_id)
+    else:
+      prev_context_ids = [prev_context_id]
+
+    if prev_content_item_ids:
+      prev_content_item_ids.insert(0, content_item_id)
+    else:
+      prev_content_item_ids = [content_item_id]
+
+    # Updating the dates of the new lti assignment
+
+    lti_assignment_start_date = lti_assignment_data.get("start_date")
+    lti_assignment_end_date = lti_assignment_data.get("end_date")
+    lti_assignment_due_date = lti_assignment_data.get("due_date")
+
+    curr_utc_timestamp = datetime.datetime.utcnow()
+
+    if lti_assignment_due_date:
+      lti_assignment_datetime = datetime.datetime.fromtimestamp(
+          lti_assignment_due_date.timestamp())
+      if lti_assignment_datetime < curr_utc_timestamp:
+        raise ValidationError(
+            f"Due date of the LTI assignment {lti_assignment.id} can not be in the past"
+        )
+
+    # TODO: Logic would be updated upon more discussion/clarity
+    # if input_data_dict.get("start_date"):
+    #   if lti_assignment_data.get("start_date"):
+    #     if input_data_dict.get("start_date") > lti_assignment_data.get(
+    #         "start_date"):
+    #       lti_assignment_start_date = input_data_dict.get("start_date")
+
+    # if input_data_dict.get("end_date"):
+    #   lti_assignment_end_date = input_data_dict.get("end_date")
+
+    # if input_data_dict.get("due_date"):
+    #   lti_assignment_due_date = input_data_dict.get("due_date")
+
+    new_lti_assignment_data = {
+        "lti_assignment_title": lti_assignment_data.get("lti_assignment_title"),
+        "context_type": "section",
+        "context_id": input_data_dict.get("context_id"),
+        "prev_context_ids": prev_context_ids,
+        "lti_content_item_id": copy_content_item_data.get("id"),
+        "prev_content_item_ids": prev_content_item_ids,
+        "course_work_id": None,
+        "tool_id": lti_assignment_data.get("tool_id"),
+        "max_points": lti_assignment_data.get("max_points"),
+        "start_date": lti_assignment_start_date,
+        "end_date": lti_assignment_end_date,
+        "due_date": lti_assignment_due_date
+    }
+
+    new_lti_assignment = LTIAssignment.from_dict(new_lti_assignment_data)
+    new_lti_assignment.save()
+    new_lti_assignment_item = new_lti_assignment.to_dict()
+
+    return {
+        "success": True,
+        "message": "Successfully copied the lti assignment",
+        "data": new_lti_assignment_item
+    }
+
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
   except ResourceNotFoundException as e:
     Logger.error(e)
     raise ResourceNotFound(str(e)) from e

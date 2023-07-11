@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light top-nav fixed-top">
+    <mat-icon style="width: 100px;" svgIcon="google-text-icon"></mat-icon>
+</nav>
+<div class="login-outer">
+    <div class="first-half">
+        <!-- <button mat-raised-button style="padding: 1rem;" (click)="authService.googleSignin()">
+            <mat-icon style="width: 50px; height:30px" svgIcon="google-icon"></mat-icon> Login With Google
+        </button> -->
+
+        <form [formGroup]="loginForm" class="login-form">
+
+            <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Email</mat-label>
+                <input type="email" matInput formControlName="email">
+            </mat-form-field>
+    
+            <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Password</mat-label>
+                <input type="password" matInput formControlName="password">
+            </mat-form-field> 
+    
+        </form>
+
+        <button mat-flat-button color="primary" (click)="login()" [disabled]="!loginForm.valid">
+            Login
+        </button>
+
+    </div>
+    <div class="second-half">
+        <div class="img-container">
+            <img src="assets/img/login.png">
+            <div class="text">Management portal</div>
+        </div>
+    </div>
+</div>

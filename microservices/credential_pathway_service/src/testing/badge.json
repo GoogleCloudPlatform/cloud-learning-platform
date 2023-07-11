@@ -1,0 +1,20 @@
+[
+    {
+        "entity_type": "badge",
+        "entity_id": "12345",
+        "open_badge_id": "12",
+        "issuer": "university",
+        "issuer_open_badge_id": "string",
+        "name": "Jon",
+        "image": "string",
+        "description": "best start",
+        "achievement_type": "Achievement",
+        "criteria_url": "string",
+        "criteria_narrative": "string",
+        "alignments": {},
+        "tags":[],
+        "expires": {},
+        "extensions": "string",
+        "created_by": "badge"
+        }
+]

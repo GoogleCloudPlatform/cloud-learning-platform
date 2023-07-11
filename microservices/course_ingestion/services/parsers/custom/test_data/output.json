@@ -1,0 +1,23 @@
+[
+  {
+    "competency": "",
+    "chapter": 1,
+    "subChapter": "",
+    "sub_competency": {
+      "title": "Foundations of Sociology Introduction",
+      "display_type": "Sub Competency",
+      "label": "Foundations of Sociology Introduction",
+      "learningResourcePath": "test/data",
+      "learning_objectives": {
+        "title": "",
+        "learning_units": [
+          {
+            "text": "Before every election, a variety of special interest groups send out surveys to just about everyone, asking participants to write down an assortment of information. Conservative groups, liberal groups, the Associated Press, and many different government-funded research groups want to know personal details about who you are if you are voting, who you are voting for and why. From the surveys collected, sociologists with access to the data could study how race, gender, income level, ethnicity, age, and even neighborhood influence votes. This data reveals political and social trends, voting habits, and demographic shifts. Sociologists across the world routinely use information gathered this way to study human society systematically. Sociology is \"the systematic study of society and social interaction. Since the term \"society\" encompasses a variety of things\u2014events, relations, peoples, media, etc.\u2014the range and scope of sociological research are broad. For instance, sociology might study how you may act differently around your family than your friends and why you may trust someone in uniform over sweatpants when making a big decision. To guide sociologists, the American Sociological Association sets forth a Code of Ethics designed to ensure that sociologists professionally conduct themselves when interacting with their study participants. This helps to provide reliable results and valid conclusions. Within the field of sociology, many sociologists work to achieve a better understanding of social processes while some are applied sociologists, focusing their efforts on researching to change social policy or suggest specific improvements on the local, state, national, or global level. Central to sociology is the sociological imagination, the ability to connect personal troubles (individual problems) to public issues (matters that affect a large number of people simultaneously). Imagine a low wage worker who routinely works 60 hours a week, is dependable and responsible, but still cannot pay their medical bills. From the standpoint of the sociological imagination, there is an apparent connection between their inability to pay the bills (personal trouble) and the often excessive price of health care combined with the relatively low salaries for workers throughout the country (two public issues). Sociologists seek to understand our society in this very manner\u2014by systematically studying the connection between individual experience and the larger community. \u00a0At the end of this lesson, students will be able to:",
+            "pdfTitle": "test.pdf",
+            "title": "Introduction"
+          }
+        ]
+      }
+    }
+  }
+]

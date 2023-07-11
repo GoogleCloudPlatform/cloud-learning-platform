@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Assessment 1",
+    "type": "practice",
+    "author_id": "author_id",
+    "instructor_id": "instructor_id",
+    "instructor_name": "instructor_name",
+    "assessor_id": "assessor_id",
+    "assessment_reference": {},
+    "max_attempts": 3,
+    "pass_threshold": 0.7,
+    "achievements": [],
+    "alignments": {},
+    "references": {},
+    "parent_nodes": {"learning_experiences": [], "learning_objects": []},
+    "child_nodes": {},
+    "prerequisites": {},
+    "metadata": {}
+  }
+]

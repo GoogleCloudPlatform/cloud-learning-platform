@@ -1,0 +1,452 @@
+tags:
+  - name: utils
+    description: Endpoint to fetch feedback questions, topics and FAQs and also to save both the inline and overall feedback provided by the user. 
+paths:
+  /utils/api/v1/feedback:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - utils
+      summary: Fetch feedback questions and options
+      description: Retrieves questions and options for the user to provide feedback.
+      responses:
+        "200":
+          description: Successfully fetched options for feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/feedbackGetApiResponse"
+        "401":
+          description: Token Expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenExpiredResponse"
+        "403":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenNotFoundResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorApiResponse"
+
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - utils
+      summary: Saves feedback provided by the user
+      description: Saves feedback given by the user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/feedbackPostApiRequest"
+        description: user_comments, course_feedback_option, notes_feedback_option, usage_feedback_option, question_ref, session_id and user_rating are required
+        required: true
+      responses:
+        "200":
+          description: Successfully saved feedback of the user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/feedbackPostApiResponse"
+        "401":
+          description: Token Expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenExpiredResponse"
+        "403":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenNotFoundResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorApiResponse"
+
+  /utils/api/v1/inlineFeedback:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - utils
+      summary: Saves inline feedback provided by the user
+      description: Saves inline feedback given by the user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/inlineFeedbackPostApiRequest"
+        description: covered_lus, context_ref, question_ref, session_id and user_rating are required
+        required: true
+      responses:
+        "200":
+          description: Successfully saved inline feedback of the user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inlineFeedbackPostApiResponse"
+        "401":
+          description: Token Expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenExpiredResponse"
+        "403":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenNotFoundResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorApiResponse"
+
+  /utils/api/v1/help:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - utils
+      summary: Fetch help me FAQs
+      description: Retrieves topic wise help me FAQs in a paginated manner, limited to 10 FAQs per retrieval.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: number
+          required: true
+          description: Page Number
+        - in: query
+          name: topic
+          schema:
+            type: string
+          required: true
+          description: Topic
+      responses:
+        "200":
+          description: Successfully fetched help me faqs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/helpGetApiResponse"
+        "401":
+          description: Token Expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenExpiredResponse"
+        "403":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenNotFoundResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorApiResponse"
+
+  /utils/api/v1/topics:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - utils
+      summary: Fetch topics
+      description: Retrieves topics in a paginated manner, limited to at max 10 topics per retrieval.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: number
+          required: true
+          description: Page Number
+      responses:
+        "200":
+          description: Successfully fetched topics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/topicsGetApiResponse"
+        "401":
+          description: Token Expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenExpiredResponse"
+        "403":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tokenNotFoundResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorApiResponse"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    feedbackPostApiRequest:
+      type: object
+      required:
+        - user_comments
+        - course_feedback_option
+        - notes_feedback_option
+        - usage_feedback_option
+        - question_ref
+        - user_rating
+        - session_id
+      properties:
+        user_comments:
+          type: string
+          example: AI tutor is just awesome!
+        course_feedback_option:
+          type: string
+          example: Very Helpful
+        notes_feedback_option:
+          type: string
+          example: Very Helpful
+        usage_feedback_option:
+          type: string
+          example: Very Helpful
+        user_rating:
+          type: string
+          example: 4
+        question_ref:
+          type: string
+          example: /feedback/1H5XwqshzReXvVowSeBp
+        session_id:
+          type: string
+          example: "4e7ea201-9193-45f9-a0ac-0b9ae4ff6520"
+
+    inlineFeedbackPostApiRequest:
+      type: object
+      required:
+        - question_ref
+        - context_ref
+        - covered_lus
+        - user_rating
+        - session_id
+      properties:
+        covered_lus:
+          type: array
+          items:
+            example: [""]
+        context_ref:
+          type: string
+          example: "sub_competencies/AjpPOsvAEEHbsQp4zR6J"
+        user_rating:
+          type: string
+          example: 4
+        question_ref:
+          type: string
+          example: /feedback/1H5XwqshzReXvVowSeBp
+        session_id:
+          type: string
+          example: "4e7ea201-9193-45f9-a0ac-0b9ae4ff6520"
+
+    helpGetApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Successfully fetched help me faqs
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  question:
+                    type: string
+                    example: What is DeepLIT?
+                  answer:
+                    type: string
+                    example: Deep learning based intelligent tutor
+                  topic:
+                    type: string
+                    example: miscellaneous
+
+    feedbackGetApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Successfully fetched options for feedback
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  courseFeedback:
+                    type: object
+                    properties:
+                      question:
+                        type: string
+                        example: How helpful was the interactive tutor in developing deeper understanding of the course material?
+                      options:
+                        type: array
+                        items:
+                          type: string
+                        example: ["Not at all Helpful", "Somewhat Helpful", "Neither Helpful or Unhelpful", "Somewhat Helpful", "Very Helpful"]
+                  descriptiveQuestion:
+                    type: string
+                    example: What else should we know about the interactive tutor? 
+                  notesFeedback:
+                    type: object
+                    properties:
+                      question:
+                        type: string
+                        example: How helpful is the notes section in preparing you for the assessment portion of your course? 
+                      options:
+                        type: array
+                        items:
+                          type: string
+                        example: ["Not at all Helpful", "Somewhat Helpful", "Neither Helpful or Unhelpful", "Somewhat Helpful", "Very Helpful", "I haven't attempted an assessment yet"]
+                  usageFeedback:
+                    type: object
+                    properties:
+                      question:
+                        type: string
+                        example: How often have you used the Interactive Tutor in your course work?
+                      options:
+                        type: array
+                        items:
+                          type: string
+                        example: ["This was my first time using the interactive tutor", "I use the interactive tutor each time I am in my course", "I use it regularly but not every time", "I use it occasionally"]      
+                  question_ref:
+                    type: string
+                    example: /feedback/1H5XwqshzReXvVowSeBp
+                  thankYouNote:
+                    type: string
+                    example: Thanks for sharing your feedback — it's a big help to us here at Walden, and we appreciate you taking the time. Our product teams will be taking this into account as we keep working to improve our Software.
+                  ratingQuestion:
+                    type: string
+                    example: How would you rate your experience with the Interactive Tutor?
+
+    feedbackPostApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Successfully saved feedback of the user
+        data:
+          type: string
+          example: 11c83e76-ee32-49f2-b419-a66d5166256d
+
+    inlineFeedbackPostApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Successfully saved inline feedback of the user
+        data:
+          type: string
+          example: 11c83e76-ee32-49f2-b419-a66d5166256d
+
+    topicsGetApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Sucessfully fetched topics
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: Interaction with the AI Tutor
+                  queryTopic:
+                    type: string
+                    example: teachme
+
+    tokenExpiredResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Token expired
+        data:
+          type: object
+          nullable: true
+          example: null
+
+    tokenNotFoundResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Token not found
+        data:
+          type: object
+          nullable: true
+          example: null
+    errorApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Something went wrong
+        data:
+          type: object
+          nullable: true

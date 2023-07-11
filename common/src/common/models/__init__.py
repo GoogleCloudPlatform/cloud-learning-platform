@@ -16,6 +16,9 @@ Flatten import namespace for models
 """
 
 from .base_model import *
+from .node_item import *
+from .competency import *
+from .temp_user import *
 from .user import *
 from .course_template import *
 from .cohort import *
@@ -23,7 +26,19 @@ from .section import *
 from .lti import *
 from .course_enrollment_mapping import *
 from .course_template_enrollment_mapping import *
-from .temp_user import *
 from .lti_assignment import *
 from .llm import *
+from .credential_pathway import *
+from .credential_pathway_model import *
+from .custom_fields import *
+from .batch_job import *
+from .skill import *
+from .learner_profile import *
+from .assessment import *
+from .knowledge import *
+from .learning_object import *
+from .learning_record import *
+from .session import *
+from .faq import *
+from .staff import *
 from .lms_job import *

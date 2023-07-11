@@ -1,0 +1,25 @@
+[
+    {
+      "entity_type": "assertion",
+      "entity_id": "986",
+      "open_badge_id": "31",
+      "created_by": "user",
+      "badgeclass": "badger",
+      "badgeclass_open_badge_id": "string",
+      "issuer": "uni",
+      "issuer_open_badge_id": "string",
+      "image": "string",
+      "recipient": {},
+      "issued_on": "string",
+      "narrative": "string",
+      "evidence": [
+        {}
+      ],
+      "revoked": true,
+      "revocation_reason": "string",
+      "acceptance": "string",
+      "extensions": "string",
+      "expires": "2022-07-21 15:01:27",
+      "badgeclass_name": "string"
+    }
+  ]
