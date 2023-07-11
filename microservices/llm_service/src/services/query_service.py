@@ -165,10 +165,10 @@ async def _query_doc_matches(q_engine: QueryEngine,
   return query_references
 
 def batch_build_query_engine(request_body: Dict, job: BatchJobModel) -> Dict:
-  """ 
+  """
   Handle a batch job request for query engine build.
-  
-  Args: 
+
+  Args:
     request_body: dict of query engine build params
     job: BatchJobModel model object
   Returns:
@@ -180,7 +180,7 @@ def batch_build_query_engine(request_body: Dict, job: BatchJobModel) -> Dict:
 
   q_engine, docs_processed, docs_not_processed = \
       query_engine_build(doc_url, query_engine, user_id, request_body)
-  
+
   # update result data in batch job model
   result_data = {
     "query_engine_id": q_engine.id,
@@ -189,7 +189,7 @@ def batch_build_query_engine(request_body: Dict, job: BatchJobModel) -> Dict:
   }
   job.result_data = result_data
   job.save(merge=True)
-  
+
   return result_data
 
 def query_engine_build(doc_url: str, query_engine: str, user_id: str,
@@ -272,7 +272,7 @@ def build_doc_index(doc_url:str, query_engine: str) -> \
       # if bucket already exists, delete and recreate
       bucket = storage_client.bucket(bucket_name)
       bucket.delete(force=True)
-      buket = storage_client.create_bucket(bucket_name, location=REGION)
+      bucket = storage_client.create_bucket(bucket_name, location=REGION)
     bucket_uri = f"gs://{bucket.name}"
 
     # process docs at url and upload embeddings to GCS for indexing

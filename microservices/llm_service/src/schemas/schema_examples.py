@@ -73,10 +73,10 @@ QUERY_RESULT_EXAMPLE = {
   "query_engine": "query-engine-test",
   "response": "test response",
   "query_refs": ["abcd1234", "defg5678"],
-  'archived_at_timestamp': None,
-  'archived_by': None,
-  'created_by': 'fake-user-id',
-  'created_time': '2023-07-04 19:22:50.799741+00:00'
+  "archived_at_timestamp": None,
+  "archived_by": None,
+  "created_by": "fake-user-id",
+  "created_time": "2023-07-04 19:22:50.799741+00:00"
 }
 
 CHAT_EXAMPLE = {

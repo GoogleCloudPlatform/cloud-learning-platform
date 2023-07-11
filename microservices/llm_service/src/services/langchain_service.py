@@ -21,7 +21,7 @@ from typing import Optional, Any
 from common.models import UserChat
 from langchain.schema import HumanMessage, AIMessage
 
-from config import LANGCHAIN_LLM, CHAT_LLM_TYPES, COHERE_LLM_TYPES
+from config import LANGCHAIN_LLM, CHAT_LLM_TYPES
 
 async def langchain_llm_generate(prompt: str, llm_type: str,
                                  user_chat: Optional[UserChat] = None):

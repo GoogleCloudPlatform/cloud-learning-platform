@@ -40,7 +40,7 @@ with mock.patch(
     side_effect=mock.MagicMock()) as mok:
   with mock.patch("langchain.chat_models.ChatOpenAI"):
     with mock.patch("langchain.llms.Cohere"):
-      from config import (COHERE_LLM_TYPE, 
+      from config import (COHERE_LLM_TYPE,
                           OPENAI_LLM_TYPE_GPT3_5,
                           VERTEX_LLM_TYPE_BISON_TEXT,
                           VERTEX_LLM_TYPE_BISON_CHAT)
