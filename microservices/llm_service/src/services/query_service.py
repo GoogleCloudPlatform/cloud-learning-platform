@@ -29,7 +29,8 @@ from common.utils.logging_handler import Logger
 from common.models import (UserQuery, QueryResult,
                           QueryEngine, QueryDocument,
                           QueryReference,
-                          QueryDocumentChunk)
+                          QueryDocumentChunk,
+                          BatchJobModel)
 from common.utils.errors import (ResourceNotFoundException,
                                  ValidationError)
 from common.utils.http_exceptions import InternalServerError
@@ -163,20 +164,37 @@ async def _query_doc_matches(q_engine: QueryEngine,
 
   return query_references
 
-def batch_build_query_engine(request_body: Dict) -> Dict:
-  """ handle a batch job request for query engine build """
+def batch_build_query_engine(request_body: Dict, job: BatchJobModel) -> Dict:
+  """ 
+  Handle a batch job request for query engine build.
+  
+  Args: 
+    request_body: dict of query engine build params
+    job: BatchJobModel model object
+  Returns:
+    dict containing job meta data
+  """
   doc_url = request_body.get("doc_url")
   query_engine = request_body.get("query_engine")
   user_id = request_body.get("user_id")
 
-  q_engine = query_engine_build(doc_url, query_engine, user_id, request_body)
-  result = {
-    "query_engine_id": q_engine.id
+  q_engine, docs_processed, docs_not_processed = \
+      query_engine_build(doc_url, query_engine, user_id, request_body)
+  
+  # update result data in batch job model
+  result_data = {
+    "query_engine_id": q_engine.id,
+    "docs_processed": docs_processed,
+    "docs_not_processed": docs_not_processed
   }
-  return result
+  job.result_data = result_data
+  job.save(merge=True)
+  
+  return result_data
 
 def query_engine_build(doc_url: str, query_engine: str, user_id: str,
-                       params: Dict) -> QueryEngine:
+                       params: Dict) -> \
+                       Tuple[str, List[QueryDocument], List[str]]:
   """
   Build a new query engine.
 
@@ -189,7 +207,8 @@ def query_engine_build(doc_url: str, query_engine: str, user_id: str,
             user_id, is_public
 
   Returns:
-    QueryEngine: the query engine object
+    Tuple of QueryEngine id, list of QueryDocument objects of docs processed,
+      list of urls of docs not processed
 
   Raises:
     ValidationError if the named query engine already exists
@@ -209,7 +228,7 @@ def query_engine_build(doc_url: str, query_engine: str, user_id: str,
 
   # build document index
   try:
-    build_doc_index(doc_url, query_engine)
+    docs_processed, docs_not_processed = build_doc_index(doc_url, query_engine)
   except Exception as e:
     # delete query engine model if build unsuccessful
     QueryDocument.collection.filter(
@@ -221,10 +240,11 @@ def query_engine_build(doc_url: str, query_engine: str, user_id: str,
     QueryEngine.delete_by_id(q_engine.id)
     raise InternalServerError(e) from e
 
-  return q_engine
+  return q_engine, docs_processed, docs_not_processed
 
 
-def build_doc_index(doc_url:str, query_engine: str):
+def build_doc_index(doc_url:str, query_engine: str) -> \
+        Tuple[List[QueryDocument], List[str]]:
   """
   Build the document index.
   Supports only GCS URLs initially, containing PDF and CSV files.
@@ -234,7 +254,8 @@ def build_doc_index(doc_url:str, query_engine: str):
     query_engine: the query engine to
 
   Returns:
-    None
+    Tuple of list of QueryDocument objects of docs processed,
+      list of urls of docs not processed
   """
   q_engine = QueryEngine.find_by_name(query_engine)
   if q_engine is None:
@@ -248,15 +269,16 @@ def build_doc_index(doc_url:str, query_engine: str):
     try:
       bucket = storage_client.create_bucket(bucket_name, location=REGION)
     except Conflict:
-      # if bucket alredy exists, delete and recreate
+      # if bucket already exists, delete and recreate
       bucket = storage_client.bucket(bucket_name)
       bucket.delete(force=True)
       buket = storage_client.create_bucket(bucket_name, location=REGION)
     bucket_uri = f"gs://{bucket.name}"
 
     # process docs at url and upload embeddings to GCS for indexing
-    docs_processed = _process_documents(doc_url, bucket_name,
-                                        q_engine, storage_client)
+    docs_processed, docs_not_processed = _process_documents(doc_url,
+                                            bucket_name,
+                                            q_engine, storage_client)
 
     # make sure we actually processed some docs
     if len(docs_processed) == 0:
@@ -269,7 +291,10 @@ def build_doc_index(doc_url:str, query_engine: str):
     # create ME index and endpoint
     _create_me_index_and_endpoint(index_name, bucket_uri, q_engine)
 
+    return docs_processed, docs_not_processed
+
   except Exception as e:
+    Logger.error(f"Error creating doc index {e}")
     raise InternalServerError(str(e)) from e
 
 
@@ -316,16 +341,18 @@ def _create_me_index_and_endpoint(index_name: str, bucket_uri: str,
         index=tree_ah_index, deployed_index_id=q_engine.deployed_index_name
     )
     Logger.info(f"Deployed matching engine endpoint for {index_name}")
-  except Exception:
-    pass
-
+  except Exception as e:
+    Logger.error(f"Error creating ME index or endpoint {e}")
+    raise InternalServerError(str(e)) from e
 
 def _process_documents(doc_url: str, bucket_name: str,
-                       q_engine: QueryEngine, storage_client) -> List[str]:
+                       q_engine: QueryEngine, storage_client) -> \
+                       Tuple[List[QueryDocument], List[str]]:
   """
   Process docs at url and upload embeddings to GCS for indexing.
   Returns:
-     list of names of fully processed documents.
+     Tuple of list of QueryDocument objects for docs processed,
+        list of doc urls of docs not processed
   """
   with tempfile.TemporaryDirectory() as temp_dir:
     # download files to local directory
@@ -344,6 +371,7 @@ def _process_documents(doc_url: str, bucket_name: str,
 
     # add embeddings for each doc to index data stored in bucket
     docs_processed = []
+    docs_not_processed = []
     for doc in doc_filepaths:
       doc_name, doc_url, doc_filepath = doc
       Logger.info(f"generating index data for {doc_name}")
@@ -354,12 +382,12 @@ def _process_documents(doc_url: str, bucket_name: str,
         doc_text_list = _read_doc(doc_name, doc_filepath)
         if doc_text_list is None:
           Logger.error(f"no content read from {doc_name}")
+          docs_not_processed.append(doc_url)
           continue
       except Exception as e:
         Logger.error(f"error reading doc {doc_name}: {e}")
+        docs_not_processed.append(doc_url)
         continue
-
-      docs_processed.append(doc_name)
 
       # split text into chunks
       text_chunks = []
@@ -402,7 +430,9 @@ def _process_documents(doc_url: str, bucket_name: str,
 
       index_base = new_index_base
 
-  return docs_processed
+      docs_processed.append(query_doc)
+
+  return docs_processed, docs_not_processed
 
 
 def _download_files_to_local(storage_client, local_dir, doc_url: str) -> \
@@ -444,6 +474,8 @@ def _read_doc(doc_name:str, doc_filepath: str) -> List[str]:
       Logger.info(f"Finished reading pdf file {doc_name}")
   else:
     # return None if doc type not supported
+    Logger.error(
+        f"Cannot read {doc_name}: unsupported extension {doc_extension}")
     pass
 
   if loader is not None:

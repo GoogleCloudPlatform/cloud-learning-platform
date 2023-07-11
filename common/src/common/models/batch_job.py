@@ -42,7 +42,7 @@ class BatchJob(BaseModel):
 
 
 class BatchJobModel(BaseModel):
-  """ Model class for Kuberetes batch job service """
+  """ Model class for Kubernetes batch job service """
   id_ = IDField()
   name = TextField(required=True, default="")
   input_data = TextField()
@@ -54,6 +54,7 @@ class BatchJobModel(BaseModel):
   errors = MapField(default={})
   job_logs = MapField(default={})
   metadata = MapField(default={})
+  result_data = MapField(default={})
   uuid = TextField()
 
   class Meta:

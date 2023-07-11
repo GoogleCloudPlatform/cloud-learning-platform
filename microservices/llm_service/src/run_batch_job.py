@@ -40,7 +40,7 @@ def main(argv):
     job.update()
     request_body = json.loads(job.input_data)
     if job.type == QUERY_ENGINE_BUILD_JOB_TYPE:
-      _ = batch_build_query_engine(request_body)
+      _ = batch_build_query_engine(request_body, job)
     else:
       raise Exception("Invalid job type")
     job.status = "succeeded"
