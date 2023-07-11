@@ -332,7 +332,7 @@ def step_8_3(context):
   resp = get_method(api_url, query_params=params)
   resp_data = resp.json()
   assert resp.status_code == 200, "Status not 200"
-  lx_uuids = [i.get("uuid") for i in resp_data.get("data")["records"]]
+  lx_uuids = [i.get("uuid") for i in resp_data.get("data")]
   assert set(inserted_lx_uuids).intersection(set(lx_uuids)) \
     == set(inserted_lx_uuids), "all data not retrieved"
 
@@ -410,6 +410,8 @@ def step_11_2(context):
   context.url = f"{API_URL}/curriculum-pathways/{context.req_id}/nodes/curriculum-pathways"
   context.res = get_method(url=context.url, query_params=context.params)
   context.res_data = context.res.json()
+  print(context.res)
+  print(context.res_data)
 
 @behave.then("All nodes of the given alias under that program will be fetched")
 def step_11_3(context):

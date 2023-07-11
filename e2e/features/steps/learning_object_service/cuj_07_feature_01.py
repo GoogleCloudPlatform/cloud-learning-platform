@@ -150,8 +150,7 @@ def step_impl_3(context):
     assert context.res.status_code == 200
     assert context.res_json["success"] == True
     assert context.res_json["message"] == "Successfully Fetched FAQs"
-    assert context.res_json["data"][
-        "records"][0]['curriculum_pathway_id'] == context.curriculum_pathway_id
+    assert context.res_json["data"][0]['curriculum_pathway_id'] == context.curriculum_pathway_id
 
 # -------------------------------------------------------------------------
 # Scenario 5: User wants to create FAQ documents

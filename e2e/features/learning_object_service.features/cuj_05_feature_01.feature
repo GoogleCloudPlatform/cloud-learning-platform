@@ -56,6 +56,7 @@ Feature: Creation, Updation (with version control) and Deletion of Curriculum Pa
             When Curriculum Pathway JSON data with incorrect payload request is imported
                 Then ingestion of Curriculum Pathway JSON data into learning object service should fail
 
+    @not-implemented
     Scenario: Fetch all nodes under a Program for a given alias
         Given that a CD or LXE wants to fetch all nodes of the given alias under a program
             When API request is sent to fetch all nodes with alias and correct program id

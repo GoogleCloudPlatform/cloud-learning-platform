@@ -352,6 +352,7 @@ def update_learning_object(uuid: str,
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 

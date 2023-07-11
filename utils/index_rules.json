@@ -151,218 +151,218 @@
   ],
   "learning_object_service": [
     {
-      "collection_group": "learning_resources",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "root_version_uuid",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "version",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "learning_resources",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "root_version_uuid",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "version",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "learning_resources",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "course_category",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "created_time",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "learning_resources",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "course_category",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "learning_resources",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "is_archived",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "created_time",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "learning_resources",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_archived",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "learning_resources",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "is_deleted",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "created_time",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "learning_resources",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_deleted",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "learning_objects",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "root_version_uuid",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "version",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "learning_objects",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "root_version_uuid",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "version",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "learning_objects",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "is_deleted",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "created_time",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "learning_objects",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_deleted",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "learning_objects",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "is_archived",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "created_time",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "learning_objects",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_archived",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "learning_experiences",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "root_version_uuid",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "version",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "learning_experiences",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "root_version_uuid",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "version",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "learning_experiences",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "is_deleted",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "created_time",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "learning_experiences",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_deleted",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "learning_experiences",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "is_archived",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "created_time",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "learning_experiences",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_archived",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "curriculum_pathways",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "root_version_uuid",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "version",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "curriculum_pathways",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "root_version_uuid",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "version",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "curriculum_pathways",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "is_archived",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "created_time",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "curriculum_pathways",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_archived",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "curriculum_pathways",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "is_deleted",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "created_time",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "curriculum_pathways",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_deleted",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "curriculum_pathways",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "alias",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "created_time",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "curriculum_pathways",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "alias",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     },
     {
-      "collection_group": "curriculum_pathways",
-      "query_scope": "COLLECTION",
-      "fields": [
-        {
-          "field_path": "is_deleted",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "alias",
-          "order": "ASCENDING"
-        },
-        {
-          "field_path": "created_time",
-          "order": "DESCENDING"
-        }
-      ]
+        "collection_group": "curriculum_pathways",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "is_deleted",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "alias",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            }
+        ]
     }
   ],
   "learning_record_service": [
