@@ -18,6 +18,7 @@
 """
 import os
 import json
+from datetime import time
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -61,11 +62,13 @@ def delete_classroom_courses():
   # pylint: disable=maybe-no-member
   response = service.courses().list().execute()
   courses.extend(response.get('courses', []))
-  test_course = DATABASE_PREFIX + "test_course"
+  count = 0
   print("Course Names to be deleted",DATABASE_PREFIX,len(DATABASE_PREFIX))
   for course in courses:
     print("Course_name "+course["name"]+" ID ",course["id"])
     if DATABASE_PREFIX + "test_course" in course["name"]:
+      if not (count %25):
+        time.sleep(60)
       print("Inside IF for delete ")
       final_list.append(course["name"])
       file_id = course["teacherFolder"]["id"]
@@ -76,6 +79,7 @@ def delete_classroom_courses():
       print(f" Updated Course and state  is :  {course.get('name')},{course.get('courseState')}")
       course = service.courses().delete(id=course["id"]).execute()
       print("AFter delete")
+      count = count +1
   return final_list
 
 if __name__ == "__main__":
