@@ -65,7 +65,7 @@ def step_impl_9(context):
   assert context.status == 404, "Status 404"
   
 # -----------------------------------------Student difference detailed report---------------------------------
-# ---exists in classrooom not in db-----------  
+# ---exists in classrooom not in db-----------
 @behave.given("A user has access to portal and wants to fetch the list of students exists in Classroom not in DB")
 def step_impl_10(context):
   context.url = f'{API_URL}/student/exists_in_classroom_not_in_db'
@@ -73,7 +73,7 @@ def step_impl_10(context):
 
 @behave.when("API request is sent to get the list of students")
 def step_impl_11(context):
-  resp = requests.delete(context.url, headers=context.header)
+  resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
@@ -93,7 +93,7 @@ def step_impl_13(context):
 
 @behave.when("API request is sent to fetch the list of students records")
 def step_impl_14(context):
-  resp = requests.delete(context.url, headers=context.header)
+  resp = requests.get(context.url, headers=context.header)
   context.status = resp.status_code
   context.response = resp.json()
 
