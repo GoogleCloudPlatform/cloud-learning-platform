@@ -13,19 +13,17 @@ spec:
         app: learning-object-service
     spec:
       serviceAccountName: ksa
-      # TODO: un-comment the below steps while updating workflows
-      # if signurl is created
-      # volumes:
-      #   - name: signurl-sa-key
-      #     secret:
-      #       secretName: signurl-sa-key
+      volumes:
+        - name: signurl-sa-key
+          secret:
+            secretName: signurl-sa-key
       containers:
       - name: learning-object-service
         image: learning-object-service
-        # volumeMounts:
-        #   - mountPath: /opt/keys
-        #     name: signurl-sa-key
-        #     readOnly: true
+        volumeMounts:
+          - mountPath: /opt/keys
+            name: signurl-sa-key
+            readOnly: true
         imagePullPolicy: IfNotPresent
         resources:
           requests:

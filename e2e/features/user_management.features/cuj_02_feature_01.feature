@@ -73,6 +73,7 @@ Feature: CRUD for managing UserGroup in user management
             When API request is sent to search UserGroup by providing invalid name
                 Then An empty list would be returned for the search
 
+    @filter-api
     Scenario: Retrieve Users that can be added to UserGroup
         Given A user has access to User management and needs to retrieve users that can be added to a UserGroup
             When API request is sent to fetch users by providing valid UserGroup uuid

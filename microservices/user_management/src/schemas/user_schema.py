@@ -53,7 +53,7 @@ class FullUserDataModel(BasicUserModel):
   user_id: str
   created_time: str
   last_modified_time: str
-  user_type_ref: Optional[str]
+  user_type_ref: str
   inspace_user: Optional[InspaceUserModel]
   # FIXME: remove optional after all docs get this field
   is_deleted: Optional[bool] = False
