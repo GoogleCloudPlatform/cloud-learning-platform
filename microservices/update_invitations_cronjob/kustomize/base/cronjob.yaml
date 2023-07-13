@@ -17,7 +17,7 @@ kind: CronJob
 metadata:
   name: update-invitations-cronjob
 spec:
-  schedule: "*/30 * * * *"
+  schedule: "0,30 * * * *"
   jobTemplate:
     spec:
       template:
