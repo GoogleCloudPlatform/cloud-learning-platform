@@ -70,11 +70,23 @@ requires:
 - path: ./microservices/learning_object_service
   configs: [learning-object-service]
 
+- path: ./microservices/dashboard
+  configs: [dashboard]
+
 - path: ./microservices/assessment_service
   configs: [assessment-service]
 
 - path: ./microservices/delete_sections_cronjob
   configs: [delete-sections-cronjob]
+
+- path: ./microservices/utils
+  configs: [utils]
+
+- path: ./microservices/credential_pathway_service
+  configs: [credential-pathway-service]
+
+- path: ./microservices/prior_learning_assessment
+  configs: [prior-learning-assessment]
 
 build:
   googleCloudBuild: {}

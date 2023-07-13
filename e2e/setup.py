@@ -15,10 +15,12 @@ from e2e.test_config import (API_URL_LEARNING_RECORD_SERVICE,
                          API_URL_AUTHENTICATION_SERVICE)
 from common.models import User, Verb, Agent, UserGroup
 from common.utils.collection_references import collection_references
+from common.utils.gcs_adapter import (is_valid_path,
+                                        delete_file_from_gcs)
 
 GCP_BUCKET = os.environ.get("GCP_PROJECT")
 CONTENT_SERVING_BUCKET = os.environ.get("CONTENT_SERVING_BUCKET",
-                                        "content-serving-bucket")
+                          "core-learning-services-dev-content-serving-bucket")
 
 UUID = uuid.uuid4()
 
@@ -403,3 +405,13 @@ def create_immutable_user_groups(user_group_name):
     assert immutable_group.get("is_immutable") is True
     user_group_id = immutable_group.get("uuid")
   return user_group_id
+
+
+def delete_test_files_from_gcs(files_to_delete):
+  for file_path in files_to_delete:
+    if is_valid_path(f"gs://{CONTENT_SERVING_BUCKET}/{file_path}"):
+      delete_file_from_gcs(
+        bucket_name=CONTENT_SERVING_BUCKET,
+        src_path=file_path)
+    else:
+      print(f"file {file_path} was not found. Hence cannot be deleted")

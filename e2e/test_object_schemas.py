@@ -1696,3 +1696,145 @@ SKIP_PRETEST_RULE = ["skipped"]
 VALID_VERBS = STARTED_RULE_VERBS + COMPLETED_RULE_VERBS\
     + RESUMED_RULE_VERBS + SUBMITTED_RULE_VERBS + NON_EVALUATED_RULE_VERBS\
     + EVALUATION_STARTED_RULE_VERBS + SKIP_PRETEST_RULE + EVALUATED_RULE_VERBS
+
+
+BASIC_HUMAN_GRADED_ASSESSMENT_EXAMPLE = {
+  "name": "Assessment 1",
+  "type": "practice",
+  "order": 1,
+  "author_id": "author_id",
+  "instructor_id": "instructor_id",
+  "assessor_id": "assessor_id",
+  "assessment_reference": {},
+  "max_attempts": 3,
+  "pass_threshold": 0.7,
+  "achievements": [],
+  "alignments": {},
+  "references": {},
+  "parent_nodes": {"assessments":[]},
+  "child_nodes": {
+  "rubrics":[
+  {"name": "Short name or label for the rubric.",
+    "description": "Full text description of the rubric.",
+    "author": "Author name",
+    "parent_nodes": {},
+    "evaluation_criteria": {},
+    "child_nodes": {
+    "rubric_criteria":[
+        {
+        "name": "Short name or label for the rubric criterion.",
+        "description": "Full text description of the rubric criterion.",
+        "author": "Author name",
+        "performance_indicators": [],
+        "parent_nodes": {"rubrics":[]}
+        }]}}],
+    },
+  "prerequisites": {},
+  "metadata": {},
+  "alias": "assessment"
+}
+
+UPDATE_HUMAN_GRADED_ASSESSMENT_EXAMPLE = {
+  "name": "Assessment 1",
+  "type": "practice",
+  "order": 1,
+  "author_id": "author_id",
+  "instructor_id": "instructor_id",
+  "assessor_id": "assessor_id",
+  "assessment_reference": {},
+  "max_attempts": 3,
+  "pass_threshold": 0.7,
+  "achievements": [],
+  "alignments": {},
+  "references": {},
+  "parent_nodes": {"assessments":[]},
+  "child_nodes": {
+  "rubrics":[
+  {
+    "name": "New name for rubric.",
+    "description": "Full text description of the rubric.",
+    "author": "Author name",
+    "evaluation_criteria":{},
+    "parent_nodes": {},
+    "child_nodes": {
+    "rubric_criteria":[
+    {
+    "name": "New name for rubric for the rubric criterion.",
+    "description": "Full text description of the rubric criterion.",
+    "author": "Author name",
+    "performance_indicators": [],
+    "parent_nodes": {"rubrics":[]}}
+    ]
+    }
+    },
+
+    {
+    "name": "New created rubric.",
+    "description": "Full text description of the rubric.",
+    "author": "Author name",
+    "evaluation_criteria":{},
+    "parent_nodes": {},
+    "child_nodes": {
+    "rubric_criteria":[
+    {
+    "name": "New created rubric criterion.",
+    "description": "Full text description of the rubric criterion.",
+    "author": "Author name",
+    "performance_indicators": [],
+    "parent_nodes": {"rubrics":[]}}
+    ]
+    }
+    }
+
+    ]
+    },
+  "prerequisites": {},
+  "metadata": {},
+  "alias": "assessment",
+  "resource_paths": ["resource paths"]
+}
+
+TEST_RUBRIC = {
+    "name": "Test Rubric",
+    "description": "Test Rubric Description",
+    "author": "",
+    "evaluation_criteria": {
+        "0": "Exemplary",
+        "1": "Proficient",
+        "2": "Needs Improvement",
+        "3": "Not Evident"
+    },
+    "parent_nodes": {},
+    "child_nodes": {}
+}
+
+TEST_RUBRIC_CRITERION = {
+    "name": "Test Rubric Criterion",
+    "description": "Test Rubric Criterion Description",
+    "author": "Author name",
+    "parent_nodes": {}
+}
+
+TEST_INAPP_NOTIFICATION = {
+  "header": "simple notification",
+  "content": "notification description",
+  "notification_type": "nudge",
+  "action_fields": None,
+  "recipient_id": "44qxEpc35pVMb6AkGfd"
+}
+
+BASIC_NOTIFICATION_RULES_MODEL_EXAMPLE = {
+    "name": "notification rule",
+    "description": "notification rule description",
+    "rule_status": "active",
+    "communication_type": ["inapp-notification", "email"],
+    "recipients": ["user1"],
+    "allow_is_read": True,
+    "trigger": [],
+    "notification_settings": {},
+    "email_settings": {},
+    "frequency": None,
+    "settings_id": None,
+    "start_delivery_time": None,
+    "end_delivery_time": None
+}

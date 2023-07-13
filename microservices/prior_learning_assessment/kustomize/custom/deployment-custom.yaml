@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prior-learning-assessment
+spec:
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: prior-learning-assessment
+        image: prior-learning-assessment
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "500Mi"
+        env:
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX

@@ -17,7 +17,7 @@ class ParentChildNodesHandler():
     for collection_name, document_id_list in child_nodes_dict.items():
       for list_index, child_node_document_id in enumerate(document_id_list):
         collection = collection_references[collection_name]
-        document = collection.find_by_id(child_node_document_id)
+        document = collection.find_by_uuid(child_node_document_id)
         child_document_fields = document.get_fields(reformat_datetime=True)
         document_id_list[list_index] = cls.load_child_nodes_data(
             child_document_fields)
@@ -45,7 +45,7 @@ class ParentChildNodesHandler():
         child_nodes_list = child_nodes_dict
         for list_index, child_node_document_id in enumerate(child_nodes_list):
           collection = collection_references[field_name]
-          document = collection.find_by_id(child_node_document_id)
+          document = collection.find_by_uuid(child_node_document_id)
           child_document_fields = document.get_fields(reformat_datetime=True)
           child_nodes_list[list_index] = cls.load_nodes_data(
               child_document_fields,
@@ -57,7 +57,7 @@ class ParentChildNodesHandler():
         for collection_name, document_id_list in child_nodes_dict.items():
           for list_index, child_node_document_id in enumerate(document_id_list):
             collection = collection_references[collection_name]
-            document = collection.find_by_id(child_node_document_id)
+            document = collection.find_by_uuid(child_node_document_id)
             child_document_fields = document.get_fields(reformat_datetime=True)
             child_document_fields = cls.update_hierarchy_with_profile_data(
                 learner_profile, child_document_fields, collection_name,
@@ -238,7 +238,7 @@ class ParentChildNodesHandler():
     for collection_name, document_id_list in child_nodes_dict.items():
       for list_index, child_node_document_id in enumerate(document_id_list):
         collection = collection_references[collection_name]
-        document = collection.find_by_id(child_node_document_id)
+        document = collection.find_by_uuid(child_node_document_id)
         child_document_fields = document.get_fields(reformat_datetime=True)
         document_id_list[list_index] = cls.load_child_nodes_data(
             child_document_fields)
@@ -255,7 +255,7 @@ class ParentChildNodesHandler():
     for collection_type, document_id_list in parent_nodes_dict.items():
       for list_index, each_document_id in enumerate(document_id_list):
         collection = collection_references[collection_type]
-        parent_document = collection.find_by_id(each_document_id)
+        parent_document = collection.find_by_uuid(each_document_id)
         parent_document_fields = parent_document.get_fields(
             reformat_datetime=True)
         parent_document_fields = cls.update_hierarchy_with_profile_data(
@@ -274,14 +274,14 @@ class ParentChildNodesHandler():
       for collection_type, document_id_list in child_nodes_dict.items():
         for each_document_id in document_id_list:
           collection = collection_references[collection_type]
-          collection.find_by_id(each_document_id)
+          collection.find_by_uuid(each_document_id)
 
     parent_nodes_dict = cls.get_parent_nodes(input_dict)
     if parent_nodes_dict is not None:
       for collection_type, document_id_list in parent_nodes_dict.items():
         for each_document_id in document_id_list:
           collection = collection_references[collection_type]
-          collection.find_by_id(each_document_id)
+          collection.find_by_uuid(each_document_id)
 
   @classmethod
   def update_child_references(cls, document_fields, collection,
@@ -294,7 +294,7 @@ class ParentChildNodesHandler():
     for collection_type, document_id_list in child_nodes_dict.items():
       for each_document_id in document_id_list:
         collection = collection_references[collection_type]
-        child_document = collection.find_by_id(each_document_id)
+        child_document = collection.find_by_uuid(each_document_id)
 
         if operation == "add":
           if document_fields.get(
@@ -320,7 +320,7 @@ class ParentChildNodesHandler():
     for collection_type, document_id_list in parent_nodes_dict.items():
       for each_document_id in document_id_list:
         collection = collection_references[collection_type]
-        parent_document = collection.find_by_id(each_document_id)
+        parent_document = collection.find_by_uuid(each_document_id)
         if operation == "add":
           if document_fields.get(
               "uuid") not in parent_document.child_nodes[collection_name]:
@@ -354,7 +354,7 @@ class ParentChildNodesHandler():
         if child_nodes_dict and each_document_id not in child_nodes_dict.get(
           collection_type):
           collection = collection_references[collection_type]
-          child_document = collection.find_by_id(each_document_id)
+          child_document = collection.find_by_uuid(each_document_id)
 
           if operation == "add":
             if doc_dict.get(
@@ -388,7 +388,7 @@ class ParentChildNodesHandler():
         if parent_nodes_dict and each_document_id not in parent_nodes_dict.get(
           collection_type):
           collection = collection_references[collection_type]
-          parent_document = collection.find_by_id(each_document_id)
+          parent_document = collection.find_by_uuid(each_document_id)
 
           if operation == "add":
             if doc_dict.get(
@@ -519,17 +519,17 @@ class ParentChildNodesHandler():
       # this flags specifies whether cognitive wrapper is unlocked
       # Ticket 4928
       if collection_type == "learning_resources" and node_dict["order"] == 1:
-        node = collection_references["learning_resources"].find_by_id(doc_id)
+        node = collection_references["learning_resources"].find_by_uuid(doc_id)
         module = collection_references["learning_objects"]\
-          .find_by_id(node.parent_nodes["learning_objects"][0])
+          .find_by_uuid(node.parent_nodes["learning_objects"][0])
         if module.type == "project":
           cw_is_locked = True
-          unit = collection_references["learning_experiences"].find_by_id(
+          unit = collection_references["learning_experiences"].find_by_uuid(
             module.parent_nodes["learning_experiences"][0])
           modules = unit.child_nodes
           for level in modules:
             for module_id in modules[level][::-1]:
-              neighbor = collection_references["learning_objects"].find_by_id(
+              neighbor = collection_references["learning_objects"].find_by_uuid(
                 module_id)
               if neighbor.type == "cognitive_wrapper":
                 cw_is_locked = learner_profile.progress.get("learning_objects",
@@ -577,6 +577,6 @@ class ParentChildNodesHandler():
   @classmethod
   def get_document_from_collection(cls, collection_type, doc_id):
     collection = collection_references[collection_type]
-    document = collection.find_by_id(doc_id)
+    document = collection.find_by_uuid(doc_id)
     child_document_fields = document.get_fields(reformat_datetime=True)
     return child_document_fields
