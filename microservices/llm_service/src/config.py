@@ -104,15 +104,6 @@ if COHERE_API_KEY is None:
       }).payload.data.decode("utf-8")
   COHERE_API_KEY = COHERE_API_KEY.strip()
 
-def load_google_access_token():
-  google_access_token = secrets.access_secret_version(
-      request={
-          "name": "projects/" + PROJECT_ID +
-                  "/secrets/google-api-access-token/versions/latest"
-      }).payload.data.decode("utf-8")
-  google_access_token = google_access_token.strip()
-  return google_access_token
-
 OPENAI_LLM_TYPE_GPT3_5 = "OpenAI-GPT3.5"
 OPENAI_LLM_TYPE_GPT4 = "OpenAI-GPT4"
 COHERE_LLM_TYPE = "Cohere"
@@ -126,7 +117,8 @@ COHERE_LLM_TYPES = [COHERE_LLM_TYPE]
 GOOGLE_LLM_TYPES = [VERTEX_LLM_TYPE_BISON_TEXT, VERTEX_LLM_TYPE_BISON_CHAT]
 
 # these LLMs are trained as chat models
-CHAT_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, OPENAI_LLM_TYPE_GPT4, VERTEX_LLM_TYPE_BISON_CHAT]
+CHAT_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, OPENAI_LLM_TYPE_GPT4,
+                  VERTEX_LLM_TYPE_BISON_CHAT]
 
 if ENABLE_OPENAI_LLM:
   LLM_TYPES.extend(OPENAI_LLM_TYPES)
