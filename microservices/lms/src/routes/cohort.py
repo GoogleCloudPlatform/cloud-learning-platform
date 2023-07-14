@@ -2,7 +2,6 @@
 import traceback
 import datetime
 from fastapi import APIRouter, Request
-from services import student_service
 from common.models import Cohort, CourseTemplate,CourseEnrollmentMapping
 from common.models.section import Section
 from common.utils.logging_handler import Logger
@@ -303,7 +302,7 @@ def get_progress_percentage(cohort_id: str, user: str, request: Request):
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
-    user_id = student_service.get_user_id(user=user.strip(), headers=headers)
+    user_id = get_user_id(user=user.strip(), headers=headers)
     Logger.info(f"user id : {user_id}")
     section_with_progress_percentage = []
     cached_progress_percentage = get_key(f"{cohort_id}::{user_id}")
@@ -374,7 +373,7 @@ def get_progress_percentage_not_turned_in(\
   """
   try:
     headers = {"Authorization": request.headers.get("Authorization")}
-    user_id = student_service.get_user_id(user=user.strip(), headers=headers)
+    user_id = get_user_id(user=user.strip(), headers=headers)
     section_with_progress_percentage = []
     cached_progress_percentage = get_key(\
     f"not_turned_in::{cohort_id}::{user_id}")

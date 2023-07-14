@@ -370,12 +370,12 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
         student_email=input_data.email,
         course_id=section.classroom_id,
         course_code=section.classroom_code)
-    cohort = section.cohort
-    cohort.enrolled_students_count += 1
-    cohort.update()
-    section.enrolled_students_count += 1
-    section.update()
-
+    latest_section = Section.find_by_id(section.id)
+    latest_cohort = latest_section.cohort
+    latest_cohort.enrolled_students_count += 1
+    latest_cohort.update()
+    latest_section.enrolled_students_count += 1
+    latest_section.update()
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = User.find_by_user_id(
@@ -423,6 +423,9 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
       raise ClassroomHttpException(status_code=ae.resp.status,
                                    message="Can't enroll student to classroom,\
   Please check organizations policy or authentication scopes") from ae
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -457,7 +460,7 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
       raise ValidationError("Cohort Max count reached hence student cannot" +
             "be erolled in this cohort")
     if section.enrolled_students_count >= section.max_students:
-      raise ValidationError("Cohort Max count reached hence student cannot" +
+      raise ValidationError("Section Max count reached hence student cannot" +
             "be erolled in this cohort")
     sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
@@ -474,12 +477,12 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
         student_email=input_data.email,
         course_id=section.classroom_id,
         course_code=section.classroom_code)
-    cohort = section.cohort
-    cohort.enrolled_students_count += 1
-    cohort.update()
-    section.enrolled_students_count += 1
-    section.update()
-
+    latest_section = Section.find_by_id(section.id)
+    latest_cohort = latest_section.cohort
+    latest_cohort.enrolled_students_count += 1
+    latest_cohort.update()
+    latest_section.enrolled_students_count += 1
+    latest_section.update()
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = User.find_by_user_id(
@@ -561,6 +564,9 @@ def invite_student(section_id: str, student_email: str, request: Request):
     if cohort.enrolled_students_count >= cohort.max_students:
       raise Conflict("Cohort Max count reached hence student cannot" +
                      " be erolled in this cohort")
+    if section.enrolled_students_count >= section.max_students:
+      raise ValidationError("Section Max count reached hence student cannot" +
+            "be erolled in this cohort")
     sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
     if not student_service.check_student_can_enroll_in_cohort(
@@ -568,11 +574,13 @@ def invite_student(section_id: str, student_email: str, request: Request):
       raise Conflict(f"User {student_email} is already\
                       registered for cohort {section.cohort.id}")
     invitation_details = student_service.invite_student(
-        section=section, student_email=student_email, headers=headers)
-    section.enrolled_students_count +=1
-    section.update()
-    cohort.enrolled_students_count +=1
-    cohort.update()
+    section=section, student_email=student_email, headers=headers)
+    latest_section = Section.find_by_id(section.id)
+    latest_cohort = latest_section.cohort
+    latest_cohort.enrolled_students_count += 1
+    latest_cohort.update()
+    latest_section.enrolled_students_count += 1
+    latest_section.update()
     return {
         "message":
         f"Successfully Added the Student with email {student_email}",
@@ -639,10 +647,12 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     headers = {"Authorization": request.headers.get("Authorization")}
     invitation_details = student_service.invite_student(
         section=section, student_email=student_email, headers=headers)
-    section.enrolled_students_count +=1
-    section.update()
-    cohort.enrolled_students_count +=1
-    cohort.update()
+    latest_section = Section.find_by_id(section.id)
+    latest_cohort = latest_section.cohort
+    latest_cohort.enrolled_students_count += 1
+    latest_cohort.update()
+    latest_section.enrolled_students_count += 1
+    latest_section.update()
     return {
         "message":
   f"Successfully Added the Student with email {student_email}",
