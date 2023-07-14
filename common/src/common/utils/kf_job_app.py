@@ -41,10 +41,12 @@ from common.utils.config import (JOB_TYPES_WITH_PREDETERMINED_TITLES,
 # Set logging
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-# Setup K8 configs
-config.load_incluster_config()
-configuration = client.Configuration()
-api_instance = client.BatchV1Api(client.ApiClient(configuration))
+# Setup K8 configs (if running in a pod)
+if os.getenv('KUBERNETES_SERVICE_HOST'):
+  config.load_incluster_config()
+  configuration = client.Configuration()
+  api_instance = client.BatchV1Api(client.ApiClient(configuration))
+
 
 def kube_delete_empty_pods(namespace="default"):
   """
