@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-  Jobs Microservice
+  Jobs Monitoring Microservice
 """
 # pylint: disable=pointless-string-statement
 # pylint: disable=wrong-import-position

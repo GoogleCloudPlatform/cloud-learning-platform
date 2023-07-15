@@ -30,9 +30,6 @@ spec:
       - name: jobs-service
         image: jobs-service
         imagePullPolicy: IfNotPresent
-        envFrom:
-        - configMapRef:
-            name: env-vars
         resources:
           requests:
             cpu: "250m"
@@ -60,3 +57,16 @@ spec:
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 10
+        env:
+        # Define the environment variable
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: CONTAINER_NAME
+          value: jobs-service
+        - name: DEPLOYMENT_NAME
+          value: jobs-service
+        - name: SERVICE_NAME
+          value: jobs-service

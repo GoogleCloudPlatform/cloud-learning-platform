@@ -16,10 +16,34 @@
   Jobs Service config file
 """
 # pylint: disable=unspecified-encoding,line-too-long
+import os
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
                                   ValidationErrorResponseModel)
+from common.utils.logging_handler import Logger
 from common.utils.config import JOB_TYPES_WITH_PREDETERMINED_TITLES
+
+PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
+PROJECT_ID = os.environ.get("PROJECT_ID", "cloud-learning-services-dev")
+os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
+GCP_PROJECT = PROJECT_ID
+DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
+REGION = os.getenv("REGION", "us-central1")
+
+CONTAINER_NAME = os.getenv("CONTAINER_NAME")
+DEPLOYMENT_NAME = os.getenv("DEPLOYMENT_NAME")
+API_BASE_URL = os.getenv("API_BASE_URL")
+SERVICE_NAME = os.getenv("SERVICE_NAME")
+
+try:
+  with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace","r",
+            encoding="utf-8",errors="ignore") as \
+    ns_file:
+    namespace = ns_file.readline()
+    JOB_NAMESPACE = namespace
+except FileNotFoundError as e:
+  JOB_NAMESPACE = "default"
+  Logger.info("Namespace File not found, setting job namespace as default")
 
 JOB_TYPES = JOB_TYPES_WITH_PREDETERMINED_TITLES
 
