@@ -16,12 +16,12 @@
 """Entry point for batch job"""
 import json
 from absl import flags, app
+from common.utils.config import JOB_TYPE_QUERY_ENGINE_BUILD
 from common.utils.logging_handler import Logger
 from common.utils.kf_job_app import kube_delete_job
 from common.models.batch_job import BatchJobModel
 from services.query_service import batch_build_query_engine
-
-from config import JOB_NAMESPACE, QUERY_ENGINE_BUILD_JOB_TYPE
+from config import JOB_NAMESPACE
 
 # pylint: disable=broad-exception-raised
 
@@ -39,7 +39,7 @@ def main(argv):
     job.status = "active"
     job.update()
     request_body = json.loads(job.input_data)
-    if job.type == QUERY_ENGINE_BUILD_JOB_TYPE:
+    if job.type == JOB_TYPE_QUERY_ENGINE_BUILD:
       _ = batch_build_query_engine(request_body, job)
     else:
       raise Exception("Invalid job type")
