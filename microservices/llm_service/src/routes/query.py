@@ -170,10 +170,13 @@ def update_query(query_id: str, input_query: UserQueryUpdateModel):
     NotFoundErrorResponseModel if the user query not found,
     InternalServerErrorResponseModel if the update raises an exception
   """
+  existing_query = UserQuery.find_by_id(query_id)
+  if existing_query is None:
+    raise ResourceNotFoundException(f"Query {query_id} not found")
+
   try:
     input_query_dict = {**input_query.dict()}
 
-    existing_query = UserQuery.find_by_id(query_id)
     for key in input_query_dict:
       if input_query_dict.get(key) is not None:
         setattr(existing_query, key, input_query_dict.get(key))
@@ -191,7 +194,7 @@ def update_query(query_id: str, input_query: UserQueryUpdateModel):
 
 
 @router.post(
-    "",
+    "/engine",
     name="Create a query engine",
     response_model=BatchJobModel)
 async def query_engine_create(gen_config: LLMQueryEngineModel,
@@ -216,6 +219,8 @@ async def query_engine_create(gen_config: LLMQueryEngineModel,
   if query_engine is None or query_engine == "":
     return BadRequest("Missing or invalid payload parameters: query_engine")
 
+  is_public = genconfig_dict.get("is_public", True)
+  
   user_id = user_data.get("user_id")
 
   try:
@@ -223,7 +228,7 @@ async def query_engine_create(gen_config: LLMQueryEngineModel,
       "doc_url": doc_url,
       "query_engine": query_engine,
       "user_id": user_id,
-      "is_public": genconfig_dict.get("is_public", True),
+      "is_public": is_public,
       "llm_type": genconfig_dict.get("llm_type", DEFAULT_QUERY_CHAT_MODEL)
     }
     env_vars = {"DATABASE_PREFIX": DATABASE_PREFIX}
@@ -252,6 +257,10 @@ async def query(query_engine_id: str,
   Returns:
       LLMQueryResponse
   """
+  q_engine = QueryEngine.find_by_id(query_engine_id)
+  if q_engine is None:
+    raise ResourceNotFoundException(f"Engine {query_engine_id} not found")
+
   genconfig_dict = {**gen_config.dict()}
 
   prompt = genconfig_dict.get("prompt")
@@ -262,13 +271,15 @@ async def query(query_engine_id: str,
     return PayloadTooLargeError(
       f"Prompt must be less than {PAYLOAD_FILE_SIZE}")
 
-  q_engine = QueryEngine.find_by_id(query_engine_id)
+  llm_type = genconfig_dict.get("llm_type")
+  if llm_type is None or llm_type == "":
+    llm_type = DEFAULT_QUERY_CHAT_MODEL
 
   user = User.find_by_email(user_data.get("email"))
 
   try:
     query_result, query_references = await query_generate(user.id, prompt,
-                                                          q_engine)
+                                                          q_engine, llm_type)
     return {
         "success": True,
         "message": "Successfully generated text",
@@ -292,11 +303,16 @@ async def query_continue(user_query_id: str, gen_config: LLMQueryModel):
   Send a query to a query engine with a prior user query as context
 
   Args:
-      LLMUserQueryModel
+      user_query_id: id of previous user query
+      LLMQueryModel
 
   Returns:
       LLMQueryResponse
   """
+  user_query = UserQuery.find_by_id(user_query_id)
+  if user_query is None:
+    raise ResourceNotFoundException(f"Query {user_query_id} not found")
+
   genconfig_dict = {**gen_config.dict()}
 
   prompt = genconfig_dict.get("prompt")
@@ -307,12 +323,16 @@ async def query_continue(user_query_id: str, gen_config: LLMQueryModel):
     return PayloadTooLargeError(
       f"Prompt must be less than {PAYLOAD_FILE_SIZE}")
 
+  llm_type = genconfig_dict.get("llm_type")
+  if llm_type is None or llm_type == "":
+    llm_type = DEFAULT_QUERY_CHAT_MODEL
+
   try:
-    user_query = UserQuery.find_by_id(user_query_id)
     q_engine = QueryEngine.find_by_id(user_query.query_engine_id)
 
     query_result, query_references = await query_generate(user_query.user_id,
-                                                          prompt, q_engine)
+                                                          prompt, q_engine, llm_type, 
+                                                          user_query)
     return {
         "success": True,
         "message": "Successfully generated text",

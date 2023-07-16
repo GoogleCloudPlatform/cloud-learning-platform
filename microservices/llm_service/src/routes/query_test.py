@@ -24,6 +24,7 @@ from fastapi.testclient import TestClient
 from unittest import mock
 from testing.test_config import API_URL, TESTING_FOLDER_PATH
 from schemas.schema_examples import (LLM_GENERATE_EXAMPLE, QUERY_EXAMPLE,
+                                     USER_QUERY_EXAMPLE,
                                      USER_EXAMPLE, QUERY_ENGINE_EXAMPLE,
                                      QUERY_RESULT_EXAMPLE)
 from common.models import UserQuery, QueryResult, QueryEngine, User
@@ -85,15 +86,13 @@ FAKE_QUERY_ENGINE_BUILD = {
   "is_public": True
 }
 
-FAKE_REFERENCES = QUERY_EXAMPLE["history"][1]["AIReferences"]
+FAKE_REFERENCES = USER_QUERY_EXAMPLE["history"][1]["AIReferences"]
 
 FAKE_GENERATE_RESPONSE = "test generation"
 
 FAKE_QUERY_RESPONSE = (QUERY_RESULT_EXAMPLE, FAKE_REFERENCES)
 
-FAKE_QUERY_PARAMS = {
-    "prompt": "test prompt"
-}
+FAKE_QUERY_PARAMS = QUERY_EXAMPLE
 
 
 @pytest.fixture
@@ -123,8 +122,8 @@ def create_engine(client_with_emulator):
   q_engine.save()
 
 @pytest.fixture
-def create_query(client_with_emulator):
-  query_dict = QUERY_EXAMPLE
+def create_user_query(client_with_emulator):
+  query_dict = USER_QUERY_EXAMPLE
   query = UserQuery.from_dict(query_dict)
   query.save()
 
@@ -145,7 +144,7 @@ def test_get_query_engine_list(create_engine, client_with_emulator):
 
 
 def test_create_query_engine(create_user, client_with_emulator):
-  url = f"{api_url}"
+  url = f"{api_url}/engine"
   params = FAKE_QUERY_ENGINE_BUILD
   with mock.patch("routes.query.initiate_batch_job",
                   return_value = FAKE_QE_BUILD_RESPONSE):
@@ -177,9 +176,9 @@ def test_query(create_user, create_engine,
     "returned query references"
 
 
-def test_query_generate(create_user, create_engine, create_query,
+def test_query_generate(create_user, create_engine, create_user_query,
                         create_query_result, client_with_emulator):
-  queryid = QUERY_EXAMPLE["id"]
+  queryid = USER_QUERY_EXAMPLE["id"]
 
   url = f"{api_url}/{queryid}"
 
@@ -198,18 +197,19 @@ def test_query_generate(create_user, create_engine, create_query,
     "returned query references"
 
 
-def test_get_query(create_user, create_engine, create_query, client_with_emulator):
-  queryid = QUERY_EXAMPLE["id"]
+def test_get_query(create_user, create_engine, create_user_query,
+                   client_with_emulator):
+  queryid = USER_QUERY_EXAMPLE["id"]
   url = f"{api_url}/{queryid}"
   resp = client_with_emulator.get(url)
   json_response = resp.json()
 
   assert resp.status_code == 200, "Status 200"
   saved_id = json_response.get("data").get("id")
-  assert QUERY_EXAMPLE["id"] == saved_id, "all data not retrieved"
+  assert USER_QUERY_EXAMPLE["id"] == saved_id, "all data not retrieved"
 
 
-def test_get_queries(create_user, create_query, client_with_emulator):
+def test_get_queries(create_user, create_user_query, client_with_emulator):
   userid = USER_EXAMPLE["id"]
   url = f"{api_url}/user/{userid}"
   resp = client_with_emulator.get(url)
@@ -217,4 +217,4 @@ def test_get_queries(create_user, create_query, client_with_emulator):
 
   assert resp.status_code == 200, "Status 200"
   saved_ids = [i.get("id") for i in json_response.get("data")]
-  assert QUERY_EXAMPLE["id"] in saved_ids, "all data not retrieved"
+  assert USER_QUERY_EXAMPLE["id"] in saved_ids, "all data not retrieved"

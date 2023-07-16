@@ -44,7 +44,8 @@ from pypdf import PdfReader
 from services import llm_generate
 from services import query_prompts
 
-from config import PROJECT_ID, DEFAULT_QUERY_CHAT_MODEL, REGION
+from config import (PROJECT_ID, DEFAULT_QUERY_CHAT_MODEL, 
+                    DEFAULT_QUERY_EMBEDDING_MODEL, GOOGLE_LLM, REGION)
 
 # number of text chunks to process into an embeddings file
 MAX_NUM_TEXT_CHUNK_PROCESS = 1000
@@ -68,6 +69,7 @@ async def query_generate(
             user_id: str,
             prompt: str,
             q_engine: QueryEngine,
+            llm_type: Optional[str] = DEFAULT_QUERY_CHAT_MODEL,
             user_query: Optional[UserQuery] = None) -> \
                 Tuple[QueryResult, List[QueryReference]]:
   """
@@ -77,6 +79,8 @@ async def query_generate(
     prompt: the text prompt to pass to the query engine
 
     query_engine: the name of the query engine to use
+
+    llm_type (optional): chat model to use for query
 
     user_query (optional): an existing user query for context
 
@@ -93,8 +97,7 @@ async def query_generate(
   question_prompt = query_prompts.question_prompt(prompt, query_references)
 
   # send question prompt to model
-  question_response = await llm_generate.llm_chat(
-      question_prompt, q_engine.llm_type)
+  question_response = await llm_generate.llm_chat(question_prompt, llm_type)
 
   # save query result
   query_ref_ids = []
@@ -177,9 +180,11 @@ def batch_build_query_engine(request_body: Dict, job: BatchJobModel) -> Dict:
   doc_url = request_body.get("doc_url")
   query_engine = request_body.get("query_engine")
   user_id = request_body.get("user_id")
+  is_public = request_body.get("is_public")
+  llm_type = request_body.get("llm_type")
 
   q_engine, docs_processed, docs_not_processed = \
-      query_engine_build(doc_url, query_engine, user_id, request_body)
+      query_engine_build(doc_url, query_engine, user_id, is_public, llm_type)
 
   # update result data in batch job model
   result_data = {
@@ -193,18 +198,23 @@ def batch_build_query_engine(request_body: Dict, job: BatchJobModel) -> Dict:
   return result_data
 
 def query_engine_build(doc_url: str, query_engine: str, user_id: str,
-                       params: Dict) -> \
+                       is_public: Optional[bool] = True, 
+                       llm_type: Optional[str] = "") -> \
                        Tuple[str, List[QueryDocument], List[str]]:
   """
-  Build a new query engine.
+  Build a new query engine. NOTE currently supports only Vertex
+   TextEmbeddingModel for embeddings.
 
   Args:
     doc_url: the URL to the set of documents to be indexed
 
     query_engine: the name of the query engine to create
 
-    params: query engine params dict, specifying
-            user_id, is_public
+    user_id: user id of engine creator
+
+    is_public: is query engine publically usable?
+
+    llm_type: LLM used for query embeddings (currently not used)
 
   Returns:
     Tuple of QueryEngine id, list of QueryDocument objects of docs processed,
@@ -218,8 +228,7 @@ def query_engine_build(doc_url: str, query_engine: str, user_id: str,
     raise ValidationError(f"Query engine {query_engine} already exists")
 
   # create model
-  is_public = params.get("is_public", True)
-  llm_type = params.get("llm_type", DEFAULT_QUERY_CHAT_MODEL)
+  llm_type = DEFAULT_QUERY_EMBEDDING_MODEL
   q_engine = QueryEngine(name=query_engine,
                          created_by=user_id,
                          llm_type=llm_type,
@@ -487,7 +496,8 @@ def _read_doc(doc_name:str, doc_filepath: str) -> List[str]:
 def _encode_texts_to_embeddings(
     sentence_list: List[str]) -> List[Optional[List[float]]]:
   """ encode text using Vertex AI embedding model """
-  model = TextEmbeddingModel.from_pretrained("textembedding-gecko@001")
+  model = TextEmbeddingModel.from_pretrained(
+      GOOGLE_LLM.get(DEFAULT_QUERY_EMBEDDING_MODEL))
   try:
     embeddings = model.get_embeddings(sentence_list)
     return [embedding.values for embedding in embeddings]

@@ -16,5 +16,5 @@ if __name__ == "__main__":
   print(f"*** building query index for {doc_url}, query_engine {query_engine}, for user id {user_id}")
   
   params = {}
-  query_engine_build(doc_url, query_engine, user_id, params)
+  query_engine_build(doc_url, query_engine, user_id)
   

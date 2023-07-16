@@ -87,6 +87,7 @@ class LLMGenerateModel(BaseModel):
 class LLMQueryModel(BaseModel):
   """LLM Query model"""
   prompt: str
+  llm_type: Optional[str]
 
   class Config():
     orm_mode = True

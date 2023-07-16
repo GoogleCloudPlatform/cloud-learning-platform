@@ -19,10 +19,15 @@ LLM_GENERATE_EXAMPLE = {
   "llm_type": "",
   "prompt": "",
   "context": "",
-  "primer":  "",
+  "primer":  ""
 }
 
 QUERY_EXAMPLE = {
+  "prompt": "test prompt",
+  "llm_type": "VertexAI-Chat"
+}
+
+USER_QUERY_EXAMPLE = {
   "id": "asd98798as7dhjgkjsdfh",
   "user_id": "fake-user-id",
   "title": "Test query",
