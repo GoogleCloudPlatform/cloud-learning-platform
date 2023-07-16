@@ -33,7 +33,7 @@ logging.basicConfig(
 secrets = secretmanager.SecretManagerServiceClient()
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
-PROJECT_ID = os.environ.get("PROJECT_ID", "cloud-learning-services-dev")
+PROJECT_ID = os.environ.get("PROJECT_ID")
 os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
 GCP_PROJECT = PROJECT_ID
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
@@ -53,6 +53,9 @@ CONTAINER_NAME = os.getenv("CONTAINER_NAME")
 DEPLOYMENT_NAME = os.getenv("DEPLOYMENT_NAME")
 API_BASE_URL = os.getenv("API_BASE_URL")
 SERVICE_NAME = os.getenv("SERVICE_NAME")
+SKAFFOLD_NAMESPACE = os.getenv("SKAFFOLD_NAMESPACE")
+GKE_CLUSTER = os.getenv("GKE_CLUSTER")
+GCP_ZONE = os.getenv("GCP_ZONE")
 
 PAYLOAD_FILE_SIZE = 1024
 

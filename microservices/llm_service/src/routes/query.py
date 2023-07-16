@@ -325,5 +325,3 @@ async def query_continue(user_query_id: str, gen_config: LLMQueryModel):
     Logger.error(e)
     Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
-
-

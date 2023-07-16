@@ -57,6 +57,9 @@ spec:
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 10
+        envFrom:
+        - configMapRef:
+            name: env-vars
         env:
         # Define the environment variable
         - name: GCP_PROJECT

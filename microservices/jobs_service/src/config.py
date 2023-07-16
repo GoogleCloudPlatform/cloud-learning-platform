@@ -24,7 +24,7 @@ from common.utils.logging_handler import Logger
 from common.utils.config import JOB_TYPES_WITH_PREDETERMINED_TITLES
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
-PROJECT_ID = os.environ.get("PROJECT_ID", "cloud-learning-services-dev")
+PROJECT_ID = os.environ.get("PROJECT_ID")
 os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
 GCP_PROJECT = PROJECT_ID
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
