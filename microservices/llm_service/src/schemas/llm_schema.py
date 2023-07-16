@@ -100,8 +100,8 @@ class LLMQueryEngineModel(BaseModel):
   """LLM Query Engine model"""
   doc_url: str
   query_engine: str
-  llm_type: str
-  is_public: bool
+  llm_type: Optional[str]
+  is_public: Optional[bool]
 
   class Config():
     orm_mode = True
