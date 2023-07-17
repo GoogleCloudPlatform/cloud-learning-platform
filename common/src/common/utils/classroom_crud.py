@@ -850,6 +850,27 @@ def update_course_work(course_id, course_work_id, update_mask, updated_body):
   return data
 
 
+def update_course_work_material(course_id, course_work_material_id, update_mask,
+                                updated_body):
+  """update course work material by course id and course work id
+  Args:
+    course_id (str): Id of the course
+    course_work_material_id (str): Id of the course work to be deleted
+    update_mask (str): Fields(Concat multiple fields if any) to be updated in the coursework
+    updated_body(dict): Updated field object data
+  Returns:
+    dict: empty dict if success
+  """
+  service = service = build("classroom", "v1", credentials=get_credentials())
+  data = service.courses().courseWork().patch(
+      courseId=course_id,
+      id=course_work_material_id,
+      body=updated_body,
+      updateMask=update_mask).execute()
+  Logger.info(f"Updated course work material - {course_work_material_id} in course - {course_id}")
+  return data
+
+
 def post_grade_of_the_user(section_id: str,
                            course_work_id: str,
                            submission_id: str,
