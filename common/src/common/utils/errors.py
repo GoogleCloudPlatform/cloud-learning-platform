@@ -73,3 +73,11 @@ class PayloadTooLargeError(Exception):
   def __init__(self, message="Payload too large"):
     self.message = message
     super().__init__(self.message)
+
+
+class BatchJobError(Exception):
+  """Error class to be raised when an error occurs creating a batch job"""
+
+  def __init__(self, message="Batch job creation error"):
+    self.message = message
+    super().__init__(self.message)
