@@ -86,6 +86,8 @@ def step_impl_8(context):
     "Notifications will be enabled using unique course id and a response model object will be return"
 )
 def step_impl_9(context):
+  print(f'--------------Status: {context.status}--------------------')
+  print(f'--------------Data: {context.response}--------------------')
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 

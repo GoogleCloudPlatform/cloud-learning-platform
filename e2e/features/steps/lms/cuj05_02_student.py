@@ -1,8 +1,8 @@
-import uuid
 import behave
 import requests
 from e2e.test_config import API_URL
 from common.models import CourseEnrollmentMapping
+from environment import wait
 
 # ------------------------------Delete student to Section-------------------------------------
 
@@ -63,3 +63,45 @@ def step_impl_8(context):
 def step_impl_9(context):
   print(f"______DELETE USING EMAIL RESPONSE______:{context.response},{context.status}")
   assert context.status == 404, "Status 404"
+  
+# -----------------------------------------Student difference detailed report---------------------------------
+# ---exists in classrooom not in db-----------
+@behave.given("A user has access to portal and wants to fetch the list of students exists in Classroom not in DB")
+@wait(60)
+def step_impl_10(context):
+  context.url = f'{API_URL}/student/exists_in_classroom_not_in_db'
+
+
+@behave.when("API request is sent to get the list of students")
+def step_impl_11(context):
+  resp = requests.get(context.url, headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then("List of students details will be fetched from bq views")
+def step_impl_12(context):
+  print(f'--------------Status: {context.status}--------------------')
+  print(f'--------------Data: {context.response}--------------------')
+  assert context.status == 200, "Status 200"
+  assert context.response["data"] !=[]
+
+# ---exists in db not in classroom-----------
+@behave.given("A user has access to portal and wants to fetch the list of students exists in DB not in classroom")
+def step_impl_13(context):
+  context.url = f'{API_URL}/student/exists_in_db_not_in_classroom'
+
+
+@behave.when("API request is sent to fetch the list of students records")
+def step_impl_14(context):
+  resp = requests.get(context.url, headers=context.header)
+  context.status = resp.status_code
+  context.response = resp.json()
+
+
+@behave.then("List of student records will be fected from bq views")
+def step_impl_15(context):
+  print(f'--------------Status: {context.status}--------------------')
+  print(f'--------------Data: {context.response}--------------------')
+  assert context.status == 200, "Status 200"
+  assert context.response["data"] !=[]

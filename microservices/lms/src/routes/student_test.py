@@ -13,7 +13,7 @@ from common.models import (CourseTemplate, Cohort, User,
                            CourseEnrollmentMapping,Section)
 from testing.test_config import BASE_URL
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
-   COHORT_EXAMPLE, TEMP_USER,CREDENTIAL_JSON
+   COHORT_EXAMPLE, TEMP_USER,CREDENTIAL_JSON, STUDENT_RECORDS_MODEL
 from config import USER_MANAGEMENT_BASE_URL
 
 
@@ -434,3 +434,27 @@ def test_invite_student_to_cohort_archived_section(
       resp = client_with_emulator.post(url)
   assert resp.status_code == 422
 
+
+def test_get_list_of_students_exists_in_db_not_in_classroom(
+  client_with_emulator):
+  url = BASE_URL + "/student/exists_in_db_not_in_classroom"
+  data=STUDENT_RECORDS_MODEL.copy()
+  data["user_email"]=data.pop("email")
+  with mock.patch("routes.student.run_query",
+                  return_value=[data]):
+    resp = client_with_emulator.get(url)
+  assert resp.status_code == 200, "Status 200"
+  assert resp.json()["data"][0]["email"] == STUDENT_RECORDS_MODEL[
+    "email"], "Return data doesn't match."
+
+def test_get_list_of_students_exists_in_classroom_not_in_db(
+  client_with_emulator):
+  url = BASE_URL + "/student/exists_in_classroom_not_in_db"
+  data=STUDENT_RECORDS_MODEL.copy()
+  data["user_emailAddress"]=data.pop("email")
+  with mock.patch("routes.student.run_query",
+                  return_value=[data]):
+    resp = client_with_emulator.get(url)
+  assert resp.status_code == 200, "Status 200"
+  assert resp.json()["data"][0]["email"] ==STUDENT_RECORDS_MODEL[
+    "email"], "Return data doesn't match."
