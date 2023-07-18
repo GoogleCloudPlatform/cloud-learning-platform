@@ -86,7 +86,7 @@ def test_get_all_applications(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status should be 200"
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
+  retrieved_ids = [i.get("uuid") for i in json_response.get("data")["records"]]
   assert application.uuid in retrieved_ids, "Response received"
 
 
@@ -157,10 +157,6 @@ def test_post_application(clean_firestore):
   loaded_application_dict.pop("created_time")
   loaded_application_dict.pop("last_modified_by")
   loaded_application_dict.pop("last_modified_time")
-  loaded_application_dict.pop("archived_at_timestamp")
-  loaded_application_dict.pop("archived_by")
-  loaded_application_dict.pop("deleted_at_timestamp")
-  loaded_application_dict.pop("deleted_by")
 
   # assert that rest of the fields are equivalent
   assert loaded_application_dict == post_json_response.get("data")
@@ -292,7 +288,7 @@ def test_update_application_negative2(clean_firestore):
   resp = client_with_emulator.put(url, json=application_dict)
   json_response = resp.json()
 
-  assert resp.status_code == 500, "Status not 500"
+  assert resp.status_code == 409, "Status not 409"
   assert json_response == response, "Response received"
 
 

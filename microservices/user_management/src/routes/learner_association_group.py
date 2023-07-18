@@ -2,13 +2,15 @@
 import traceback
 from fastapi import APIRouter, Query
 from typing import Optional
+from typing_extensions import Literal
 from traceback import print_exc
-from common.models import AssociationGroup, User, CurriculumPathway
+from common.models import AssociationGroup, User, CurriculumPathway, UserGroup
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  ConflictError)
 from common.utils.http_exceptions import (Conflict, InternalServerError,
                                           BadRequest, ResourceNotFound)
+from common.utils.sorting_logic import sort_records
 from schemas.learner_association_group_schema import (
   GetLearnerAssociationGroupResponseModel, LearnerAssociationGroupModel,
   PostLearnerAssociationGroupResponseModel, DeleteLearnerAssociationGroup,
@@ -21,11 +23,15 @@ from schemas.learner_association_group_schema import (
   AddInstructorToLearnerAssociationGroupResponseModel,
   RemoveInstructorFromLearnerAssociationGroup,
   RemoveInstructorFromLearnerAssociationGroupResponseModel,
-  GetAllLearnerForCoachORInstructor)
+  GetAllLearnerForCoachORInstructor,
+  GetLearnerAssociationGroupLearnersResponseModel,
+  GetLearnerAssociationGroupCoachesResponseModel,
+  GetLearnerAssociationGroupInstructorsResponseModel)
 from schemas.error_schema import (NotFoundErrorResponseModel,
                                 ConflictResponseModel)
 from services.association_group_handler import (load_learner_group_field_data,
                                         is_learner_association_group,
+                                        process_threads,
                                         check_instructor_discipline_association)
 from services.helper import (get_all_discipline_for_given_program,
                              get_all_assign_user_for_given_instructor_or_coach)
@@ -65,9 +71,10 @@ def get_learner_association_groups(
     collection_manager = collection_manager.filter("association_type", "==",
                                                    "learner")
 
-    learner_groups= collection_manager.fetch()
-    for idx, _ in enumerate(learner_groups):
-      count = idx + 1
+    # learner_groups= collection_manager.fetch()
+    # for idx, _ in enumerate(learner_groups):
+    #   count = idx + 1
+    count = 10000
 
     groups = collection_manager.order("-created_time").offset(skip).fetch(limit)
 
@@ -89,6 +96,219 @@ def get_learner_association_groups(
         "data": response
     }
   except ValidationError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise BadRequest(str(e)) from e
+  except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise InternalServerError(str(e)) from e
+
+
+@router.get(
+  "/learner-association/{uuid}/learners",
+  response_model=GetLearnerAssociationGroupLearnersResponseModel,
+  responses={404: {
+      "model": NotFoundErrorResponseModel
+  }})
+def get_learners_of_learner_association_group(
+  uuid: str,
+  skip: int = Query(0, ge=0, le=2000),
+  limit: int = Query(10, ge=1, le=100),
+  fetch_tree: Optional[bool] = False,
+  sort_by: Optional[Literal["first_name", "last_name",
+  "email", "created_time"]] = "created_time",
+  sort_order: Optional[Literal["ascending", "descending"]] = "descending",
+  status: Optional[Literal["active", "inactive"]] = None):
+  """The endpoint will return all the learners which are part of the association
+  group of learner type from firestore of which uuid is provided
+
+  ### Args:
+      uuid (str): Unique identifier for association group
+      skip (int): Number of objects to be skipped
+      limit (int): Size of group array to be returned
+      fetch_tree (bool): To fetch the entire object
+                        instead of the UUID of the object
+      status (str): To fetch the learner having given status 
+      (active or inactive)
+
+  ### Raises:
+      ResourceNotFoundException: If the association group does not exist
+      ValidationError: If the association type is not learner
+      Exception: 500 Internal Server Error if something went wrong
+
+  ### Returns:
+      GetLearnerAssociationGroupUsersResponseModel: Users Object
+  """
+  try:
+    association_group = AssociationGroup.find_by_uuid(uuid)
+    association_group = association_group.get_fields(reformat_datetime=True)
+
+    if not is_learner_association_group(association_group):
+      raise ValidationError(f"AssociationGroup for given uuid: {uuid} "
+                            "is not learner type")
+
+    learners = association_group.get("users")
+
+    if status:
+      learners = [learner for learner in learners
+                  if learner["status"] == status]
+
+    if fetch_tree:
+      learners = process_threads(learners, "users", "user")
+      learners = sort_records(sort_by=sort_by, sort_order=sort_order,
+                              records=learners, key="user")
+
+    count = 10000
+    response = {"records": learners[skip: skip + limit], "total_count": count}
+
+    return {
+      "success": True,
+      "message": "Successfully fetched the learners",
+      "data": response
+    }
+  except ResourceNotFoundException as e:
+    raise ResourceNotFound(str(e)) from e
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+
+@router.get(
+  "/learner-association/{uuid}/coaches",
+  response_model=GetLearnerAssociationGroupCoachesResponseModel,
+  responses={404: {
+      "model": NotFoundErrorResponseModel
+  }})
+def get_coaches_of_learner_association_group(
+  uuid: str,
+  skip: int = Query(0, ge=0, le=2000),
+  limit: int = Query(10, ge=1, le=100),
+  fetch_tree: Optional[bool] = False,
+  sort_by: Optional[Literal["first_name", "last_name",
+  "email", "created_time"]] = "created_time",
+  sort_order: Optional[Literal["ascending", "descending"]] = "descending",
+  status: Optional[Literal["active", "inactive"]] = None):
+  """The endpoint will return all the coaches which are part of the association
+  group of learner type from firestore of which uuid is provided
+
+  ### Args:
+      uuid (str): Unique identifier for association group
+      skip (int): Number of objects to be skipped
+      limit (int): Size of group array to be returned
+      fetch_tree (bool): To fetch the entire object
+                        instead of the UUID of the object
+      status (str): To fetch the coach having given status (active or inactive)
+
+  ### Raises:
+      ResourceNotFoundException: If the association group does not exist
+      ValidationError: If the association type is not learner
+      Exception: 500 Internal Server Error if something went wrong
+
+  ### Returns:
+      GetLearnerAssociationGroupUsersResponseModel: Users Object
+  """
+  try:
+    association_group = AssociationGroup.find_by_uuid(uuid)
+    association_group = association_group.get_fields(reformat_datetime=True)
+
+    if not is_learner_association_group(association_group):
+      raise ValidationError(f"AssociationGroup for given uuid: {uuid} "
+                            "is not learner type")
+
+    coaches = association_group.get("associations").get("coaches")
+
+    if status:
+      coaches = [coach for coach in coaches if coach["status"] == status]
+
+    if fetch_tree:
+      coaches = process_threads(coaches,"users", "coach")
+      coaches = sort_records(sort_by=sort_by, sort_order=sort_order,
+                            records=coaches, key="coach")
+
+    count = 10000
+    response = {"records": coaches[skip: skip + limit], "total_count": count}
+
+    return {
+      "success": True,
+      "message": "Successfully fetched the coaches",
+      "data": response
+    }
+  except ResourceNotFoundException as e:
+    raise ResourceNotFound(str(e)) from e
+  except ValidationError as e:
+    raise BadRequest(str(e)) from e
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+
+@router.get(
+  "/learner-association/{uuid}/instructors",
+  response_model=GetLearnerAssociationGroupInstructorsResponseModel,
+  responses={404: {
+      "model": NotFoundErrorResponseModel
+  }})
+def get_instructors_of_learner_association_group(
+  uuid: str,
+  skip: int = Query(0, ge=0, le=2000),
+  limit: int = Query(10, ge=1, le=100),
+  fetch_tree: Optional[bool] = False,
+  sort_by: Optional[Literal["first_name", "last_name",
+  "email", "created_time"]] = "created_time",
+  sort_order: Optional[Literal["ascending", "descending"]] = "descending",
+  status: Optional[Literal["active", "inactive"]] = None):
+  """The endpoint will return all the instructors which are part of the
+  association group of learner type from firestore of which uuid is provided
+
+  ### Args:
+      uuid (str): Unique identifier for association group
+      skip (int): Number of objects to be skipped
+      limit (int): Size of group array to be returned
+      fetch_tree (bool): To fetch the entire object
+                        instead of the UUID of the object
+      status (str): To fetch the instructor having given status 
+      (active or inactive)
+
+  ### Raises:
+      ResourceNotFoundException: If the association group does not exist
+      ValidationError: If the association type is not learner
+      Exception: 500 Internal Server Error if something went wrong
+
+  ### Returns:
+      GetLearnerAssociationGroupUsersResponseModel: Users Object
+  """
+  try:
+    association_group = AssociationGroup.find_by_uuid(uuid)
+    association_group = association_group.get_fields(reformat_datetime=True)
+
+    if not is_learner_association_group(association_group):
+      raise ValidationError(f"AssociationGroup for given uuid: {uuid} "
+                            "is not learner type")
+
+    instructors = association_group.get("associations").get("instructors")
+
+    if status:
+      instructors = [instructor for instructor in instructors
+                      if instructor["status"] == status]
+
+    if fetch_tree:
+      instructors = process_threads(instructors,"users", "instructor")
+      instructors = sort_records(sort_by=sort_by,sort_order=sort_order,
+                                records=instructors, key="instructor")
+
+    count = 10000
+    response = {
+      "records": instructors[skip: skip + limit], "total_count": count}
+
+    return {
+      "success": True,
+      "message": "Successfully fetched the instructors",
+      "data": response
+    }
+  except ResourceNotFoundException as e:
+    raise ResourceNotFound(str(e)) from e
+  except ValidationError as e:
     raise BadRequest(str(e)) from e
   except Exception as e:
     raise InternalServerError(str(e)) from e
@@ -107,6 +327,8 @@ def get_learner_association_group(uuid: str,
 
   ### Args:
       uuid (str): Unique identifier for association group
+      fetch_tree (bool): To fetch the entire object
+                        instead of the UUID of the object
 
   ### Raises:
       ResourceNotFoundException: If the association group does not exist
@@ -124,7 +346,8 @@ def get_learner_association_group(uuid: str,
                             "is not learner type")
 
     if fetch_tree:
-      association_group = load_learner_group_field_data(association_group)
+      association_group = load_learner_group_field_data(
+                                        association_group, False)
 
     return {
         "success": True,
@@ -373,12 +596,13 @@ def add_user_to_learner_association_group(uuid: str,
     learner_association_groups = [i.get_fields(reformat_datetime=True) for i \
                           in learner_association_groups]
 
+
     for input_user in input_users_dict.get("users"):
 
       # Checking wheather given user is of type learner or not
       learner = User.find_by_user_id(input_user)
-
       learner_fields = learner.get_fields(reformat_datetime=True)
+
       if learner_fields["user_type"] != "learner":
         raise ValidationError(
           f"User for given user_id {input_user} is not of learner type")
@@ -496,10 +720,16 @@ def remove_user_from_learner_association_group(uuid: str,
     }
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
   except ValidationError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -569,14 +799,15 @@ def add_coach_to_learner_association_group(uuid: str,
           "already contains coach"
       )
 
+    user_group = UserGroup.find_by_name("coach")
+
     for input_coach in input_coaches_dict.get("coaches"):
 
       # checking if given coach id is valid and has user_type as coach
       user = User.find_by_user_id(input_coach)
-
       coach_fields = user.get_fields(reformat_datetime=True)
 
-      if coach_fields["user_type"] != "coach":
+      if user_group.uuid not in coach_fields["user_groups"]:
         raise ValidationError(
           f"User for given user_id {input_coach} is not of coach type")
 
@@ -849,13 +1080,16 @@ def add_instructors(uuid: str,
                             f"doesn't belong to the program {program_id} "\
                               "tagged to the learner association group")
 
-    users = [i for i in data["instructors"] if User.find_by_user_id(
-      i).user_type != "instructor"]
+    user_group = UserGroup.find_by_name("instructor")
 
-    # validating User Type as instructor
-    if len(users) > 0:
-      raise ValidationError(f"The following list of users are not instructors "
-                            f"{users}")
+    for input_instructor in data["instructors"]:
+      user = User.find_by_user_id(input_instructor)
+
+      instructor_fields = user.get_fields(reformat_datetime=True)
+
+      if user_group.uuid not in instructor_fields["user_groups"]:
+        raise ValidationError(f"User for given user_id {input_instructor} "
+                              "is not of instructor type")
 
     # validating the curriculum pathway id
     CurriculumPathway.find_by_uuid(uuid=data["curriculum_pathway_id"])
@@ -1037,7 +1271,11 @@ def get_all_the_learners_of_instructor(
   """
   try:
     user = User.find_by_user_id(user_id)
-    if not user.user_type == "instructor":
+    user_fields = user.get_fields(reformat_datetime=True)
+
+    user_group = UserGroup.find_by_name("instructor")
+
+    if user_group.uuid not in user_fields["user_groups"]:
       raise ValidationError(
         f"User for given uuid: {user_id} is not a instructor"
       )
@@ -1099,7 +1337,11 @@ def get_all_the_learners_of_coach(
   """
   try:
     user = User.find_by_user_id(user_id)
-    if not user.user_type == "coach":
+    user_fields = user.get_fields(reformat_datetime=True)
+
+    user_group = UserGroup.find_by_name("coach")
+
+    if user_group.uuid not in user_fields["user_groups"]:
       raise ValidationError(
         f"User for given uuid: {user_id} is not a coach"
       )

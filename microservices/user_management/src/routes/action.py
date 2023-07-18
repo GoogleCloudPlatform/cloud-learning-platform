@@ -1,9 +1,11 @@
 """ Action endpoints """
+import traceback
 from fastapi import APIRouter, Query
 from common.models import Action
+from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError, ConflictError
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
-                                          ResourceNotFound)
+                                          ResourceNotFound, Conflict)
 from schemas.action_schema import (AllActionResponseModel,
                                    GetActionResponseModel, ActionModel,
                                    PostActionResponseModel, UpdateActionModel,
@@ -38,14 +40,20 @@ def get_actions(skip: int = Query(0, ge=0, le=2000),
     actions = collection_manager.order("-created_time").offset(
       skip).fetch(limit)
     actions = [i.get_fields(reformat_datetime=True) for i in actions]
+    count = 10000
+    response = {"records": actions, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": actions
+        "data": response
     }
   except ValidationError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -80,8 +88,12 @@ def get_action(uuid: str):
     }
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -123,7 +135,13 @@ def create_action(input_action: ActionModel):
         "data": action_fields
     }
 
+  except ConflictError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise Conflict(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -156,7 +174,7 @@ def update_action(uuid: str, input_action: UpdateActionModel):
 
     existing_action = Action.find_by_uuid(uuid)
 
-    input_action_dict = {**input_action.dict()}
+    input_action_dict = {**input_action.dict(exclude_unset=True)}
     action_fields = existing_action.get_fields()
 
     for key, value in input_action_dict.items():
@@ -174,8 +192,16 @@ def update_action(uuid: str, input_action: UpdateActionModel):
     }
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
+  except ConflictError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise Conflict(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -206,6 +232,10 @@ def delete_action(uuid: str):
     return {"success": True, "message": "Successfully deleted the action"}
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e

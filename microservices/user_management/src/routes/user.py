@@ -24,7 +24,7 @@ from schemas.user_schema import (
   AllUserResponseModel, BasicUserModel, GetUserResponseModel, UserModel,
   PostUserResponseModel, UpdateUserModel, UpdateUserResponseModel, DeleteUser,
   UserSearchResponseModel, BulkImportUserResponseModel, UpdateStatusModel,
-  GetApplicationsOfUser)
+  GetApplicationsOfUser, GetUserGroupsOfUser,)
 from schemas.staff_schema import UpdateStaffModel
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.json_import import json_import, add_user_to_db
@@ -33,6 +33,7 @@ from services.learner import (delete_learner, delete_learner_profile,
                               update_learner)
 from services.staff import update_staff
 from services.agent import delete_agent, get_agent, update_agent
+from services.helper import get_data_for_fetch_tree
 from services.association_group_handler import (update_refs_for_user_by_type)
 from config import ERROR_RESPONSES
 
@@ -165,19 +166,16 @@ def get_users(user_type: Optional[str] = None,
     if status is not None:
       collection_manager = collection_manager.filter("status", "==", status)
 
-    total_users = collection_manager.fetch()
-    count = 0
-    for idx, i in enumerate(total_users):
-      count = idx + 1
+    # total_users = collection_manager.fetch()
+    count = 10000
+    # for idx, i in enumerate(total_users):
+    #   count = idx + 1
 
     users = collection_sorting(collection_manager=collection_manager,
                                sort_by=sort_by, sort_order=sort_order,
                                skip=skip, limit=limit)
     if fetch_tree:
-      users = [
-        CollectionHandler.loads_field_data_from_collection(
-          i.get_fields(reformat_datetime=True)) for i in users
-      ]
+      users = get_data_for_fetch_tree(users, sort_by, sort_order)
     else:
       users = [i.get_fields(reformat_datetime=True) for i in users]
 
@@ -257,7 +255,7 @@ def create_user(input_user: UserModel, request: Request,
   ### Args:
       input_user (UserModel): input user to be inserted
       create_inspace_user (bool): To create inspace user after
-              GP-Core user creation
+              backend user creation
 
   ### Raises:
       Exception: 500 Internal Server Error if something went wrong
@@ -451,6 +449,10 @@ def update_user(user_id: str,
     Logger.error(e)
     Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
+  except ConflictError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise Conflict(str(e)) from e
   except Exception as e:
     Logger.error(e)
     Logger.error(traceback.print_exc())
@@ -659,6 +661,51 @@ def get_applications_assigned_to_user(user_id: str):
       "data": {
         "applications": response
       }
+    }
+
+  except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise ResourceNotFound(str(e)) from e
+  except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise InternalServerError(str(e)) from e
+
+@router.get(
+  "/user/{user_id}/user-groups",
+  response_model=GetUserGroupsOfUser,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
+def get_user_groups_of_user(user_id: str, immutable: Optional[bool] = None):
+  """Get all the user groups of a user
+
+  ### Args:
+      user_id: Unique identifier of the user
+
+  ### Raises:
+      ResourceNotFoundException: If the user does not exist
+      Exception: 500 Internal Server Error if something went wrong
+
+  ### Returns:
+      GetUserGroupsOfUser: List of usergroups
+  """
+  try:
+    user = CollectionHandler.get_document_from_collection("users", user_id)
+    usergroups_of_user = []
+    for user_group in user.get("user_groups", []):
+      group = CollectionHandler. \
+        get_document_from_collection("user_groups", user_group)
+      if immutable is not None:
+        if group.get("is_immutable")==immutable:
+          usergroups_of_user.append(group)
+      else:
+        usergroups_of_user.append(group)
+    return {
+      "success": True,
+      "message": "Successfully fetched user groups of the user",
+      "data": usergroups_of_user
     }
 
   except ResourceNotFoundException as e:
@@ -903,3 +950,4 @@ def update_user_documents():
     Logger.error(e)
     Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
+

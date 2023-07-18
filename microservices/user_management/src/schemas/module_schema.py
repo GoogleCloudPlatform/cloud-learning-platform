@@ -5,9 +5,9 @@ from typing import List, Optional
 from pydantic import BaseModel, Extra
 from schemas.schema_examples import (BASIC_MODULE_MODEL_EXAMPLE,
                                      FULL_MODULE_MODEL_EXAMPLE)
+from common.utils.schema_validator import BaseConfigModel
 
-
-class BasicModuleModel(BaseModel):
+class BasicModuleModel(BaseConfigModel):
   """Module Skeleton Pydantic Model"""
   # uuid: str
   name: str
@@ -31,7 +31,7 @@ class ModuleModel(BasicModuleModel):
     schema_extra = {"example": BASIC_MODULE_MODEL_EXAMPLE}
 
 
-class UpdateModuleModel(BaseModel):
+class UpdateModuleModel(BaseConfigModel):
   """Update Module Pydantic Request Model"""
   name: Optional[str]
   description: Optional[str]
@@ -109,11 +109,15 @@ class DeleteModule(BaseModel):
     }
 
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullModuleDataModel]]
+  total_count: int
+
 class AllModuleResponseModel(BaseModel):
   """Module Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Data fetched successfully"
-  data: Optional[List[FullModuleDataModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -121,7 +125,10 @@ class AllModuleResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Data fetched successfully",
-            "data": [FULL_MODULE_MODEL_EXAMPLE]
+            "data": {
+                      "records":[FULL_MODULE_MODEL_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

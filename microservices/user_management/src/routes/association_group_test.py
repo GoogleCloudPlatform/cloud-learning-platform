@@ -9,14 +9,15 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from src.routes.association_group import router
 from testing.test_config import API_URL
-from schemas.schema_examples import ( BASIC_ASSOCIATION_GROUP_EXAMPLE,
+from schemas.schema_examples import (BASIC_ASSOCIATION_GROUP_EXAMPLE,
                                      ASSOCIATION_GROUP_EXAMPLE,
-                                    FULL_USER_MODEL_EXAMPLE,
-                                    BASIC_CURRICULUM_PATHWAY_EXAMPLE,
-                                    FULL_DISCIPLINE_ASSOCIATION_GROUP_EXAMPLE,
-                                    BASIC_USER_MODEL_EXAMPLE
-                                    )
-from common.models import AssociationGroup, CurriculumPathway, User
+                                     FULL_USER_MODEL_EXAMPLE,
+                                     BASIC_CURRICULUM_PATHWAY_EXAMPLE,
+                                     FULL_DISCIPLINE_ASSOCIATION_GROUP_EXAMPLE,
+                                     BASIC_USER_MODEL_EXAMPLE,
+                                     BASIC_LEARNER_EXAMPLE
+                                     )
+from common.models import AssociationGroup, CurriculumPathway, User, Learner
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
 from common.utils.http_exceptions import add_exception_handlers
@@ -33,9 +34,10 @@ api_url = f"{API_URL}/association-groups"
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 
+
 def test_search_association_group(clean_firestore):
-  association_group_dict = {**BASIC_ASSOCIATION_GROUP_EXAMPLE}
-  association_group_dict["association_type"] = "discipline"
+  association_group_dict = {**BASIC_ASSOCIATION_GROUP_EXAMPLE,
+                            "association_type": "discipline"}
   association_group = AssociationGroup.from_dict(association_group_dict)
   association_group.uuid = ""
   association_group.save()
@@ -49,19 +51,20 @@ def test_search_association_group(clean_firestore):
   json_response = resp.json()
 
   assert resp.status_code == 200, "Status not 200"
-  assert json_response["data"][0][
-          "name"] == association_group.name, "Response not received"
+  assert json_response["data"]["records"][0][
+           "name"] == association_group.name, "Response not received"
+
 
 def test_search_association_group_negative1(clean_firestore):
-  association_group_dict = {**BASIC_ASSOCIATION_GROUP_EXAMPLE}
-  association_group_dict["association_type"] = "discipline"
+  association_group_dict = {**BASIC_ASSOCIATION_GROUP_EXAMPLE,
+                            "association_type": "discipline"}
   association_group = AssociationGroup.from_dict(association_group_dict)
   association_group.uuid = ""
   association_group.save()
   association_group.uuid = association_group.id
   association_group.update()
 
-  params = {"search_query": association_group.name,  "skip":0, "limit":0}
+  params = {"search_query": association_group.name, "skip": 0, "limit": 0}
 
   url = f"{api_url}/search"
   resp = client_with_emulator.get(url, params=params)
@@ -70,9 +73,10 @@ def test_search_association_group_negative1(clean_firestore):
   assert resp.status_code == 422, "Status not 422"
   assert json_response.get("success") is False, "Response is not False"
 
+
 def test_search_association_group_negative2(clean_firestore):
-  association_group_dict = {**BASIC_ASSOCIATION_GROUP_EXAMPLE}
-  association_group_dict["association_type"] = "discipline"
+  association_group_dict = {**BASIC_ASSOCIATION_GROUP_EXAMPLE,
+                            "association_type": "discipline"}
   association_group = AssociationGroup.from_dict(association_group_dict)
   association_group.uuid = ""
   association_group.save()
@@ -89,6 +93,7 @@ def test_search_association_group_negative2(clean_firestore):
   assert json_response.get("success") is False, "Response is not False"
   assert json_response.get("message") == "search_query cannot be empty"
 
+
 def test_association_group(clean_firestore):
   association_group_dict = {**ASSOCIATION_GROUP_EXAMPLE}
   association_group = AssociationGroup.from_dict(association_group_dict)
@@ -97,15 +102,17 @@ def test_association_group(clean_firestore):
   association_group.uuid = association_group.id
   association_group.update()
 
-  params = {"skip": 0, "limit": 3 }
+  params = {"skip": 0, "limit": 3}
 
   url = f"{api_url}"
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
 
   assert resp.status_code == 200, "Status should be 200"
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
+  retrieved_ids = [
+    i.get("uuid") for i in json_response.get("data")["records"]]
   assert association_group.uuid in retrieved_ids, "Response received"
+
 
 def test_association_group_with_negative_filter(clean_firestore):
   association_group_dict = {**ASSOCIATION_GROUP_EXAMPLE}
@@ -115,7 +122,7 @@ def test_association_group_with_negative_filter(clean_firestore):
   association_group.uuid = association_group.id
   association_group.update()
 
-  params = {"skip": 0, "limit": -3 }
+  params = {"skip": 0, "limit": -3}
 
   url = f"{api_url}"
   resp = client_with_emulator.get(url, params=params)
@@ -123,8 +130,9 @@ def test_association_group_with_negative_filter(clean_firestore):
 
   assert resp.status_code == 422, "Status should be 422"
   assert json_response.get(
-      "message"
+    "message"
   ) == "Validation Failed"
+
 
 def test_association_group_with_association_type_filter(clean_firestore):
   association_group_dict = {**ASSOCIATION_GROUP_EXAMPLE}
@@ -134,21 +142,122 @@ def test_association_group_with_association_type_filter(clean_firestore):
   association_group.uuid = association_group.id
   association_group.update()
 
-  params = {"skip": 0, "limit": 1, "association_type": "discipline" }
+  params = {"skip": 0, "limit": 1, "association_type": "discipline"}
 
   url = f"{api_url}"
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
 
   assert resp.status_code == 200, "Status should be 200"
-  retrieved_association_type =[i.get("association_type")
-    for i in json_response.get("data")]
+  retrieved_association_type = [i.get("association_type")
+                                for i in json_response.get("data")["records"]]
   assert association_group.association_type in retrieved_association_type
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
+  retrieved_ids = [
+    i.get("uuid") for i in json_response.get("data")["records"]]
   assert association_group.uuid in retrieved_ids, "Response received"
 
-def test_update_disciplines_with_active_pathway(clean_firestore):
 
+def test_association_group_with_name_sorting_asc(clean_firestore):
+  association_group_dict = {**ASSOCIATION_GROUP_EXAMPLE}
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 1, "sort_by": "name", "sort_order": "ascending"}
+
+  url = f"{api_url}"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status should be 200"
+  retrieved_association_type = [i.get("association_type")
+                                for i in json_response.get("data")["records"]]
+  assert association_group.association_type in retrieved_association_type
+  retrieved_ids = [i.get("uuid") for i in json_response.get("data")["records"]]
+  print(retrieved_ids)
+  assert association_group.uuid in retrieved_ids, "Response received"
+
+
+def test_association_group_with_name_sorting_desc(clean_firestore):
+  association_group_dict = {**ASSOCIATION_GROUP_EXAMPLE}
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 1, "sort_by": "name"}
+
+  url = f"{api_url}"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status should be 200"
+  retrieved_association_type = [i.get("association_type")
+                                for i in json_response.get("data")["records"]]
+  assert association_group.association_type in retrieved_association_type
+  retrieved_ids = [
+    i.get("uuid") for i in json_response.get("data")["records"]]
+  assert association_group.uuid in retrieved_ids, "Response received"
+
+
+def test_association_group_with_type_sorting_asc(clean_firestore):
+  association_group_dict = {**ASSOCIATION_GROUP_EXAMPLE}
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {
+    "skip": 0, "limit": 1,
+    "sort_by": "association_type",
+    "sort_order": "ascending"
+  }
+
+  url = f"{api_url}"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status should be 200"
+  retrieved_association_type = [i.get("association_type")
+                                for i in json_response.get("data")["records"]]
+  assert association_group.association_type in retrieved_association_type
+  retrieved_ids = [
+    i.get("uuid") for i in json_response.get("data")["records"]]
+  assert association_group.uuid in retrieved_ids, "Response received"
+
+
+def test_association_group_with_type_sorting_desc(clean_firestore):
+  association_group_dict = {**ASSOCIATION_GROUP_EXAMPLE}
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {
+    "skip": 0, "limit": 1,
+    "sort_by": "association_type",
+    "sort_order": "descending",
+  }
+
+  url = f"{api_url}"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status should be 200"
+  retrieved_association_type = [i.get("association_type")
+                                for i in json_response.get("data")["records"]]
+  assert association_group.association_type in retrieved_association_type
+  retrieved_ids = [
+    i.get("uuid") for i in json_response.get("data")["records"]]
+  assert association_group.uuid in retrieved_ids, "Response received"
+
+
+def test_update_disciplines_with_active_pathway(clean_firestore):
   # Preparing Instructor Data
   user_dict = {**FULL_USER_MODEL_EXAMPLE}
   user = User.from_dict(user_dict)
@@ -195,7 +304,7 @@ def test_update_disciplines_with_active_pathway(clean_firestore):
 
   # Learner Association Group
   learner_group_dict = {**BASIC_ASSOCIATION_GROUP_EXAMPLE,
-                            "association_type": "learner"}
+                        "association_type": "learner"}
   learner_group = AssociationGroup.from_dict(learner_group_dict)
   learner_group.uuid = ""
   learner_group.save()
@@ -288,23 +397,33 @@ def test_update_disciplines_with_active_pathway(clean_firestore):
 
 
 def test_get_users_by_usertype(clean_firestore):
-  #create user
-  user_dict = {**BASIC_USER_MODEL_EXAMPLE}
-  user_dict["user_type"] = "coach"
-  user_dict["user_type_ref"] = ""
+  # create user
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type": "coach",
+               "user_type_ref": ""}
   user = User.from_dict(user_dict)
   user.user_id = ""
   user.save()
+
+  learner_dict = BASIC_LEARNER_EXAMPLE
+  learner = Learner.from_dict(learner_dict)
+  learner.uuid = ""
+  learner.save()
+  learner.uuid = learner.id
+  learner.update()
+  learner_dict["uuid"] = learner.id
+  learner_dict["is_archived"] = False
+
   user.user_id = user.id
+  user.user_type_ref = learner_dict["uuid"]
   user.update()
   user_dict["user_id"] = user.id
 
-  #create association group
+  # create association group
   association_group_dict = {**BASIC_ASSOCIATION_GROUP_EXAMPLE,
                             "association_type": "learner",
                             "associations": {"coaches": [],
-                                      "instructors": [],
-                                      "curriculum_pathway_id": ""}}
+                                             "instructors": [],
+                                             "curriculum_pathway_id": ""}}
   association_group = AssociationGroup.from_dict(association_group_dict)
   association_group.uuid = ""
   association_group.save()
@@ -319,14 +438,14 @@ def test_get_users_by_usertype(clean_firestore):
   assert resp.status_code == 200, "Status should be 200"
 
   assert json_response.get("data")[0]["user_id"
-                ] == user.id, "expected data not retrieved"
+         ] == user.id, "expected data not retrieved"
+
 
 def test_get_users_by_usertype_for_learner(clean_firestore):
-  "when the user of type learner present in an assocation group"
-  #create user
-  user_dict = {**BASIC_USER_MODEL_EXAMPLE}
-  user_dict["user_type"] = "learner"
-  user_dict["user_type_ref"] = ""
+  """when the user of type learner present in an association group"""
+  # create user
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type": "learner",
+               "user_type_ref": ""}
   user = User.from_dict(user_dict)
   user.user_id = ""
   user.save()
@@ -334,15 +453,26 @@ def test_get_users_by_usertype_for_learner(clean_firestore):
   user.update()
   user_dict["user_id"] = user.id
 
-  #association_group with above user_id
-  association_group_dict = {**BASIC_ASSOCIATION_GROUP_EXAMPLE,
-                            "association_type": "learner",
-                            "users": [{
-                                "user": user.id,
-                                "status": "active",
-                                "user_group_type": "learner"
-                                }]
-                            }
+  #create inactive user
+  user_dict_2 = {**BASIC_USER_MODEL_EXAMPLE, "user_type": "learner",
+               "user_type_ref": "", "status": "inactive"}
+  user_2 = User.from_dict(user_dict_2)
+  user_2.user_id = ""
+  user_2.save()
+  user_2.user_id = user_2.id
+  user_2.update()
+  user_dict_2["user_id"] = user_2.id
+
+  # association_group with above user_id
+  association_group_dict = {
+    **BASIC_ASSOCIATION_GROUP_EXAMPLE,
+    "association_type": "learner",
+    "users": [{
+      "user": user.id,
+      "status": "active",
+      "user_group_type": "learner"
+    }]
+  }
 
   association_group = AssociationGroup.from_dict(association_group_dict)
   association_group.uuid = ""
@@ -350,9 +480,9 @@ def test_get_users_by_usertype_for_learner(clean_firestore):
   association_group.uuid = association_group.id
   association_group.update()
 
-  #association_group that users will be added to
+  # association_group that users will be added to
   association_group_dict1 = {**BASIC_ASSOCIATION_GROUP_EXAMPLE,
-                            "association_type": "learner"}
+                             "association_type": "learner"}
   association_group1 = AssociationGroup.from_dict(association_group_dict1)
   association_group1.uuid = ""
   association_group1.save()
@@ -366,4 +496,4 @@ def test_get_users_by_usertype_for_learner(clean_firestore):
   json_response = resp.json()
   assert resp.status_code == 200, "Status should be 200"
   assert json_response.get("data"
-                      ) == [], "expected data not retrieved"
+                           ) == [], "expected data not retrieved"

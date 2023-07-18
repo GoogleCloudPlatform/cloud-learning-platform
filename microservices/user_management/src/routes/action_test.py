@@ -79,7 +79,7 @@ def test_get_all_actions(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status should be 200"
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
+  retrieved_ids = [i.get("uuid") for i in json_response.get("data")["records"]]
   assert action.uuid in retrieved_ids, "expected data not retrieved"
 
 def test_get_all_actions_negative_params(clean_firestore):
@@ -148,10 +148,6 @@ def test_post_action(clean_firestore):
   loaded_action_dict.pop("created_time")
   loaded_action_dict.pop("last_modified_by")
   loaded_action_dict.pop("last_modified_time")
-  loaded_action_dict.pop("archived_at_timestamp")
-  loaded_action_dict.pop("archived_by")
-  loaded_action_dict.pop("deleted_at_timestamp")
-  loaded_action_dict.pop("deleted_by")
 
   # assert that rest of the fields are equivalent
   assert loaded_action_dict == post_json_response.get("data")
@@ -170,7 +166,7 @@ def test_post_action_negative(clean_firestore):
   post_json_response = post_resp.json()
 
   assert post_json_response.get("success") is False, "Success not False"
-  assert post_resp.status_code == 500
+  assert post_resp.status_code == 409
   assert post_json_response.get("message") == \
     "Action with the given name: edit already exists"
 
@@ -241,7 +237,7 @@ def test_update_action_negative2(clean_firestore):
   resp = client_with_emulator.put(url, json=action_dict)
   json_response = resp.json()
 
-  assert resp.status_code == 500, "Status not 500"
+  assert resp.status_code == 409, "Status not 409"
   assert json_response == response, "Expected response not same"
 
 def test_delete_action(clean_firestore):

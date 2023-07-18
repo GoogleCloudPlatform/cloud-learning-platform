@@ -7,8 +7,7 @@ from config import SLP_BASE_URL
 
 # pylint: disable = broad-exception-raised
 
-def create_learner(headers: dict = None,
-                   learner_dict: dict = None):
+def create_learner(headers: dict = None, learner_dict: dict = None):
   """Post request to student learner profile service to create learner"""
   api_url = f"{SLP_BASE_URL}/learner"
   response = post_method(url=api_url,
@@ -20,8 +19,7 @@ def create_learner(headers: dict = None,
   return learner_id
 
 
-def create_learner_profile(headers: dict = None,
-                           learner_id: str = None,
+def create_learner_profile(headers: dict = None, learner_id: str = None,
                            learner_profile_dict: dict = None):
   """Post request to student learner profile service to create learner
   profile"""
@@ -34,9 +32,7 @@ def create_learner_profile(headers: dict = None,
   if response.status_code != 200:
     raise Exception("Failed to create learner profile")
 
-
-def delete_learner(headers: dict = None,
-                   learner_id: str = None):
+def delete_learner(headers: dict = None, learner_id: str = None):
   """Delete request to student learner profile service to delete learner"""
   api_url = f"{SLP_BASE_URL}/learner/{learner_id}"
   response = delete_method(url=api_url,
@@ -44,9 +40,7 @@ def delete_learner(headers: dict = None,
   if response.status_code != 200:
     raise Exception("Failed to delete learner")
 
-
-def delete_learner_profile(headers: dict = None,
-                           learner_id: str = None):
+def delete_learner_profile(headers: dict = None, learner_id: str = None):
   """Delete request to student learner profile service to delete learner
   profile"""
   api_url = f"{SLP_BASE_URL}/learner/{learner_id}/learner-profile"
@@ -54,7 +48,6 @@ def delete_learner_profile(headers: dict = None,
                          token=headers.get("Authorization"))
   if response.status_code != 200:
     raise Exception("Failed to delete learner profile")
-
 
 def update_learner(headers: dict = None,
                    learner_id: str = None,

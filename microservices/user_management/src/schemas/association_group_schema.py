@@ -9,12 +9,12 @@ from schemas.schema_examples import (ASSOCIATION_GROUP_EXAMPLE,
                                      BASIC_ASSOCIATION_GROUP_EXAMPLE,
                                      FULL_USER_MODEL_EXAMPLE)
 from schemas.user_schema import FullUserDataModel
+from common.utils.schema_validator import BaseConfigModel
 
-# pylint: disable=invalid-name
 ALLOWED_IMMUTABLE_ASSOCIATION_GROUPS = \
   Literal[tuple(IMMUTABLE_ASSOCIATION_GROUPS)]
 
-class BasicAssociationGroupModel(BaseModel):
+class BasicAssociationGroupModel(BaseConfigModel):
   """Association Group Skeleton Pydantic Model"""
   name: str
   description: str
@@ -56,11 +56,15 @@ class PostImmutableAssociationGroupResponseModel(BaseModel):
     }
 
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullAssociationGroupDataModel]]
+  total_count: int
+
 class GetAssociationGroupResponseModel(BaseModel):
   """Fetch Association Group Response Pydantic Model"""
   success: bool = True
   message: str = "Successfully fetched the association group"
-  data: List[FullAssociationGroupDataModel]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -68,7 +72,10 @@ class GetAssociationGroupResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully fetched the association group",
-            "data": [ASSOCIATION_GROUP_EXAMPLE]
+            "data": {
+                      "records":[ASSOCIATION_GROUP_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 
@@ -76,10 +83,16 @@ class GetAllAssociationGroupResponseModel(BaseModel):
   """Fetch Association Group Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the association group"
-  data: Optional[List[FullAssociationGroupDataModel]]
+  data: Optional[TotalCountResponseModel]
   class Config():
     orm_mode = True
-    schema_extra = {"example": ASSOCIATION_GROUP_EXAMPLE}
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the association groups",
+            "data": [ASSOCIATION_GROUP_EXAMPLE]
+        }
+    }
 
 class AutoUpdateAllAssociationGroups(BaseModel):
   """Node Skeleton Pydantic Model"""
@@ -87,7 +100,7 @@ class AutoUpdateAllAssociationGroups(BaseModel):
   alias: Literal["discipline"]
   name: Optional[str]
 
-class AutoUpdateAllAssociationGroupDisciplines(BaseModel):
+class AutoUpdateAllAssociationGroupDisciplines(BaseConfigModel):
   """Disciplines Request Pydantic Model"""
   program_id: str
   disciplines: List[AutoUpdateAllAssociationGroups]
