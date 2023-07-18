@@ -71,7 +71,8 @@ When we need to fetch all the Activities available then we would make a **GET** 
 {
   "success": true,
   "message": "Data fetched successfully",
-  "data": [
+  "data": {
+    "records": [
     {
       "name": "Tin Can Prototypes Launcher",
       "authority": "",
@@ -91,7 +92,9 @@ When we need to fetch all the Activities available then we would make a **GET** 
       "created_time": "2022-09-01 07:33:09.750993+00:00",
       "last_modified_time": "2022-09-01 07:33:10.077393+00:00"
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 

@@ -56,7 +56,8 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Data fetched successfully",
-  "data": [
+  "data": {
+    "records": [
     {
       "uuid": "124hsgxR77QKS8uS7Zgm",
       "first_name": "Ted",
@@ -69,7 +70,9 @@ Then the response would be as follows:
       "shared_inboxes": "",
       "office_hours": []
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 

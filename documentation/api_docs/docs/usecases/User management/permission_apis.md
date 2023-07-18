@@ -48,7 +48,7 @@ A new permission with the request body details and with a new uuid(unique ID of 
 
 ### Get all permissions:
 
-To fetch all the permissions available, we would make a **GET** request to the API endpoint - **`<APP_URL>/user-management/api/v1/permissions`** with **`skip`** , **`limit`**, **`application_ids`**, **`module_ids`**, **`action_ids`**, **`user_groups`** and **`fetch_tree`** where **`skip`** is the number of objects to be skipped which takes a default value **`0`** if not provided, **`limit`** is the size of permissions array to be returned which takes a default value **`10`**, **`application_ids`** is the comma delimited string of uuid's of the applications, **`module_ids`** is the comma delimited string of uuid's of the modules, **`action_ids`** is the comma delimited string of uuid's of the actions, **`user_groups`** is the comma delimited string of uuids of the users and **`fetch_tree`** is to fetch the complete action, module and application objects when set **`true`** if not it takes the default value **`false`** returning only respective UUIDs.
+To fetch all the permissions available, we would make a **GET** request to the API endpoint - **`<APP_URL>/user-management/api/v1/permissions`** with **`skip`** , **`limit`**, **`application_ids`**, **`module_ids`**, **`action_ids`**, **`user_groups`**, **`sort_by`**, **`sort_order`** and **`fetch_tree`** where **`skip`** is the number of objects to be skipped which takes a default value **`0`** if not provided, **`limit`** is the size of permissions array to be returned which takes a default value **`10`**, **`application_ids`** is the comma delimited string of uuid's of the applications, **`module_ids`** is the comma delimited string of uuid's of the modules, **`action_ids`** is the comma delimited string of uuid's of the actions, **`user_groups`** is the comma delimited string of uuids of the users, **`sort_by`** is the sorting field name, **`sort_order`** is the sorting order and **`fetch_tree`** is to fetch the complete action, module and application objects when set **`true`** if not it takes the default value **`false`** returning only respective UUIDs.
 
 
 Then the response would be as follows: 
@@ -57,7 +57,8 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Data fetched successfully",
-  "data": [
+  "data": {
+    "records": [
     {
       "uuid": "124hsgxR77QKS8uS7Zgm",
       "name": "assessment_authoring.summative_assessment.edit",
@@ -69,7 +70,9 @@ Then the response would be as follows:
         "U2DDBkl3Ayg0PWudzhI"
       ]
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 

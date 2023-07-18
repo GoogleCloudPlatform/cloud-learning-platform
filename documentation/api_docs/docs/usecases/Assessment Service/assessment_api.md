@@ -159,7 +159,8 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Successfully fetched the assessments",
-  "data": [
+  "data": {
+    "records": [
     {
     "uuid": "asd98798as7dhjgkjsdfh",
     "name": "Assessment 1",
@@ -206,7 +207,9 @@ Then the response would be as follows:
     "created_time": "2022-03-03 09:22:49.843674+00:00",
     "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
   }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 

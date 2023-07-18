@@ -121,7 +121,8 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Data fetched successfully",
-  "data": [
+  "data": {
+    "records": [
     {
       "name": "Kubernetes",
       "display_name": "Introduction to Kubernetes",
@@ -170,7 +171,9 @@ Then the response would be as follows:
       "progress": null,
       "status": null
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 

@@ -48,7 +48,8 @@ When we need to fetch all the Activity states available then we would make a **G
 {
   "success": true,
   "message": "Data fetched successfully",
-  "data": [
+  "data": {
+    "records": [
     {
       "uuid": "1Tusjz6W1JI2aFr4SiIw",
       "created_time": "2022-03-03 09:22:49.843674+00:00",
@@ -57,7 +58,9 @@ When we need to fetch all the Activity states available then we would make a **G
       "activity_id": "12345678-1234-5678-1234-567812345678",
       "canonical_data": {}
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 

@@ -52,12 +52,15 @@ Then the response would be as follows:
   "success": true,
   "message": "Successfully fetched the module",
   "data": {
+    "records": [{
     "uuid": "124hsgxR77QKS8uS7Zgm",
     "name": "learning resource",
     "description": "learning resource module",
     "actions": [
       "44qxEpc35pVMb6AkZGbi"
     ]
+  }],
+    "total_count": 10000
   }
 }
 ```

@@ -51,7 +51,8 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Successfully fetched the association groups",
-  "data": [
+  "data": {
+    "records": [
     {
       "uuid": "124hsgxR77QKS8uS7Zgm",
       "name": "Learner Association Group",
@@ -64,7 +65,9 @@ Then the response would be as follows:
       "created_time": "2023-02-10 11:54:36.604328+00:00",
       "last_modified_time": "2023-02-10 11:57:11.611761+00:00"
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 
@@ -105,7 +108,7 @@ If the Association Group is not present for a given uuid - **`JAnZNzyh490mbPoE5S
 
 ### Get learners of a Learner Association Group:
 
-To fetch the learner details of a specific learner association group, we would make a **GET** request to the API endpoint - **`<APP_URL>/user-management/api/v1/association-groups/learner-association/{uuid}/learners`** where **`uuid`** is the unique ID of the learner association group and the query parameter  **`fetch_tree`** is to fetch the complete user object when set **`true`** if not it takes the default value **`false`** returning only UUID. Other query parameters include **`skip`** and **`limit`**, where **`skip`** is the number of objects to be skipped and it takes a default value **`0`** if not provided, **`limit`** is the size of learners array to be returned which takes a default value **`10`** if not provided.
+To fetch the learner details of a specific learner association group, we would make a **GET** request to the API endpoint - **`<APP_URL>/user-management/api/v1/association-groups/learner-association/{uuid}/learners`** where **`uuid`** is the unique ID of the learner association group and the query parameter  **`fetch_tree`** is to fetch the complete user object when set **`true`** if not it takes the default value **`false`** returning only UUID. Other query parameters include **`status`**, **`skip`** and **`limit`**, where **`status`** is the status of the learner(active or inactive), **`skip`** is the number of objects to be skipped and it takes a default value **`0`** if not provided, **`limit`** is the size of learners array to be returned which takes a default value **`10`** if not provided.
 
 Following are the query parameters that can be used to filter the response:
 | Field Name   |      Type      |  Description |
@@ -119,7 +122,8 @@ If `fetch_tree` is `false`, then the response would be as follows:
 {
     "success": true,
     "message": "Successfully fetched the learners",
-    "data": [
+    "data": {
+    "records": [
         {
             "user": "zYyqFBPWM8jbwoZw6veQ",
             "status": "active"
@@ -128,7 +132,9 @@ If `fetch_tree` is `false`, then the response would be as follows:
             "user": "1qAF5rPScDNKTDzYqrYe",
             "status": "active"
         }
-    ]
+    ],
+    "total_count": 10000
+  }
 }
 ```
 
@@ -154,7 +160,7 @@ If the Association Group is not of type `learner`, then the response would be as
 
 ### Get coaches of a Learner Association Group:
 
-To fetch the learner details of a specific learner association group, we would make a **GET** request to the API endpoint - **`<APP_URL>/user-management/api/v1/association-groups/learner-association/{uuid}/coaches`** where **`uuid`** is the unique ID of the learner association group and the query parameter  **`fetch_tree`** is to fetch the complete user object when set **`true`** if not it takes the default value **`false`** returning only UUID. Other query parameters include **`skip`** and **`limit`**, where **`skip`** is the number of objects to be skipped and it takes a default value **`0`** if not provided, **`limit`** is the size of coaches array to be returned which takes a default value **`10`** if not provided
+To fetch the learner details of a specific learner association group, we would make a **GET** request to the API endpoint - **`<APP_URL>/user-management/api/v1/association-groups/learner-association/{uuid}/coaches`** where **`uuid`** is the unique ID of the learner association group and the query parameter  **`fetch_tree`** is to fetch the complete user object when set **`true`** if not it takes the default value **`false`** returning only UUID. Other query parameters include **`status`**, **`skip`** and **`limit`**, where **`status`** is the status of coach(active or inactive), **`skip`** is the number of objects to be skipped and it takes a default value **`0`** if not provided, **`limit`** is the size of coaches array to be returned which takes a default value **`10`** if not provided
 
 Following are the query parameters that can be used to filter the response:
 | Field Name   |      Type      |  Description |
@@ -168,7 +174,8 @@ If `fetch_tree` is `true`, then the response would be as follows:
 {
     "success": true,
     "message": "Successfully fetched the coaches",
-    "data": [
+    "data": {
+    "records": [
         {
             "coach": {
                 "user_id": "iwIYtB9kiliMCPTUvBKS",
@@ -193,7 +200,9 @@ If `fetch_tree` is `true`, then the response would be as follows:
             },
             "status": "active"
         }
-    ]
+    ],
+    "total_count": 10000
+  }
 }
 ```
 
@@ -219,7 +228,7 @@ If the Association Group is not of type `learner`, then the response would be as
 
 ### Get instructors of a Learner Association Group:
 
-To fetch the learner details of a specific learner association group, we would make a **GET** request to the API endpoint - **`<APP_URL>/user-management/api/v1/association-groups/learner-association/{uuid}/instructors`** where **`uuid`** is the unique ID of the learner association group and the query parameter  **`fetch_tree`** is to fetch the complete user object when set **`true`** if not it takes the default value **`false`** returning only UUID. Other query parameters include **`skip`** and **`limit`**, where **`skip`** is the number of objects to be skipped and it takes a default value **`0`** if not provided, **`limit`** is the size of instructors array to be returned which takes a default value **`10`** if not provided
+To fetch the learner details of a specific learner association group, we would make a **GET** request to the API endpoint - **`<APP_URL>/user-management/api/v1/association-groups/learner-association/{uuid}/instructors`** where **`uuid`** is the unique ID of the learner association group and the query parameter  **`fetch_tree`** is to fetch the complete user object when set **`true`** if not it takes the default value **`false`** returning only UUID. Other query parameters include  **`status`**, **`skip`** and **`limit`**, where **`status`** is the status of instructor(active or inactive), **`skip`** is the number of objects to be skipped and it takes a default value **`0`** if not provided, **`limit`** is the size of instructors array to be returned which takes a default value **`10`** if not provided
 
 Following are the query parameters that can be used to filter the response:
 | Field Name   |      Type      |  Description |
@@ -233,7 +242,8 @@ If `fetch_tree` is `false`, then the response would be as follows:
 {
     "success": true,
     "message": "Successfully fetched the instructors",
-    "data": [
+    "data": {
+      "records": [
         {
             "instructor": "1AZ9XzTXXahaCbPOSrep",
             "curriculum_pathway_id": "0JDAEH6cvbNFLHxxsDN8",
@@ -244,7 +254,10 @@ If `fetch_tree` is `false`, then the response would be as follows:
             "curriculum_pathway_id": "0KdLQDPxe3SLTGJOvoAQ",
             "status": "active"
         }
-    ]
+    ],
+      "total_count": 10000
+     }
+    
 }
 ```
 

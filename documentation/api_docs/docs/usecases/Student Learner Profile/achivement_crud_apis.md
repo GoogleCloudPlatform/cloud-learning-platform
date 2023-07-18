@@ -102,44 +102,47 @@ When we need to fetch all available achievements then we would make a **GET** re
 {
   "success": true,
   "message": "Successfully fetched the achievements",
-  "data": [
-    {
-      "uuid": "U2DDBkl3Ayg0PWudzhI",
-      "type": "course equate",
-      "name": "ML Professional",
-      "description": "",
-      "alignments": {
-        "competency_alignments": [],
-        "skill_alignments": []
-      },
-      "associations": {
-        "exact_match_of": [],
-        "exemplar": [],
-        "has_skill_level": [],
-        "is_child_of": [],
-        "is_parent_of": [],
-        "is_part_of": [],
-        "is_peer_of": [],
-        "is_related_to": [],
-        "precedes": [],
-        "replaced_by": []
-      },
-      "tags": ["ML"],
-      "credits_available": 0,
-      "field_of_study": "",
-"metadata": {"design_config" : {
-                           "shape" : "",
-                           "theme": "",
-                           "illustration": ""
-}},
-      "image": "",
-      "result_descriptions": [],
-      "timestamp": "",
-      "is_archived": false,
-      "created_time": "2022-03-03 09:22:49.843674+00:00",
-      "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
-    }
-  ]
+  "data": {
+    "records": [
+      {
+        "uuid": "U2DDBkl3Ayg0PWudzhI",
+        "type": "course equate",
+        "name": "ML Professional",
+        "description": "",
+        "alignments": {
+          "competency_alignments": [],
+          "skill_alignments": []
+        },
+        "associations": {
+          "exact_match_of": [],
+          "exemplar": [],
+          "has_skill_level": [],
+          "is_child_of": [],
+          "is_parent_of": [],
+          "is_part_of": [],
+          "is_peer_of": [],
+          "is_related_to": [],
+          "precedes": [],
+          "replaced_by": []
+        },
+        "tags": ["ML"],
+        "credits_available": 0,
+        "field_of_study": "",
+        "metadata": {"design_config" : {
+                                  "shape" : "",
+                                  "theme": "",
+                                  "illustration": ""
+        }},
+        "image": "",
+        "result_descriptions": [],
+        "timestamp": "",
+        "is_archived": false,
+        "created_time": "2022-03-03 09:22:49.843674+00:00",
+        "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
+      }
+    ],
+    "total_count": 10000
+  }
 }
 ```
 

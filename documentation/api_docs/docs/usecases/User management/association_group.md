@@ -18,7 +18,8 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Successfully fetched the association groups",
-  "data": [
+  "data": {
+    "records": [
     {
       "uuid": "124hsgxR77QKS8uS7Zgm",
       "name": "Discipline Association Group",
@@ -27,7 +28,9 @@ Then the response would be as follows:
       "created_time": "2023-02-10 11:54:36.604328+00:00",
       "last_modified_time": "2023-02-10 11:57:11.611761+00:00"
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 
@@ -41,7 +44,8 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Successfully fetched the association groups",
-  "data": [
+  "data": {
+    "records": [
     {
       "uuid": "124hsgxR77QKS8uS7Zgm",
       "name": "Learner Association Group",
@@ -50,5 +54,7 @@ Then the response would be as follows:
       "created_time": "2023-02-10 11:54:36.604328+00:00",
       "last_modified_time": "2023-02-10 11:57:11.611761+00:00"
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }

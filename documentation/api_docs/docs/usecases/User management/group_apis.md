@@ -56,7 +56,8 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Data fetched successfully",
-  "data": [
+  "data": {
+    "records": [
     {
       "uuid": "124hsgxR77QKS8uS7Zgm",
       "name": "muttable user group",
@@ -73,7 +74,9 @@ Then the response would be as follows:
       ],
       "is_immutable": false
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 

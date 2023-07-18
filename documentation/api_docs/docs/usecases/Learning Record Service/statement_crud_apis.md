@@ -85,7 +85,8 @@ When we need to fetch all the Statements available then we would make a **GET** 
 {
   "success": true,
   "message": "Successfully fetched the statements",
-  "data": [
+  "data": {
+    "records": [
     {
       "actor": {
         "uuid": "2ivy523v5y6ynefn7a",
@@ -120,7 +121,9 @@ When we need to fetch all the Statements available then we would make a **GET** 
       "uuid": "98c60a1f-28f2-46a8-a3b5-35ed8e22d3d3",
       "stored": "2022-09-01 09:45:19 +0000"
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 

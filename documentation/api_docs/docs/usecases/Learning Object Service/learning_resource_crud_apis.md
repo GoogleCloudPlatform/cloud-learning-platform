@@ -126,7 +126,8 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Data fetched successfully",
-  "data": [
+  "data": {
+    "records": [
     {
       "name": "Text Books",
       "display_name": "Text Books",
@@ -225,7 +226,9 @@ Then the response would be as follows:
       "created_time": "2022-11-15 07:31:05.423165+00:00",
       "last_modified_time": "2022-11-15 07:31:05.593248+00:00"
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 
