@@ -123,6 +123,8 @@ def step_impl_14(context):
     "Notifications will be enabled using unique section id and a response model object will be return"
 )
 def step_impl_15(context):
+  print(f'--------------Status: {context.status}--------------------')
+  print(f'--------------Data: {context.response}--------------------')
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 
