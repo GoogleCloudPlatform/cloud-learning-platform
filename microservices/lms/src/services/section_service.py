@@ -266,7 +266,11 @@ def copy_course_background_task(course_template_details,
               "material"]
           error_flag = coursework_update_output["error_flag"]
           print("Updated coursework material attached")
-        final_coursewok_material.append(coursework_material)
+        
+        classroom_crud.create_coursework_material(new_course["id"],
+                                                final_coursewok_material)
+
+        # final_coursewok_material.append(coursework_material)
       except Exception as error:
         title = coursework_material["title"]
         error_flag = True
@@ -279,10 +283,11 @@ def copy_course_background_task(course_template_details,
         error = traceback.format_exc().replace("\n", " ")
         Logger.error(error)
         continue
-    # Create coursework in new course
-    if final_coursewok_material is not None:
-      classroom_crud.create_coursework_material(new_course["id"],
-                                                final_coursewok_material)
+
+    # # Create coursework in new course
+    # if final_coursewok_material is not None:
+    #   classroom_crud.create_coursework_material(new_course["id"],
+    #                                             final_coursewok_material)
 
     # Classroom copy is successful then the section status is changed to active
     if error_flag:

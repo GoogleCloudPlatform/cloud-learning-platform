@@ -190,7 +190,7 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
         coursework["maxPoints"] = lti_assignment_dict.get("max_points")
 
     elif course_work_type == "course_work_material":
-      coursework_material_list = [{
+      coursework_material = {
           "title": lti_assignment.lti_assignment_title,
           "materials": [{
               "link": {
@@ -199,7 +199,7 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
               }
           },],
           "state": "PUBLISHED"
-      }]
+      }
     else:
       raise ValidationError(
           f"Provided course work type - '{course_work_type}' is not valid")
@@ -212,7 +212,7 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
         classroom_resp = classroom_crud.create_coursework(course_id, coursework)
       elif course_work_type == "course_work_material":
         classroom_resp = classroom_crud.create_coursework_material(
-            course_id, coursework_material_list)
+            course_id, coursework_material)
     except Exception as e:
       LTIAssignment.delete_by_id(lti_assignment_id)
       Logger.error(
@@ -308,31 +308,22 @@ def update_lti_assignment(
     update_mask = ",".join(update_mask_list)
 
     if update_mask:
-      if course_work_type == "course_work":
-        try:
+      try:
+        if course_work_type == "course_work":
           classroom_crud.update_course_work(
               course_id, lti_assignment_details.course_work_id, update_mask,
               coursework_body)
-        except Exception as e:
-          Logger.error(
-              f"Update coursework failed for assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
-          )
-          raise Exception(
-              f"Internal error from classroom - {e} for assignment - {lti_assignment_id}"
-          ) from e
-
-      elif course_work_type == "course_work_material":
-        try:
+        elif course_work_type == "course_work_material":
           classroom_crud.update_course_work_material(
               course_id, lti_assignment_details.course_work_id, update_mask,
               coursework_body)
-        except Exception as e:
-          Logger.error(
-              f"Update coursework material failed for assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
-          )
-          raise Exception(
-              f"Internal error from classroom - {e} for assignment - {lti_assignment_id}"
-          ) from e
+      except Exception as e:
+        Logger.error(
+            f"Update coursework failed for assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
+        )
+        raise Exception(
+            f"Internal error from classroom - {e} for assignment - {lti_assignment_id}"
+        ) from e
 
     for key in update_lti_assignment_dict:
       if update_lti_assignment_dict[key] is not None:
@@ -380,10 +371,15 @@ def delete_lti_assignment(lti_assignment_id: str):
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
     context_resp = get_context_details(lti_assignment.context_id)
     course_id = context_resp["data"]["classroom_id"]
+    course_work_type = lti_assignment.course_work_type
 
     try:
-      classroom_crud.delete_course_work(course_id,
-                                        lti_assignment.course_work_id)
+      if course_work_type == "course_work":
+        classroom_crud.delete_course_work(course_id,
+                                          lti_assignment.course_work_id)
+      elif course_work_type == "course_work_material":
+        classroom_crud.delete_course_work_material(course_id,
+                                          lti_assignment.course_work_id)
     except Exception as e:
       Logger.error(
           f"Error deleting assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"

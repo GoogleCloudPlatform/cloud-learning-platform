@@ -24,8 +24,8 @@ class LTIAssignmentModel(BaseModel):
   lti_content_item_id: Optional[str]
   tool_id: Optional[str]
   course_work_id: Optional[str]
-  course_work_type: Literal["course_work",
-                            "course_work_material"] = "course_work"
+  course_work_type: Optional[Literal["course_work",
+                            "course_work_material"]] = "course_work"
   max_points: Optional[float]
   start_date: Optional[datetime.datetime]
   end_date: Optional[datetime.datetime]
@@ -118,6 +118,8 @@ class InputLTIAssignmentModel(BaseModel):
   context_id: str
   context_type: Literal["section", "course_template"]
   lti_content_item_id: Optional[str]
+  course_work_type: Optional[Literal["course_work",
+                            "course_work_material"]] = "course_work"
   lti_assignment_title: Optional[str]
   tool_id: Optional[str]
   max_points: Optional[float]
