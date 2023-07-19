@@ -3,6 +3,7 @@ import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA
 import { FormControl, UntypedFormGroup, UntypedFormBuilder, Validators, Form } from '@angular/forms';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { HomeService } from '../service/home.service';
+import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-create-cohort-modal',
@@ -10,6 +11,10 @@ import { HomeService } from '../service/home.service';
   styleUrls: ['./create-cohort-modal.component.scss']
 })
 export class CreateCohortModalComponent implements OnInit {
+  courseTemplateSkip: number = 0
+  courseTemplateLimit: number = 10
+  noMoreBatch : Boolean = false;
+  courseTemplateList = []
   createCohortForm: UntypedFormGroup
   showProgressSpinner: boolean = false
   constructor(public dialogRef: MatDialogRef<CreateCohortModalComponent>, @Inject(MAT_DIALOG_DATA) public cohortModalData: any, private fb: UntypedFormBuilder,
@@ -17,6 +22,7 @@ export class CreateCohortModalComponent implements OnInit {
   ngOnInit(): void {
     console.log("data ", this.cohortModalData)
     if (this.cohortModalData.mode == 'Create') {
+      this.getCourseTemplateList()
       console.log('data', this.cohortModalData)
       this.createCohortForm = this.fb.group({
         name: this.fb.control('', [Validators.required]),
@@ -54,6 +60,28 @@ export class CreateCohortModalComponent implements OnInit {
       duration: 3000,
       panelClass: ['red-snackbar'],
     });
+  }
+
+  getCourseTemplateList(){
+    this._HomeService.getCourseTemplateList(this.courseTemplateSkip, this.courseTemplateLimit)
+    .pipe(debounceTime(300))
+    .subscribe((res: any) => {
+      if (res.success == true){
+        if(res.course_template_list.length){
+          this.courseTemplateList = this.courseTemplateList.concat(res.course_template_list)
+          console.log(this.courseTemplateList.length)
+        }else{
+          this.noMoreBatch = true
+        }
+      }
+    })
+  }
+
+  getNextBatch(){
+    if(!this.noMoreBatch){
+      this.courseTemplateSkip = this.courseTemplateList.length
+      this.getCourseTemplateList()
+    }
   }
 
   createCohort() {
