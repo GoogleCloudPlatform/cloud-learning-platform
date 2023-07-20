@@ -22,18 +22,14 @@ def test_insert_data_to_db():
 
   parent_lo = LearningObject.from_dict(PARENT_LEARNING_OBJECT)
   parent_lo.version = 1
-  parent_lo.is_deleted = False
   parent_lo.save()
   parent_id = parent_lo.id
-  parent_lo.uuid = parent_id
-  parent_lo.update()
 
   child_lo = LearningObject()
   for each_object in CHILD_LEARNING_OBJECTS:
     lo = LearningObject.from_dict(each_object)
     lo.parent_nodes["learning_objects"] = [parent_id]
     lo.version = 1
-    lo.is_deleted = False
     lo.save()
     lo.uuid = lo.id
     lo.update()
@@ -43,11 +39,11 @@ def test_insert_data_to_db():
 
   parent_lo = LearningObject.find_by_uuid(parent_id)
   parent_lo.child_nodes["learning_objects"].extend(child_ids)
+  parent_lo.uuid = parent_id
   parent_lo.update()
 
   new_independent_lo = LearningObject.from_dict(PARENT_LEARNING_OBJECT)
   new_independent_lo.version = 1
-  new_independent_lo.is_deleted = False
   new_independent_lo.save()
   new_independent_lo.uuid = new_independent_lo.id
   new_independent_lo.update()
@@ -64,18 +60,14 @@ def test_insert_cirriculum_data_to_db():
 
   parent_cp = CurriculumPathway.from_dict(PARENT_CURRICULUM_PATHWAY_OBJECT)
   parent_cp.version = 1
-  parent_cp.is_deleted = False
   parent_cp.save()
   parent_cp_id = parent_cp.id
-  parent_cp.uuid = parent_cp_id
-  parent_cp.update()
 
   child_cp = CurriculumPathway()
   for each_object in CHILD_CURRICULUM_PATHWAY_OBJECTS:
     lo = CurriculumPathway.from_dict(each_object)
     lo.parent_nodes["learning_objects"] = [parent_cp_id]
     lo.version = 1
-    lo.is_deleted = False
     lo.save()
     lo.uuid = lo.id
     lo.update()
@@ -85,6 +77,7 @@ def test_insert_cirriculum_data_to_db():
 
   parent_cp = CurriculumPathway.find_by_uuid(parent_cp_id)
   parent_cp.child_nodes["curriculum_pathways"].extend(child_ids)
+  parent_cp.uuid = parent_cp_id
   parent_cp.update()
 
   yield parent_cp, child_ids, child_cp
