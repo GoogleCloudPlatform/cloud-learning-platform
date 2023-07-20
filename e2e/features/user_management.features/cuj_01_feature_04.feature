@@ -23,3 +23,8 @@ Feature: Relationship between User and Group
             When A API request to deactivate a user is sent to User management
                 Then the user should be deactivated 
                     Then the user should be removed from all the groups 
+
+    Scenario: Get user groups of a user
+        Given A user is part of multiple usergroups
+            When A API request is sent to user management to get usergroups of the user 
+                Then the user management will return usergroups of user based on queryparams
