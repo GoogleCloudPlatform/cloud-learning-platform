@@ -7,7 +7,7 @@ from pydantic import BaseModel, Extra
 from schemas.schema_examples import (BASIC_ACTION_MODEL_EXAMPLE,
                                      FULL_ACTION_MODEL_EXAMPLE)
 from common.utils.schema_validator import BaseConfigModel
-
+# pylint: disable = invalid-name
 ALLOWED_ACTION_TYPES = Literal["main","other"]
 
 class BasicActionModel(BaseConfigModel):

@@ -9,7 +9,7 @@ from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import InternalServerError
 from services.collection_handler import CollectionHandler
 
-
+# pylint: disable = invalid-name
 def get_all_discipline_for_given_program(uuid, nodes):
   """
   Args:

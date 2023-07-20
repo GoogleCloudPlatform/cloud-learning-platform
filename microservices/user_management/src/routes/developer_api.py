@@ -16,7 +16,7 @@ project_id = os.getenv("GCP_PROJECT", "aitutor-dev")
 @router.put("/update-fields", include_in_schema=False)
 def update_collection_fields(request: BasicUpdateModel):
   """
-  Update fields of a given collection 
+  Update fields of a given collection
 
   Args:
     collection_name (str): Name of the collection

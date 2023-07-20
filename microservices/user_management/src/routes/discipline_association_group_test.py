@@ -464,7 +464,7 @@ def test_remove_discipline_from_discipline_association_group(clean_firestore,
   assert resp.status_code == 422, f"Status Code = {resp.status_code}"
 
 def create_user_and_group(user_group_name, user_type):
-
+  """Create a user and a user group"""
   user_dict1 = User.from_dict({
       **BASIC_USER_MODEL_EXAMPLE, "user_type": user_type
   })

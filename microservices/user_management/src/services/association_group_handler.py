@@ -43,6 +43,7 @@ def check_instructor_discipline_association(instructor_id,
 
 
 def fetch_firestore_doc(data: list, collection: str=None, key_name: str=None):
+  """Fetches the firestore doc for a given collection"""
   for record in data:
     doc_fields = CollectionHandler.get_document_from_collection(
               collection, record.get(key_name))
@@ -58,6 +59,7 @@ def fetch_firestore_doc(data: list, collection: str=None, key_name: str=None):
 
 
 def process_threads(data: list, collection_type: str=None, key_name: str=None):
+  """Process a collection from the database with threads"""
   try:
     expanded_details = []
     child_count = 0
@@ -149,6 +151,7 @@ def instructor_exists_in_lag(association_grp, instructor_uuid):
   return False
 
 def remove_instructor_from_lag(instructor_uuid):
+  """Remove an instructor from the learner association group"""
   # Filter Learner Association Groups
   association_grp_manager = AssociationGroup.collection
   association_grp_manager = association_grp_manager.filter(
@@ -173,6 +176,7 @@ def remove_instructor_from_lag(instructor_uuid):
       learner_association_grp.update()
 
 def remove_instructor_from_dag(instructor_uuid, instructor_status):
+  """Remove an instructor from the discipline association group"""
   comparison_key = "users"
   comparator = {
           "status": instructor_status,

@@ -129,7 +129,7 @@ def get_learners_of_learner_association_group(
       limit (int): Size of group array to be returned
       fetch_tree (bool): To fetch the entire object
                         instead of the UUID of the object
-      status (str): To fetch the learner having given status 
+      status (str): To fetch the learner having given status
       (active or inactive)
 
   ### Raises:
@@ -267,7 +267,7 @@ def get_instructors_of_learner_association_group(
       limit (int): Size of group array to be returned
       fetch_tree (bool): To fetch the entire object
                         instead of the UUID of the object
-      status (str): To fetch the instructor having given status 
+      status (str): To fetch the instructor having given status
       (active or inactive)
 
   ### Raises:

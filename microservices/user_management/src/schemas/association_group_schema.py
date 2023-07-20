@@ -10,7 +10,7 @@ from schemas.schema_examples import (ASSOCIATION_GROUP_EXAMPLE,
                                      FULL_USER_MODEL_EXAMPLE)
 from schemas.user_schema import FullUserDataModel
 from common.utils.schema_validator import BaseConfigModel
-
+# pylint: disable = invalid-name
 ALLOWED_IMMUTABLE_ASSOCIATION_GROUPS = \
   Literal[tuple(IMMUTABLE_ASSOCIATION_GROUPS)]
 
