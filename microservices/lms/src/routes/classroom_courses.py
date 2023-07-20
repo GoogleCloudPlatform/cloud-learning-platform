@@ -294,3 +294,28 @@ def classroom_enable_notifications_pub_sub(course_id:str):
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
+
+@router.post("/duplicate_course")
+def duplicate_course_using_classroom_api(course_id: str, name: str):
+  """Duplicate classroom course using the classroom course API"""
+  try:
+    # input_course_details_dict = {**course_details.dict()}
+    # course_id = input_course_details_dict["course_id"]
+    # name = input_course_details_dict["name"]
+    data = classroom_crud.copy_classroom_course(course_id, name)
+    new_course_id = data.get("id")
+    Logger.info(f"New classroom created with id {new_course_id}")
+
+    classroom_crud.update_course_state(new_course_id, "ARCHIVED")
+    Logger.info(f"Classroom with id {new_course_id} has been archived")
+
+    classroom_crud.delete_course_by_id(new_course_id)
+    Logger.info(f"Classroom with id {new_course_id} has been deleted")
+
+    return {"course_id" :new_course_id}
+
+  except Exception as e:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
