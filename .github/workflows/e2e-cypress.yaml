@@ -1,0 +1,25 @@
+name: Run Cypress tests after merge
+on:
+  pull_request:
+    types:
+      - merged
+
+jobs:
+  e2eTests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install & run e2e tests
+        uses: cypress-io/github-action@v5
+        with:
+          record: true
+          start: npx run cypress:run:ci
+          config-file: cypress.json
+
+      - name: Check status
+        uses: actions/github-status@v1
+        with:
+          status: ${{ job.status }}
+          context: Cypress E2E Tests

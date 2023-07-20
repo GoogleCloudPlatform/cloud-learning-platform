@@ -1,6 +1,9 @@
 import "cypress-iframe";
-
 describe("Test Harmonize Deeplinking", () => {
+  let LTI_ASSIGNMENT_ID = null;
+
+  const EMAIL = "e2e_7112f773_1a53_email@gmail.com";
+  const PASSWORD = "!45RK&2L!m9%Ef";
   const getIframeDocument = () => {
     console.log(cy.get("#ltiIframe"));
     return cy.get("#ltiIframe").its("0.contentDocument").should("exist");
@@ -24,9 +27,9 @@ describe("Test Harmonize Deeplinking", () => {
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e"
     );
 
-    // signin with a account
-    cy.get('[type="email"]').type("e2e_7112f773_1a53_email@gmail.com");
-    cy.get('[type="password"]').type("!45RK&2L!m9%Ef");
+    // sign in with a account
+    cy.get('[type="email"]').type(EMAIL);
+    cy.get('[type="password"]').type(PASSWORD);
     cy.contains("Login").click();
 
     // check if domain is right
@@ -35,8 +38,14 @@ describe("Test Harmonize Deeplinking", () => {
       "https://core-learning-services-dev.cloudpssolutions.com"
     );
 
+    cy.intercept(
+      "GET",
+      "https://core-learning-services-dev.cloudpssolutions.com/lms/api/v1/sections?skip=0&limit=10"
+    ).as("getAllSections");
+
     // go to section
     cy.contains("Section List").click();
+    cy.wait("@getAllSections");
     cy.get("a.text").first().click();
     cy.contains(" Add LTI Assignment").click();
     cy.get('mat-select[formcontrolname="tool_id"]').click();
@@ -54,7 +63,7 @@ describe("Test Harmonize Deeplinking", () => {
     getIframeBody().contains("Discussion").click();
     getIframeBody().contains("Create New").click();
 
-    // type text in discussion title inputbox
+    // type text in discussion title input box
     cy.wait(5000);
     getIframeBody().find(".highlight-box").as("parentElement");
     cy.get("@parentElement")
@@ -63,7 +72,7 @@ describe("Test Harmonize Deeplinking", () => {
     cy.get("@parentElement").find('input[type="number"]').type(50);
     cy.get("@parentElement").contains("Create Discussion").click();
 
-    // type text in discussion title inputbox
+    // type text in discussion title input box
     cy.wait(10000);
     cy.get("#ltiIframe").should("not.exist");
 
@@ -73,10 +82,32 @@ describe("Test Harmonize Deeplinking", () => {
     ).as("apiRequest");
 
     cy.get('button[type="submit"]').contains("Save").click();
-    // Assert that the API call was made and wait for the response
     cy.wait("@apiRequest").then((interception) => {
       const response = interception.response;
+      Cypress.env.LTI_ASSIGNMENT_ID = response.body.data.id;
+      cy.log("response.body.id", response.body.data.id);
       expect(response.statusCode).to.equal(200);
     });
+    // let sectionId =
+    //   window.location.href.split("/")[
+    //     window.location.href.split("/").length - 1
+    //   ];
+    // let url = `https://core-learning-services-dev.cloudpssolutions.com/lms/api/v1/sections/${sectionId}/teachers`;
+    // cy.log("url", url);
+    // cy.intercept("POST", url).as("addTeacherApiRequest");
+
+    cy.contains(" Add Teacher").click();
+    cy.get('[formcontrolname="email"]').type(
+      "test_user_1@dhodun.altostrat.com"
+    );
+    cy.get(".mat-dialog-actions button").contains(" Add ").click();
+    // cy.wait("@addTeacherApiRequest").then((interception) => {
+    //   if (interception.response.statusCode == 200) {
+    //     cy.log("Teacher added successfully");
+    //   } else if (interception.response.statusCode == 409) {
+    //     cy.log("Teacher already existed");
+    //     cy.get("button").contains("No").click();
+    //   }
+    // });
   });
 });

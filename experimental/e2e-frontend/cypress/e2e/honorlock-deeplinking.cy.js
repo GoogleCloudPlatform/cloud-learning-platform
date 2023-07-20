@@ -1,19 +1,4 @@
-import "cypress-iframe";
-
-describe("Test Harmonize Deeplinking", () => {
-  const getIframeDocument = () => {
-    console.log(cy.get("#ltiIframe"));
-    return cy.get("#ltiIframe").its("0.contentDocument").should("exist");
-  };
-
-  const getIframeBody = () => {
-    console.log("body", getIframeDocument().its("body"));
-    return getIframeDocument()
-      .its("body")
-      .should("not.be.undefined")
-      .then(cy.wrap);
-  };
-
+describe("Test Honorlock Deeplinking", () => {
   it("should visit the login page with username password", () => {
     const domain =
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e";
@@ -40,27 +25,21 @@ describe("Test Harmonize Deeplinking", () => {
     cy.get("a.text").first().click();
     cy.contains(" Add LTI Assignment").click();
     cy.get('mat-select[formcontrolname="tool_id"]').click();
-    cy.get("mat-option").contains("ALEKS").click();
-    cy.get('[formcontrolname="lti_assignment_title"]').type("ALEKS testing");
-    cy.wait(5000);
-    cy.contains("Select Content").then(($button) => {
+    cy.get("mat-option").contains("Honorlock QA Tool").click();
+    cy.get('[formcontrolname="lti_assignment_title"]').type(
+      "Honorlock QA Tool testing"
+    );
+    cy.wait(3000);
+    cy.contains("Create Content Item").then(($button) => {
       if ($button.is(":disabled")) {
         cy.log("found existing content item");
       } else {
         cy.log("no existing content item was found");
-        cy.contains("Select Content").click();
-        cy.wait(15000);
-
-        // check if we are on home page of aleks deeplinking
-        getIframeBody().contains("ALEKS").should("be.visible");
-        getIframeBody().find("form[name='lti_ci']").as("parentElement");
-        cy.get("@parentElement").find(".mhe_but").click();
+        cy.contains("Create Content Item").click();
+        cy.wait(3000);
+        cy.get("button").contains("Create Content Item").should("be.disabled");
       }
     });
-
-    // validate if modal/dialogue-box is closed and click on save button and verify if save is successful
-    cy.wait(10000);
-    cy.get("#ltiIframe").should("not.exist");
 
     cy.intercept(
       "POST",
