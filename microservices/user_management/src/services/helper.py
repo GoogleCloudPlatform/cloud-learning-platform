@@ -62,6 +62,7 @@ def get_all_assign_user_for_given_instructor_or_coach(uuid, user_type):
   return users
 
 def get_data_for_fetch_tree(data,sort_by="created_time",sort_order="ascending"):
+  """Get data for fetch_tree"""
   userList = []
   def fetch_records(records):
     for i in records:
