@@ -391,6 +391,10 @@ def test_post_user(mock_learner, mock_learner_profile, mock_agent,
   loaded_user_dict.pop("created_time")
   loaded_user_dict.pop("last_modified_by")
   loaded_user_dict.pop("last_modified_time")
+  loaded_user_dict.pop("archived_at_timestamp")
+  loaded_user_dict.pop("archived_by")
+  loaded_user_dict.pop("deleted_at_timestamp")
+  loaded_user_dict.pop("deleted_by")
 
   # assert that rest of the fields are equivalent
   assert loaded_user_dict == post_json_response.get("data")
@@ -482,6 +486,10 @@ def test_post_user_faculty(mock_learner, mock_learner_profile, mock_agent,
   loaded_user_dict.pop("created_time")
   loaded_user_dict.pop("last_modified_by")
   loaded_user_dict.pop("last_modified_time")
+  loaded_user_dict.pop("archived_at_timestamp")
+  loaded_user_dict.pop("archived_by")
+  loaded_user_dict.pop("deleted_at_timestamp")
+  loaded_user_dict.pop("deleted_by")
 
   # assert that rest of the fields are equivalent
   assert loaded_user_dict == post_json_response.get("data")

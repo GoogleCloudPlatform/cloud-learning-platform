@@ -194,6 +194,10 @@ def test_post_user_group(clean_firestore):
   loaded_group_dict.pop("created_time")
   loaded_group_dict.pop("last_modified_by")
   loaded_group_dict.pop("last_modified_time")
+  loaded_group_dict.pop("archived_at_timestamp")
+  loaded_group_dict.pop("archived_by")
+  loaded_group_dict.pop("deleted_at_timestamp")
+  loaded_group_dict.pop("deleted_by")
   # assert that rest of the fields are equivalent
   assert loaded_group_dict == post_json_response.get("data")
 

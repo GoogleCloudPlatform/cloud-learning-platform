@@ -157,6 +157,10 @@ def test_post_application(clean_firestore):
   loaded_application_dict.pop("created_time")
   loaded_application_dict.pop("last_modified_by")
   loaded_application_dict.pop("last_modified_time")
+  loaded_application_dict.pop("archived_at_timestamp")
+  loaded_application_dict.pop("archived_by")
+  loaded_application_dict.pop("deleted_at_timestamp")
+  loaded_application_dict.pop("deleted_by")
 
   # assert that rest of the fields are equivalent
   assert loaded_application_dict == post_json_response.get("data")

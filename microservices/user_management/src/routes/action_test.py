@@ -148,6 +148,10 @@ def test_post_action(clean_firestore):
   loaded_action_dict.pop("created_time")
   loaded_action_dict.pop("last_modified_by")
   loaded_action_dict.pop("last_modified_time")
+  loaded_action_dict.pop("archived_at_timestamp")
+  loaded_action_dict.pop("archived_by")
+  loaded_action_dict.pop("deleted_at_timestamp")
+  loaded_action_dict.pop("deleted_by")
 
   # assert that rest of the fields are equivalent
   assert loaded_action_dict == post_json_response.get("data")
