@@ -25,30 +25,49 @@ GKE_POD_SA_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CREDENTIALS = service_account.Credentials.from_service_account_info(
     GKE_POD_SA_KEY)
 
-try:
-  # create publisher client object using credentials
-  publisher = pubsub_v1.PublisherClient(credentials=CREDENTIALS)
-  # create subscriber client object using credentials
-  subscriber = pubsub_v1.SubscriberClient(credentials=CREDENTIALS)
+# create publisher client object using credentials
+publisher = pubsub_v1.PublisherClient(credentials=CREDENTIALS)
+# create subscriber client object using credentials
+subscriber = pubsub_v1.SubscriberClient(credentials=CREDENTIALS)
 
-  topic_name = DATABASE_PREFIX + "classroom-notifications"
-  subscription_name = DATABASE_PREFIX + "classroom-notifications-sub"
-  #generate complete topic path using topic name and project id
-  topic_path = publisher.topic_path(PUB_SUB_PROJECT_ID, topic_name)
-
-  #generate complete subscription path using subscription name and project id
-  subscription_path = subscriber.subscription_path(PUB_SUB_PROJECT_ID,
-                                                   subscription_name)
-
+def create_topic_subs(topic_path, subscription_request):
   topic = publisher.create_topic(request={"name": topic_path})
   print(f"Created Pub/Sub topic: {topic.name}")
-  subscription = subscriber.create_subscription(request={
-      "name": subscription_path,
-      "topic": topic_path,
-      "ack_deadline_seconds":600
-  })
+  subscription = subscriber.create_subscription(request=subscription_request)
   print(f"Subscription created: {subscription.name}")
-except AlreadyExists:
-  print(f"{topic_name} already exists.")
-except Exception as e:
-  print(f"Error occured while creating topic: {topic_path}. \nError: {str(e)}")
+
+if __name__ == "__main__":
+  try:
+    cls_topic_name = DATABASE_PREFIX + "classroom-notifications"
+    lms_topic_name = DATABASE_PREFIX + "lms-notifications"
+    cls_subscription_name = DATABASE_PREFIX + "classroom-notifications-sub"
+    lms_subscription_name = DATABASE_PREFIX + "lms-notifications-push-sub"
+    #generate complete topic path using topic name and project id
+    cls_topic_path = publisher.topic_path(PUB_SUB_PROJECT_ID, cls_topic_name)
+    lms_topic_path = publisher.topic_path(PUB_SUB_PROJECT_ID, lms_topic_name)
+
+    #generate complete subscription path using subscription name and project id
+    cls_subscription_path = subscriber.subscription_path(PUB_SUB_PROJECT_ID,
+                                                    cls_subscription_name)
+    lms_subscription_path = subscriber.subscription_path(PUB_SUB_PROJECT_ID,
+                                                    lms_subscription_name)
+    create_topic_subs(
+        cls_topic_path, {
+            "name": cls_subscription_path,
+            "topic": cls_topic_path,
+            "ack_deadline_seconds": 600
+        })
+    webhook_url = ("https://core-learning-services-dev.cloudpssolutions.com"
+                   + "/lms/api/test/webhook")
+    push_config = pubsub_v1.types.PushConfig(push_endpoint=webhook_url)
+    create_topic_subs(
+        lms_topic_name, {
+            "name": lms_subscription_path,
+            "topic": lms_topic_path,
+            "push_config": push_config,
+        })
+  except AlreadyExists:
+    print(f"{cls_topic_name} already exists.")
+  except Exception as e:
+    print(f"Error occured while creating topic: {cls_topic_path}."
+          + f" \nError: {str(e)}")

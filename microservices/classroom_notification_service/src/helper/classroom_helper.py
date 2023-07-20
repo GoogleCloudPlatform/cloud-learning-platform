@@ -52,6 +52,19 @@ def get_user(user_id):
   service=get_service()
   return service.userProfiles().get(userId=user_id).execute()
 
+
+def get_course_by_id(course_id):
+  """Get course by Id function from classroom
+
+    Args: course_id
+  Returns:
+        course details
+  """
+
+  service = get_service()
+  course = service.courses().get(id=course_id).execute()
+  return course
+
 def get_course_work(course_id,course_work_id):
   """get course work details
 
