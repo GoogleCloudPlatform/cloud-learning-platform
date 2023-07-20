@@ -1,29 +1,32 @@
 """Learning Object Service Data Models"""
 
-from fireo.fields import (TextField, MapField, NumberField, BooleanField,
-                          ListField, DateTime)
+from fireo.fields import TextField, MapField, NumberField, BooleanField, ListField, DateTime
 from common.models import NodeItem, BaseModel
 from common.utils.errors import ResourceNotFoundException
 
-# pylint: disable = arguments-renamed
 LOS_LITERALS = {
-  "CP_TYPES" : ["pathway"],
-  "LE_TYPES" : ["learning_experience"],
-  "LO_TYPES" : ["srl", "static_srl", "cognitive_wrapper", "pretest",
-                "learning_module", "unit_overview", "project"],
-  "LR_TYPES" : ["pdf", "image", "html_package", "html",
-                "video", "scorm", "docx",""],
-
-  "CP_ALIASES" : ["program", "level", "discipline", "unit"],
-  "LE_ALIASES" : ["learning_experience"],
-  "LO_ALIASES" : ["module"],
-  "LR_ALIASES" : ["lesson"]
+  "curriculum_pathways": {
+    "alias": ["program", "level", "discipline", "unit"],
+    "type": ["pathway"]
+  },
+  "learning_experiences": {
+    "alias": ["learning_experience"],
+    "type": ["learning_experience"]
+  },
+  "learning_objects": {
+    "alias": ["module"],
+    "type": ["srl", "static_srl", "cognitive_wrapper", "pretest",
+                "learning_module", "unit_overview", "project"]
+  },
+  "learning_resources": {
+    "alias": ["lesson"],
+    "type": ["pdf", "image", "html_package", "html",
+                "video", "scorm", "docx",""]
+  }
 }
 
-
 def check_type(level):
-  """Function to check type"""
-  allowed_types = LOS_LITERALS[level + "_TYPES"]
+  allowed_types = LOS_LITERALS[level]["type"]
 
   def _check_type(field_val):
     """validator method for type field"""
@@ -36,8 +39,7 @@ def check_type(level):
 
 
 def check_alias(level):
-  """Function to check alias"""
-  allowed_aliases = LOS_LITERALS[level + "_ALIASES"]
+  allowed_aliases = LOS_LITERALS[level]["alias"]
 
   def _check_alias(field_val):
     """validator method for alias field"""
@@ -83,8 +85,10 @@ class CurriculumPathway(NodeItem):
   parent_nodes = MapField(default={})
   # meta fields
   order = NumberField()
-  alias = TextField(default="unit", validator=check_alias("CP"))
-  type = TextField(default="pathway", validator=check_type("CP"))
+  alias = TextField(default="unit",
+                    validator=check_alias("curriculum_pathways"))
+  type = TextField(default="pathway",
+                   validator=check_type("curriculum_pathways"))
   is_locked = BooleanField()
   is_optional = BooleanField(default=False)
   is_hidden = BooleanField(default=False)
@@ -153,8 +157,10 @@ class LearningExperience(NodeItem):
   parent_nodes = MapField(default={})
   # meta fields
   order = NumberField()
-  alias = TextField(default="learning_experience", validator=check_alias("LE"))
-  type = TextField(default="learning_experience", validator=check_type("LE"))
+  alias = TextField(default="learning_experience",
+                    validator=check_alias("learning_experiences"))
+  type = TextField(default="learning_experience",
+                   validator=check_type("learning_experiences"))
   is_locked = BooleanField()
   is_optional = BooleanField(default=False)
   is_hidden = BooleanField(default=False)
@@ -206,8 +212,10 @@ class LearningObject(NodeItem):
   parent_nodes = MapField(default={})
   # meta fields
   order = NumberField()
-  alias = TextField(default="module", validator=check_alias("LO"))
-  type = TextField(default="learning_module", validator=check_type("LO"))
+  alias = TextField(default="module",
+                    validator=check_alias("learning_objects"))
+  type = TextField(default="learning_module",
+                   validator=check_type("learning_objects"))
   is_locked = BooleanField()
   is_optional = BooleanField(default=False)
   is_hidden = BooleanField(default=False)
@@ -273,8 +281,10 @@ class LearningResource(NodeItem):
   prerequisites = MapField(default={})
   # meta fields
   order = NumberField()
-  alias = TextField(default="lesson", validator=check_alias("LR"))
-  type = TextField(default="", validator=check_type("LR"))
+  alias = TextField(default="lesson",
+                    validator=check_alias("learning_resources"))
+  type = TextField(default="",
+                   validator=check_type("learning_resources"))
   is_locked = BooleanField()
   is_hidden = BooleanField(default=False)
   is_optional = BooleanField(default=False)
