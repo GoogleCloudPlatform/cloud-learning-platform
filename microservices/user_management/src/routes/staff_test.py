@@ -137,7 +137,7 @@ def test_update_staff_negative(clean_firestore):
 def test_import_staff(clean_firestore):
   url = f"{api_url}/import/json"
   file_path = os.path.join(
-    os.getcwd(), "../../../e2e/api-tests/clp/testing_objects/", "staffs.json")
+    os.getcwd(), "../../../e2e/testing_objects/", "staffs.json")
   with open(file_path, "rb") as file:
     resp = client_with_emulator.post(url, files={"json_file": file})
 
