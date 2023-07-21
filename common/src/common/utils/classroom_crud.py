@@ -23,9 +23,23 @@ FEED_TYPE_DICT = {
     "COURSE_ROSTER_CHANGES": "courseRosterChangesInfo"
 }
 
-COPY_COURSE_API_KEY = get_secret("copy-course-api-key")
-COPY_COURSE_API_LABEL = get_secret("copy-course-api-label")
-COPY_COURSE_API_VERSION = get_secret("copy-course-api-version")
+try:
+  COPY_COURSE_API_KEY = get_secret("copy-course-api-key")
+except Exception as e:
+  COPY_COURSE_API_KEY = ""
+  Logger.info(f"Failed to fetch copy course api key secret with error - {e}")
+
+try:
+  COPY_COURSE_API_LABEL = get_secret("copy-course-api-label")
+except Exception as e:
+  COPY_COURSE_API_LABEL = ""
+  Logger.info(f"Failed to fetch copy course api label secret with error - {e}")
+
+try:
+  COPY_COURSE_API_VERSION = get_secret("copy-course-api-version")
+except Exception as e:
+  COPY_COURSE_API_VERSION = ""
+  Logger.info(f"Failed to fetch copy course api version secret with error - {e}")
 
 DISCOVERY_SERVICE_URL = f"https://classroom.googleapis.com/$discovery/rest?labels={COPY_COURSE_API_LABEL}&key={COPY_COURSE_API_KEY}"
 
