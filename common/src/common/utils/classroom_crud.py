@@ -14,7 +14,7 @@ from common.utils.secrets import get_secret
 from common.models import Section
 from common.config import (CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,
                            PUB_SUB_PROJECT_ID, DATABASE_PREFIX)
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, redefined-outer-name, broad-exception-caught
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
