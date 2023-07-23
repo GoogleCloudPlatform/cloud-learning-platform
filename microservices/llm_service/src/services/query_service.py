@@ -352,7 +352,7 @@ def _create_me_index_and_endpoint(index_name: str, bucket_uri: str,
     Logger.info(f"Deployed matching engine endpoint for {index_name}")
   except Exception as e:
     Logger.error(f"Error creating ME index or endpoint {e}")
-    raise InternalServerError(str(e)) from e
+
 
 def _process_documents(doc_url: str, bucket_name: str,
                        q_engine: QueryEngine, storage_client) -> \
