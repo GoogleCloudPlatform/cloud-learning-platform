@@ -1,0 +1,26 @@
+[{
+    "name": "Kubernetes",
+    "description": "",
+    "author": "",
+    "alignments": {
+        "competency_alignments": [],
+        "skill_alignments": []
+    },
+    "child_nodes": {
+        "learning_objects": [],
+        "assessments": []
+    },
+    "parent_nodes": {
+        "learning_opportunities": [],
+        "curriculum_pathways": []
+    },
+    "metadata": {
+        "design_config":{
+            "theme": "blue",
+            "illustration": "U1C1"
+        }
+    },
+    "duration": 0,
+    "equivalent_credits": 0,
+    "type": "learning_experience"
+}]

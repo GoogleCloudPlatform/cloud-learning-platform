@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-management
+spec:
+  replicas: 3
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: user-management
+        image: user-management
+        imagePullPolicy: Always
+        env:
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID
+        - name: EXTERNAL_DATA_GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: EXTERNAL_DATA_GCP_PROJECT
+        - name: INSPACE_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: INSPACE_BASE_URL
+        - name: EXTERNAL_USER_PROPERTY_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: EXTERNAL_USER_PROPERTY_PREFIX

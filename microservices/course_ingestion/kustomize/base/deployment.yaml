@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: course-ingestion
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: course-ingestion
+  template:
+    metadata:
+      labels:
+        app: course-ingestion
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: course-ingestion
+        image: course-ingestion
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1500Mi"
+          limits:
+            memory: "2500Mi"
+            cpu: "1500m" 
+        env:
+        # Define the environment variable
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: SKAFFOLD_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: SKAFFOLD_NAMESPACE
+        - name: GCP_ZONE
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_ZONE
+        - name: GKE_CLUSTER
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GKE_CLUSTER
+        - name: CONTAINER_NAME
+          value: course-ingestion
+        - name: DEPLOYMENT_NAME
+          value: course-ingestion
+        - name: API_BASE_URL
+          # Required format: api/version
+          value: api/v1
+        - name: SERVICE_NAME
+          value: course_ingestion
+        - name: REDIS_HOST
+          value: redis-master
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          initialDelaySeconds: 10
+          failureThreshold: 20
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15

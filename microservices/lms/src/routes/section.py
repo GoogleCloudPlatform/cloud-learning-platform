@@ -1,7 +1,7 @@
 """ Section endpoints """
 import traceback
 import datetime
-from common.models import Cohort, CourseTemplate, Section, BatchJob, CourseEnrollmentMapping
+from common.models import Cohort, CourseTemplate, Section, LmsJob, CourseEnrollmentMapping
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (ClassroomHttpException,
                                           InternalServerError,
@@ -25,10 +25,10 @@ from schemas.section import (
     ImportGradeResponseModel,
     EnrollTeacherSection,DeleteTeacherFromSectionResponseModel,
     UpdateEnrollmentStatusSectionModel,
-    DeleteFailedSectionSectionModel)
+    DeleteFailedSectionSectionModel,UpdateInviteResponseModel)
 from schemas.update_section import UpdateSection
-from services.section_service import copy_course_background_task,\
-update_grades,add_teacher
+from services.section_service import (copy_course_background_task,
+update_grades,add_teacher, insert_section_enrollment_to_bq)
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model, FEED_TYPES,
                           convert_coursework_to_short_coursework_model)
@@ -88,7 +88,7 @@ def create_section(sections_details: SectionDetails,
           "classroom with id" +
           f" {course_template_details.classroom_id} is not found")
 
-    batch_job_input = {
+    lms_job_input = {
         "job_type": "course_copy",
         "status": "ready",
         "input_data": {**sections_details.dict()},
@@ -98,28 +98,28 @@ def create_section(sections_details: SectionDetails,
         }
     }
 
-    batch_job = BatchJob.from_dict(batch_job_input)
-    batch_job.save()
+    lms_job = LmsJob.from_dict(lms_job_input)
+    lms_job.save()
 
     background_tasks.add_task(
         copy_course_background_task,
         course_template_details=course_template_details,
         sections_details=sections_details,
         cohort_details=cohort_details,
-        batch_job_id=batch_job.id,
+        lms_job_id=lms_job.id,
         message="Create section background task completed")
     info_msg = f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
                  section name {sections_details.name}"
     Logger.info(info_msg)
 
-    batch_job.logs["info"].append(info_msg)
-    batch_job.update()
+    lms_job.logs["info"].append(info_msg)
+    lms_job.update()
 
     return {
         "success": True,
         "message": "Section will be created shortly, " +
-                    f"use this job id - '{batch_job.id}' for more info",
+                    f"use this job id - '{lms_job.id}' for more info",
         "data": None
     }
   except ResourceNotFoundException as err:
@@ -325,6 +325,7 @@ def delete_teacher(section_id: str, teacher: str, request: Request):
     classroom_crud.delete_teacher(section.classroom_id, result.user.email)
     result.status = "inactive"
     result.update()
+    insert_section_enrollment_to_bq(result, section)
     return {
         "message": ("Successfully deleted the teacher from the section" +
                     f" {section_id} using {teacher}")
@@ -461,7 +462,7 @@ def update_section(sections_details: UpdateSection):
       "sectionId":section.id,\
       "courseId":section.classroom_id,\
       "classroomUrl":section.classroom_url,\
-        "name":section.name,\
+        "name":section.section,\
         "description":section.description,\
           "cohortId":section.cohort.id,\
           "courseTemplateId":section.course_template.id,\
@@ -643,7 +644,7 @@ def import_grade(section_id: str, coursework_id: str,
     section = Section.find_by_id(section_id)
     result = classroom_crud.get_course_work(section.classroom_id, coursework_id)
 
-    batch_job_input = {
+    lms_job_input = {
         "job_type": "grade_import",
         "status": "ready",
         "section_id": section_id,
@@ -658,8 +659,8 @@ def import_grade(section_id: str, coursework_id: str,
         }
     }
 
-    batch_job = BatchJob.from_dict(batch_job_input)
-    batch_job.save()
+    lms_job = LmsJob.from_dict(lms_job_input)
+    lms_job.save()
 
     #Get url mapping of google forms view links and edit ids
     is_google_form_present = False
@@ -668,24 +669,24 @@ def import_grade(section_id: str, coursework_id: str,
         if "form" in material.keys():
           is_google_form_present = True
           background_tasks.add_task(update_grades, material, section,
-                                    coursework_id, batch_job.id)
+                                    coursework_id, lms_job.id)
 
       if is_google_form_present:
         return {
             "message":
                 "Grades for coursework will be updated shortly, " +
-                f"use this job id - '{batch_job.id}' for more info"
+                f"use this job id - '{lms_job.id}' for more info"
         }
       else:
-        batch_job.logs["errors"].append(
+        lms_job.logs["errors"].append(
             f"Form is not present for coursework_id {coursework_id}")
-        batch_job.update()
+        lms_job.update()
         raise ResourceNotFoundException(
             f"Form is not present for coursework_id {coursework_id}")
     else:
-      batch_job.logs["errors"].append(
+      lms_job.logs["errors"].append(
             f"Form is not present for coursework_id {coursework_id}")
-      batch_job.update()
+      lms_job.update()
       raise ResourceNotFoundException(
           f"Form is not present for coursework_id {coursework_id}")
   except HttpError as hte:
@@ -729,7 +730,7 @@ def update_enrollment_status(section_id:str,enrollment_status: str):
       "sectionId":section.id,\
       "courseId":section.classroom_id,\
       "classroomUrl":section.classroom_url,\
-        "name":section.name,\
+        "name":section.section,\
         "description":section.description,\
           "cohortId":section.cohort.id,\
           "courseTemplateId":section.course_template.id,\
@@ -794,12 +795,32 @@ def failed_to_provision():
           Logger.info(f"Delete_drive folder {type(classroom_course)}")
           classroom_crud.delete_drive_folder(
             classroom_course["teacherFolder"]["id"])
+          course_enrollments =CourseEnrollmentMapping.fetch_users_by_section(
+            section.key)
+          Logger.info(f"Course enrollments {course_enrollments}")
+          for course_enrollment in course_enrollments:
+            rows=[{
+              "enrollment_id" : course_enrollment.id,
+              "email" : course_enrollment.user.email,
+              "user_id" : course_enrollment.user.user_id,
+              "role" : course_enrollment.role,
+              "status" : "inactive",
+              "invitation_id" : course_enrollment.invitation_id,
+              "section_id" : section.id,
+              "cohort_id" : section.cohort.id,
+              "course_id" : section.classroom_id,
+              "timestamp" : datetime.datetime.utcnow()
+            }]
+            insert_rows_to_bq(
+              rows=rows, dataset=BQ_DATASET,
+              table_name=BQ_TABLE_DICT["BQ_ENROLLMENT_RECORD"])
+            CourseEnrollmentMapping.delete_by_id(course_enrollment.id)
           classroom_crud.delete_course_by_id(section.classroom_id)
           Section.delete_by_id(section.id)
-          Logger.info(f"Deleted section with id \
-                {section.id} classroom_id {section.classroom_id} {folder_id}")
+          Logger.info(
+          f"Deleted section with name {section.name} {section.section} id\
+            {section.id} classroom_id {section.classroom_id} {folder_id}")
           count=count+1
-
       except HttpError as ae:
         Logger.error(ae)
         Logger.error(f"Delete course failed for section_id {section.id} \
@@ -816,3 +837,90 @@ def failed_to_provision():
     Logger.error(e)
     raise InternalServerError(str(e)) from e
 
+@router.patch("/{section_id}/update_invites",
+                              response_model=UpdateInviteResponseModel)
+def update_invites(section_id:str):
+  """
+  Args:
+  Raises:
+    InternalServerError: 500 Internal Server Error if something fails
+    ResourceNotFound : 404 if the section or classroom does not exist
+    Conflict: 409 if the student already exists
+  Returns:
+    : if the student successfully added,
+    NotFoundErrorResponseModel: if the section and course not found,
+    ConflictResponseModel: if any conflict occurs,
+    InternalServerErrorResponseModel: if the add student raises an exception
+  """
+  try:
+    section = Section.find_by_id(section_id)
+    course_records = CourseEnrollmentMapping.collection.filter(
+        "status", "==", "invited").filter(
+      "section", "==", section.key).fetch()
+    updated_list_inviations = []
+    for course_record in course_records:
+      Logger.info(f"course_record {course_record.section.id}, " +
+                  f"user_id {course_record.user.id}")
+      if course_record.invitation_id:
+        try:
+          result = classroom_crud.get_invite(course_record.invitation_id)
+          Logger.info(
+              f"Invitation {result} found for User id {course_record.user.id},\
+          course_enrollment_id {course_record.id} database will be updated\
+          once invite is accepted.")
+        except HttpError as ae:
+          Logger.info(f"Get invite response status code {ae.resp.status}")
+          Logger.info(
+              f"Could not get the invite for user_id {course_record.user.id}\
+          section_id{course_record.section.id}\
+           course_enrollment id {course_record.id}")
+          # user_details = classroom_crud.get_user_details(
+          #     user_id=course_record.user, headers=headers)
+          # Logger.info(f"User record found for User {user_details}")
+          user_profile = classroom_crud.get_user_profile_information(
+              course_record.user.email)
+          user_ref = course_record.user
+          # Check if gaia_id is "" if yes so update personal deatils
+          if "familyName" not in user_profile["name"].keys() or \
+            "givenName" not in user_profile["name"].keys():
+            Logger.error(
+f"Cannot update invitation status for{user_ref.email}\
+  {course_record.section.id} because does not have first name or last\
+      name set in google profile")
+            continue
+          if user_ref.gaia_id == "":
+            user_ref.first_name = user_profile["name"]["givenName"]
+            user_ref.last_name = user_profile["name"]["familyName"]
+            user_ref.gaia_id = user_profile["id"]
+            user_ref.photo_url = user_profile["photoUrl"]
+            user_ref.update()
+          course_record.status = "active"
+          course_record.update()
+          insert_section_enrollment_to_bq(course_record, section)
+          updated_list_inviations.append(course_record.key)
+          Logger.info(
+              f"Successfully  updated the invitations {updated_list_inviations}"
+          )
+    return {
+        "message": "Successfully  updated the invitations",
+        "data": {
+            "list_coursenrolment": updated_list_inviations
+        }
+    }
+  except ResourceNotFoundException as err:
+    error = traceback.format_exc().replace("\n", " ")
+    Logger.error(error)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                                 message=str(ae)) from ae
+  except Exception as e:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e

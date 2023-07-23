@@ -4,14 +4,17 @@ import time
 import datetime
 from datetime import timedelta
 from common.models import Section
-from testing_objects.test_config import API_URL,e2e_google_form_id,e2e_drive_folder_id
-from testing_objects.course_template import emails
+from e2e.gke_api_tests.testing_objects.test_config import API_URL
 from e2e.gke_api_tests.secrets_helper import (get_student_email_and_token,
-  get_workspace_student_email_and_token,create_coursework_submission,
+  get_workspace_student_email_and_token)
+from e2e.gke_api_tests.classroom_e2e_helper import(
+create_coursework_submission,
 list_coursework_submission_user,insert_file_into_folder)
+
 
 # -------------------------------Enroll student to cohort-------------------------------------
 # ----Positive Scenario-----
+
 
 
 @behave.given("A user has access privileges and wants to enroll a student into a cohort")
@@ -120,6 +123,8 @@ def step_impl_14(context):
     "Notifications will be enabled using unique section id and a response model object will be return"
 )
 def step_impl_15(context):
+  print(f'--------------Status: {context.status}--------------------')
+  print(f'--------------Data: {context.response}--------------------')
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 
@@ -367,7 +372,7 @@ def step_impl_48(context):
 )
 def step_impl_49(context):
   context.url = f'{API_URL}/sections/{context.sections.id}/teachers'
-  context.payload = {"email":emails["teacher"]}
+  context.payload = {"email":get_workspace_student_email_and_token()["email"]}
 
 
 @behave.when(
@@ -417,7 +422,7 @@ def step_impl_54(context):
   result = list_coursework_submission_user(context.access_token,
                                   context.classroom_id,
                                   context.coursework["id"],"me")
-  insert_file_into_folder(e2e_drive_folder_id,e2e_google_form_id)
+  
   print("This is result after list coursework submission Before turn in",result)
   assert "assignedGrade" not in result[0].keys()
 
@@ -452,14 +457,13 @@ def step_impl_56(context):
 )
 def step_impl_57(context):
   time.sleep(15)
-  insert_file_into_folder(e2e_drive_folder_id,e2e_google_form_id)
   print("After inser to origin folder")
   result = list_coursework_submission_user(context.access_token,
                                   context.classroom_id,
                                   context.coursework["id"],"me")
   print("This is result after Turn in list coursework submission",result)
   assert context.status == 202, "Status 202"
-  assert context.response["message"] == "Grades for coursework will be updated shortly","message not matching"
+  assert context.response["success"] is True,"success status not matching"
 
 # -------------------------------update classroom code of a section-------------------------------------
 # ----Positive Scenario-----

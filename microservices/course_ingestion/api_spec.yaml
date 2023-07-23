@@ -1,0 +1,2782 @@
+tags:
+  - name: Learning Content Ingestion
+    description: Ingests a particular learning content, performs CRUD at learning content level.
+  - name: Course Creation
+    description: Perform CRUDs course level.
+  - name: Competency level
+    description: Performs CRUD at Competency level.
+  - name: Competency level from Learning Content
+    description: Competency level operations from particular Learning content
+  - name: Competency level from Course
+    description: Competency level operations from particular Course
+  - name: Sub Competency level
+    description: Performs CRUD at SubCompetency level.
+  - name: Learning Objective level
+    description: Performs CRUD at Learning Objective level.
+  - name: Learning Unit level
+    description: Performs CRUD at Learning Unit level.
+  - name: Topic Tree
+    description: Performs topic tree creation at all levels, fetches complete topic tree
+  - name: Triple level
+    description: Performs CRUD at Triple level.
+  - name: Job Status Check
+    description: Checks and returns status of long running jobs
+  
+paths:
+  /course_ingestion/api/v1/course/:
+    get:
+      tags:
+        - Course Creation
+      description: This route fetches all the courses stored in firestore.
+      parameters:
+        - in: query
+          name: competencies
+          required: false
+          description: Flag to fetch competencies for each course.
+          schema:
+            type: string
+            enum: ["true", "false"]
+            example: "true"
+      responses:
+        "200":
+          description: All the courses present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllCourseResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    
+    post:
+      tags:
+        - Course Creation
+      description: This route creates a course.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/courseCreateSchema"
+      responses:
+        "200":
+          description: Updates a particular course present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  
+  /course_ingestion/api/v1/course/{id}:
+        
+    get:
+      tags:
+        - Course Creation
+      description: This route fetches a particular course using id.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Firestore ID of the course
+      responses:
+        "200":
+          description: A particular course present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  
+    put:
+      tags:
+        - Course Creation
+      description: This route updates a particular course using id.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Firestore ID of the course
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateCourseSchema"
+      responses:
+        "200":
+          description: Updates a particular course present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/updateCourseResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    
+    delete:
+      tags:
+        - Course Creation
+      description: This route deletes a particular course using id.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Firestore ID of the course
+      responses:
+        "200":
+          description: Deleted a particular course present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/deleteCourse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+                
+                
+  /course_ingestion/api/v1/learning_content/:
+    get:
+      tags:
+        - Learning Content Ingestion
+      description: This route fetches all the learning content items stored in firestore.
+      parameters: []
+      responses:
+        "200":
+          description: All the learning contents present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/allLearningContentResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    
+    post:
+      tags:
+        - Learning Content Ingestion
+      description: This route initiates a batch job to create a learning content.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/learningContentCreate"
+      responses:
+        "200":
+          description: Creates a Learning content in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/jobStartedResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  
+  /course_ingestion/api/v1/learning_content/{id}:
+        
+    get:
+      tags:
+        - Learning Content Ingestion
+      description: This route fetches a particular learning content using id.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Firestore ID of the learning content
+      responses:
+        "200":
+          description: A particular learning content present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/learningContentResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  
+    put:
+      tags:
+        - Learning Content Ingestion
+      description: This route updates a particular learning content using id.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Firestore ID of the learning content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateLearningContentSchema"
+      responses:
+        "200":
+          description: Updates a particular learning content present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/updateLearningContentResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    
+    delete:
+      tags:
+        - Learning Content Ingestion
+      description: This route deletes a particular learning content using id.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Firestore ID of the learning content
+      responses:
+        "200":
+          description: Deleted a particular learning content present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/learningContentDelete"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+                
+  /course_ingestion/api/v1/jobs/:
+    get:
+      tags:
+        - Job Status Check
+      description: This route fetches status of all jobs.
+      responses:
+        "200":
+          description: Returns the status of all jobs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/jobStatusCheck"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+
+  /course_ingestion/api/v1/jobs/{job_name}:
+  
+    get:
+      tags:
+        - Job Status Check
+      description: This route fetches status of given job name.
+      parameters:
+        - in: path
+          name: job_name
+          schema:
+            type: string
+          required: true
+          description:  Job name
+      responses:
+        "200":
+          description: Returns the status a single job given job_name or all jobs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/jobStatusCheck"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    
+    put:
+      tags:
+        - Job Status Check
+      description: This route removes the job from the namespace and updates the stauts.
+      parameters:
+        - in: path
+          name: job_name
+          schema:
+            type: string
+          required: true
+          description:  Job name
+      responses:
+        "200":
+          description: Removes the job from cluster and updates the status accordingly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/jobPutResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    
+    delete:
+      tags:
+        - Job Status Check
+      description: This route removes the the particular job document from firestore.
+      parameters:
+        - in: path
+          name: job_name
+          schema:
+            type: string
+          required: true
+          description:  Job name
+      responses:
+        "200":
+          description: Deletes the job document from the firestore.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/jobDeleteResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+
+  /course_ingestion/api/v1/course/{id}/competency/:
+    get:
+      tags:
+        - Competency level from Course
+      description: This route fetches all the competencies of a given course
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: All the competency of course with the given id present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    post:
+      tags:
+        - Competency level from Course
+      description: This route creates a competency using request parameters and associates it with the current course.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCompetencyRequest"
+      responses:
+        "200":
+          description: competency created in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  /course_ingestion/api/v1/course/{id}/competency/{competency_id}:
+    get:
+      tags:
+        - Competency level from Course
+      description: This route fetches a particular competency of a course using id.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Competency fetched from the firestore.
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/GetCompetencyResponse"
+                  
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    
+    delete:
+      tags:
+        - Competency level from Course
+      description: This route deletes(unlinks) a particular competency using id from a course.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted the competency from firestore.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  
+  /course_ingestion/api/v1/learning_content/{id}/competency/:
+    get:
+      tags:
+        - Competency level from Learning Content
+      description: This route fetches all the competencies of a given learning content
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: All the competency of learning content with the given id present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    post:
+      tags:
+        - Competency level from Learning Content
+      description: This route creates a competency using request parameters and associates it with current learning content.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCompetencyRequest"
+      responses:
+        "200":
+          description: competency created in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  /course_ingestion/api/v1/learning_content/{id}/competency/{competency_id}:
+    get:
+      tags:
+        - Competency level from Learning Content
+      description: This route fetches a particular competency using id with a learning content.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Competency fetched from the firestore.
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/GetCompetencyResponse"
+                  
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    delete:
+      tags:
+        - Competency level from Learning Content
+      description: This route deletes(unlink) a particular competency using id from a learning content.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted the competency from firestore.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  
+  /course_ingestion/api/v1/competency/:
+    get:
+      tags:
+        - Competency level
+      description: This route fetches all the competencies.
+      responses:
+        "200":
+          description: All the competency of course with the given id present in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    post:
+      tags:
+        - Competency level
+      description: This route creates a competency using request parameters.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCompetencyRequest"
+      responses:
+        "200":
+          description: competency created in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  /course_ingestion/api/v1/competency/{competency_id}:
+    get:
+      tags:
+        - Competency level
+      description: This route fetches a particular competency using id.
+      parameters:
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: is_text_required
+          required: false
+          description: Flag to fetch text of competency.
+          schema:
+            type: string
+            enum: ["true", "false"]
+            example: "false"
+      responses:
+        "200":
+          description: Competency fetched from the firestore.
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/GetCompetencyResponse"
+                  
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    put:
+      tags:
+        - Competency level
+      description: This route updates a particular competency using id.
+      parameters:
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCompetencyRequest"
+      responses:
+        "200":
+          description: Updated competency of the course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    delete:
+      tags:
+        - Competency level
+      description: This route deletes a particular competency using id.
+      parameters:
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted the competency from firestore.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  
+  /course_ingestion/api/v1/competency/{competency_id}/sub_competency/:
+    get:
+      tags:
+        - Sub Competency level
+      description: This route fetches all the sub competencies of a particular competency
+      parameters:
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: All the sub competencies of competency with the given id.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllSubCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    post:
+      tags:
+        - Sub Competency level
+      description: This route creates a particular sub competency using request parameters.
+      parameters:
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSubCompetencyRequest"
+      responses:
+        "200":
+          description: Created a sub competency in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateSubCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  /course_ingestion/api/v1/competency/{competency_id}/sub_competency/{sub_competency_id}:
+    get:
+      tags:
+        - Sub Competency level
+      description: This route fetches a particular sub competency using id.
+      parameters:
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: sub_competency_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: is_text_required
+          required: false
+          description: Flag to fetch text of subcompetency.
+          schema:
+            type: string
+            enum: ["true", "false"]
+            example: "false"
+      responses:
+        "200":
+          description: Fetched sub competency from firestore.
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/GetSubCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    put:
+      tags:
+        - Sub Competency level
+      description: This route updates a particular sub competency using id.
+      parameters:
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: sub_competency_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSubCompetencyRequest"
+      responses:
+        "200":
+          description: Updated sub competency of the course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateSubCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    delete:
+      tags:
+        - Sub Competency level
+      description: This route deletes a particular sub competency using id.
+      parameters:
+        - in: path
+          name: competency_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: sub_competency_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted the sub competency from firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteSubCompetencyResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+                
+                
+  /course_ingestion/api/v1/sub_competency/{sub_competency_id}/learning_objective/:
+    get:
+      tags:
+        - Learning Objective level
+      description: This route fetches all the learning objectives of a particular sub competency
+      parameters:
+        - in: path
+          name: sub_competency_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fetched all learning objectives of the given sub competency.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllLearningObjectiveResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    post:
+      tags:
+        - Learning Objective level
+      description: This route creates a learning objective using request parameters.
+      parameters:
+        - in: path
+          name: sub_competency_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLearningObjectiveRequest"
+      responses:
+        "200":
+          description: Created a learning objective in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateLearningObjectiveResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  /course_ingestion/api/v1/sub_competency/{sub_competency_id}/learning_objective/{learning_objective_id}:
+    get:
+      tags:
+        - Learning Objective level
+      description: This route fetches a particular learning objective using id.
+      parameters:
+        - in: path
+          name: sub_competency_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: learning_objective_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fetched learning objective from firestore.
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/GetLearningObjectiveResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    put:
+      tags:
+        - Learning Objective level
+      description: This route updates a particular learning objective using id.
+      parameters:
+        - in: path
+          name: sub_competency_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: learning_objective_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLearningObjectiveRequest"
+      responses:
+        "200":
+          description: Updated learning objective in firestore.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateLearningObjectiveResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    delete:
+      tags:
+        - Learning Objective level
+      description: This route deletes a particular learning objective using id
+      parameters:
+        - in: path
+          name: sub_competency_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: learning_objective_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted the learning objective from firestore.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteLearningObjectiveResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+                
+  /course_ingestion/api/v1/learning_objective/{learning_objective_id}/learning_unit/tree:
+    post:
+      tags:
+        - Learning Unit level
+      description: This route creates learning units for a given learning objective
+      parameters:
+        - in: path
+          name: learning_objective_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createLUFromLO"
+      responses:
+        "200":
+          description: Created learning units from Learning Objective
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createLUFromLOResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  
+  /course_ingestion/api/v1/learning_objective/{learning_objective_id}/learning_unit/:
+    get:
+      tags:
+        - Learning Unit level
+      description: This route fetches all the learning units of a particular learning objective
+      parameters:
+        - in: path
+          name: learning_objective_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: All the learning units of learning objective with the given id.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllLearningUnitResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    post:
+      tags:
+        - Learning Unit level
+      description: This route creates a learning unit using request parameters.
+      parameters:
+        - in: path
+          name: learning_objective_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLearningUnitRequest"
+      responses:
+        "200":
+          description: Created a learning unit in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateLearningUnitResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  /course_ingestion/api/v1/learning_objective/{learning_objective_id}/learning_unit/{learning_unit_id}:
+    get:
+      tags:
+        - Learning Unit level
+      description: This route fetches a particular learning unit using id.
+      parameters:
+        - in: path
+          name: learning_objective_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: learning_unit_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fetched learning unit from firestore.
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/GetLearningUnitResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    put:
+      tags:
+        - Learning Unit level
+      description: This route updates a particular learning unit using id.
+      parameters:
+        - in: path
+          name: learning_objective_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: learning_unit_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLearningUnitRequest"
+      responses:
+        "200":
+          description: Updated learning unit of the course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateLearningUnitResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    delete:
+      tags:
+        - Learning Unit level
+      description: This route deletes a particular learning unit using id.
+      parameters:
+        - in: path
+          name: learning_objective_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: learning_unit_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted the learning unit from firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteLearningUnitResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+                
+                
+  /course_ingestion/api/v1/learning_unit/{learning_unit_id}/triple/:
+    get:
+      tags:
+        - Triple level
+      description: This route fetches all the triples of a particular learning unit
+      parameters:
+        - in: path
+          name: learning_unit_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: All the triples of learning unit with the given id.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllTriplesResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    post:
+      tags:
+        - Triple level
+      description: This route creates a triple using request parameters.
+      parameters:
+        - in: path
+          name: learning_unit_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTripleRequest"
+      responses:
+        "200":
+          description: Created a triple in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTripleResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  /course_ingestion/api/v1/learning_unit/{learning_unit_id}/lu/triple/:
+    post:
+      tags:
+        - Triple level
+      description: Creates triples for a given learning unit ID.
+      parameters:
+        - in: path
+          name: learning_unit_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTriplesForLU"
+      responses:
+        "200":
+          description: Created a triple in firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllTriplesResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  /course_ingestion/api/v1/learning_unit/{learning_unit_id}/triple/{triple_id}:
+    get:
+      tags:
+        - Triple level
+      description: This route fetches a particular triple using id.
+      parameters:
+        - in: path
+          name: learning_unit_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: triple_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fetched triple from firestore.
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/GetTripleResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    put:
+      tags:
+        - Triple level
+      description: This route updates a particular triple using id.
+      parameters:
+        - in: path
+          name: learning_unit_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: triple_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTripleRequest"
+      responses:
+        "200":
+          description: Updated triple of the course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTripleResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    delete:
+      tags:
+        - Triple level
+      description: This route deletes a particular triple using id.
+      parameters:
+        - in: path
+          name: learning_unit_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: triple_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted the triple from firestore collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteTripleResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+  
+  
+  /course_ingestion/api/v1/topic_tree/:
+    get:
+      tags:
+       - Topic Tree
+      description: This route fetches entire topic tree for a given node id along with corresponding hierarchy level
+      parameters:
+        - in: query
+          name: level
+          required: true
+          description: Topic tree hierarchy level 
+          schema:
+            type: string
+            enum: ["learning_content","course","competency", "sub_competency","learning_objective","learning_unit"]
+            example: learning_objective
+        - in: query
+          name: id
+          required: true
+          description: Unique document identifier.
+          schema:
+            type: string
+          example: nczwaowmwvr
+      responses:
+        "200":
+          description: Topic tree for the given node id and level.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopicTreeGetResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    post:
+      tags:
+       - Topic Tree
+      description: This route initiates a batch job to create a topic tree for a given node.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TopicTreePostRequest"
+      responses:
+        "200":
+          description: Replaces the existing children nodes with newly created nodes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopicTreePostResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    
+components:
+  schemas:
+    defaultResponseSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "All good"
+        data:
+          type: object
+          
+    CourseResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the course(s)" 
+        data:
+          $ref: '#/components/schemas/courseSchemaWithCompetency'
+          
+    updateCourseResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully updated the course" 
+        data:
+          allOf:
+            - $ref: '#/components/schemas/courseSchemaWithCompetency'
+            - type: object
+              properties:
+                title:
+                  type: string
+                  example: "Updated title"
+              
+    courseSchema:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "course 1 title"
+        label:
+          type: string
+          example: "sample label"
+          
+    updateCourseSchema:
+      allOf:
+        - $ref: '#/components/schemas/courseSchema'
+        - type: object
+          properties:
+            title:
+              type: string
+              example: "Updated title"
+            competency_ids:
+              type: array
+              items:
+                type: string
+              example: ["fdskajgsdfg"]
+            override_existing_competencies:
+              type: boolean
+              default: False
+              description: If False then it will append the competency ids to existing competency ids.
+      
+    
+    courseCreateSchema:
+      type: object
+      required:
+        - title
+        - label
+      properties:
+        title:
+          type: string
+          example: "course 1 title"
+        label:
+          type: string
+          example: "sample title"
+        competency_ids:
+          type: array
+          items:
+            type: string
+            example: "dsfkjafal"
+        add_competencies_from_learning_content:
+          type: boolean
+          default: False
+          description: If set to True all competencies from the given learning content ids will be considered for course creation, ignoring field competency_ids.
+        learning_content_ids:
+          type: array
+          items:
+            type: string
+            example: "fkdaflgsgff"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+        course_category:
+          type: string
+          enum: ["default", "bio"]
+          description: If course is scientific choose "bio" else default
+        
+    
+    courseSchemaWithCompetency:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "course 1 title"
+        label:
+          type: string
+          example: "sample label"
+        is_valid:
+          type: boolean
+          example: true
+        type:
+          type: string
+          example: "course"
+        id:
+          type: string
+          example: "jfkdsafjalfd"
+        competencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/competencySchema'
+        created_time:
+              type: string
+              example: "2021-08-12 15:24:53.674795+00:00"
+        last_modified_time:
+          type: string
+          example: "2021-08-12 15:24:53.674795+00:00"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+        course_category:
+          type: string
+          example: "bio"
+        
+        
+        
+    deleteCourse:
+      allOf:
+        - $ref: '#/components/schemas/defaultResponseSchema'
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "Successfully deleted the course"
+          
+    learningContentDelete:
+      allOf:
+        - $ref: '#/components/schemas/defaultResponseSchema'
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "Successfully deleted the Learning Content"
+              
+    
+    learningContentSchema:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "learning content 1 title"
+        description:
+          type: string
+          example: "sample description"
+        format: 
+          type: string
+          example: "pdf"
+        competency_ids:
+          type: array
+          items:
+            type: string
+          example: ["fjsdsaflasdkfl"]
+        gcs_path:
+          type: string
+          example: "gs://bucket-name/learning_contents/sample_content.pdf"
+        override_existing_competencies:
+          type: boolean
+          default: False
+          description: If False then it will append the competency ids to existing competency ids.
+        course_category:
+          type: string
+          example: "bio"
+          
+    updateLearningContentSchema:
+      allOf:
+        - $ref: '#/components/schemas/learningContentSchema'
+        - type: object
+          properties:
+            title:
+              type: string
+              example: "Updated title"
+          
+          
+    allLearningContentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the learning content item(s)" 
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/learningConentWithCompetency'
+          
+    learningContentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the learning content item(s)" 
+        data:
+          $ref: '#/components/schemas/learningConentWithCompetency'
+          
+          
+    updateLearningContentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully updated the learning content item(s)" 
+        data:
+          allOf:
+          - $ref: '#/components/schemas/learningConentWithCompetency'
+          - type: object
+            properties:
+              title:
+                type: string
+                example: "Updated title"
+          
+
+    learningConentWithCompetency:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "learning content 1 title"
+        description:
+          type: string
+          example: "sample description"
+        document_type:
+          type: string
+          example: "pdf"
+        id:
+          type: string
+          example: "jfkdsafjalfd"
+        gcs_path:
+          type: string
+          example: "gs://bucket-name/learning_contents/sample_content.pdf"
+        competencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/competencyWithoutParent'
+        created_time:
+              type: string
+              example: "2021-08-12 15:24:53.674795+00:00"
+        last_modified_time:
+          type: string
+          example: "2021-08-12 15:24:53.674795+00:00"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+        course_category:
+          type: string
+          example: "bio"
+          
+    competencyWithoutParent:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "competency title"
+        description:
+          type: string
+          example: "description"
+        is_valid:
+          type: boolean
+          example: true
+        id:
+          type: string
+          example: "fjaskdfjas"
+        type:
+          type: string
+          example: "competencies"
+        label:
+          type: string
+          example: "sample label"
+        created_time:
+              type: string
+              example: "2021-08-12 15:24:53.674795+00:00"
+        last_modified_time:
+          type: string
+          example: "2021-08-12 15:24:53.674795+00:00"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+            
+            
+    learningContentCreate:
+      type: object
+      required:
+        - title
+        - gcs_path
+        - format
+      properties:
+        title:
+          type: string
+          example: "Sample Learning Content title"
+        gcs_path:
+          type: string
+          example: "gs://bucket-name/learning_contents/sample_content.pdf"
+        format:
+          type: string
+          example: "pdf"
+        start_page:
+          type: integer
+          example: 30
+        end_page:
+          type: integer
+          example: 300
+        created_by:
+          type: string
+          example: "user 1"
+        last_modified_by:
+          type: string
+          example: "user 2"
+        description:
+          type: string
+          example: "sample description"
+        create_learning_units:
+          type: boolean
+          default: true
+        create_triples:
+          type: boolean
+          default: false
+        using_parser:
+          type: boolean
+          default: false
+          description: "Whether to use only parser to ingest learning content"
+        fcm_token:
+          type: string
+          example: "dmiBYXlO3lI:APA91bEXIGi_13Ofwdu9-GPBbQQs_4eANqx2DW"
+          description: "Firebase Cloud Messaging token, used to send notifications about batch job status"
+        course_category:
+          type: string
+          enum: ["default", "bio"]
+          description: If course is scientific choose "bio" else default
+    jobStartedResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "A job with name abcd-ajdf-sdfk-sdff has been started"
+        data:
+          type: object
+          properties:
+            job_name:
+              type: string
+              example: "abcd-ajdf-sdfk-sdff"
+            status:
+              type: string
+              example: "running"
+    
+    TopicTreePostResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "A job with name abcd-ajdf-sdfk-sdff has been started"
+        data:
+          type: object
+          properties:
+            job_name:
+              type: string
+              example: "abcd-ajdf-sdfk-sdff"
+            status:
+              type: string
+              example: "running"
+  
+    jobStatusCheck:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Batch Job status: succeeded"
+        data:
+          type: object
+          properties:
+            job_name:
+              type: string
+              example: "abcd-ajdf-sdfk-sdff"
+            created_by:
+              type: string
+              example: "Sample User"
+            created_time:
+              type: string
+              example: "2021-09-03 11:56:25.370711+00:00"
+            last_modified_by:
+              type: string
+              example: "Sample User"
+            last_modified_time:
+              type: string
+              example: "2021-09-03 11:56:25.370711+00:00"
+            input_data:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Sample title"
+                gcs_path:
+                  type: string
+                  example: "gs://bucket-name/learning_contents/sample_content.pdf"
+                format:
+                  type: string
+                  example: "pdf"
+                start_page:
+                  type: number
+                  example: 1
+                end_page:
+                  type: number
+                  example: 200
+            status:
+              type: string
+              example: "succeeded"
+            generated_item_id:
+              type: string
+              example: "HlgZWSyu5hvNGZX5sb7t"
+                  
+    jobPutResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "A job with name abcd-ajdf-sdfk-sdff has been aborted"
+        data:
+          type: object
+    
+    jobDeleteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "A job with name abcd-ajdf-sdfk-sdff has been deleted"
+        data:
+          type: object
+
+    AllCourseResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the course" 
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+                example: "course 1 title"
+              is_valid:
+                type: boolean
+                example: true
+              type:
+                type: string
+                example: "course"
+              id:
+                type: string
+                example: "jfkdsafjalfd"
+              competencies:
+                type: array
+                items:
+                  $ref: '#/components/schemas/competencySchema'
+              created_time:
+                type: string
+                example: "2021-08-12 15:24:53.674795+00:00"
+              last_modified_time:
+                type: string
+                example: "2021-08-12 15:24:53.674795+00:00"
+              created_by:
+                type: string
+                example: "User 1"
+              last_modified_by:
+                type: string
+                example: "User 1"
+              course_category:
+                type: string
+                example: "bio"
+
+    AllCompetencyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the competency(s)" 
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/competencySchema'
+    UpdateCompetencyRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          example: updated title
+    CreateCompetencyRequest:
+      type: object
+      required:
+        - title
+        - label
+      properties:
+        title:
+          type: string
+          example: "competency title"
+        description:
+          type: string
+          example: "description"
+        label:
+          type: string
+          example: "sample label"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+
+    CreateCompetencyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully created the competency" 
+        data:
+          $ref: '#/components/schemas/competencySchema'
+          
+    DeleteCompetencyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully deleted the competency" 
+        data:
+          type: object
+    GetCompetencyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the competency(s)" 
+        data:
+          $ref: '#/components/schemas/competencySchema'
+    UpdateCompetencyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully updated the competency(s)" 
+        data:
+          allOf:
+           - $ref: '#/components/schemas/competencySchema'
+           - type: object
+             properties:
+              title:
+                type: string
+                example: "updated title"
+                
+    AllSubCompetencyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the sub competency(s)" 
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubCompetencySchema'
+    UpdateSubCompetencyRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          example: updated title
+    CreateSubCompetencyRequest:
+      type: object
+      required:
+        - title
+        - label
+      properties:
+        title:
+          type: string
+          example: "sub competency title"
+        description:
+          type: string
+          example: "description"
+        all_learning_resource:
+          type: string
+          example: ""
+        label:
+          type: string
+          example: "sample label"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+    CreateSubCompetencyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully created the sub competency" 
+        data:
+          $ref: '#/components/schemas/SubCompetencySchema'
+    DeleteSubCompetencyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully deleted the sub competency" 
+        data:
+          type: object
+    GetSubCompetencyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the sub competency(s)" 
+        data:
+          $ref: '#/components/schemas/SubCompetencySchema'
+    UpdateSubCompetencyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully updated the sub competency" 
+        data:
+          allOf:
+           - $ref: '#/components/schemas/SubCompetencySchema'
+           - type: object
+             properties:
+              title:
+                type: string
+                example: "updated title"
+    
+    AllLearningObjectiveResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the Learning objective(s)" 
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LearningObjectiveSchema'
+    CreateLearningObjectiveRequest:
+      type: object
+      required:
+        - title
+        - text
+      properties:
+        title:
+          type: string
+          example: "learning objective title"
+        description:
+          type: string
+          example: "description"
+        text:
+          type: array
+          items:
+            type: string
+          example: ["paragraph 1", "paragraph 2"]
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+    CreateLearningObjectiveResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully created the learning objective" 
+        data:
+          $ref: '#/components/schemas/LearningObjectiveSchema'
+    DeleteLearningObjectiveResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully deleted the learning objective" 
+        data:
+          type: object
+    GetLearningObjectiveResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the learning objective(s)" 
+        data:
+          $ref: "#/components/schemas/LearningObjectiveSchema"
+          
+    UpdateLearningObjectiveRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          example: updated title
+          
+    UpdateLearningObjectiveResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully updated the learning objective" 
+        data:
+          allOf:
+           - $ref: '#/components/schemas/LearningObjectiveSchema'
+           - type: object
+             properties:
+              title:
+                type: string
+                example: "updated title"
+    
+    createLUFromLO:
+      type: object
+      required:
+        - create_triples
+      properties:
+        created_by:
+          type: string
+          example: User 1
+        last_modified_by:
+          type: string
+          example: User 1
+        create_triples:
+          type: boolean
+          example: false
+          default: false
+
+    createLUFromLOResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "A job with name abcd-ajdf-sdfk-sdff has been started"
+        data:
+          type: object
+          properties:
+            job_name:
+              type: string
+              example: "abcd-ajdf-sdfk-sdff"
+            status:
+              type: string
+              example: "running"
+    
+    AllLearningUnitResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the Learning unit(s)" 
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LearningUnitSchema'
+    CreateLearningUnitRequest:
+      type: object
+      required:
+        - title
+        - text
+      properties:
+        title:
+          type: string
+          example: "learning unit title"
+        pdf_title:
+          type: string
+          example: ""
+        text:
+          type: array
+          items:
+            type: string
+            example: "Sample paragraph"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+    CreateLearningUnitResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully created the learning unit" 
+        data:
+          $ref: '#/components/schemas/LearningUnitSchema'
+    DeleteLearningUnitResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully deleted the learning unit" 
+        data:
+          type: object
+    GetLearningUnitResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the learning unit(s)" 
+        data:
+          $ref: "#/components/schemas/LearningUnitSchema"
+          
+    UpdateLearningUnitRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          example: updated title
+          
+    UpdateLearningUnitResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully updated the learning unit" 
+        data:
+          allOf:
+           - $ref: '#/components/schemas/LearningUnitSchema'
+           - type: object
+             properties:
+              title:
+                type: string
+                example: "updated title"
+
+    AllTriplesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the triple(s)" 
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripleSchema'
+    CreateTripleRequest:
+      type: object
+      required:
+        - subject
+        - predicate
+        - object
+        - confidence
+        - sentence
+      properties:
+        subject:
+          type: string
+          example: "subject"
+        predicate:
+          type: string
+          example: "predicate"
+        object:
+          type: string
+          example: "object"
+        confidence:
+          type: number
+          example: 0.9
+        sentence:
+          type: string
+          example: "This sentence has subject predicate object."
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+    CreateTripleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully created the learning unit" 
+        data:
+          $ref: '#/components/schemas/TripleSchema'
+    DeleteTripleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully deleted the triple" 
+        data:
+          type: object
+    GetTripleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully fetched the triple(s)" 
+        data:
+          $ref: "#/components/schemas/TripleSchema"
+          
+    UpdateTripleRequest:
+      type: object
+      properties:
+        subject:
+          type: string
+          example: updated subject
+          
+    UpdateTripleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message: 
+          type: string
+          example: "Successfully updated the triple" 
+        data:
+          allOf:
+           - $ref: '#/components/schemas/TripleSchema'
+           - type: object
+             properties:
+              subject:
+                type: string
+                example: "updated subject"
+    
+    TripleSchema:
+      type: object
+      properties:
+        subject:
+          type: string
+          example: "subject"
+        predicate:
+          type: string
+          example: "predicate"
+        object:
+          type: string
+          example: "object"
+        confidence:
+          type: number
+          example: 0.9
+        sentence:
+          type: string
+          example: "This sentence contains subject predicate object"
+        created_time:
+          type: string
+          example: "2021-08-12 15:24:53.674795+00:00"
+        last_modified_time:
+          type: string
+          example: "2021-08-12 15:24:53.674795+00:00"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+          
+    CreateTriplesForLU:
+      type: object
+      properties:
+        top_n:
+          type: number
+          example: 1
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+
+
+
+    competencySchema:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "competency title"
+        description:
+          type: string
+          example: "sample description"
+        is_valid:
+          type: boolean
+          example: true
+        id:
+          type: string
+          example: "fjaskdfjas"
+        type:
+          type: string
+          example: "competencies"
+        label:
+          type: string
+          example: "sample label"
+        created_time:
+              type: string
+              example: "2021-08-12 15:24:53.674795+00:00"
+        last_modified_time:
+          type: string
+          example: "2021-08-12 15:24:53.674795+00:00"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+        
+          
+    SubCompetencySchema:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "sub competency title"
+        description:
+          type: string
+          example: "description"
+        parent_node:
+          type: string
+          example: "competency/jfkdsafjalfd"
+        all_learning_resource:
+          type: string
+          example: ""
+        is_valid:
+          type: boolean
+          example: true
+        id:
+          type: string
+          example: "nczwaowmwvr"
+        label:
+          type: string
+          example: "sample label"
+        total_lus:
+          type: number
+          example: 10
+        created_time:
+              type: string
+              example: "2021-08-12 15:24:53.674795+00:00"
+        last_modified_time:
+          type: string
+          example: "2021-08-12 15:24:53.674795+00:00"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+    
+    LearningObjectiveSchema:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "learning objective title"
+        description:
+          type: string
+          example: "description"
+        parent_node:
+          type: string
+          example: "sub_competency/jfkdsafjalfd"
+        is_valid:
+          type: boolean
+          example: true
+        id:
+          type: string
+          example: "nczwaowmwvr"
+        text:
+          type: array
+          items:
+            type: string
+          example: ["paragraph 1", "paragraph 2"]
+        created_time:
+              type: string
+              example: "2021-08-12 15:24:53.674795+00:00"
+        last_modified_time:
+          type: string
+          example: "2021-08-12 15:24:53.674795+00:00"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+    LearningObjectivewithLearingUnitSchema:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "learning objective title"
+        description:
+          type: string
+          example: "description"
+        parent_node:
+          type: string
+          example: "sub_competency/jfkdsafjalfd"
+        is_valid:
+          type: boolean
+          example: true
+        id:
+          type: string
+          example: "nczwaowmwvr"
+        text:
+          type: string
+          example: "sample text"
+        learningunits:
+          type: array
+          items:
+            $ref: '#/components/schemas/LearningUnitSchema'
+    LearningUnitSchema:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "learning unit title"
+        parent_node:
+          type: string
+          example: "learning_objective/jfkdsafjalfd"
+        pdf_title:
+          type: string
+          example: ""
+        is_valid:
+          type: boolean
+          example: true
+        id:
+          type: string
+          example: "nczwaowmwvr"
+        text:
+          type: array
+          items:
+            type: string
+            example: "Amino acids are the monomers that comprise proteins."
+        topics:
+          type: array
+          items:
+            type: object
+            properties:
+              entity:
+                type: string
+                example : "Amino acids"
+              salience:
+                type: number
+                example : 0.35
+        created_time:
+              type: string
+              example: "2021-08-12 15:24:53.674795+00:00"
+        last_modified_time:
+          type: string
+          example: "2021-08-12 15:24:53.674795+00:00"
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+    
+    TopicTreePostRequest:
+      type: object
+      required:
+        - id
+        - level
+        - text
+      properties:
+        id:
+          type: string
+          example: "7xoVamA9KASRPkQNP5zg"
+          description: "Id of the parent node from which topic tree has to be created"
+        level:
+          type: string
+          example: "learning_objective"
+          description: "Level of the parent node from which topic tree has to be created"
+        text:
+          type: array
+          items:
+            type: string
+            example: "Sample paragraph"
+          description: "List of paragraphs to consider for topic tree creation"
+        
+        created_by:
+          type: string
+          example: "User 1"
+        last_modified_by:
+          type: string
+          example: "User 1"
+        create_learning_units:
+          type: boolean
+          default: true
+        create_triples:
+          type: boolean
+          default: false
+  
+    TopicTreeGetResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Successfully fetched the Tree"
+        data:
+            $ref: '#/components/schemas/LearningObjectivewithLearingUnitSchema'
+
+    errorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Something went wrong
+        data:
+          type: object
+          nullable: true
+          example: null
+    badRequestResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Validation failed
+        data:
+          type: object
+          nullable: true
+          example: null
+          

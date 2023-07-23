@@ -31,3 +31,32 @@ def get_method(url: str,
 
   return requests.get(
       url=f"{url}", params=query_params, headers=headers, timeout=60)
+
+
+def post_method(url: str,
+                request_body=None,
+                use_bot_account=None,
+                token=None) -> json:
+  """
+  Function for API test POST method
+  Parameters
+  ----------
+  url: str
+  request_body: dict
+  use_bot_account: bool
+  token: token
+  Returns
+  -------
+  JSON Object
+  """
+
+  if use_bot_account:
+    token = auth_client.get_id_token()
+
+  if token:
+    headers = {"Authorization": f"Bearer {token}"}
+  else:
+    headers = {}
+
+  return requests.post(
+      url=f"{url}", json=request_body, headers=headers, timeout=60)

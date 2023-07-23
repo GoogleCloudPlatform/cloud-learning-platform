@@ -1,0 +1,90 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: prior-learning-assessment
+requires:
+  - path: ../../common
+    configs: [common]
+build:
+  tagPolicy:
+    gitCommit: {}
+  local:
+    concurrency: 0
+  artifacts:
+  - image: prior-learning-assessment
+    requires:
+      - image: common
+        alias: BASE_IMG
+    sync:
+      infer:
+        - '**/*.py'
+        - '**/*.json'
+portForward:
+- resourceType: service
+  resourceName: prior-learning-assessment
+  port: 80
+  localPort: 8888
+deploy:
+  kustomize:
+    paths:
+    - ./kustomize/minikube
+profiles:
+- name: custom
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: prior-learning-assessment
+      docker:
+        cacheFrom:
+          - prior-learning-assessment
+          - prior-learning-assessment:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/custom
+- name: prod_non_cloudbuild
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod
+- name: dev
+  activation:
+    - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: gcr.io/core-learning-services-dev/prior-learning-assessment
+      docker:
+        cacheFrom:
+          - gcr.io/core-learning-services-dev/prior-learning-assessment
+          - gcr.io/core-learning-services-dev/prior-learning-assessment:latest
+      requires:
+        - image: gcr.io/core-learning-services-dev/common
+          alias: BASE_IMG
+      sync:
+        infer:
+          - '**/*.py'
+          - '**/*.json'
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/dev
+- name: prod
+  build:
+    googleCloudBuild: {}
+    artifacts:
+    - image: prior-learning-assessment
+      docker:
+        cacheFrom:
+          - prior-learning-assessment
+          - prior-learning-assessment:latest
+      requires:
+        - image: common
+          alias: BASE_IMG
+  deploy:
+    kustomize:
+      paths:
+      - ./kustomize/prod

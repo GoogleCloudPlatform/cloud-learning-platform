@@ -1,7 +1,7 @@
 import behave
 import requests
-from testing_objects.test_config import API_URL
-from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA
+from e2e.test_config import API_URL
+from e2e.utils.course_template import COURSE_TEMPLATE_INPUT_DATA
 from environment import create_course
 
 # -------------------------------Fetch All Courses-------------------------------------
@@ -86,6 +86,8 @@ def step_impl_8(context):
     "Notifications will be enabled using unique course id and a response model object will be return"
 )
 def step_impl_9(context):
+  print(f'--------------Status: {context.status}--------------------')
+  print(f'--------------Data: {context.response}--------------------')
   assert context.status == 200, "Status 200"
   assert context.response["success"] is True, "Check success"
 

@@ -19,6 +19,7 @@ metadata:
 spec:
   jobTemplate:
     spec:
+      backoffLimit: 0
       template:
         spec:
           containers:
@@ -27,5 +28,5 @@ spec:
             envFrom:
             - configMapRef:
                 name: env-vars
-          restartPolicy: OnFailure
+          restartPolicy: Never
           

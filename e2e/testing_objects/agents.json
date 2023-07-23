@@ -1,0 +1,34 @@
+[
+    {
+        "object_type": "agent",
+        "name": "agent 1",
+        "mbox": "mailto:test_agent@example.org",
+        "mbox_sha1sum": "SHA-123",
+        "open_id": "",
+        "account_homepage": "",
+        "account_name": "test_account_name",
+        "members": [],
+        "user_id": "user_id_1234"
+    },
+    {
+        "object_type": "agent",
+        "name": "agent 2",
+        "mbox": "mailto:test_agent@example.org",
+        "mbox_sha1sum": "SHA-123",
+        "open_id": "",
+        "account_homepage": "",
+        "account_name": "test_account_name",
+        "members": [],
+        "user_id": "user_id_1234"   },
+    {
+        "object_type": "agent",
+        "name": "agent 3",
+        "mbox": "mailto:test_agent@example.org",
+        "mbox_sha1sum": "SHA-123",
+        "open_id": "",
+        "account_homepage": "",
+        "account_name": "test_account_name",
+        "members": [],
+        "user_id": "user_id_1234"    }
+    
+] 

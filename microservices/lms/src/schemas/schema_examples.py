@@ -354,7 +354,7 @@ COURSE_EXAMPLE = {
 }
 }
 
-BATCH_JOB_EXAMPLE = {
+LMS_JOB_EXAMPLE = {
     "id": "vbt1o7bp0n91e",
     "job_type": "copy_course",
     "status": "success",
@@ -371,3 +371,13 @@ BATCH_JOB_EXAMPLE = {
     "start_time": "2023-01-24 17:38:32",
     "end_time": "2023-01-24 17:53:17"
 }
+
+STUDENT_RECORDS_MODEL={
+    "user_id": "2xBnBjqm2X3eRgVxE6Bv",
+    "email": "test_user@gmail",
+    "section_id": "fake-section-id",
+    "cohort_id": "fake-cohort-id",
+    "classroom_id": "123453333",
+    "enrollment_status":"invited",
+    "invitation_id":"dxfcgvhbjn"
+            }

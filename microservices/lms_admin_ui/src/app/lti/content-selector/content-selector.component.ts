@@ -3,6 +3,7 @@ import { LtiService } from '../service/lti.service';
 import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-content-selector',
@@ -30,12 +31,13 @@ export class ContentSelectorComponent {
   }
   getToolUrl() {
     let data = this.dialogData.extra_data
-    this.ltiService.contentSelectionLaunch(data.toolId, data.userId, data.contextId, data.contextType).subscribe(
-      (response: any) => {
-        this.loadingIframe = false
-        this.iframeUrl = response.url
-      }
-    )
+    // this.ltiService.contentSelectionLaunch(data.toolId, data.userId, data.contextId, data.contextType).subscribe(
+    //   (response: any) => {
+    //     this.loadingIframe = false
+    //     this.iframeUrl = this.getUrl(response.url)
+    //   }
+    // )
+    this.iframeUrl = `${environment.ltiUrl}content-selection-launch-init?tool_id=${data.toolId}&user_id=${data.userId}&context_id=${data.contextId}&context_type=${data.contextType}`
   }
 
   openFailureSnackBar(message: string, action: string) {
