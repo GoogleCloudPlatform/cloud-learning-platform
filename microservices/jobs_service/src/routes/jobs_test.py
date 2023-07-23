@@ -22,7 +22,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from unittest import mock
-from testing.test_config import API_URL, TESTING_FOLDER_PATH
+from testing.test_config import API_URL
 from schemas.schema_examples import USER_EXAMPLE
 from common.models import UserChat, User
 from common.utils.http_exceptions import add_exception_handlers
@@ -32,9 +32,7 @@ from common.testing.firestore_emulator import firestore_emulator, clean_firestor
 from config import JOB_TYPES
 
 # assigning url
-api_url = f"{API_URL}/chat"
-LLM_TESTDATA_FILENAME = os.path.join(TESTING_FOLDER_PATH,
-                                        "llm_generate.json")
+api_url = f"{API_URL}/jobs"
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
@@ -44,18 +42,12 @@ os.environ["COHERE_API_KEY"] = "fake-key"
 with mock.patch(
     "google.cloud.secretmanager.SecretManagerServiceClient",
     side_effect=mock.MagicMock()) as mok:
-  from routes.llm import router
+  from routes.jobs import router
 
 app = FastAPI()
 add_exception_handlers(app)
 app.include_router(router, prefix="/jobs-service/api/v1")
 
-FAKE_GENERATE_PARAMS = {
-    "llm_type": "LLM Test",
-    "prompt": "test prompt"
-  }
-
-FAKE_GENERATE_RESPONSE = "test generation"
 
 @pytest.fixture
 def create_user(client_with_emulator):
