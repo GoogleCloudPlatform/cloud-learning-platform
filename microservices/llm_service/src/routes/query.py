@@ -39,8 +39,9 @@ from schemas.llm_schema import (LLMQueryModel,
                                 LLMQueryResponse)
 
 from services.query_service import query_generate, query_engine_build
-from config import (DATABASE_PREFIX, PAYLOAD_FILE_SIZE, ERROR_RESPONSES,
-                    DEFAULT_QUERY_CHAT_MODEL)
+from config import (PROJECT_ID, DATABASE_PREFIX, PAYLOAD_FILE_SIZE, 
+                    ERROR_RESPONSES, DEFAULT_QUERY_EMBEDDING_MODEL,
+                    ENABLE_OPENAI_LLM, ENABLE_COHERE_LLM)
 
 router = APIRouter(prefix="/query", tags=["LLMs"], responses=ERROR_RESPONSES)
 
@@ -229,9 +230,14 @@ async def query_engine_create(gen_config: LLMQueryEngineModel,
       "query_engine": query_engine,
       "user_id": user_id,
       "is_public": is_public,
-      "llm_type": genconfig_dict.get("llm_type", DEFAULT_QUERY_CHAT_MODEL)
+      "llm_type": genconfig_dict.get("llm_type", DEFAULT_QUERY_EMBEDDING_MODEL)
     }
-    env_vars = {"DATABASE_PREFIX": DATABASE_PREFIX}
+    env_vars = {
+      "DATABASE_PREFIX": DATABASE_PREFIX,
+      "PROJECT_ID": PROJECT_ID,
+      "ENABLE_OPENAI_LLM": str(ENABLE_OPENAI_LLM),
+      "ENABLE_COHERE_LLM": str(ENABLE_COHERE_LLM)
+    }
     response = initiate_batch_job(data, JOB_TYPE_QUERY_ENGINE_BUILD, env_vars)
     Logger.info(response)
     return response
