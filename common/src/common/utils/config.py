@@ -13,25 +13,46 @@ DEFAULT_JOB_REQUESTS = {
       "memory": "5000Mi"
     }
 
+JOB_TYPE_UNIFIED_ALIGNMENT = "unified_alignment"
+JOB_TYPE_COURSE_INGESTION = "course-ingestion"
+JOB_TYPE_SKILL_ALIGNMENT = "skill_alignment"
+JOB_TYPE_EMSI_INGESTION = "emsi_ingestion"
+JOB_TYPE_CSV_SKILL_INGESTION = "csv_ingestion"
+JOB_TYPE_WGU_SKILL_INGESTION = "wgu_ingestion"
+JOB_TYPE_CSV_INGESTION = "generic_csv_ingestion"
+JOB_TYPE_CREDENTIAL_ENGINE_INGESTION = "credential_engine_ingestion"
+JOB_TYPE_EMBEDDING_DB_UPDATE = "skill_embedding_db_update"
+JOB_TYPE_KNOWLEDGE_EMBEDDING_DB_UPDATE = "knowledge_embedding_db_update"
+JOB_TYPE_ONET_ROLE_INGESTION = "onet_role_ingestion"
+JOB_TYPE_ROLE_SKILL_ALIGNMENT = "role_skill_alignment"
+JOB_TYPE_LEARNING_RESOURCE_INGESTION = "learning_resource_ingestion"
+JOB_TYPE_COURSE_INGESTION_TOPIC_TREE = "course-ingestion_topic-tree"
+JOB_TYPE_COURSE_INGESTION_LEARNING_UNITS = "course-ingestion_learning-units"
+JOB_TYPE_CREATE_KNOWLEDGE_GRAPH_EMBEDDING = "create_knowledge_graph_embedding"
+JOB_TYPE_DEEP_KNOWLEDGE_TRACING = "deep-knowledge-tracing"
+JOB_TYPE_VALIDATE_AND_UPLOAD_ZIP = "validate_and_upload_zip"
+JOB_TYPE_QUERY_ENGINE_BUILD = "query_engine_build"
+
 JOB_TYPES_WITH_PREDETERMINED_TITLES = [
-    "unified_alignment",
-    "course-ingestion",
-    "skill_alignment",
-    "emsi_ingestion",
-    "csv_ingestion",
-    "wgu_ingestion",
-    "generic_csv_ingestion",
-    "credential_engine_ingestion",
-    "skill_embedding_db_update",
-    "knowledge_embedding_db_update",
-    "onet_role_ingestion",
-    "role_skill_alignment",
-    "learning_resource_ingestion",
-    "course-ingestion_topic-tree",
-    "course-ingestion_learning-units",
-    "create_knowledge_graph_embedding",
-    "deep-knowledge-tracing",
-    "validate_and_upload_zip"
+    JOB_TYPE_UNIFIED_ALIGNMENT,
+    JOB_TYPE_COURSE_INGESTION,
+    JOB_TYPE_SKILL_ALIGNMENT,
+    JOB_TYPE_EMSI_INGESTION,
+    JOB_TYPE_CSV_SKILL_INGESTION,
+    JOB_TYPE_WGU_SKILL_INGESTION,
+    JOB_TYPE_CSV_INGESTION,
+    JOB_TYPE_CREDENTIAL_ENGINE_INGESTION,
+    JOB_TYPE_EMBEDDING_DB_UPDATE,
+    JOB_TYPE_KNOWLEDGE_EMBEDDING_DB_UPDATE,
+    JOB_TYPE_ONET_ROLE_INGESTION,
+    JOB_TYPE_ROLE_SKILL_ALIGNMENT,
+    JOB_TYPE_LEARNING_RESOURCE_INGESTION,
+    JOB_TYPE_COURSE_INGESTION_TOPIC_TREE,
+    JOB_TYPE_COURSE_INGESTION_LEARNING_UNITS,
+    JOB_TYPE_CREATE_KNOWLEDGE_GRAPH_EMBEDDING,
+    JOB_TYPE_DEEP_KNOWLEDGE_TRACING,
+    JOB_TYPE_VALIDATE_AND_UPLOAD_ZIP,
+    JOB_TYPE_QUERY_ENGINE_BUILD
 ]
 
 BATCH_JOB_FETCH_TIME = 24  # in hours
