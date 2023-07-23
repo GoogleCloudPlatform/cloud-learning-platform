@@ -45,8 +45,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 # Setup K8 configs (if running in a pod)
 if os.getenv('KUBERNETES_SERVICE_HOST'):
   config.load_incluster_config()
-  configuration = client.Configuration()
-  api_instance = client.BatchV1Api(client.ApiClient(configuration))
+  api_instance = client.BatchV1Api()
 
 
 def kube_delete_empty_pods(namespace="default"):
@@ -368,12 +367,10 @@ def kube_create_job(job_specs, namespace="default", env_vars={}):
     return response
 
   except Exception as e:
-    logging.error(f"Batch Job {job_model.uuid}: Failed")
+    logging.error(f"Batch Job {job_specs}: Failed")
     logging.error(traceback.print_exc())
     BatchJobModel.delete_by_id(job_model.id)
-    raise Exception(
-        "Exception when calling BatchV1Api->create_namespaced_job: %s\n" % e) \
-            from e
+    raise BatchJobError(str(e)) from e
 
 
 def kube_get_namespaced_deployment_image_path(deployment_name,container_name,
