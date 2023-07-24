@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: cpu-pod-scaling-credential-pathway-service
@@ -11,9 +11,8 @@ spec:
   maxReplicas: 3
   metrics:
   - type: Resource
-    #resource:
-    #  name: memory
-    #  targetAverageValue: 500Mi
     resource:
       name: cpu
-      targetAverageUtilization: 60
+      target:
+        averageUtilization: 60
+        type: Utilization
