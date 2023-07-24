@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prior-learning-assessment
+spec:
+  replicas: 3
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: prior-learning-assessment
+        image: prior-learning-assessment
+        imagePullPolicy: Always
+        env:
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID
+        - name: EXTERNAL_DATA_GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: EXTERNAL_DATA_GCP_PROJECT

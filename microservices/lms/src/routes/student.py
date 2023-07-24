@@ -5,6 +5,8 @@ from googleapiclient.errors import HttpError
 from services import student_service,section_service
 from utils.user_helper import (
   course_enrollment_user_model,get_user_id)
+from utils.helper import bq_query_results_to_dict_list
+from common.utils.bq_helper import run_query
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  InvalidTokenError)
@@ -22,8 +24,11 @@ from schemas.section import(StudentListResponseModel,\
    DeleteStudentFromSectionResponseModel)
 from schemas.student import(AddStudentResponseModel,
   AddStudentModel,GetStudentDetailsResponseModel,
-    GetProgressPercentageResponseModel,InviteStudentToSectionResponseModel
+    GetProgressPercentageResponseModel,
+    InviteStudentToSectionResponseModel,
+    StudentsRecordsResponseModel
 )
+from config import BQ_TABLE_DICT,BQ_DATASET,PROJECT_ID
 
 router = APIRouter(prefix="/student",
                    tags=["Students"],
@@ -81,6 +86,11 @@ cohort_student_router = APIRouter(prefix="/cohorts",
                                           "model": ValidationErrorResponseModel
                                       }
                                   })
+NOT_DB_TABLE_ID=(f"`{PROJECT_ID}.{BQ_DATASET}."
++ f"{BQ_TABLE_DICT['EXISTS_IN_CLASSROOM_NOT_IN_DB_VIEW']}`")
+NOT_CLASSROOM_TABLE_ID=(
+  f"`{PROJECT_ID}.{BQ_DATASET}"
+  + f".{BQ_TABLE_DICT['EXISTS_IN_DB_NOT_IN_CLASSROOM_VIEW']}`")
 
 
 @section_student_router.get("/{section_id}/get_progress_percentage/{user}",
@@ -360,12 +370,12 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
         student_email=input_data.email,
         course_id=section.classroom_id,
         course_code=section.classroom_code)
-    cohort = section.cohort
-    cohort.enrolled_students_count += 1
-    cohort.update()
-    section.enrolled_students_count += 1
-    section.update()
-
+    latest_section = Section.find_by_id(section.id)
+    latest_cohort = latest_section.cohort
+    latest_cohort.enrolled_students_count += 1
+    latest_cohort.update()
+    latest_section.enrolled_students_count += 1
+    latest_section.update()
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = User.find_by_user_id(
@@ -413,6 +423,9 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
       raise ClassroomHttpException(status_code=ae.resp.status,
                                    message="Can't enroll student to classroom,\
   Please check organizations policy or authentication scopes") from ae
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
@@ -447,7 +460,7 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
       raise ValidationError("Cohort Max count reached hence student cannot" +
             "be erolled in this cohort")
     if section.enrolled_students_count >= section.max_students:
-      raise ValidationError("Cohort Max count reached hence student cannot" +
+      raise ValidationError("Section Max count reached hence student cannot" +
             "be erolled in this cohort")
     sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
@@ -464,12 +477,12 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
         student_email=input_data.email,
         course_id=section.classroom_id,
         course_code=section.classroom_code)
-    cohort = section.cohort
-    cohort.enrolled_students_count += 1
-    cohort.update()
-    section.enrolled_students_count += 1
-    section.update()
-
+    latest_section = Section.find_by_id(section.id)
+    latest_cohort = latest_section.cohort
+    latest_cohort.enrolled_students_count += 1
+    latest_cohort.update()
+    latest_section.enrolled_students_count += 1
+    latest_section.update()
     course_enrollment_mapping = CourseEnrollmentMapping()
     course_enrollment_mapping.section = section
     course_enrollment_mapping.user = User.find_by_user_id(
@@ -551,6 +564,9 @@ def invite_student(section_id: str, student_email: str, request: Request):
     if cohort.enrolled_students_count >= cohort.max_students:
       raise Conflict("Cohort Max count reached hence student cannot" +
                      " be erolled in this cohort")
+    if section.enrolled_students_count >= section.max_students:
+      raise ValidationError("Section Max count reached hence student cannot" +
+            "be erolled in this cohort")
     sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
     sections = list(sections)
     if not student_service.check_student_can_enroll_in_cohort(
@@ -558,11 +574,13 @@ def invite_student(section_id: str, student_email: str, request: Request):
       raise Conflict(f"User {student_email} is already\
                       registered for cohort {section.cohort.id}")
     invitation_details = student_service.invite_student(
-        section=section, student_email=student_email, headers=headers)
-    section.enrolled_students_count +=1
-    section.update()
-    cohort.enrolled_students_count +=1
-    cohort.update()
+    section=section, student_email=student_email, headers=headers)
+    latest_section = Section.find_by_id(section.id)
+    latest_cohort = latest_section.cohort
+    latest_cohort.enrolled_students_count += 1
+    latest_cohort.update()
+    latest_section.enrolled_students_count += 1
+    latest_section.update()
     return {
         "message":
         f"Successfully Added the Student with email {student_email}",
@@ -629,10 +647,12 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     headers = {"Authorization": request.headers.get("Authorization")}
     invitation_details = student_service.invite_student(
         section=section, student_email=student_email, headers=headers)
-    section.enrolled_students_count +=1
-    section.update()
-    cohort.enrolled_students_count +=1
-    cohort.update()
+    latest_section = Section.find_by_id(section.id)
+    latest_cohort = latest_section.cohort
+    latest_cohort.enrolled_students_count += 1
+    latest_cohort.update()
+    latest_section.enrolled_students_count += 1
+    latest_section.update()
     return {
         "message":
   f"Successfully Added the Student with email {student_email}",
@@ -647,6 +667,75 @@ def invite_student_cohort(cohort_id: str, student_email: str,
   except HttpError as ae:
     raise ClassroomHttpException(status_code=ae.resp.status,
                                  message=str(ae)) from ae
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+@router.get("/exists_in_classroom_not_in_db",
+            response_model=StudentsRecordsResponseModel)
+def get_list_of_students_not_in_db():
+  """Get list of students who doesn't exists in db
+
+  Raises:
+      BadRequest: Custom exception raised when any bad request occurs
+      ResourceNotFound: Resource not found exception
+      InternalServerError: Internal server error
+
+  Returns:
+      _type_: _description_
+  """
+  try:
+    result= run_query(
+      query=(f"Select * from {NOT_DB_TABLE_ID} "
+             + "where roster_collection=\"courses.students\""))
+    return {
+      "data":bq_query_results_to_dict_list(result),
+      "message":
+        "Successfully fetched list of students exists in DB not in Classroom"
+        }
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Exception as e:
+    Logger.error(e)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise InternalServerError(str(e)) from e
+
+@router.get("/exists_in_db_not_in_classroom",
+            response_model=StudentsRecordsResponseModel)
+def get_list_of_students_not_in_classroom():
+  """Get list of students who doesn't exists in Classroom
+
+  Raises:
+      BadRequest: Custom exception raised when any bad request occurs
+      ResourceNotFound: Resource not found exception
+      InternalServerError: Internal server error
+
+  Returns:
+      _type_: _description_
+  """
+  try:
+    result= run_query(
+      query=(f"Select * from {NOT_CLASSROOM_TABLE_ID} "
+             + "where enrollment_role=\"learner\""))
+    data=bq_query_results_to_dict_list(result)
+    return {
+      "data":data,
+      "message":
+        "Successfully fetched list of students exists in DB not in Classroom"
+        }
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")

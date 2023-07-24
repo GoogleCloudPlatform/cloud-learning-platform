@@ -20,7 +20,7 @@ from common.utils.gcs_adapter import (is_valid_path,
 
 GCP_BUCKET = os.environ.get("GCP_PROJECT")
 CONTENT_SERVING_BUCKET = os.environ.get("CONTENT_SERVING_BUCKET",
-                                        "content-serving-bucket")
+                          "core-learning-services-dev-content-serving-bucket")
 
 UUID = uuid.uuid4()
 
