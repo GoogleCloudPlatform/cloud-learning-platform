@@ -243,7 +243,7 @@ def create_topics(course_id, topics):
   return topic_id_map
 
 
-def get_coursework_list(course_id):
+def get_coursework_list(course_id,coursework_state="PUBLISHED"):
   """Get  list of coursework from classroom
 
   Args: course_id
@@ -251,12 +251,17 @@ def get_coursework_list(course_id):
     returns list of coursework of given course in classroom
   """
 
-  service = build("classroom", "v1", credentials=get_credentials())
+  service = build("classroom", "v1", credentials=get_credentials("e2e-admin-teacher-1@dhodun.altostrat.com"))
+  page_token = None
+  coursework_list=[]
   try:
-    coursework_list = service.courses().courseWork().list(
-        courseId=course_id).execute()
-    if coursework_list:
-      coursework_list = coursework_list["courseWork"]
+    while(True):
+      response = service.courses().courseWork().list(
+          courseId=course_id,pageToken=page_token,courseWorkStates=coursework_state).execute()
+      coursework_list.extend(response.get("courseWork", []))
+      page_token = response.get('nextPageToken', None)
+      if not page_token:
+        break
     return coursework_list
   except HttpError as error:
     logger.error(error)
@@ -311,7 +316,7 @@ def patch_student_submission(course_id, coursework_id, student_submission_id,
   return patch_result
 
 
-def get_coursework_material_list(course_id):
+def get_coursework_material_list(course_id,coursework_material_state="PUBLISHED"):
   """Get  list of coursework from classroom
 
   Args: course_id
@@ -319,13 +324,19 @@ def get_coursework_material_list(course_id):
     returns list of coursework of given course in classroom
   """
 
-  service = build("classroom", "v1", credentials=get_credentials())
+  service = build("classroom", "v1", credentials=get_credentials("e2e-admin-teacher-1@dhodun.altostrat.com"))
+  page_token = None
+  coursework_material_list=[]
   try:
-    coursework_list = service.courses().courseWorkMaterials().list(
-        courseId=course_id).execute()
-    if coursework_list:
-      coursework_list = coursework_list["courseWorkMaterial"]
-    return coursework_list
+    while(True):
+      response = service.courses().courseWorkMaterials().list(
+       courseId=course_id,pageToken=page_token,
+       courseWorkMaterialStates=coursework_material_state).execute()
+      coursework_material_list.extend(response.get("courseWorkMaterial", []))
+      page_token = response.get('nextPageToken', None)
+      if not page_token:
+        break
+    return coursework_material_list
   except HttpError as error:
     logger.error(error)
     return None
@@ -808,10 +819,20 @@ def get_course_work(course_id, course_work_id):
   Returns:
     dict: _description_
   """
+  page_token = None
+  coursework_list=[]
   service = service = build("classroom", "v1", credentials=get_credentials())
-  return service.courses().courseWork().get(courseId=course_id,
-                                            id=course_work_id).execute()
 
+  while True:
+
+    response = service.courses().courseWork().get(courseId=course_id,
+                                            id=course_work_id,
+                                            pageToken=page_token).execute()
+    coursework_list.extend(response.get('courseWork', []))
+    page_token = response.get('nextPageToken', None)
+    if not page_token:
+      break
+  return coursework_list
 
 def delete_course_work(course_id, course_work_id):
   """delete course work by course id and course work id
