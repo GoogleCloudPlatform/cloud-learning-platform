@@ -25,7 +25,8 @@ from schemas.section import (
     ImportGradeResponseModel,
     EnrollTeacherSection,DeleteTeacherFromSectionResponseModel,
     UpdateEnrollmentStatusSectionModel,
-    DeleteFailedSectionSectionModel,UpdateInviteResponseModel)
+    DeleteFailedSectionSectionModel,UpdateInviteResponseModel,
+    NullGradesResponseModel)
 from schemas.update_section import UpdateSection
 from services.section_service import (copy_course_background_task,
 update_grades,add_teacher, insert_section_enrollment_to_bq)
@@ -925,8 +926,10 @@ f"Cannot update invitation status for{user_ref.email}\
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
-@router.post("/{section_id}/post_null_value/{course_id}/{coursework_id}", response_model=GetTeacherResponseModel)
-def post_null_value(section_id: str, course_id:str,coursework_id:str, request: Request):
+@router.post("/{section_id}/post_null_value/{coursework_id}",
+             response_model=NullGradesResponseModel)
+def post_null_value(section_id: str,
+                    coursework_id:str):
   """_summary_
 
   Args:
@@ -945,23 +948,20 @@ def post_null_value(section_id: str, course_id:str,coursework_id:str, request: R
       _type_: _description_
   """
   try:
-    # teacher_email = teacher_details.email
-    # headers = {"Authorization": request.headers.get("Authorization")}
-    # section = Section.find_by_id(section_id)
-    # if not check_user_can_enroll_in_section(teacher_email, headers, section):
-    #   raise Conflict(f"User {teacher_email} is already" +
-    #                  f" in this section {section.id} as a leaner or faculty")
+    section = Section.find_by_id(section_id)
+    results=CourseEnrollmentMapping.\
+    fetch_all_by_section(section.key,"learner")
+    data = [
+        course_enrollment_user_model(i) for i in results
+    ]
+    classroom_submissions = classroom_crud.list_coursework_submissions(section_id,coursework_id)
+    for student in data:
+      submission_obj = next((x for x in classroom_submissions if x.userId == student.gaia_id), None)
+      classroom_crud.post_grade_of_the_user(section_id,coursework_id,submission_obj.id,0,0)
 
-    # result=add_teacher(headers,section,teacher_email)
-    # if result.invitation_id:
-    #   return {
-    #     "message": f"Successfully invited the teacher using {teacher_email}",
-    #     "data": course_enrollment_user_model(result)
-    # }
-    # return {
-    #     "message": f"Successfully enrolled the teacher using {teacher_email}",
-    #     "data": course_enrollment_user_model(result)
-    # }
+    return {
+        "message": f"Successfully provided null grades for section id : {section_id}"
+    }
 
   except ResourceNotFoundException as err:
     Logger.error(err)

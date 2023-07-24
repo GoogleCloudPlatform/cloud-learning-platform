@@ -891,3 +891,26 @@ def delete_drive_folder(folder_id):
   service= build("drive", "v3", credentials=get_credentials())
   result=service.files().delete(fileId=folder_id).execute()
   return result
+
+def list_coursework_submissions(course_id, coursework_id):
+  """Get  list of coursework from classroom
+
+  Args: course_id: classroom course_id
+  coursework_id: coursework_id of claaassroom coursework
+  Returns:
+    returns list of coursework submissions for a coursework
+    """ ""
+
+  service = build("classroom", "v1", credentials=get_credentials())
+  submissions = []
+  page_token = None
+  while True:
+    coursework = service.courses().courseWork()
+    response = coursework.studentSubmissions().list(pageToken=page_token,
+                                                    courseId=course_id,
+                                                    courseWorkId=coursework_id).execute()
+    submissions.extend(response.get("studentSubmissions", []))
+    page_token = response.get("nextPageToken", None)
+    if not page_token:
+      break
+  return submissions

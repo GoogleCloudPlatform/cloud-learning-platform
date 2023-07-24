@@ -391,3 +391,17 @@ class UpdateInviteResponseModel(BaseModel):
             }
         }
     }
+
+class NullGradesResponseModel(BaseModel):
+  """Import grade esponseModel Details Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Success"
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Success"
+        }
+    }
