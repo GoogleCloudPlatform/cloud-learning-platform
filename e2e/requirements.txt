@@ -12,7 +12,7 @@ behave==1.2.6
 pyyaml==6.0
 requests==2.28.1
 google-auth==2.16.0
-google-api-python-client==2.74.0
+google-api-python-client==2.94.0
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.8.0
 google-cloud-pubsub==2.14.0
