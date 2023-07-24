@@ -142,8 +142,7 @@ def test_import_staff(clean_firestore):
     resp = client_with_emulator.post(url, files={"json_file": file})
 
   json_response = resp.json()
-  print("json_response")
-  print(json_response)
+
   assert resp.status_code == 200, "Success not 200"
   assert isinstance(json_response.get("data"), list), "Response is not a list"
   assert len(json_response.get("data")) == 3, "returned length is not same"
