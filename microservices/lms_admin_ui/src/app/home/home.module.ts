@@ -29,6 +29,8 @@ import { DeleteLtiDialog } from './single-template/single-template.component';
 import { ViewSectionLtiAssignmentDialog } from './section/section.component';
 import { DeleteSectionLtiDialog } from './section/section.component';
 import { addTeacherDialog } from './section/section.component';
+import { MatSelectScrollBottomDirective } from './mat-select-bottom-scroll.directive';
+
 @NgModule({
   declarations: [
     HomeComponent,
@@ -51,7 +53,8 @@ import { addTeacherDialog } from './section/section.component';
     DeleteLtiDialog,
     ViewSectionLtiAssignmentDialog,
     DeleteSectionLtiDialog,
-    addTeacherDialog
+    addTeacherDialog,
+    MatSelectScrollBottomDirective
   ],
   // entryComponents: [CreateCohortModalComponent],
   imports: [
