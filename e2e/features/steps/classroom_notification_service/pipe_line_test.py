@@ -28,7 +28,7 @@ def step_impl_02(context):
 
 
 @behave.then(
-    "Pipline get user related details from classroom and store user details and Pub/Sub message in bigquery"
+    "Pipline get user related details from classroom and store user details and Push filter message to lms notifications"
 )
 def step_impl_03(context):
   user=context.users[0]
@@ -52,7 +52,7 @@ def step_impl_05(context):
 
 
 @behave.then(
-    "Pipline get course work details from classroom and store course work details and Pub/Sub message in bigquery"
+    "Pipline get course work details from classroom and store course work details and Push filter message to lms notifications"
 )
 def step_impl_06(context):
   course_work=context.course_work[0]
@@ -69,7 +69,7 @@ def step_impl_07(context):
 
 
 @behave.when(
-    "Pipline got messages related to create Submitted Course work"
+    "Pipline got messages related to Submitted Course work"
 )
 def step_impl_08(context):
   qurey_result=run_query(f"select * from {PROJECT_ID}.{BQ_DATASET}.submittedCourseWorkCollectionView where submission_id=\"{context.submission_id}\"")
@@ -77,7 +77,7 @@ def step_impl_08(context):
 
 
 @behave.then(
-    "Pipline get submitted course work details from classroom and store Submitted Course Work details and Pub/Sub message in bigquery"
+    "Pipline get submitted course work details from classroom and store Submitted Course Work details and Push filter message to lms notifications"
 )
 def step_impl_09(context):
   assert context.submission["submission_course_id"]==context.analytics_data["course_details"]["id"]

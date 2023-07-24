@@ -16,9 +16,16 @@ import os
 from google.cloud import pubsub_v1
 from google.api_core.exceptions import AlreadyExists
 from google.oauth2 import service_account
+from bq_helper import create_bigquery_dataset,create_table_using_sql,BQ_DATASET,GCP_PROJECT
+
+# disabling for linting to pass
+# pylint: disable = broad-exception-raised
+
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
+PROJECT_ID = os.environ.get("PROJECT_ID") or \
+    os.environ.get("GOOGLE_CLOUD_PROJECT")
 PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
-  os.getenv("PROJECT_ID")
+  PROJECT_ID
 
 # generate credentials using SA json keys
 GKE_POD_SA_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
@@ -30,11 +37,12 @@ publisher = pubsub_v1.PublisherClient(credentials=CREDENTIALS)
 # create subscriber client object using credentials
 subscriber = pubsub_v1.SubscriberClient(credentials=CREDENTIALS)
 
-def create_topic_subs(topic_path, subscription_request):
+def create_topic_subs(topic_path, subscription_requests):
   topic = publisher.create_topic(request={"name": topic_path})
   print(f"Created Pub/Sub topic: {topic.name}")
-  subscription = subscriber.create_subscription(request=subscription_request)
-  print(f"Subscription created: {subscription.name}")
+  for subscription_request in subscription_requests:
+    subscription = subscriber.create_subscription(request=subscription_request)
+    print(f"Subscription created: {subscription.name}")
 
 if __name__ == "__main__":
   try:
@@ -42,6 +50,7 @@ if __name__ == "__main__":
     lms_topic_name = DATABASE_PREFIX + "lms-notifications"
     cls_subscription_name = DATABASE_PREFIX + "classroom-notifications-sub"
     lms_subscription_name = DATABASE_PREFIX + "lms-notifications-push-sub"
+    lms_bq_subscription_name = DATABASE_PREFIX + "lms-notifications-bq-sub"
     #generate complete topic path using topic name and project id
     cls_topic_path = publisher.topic_path(PUB_SUB_PROJECT_ID, cls_topic_name)
     lms_topic_path = publisher.topic_path(PUB_SUB_PROJECT_ID, lms_topic_name)
@@ -51,21 +60,39 @@ if __name__ == "__main__":
                                                     cls_subscription_name)
     lms_subscription_path = subscriber.subscription_path(PUB_SUB_PROJECT_ID,
                                                     lms_subscription_name)
+    lms_bq_subscription_path = subscriber.subscription_path(
+        PUB_SUB_PROJECT_ID, lms_bq_subscription_name)
     create_topic_subs(
-        cls_topic_path, {
+        cls_topic_path, [{
             "name": cls_subscription_path,
             "topic": cls_topic_path,
             "ack_deadline_seconds": 600
-        })
+        }])
     webhook_url = ("https://core-learning-services-dev.cloudpssolutions.com"
                    + "/lms/api/test/webhook")
-    push_config = pubsub_v1.types.PushConfig(push_endpoint=webhook_url)
-    create_topic_subs(
-        lms_topic_name, {
-            "name": lms_subscription_path,
-            "topic": lms_topic_path,
-            "push_config": push_config,
-        })
+    oidc_token=pubsub_v1.types.PushConfig.OidcToken(
+        service_account_email=
+        f"pub-sub-test@{PROJECT_ID}.iam.gserviceaccount.com")
+    push_config = pubsub_v1.types.PushConfig(
+      push_endpoint=webhook_url,
+      oidc_token=oidc_token)
+    create_bigquery_dataset()
+    query = ("CREATE TABLE IF NOT EXISTS lms_notifications (message_id STRING,"
+             + " publish_time TIMESTAMP, data JSON, attributes JSON);")
+    create_table_using_sql(query,"lms_notifications")
+    bigquery_table_id = f"{GCP_PROJECT}.{BQ_DATASET}.lms_notifications"
+    bigquery_config = pubsub_v1.types.BigQueryConfig(
+      table=bigquery_table_id,write_metadata=True,use_topic_schema=True)
+    create_topic_subs(lms_topic_name, [{
+        "name": lms_subscription_path,
+        "topic": lms_topic_path,
+        "push_config": push_config,
+    }, {
+        "name": lms_bq_subscription_path,
+        "topic": lms_topic_path,
+        "bigquery_config": bigquery_config,
+        "filter": "store_to_bq = \"true\""
+    }])
   except AlreadyExists:
     print(f"{cls_topic_name} already exists.")
   except Exception as e:

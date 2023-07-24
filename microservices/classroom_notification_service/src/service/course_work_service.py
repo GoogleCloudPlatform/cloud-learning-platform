@@ -26,6 +26,15 @@ from helper.json_helper import convert_dict_array_to_json,convert_to_json
 from config import BQ_TABLE_DICT,BQ_DATASET
 # disabling for linting to pass
 # pylint: disable = broad-except
+event_based_message={
+  "CREATED":"New Assignment is assigned",
+  "MODIFIED":"Assignment got modified"
+}
+def get_message(event_type,course_work_type):
+  if event_type == "CREATED":
+    return f"New {course_work_type} is assigned"
+  else:
+    return f"Existing {course_work_type} is modified"
 
 def save_course_work(data):
   """_summary_
@@ -46,7 +55,7 @@ def save_course_work(data):
                                  dataset=BQ_DATASET,
                                  table_name=BQ_TABLE_DICT["BQ_LOG_CW_TABLE"])
     if data["eventType"] == "DELETED":
-      return log_flag
+      return log_flag,None
     course_work_flag=False
     if len(data["collection"].split(".")) == 3:
       if data["collection"].split(".")[2] == "studentSubmissions":
@@ -87,16 +96,14 @@ def save_course_work_collection(course_id,course_work_id,message_id,event_type):
     course_work=get_course_work(
       course_id=course_id,course_work_id=course_work_id)
     course_work["uuid"] = str(uuid.uuid4())
-    notification_message=None
-    if event_type == "CREATED":
-      notification_message = {
-              "type": "broadcast",
-              "classroom_id": course_id,
-              "course_work_id": course_work_id,
-              "course_work_title": course_work["title"],
-              "course_work_url": course_work["alternateLink"],
-              "message": "New Assignment is assigned",
-          }
+    notification_message = {
+        "type": "broadcast",
+        "classroom_id": course_id,
+        "course_work_id": course_work_id,
+        "course_work_title": course_work["title"],
+        "course_work_url": course_work["alternateLink"],
+        "message": get_message(event_type,"Assignment")
+    }
     course_work["message_id"] = message_id
     course_work["assignment"] =convert_to_json(course_work,"assignment")
     course_work["multipleChoiceQuestion"] = convert_to_json(
@@ -118,14 +125,13 @@ def save_course_work_collection(course_id,course_work_id,message_id,event_type):
       course_work_material=get_course_work_material(
         course_id,course_work_id)
       if course_work_material:
-        if event_type == "CREATED":
-          notification_message = {
+        notification_message = {
               "type": "broadcast",
               "classroom_id": course_id,
               "course_work_id": course_work_id,
               "course_work_title": course_work_material["title"],
               "course_work_url": course_work_material["alternateLink"],
-              "message": "New Material is assigned",
+              "message": get_message(event_type,"Material")
           }
 
         return True,notification_message
@@ -135,7 +141,7 @@ def save_course_work_collection(course_id,course_work_id,message_id,event_type):
 
 def save_student_submission(course_id, course_work_id,
                             submissions_id, message_id,event_type):
-  """method to save student submission in bq 
+  """method to save student submission in bq
     and also return filltered message.
 
   Args:
@@ -164,7 +170,7 @@ def save_student_submission(course_id, course_work_id,
         "assigned_grade": submission["assignedGrade"],
         "gaia_id": submission["userId"],
         "role": "learner",
-        "message": "Teacher returned the assignment"
+        "message": "Teacher returned/graded the assignment"
     }
 
   submission["uuid"] = str(uuid.uuid4())

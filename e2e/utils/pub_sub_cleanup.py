@@ -28,10 +28,12 @@ publisher = pubsub_v1.PublisherClient(credentials=CREDENTIALS)
 # create subscriber client object using credentials
 subscriber = pubsub_v1.SubscriberClient(credentials=CREDENTIALS)
 
-def clean_pub_sub(topic_path, subscription_path):
-  with subscriber:
-    subscriber.delete_subscription(request={"subscription": subscription_path})
-  print(f"Subscription deleted: {subscription_path}")
+def clean_pub_sub(topic_path, subscription_paths):
+  for subscription_path in subscription_paths:
+    with subscriber:
+      subscriber.delete_subscription(
+        request={"subscription": subscription_path})
+    print(f"Subscription deleted: {subscription_path}")
   publisher.delete_topic(request={"topic": topic_path})
   print(f"Deleted Pub/Sub topic: {topic_path}")
 
@@ -44,6 +46,7 @@ if __name__ == "__main__":
     lms_topic_name = DATABASE_PREFIX + "lms-notifications"
     cls_subscription_name = DATABASE_PREFIX + "classroom-notifications-sub"
     lms_subscription_name = DATABASE_PREFIX + "lms-notifications-push-sub"
+    lms_bq_subscription_name = DATABASE_PREFIX + "lms-notifications-bq-sub"
     #generate complete topic path using topic name and project id
     cls_topic_path = publisher.topic_path(PUB_SUB_PROJECT_ID, cls_topic_name)
     lms_topic_path = publisher.topic_path(PUB_SUB_PROJECT_ID, lms_topic_name)
@@ -53,8 +56,11 @@ if __name__ == "__main__":
       PUB_SUB_PROJECT_ID,cls_subscription_name)
     lms_subscription_path = subscriber.subscription_path(
       PUB_SUB_PROJECT_ID, lms_subscription_name)
-    clean_pub_sub(cls_topic_path, cls_subscription_path)
-    clean_pub_sub(lms_topic_path, lms_subscription_path)
+    lms_bq_subscription_path = subscriber.subscription_path(
+        PUB_SUB_PROJECT_ID, lms_bq_subscription_name)
+    clean_pub_sub(cls_topic_path, [cls_subscription_path])
+    clean_pub_sub(
+      lms_topic_path,[lms_subscription_path,lms_bq_subscription_path])
   except Exception as e:
     print("Error occured while deleting topic:"
           + f" {cls_topic_path} \nError: {str(e)}")

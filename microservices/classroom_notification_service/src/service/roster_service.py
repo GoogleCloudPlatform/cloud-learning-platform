@@ -47,7 +47,7 @@ def save_roster(data):
                                  dataset=BQ_DATASET,
                                  table_name=BQ_TABLE_DICT["BQ_LOG_RS_TABLE"])
     if data["eventType"] == "DELETED":
-      return log_flag
+      return log_flag,None
     user_flag,notification_message=save_user(
         data["resourceId"]["userId"],
         data["resourceId"]["courseId"],

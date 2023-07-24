@@ -32,7 +32,7 @@ def test_save_course_work_collection():
                   return_value=True):
     with mock.patch("service.course_work_service.insert_rows_to_bq",
                     return_value=True):
-      result = save_course_work(data)
+      result,_ = save_course_work(data)
   assert result is True
 
 
@@ -50,12 +50,12 @@ def test_save_course_work_collection_negative():
                   return_value=False):
     with mock.patch("service.course_work_service.insert_rows_to_bq",
                     return_value=True):
-      result_1 = save_course_work(data)
+      result_1,_ = save_course_work(data)
   with mock.patch("service.course_work_service.save_course_work_collection",
                   return_value=True):
     with mock.patch("service.course_work_service.insert_rows_to_bq",
                     return_value=False):
-      result_2 = save_course_work(data)
+      result_2,_ = save_course_work(data)
 
   assert result_1 is False
   assert result_2 is False
@@ -76,7 +76,7 @@ def test_save_student_submission_collection():
                   return_value=True):
     with mock.patch("service.course_work_service.save_student_submission",
                     return_value=True):
-      result = save_course_work(data)
+      result,_ = save_course_work(data)
   assert result is True
 
 
@@ -95,12 +95,12 @@ def test_save_student_submission_collection_negative():
                   return_value=False):
     with mock.patch("service.course_work_service.insert_rows_to_bq",
                     return_value=True):
-      result_1 = save_course_work(data)
+      result_1,_ = save_course_work(data)
   with mock.patch("service.course_work_service.save_student_submission",
                   return_value=True):
     with mock.patch("service.course_work_service.insert_rows_to_bq",
                     return_value=False):
-      result_2 = save_course_work(data)
+      result_2,_ = save_course_work(data)
 
   assert result_1 is False
   assert result_2 is False
