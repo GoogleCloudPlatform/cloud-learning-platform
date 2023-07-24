@@ -67,8 +67,8 @@ requires:
 - path: ./microservices/learning_record_service
   configs: [learning-record-service]
 
-- path: ./microservices/learning_object_service
-  configs: [learning-object-service]
+# - path: ./microservices/learning_object_service
+#   configs: [learning-object-service]
 
 - path: ./microservices/dashboard
   configs: [dashboard]
