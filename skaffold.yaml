@@ -73,8 +73,8 @@ requires:
 - path: ./microservices/dashboard
   configs: [dashboard]
 
-- path: ./microservices/assessment_service
-  configs: [assessment-service]
+# - path: ./microservices/assessment_service
+#   configs: [assessment-service]
 
 - path: ./microservices/delete_sections_cronjob
   configs: [delete-sections-cronjob]
