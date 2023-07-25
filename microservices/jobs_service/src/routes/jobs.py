@@ -41,7 +41,7 @@ router = APIRouter(
     }})
 def get_batch_job_status(job_type_const: JobTypes, job_name: str):
   """ Get status of job by type and name """
-  job_type = str(job_type_const)
+  job_type = job_type_const.value
   try:
     if job_name:
       data = get_job_status(job_type, job_name)
@@ -62,7 +62,7 @@ def get_batch_job_status(job_type_const: JobTypes, job_name: str):
 @router.get("/{job_type_const}")
 def get_all_job_status(job_type_const: JobTypes):
   """ Get status of all jobs by type """
-  job_type = str(job_type_const)
+  job_type = job_type_const.value
   try:
     data = get_all_jobs(job_type)
     response = {
@@ -87,7 +87,7 @@ def get_all_job_status(job_type_const: JobTypes):
     }})
 def delete_batch_job_status(job_type_const: JobTypes, job_name: str):
   """ Delete job by type and name """
-  job_type = str(job_type_const)
+  job_type = job_type_const.value
   try:
     delete_batch_job(job_type, job_name)
     response = {
@@ -112,7 +112,7 @@ def delete_batch_job_status(job_type_const: JobTypes, job_name: str):
     }})
 def update_batch_job_status(job_type_const: JobTypes, job_name: str):
   """ Remove job and update status by type and name """
-  job_type = str(job_type_const)
+  job_type = job_type_const.value
   try:
     return remove_job_and_update_status(job_type, job_name)
   except ResourceNotFoundException as e:
