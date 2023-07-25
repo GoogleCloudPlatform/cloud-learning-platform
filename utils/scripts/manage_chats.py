@@ -24,7 +24,7 @@ def delete_all_chats(db):
 def main(argv):
   print("Started Script")
   # Use a service account.
-  cred = credentials.Certificate("core-learning-services-dev-9bd19887b141.json")
+  cred = credentials.Certificate("key.json")
   firebase_admin.initialize_app(cred)
   db = firestore.client()
   delete_all_chats(db)
