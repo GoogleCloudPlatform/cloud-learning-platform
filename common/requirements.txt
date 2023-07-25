@@ -1,4 +1,4 @@
-fastapi==0.85.1
+fastapi==0.100.0
 fireo==1.6.2
 google-cloud-core==2.3.2 
 google-api-python-client==2.91.0
