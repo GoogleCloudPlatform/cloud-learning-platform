@@ -12,36 +12,13 @@ describe("Test Harmonize Resource Launch", () => {
       }
     ).then((res) => {
       idToken = res.body.data.idToken;
-      cy.request({
+      cy.visit({
         method: "GET",
-        url: `https://core-learning-services-dev.cloudpssolutions.com/classroom-shim/api/v1/launch-assignment?lti_assignment_id=${Cypress.env.LTI_ASSIGNMENT_ID}`,
+        url: `https://core-learning-services-dev.cloudpssolutions.com/classroom-shim/api/v1/e2e-resource-launch?lti_assignment_id=${Cypress.env.LTI_ASSIGNMENT_ID}`,
         headers: {
           Authorization: `Bearer ${idToken}`,
         },
-      }).then((resp) => {
-        cy.request({
-          method: "POST",
-          url: resp.body.url,
-          json: resp.body.message_hint,
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }).then((response) => {
-          cy.log("response.body.url", response.body.url);
-          cy.config("experimentalOriginDependencies", true);
-          cy.origin(
-            response.body.url,
-            {
-              args: {
-                response: response,
-              },
-            },
-            () => {
-              cy.visit(response.body.url);
-            }
-          );
-        });
-      });
+      })
     });
   });
 });

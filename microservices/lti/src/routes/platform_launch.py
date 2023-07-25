@@ -188,8 +188,7 @@ def content_selection_launch_init(tool_id: str, user_id: str, context_id: str,
           (login_url.scheme, login_url.netloc, login_url.path, login_url.params,
            urlencode(query_params), login_url.fragment))
 
-      # return {"url": redirect_url}
-      return RedirectResponse(url = redirect_url, status_code=302)
+      return {"url": redirect_url}
 
   except ValidationError as e:
     raise BadRequest(str(e), data=e.data) from e
