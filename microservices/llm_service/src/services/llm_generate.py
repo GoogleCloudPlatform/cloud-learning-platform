@@ -27,11 +27,9 @@ from vertexai.preview.language_models import (ChatModel,
     TextGenerationModel)
 
 async def llm_generate(prompt: str, llm_type: str,
-                       user_chat: Optional[UserChat] = None):
+                       user_chat: Optional[UserChat] = None) -> str:
   """
-  Generate text with an LLM given a prompt.  This is
-    always done asychronously, and so must be used in a route defined with
-    async def.
+  Generate text with an LLM given a prompt.
 
   Args:
     prompt: the text prompt to pass to the LLM
@@ -41,7 +39,7 @@ async def llm_generate(prompt: str, llm_type: str,
     user_chat (optional): a user chat to use for context
 
   Returns:
-    the text result.
+    the text response: str
   """
   # default to openai LLM
   if llm_type is None:
@@ -50,19 +48,48 @@ async def llm_generate(prompt: str, llm_type: str,
   Logger.info(f"generating text with llm_type {llm_type}")
   try:
     if llm_type in LANGCHAIN_LLM.keys():
-      result = await langchain_llm_generate(prompt, llm_type, user_chat)
+      response = await langchain_llm_generate(prompt, llm_type, user_chat)
     elif llm_type in GOOGLE_LLM.keys():
       google_llm = GOOGLE_LLM.get(llm_type, VERTEX_LLM_TYPE_BISON_TEXT)
       is_chat = llm_type in CHAT_LLM_TYPES
-      result = await google_llm_predict(prompt, is_chat, google_llm)
+      response = await google_llm_predict(prompt, is_chat, google_llm)
     else:
       raise ResourceNotFoundException(f"Cannot find llm type '{llm_type}'")
 
-    return result
+    return response
   except Exception as e:
     raise InternalServerError(str(e)) from e
 
-async def google_llm_predict(prompt, is_chat, google_llm):
+async def llm_chat(prompt: str, llm_type: str) -> str:
+  """
+  Send a prompt to a chat model and return response.
+
+  Args:
+    prompt: the text prompt to pass to the LLM
+    llm_type: the type of LLM to use (default to openai)
+
+
+  Returns:
+    the text response: str
+  """
+  Logger.info(f"generating chat with llm_type {llm_type}")
+  if not llm_type in CHAT_LLM_TYPES:
+    raise ResourceNotFoundException(f"Cannot find chat llm type '{llm_type}'")
+
+  try:
+    if llm_type in LANGCHAIN_LLM.keys():
+      response = await langchain_llm_generate(prompt, llm_type)
+    elif llm_type in GOOGLE_LLM.keys():
+      google_llm = GOOGLE_LLM.get(llm_type)
+      is_chat = True
+      response = await google_llm_predict(prompt, is_chat, google_llm)
+    return response
+  except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+
+async def google_llm_predict(prompt: str, is_chat: bool,
+                             google_llm: str, user_chat=None) -> str:
   """
   Generate text with a Google LLM given a prompt.
 
@@ -72,8 +99,19 @@ async def google_llm_predict(prompt, is_chat, google_llm):
     google_llm: name of the vertex llm model
 
   Returns:
-    the text result.
+    the text response.
   """
+  prompt_list = []
+  if user_chat is not None:
+    history = user_chat.history
+    for entry in history:
+      content = UserChat.entry_content(entry)
+      if UserChat.is_human(entry):
+        prompt_list.append(f"Human input: {content}")
+      elif UserChat.is_ai(entry):
+        prompt_list.append(f"AI response: {content}")
+  prompt_list.append(prompt)
+  context_prompt = prompt.join("\n\n")
 
   # Temperature controls the degree of randomness in token selection.
   # Token limit determines the maximum amount of text output.
@@ -92,11 +130,11 @@ async def google_llm_predict(prompt, is_chat, google_llm):
     if is_chat:
       chat_model = ChatModel.from_pretrained(google_llm)
       chat = chat_model.start_chat()
-      response = chat.send_message(prompt, **parameters)
+      response = chat.send_message(context_prompt, **parameters)
     else:
       text_model = TextGenerationModel.from_pretrained(google_llm)
       response = text_model.predict(
-          prompt,
+          context_prompt,
           **parameters,
       )
 
@@ -104,6 +142,6 @@ async def google_llm_predict(prompt, is_chat, google_llm):
     raise InternalServerError(str(e)) from e
 
   Logger.info(f"Response from Model: {response.text}")
-  result = response.text
+  response = response.text
 
-  return result
+  return response

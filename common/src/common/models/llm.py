@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Module to add cohort in Fireo
+Models for LLM generation and chat
 """
+from typing import List
 from fireo.fields import TextField, ListField, IDField
 from common.models import BaseModel
 
@@ -59,3 +60,33 @@ class UserChat(BaseModel):
             "deleted_at_timestamp", "==",
             None).order(order_by).offset(skip).fetch(limit)
     return list(objects)
+
+  @classmethod
+  def get_history_entry(cls, prompt: str, response: str) -> List[dict]:
+    """ Get history entry for query and response """
+    entry = []
+    entry.append(
+      {CHAT_HUMAN: prompt}
+    )
+    entry.append(
+      {CHAT_AI: response}
+    )
+    return entry
+
+  def update_history(self, prompt: str, response: str):
+    """ Update history with query and response """
+    entry = self.get_history_entry(prompt, response)
+    self.history.extend(entry)
+    self.save(merge=True)
+
+  @classmethod
+  def is_human(cls, entry: dict) -> bool:
+    return CHAT_HUMAN in entry.keys()
+
+  @classmethod
+  def is_ai(cls, entry: dict) -> bool:
+    return CHAT_AI in entry.keys()
+
+  @classmethod
+  def entry_content(cls, entry: dict) -> str:
+    return list(entry.values())[0]

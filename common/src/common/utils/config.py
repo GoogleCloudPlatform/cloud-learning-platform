@@ -1,4 +1,19 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Config file for utils"""
+
 import os
 from enum import Enum
 
@@ -57,6 +72,10 @@ JOB_TYPES_WITH_PREDETERMINED_TITLES = [
 ]
 
 class JobTypes(Enum):
+  """
+  Enum class for JobTypes, used for param validation
+  in Jobs Service
+  """
   JOB_TYPE_UNIFIED_ALIGNMENT = "unified_alignment"
   JOB_TYPE_COURSE_INGESTION = "course-ingestion"
   JOB_TYPE_SKILL_ALIGNMENT = "skill_alignment"
@@ -76,8 +95,7 @@ class JobTypes(Enum):
   JOB_TYPE_DEEP_KNOWLEDGE_TRACING = "deep-knowledge-tracing"
   JOB_TYPE_VALIDATE_AND_UPLOAD_ZIP = "validate_and_upload_zip"
   JOB_TYPE_QUERY_ENGINE_BUILD = "query_engine_build"
-  
-  
+
 BATCH_JOB_FETCH_TIME = 24  # in hours
 
 BATCH_JOB_PENDING_TIME_THRESHOLD = 10  # in minutes

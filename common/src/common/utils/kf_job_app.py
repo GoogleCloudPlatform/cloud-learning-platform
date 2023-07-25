@@ -43,7 +43,7 @@ from common.utils.config import (JOB_TYPES_WITH_PREDETERMINED_TITLES,
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 # Setup K8 configs (if running in a pod)
-if os.getenv('KUBERNETES_SERVICE_HOST'):
+if os.getenv("KUBERNETES_SERVICE_HOST"):
   config.load_incluster_config()
   api_instance = client.BatchV1Api()
 
@@ -237,31 +237,33 @@ def get_cloud_link(microservice_name):
   """Creates a query which can be used to directly view the logs of
   the required microservice"""
   # Fetching the required ENV variables to create the log query
-  GCP_PROJECT = os.getenv("GCP_PROJECT")
-  SKAFFOLD_NAMESPACE = os.getenv("SKAFFOLD_NAMESPACE")
-  GKE_CLUSTER = os.getenv("GKE_CLUSTER")
-  GCP_ZONE = os.getenv("GCP_ZONE")
+  gcp_project = os.getenv("GCP_PROJECT")
+  skaffold_namespace = os.getenv("SKAFFOLD_NAMESPACE")
+  gke_cluster = os.getenv("GKE_CLUSTER")
+  gcp_zone = os.getenv("GCP_ZONE")
   url = GCLOUD_LOG_URL
   # Fetching the current time in GMT
   tz = timezone("GMT")
-  INIT_TIMESTAMP = datetime.now(tz)
-  FINAL_TIMESTAMP = (INIT_TIMESTAMP + \
+  init_timestamp = datetime.now(tz)
+  final_timestamp = (init_timestamp + \
     timedelta(hours=-1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-  INIT_TIMESTAMP = INIT_TIMESTAMP.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+  init_timestamp = init_timestamp.strftime("%Y-%m-%dT%H:%M:%S.000Z")
   # Replacing the values to get the correct URL
-  url = url.replace("{GCP_PROJECT}", GCP_PROJECT)
-  url = url.replace("{SKAFFOLD_NAMESPACE}", SKAFFOLD_NAMESPACE)
-  url = url.replace("{GKE_CLUSTER}", GKE_CLUSTER)
-  url = url.replace("{GCP_ZONE}", GCP_ZONE)
-  url = url.replace("{INIT_TIMESTAMP}", INIT_TIMESTAMP)
-  url = url.replace("{FINAL_TIMESTAMP}", FINAL_TIMESTAMP)
+  url = url.replace("{GCP_PROJECT}", gcp_project)
+  url = url.replace("{SKAFFOLD_NAMESPACE}", skaffold_namespace)
+  url = url.replace("{GKE_CLUSTER}", gke_cluster)
+  url = url.replace("{GCP_ZONE}", gcp_zone)
+  url = url.replace("{INIT_TIMESTAMP}", init_timestamp)
+  url = url.replace("{FINAL_TIMESTAMP}", final_timestamp)
   url = url.replace("{MICROSERVICE}", microservice_name)
 
   return url
 
 def kube_create_job(job_specs, namespace="default", env_vars={}):
-  logging.info(f"kube_create_job: job specs {job_specs}")
-  logging.info(f"kube_create_job: namespace {namespace} env {env_vars}")
+  """ Create a kube job based on the job spec """
+  logging.info("kube_create_job: {}".format(job_specs))
+  logging.info("kube_create_job: namespace {} env {}".format(
+      namespace, env_vars))
   try:
     # check for pending/active duplicate job
     job_logs = {}
@@ -338,11 +340,11 @@ def kube_create_job(job_specs, namespace="default", env_vars={}):
 
     job_model.save(merge=True)
 
-    logging.info(f"Batch Job {job_model.name}:  " \
-        "model updated in firestore")
+    logging.info("Batch Job {}:  " \
+        "model updated in firestore".format(job_model.name))
 
-    logging.info(f"Batch Job {job_model.name}:  " \
-        "creating kube job object")
+    logging.info("Batch Job {}:  " \
+        "creating kube job object".format(job_model.name))
     body = kube_create_job_object(
       name=name,
       container_image=container_image,
@@ -351,23 +353,23 @@ def kube_create_job(job_specs, namespace="default", env_vars={}):
       limits=limits,
       requests=requests)
 
-    logging.info(f"Batch Job {job_model.name}:  " \
-        "kube job body created")
+    logging.info("Batch Job {}:  " \
+        "kube job body created".format(job_model.name))
 
     # call kube batch API to create job
     job = api_instance.create_namespaced_job(namespace, body, pretty=True)
-    logging.info(f"Batch Job {job} id {job_model.uuid} : Created")
-    
+    logging.info("Batch Job {} id {}: Created".format(job, job_model.uuid))
+
     response = {
-      "job_name": job_model.uuid, 
+      "job_name": job_model.uuid,
       "doc_id": job_model.id_,
-      "status": "active", 
+      "status": "active",
       "job logs": job_logs
     }
     return response
 
   except Exception as e:
-    logging.error(f"Batch Job {job_specs}: Failed")
+    logging.error("Batch Job {}: Failed".format(job_specs))
     logging.error(traceback.print_exc())
     BatchJobModel.delete_by_id(job_model.id)
     raise BatchJobError(str(e)) from e
