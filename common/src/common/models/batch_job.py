@@ -31,7 +31,6 @@ class BatchJobModel(BaseModel):
   output_gcs_path = GCSPathField()
   errors = MapField(default={})
   job_logs = MapField(default={})
-  result_data = MapField(default={})
   metadata = MapField(default={})
   result_data = MapField(default={})
   uuid = TextField()
