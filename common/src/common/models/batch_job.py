@@ -14,31 +14,10 @@
 
 """FireO model for batch jobs"""
 
-from fireo.fields import TextField, MapField, IDField, DateTime
+from fireo.fields import TextField, MapField, IDField
 from common.models import GCSPathField
 from common.models import BaseModel
 from common.utils.errors import ResourceNotFoundException
-
-
-class BatchJob(BaseModel):
-  """Batch job Data Model for Classroom services """
-  id = IDField()
-  job_type = TextField()
-  status = TextField()
-  logs = MapField(default={})
-  input_data = MapField(default={})
-  section_id = TextField()
-  classroom_id = TextField()
-  start_time = DateTime()
-  end_time = DateTime()
-
-  class Meta:
-    ignore_none_field = False
-    collection_name = BaseModel.DATABASE_PREFIX + "batch_jobs"
-
-# type -> Batch job type would be couse_copy/grade_import/cron_job(specific)
-# status -> ready, running, failed, success
-# logs -> {"errors": ["error1","error2"], "info": ["info1","info2"]}
 
 
 class BatchJobModel(BaseModel):
@@ -76,3 +55,8 @@ class BatchJobModel(BaseModel):
       return job
     else:
       raise ResourceNotFoundException(f"Invalid {cls.__name__} name: {name}")
+
+  @classmethod
+  def find_by_job_type(cls, job_type):
+    jobs = cls.collection.filter("type", "==", job_type).fetch()
+    return jobs
