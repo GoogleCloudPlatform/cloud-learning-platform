@@ -72,7 +72,7 @@ FAKE_USER_DATA = {
 
 FAKE_QE_BUILD_RESPONSE = {
   "success": True,
-  "message": f"job created",
+  "message": "job created",
   "data": {
     "job_name": "fake_job_name",
     "status": "fake_job_status"
