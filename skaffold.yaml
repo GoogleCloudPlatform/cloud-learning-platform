@@ -42,9 +42,6 @@ requires:
 - path: ./microservices/llm_service
   configs: [llm-service]
 
-- path: ./microservices/jobs_service
-  configs: [jobs-service]
-
 - path: ./microservices/classroom_notification_service
   configs: [classroom-notification-service]
 
