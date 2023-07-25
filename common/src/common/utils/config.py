@@ -96,6 +96,7 @@ class JobTypes(Enum):
   JOB_TYPE_VALIDATE_AND_UPLOAD_ZIP = "validate_and_upload_zip"
   JOB_TYPE_QUERY_ENGINE_BUILD = "query_engine_build"
 
+
 BATCH_JOB_FETCH_TIME = 24  # in hours
 
 BATCH_JOB_PENDING_TIME_THRESHOLD = 10  # in minutes
