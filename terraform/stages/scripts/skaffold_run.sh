@@ -18,7 +18,7 @@
 
 # TODO: Set Project ID and other variables
 export PROJECT_ID=<your-project-id>
-export CLP_VERSION=<tag-version> # e.g. v2.0.0-beta25
+export CLP_VERSION=<tag-version> # e.g. v3.0.0-beta25
 export REGION=<your-region>
 export ZONE=<your-zone>
 export GCP_PROJECT=${PROJECT_ID}
@@ -26,7 +26,7 @@ export GIT_SHA=$(git rev-parse HEAD)
 export SKAFFOLD_DEFAULT_REPO="gcr.io/${PROJECT_ID}"
 export SKAFFOLD_BUILD_CONCURRENCY=0
 
-pushd ~/ailearning-backend
+pushd ~/cloud-learning-platform
 git checkout "${CLP_VERSION}"
 
 gcloud container clusters list --project "${PROJECT_ID}"

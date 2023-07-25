@@ -49,8 +49,7 @@ git config --global user.name "Your Name"
 git config --global credential.https://github.com.username "username"
 
 git config --global credential.helper store
-git clone https://github.com/GPS-Solutions/ailearning-tf-modules.git
-git clone https://github.com/GPS-Solutions/ailearning-backend.git
+git clone https://github.com/GPS-Solutions/cloud-learning-platform.git
 
 # TODO: Set Project ID and other variables
 export PROJECT_ID=<your-project-id>
@@ -58,7 +57,6 @@ export LDAP=<your-ldap>
 export GITHUB_ID=<your-github-id>
 export REGION=<your-region>
 export ZONE=<your-zone>
-export CLP_TF_MODULE_VERSION=<tf-module-tag-version> # e.g. v0.3.2
 export DEMO_VERSION=v2.0.0-beta12.7-demo
 
 # Authenticate to Google Cloud
@@ -98,9 +96,7 @@ export TF_VAR_ckt_whitelist_emails="${LDAP}@google.com,admin@${LDAP}.altostrat.c
 export TF_VAR_existing_custom_vpc="true"
 
 # Create main GKE cluster for installing backend services
-pushd ailearning-tf-modules
-git checkout "${CLP_TF_MODULE_VERSION}"
-
+pushd cloud-learning-platform/terraform
 cd stages/demo_environment
 
 terraform init -backend-config="bucket=${PROJECT_ID}-tfstate"

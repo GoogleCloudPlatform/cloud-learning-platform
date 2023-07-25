@@ -1,6 +1,6 @@
 locals {
   github_owner    = var.github_owner
-  github_repo     = "ailearning-frontend"
+  github_repo     = "cloud-learning-platform"
   github_url      = "https://github.com/${local.github_owner}/${local.github_repo}"
   ai_tutor_domain = var.project_id
   ckt_domain      = "${var.project_id}-ckt"
@@ -10,8 +10,6 @@ resource "google_firebase_project" "default" {
   provider = google-beta
   project  = var.project_id
 }
-
-# TODO: need google_firebase_project_location?
 
 resource "google_firebase_web_app" "ai-tutor" {
   provider     = google-beta
@@ -101,7 +99,6 @@ resource "google_cloudbuild_trigger" "ckt" {
     _CKN_ASSESSMENTS_REQ = var.ckt_ckn_assessments
   }
 }
-
 
 # so Cloud Build can run deploy jobs
 data "google_project" "project" {
