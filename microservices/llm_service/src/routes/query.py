@@ -39,7 +39,7 @@ from schemas.llm_schema import (LLMQueryModel,
                                 LLMQueryResponse)
 
 from services.query_service import query_generate, query_engine_build
-from config import (PROJECT_ID, DATABASE_PREFIX, PAYLOAD_FILE_SIZE, 
+from config import (PROJECT_ID, DATABASE_PREFIX, PAYLOAD_FILE_SIZE,
                     ERROR_RESPONSES, DEFAULT_QUERY_EMBEDDING_MODEL,
                     ENABLE_OPENAI_LLM, ENABLE_COHERE_LLM)
 
@@ -221,7 +221,7 @@ async def query_engine_create(gen_config: LLMQueryEngineModel,
     return BadRequest("Missing or invalid payload parameters: query_engine")
 
   is_public = genconfig_dict.get("is_public", True)
-  
+
   user_id = user_data.get("user_id")
 
   try:
@@ -337,7 +337,7 @@ async def query_continue(user_query_id: str, gen_config: LLMQueryModel):
     q_engine = QueryEngine.find_by_id(user_query.query_engine_id)
 
     query_result, query_references = await query_generate(user_query.user_id,
-                                                          prompt, q_engine, llm_type, 
+                                                          prompt, q_engine, llm_type,
                                                           user_query)
     return {
         "success": True,

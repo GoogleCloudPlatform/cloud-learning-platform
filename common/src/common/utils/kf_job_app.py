@@ -357,11 +357,11 @@ def kube_create_job(job_specs, namespace="default", env_vars={}):
     # call kube batch API to create job
     job = api_instance.create_namespaced_job(namespace, body, pretty=True)
     logging.info(f"Batch Job {job} id {job_model.uuid} : Created")
-    
+
     response = {
-      "job_name": job_model.uuid, 
+      "job_name": job_model.uuid,
       "doc_id": job_model.id_,
-      "status": "active", 
+      "status": "active",
       "job logs": job_logs
     }
     return response

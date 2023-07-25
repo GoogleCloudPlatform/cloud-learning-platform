@@ -44,7 +44,7 @@ from pypdf import PdfReader
 from services import llm_generate
 from services import query_prompts
 
-from config import (PROJECT_ID, DEFAULT_QUERY_CHAT_MODEL, 
+from config import (PROJECT_ID, DEFAULT_QUERY_CHAT_MODEL,
                     DEFAULT_QUERY_EMBEDDING_MODEL, GOOGLE_LLM, REGION)
 
 # number of text chunks to process into an embeddings file
@@ -189,7 +189,7 @@ def batch_build_query_engine(request_body: Dict, job: BatchJobModel) -> Dict:
       query_engine_build(doc_url, query_engine, user_id, is_public, llm_type)
 
   # update result data in batch job model
-  docs_processed_urls = [doc.doc_url for doc in docs_processed]  
+  docs_processed_urls = [doc.doc_url for doc in docs_processed]
   result_data = {
     "query_engine_id": q_engine.id,
     "docs_processed": docs_processed_urls,
@@ -203,7 +203,7 @@ def batch_build_query_engine(request_body: Dict, job: BatchJobModel) -> Dict:
   return result_data
 
 def query_engine_build(doc_url: str, query_engine: str, user_id: str,
-                       is_public: Optional[bool] = True, 
+                       is_public: Optional[bool] = True,
                        llm_type: Optional[str] = "") -> \
                        Tuple[str, List[QueryDocument], List[str]]:
   """
