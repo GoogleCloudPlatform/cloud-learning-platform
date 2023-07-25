@@ -1,4 +1,4 @@
-firebase_admin==6.0.1
+firebase_admin==6.2.0
 fireo==1.6.2
 google-cloud-logging==3.5.0
 google-cloud-secret-manager==2.16.1
