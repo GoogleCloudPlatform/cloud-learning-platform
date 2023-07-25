@@ -1,0 +1,27 @@
+[{
+    "name": "Online presentation",
+    "description": "",
+    "author": "TestUser",
+    "alignments": {
+        "competency_alignments": [],
+        "skill_alignments": []
+    },
+    "child_nodes": {
+        "learning_objects": [],
+        "learning_resources": [],
+        "assessments": []
+    },
+    "parent_nodes": {
+        "learning_experiences": [],
+        "learning_objects": []
+    },
+    "metadata": {
+        "design_config":{
+            "theme": "blue",
+            "illustration": "U1C1"
+        }
+    },
+    "duration": 0,
+    "equivalent_credits": 0,
+    "type": "learning_module"
+}]

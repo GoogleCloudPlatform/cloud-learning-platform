@@ -19,9 +19,8 @@ from common.models import GCSPathField
 from common.models import BaseModel
 from common.utils.errors import ResourceNotFoundException
 
-
 class BatchJobModel(BaseModel):
-  """ Model class for Kubernetes batch job service """
+  """Model class for batch job"""
   id_ = IDField()
   name = TextField(required=True, default="")
   input_data = TextField()
@@ -38,7 +37,7 @@ class BatchJobModel(BaseModel):
 
   class Meta:
     ignore_none_field = False
-    collection_name = BaseModel.DATABASE_PREFIX + "batch_jobs"
+    collection_name = BaseModel.DATABASE_PREFIX+"batch_jobs"
 
   @classmethod
   def find_by_name(cls, name):

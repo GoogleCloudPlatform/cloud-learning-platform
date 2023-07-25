@@ -6,7 +6,7 @@ import os
 
 # pylint: disable=broad-exception-raised
 
-GCS_BUCKET = os.environ.get("GCP_PROJECT", "aitutor-dev")
+GCS_BUCKET = os.environ.get("PROJECT_ID")
 
 class GCSPathField(Field):
   """Custom field to save only GCS file path to firestore and

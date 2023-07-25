@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: extractive-summarization
+spec:
+  template:
+    spec:
+      containers:
+      - name: extractive-summarization
+        image: extractive-summarization
+        imagePullPolicy: IfNotPresent

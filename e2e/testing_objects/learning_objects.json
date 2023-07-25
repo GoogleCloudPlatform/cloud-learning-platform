@@ -1,0 +1,95 @@
+[
+{
+    "name": "Online presentation",
+    "display_name": "Online presentation",
+    "description": "Details on ppt",
+    "author": "",
+    "alignments": {
+        "competency_alignments": [],
+        "skill_alignments": []
+    },
+    "child_nodes": {
+        "learning_objects": [],
+        "learning_resources": [],
+        "assessments": []
+    },
+    "parent_nodes": {
+        "learning_experiences": [],
+        "learning_objects": []
+    },
+    "version": 1,
+    "is_archived": false,
+    "is_deleted": false,
+    "metadata": {
+        "theme": "blue",
+        "illustration": "U1C1"
+    },
+    "duration": 0,
+    "equivalent_credits": 0,
+    "type": "learning_module",
+    "alias": "module"
+},
+{
+    "name": "Regression testing",
+    "display_name": "Regression testing",
+    "description": "Forecsating demand",
+    "author": "",
+    "alignments": {
+        "competency_alignments": [],
+        "skill_alignments": []
+    },
+    "child_nodes": {
+        "learning_objects": [],
+        "learning_resources": [],
+        "assessment_items": []
+    },
+    "parent_nodes": {
+        "learning_experiences": [],
+        "learning_objects": []
+    },
+    "version": 1,
+    "is_archived": false,
+    "is_deleted": false,
+    "metadata": {
+        "theme": "blue",
+        "illustration": "U1C1"
+    },
+    "duration": 0,
+    "type": "learning_module",
+    "alias": "module",
+    "equivalent_credits": 0
+},
+{
+    "name": "Testing",
+    "display_name": "Testing",
+    "description": "Behave and behavex",
+    "author": "",
+    "alignments": {
+        "competency_alignments": [],
+        "skill_alignments": []
+    },
+    "child_nodes": {
+        "learning_objects": [],
+        "learning_resources": [],
+        "assessment_items": []
+    },
+    "parent_nodes": {
+        "learning_experiences": [],
+        "learning_objects": []
+    },
+    "version": 1,
+    "is_archived": false,
+    "is_deleted": false,
+    "metadata": {
+        "design_config": {
+            "theme": "blue",
+            "illustration": "U1C1"
+        }
+    },
+    "duration": 0,
+    "type": "learning_module",
+    "alias": "module",
+    "equivalent_credits": 0
+}    
+]
+

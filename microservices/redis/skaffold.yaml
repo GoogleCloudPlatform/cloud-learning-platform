@@ -1,0 +1,20 @@
+apiVersion: skaffold/v2beta13
+kind: Config
+metadata:
+  name: redis
+deploy:
+    helm:
+      releases:
+      - name: redis
+        repo: https://charts.bitnami.com/bitnami
+        remoteChart: redis
+        setValues:
+          auth.enabled: false
+          global.storageClass: "standard"
+portForward:
+- resourceType: service
+  resourceName: redis-master
+  port: 6379
+profiles:
+- name: custom
+- name: dev

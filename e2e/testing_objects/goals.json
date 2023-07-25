@@ -1,0 +1,22 @@
+[{
+    "uuid": "goal1",
+    "name": "Intellectual Skills",
+    "description": "",
+    "type": "Long-term",
+    "aligned_skills": [],
+    "aligned_workforces": [],
+    "aligned_credentials": [],
+    "aligned_learning_experiences": [],
+    "created_time": "2022-03-03 09:22:49.843674+00:00",
+    "last_modified_time": "2022-03-03 09:22:49.843674+00:00"},
+{
+    "uuid": "goal2",
+    "name": "Coding Skills",
+    "description": "",
+    "type": "Short-term",
+    "aligned_skills": [],
+    "aligned_workforces": [],
+    "aligned_credentials": [],
+    "aligned_learning_experiences": [],
+    "created_time": "2022-03-03 09:22:49.843674+00:00",
+    "last_modified_time": "2022-03-03 09:22:49.843674+00:00"}]

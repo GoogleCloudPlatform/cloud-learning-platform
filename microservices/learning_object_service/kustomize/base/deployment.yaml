@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learning-object-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: learning-object-service
+  template:
+    metadata:
+      labels:
+        app: learning-object-service
+    spec:
+      serviceAccountName: ksa
+      volumes:
+        - name: signurl-sa-key
+          secret:
+            secretName: signurl-sa-key
+      containers:
+      - name: learning-object-service
+        image: learning-object-service
+        volumeMounts:
+          - mountPath: /opt/keys
+            name: signurl-sa-key
+            readOnly: true
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1000Mi"
+          limits:
+            memory: "5000Mi"
+            cpu: "2000m"
+        env:
+        # Define the environment variable
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID
+        - name: API_BASE_URL
+          # Required format: api/version
+          value: api/v1
+        - name: CONTAINER_NAME
+          value: learning-object-service
+        - name: DEPLOYMENT_NAME
+          value: learning-object-service
+        - name: SERVICE_NAME
+          value: learning-object-service
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60

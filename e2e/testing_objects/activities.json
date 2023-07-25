@@ -1,0 +1,21 @@
+[{
+    "name":
+        "Activity 1",
+    "authority":
+        "author 1",
+    
+    "canonical_data" :{}
+    
+}, {
+    "name":
+        "Activity 2",
+    "authority":
+        "author 1"
+    
+}, {
+    "name":
+        "Activity 3",
+    
+    "canonical_data" :{}
+    
+}]

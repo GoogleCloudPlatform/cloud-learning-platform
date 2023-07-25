@@ -1,0 +1,37 @@
+{
+    "pdf":
+    {
+        "transcripts": {
+            "location": "us",
+            "parser_name": "form_parser",
+            "parser_type": "FORM_PARSER_PROCESSOR",
+            "processor_id": "projects/1093813756233/locations/us/processors/b9480918eb41b107"
+        },
+        "others": {
+            "location": "us",
+            "parser_name": "document_ocr",
+            "parser_type": "OCR_PROCESSOR",
+            "processor_id": "projects/1093813756233/locations/us/processors/97e5f741d2ef5fe"
+        }
+    },
+    "csv":
+    {
+        "others": {
+            "location": "us",
+            "parser_name": "TBD",
+            "parser_type": "TBD",
+            "processor_id": "TBD"
+        }
+
+    },
+    "docx":
+    {
+        "others": {
+            "location": "us",
+            "parser_name": "TBD",
+            "parser_type": "TBD",
+            "processor_id": "TBD"
+        }
+
+    }
+}

@@ -27,7 +27,7 @@ this.callToGetId()
   }
 
   callToGetId(){
-    for(let x=0;x<=this.courseTemplateList.length;x++){
+    for(let x=0;x<this.courseTemplateList.length;x++){
       this._HomeService.getInstructionalDesigner(this.courseTemplateList[x].id).subscribe((res:any)=>{
         if(res.data.length > 0){
           this.courseTemplateList[x]['instructional_designer']=res.data

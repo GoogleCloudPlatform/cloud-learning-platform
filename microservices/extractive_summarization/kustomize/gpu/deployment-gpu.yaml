@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: extractive-summarization
+spec:
+  template:
+    spec:
+      tolerations:
+      - key: "key"
+        operator: "Equal"
+        value: "gpu"
+        effect: "NoSchedule"
+      containers:
+      - name: extractive-summarization
+        image: gcr.io/core-learning-services-dev/extractive-summarization
+        imagePullPolicy: Always
+        resources:
+          limits:
+            nvidia.com/gpu: "1"

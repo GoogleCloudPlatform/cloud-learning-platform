@@ -331,6 +331,7 @@ def upload_file_to_bucket(bucket_name, prefix, file_name, file):
 
 
 def upload_folder(bucket_name, src_path, dest_base_path):
+  """Function to upload folder to destination"""
   storage_client = storage.Client()
   bucket = storage_client.bucket(bucket_name)
   for source_file in glob.glob(src_path+"/**",recursive=True):
@@ -393,6 +394,12 @@ def move_file_within_bucket(bucket_name, src_path, dest_path):
     -------------------------------------------------------
     Output:
       blob_name `str`: Final path of the file on the bucket
+    -------------------------------------------------------
+    Note:
+      if gsutil URI is
+        `gs://<bucket_name>/path/to/file/abc.txt`
+      then src_path and dest_path should be
+        `path/to/file/abc.txt`
   """
   storage_client = storage.Client()
   bucket = storage_client.bucket(bucket_name)
@@ -407,3 +414,31 @@ def move_file_within_bucket(bucket_name, src_path, dest_path):
   source_blob = bucket.blob(src_path)
   new_blob = bucket.rename_blob(source_blob, dest_path)
   return new_blob.name
+
+def delete_file_from_gcs(bucket_name, src_path):
+  """
+    This function deletes a file present at src_path in the
+    GCS bucket given by bucket_name
+    -------------------------------------------------------
+    Input:
+      bucket_name `str`: Bucket to upload files
+      src_path `str`: Current path of the file on the bucket
+    -------------------------------------------------------
+    Output:
+      File will be deleted
+    -------------------------------------------------------
+    Note:
+      if gsutil URI is
+        `gs://<bucket_name>/path/to/file/abc.txt`
+      then src_path should be
+        `path/to/file/abc.txt`
+  """
+  storage_client = storage.Client()
+  bucket = storage_client.bucket(bucket_name)
+
+  # Remove Bucket name from src_path if it exists
+  if src_path[0:len(bucket_name)] == bucket_name:
+    src_path = src_path[len(bucket_name):]
+
+  blob = bucket.blob(src_path)
+  blob.delete()

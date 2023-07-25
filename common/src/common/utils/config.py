@@ -99,3 +99,4 @@ SERVICES = {
 }
 
 STAFF_USERS = ["assessor", "instructor", "coach"]
+EXTERNAL_USER_PROPERTY_PREFIX = os.getenv("EXTERNAL_USER_PROPERTY_PREFIX")

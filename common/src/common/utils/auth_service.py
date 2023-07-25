@@ -1,13 +1,15 @@
 """Firebase token validation"""
+import json
 import requests
 from fastapi import Depends
 from fastapi.security import HTTPBearer
 from common.utils.errors import InvalidTokenError
 from common.utils.http_exceptions import Unauthenticated, InternalServerError
+from common.utils.config import SERVICES
 
 auth_scheme = HTTPBearer(auto_error=False)
 
-
+# pylint: disable = consider-using-f-string
 def validate_token(token: auth_scheme = Depends()):
   """_summary_
 
@@ -97,3 +99,22 @@ def validate_user_type_and_token(accepted_user_types: list,
 def validate_user(token: auth_scheme = Depends()):
   return validate_user_type_and_token(["other", "faculty", "admin", "robot"],
                                       token)
+
+
+def user_verification(token: str) -> json:
+  """
+  Verify the user with firebase IDToken
+  :param token:
+  :return: json
+  """
+  api_endpoint = "http://{}:{}/authentication/api/v1/validate".format(
+    SERVICES["authentication"]["host"], SERVICES["authentication"]["port"])
+  response = requests.get(
+    url=api_endpoint,
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": token
+    },
+  )
+
+  return response

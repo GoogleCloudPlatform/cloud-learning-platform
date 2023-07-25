@@ -6,6 +6,7 @@ from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from fastapi import APIRouter
 from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
+from starlette.responses import RedirectResponse
 from common.models import Tool, LTIContentItem
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  TokenNotFoundError)
@@ -187,7 +188,8 @@ def content_selection_launch_init(tool_id: str, user_id: str, context_id: str,
           (login_url.scheme, login_url.netloc, login_url.path, login_url.params,
            urlencode(query_params), login_url.fragment))
 
-      return {"url": redirect_url}
+      # return {"url": redirect_url}
+      return RedirectResponse(url = redirect_url, status_code=302)
 
   except ValidationError as e:
     raise BadRequest(str(e), data=e.data) from e

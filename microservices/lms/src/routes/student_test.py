@@ -13,7 +13,7 @@ from common.models import (CourseTemplate, Cohort, User,
                            CourseEnrollmentMapping,Section)
 from testing.test_config import BASE_URL
 from schemas.schema_examples import COURSE_TEMPLATE_EXAMPLE,\
-   COHORT_EXAMPLE, TEMP_USER,CREDENTIAL_JSON
+   COHORT_EXAMPLE, TEMP_USER,CREDENTIAL_JSON, STUDENT_RECORDS_MODEL
 from config import USER_MANAGEMENT_BASE_URL
 
 
@@ -122,7 +122,10 @@ def test_delete_student_from_section(client_with_emulator,create_fake_data):
                   return_value=[{}, {}]):
     with mock.patch("routes.student.classroom_crud.get_user_details",
                   return_value={"data":{"email":"clplmstestuser1@gmail.com"}}):
-      resp = client_with_emulator.delete(url)
+      with mock.patch("routes.student.section_service."
+                        + "insert_section_enrollment_to_bq"
+                                  ):
+        resp = client_with_emulator.delete(url)
   assert resp.status_code == 200
 
 def test_delete_student_sectionid_not_found\
@@ -169,7 +172,10 @@ def test_enroll_student(client_with_emulator, create_fake_data):
       "services.student_service.check_student_can_enroll_in_cohort",
     return_value =True):
       with mock.patch("routes.student.Logger"):
-        resp = client_with_emulator.post(url, json=input_data)
+        with mock.patch("routes.student.section_service."
+                        + "insert_section_enrollment_to_bq"
+                                  ):
+          resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True
   assert resp.json()["data"]["classroom_url"] == "https://classroom.google.com"
@@ -203,7 +209,7 @@ def test_enroll_student_already_present_section\
   with mock.patch("routes.student.classroom_crud.enroll_student",
   return_value ={"user_id":"test_user_id"}):
     with mock.patch(
-      "routes.student.check_user_can_enroll_in_section",
+  "routes.student.student_service.check_student_can_enroll_in_cohort",
     return_value =False):
       with mock.patch("routes.student.Logger"):
         resp = client_with_emulator.post(url, json=input_data)
@@ -226,9 +232,13 @@ def test_enroll_student_section(client_with_emulator, create_fake_data):
     with mock.patch("routes.student.classroom_crud.enroll_student",
       return_value ={"user_id":course_user.user_id}):
       with mock.patch(
-        "routes.student.check_user_can_enroll_in_section",
+  "routes.student.student_service.check_student_can_enroll_in_cohort",
         return_value =True):
-        resp = client_with_emulator.post(url, json=input_data)
+        with mock.patch(
+          "routes.student.section_service"
+          + ".insert_section_enrollment_to_bq"
+                                  ):
+          resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["success"] is True
   assert resp.json()["data"]["classroom_url"] == "https://classroom.google.com"
@@ -254,7 +264,7 @@ def test_enroll_student_section_closed_enrollment(
     with mock.patch("routes.student.classroom_crud.enroll_student",
       return_value ={"user_id":course_user.user_id}):
       with mock.patch(
-        "routes.student.check_user_can_enroll_in_section",
+    "routes.student.student_service.check_student_can_enroll_in_cohort",
         return_value =True):
         resp = client_with_emulator.post(url, json=input_data)
   print(resp.json())
@@ -280,7 +290,7 @@ def test_enroll_student_section_failed_section(
     with mock.patch("routes.student.classroom_crud.enroll_student",
       return_value ={"user_id":course_user.user_id}):
       with mock.patch(
-        "routes.student.check_user_can_enroll_in_section",
+    "routes.student.student_service.check_student_can_enroll_in_cohort",
         return_value =True):
         resp = client_with_emulator.post(url, json=input_data)
   print(resp.json())
@@ -307,7 +317,7 @@ def test_enroll_student_section_enrollment_count(
     with mock.patch("routes.student.classroom_crud.enroll_student",
       return_value ={"user_id":course_user.user_id}):
       with mock.patch(
-        "routes.student.check_user_can_enroll_in_section",
+  "routes.student.student_service.check_student_can_enroll_in_cohort",
         return_value =True):
         resp = client_with_emulator.post(url, json=input_data)
   print(resp.json())
@@ -372,7 +382,13 @@ def test_invite_student_to_section_api(client_with_emulator,create_fake_data):
                   "cohort_id":"section.cohort.key",
             "classroom_id":"section.classroom_id",
             "classroom_url":"section.classroom_url"}):
-    resp = client_with_emulator.post(url)
+    with mock.patch(
+      "routes.student.student_service.check_student_can_enroll_in_cohort",
+                    return_value=True):
+      with mock.patch(
+        "services.section_service" +
+        ".insert_section_enrollment_to_bq"):
+        resp = client_with_emulator.post(url)
   assert resp.status_code == 200
 
 def test_invite_student_to_cohort_api(client_with_emulator,create_fake_data):
@@ -390,7 +406,10 @@ def test_invite_student_to_cohort_api(client_with_emulator,create_fake_data):
     with mock.patch(
       "services.student_service.check_student_can_enroll_in_cohort",
     return_value =True):
-      resp = client_with_emulator.post(url)
+      with mock.patch(
+        "services.section_service"
+        + ".insert_section_enrollment_to_bq"):
+        resp = client_with_emulator.post(url)
   assert resp.status_code == 200
 
 def test_invite_student_to_cohort_archived_section(
@@ -415,18 +434,27 @@ def test_invite_student_to_cohort_archived_section(
       resp = client_with_emulator.post(url)
   assert resp.status_code == 422
 
-def test_update_invites(client_with_emulator,create_fake_data):
-  url = BASE_URL + "/sections/update_invites"
-  with mock.patch\
-  ("routes.student.classroom_crud.get_invite",
-   return_value={
-      "id": "NTk1MjkyNTc2Mzk4KjU5OTI5MzU5NTA3OFpa",
-      "courseId": "595292576398",
-      "role": "STUDENT"
-        }):
-    with mock.patch(
-    "routes.student.classroom_crud.get_user_profile_information"):
-      with mock.patch("routes.section.Logger"):
-        resp = client_with_emulator.patch(url)
-  print("Update invitest status code",resp.status_code,resp.json())
-  assert resp.status_code == 200
+
+def test_get_list_of_students_exists_in_db_not_in_classroom(
+  client_with_emulator):
+  url = BASE_URL + "/student/exists_in_db_not_in_classroom"
+  data=STUDENT_RECORDS_MODEL.copy()
+  data["user_email"]=data.pop("email")
+  with mock.patch("routes.student.run_query",
+                  return_value=[data]):
+    resp = client_with_emulator.get(url)
+  assert resp.status_code == 200, "Status 200"
+  assert resp.json()["data"][0]["email"] == STUDENT_RECORDS_MODEL[
+    "email"], "Return data doesn't match."
+
+def test_get_list_of_students_exists_in_classroom_not_in_db(
+  client_with_emulator):
+  url = BASE_URL + "/student/exists_in_classroom_not_in_db"
+  data=STUDENT_RECORDS_MODEL.copy()
+  data["user_emailAddress"]=data.pop("email")
+  with mock.patch("routes.student.run_query",
+                  return_value=[data]):
+    resp = client_with_emulator.get(url)
+  assert resp.status_code == 200, "Status 200"
+  assert resp.json()["data"][0]["email"] ==STUDENT_RECORDS_MODEL[
+    "email"], "Return data doesn't match."

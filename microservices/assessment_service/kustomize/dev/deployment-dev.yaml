@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: assessment-service
+spec:
+  replicas: 1
+  template:
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: assessment-service
+        image: gcr.io/core-learning-services-dev/assessment-service
+        imagePullPolicy: Always
+        env:
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_ID
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX
+        - name: ONET_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: ONET_USERNAME
+        - name: ONET_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: ONET_PASSWORD
+        - name: USE_LEARNOSITY_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: USE_LEARNOSITY_SECRET
+        - name: CONTENT_SERVING_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: CONTENT_SERVING_BUCKET 

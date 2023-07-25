@@ -2,6 +2,7 @@
 import requests
 import traceback
 from config import USER_MANAGEMENT_BASE_URL
+from services.section_service import insert_section_enrollment_to_bq
 from common.utils import classroom_crud
 from common.utils.logging_handler import Logger
 from common.models import CourseEnrollmentMapping, User
@@ -19,15 +20,18 @@ def get_section_with_minimum_student(sections):
   """
   min_sections_count_mapping = None
   min_student = 0
-  for i in sections:
+  for section in sections:
     if min_sections_count_mapping is None:
-      if i.enrolled_students_count < i.max_students:
-        min_sections_count_mapping = i
-        min_student = i.enrolled_students_count
+      if section.enrolled_students_count < section.max_students and\
+          section.status =="ACTIVE" and section.enrollment_status=="OPEN":
+        min_sections_count_mapping = section
+        min_student = section.enrolled_students_count
     else:
-      if i.enrolled_students_count < min_student:
-        min_student = i.enrolled_students_count
-        min_sections_count_mapping = i
+      if section.enrolled_students_count < min_student and\
+        section.enrolled_students_count < section.max_students and\
+        section.status =="ACTIVE" and section.enrollment_status=="OPEN":
+        min_student = section.enrolled_students_count
+        min_sections_count_mapping = section
   return min_sections_count_mapping
 
 
@@ -56,7 +60,8 @@ def check_student_can_enroll_in_cohort(email, headers, sections):
       result = CourseEnrollmentMapping.check_enrollment_exists_section(
           section_key=section.key, user_id=user_id)
       if result is not None:
-        Logger.error(f"Student {email} is present in section_id {section.id}")
+        Logger.error(f"Student {email} is present in section_id {section.id}\
+                     enrollment_id {result.id}")
         return False
   return True
 
@@ -128,6 +133,7 @@ def invite_student(section, student_email, headers):
   course_enrollment_mapping.role = "learner"
   course_enrollment_mapping.invitation_id = invitation["id"]
   course_enrollment_id = course_enrollment_mapping.save().id
+  insert_section_enrollment_to_bq(course_enrollment_mapping,section)
   return {
       "invitation_id": invitation["id"],
       "course_enrollment_id": course_enrollment_id,

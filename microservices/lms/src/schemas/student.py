@@ -3,7 +3,7 @@ Pydantic Model for copy course API's
 """
 from typing import Optional
 from pydantic import BaseModel, constr
-from schemas.schema_examples import INVITE_STUDENT, COURSE_ENROLLMENT_USER_EXAMPLE
+from schemas.schema_examples import INVITE_STUDENT, COURSE_ENROLLMENT_USER_EXAMPLE,STUDENT_RECORDS_MODEL
 
 
 class UserModel(BaseModel):
@@ -106,35 +106,10 @@ class InviteStudentToSectionResponseModel(BaseModel):
             "data": INVITE_STUDENT
         }
     }
-
-
-class UpdateInviteResponseModel(BaseModel):
-  """Invite Student Model"""
-  success: Optional[bool] = True
-  message: Optional[str] = "Successfully Updated the invitation status"
-  data: Optional[dict] = None
-
-  class Config():
-    orm_mode = True
-    schema_extra = {
-        "example": {
-            "success": True,
-            "message": "Successfully Invited the Student",
-            "data": {
-                "list_coursenrolment": [
-                    "courseenrollment_id1", "courseenrollment_id2",
-                    "courseenrollment_id3"
-                ]
-            }
-        }
-    }
-
-
 class GetProgressPercentageResponseModel(BaseModel):
   """Get Progress Percentage"""
   success: Optional[bool] = True
   data: int = None
-
 
 class GetProgressPercentageCohortResponseModel(BaseModel):
   """Get Progress Percentage"""
@@ -154,3 +129,32 @@ class GetOverallPercentage(BaseModel):
             "data":None
       }
       }
+class StudentsRecordsModel(BaseModel):
+  """Student model used for classroom and db difference"""
+  email: str
+  user_id: Optional[str]
+  section_id: str
+  cohort_id: str
+  enrollment_status: Optional[str]
+  invitation_id: Optional[str]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": STUDENT_RECORDS_MODEL
+        }
+
+class StudentsRecordsResponseModel(BaseModel):
+  """Response model used for classroom and db difference"""
+  success: Optional[bool]=True
+  message: Optional[str]="Successfully fetched the Students list"
+  data: Optional[list[StudentsRecordsModel]]=[]
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the Students list",
+            "data": STUDENT_RECORDS_MODEL
+        }
+    }

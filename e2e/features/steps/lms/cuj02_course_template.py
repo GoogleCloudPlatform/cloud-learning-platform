@@ -1,8 +1,7 @@
 import behave
 import requests
-from testing_objects.test_config import API_URL
-from testing_objects.course_template import COURSE_TEMPLATE_INPUT_DATA, DATABASE_PREFIX, emails
-
+from e2e.test_config import API_URL
+from e2e.utils.course_template import COURSE_TEMPLATE_INPUT_DATA,DATABASE_PREFIX, emails
 
 # -------------------------------CREATE Course Template-------------------------------------
 # ----Positive Scenario-----
