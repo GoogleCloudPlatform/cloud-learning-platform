@@ -183,17 +183,22 @@ def batch_build_query_engine(request_body: Dict, job: BatchJobModel) -> Dict:
   is_public = request_body.get("is_public")
   llm_type = request_body.get("llm_type")
 
+  Logger.info(f"Starting batch job for {query_engine} job id {job.id_}")
+
   q_engine, docs_processed, docs_not_processed = \
       query_engine_build(doc_url, query_engine, user_id, is_public, llm_type)
 
   # update result data in batch job model
+  docs_processed_urls = [doc.doc_url for doc in docs_processed]  
   result_data = {
     "query_engine_id": q_engine.id,
-    "docs_processed": docs_processed,
+    "docs_processed": docs_processed_urls,
     "docs_not_processed": docs_not_processed
   }
   job.result_data = result_data
   job.save(merge=True)
+
+  Logger.info(f"Completed batch job query engine build for {query_engine}")
 
   return result_data
 
@@ -249,6 +254,8 @@ def query_engine_build(doc_url: str, query_engine: str, user_id: str,
     QueryEngine.delete_by_id(q_engine.id)
     raise InternalServerError(e) from e
 
+  Logger.info(f"Completed query engine build for {query_engine}")
+
   return q_engine, docs_processed, docs_not_processed
 
 
@@ -256,7 +263,7 @@ def build_doc_index(doc_url:str, query_engine: str) -> \
         Tuple[List[QueryDocument], List[str]]:
   """
   Build the document index.
-  Supports only GCS URLs initially, containing PDF and CSV files.
+  Supports only GCS URLs initially, containing PDF files.
 
   Args:
     doc_url: URL pointing to folder of documents
