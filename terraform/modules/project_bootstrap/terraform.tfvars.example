@@ -1,0 +1,3 @@
+project_id                   = "YOUR-PROJECT-ID"
+bucket_region_or_multiregion = "US"
+add_project_owner            = true

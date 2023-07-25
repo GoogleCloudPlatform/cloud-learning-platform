@@ -449,8 +449,8 @@ If you are deploying common Cloud Learning Platform services from another repo i
 
 Clone the repo:
 ```
-git glone git@github.com:GPS-Solutions/ailearning-backend.git
-cd ailearning-backend
+git glone git@github.com:GPS-Solutions/cloud-learning-platform.git
+cd cloud-learning-platform
 ```
 
 Run a skaffold dev command to build / deploy the microservice:
