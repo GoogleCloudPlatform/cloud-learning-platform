@@ -7,7 +7,7 @@ from schemas.error_schema import (UnauthorizedResponseModel,
                                   ValidationErrorResponseModel)
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
-GCP_PROJECT = os.environ.get("GCP_PROJECT", "")
+GCP_PROJECT = os.environ.get("PROJECT_ID", "")
 os.environ["GOOGLE_CLOUD_PROJECT"] = GCP_PROJECT
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 

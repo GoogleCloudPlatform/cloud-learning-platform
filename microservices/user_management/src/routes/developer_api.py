@@ -10,7 +10,7 @@ from common.utils.http_exceptions import InternalServerError
 
 router = APIRouter(tags=["Developer API"], responses=ERROR_RESPONSES)
 
-project_id = os.getenv("GCP_PROJECT", "aitutor-dev")
+project_id = os.getenv("PROJECT_ID")
 
 
 @router.put("/update-fields", include_in_schema=False)
