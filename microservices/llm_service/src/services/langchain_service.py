@@ -17,11 +17,11 @@
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
-from typing import Optional
+from typing import Optional, Any
 from common.models import UserChat
 from langchain.schema import HumanMessage, AIMessage
 
-from config import LANGCHAIN_LLM, CHAT_LLM_TYPES, COHERE_LLM_TYPES
+from config import LANGCHAIN_LLM, CHAT_LLM_TYPES
 
 async def langchain_llm_generate(prompt: str, llm_type: str,
                                  user_chat: Optional[UserChat] = None):
@@ -38,7 +38,7 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
     user_chat (optional): a user chat to use for context
 
   Returns:
-    the text result.
+    the text response.
   """
   Logger.info(f"generating text with langchain llm_type {llm_type}")
   try:
@@ -47,7 +47,7 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
     if llm is None:
       raise ResourceNotFoundException(f"Cannot find llm type '{llm_type}'")
 
-    result_text = ""
+    response_text = ""
     if llm_type in CHAT_LLM_TYPES:
       # use langchain chat interface for openai
 
@@ -55,30 +55,33 @@ async def langchain_llm_generate(prompt: str, llm_type: str,
       msg = []
       if user_chat is not None:
         history = user_chat.history
-        for i in range(len(history)):
-          msg.append(HumanMessage(content=history[i]))
-          msg.append(AIMessage(content=history[i+1]))
-          i = i + 1
-
+        for entry in history:
+          content = UserChat.entry_content(entry)
+          if UserChat.is_human(entry):
+            msg.append(HumanMessage(content=content))
+          elif UserChat.is_ai(entry):
+            msg.append(AIMessage(content=content))
       msg.append(HumanMessage(content=prompt))
 
       Logger.info(f"generating text for [{prompt}]")
-      result = await llm.agenerate([msg])
-      result_text = result.generations[0][0].message.content
-      Logger.info(f"result {result.generations[0][0].message.content}")
+      response = await llm.agenerate([msg])
+      response_text = response.generations[0][0].message.content
+      Logger.info(f"response {response_text}")
     else:
       msg = []
       if user_chat is not None:
         msg = user_chat.history
       msg.append(prompt)
-      if llm_type in COHERE_LLM_TYPES:
-        result = llm.generate(msg)
-        result_text = result.generations[0][0].text
-      else:
-        # we always use await for LLM calls if we can
-        result = await llm.agenerate(msg)
-        result_text = result.generations[0][0].message.content
+      response = await llm.agenerate(msg)
+      response_text = response.generations[0][0].text
 
-    return result_text
+    return response_text
   except Exception as e:
     raise InternalServerError(str(e)) from e
+
+
+def get_model(llm_type: str) -> Any:
+  """ return a lanchain model given type """
+  llm = LANGCHAIN_LLM.get(llm_type)
+
+  return llm

@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""class for handling errors specific to LLM Service"""
+""" Query prompt generator methods """
 
-class NoDocumentsIndexedException(Exception):
-  """Exception for No documents found for query indexing"""
+from typing import List
 
-  def __init__(self, message="No documents found"):
-    self.message = message
-    super().__init__(self.message)
+from services.query_prompt_config import QUESTION_PROMPT
+
+def question_prompt(prompt: str, query_context: List[dict]) -> str:
+  """ Create question prompt with context for LLM """
+  context_list = [ref["document_text"] for ref in query_context]
+  text_context = "\n\n".join(context_list)
+  question = QUESTION_PROMPT.format(question=prompt, context=text_context)
+  return question

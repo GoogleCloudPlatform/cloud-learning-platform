@@ -17,6 +17,7 @@
 """
 # pylint: disable=unspecified-encoding,line-too-long
 import os
+import logging
 from common.utils.logging_handler import Logger
 from schemas.error_schema import (UnauthorizedResponseModel,
                                   InternalServerErrorResponseModel,
@@ -25,12 +26,18 @@ from google.cloud import secretmanager
 from langchain.chat_models import ChatOpenAI
 from langchain.llms import Cohere
 
+# overridde default logging format
+logging.basicConfig(
+      format="%(asctime)s:%(levelname)s:%(message)s",level=logging.INFO)
+
 secrets = secretmanager.SecretManagerServiceClient()
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
-PROJECT_ID = os.environ.get("PROJECT_ID", "cloud-learning-services-dev")
+PROJECT_ID = os.environ.get("PROJECT_ID")
 os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
+GCP_PROJECT = PROJECT_ID
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
+REGION = os.getenv("REGION", "us-central1")
 
 try:
   with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace","r",
@@ -46,6 +53,9 @@ CONTAINER_NAME = os.getenv("CONTAINER_NAME")
 DEPLOYMENT_NAME = os.getenv("DEPLOYMENT_NAME")
 API_BASE_URL = os.getenv("API_BASE_URL")
 SERVICE_NAME = os.getenv("SERVICE_NAME")
+SKAFFOLD_NAMESPACE = os.getenv("SKAFFOLD_NAMESPACE")
+GKE_CLUSTER = os.getenv("GKE_CLUSTER")
+GCP_ZONE = os.getenv("GCP_ZONE")
 
 PAYLOAD_FILE_SIZE = 1024
 
@@ -97,29 +107,22 @@ if COHERE_API_KEY is None:
       }).payload.data.decode("utf-8")
   COHERE_API_KEY = COHERE_API_KEY.strip()
 
-def load_google_access_token():
-  google_access_token = secrets.access_secret_version(
-      request={
-          "name": "projects/" + PROJECT_ID +
-                  "/secrets/google-api-access-token/versions/latest"
-      }).payload.data.decode("utf-8")
-  google_access_token = google_access_token.strip()
-  return google_access_token
-
 OPENAI_LLM_TYPE_GPT3_5 = "OpenAI-GPT3.5"
 OPENAI_LLM_TYPE_GPT4 = "OpenAI-GPT4"
 COHERE_LLM_TYPE = "Cohere"
 VERTEX_LLM_TYPE_BISON_TEXT = "VertexAI-Text"
 VERTEX_LLM_TYPE_BISON_CHAT = "VertexAI-Chat"
+VERTEX_LLM_TYPE_GECKO_EMBEDDING = "VertexAI-Embedding"
 
 LLM_TYPES = []
-#OPENAI_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, OPENAI_LLM_TYPE_GPT4]
-OPENAI_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5]
+OPENAI_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, OPENAI_LLM_TYPE_GPT4]
+#OPENAI_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5]
 COHERE_LLM_TYPES = [COHERE_LLM_TYPE]
 GOOGLE_LLM_TYPES = [VERTEX_LLM_TYPE_BISON_TEXT, VERTEX_LLM_TYPE_BISON_CHAT]
 
 # these LLMs are trained as chat models
-CHAT_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, VERTEX_LLM_TYPE_BISON_CHAT]
+CHAT_LLM_TYPES = [OPENAI_LLM_TYPE_GPT3_5, OPENAI_LLM_TYPE_GPT4,
+                  VERTEX_LLM_TYPE_BISON_CHAT]
 
 if ENABLE_OPENAI_LLM:
   LLM_TYPES.extend(OPENAI_LLM_TYPES)
@@ -144,7 +147,11 @@ GOOGLE_LLM = {}
 if ENABLE_GOOGLE_LLM:
   GOOGLE_LLM = {
     VERTEX_LLM_TYPE_BISON_TEXT: "text-bison@001",
-    VERTEX_LLM_TYPE_BISON_CHAT: "chat-bison@001"
+    VERTEX_LLM_TYPE_BISON_CHAT: "chat-bison@001",
+    VERTEX_LLM_TYPE_GECKO_EMBEDDING: "textembedding-gecko@001"
   }
 
 Logger.info(f"LLM types loaded {LLM_TYPES}")
+
+DEFAULT_QUERY_CHAT_MODEL = VERTEX_LLM_TYPE_BISON_CHAT
+DEFAULT_QUERY_EMBEDDING_MODEL = VERTEX_LLM_TYPE_GECKO_EMBEDDING

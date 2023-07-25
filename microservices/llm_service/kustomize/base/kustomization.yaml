@@ -17,6 +17,8 @@ kind: Kustomization
 resources:
 - ./deployment.yaml
 - ./service.yaml
+- ./role_binding.yaml
+- ./role.yaml
 configMapGenerator:
 - name: env-vars
   envs:
