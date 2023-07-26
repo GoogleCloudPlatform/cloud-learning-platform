@@ -94,4 +94,8 @@ Project Requirements
 
 Please see [docs/INSTALLATION.md](./docs/INSTALLATION.md) for the full installation steps.
 
+### Development
+
+Please see [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) for the development details and process.
+
 
