@@ -166,10 +166,12 @@ def get_all_xapi_statements(agent_uuid: str = None,
       each_row["stored"] = each_row["stored"].strftime("%Y-%m-%d %H:%M:%S %z")
       each_row["timestamp"] = each_row["timestamp"].strftime(
           "%Y-%m-%d %H:%M:%S %z")
+    count = 10000
+    response = {"records": final_output, "total_count": count}
     return {
         "success": True,
         "message": "Successfully fetched the statements",
-        "data": final_output
+        "data": response
     }
   except ValidationError as e:
     Logger.error(e)

@@ -140,7 +140,8 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  fetched_uuids = [i.get("uuid") for i in context.res_data.get("data")]
+  fetched_uuids = [i.get("uuid") for i in context.res_data.get(
+    "data")["records"]]
   assert set(context.imported_activities_ids).intersection(set(fetched_uuids)) \
     == set(context.imported_activities_ids), "all data not retrieved"
 
@@ -279,7 +280,8 @@ def step_impl_3(context):
   get_activities_url = f"{API_URL_LEARNING_RECORD_SERVICE}/activities"
   get_res = get_method(get_activities_url)
   get_res_data = get_res.json()
-  fetched_uuids = [i.get("uuid") for i in get_res_data.get("data")]
+  fetched_uuids = [i.get("uuid") for i in get_res_data.get(
+    "data")["records"]]
   assert set(imported_activity_ids).intersection(set(fetched_uuids)) \
     == set(imported_activity_ids), "all data not retrieved"
 

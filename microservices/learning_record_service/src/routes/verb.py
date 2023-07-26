@@ -42,10 +42,12 @@ def get_verbs(skip: int = Query(0, ge=0, le=2000),
 
     verbs = collection_manager.order("-created_time").offset(skip).fetch(limit)
     verbs = [i.get_fields(reformat_datetime=True) for i in verbs]
+    count = 10000
+    response = {"records": verbs, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": verbs
+        "data": response
     }
   except ValidationError as e:
     raise BadRequest(str(e)) from e
@@ -122,9 +124,9 @@ def create_verb(input_verb: VerbModel):
           "data": verb_fields
       }
     else:
-      verb_name = input_verb_dict["name"]
       raise ConflictError(
-        f"Verb with the given name {verb_name} already exists")
+        f"Verb with the given name {input_verb_dict['name']} already exists"
+        )
 
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e

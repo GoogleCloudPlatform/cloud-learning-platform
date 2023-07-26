@@ -202,11 +202,14 @@ class UpdateLearningResourceModelResponse(BaseModel):
         }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullLearningResourceDataModel]]
+  total_count: int
 
 class AllLearningResourcesModelResponse(BaseModel):
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the learning resources"
-  data: List[FullLearningResourceDataModel]
+  data: TotalCountResponseModel
 
   class Config():
     orm_mode = True
@@ -214,7 +217,10 @@ class AllLearningResourcesModelResponse(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully fetched the learning resources",
-            "data": [FULL_LEARNING_RESOURCE_EXAMPLE]
+            "data": {
+                      "records":[FULL_LEARNING_RESOURCE_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

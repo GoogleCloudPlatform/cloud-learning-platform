@@ -80,7 +80,8 @@ def test_get_all_faq_positive(clean_firestore):
   assert res_json["success"] is True
   assert res_json["message"] == "Successfully Fetched FAQs"
 
-  assert res_json["data"][0]["name"] == BASIC_FAQ_CONTENT_EXAMPLE[
+  assert res_json["data"][
+    "records"][0]["name"] == BASIC_FAQ_CONTENT_EXAMPLE[
       "name"]
 
 def test_filter_faq_by_pathway_id_positive(clean_firestore):
@@ -108,7 +109,7 @@ def test_filter_faq_by_pathway_id_positive(clean_firestore):
   assert res.status_code == 200
   assert res_json["success"] is True
   assert res_json["message"] == "Successfully Fetched FAQs"
-  assert res_json["data"][0][
+  assert res_json["data"]["records"][0][
     "curriculum_pathway_id"] == curriculum_pathway_dict["uuid"]
 
 def test_filter_faq_by_pathway_id_negative(clean_firestore):

@@ -47,7 +47,7 @@ def recreate_zip_structure_on_gcs(input_data):
     Failure 1:
     {
         "success": False,
-        "message": "Some error occured while uploading the content.
+        "message": "Some error occurred while uploading the content.
         Unable to locate the mentioned entrypoint after upload.",
         "data": None
     }

@@ -1009,8 +1009,8 @@ TEST_AGENT = {
     "name": "example agent",
     "mbox": "mailto:test_agent@example.org",
     "mbox_sha1sum": "SHA-123",
-    "open_id": "",
-    "account_homepage": "",
+    "open_id": "open_id",
+    "account_homepage": "homepage",
     "account_name": "test_account_name",
     "members": [],
     "user_id": "user_id_1234"

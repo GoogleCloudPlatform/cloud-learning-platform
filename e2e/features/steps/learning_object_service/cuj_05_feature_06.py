@@ -50,13 +50,13 @@ def step_impl_3(context):
   # Check Correct Program Details are inserted
   context.program = context.get_res_data
   context.input_program = context.input_data
-  assert context.program["name"] == context.input_program["curriculum_pathways"]["name"], "Wrong Program Name"
-  assert context.program["alias"] == context.input_program["curriculum_pathways"]["alias"], "Wrong Alias of the Program"
+  assert context.program["name"] == context.input_program["name"], "Wrong Program Name"
+  assert context.program["alias"] == context.input_program["alias"], "Wrong Alias of the Program"
   assert context.program["uuid"] == context.program["root_version_uuid"], "Wrong Root Version UUID"
 
   # Check Correct level Details are inserted
   context.level = context.program["child_nodes"]["curriculum_pathways"][0]
-  context.input_level = context.input_program["curriculum_pathways"]["child_nodes"]["curriculum_pathways"][0]
+  context.input_level = context.input_program["child_nodes"]["curriculum_pathways"][0]
   assert context.level["name"] == context.input_level["name"], "Wrong level Name"
   assert context.level["alias"] == context.input_level["alias"], "Wrong Alias of the level"
   assert context.level["uuid"] == context.level["root_version_uuid"], "Wrong Root Version UUID"
@@ -140,9 +140,12 @@ def step_impl_7(context):
   context.le = context.get_le_res["data"]
 
   context.skills_list = []
-  for skills_id in context.sa["references"]["skills"]:
+  for skills_id in context.sa["references"]["competencies"][0]["child_nodes"]["skills"]:
      context.skills_list.append(skills_id["uuid"])
   assert context.pretest["references"]["skills"][0]["uuid"] in context.skills_list
+  assert context.pretest["references"]["skills"][0]["parent_nodes"]["competencies"][0] == context.sa["references"]["competencies"][0]["uuid"]
+  assert context.module["parent_nodes"]["learning_experiences"][0] == context.le["uuid"]
+  assert context.le["child_nodes"]["learning_objects"][0] == context.module["uuid"]
 
 #LXE/CD ingest the full learning that is designed to be ingested via invalid JSON NEGATIVE
 @behave.given("that a LXE/CD has access to the content authoring tool and has an invalid JSON that needs to be ingested into the system")

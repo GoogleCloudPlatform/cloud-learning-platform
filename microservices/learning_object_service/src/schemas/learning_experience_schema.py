@@ -203,11 +203,15 @@ class LearningExperienceSearchResponseModel(BaseModel):
     }
 
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullLearningExperienceModel]]
+  total_count: int
+
 class AllLearningExperiencesResponseModel(BaseModel):
   """Learning Experience Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Data fetched successfully"
-  data: List[FullLearningExperienceModel]
+  data: TotalCountResponseModel
 
   class Config():
     orm_mode = True
@@ -215,7 +219,10 @@ class AllLearningExperiencesResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Data fetched successfully",
-            "data": [FULL_LEARNING_EXPERIENCE_EXAMPLE]
+            "data": {
+                      "records":[FULL_LEARNING_EXPERIENCE_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

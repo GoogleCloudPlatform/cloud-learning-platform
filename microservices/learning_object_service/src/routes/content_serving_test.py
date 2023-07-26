@@ -10,7 +10,6 @@ import copy
 # pylint: disable = unspecified-encoding
 # pylint: disable = consider-using-with
 # pylint: disable = line-too-long
-# pylint: disable = invalid-name
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -30,7 +29,7 @@ from common.utils.http_exceptions import add_exception_handlers
 from schemas.schema_examples import (BASIC_LEARNING_RESOURCE_EXAMPLE,
                                      BASIC_LEARNING_OBJECT_EXAMPLE,
                                      BASIC_LEARNING_EXPERIENCE_EXAMPLE)
-from services.helper import get_all_nodes_for_alias
+from services.helper import get_all_nodes
 
 SRL_PATHWAY = os.path.join(TESTING_FOLDER_PATH,
                            "content_serving/hierarchy_for_srl.json")
@@ -84,7 +83,7 @@ class FileUtils:
 
   def __init__(self):
     pass
-
+  #pylint: disable=invalid-name
   def getContentFolderFiles(self, folder_path, list_madcap_contents=False):
     return ["abc"]
 
@@ -282,7 +281,7 @@ def link_content_and_create_version_positive(clean_firestore, mocker):
   new_resource_uuid = res_json["data"]["resource_uuid"]
   assert new_resource_uuid != learning_resource.uuid
 
-  learning_resource = LearningResource.find_by_uuid(new_resource_uuid)
+  learning_resource = LearningResource.find_by_id(new_resource_uuid)
   assert learning_resource.resource_path == sample_resource_path
   assert learning_resource.status == "draft"
   assert learning_resource.parent_version_uuid == parent_uuid
@@ -304,7 +303,7 @@ def link_content_and_create_version_positive(clean_firestore, mocker):
   new_resource_uuid_2 = res_json["data"]["resource_uuid"]
   assert new_resource_uuid_2 != new_resource_uuid
 
-  learning_resource = LearningResource.find_by_uuid(new_resource_uuid_2)
+  learning_resource = LearningResource.find_by_id(new_resource_uuid_2)
   assert learning_resource.resource_path == sample_resource_path
   assert learning_resource.status == "draft"
   assert learning_resource.parent_version_uuid == new_resource_uuid
@@ -435,7 +434,7 @@ def get_content_versions_positive(clean_firestore, mocker):
   assert res_json["success"] is True
   assert res_json[
       "message"] == "Successfully fetched content version for learning resource"
-  assert len(res_json["data"]) == 2
+  assert len(res_json["data"]["records"]) == 2
 
   # 2. Generic Case
   res = client_with_emulator.put(
@@ -459,7 +458,7 @@ def get_content_versions_positive(clean_firestore, mocker):
   assert res_json["success"] is True
   assert res_json[
       "message"] == "Successfully fetched content version for learning resource"
-  assert len(res_json["data"]) == 3
+  assert len(res_json["data"]["records"]) == 3
 
   # 3. Filter by status
   learning_resource_dict = copy.deepcopy(BASIC_LEARNING_RESOURCE_EXAMPLE)
@@ -515,8 +514,8 @@ def get_content_versions_positive(clean_firestore, mocker):
   assert res_json["success"] is True
   assert res_json[
       "message"] == "Successfully fetched content version for learning resource"
-  assert len(res_json["data"]) == 1
-  assert res_json["data"][0]["status"] == "draft"
+  assert len(res_json["data"]["records"]) == 1
+  assert res_json["data"]["records"][0]["status"] == "draft"
 
   res = client_with_emulator.get(
       url=f"{api_url}/content-versions/{learning_resource.uuid}",
@@ -527,8 +526,8 @@ def get_content_versions_positive(clean_firestore, mocker):
   assert res_json["success"] is True
   assert res_json[
       "message"] == "Successfully fetched content version for learning resource"
-  assert len(res_json["data"]) == 1
-  assert res_json["data"][0]["status"] == "published"
+  assert len(res_json["data"]["records"]) == 1
+  assert res_json["data"]["records"][0]["status"] == "published"
 
   res = client_with_emulator.get(
       url=f"{api_url}/content-versions/{learning_resource.uuid}",
@@ -539,8 +538,8 @@ def get_content_versions_positive(clean_firestore, mocker):
   assert res_json["success"] is True
   assert res_json[
       "message"] == "Successfully fetched content version for learning resource"
-  assert len(res_json["data"]) == 1
-  assert res_json["data"][0]["status"] == "unpublished"
+  assert len(res_json["data"]["records"]) == 1
+  assert res_json["data"]["records"][0]["status"] == "unpublished"
 
   # 4. Filter by Status with initial document
   learning_resource_dict = copy.deepcopy(BASIC_LEARNING_RESOURCE_EXAMPLE)
@@ -564,7 +563,7 @@ def get_content_versions_positive(clean_firestore, mocker):
   assert res_json["success"] is True
   assert res_json[
       "message"] == "Successfully fetched content version for learning resource"
-  assert len(res_json["data"]) == 1
+  assert len(res_json["data"]["records"]) == 1
 
 
 def get_content_versions_negative(clean_firestore, mocker):
@@ -677,10 +676,10 @@ def handle_publish_event_positive(clean_firestore, mocker):
   assert res_json["success"] is True
   assert res_json["message"] == "Successfully published content"
 
-  old_lr = LearningResource.find_by_uuid(new_content_version_uuid)
+  old_lr = LearningResource.find_by_id(new_content_version_uuid)
   assert old_lr.status == "unpublished"
 
-  new_lr = LearningResource.find_by_uuid(new_resource_uuid_1)
+  new_lr = LearningResource.find_by_id(new_resource_uuid_1)
   assert new_lr.status == "published"
 
   # 3. Republish Scenario
@@ -696,12 +695,12 @@ def handle_publish_event_positive(clean_firestore, mocker):
   assert res_json["data"]["resource_uuid"] != old_lr.uuid
   assert res_json["data"]["resource_uuid"] != new_lr.uuid
 
-  new_lr_2 = LearningResource.find_by_uuid(res_json["data"]["resource_uuid"])
+  new_lr_2 = LearningResource.find_by_id(res_json["data"]["resource_uuid"])
   assert new_lr_2.parent_version_uuid == old_lr.uuid
   assert new_lr_2.status == "published"
 
-  old_lr = LearningResource.find_by_uuid(new_content_version_uuid)
-  new_lr = LearningResource.find_by_uuid(new_resource_uuid_1)
+  old_lr = LearningResource.find_by_id(new_content_version_uuid)
+  new_lr = LearningResource.find_by_id(new_resource_uuid_1)
 
   assert old_lr.status == "unpublished"
   assert new_lr.status == "unpublished"
@@ -1004,7 +1003,7 @@ def test_upload_madcap_positive(clean_firestore, mocker):
   learning_experience_dict["uuid"] = learning_experience.id
 
   file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
-  print(file_path)
+
   resp = client_with_emulator.post(
       f"{api_url}/upload/madcap/{learning_experience.uuid}",
       files={
@@ -1020,7 +1019,7 @@ def test_upload_madcap_positive(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le = LearningExperience.find_by_uuid(learning_experience.uuid)
+  le = LearningExperience.find_by_id(learning_experience.uuid)
   assert le.resource_path == "learning-resources/dummy_madcap/"
 
 
@@ -1076,7 +1075,7 @@ def test_upload_madcap_negative(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le = LearningExperience.find_by_uuid(learning_experience.uuid)
+  le = LearningExperience.find_by_id(learning_experience.uuid)
   assert le.resource_path == "learning-resources/dummy_madcap/"
 
   #-------------------------------------------------------------
@@ -1133,327 +1132,326 @@ def test_upload_madcap_negative(clean_firestore, mocker):
 
 # Alpha Scope: Link Madcap to LR
 #------------------------------------------------
-# def test_link_madcap_to_lr_positive(clean_firestore, mocker):
-#   mocker.patch(
-#       "services.hierarchy_content_mapping.GcsCrudService",
-#       return_value=GcsCrudService("GCP_LEARNING_RESOURCE_BUCKET"))
-#   mocker.patch(
-#       "services.hierarchy_content_mapping.FileUtils", return_value=FileUtils())
-#   mocker.patch("routes.content_serving.is_valid_path", return_value=True)
-#   mocker.patch("routes.content_serving.upload_folder")
-#   mocker.patch(
-#       "services.hierarchy_content_mapping.is_missing_linked_files",
-#       return_value=(False,
-#                     "Content override is forbidden because of missing files."))
-#   mocker.patch(
-#       "services.hierarchy_content_mapping.get_file_and_folder_list",
-#       return_value=(None, None, ["def"]))
+def test_link_madcap_to_lr_positive(clean_firestore, mocker):
+  mocker.patch(
+      "services.hierarchy_content_mapping.GcsCrudService",
+      return_value=GcsCrudService("GCP_LEARNING_RESOURCE_BUCKET"))
+  mocker.patch(
+      "services.hierarchy_content_mapping.FileUtils", return_value=FileUtils())
+  mocker.patch("routes.content_serving.is_valid_path", return_value=True)
+  mocker.patch("routes.content_serving.upload_folder")
+  mocker.patch(
+      "services.hierarchy_content_mapping.is_missing_linked_files",
+      return_value=(False,
+                    "Content override is forbidden because of missing files."))
+  mocker.patch(
+      "services.hierarchy_content_mapping.get_file_and_folder_list",
+      return_value=(None, None, ["def"]))
 
-#   #-------------------------------------------------------------
-#   # Setup Steps Start
-#   #-------------------------------------------------------------
-#   learning_experience_dict = copy.deepcopy(BASIC_LEARNING_EXPERIENCE_EXAMPLE)
-#   learning_experience = LearningExperience.from_dict(learning_experience_dict)
-#   learning_experience.uuid = ""
-#   learning_experience.resource_path = ""
-#   learning_experience.save()
-#   learning_experience.uuid = learning_experience.id
-#   learning_experience.root_version_uuid = learning_experience.id
-#   learning_experience.update()
-#   learning_experience_dict["uuid"] = learning_experience.id
+  #-------------------------------------------------------------
+  # Setup Steps Start
+  #-------------------------------------------------------------
+  learning_experience_dict = copy.deepcopy(BASIC_LEARNING_EXPERIENCE_EXAMPLE)
+  learning_experience = LearningExperience.from_dict(learning_experience_dict)
+  learning_experience.uuid = ""
+  learning_experience.resource_path = ""
+  learning_experience.save()
+  learning_experience.uuid = learning_experience.id
+  learning_experience.root_version_uuid = learning_experience.id
+  learning_experience.update()
+  learning_experience_dict["uuid"] = learning_experience.id
 
-#   file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
+  file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
 
-#   resp = client_with_emulator.post(
-#       f"{api_url}/upload/madcap/{learning_experience.uuid}",
-#       files={
-#           "content_file": ("dummy_madcap.zip", open(file_path,
-#                                                     "rb"), "application/zip")
-#       })
-#   resp_json = resp.json()
-#   assert resp.status_code == 200
-#   assert resp_json["success"] is True
-#   assert resp_json[
-#       "message"] == f"Successfully uploaded the content for learning experience with uuid {learning_experience.uuid}"
-#   assert resp_json["data"].get("prefix") is not None
-#   assert resp_json["data"].get("files") is not None
-#   assert resp_json["data"].get("folders") is not None
+  resp = client_with_emulator.post(
+      f"{api_url}/upload/madcap/{learning_experience.uuid}",
+      files={
+          "content_file": ("dummy_madcap.zip", open(file_path,
+                                                    "rb"), "application/zip")
+      })
+  resp_json = resp.json()
+  assert resp.status_code == 200
+  assert resp_json["success"] is True
+  assert resp_json[
+      "message"] == f"Successfully uploaded the content for learning experience with uuid {learning_experience.uuid}"
+  assert resp_json["data"].get("prefix") is not None
+  assert resp_json["data"].get("files") is not None
+  assert resp_json["data"].get("folders") is not None
 
-#   le = LearningExperience.find_by_uuid(learning_experience.uuid)
-#   assert le.resource_path == "learning-resources/dummy_madcap/"
+  le = LearningExperience.find_by_id(learning_experience.uuid)
+  assert le.resource_path == "learning-resources/dummy_madcap/"
 
-#   learning_object_dict = copy.deepcopy(BASIC_LEARNING_OBJECT_EXAMPLE)
-#   learning_object_dict["name"] = "Kubernetes Container Orchestration"
-#   learning_object = LearningObject.from_dict(learning_object_dict)
-#   learning_object.uuid = ""
-#   learning_object.parent_nodes = {
-#       "learning_experiences": [learning_experience.uuid]
-#   }
-#   learning_object.save()
-#   learning_object.uuid = learning_object.id
-#   learning_object.update()
-#   learning_object_dict["uuid"] = learning_object.id
+  learning_object_dict = copy.deepcopy(BASIC_LEARNING_OBJECT_EXAMPLE)
+  learning_object_dict["name"] = "Kubernetes Container Orchestration"
+  learning_object = LearningObject.from_dict(learning_object_dict)
+  learning_object.uuid = ""
+  learning_object.parent_nodes = {
+      "learning_experiences": [learning_experience.uuid]
+  }
+  learning_object.save()
+  learning_object.uuid = learning_object.id
+  learning_object.update()
+  learning_object_dict["uuid"] = learning_object.id
 
-#   learning_experience.child_nodes = {"learning_objects": [learning_object.uuid]}
-#   learning_experience.update()
+  learning_experience.child_nodes = {"learning_objects": [learning_object.uuid]}
+  learning_experience.update()
 
-#   learning_resource_dict = copy.deepcopy(BASIC_LEARNING_RESOURCE_EXAMPLE)
-#   learning_resource = LearningResource.from_dict(learning_resource_dict)
-#   learning_resource.uuid = ""
-#   learning_resource.type = ""
-#   learning_resource.resource_path = ""
-#   learning_resource.parent_nodes = {"learning_objects": [learning_object.uuid]}
-#   learning_resource.save()
-#   learning_resource.uuid = learning_resource.id
-#   learning_resource.update()
-#   learning_resource_dict["uuid"] = learning_resource.id
+  learning_resource_dict = copy.deepcopy(BASIC_LEARNING_RESOURCE_EXAMPLE)
+  learning_resource = LearningResource.from_dict(learning_resource_dict)
+  learning_resource.uuid = ""
+  learning_resource.type = ""
+  learning_resource.resource_path = ""
+  learning_resource.parent_nodes = {"learning_objects": [learning_object.uuid]}
+  learning_resource.save()
+  learning_resource.uuid = learning_resource.id
+  learning_resource.update()
+  learning_resource_dict["uuid"] = learning_resource.id
 
-#   learning_object.child_nodes = {"learning_resources": [learning_resource.uuid]}
-#   learning_object.update()
+  learning_object.child_nodes = {"learning_resources": [learning_resource.uuid]}
+  learning_object.update()
 
-#   file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
+  file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
 
-#   resp = client_with_emulator.post(
-#       f"{api_url}/upload/madcap/{learning_experience.uuid}",
-#       files={
-#           "content_file": ("dummy_madcap.zip", open(file_path,
-#                                                     "rb"), "application/zip")
-#       })
-#   resp_json = resp.json()
-#   assert resp.status_code == 200
-#   assert resp_json["success"] is True
-#   assert resp_json[
-#       "message"] == f"Successfully uploaded the content for learning experience with uuid {learning_experience.uuid}"
-#   assert resp_json["data"].get("prefix") is not None
-#   assert resp_json["data"].get("files") is not None
-#   assert resp_json["data"].get("folders") is not None
+  resp = client_with_emulator.post(
+      f"{api_url}/upload/madcap/{learning_experience.uuid}",
+      files={
+          "content_file": ("dummy_madcap.zip", open(file_path,
+                                                    "rb"), "application/zip")
+      })
+  resp_json = resp.json()
+  assert resp.status_code == 200
+  assert resp_json["success"] is True
+  assert resp_json[
+      "message"] == f"Successfully uploaded the content for learning experience with uuid {learning_experience.uuid}"
+  assert resp_json["data"].get("prefix") is not None
+  assert resp_json["data"].get("files") is not None
+  assert resp_json["data"].get("folders") is not None
 
-#   le = LearningExperience.find_by_uuid(learning_experience.uuid)
-#   assert le.resource_path == "learning-resources/dummy_madcap/"
-#   #-------------------------------------------------------------
-#   # Setup Steps End
-#   #-------------------------------------------------------------
+  le = LearningExperience.find_by_id(learning_experience.uuid)
+  assert le.resource_path == "learning-resources/dummy_madcap/"
+  #-------------------------------------------------------------
+  # Setup Steps End
+  #-------------------------------------------------------------
 
-#   resp = client_with_emulator.post(
-#       url=f"{api_url}/link/madcap/{learning_experience.uuid}/{learning_resource.uuid}",
-#       json={
-#           "resource_path": "def",
-#           "type": "html"
-#       })
+  resp = client_with_emulator.post(
+      url=f"{api_url}/link/madcap/{learning_experience.uuid}/{learning_resource.uuid}",
+      json={
+          "resource_path": "def",
+          "type": "html"
+      })
 
-#   resp_json = resp.json()
+  resp_json = resp.json()
 
-#   assert resp.status_code == 200
-#   assert resp_json["success"] is True
-#   assert resp_json[
-#       "message"] == f"Successfully linked content to Learning Resource with uuid {learning_resource.uuid}"
+  assert resp.status_code == 200
+  assert resp_json["success"] is True
+  assert resp_json[
+      "message"] == f"Successfully linked content to Learning Resource with uuid {learning_resource.uuid}"
 
-#   lr = LearningResource.find_by_uuid(learning_resource.uuid)
-#   assert lr.resource_path == "def"
-#   assert lr.type == "html"
+  lr = LearningResource.find_by_id(learning_resource.uuid)
+  assert lr.resource_path == "def"
+  assert lr.type == "html"
 
 
-# def test_link_madcap_to_lr_negative(clean_firestore, mocker):
-#   """
-#         Possible scenarios
-#         1. Invalid LE uuid
-#         2. Invalid LR uuid
-#         3. Invalid LE, LR pair
-#         4. File does not exists in prefix given by LE
-#         5. LE does not have a resource_path
-#     """
+def test_link_madcap_to_lr_negative(clean_firestore, mocker):
+  """
+        Possible scenarios
+        1. Invalid LE uuid
+        2. Invalid LR uuid
+        3. Invalid LE, LR pair
+        4. File does not exists in prefix given by LE
+        5. LE does not have a resource_path
+    """
 
-#   mocker.patch(
-#       "services.hierarchy_content_mapping.GcsCrudService",
-#       return_value=GcsCrudService("GCP_LEARNING_RESOURCE_BUCKET"))
-#   mocker.patch(
-#       "services.hierarchy_content_mapping.FileUtils", return_value=FileUtils())
-#   mocker.patch("routes.content_serving.is_valid_path", return_value=True)
-#   mocker.patch("routes.content_serving.upload_folder")
-#   mocker.patch(
-#       "services.hierarchy_content_mapping.is_missing_linked_files",
-#       return_value=(False,
-#                     "Content override is forbidden because of missing files."))
-#   mocker.patch(
-#       "services.hierarchy_content_mapping.get_file_and_folder_list",
-#       return_value=(None, None, ["def"]))
+  mocker.patch(
+      "services.hierarchy_content_mapping.GcsCrudService",
+      return_value=GcsCrudService("GCP_LEARNING_RESOURCE_BUCKET"))
+  mocker.patch(
+      "services.hierarchy_content_mapping.FileUtils", return_value=FileUtils())
+  mocker.patch("routes.content_serving.is_valid_path", return_value=True)
+  mocker.patch("routes.content_serving.upload_folder")
+  mocker.patch(
+      "services.hierarchy_content_mapping.is_missing_linked_files",
+      return_value=(True, None))
+  mocker.patch(
+      "services.hierarchy_content_mapping.get_file_and_folder_list",
+      return_value=(None, None, ["def"]))
 
-#   #-------------------------------------------------------------
-#   # Setup Steps Start
-#   #-------------------------------------------------------------
-#   learning_experience_dict = copy.deepcopy(BASIC_LEARNING_EXPERIENCE_EXAMPLE)
-#   learning_experience = LearningExperience.from_dict(learning_experience_dict)
-#   learning_experience.uuid = ""
-#   learning_experience.resource_path = ""
-#   learning_experience.save()
-#   learning_experience.uuid = learning_experience.id
-#   learning_experience.root_version_uuid = learning_experience.id
-#   learning_experience.update()
-#   learning_experience_dict["uuid"] = learning_experience.id
+  #-------------------------------------------------------------
+  # Setup Steps Start
+  #-------------------------------------------------------------
+  learning_experience_dict = copy.deepcopy(BASIC_LEARNING_EXPERIENCE_EXAMPLE)
+  learning_experience = LearningExperience.from_dict(learning_experience_dict)
+  learning_experience.uuid = ""
+  learning_experience.resource_path = ""
+  learning_experience.save()
+  learning_experience.uuid = learning_experience.id
+  learning_experience.root_version_uuid = learning_experience.id
+  learning_experience.update()
+  learning_experience_dict["uuid"] = learning_experience.id
 
-#   file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
+  file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
 
-#   resp = client_with_emulator.post(
-#       f"{api_url}/upload/madcap/{learning_experience.uuid}",
-#       files={
-#           "content_file": ("dummy_madcap.zip", open(file_path,
-#                                                     "rb"), "application/zip")
-#       })
-#   resp_json = resp.json()
-#   assert resp.status_code == 200
-#   assert resp_json["success"] is True
-#   assert resp_json[
-#       "message"] == f"Successfully uploaded the content for learning experience with uuid {learning_experience.uuid}"
-#   assert resp_json["data"].get("prefix") is not None
-#   assert resp_json["data"].get("files") is not None
-#   assert resp_json["data"].get("folders") is not None
+  resp = client_with_emulator.post(
+      f"{api_url}/upload/madcap/{learning_experience.uuid}",
+      files={
+          "content_file": ("dummy_madcap.zip", open(file_path,
+                                                    "rb"), "application/zip")
+      })
+  resp_json = resp.json()
+  assert resp.status_code == 200
+  assert resp_json["success"] is True
+  assert resp_json[
+      "message"] == f"Successfully uploaded the content for learning experience with uuid {learning_experience.uuid}"
+  assert resp_json["data"].get("prefix") is not None
+  assert resp_json["data"].get("files") is not None
+  assert resp_json["data"].get("folders") is not None
 
-#   le = LearningExperience.find_by_uuid(learning_experience.uuid)
-#   assert le.resource_path == "learning-resources/dummy_madcap/"
+  le = LearningExperience.find_by_id(learning_experience.uuid)
+  assert le.resource_path == "learning-resources/dummy_madcap/"
 
-#   learning_object_dict = copy.deepcopy(BASIC_LEARNING_OBJECT_EXAMPLE)
-#   learning_object_dict["name"] = "Kubernetes Container Orchestration"
-#   learning_object = LearningObject.from_dict(learning_object_dict)
-#   learning_object.uuid = ""
-#   learning_object.parent_nodes = {
-#       "learning_experiences": [learning_experience.uuid]
-#   }
-#   learning_object.save()
-#   learning_object.uuid = learning_object.id
-#   learning_object.update()
-#   learning_object_dict["uuid"] = learning_object.id
+  learning_object_dict = copy.deepcopy(BASIC_LEARNING_OBJECT_EXAMPLE)
+  learning_object_dict["name"] = "Kubernetes Container Orchestration"
+  learning_object = LearningObject.from_dict(learning_object_dict)
+  learning_object.uuid = ""
+  learning_object.parent_nodes = {
+      "learning_experiences": [learning_experience.uuid]
+  }
+  learning_object.save()
+  learning_object.uuid = learning_object.id
+  learning_object.update()
+  learning_object_dict["uuid"] = learning_object.id
 
-#   learning_experience.child_nodes = {"learning_objects": [learning_object.uuid]}
-#   learning_experience.update()
+  learning_experience.child_nodes = {"learning_objects": [learning_object.uuid]}
+  learning_experience.update()
 
-#   learning_resource_dict = copy.deepcopy(BASIC_LEARNING_RESOURCE_EXAMPLE)
-#   learning_resource = LearningResource.from_dict(learning_resource_dict)
-#   learning_resource.uuid = ""
-#   learning_resource.type = ""
-#   learning_resource.resource_path = ""
-#   learning_resource.parent_nodes = {"learning_objects": [learning_object.uuid]}
-#   learning_resource.save()
-#   learning_resource.uuid = learning_resource.id
-#   learning_resource.update()
-#   learning_resource_dict["uuid"] = learning_resource.id
+  learning_resource_dict = copy.deepcopy(BASIC_LEARNING_RESOURCE_EXAMPLE)
+  learning_resource = LearningResource.from_dict(learning_resource_dict)
+  learning_resource.uuid = ""
+  learning_resource.type = ""
+  learning_resource.resource_path = ""
+  learning_resource.parent_nodes = {"learning_objects": [learning_object.uuid]}
+  learning_resource.save()
+  learning_resource.uuid = learning_resource.id
+  learning_resource.update()
+  learning_resource_dict["uuid"] = learning_resource.id
 
-#   learning_object.child_nodes = {"learning_resources": [learning_resource.uuid]}
-#   learning_object.update()
+  learning_object.child_nodes = {"learning_resources": [learning_resource.uuid]}
+  learning_object.update()
 
-#   file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
+  file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
 
-#   resp = client_with_emulator.post(
-#       f"{api_url}/upload/madcap/{learning_experience.uuid}",
-#       files={
-#           "content_file": ("dummy_madcap.zip", open(file_path,
-#                                                     "rb"), "application/zip")
-#       })
-#   resp_json = resp.json()
-#   assert resp.status_code == 200
-#   assert resp_json["success"] is True
-#   assert resp_json[
-#       "message"] == f"Successfully uploaded the content for learning experience with uuid {learning_experience.uuid}"
-#   assert resp_json["data"].get("prefix") is not None
-#   assert resp_json["data"].get("files") is not None
-#   assert resp_json["data"].get("folders") is not None
+  resp = client_with_emulator.post(
+      f"{api_url}/upload/madcap/{learning_experience.uuid}",
+      files={
+          "content_file": ("dummy_madcap.zip", open(file_path,
+                                                    "rb"), "application/zip")
+      })
+  resp_json = resp.json()
+  assert resp.status_code == 200
+  assert resp_json["success"] is True
+  assert resp_json[
+      "message"] == f"Successfully uploaded the content for learning experience with uuid {learning_experience.uuid}"
+  assert resp_json["data"].get("prefix") is not None
+  assert resp_json["data"].get("files") is not None
+  assert resp_json["data"].get("folders") is not None
 
-#   le = LearningExperience.find_by_uuid(learning_experience.uuid)
-#   assert le.resource_path == "learning-resources/dummy_madcap/"
-#   #-------------------------------------------------------------
-#   # Setup Steps End
-#   #-------------------------------------------------------------
+  le = LearningExperience.find_by_id(learning_experience.uuid)
+  assert le.resource_path == "learning-resources/dummy_madcap/"
+  #-------------------------------------------------------------
+  # Setup Steps End
+  #-------------------------------------------------------------
 
-#   # 1. Invalid LE uuid
-#   invalid_uuid = "random_uuid"
-#   resp = client_with_emulator.post(
-#       url=f"{api_url}/link/madcap/{invalid_uuid}/{learning_resource.uuid}",
-#       json={
-#           "resource_path": "def",
-#           "type": "html"
-#       })
+  # 1. Invalid LE uuid
+  invalid_uuid = "random_uuid"
+  resp = client_with_emulator.post(
+      url=f"{api_url}/link/madcap/{invalid_uuid}/{learning_resource.uuid}",
+      json={
+          "resource_path": "def",
+          "type": "html"
+      })
 
-#   resp_json = resp.json()
+  resp_json = resp.json()
 
-#   assert resp.status_code == 404
-#   assert resp_json["success"] is False
-#   assert resp_json[
-#       "message"] == f"Learning Experience with uuid {invalid_uuid} not found"
+  assert resp.status_code == 404
+  assert resp_json["success"] is False
+  assert resp_json[
+      "message"] == f"Learning Experience with uuid {invalid_uuid} not found"
 
-#   # 2. Invalid LR uuid
-#   invalid_uuid = "random_uuid"
-#   resp = client_with_emulator.post(
-#       url=f"{api_url}/link/madcap/{learning_experience.uuid}/{invalid_uuid}",
-#       json={
-#           "resource_path": "def",
-#           "type": "html"
-#       })
+  # 2. Invalid LR uuid
+  invalid_uuid = "random_uuid"
+  resp = client_with_emulator.post(
+      url=f"{api_url}/link/madcap/{learning_experience.uuid}/{invalid_uuid}",
+      json={
+          "resource_path": "def",
+          "type": "html"
+      })
 
-#   resp_json = resp.json()
+  resp_json = resp.json()
 
-#   assert resp.status_code == 404
-#   assert resp_json["success"] is False
-#   assert resp_json[
-#       "message"] == f"Learning Resource with uuid {invalid_uuid} not found"
+  assert resp.status_code == 404
+  assert resp_json["success"] is False
+  assert resp_json[
+      "message"] == f"Learning Resource with uuid {invalid_uuid} not found"
 
-#   # 3. Invalid LE, LR pair
-#   learning_resource_dict_2 = copy.deepcopy(BASIC_LEARNING_RESOURCE_EXAMPLE)
-#   learning_resource_2 = LearningResource.from_dict(learning_resource_dict_2)
-#   learning_resource_2.uuid = ""
-#   learning_resource_2.type = ""
-#   learning_resource_2.resource_path = ""
-#   learning_resource_2.save()
-#   learning_resource_2.uuid = learning_resource_2.id
-#   learning_resource_2.update()
-#   learning_resource_dict_2["uuid"] = learning_resource_2.id
+  # 3. Invalid LE, LR pair
+  learning_resource_dict_2 = copy.deepcopy(BASIC_LEARNING_RESOURCE_EXAMPLE)
+  learning_resource_2 = LearningResource.from_dict(learning_resource_dict_2)
+  learning_resource_2.uuid = ""
+  learning_resource_2.type = ""
+  learning_resource_2.resource_path = ""
+  learning_resource_2.save()
+  learning_resource_2.uuid = learning_resource_2.id
+  learning_resource_2.update()
+  learning_resource_dict_2["uuid"] = learning_resource_2.id
 
-#   resp = client_with_emulator.post(
-#       url=f"{api_url}/link/madcap/{learning_experience.uuid}/{learning_resource_2.uuid}",
-#       json={
-#           "resource_path": "def",
-#           "type": "html"
-#       })
+  resp = client_with_emulator.post(
+      url=f"{api_url}/link/madcap/{learning_experience.uuid}/{learning_resource_2.uuid}",
+      json={
+          "resource_path": "def",
+          "type": "html"
+      })
 
-#   resp_json = resp.json()
+  resp_json = resp.json()
 
-#   assert resp.status_code == 422
-#   assert resp_json["success"] is False
-#   assert resp_json[
-#       "message"] == f"Given Learning Resource {learning_resource_2.uuid} is not a child of Learning Experience {learning_experience.uuid}"
+  assert resp.status_code == 422
+  assert resp_json["success"] is False
+  assert resp_json[
+      "message"] == f"Given Learning Resource {learning_resource_2.uuid} is not a child of Learning Experience {learning_experience.uuid}"
 
-#   # 4. Invalid resource path
-#   resp = client_with_emulator.post(
-#       url=f"{api_url}/link/madcap/{learning_experience.uuid}/{learning_resource.uuid}",
-#       json={
-#           "resource_path": "hij",
-#           "type": "html"
-#       })
+  # 4. Invalid resource path
+  resp = client_with_emulator.post(
+      url=f"{api_url}/link/madcap/{learning_experience.uuid}/{learning_resource.uuid}",
+      json={
+          "resource_path": "hij",
+          "type": "html"
+      })
 
-#   resp_json = resp.json()
+  resp_json = resp.json()
 
-#   assert resp.status_code == 422
-#   assert resp_json["success"] is False
-#   assert resp_json[
-#       "message"] == "Cannot link Learning Resource with a file that does not belong to the folder given by Learning Experience.Required file path prefix: learning-resources/dummy_madcap/"
+  assert resp.status_code == 422
+  assert resp_json["success"] is False
+  assert resp_json[
+      "message"] == "Cannot link Learning Resource with a file that does not belong to the folder given by Learning Experience.Required file path prefix: learning-resources/dummy_madcap/"
 
-#   # 5. LE does not have a resource_path
-#   learning_experience = LearningExperience.find_by_uuid(
-#       learning_experience.uuid)
-#   learning_experience.resource_path = ""
-#   learning_experience.update()
+  # 5. LE does not have a resource_path
+  learning_experience = LearningExperience.find_by_id(
+      learning_experience.uuid)
+  learning_experience.resource_path = ""
+  learning_experience.update()
 
-#   resp = client_with_emulator.post(
-#       url=f"{api_url}/link/madcap/{learning_experience.uuid}/{learning_resource.uuid}",
-#       json={
-#           "resource_path": "hij",
-#           "type": "html"
-#       })
+  resp = client_with_emulator.post(
+      url=f"{api_url}/link/madcap/{learning_experience.uuid}/{learning_resource.uuid}",
+      json={
+          "resource_path": "hij",
+          "type": "html"
+      })
 
-#   resp_json = resp.json()
+  resp_json = resp.json()
 
-#   assert resp.status_code == 422
-#   assert resp_json["success"] is False
-#   assert resp_json[
-#       "message"] == f"The resource_path of Learning Experience {learning_experience.uuid} is empty. Hence, we cannot link content to Learning resource with uuid {learning_resource.uuid}"
+  assert resp.status_code == 422
+  assert resp_json["success"] is False
+  assert resp_json[
+      "message"] == f"The resource_path of Learning Experience {learning_experience.uuid} is empty. Hence, we cannot link content to Learning resource with uuid {learning_resource.uuid}"
 
 
 # Alpha Scope: Upload Madcap SRL to LE
@@ -1495,10 +1493,10 @@ def test_link_madcap_srl_to_le_positive(clean_firestore, mocker):
     program_uuid = resp_json["data"][0]
 
   sibling_le_list = []
-  le_list = get_all_nodes_for_alias(
+  le_list = get_all_nodes(
       uuid=program_uuid,
       level="curriculum_pathways",
-      final_alias="learning_experience",
+      node_type="learning_experiences",
       nodes=sibling_le_list)
 
   le_1_uuid = le_list[0]["uuid"]
@@ -1527,14 +1525,14 @@ def test_link_madcap_srl_to_le_positive(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le_1 = LearningExperience.find_by_uuid(le_1_uuid)
-  le_2 = LearningExperience.find_by_uuid(le_2_uuid)
+  le_1 = LearningExperience.find_by_id(le_1_uuid)
+  le_2 = LearningExperience.find_by_id(le_2_uuid)
   assert le_1.srl_resource_path == "learning-resources/SRL_Dummy/"
   assert le_2.srl_resource_path == "learning-resources/SRL_Dummy/"
 
-  lo_1 = LearningObject.find_by_uuid(le_1.child_nodes["learning_objects"][0])
+  lo_1 = LearningObject.find_by_id(le_1.child_nodes["learning_objects"][0])
 
-  lr_1 = LearningResource.find_by_uuid(
+  lr_1 = LearningResource.find_by_id(
       lo_1.child_nodes["learning_resources"][0])
 
   resp = client_with_emulator.post(
@@ -1552,7 +1550,7 @@ def test_link_madcap_srl_to_le_positive(clean_firestore, mocker):
   assert resp_json[
       "message"] == f"Successfully linked content to Learning Resource with uuid {lr_1.uuid}"
 
-  lr_1 = LearningResource.find_by_uuid(lr_1.uuid)
+  lr_1 = LearningResource.find_by_id(lr_1.uuid)
   assert lr_1.resource_path == "abc"
   assert lr_1.type == "html"
 
@@ -1576,14 +1574,14 @@ def test_link_madcap_srl_to_le_positive(clean_firestore, mocker):
   assert resp_json["data"].get("files") is not None
   assert resp_json["data"].get("folders") is not None
 
-  le_1 = LearningExperience.find_by_uuid(le_1_uuid)
-  le_2 = LearningExperience.find_by_uuid(le_2_uuid)
+  le_1 = LearningExperience.find_by_id(le_1_uuid)
+  le_2 = LearningExperience.find_by_id(le_2_uuid)
   assert le_1.srl_resource_path == "learning-resources/SRL_Dummy_v2/"
   assert le_2.srl_resource_path == "learning-resources/SRL_Dummy_v2/"
 
-  lo_1 = LearningObject.find_by_uuid(le_1.child_nodes["learning_objects"][0])
+  lo_1 = LearningObject.find_by_id(le_1.child_nodes["learning_objects"][0])
 
-  lr_1 = LearningResource.find_by_uuid(
+  lr_1 = LearningResource.find_by_id(
       lo_1.child_nodes["learning_resources"][0])
 
   assert lr_1.resource_path == "abc"
@@ -1627,10 +1625,10 @@ def test_link_madcap_srl_to_le_negative(clean_firestore, mocker):
     program_uuid = resp_json["data"][0]
 
   sibling_le_list = []
-  le_list = get_all_nodes_for_alias(
+  le_list = get_all_nodes(
       uuid=program_uuid,
       level="curriculum_pathways",
-      final_alias="learning_experience",
+      node_type="learning_experiences",
       nodes=sibling_le_list)
 
   le_1_uuid = le_list[0]["uuid"]

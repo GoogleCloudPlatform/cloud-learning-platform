@@ -4,20 +4,20 @@ Pydantic Model for Activity API's
 from typing import List, Optional
 from pydantic import BaseModel
 from schemas.schema_examples import BASIC_ACTIVITY_EXAMPLE, FULL_ACTIVITY_EXAMPLE
+from common.utils.schema_validator import BaseConfigModel
 
 
-class BasicActivityModel(BaseModel):
+class BasicActivityModel(BaseConfigModel):
   """Activity Pydantic Model"""
   name: str
-  authority: Optional[str] = ""
+  authority: Optional[str] = None
   canonical_data: Optional[dict] = {}
 
   class Config():
     orm_mode = True
     schema_extra = {"example": BASIC_ACTIVITY_EXAMPLE}
 
-
-class UpdateActivityModel(BaseModel):
+class UpdateActivityModel(BaseConfigModel):
   """Update Activity Pydantic Model"""
   canonical_data: Optional[dict]
   name: Optional[str]
@@ -44,12 +44,15 @@ class FullActivityDataModel(BasicActivityModel):
         }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullActivityDataModel]]
+  total_count: int
 
 class AllActivitiesResponseModel(BaseModel):
   """Activity Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Data fetched successfully"
-  data: Optional[List[FullActivityDataModel]]
+  data: TotalCountResponseModel
 
   class Config():
     orm_mode = True
@@ -57,7 +60,10 @@ class AllActivitiesResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Data fetched successfully",
-            "data": [FULL_ACTIVITY_EXAMPLE]
+            "data": {
+                      "records":[FULL_ACTIVITY_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

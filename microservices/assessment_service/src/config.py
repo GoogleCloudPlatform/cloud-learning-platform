@@ -22,7 +22,6 @@ USE_LEARNOSITY_SECRET = bool(os.getenv(
     "USE_LEARNOSITY_SECRET", "").lower() == "true")
 print("USE_LEARNOSITY_SECRET: ", os.getenv(
     "USE_LEARNOSITY_SECRET", ""))
-
 CONTENT_SERVING_BUCKET = os.environ.get("CONTENT_SERVING_BUCKET", "")
 SIGNURL_SA_KEY_PATH = f"./keys/{PROJECT_ID}-signurl-sa-key.json"
 

@@ -192,12 +192,15 @@ class LearningObjectSearchResponseModel(BaseModel):
         }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullLearningObjectModel]]
+  total_count: int
 
 class AllLearningObjectsResponseModel(BaseModel):
   """Learning Object Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Data fetched successfully"
-  data: List[FullLearningObjectModel]
+  data: TotalCountResponseModel
 
   class Config():
     orm_mode = True
@@ -205,7 +208,10 @@ class AllLearningObjectsResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Data fetched successfully",
-            "data": [FULL_LEARNING_OBJECT_EXAMPLE]
+            "data": {
+                      "records":[FULL_LEARNING_OBJECT_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 
