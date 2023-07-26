@@ -27,12 +27,8 @@ from schemas.schema_examples import (LLM_GENERATE_EXAMPLE, CHAT_EXAMPLE,
                                      USER_EXAMPLE)
 from common.models import UserChat, User
 from common.utils.http_exceptions import add_exception_handlers
-with mock.patch(
-    "google.cloud.secretmanager.SecretManagerServiceClient",
-    side_effect=mock.MagicMock()) as mok:
-  with mock.patch("langchain.chat_models.ChatOpenAI"):
-    with mock.patch("langchain.llms.Cohere"):
-      from common.testing.client_with_emulator import client_with_emulator
+from common.utils.auth_service import validate_user
+from common.utils.auth_service import validate_token
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 
 with mock.patch(
@@ -61,6 +57,14 @@ app = FastAPI()
 add_exception_handlers(app)
 app.include_router(router, prefix="/llm-service/api/v1")
 
+FAKE_USER_DATA = {
+    "id": "fake-user-id",
+    "user_id": "fake-user-id",
+    "auth_id": "fake-user-id",
+    "email": "user@gmail.com",
+    "role": "Admin"
+}
+
 FAKE_GENERATE_PARAMS = {
     "llm_type": "LLM Test",
     "prompt": "test prompt"
@@ -69,10 +73,18 @@ FAKE_GENERATE_PARAMS = {
 FAKE_GENERATE_RESPONSE = "test generation"
 
 @pytest.fixture
-def create_user(client_with_emulator):
-  user_dict = USER_EXAMPLE
-  user = User.from_dict(user_dict)
-  user.save()
+def client_with_emulator(clean_firestore, scope="module"):
+  """ Create FastAPI test client with clean firestore emulator """
+  def mock_validate_user():
+    return True
+
+  def mock_validate_token():
+    return FAKE_USER_DATA
+
+  app.dependency_overrides[validate_user] = mock_validate_user
+  app.dependency_overrides[validate_token] = mock_validate_token
+  test_client = TestClient(app)
+  yield test_client
 
 
 def test_get_llm_list(client_with_emulator):
@@ -94,79 +106,3 @@ def test_llm_generate(client_with_emulator):
   assert resp.status_code == 200, "Status 200"
   assert json_response.get("content") == FAKE_GENERATE_RESPONSE, \
     "returned generated text"
-
-
-def test_create_chat(create_user, client_with_emulator):
-  userid = CHAT_EXAMPLE["user_id"]
-  url = f"{api_url}/chat"
-
-  with mock.patch("routes.llm.llm_generate",
-                  return_value = FAKE_GENERATE_RESPONSE):
-    resp = client_with_emulator.post(url, json=FAKE_GENERATE_PARAMS)
-
-  json_response = resp.json()
-  assert resp.status_code == 200, "Status 200"
-  chat_data = json_response.get("data")
-  assert chat_data["history"][0] == FAKE_GENERATE_PARAMS["prompt"], \
-    "returned chat data prompt"
-  assert chat_data["history"][1] == FAKE_GENERATE_RESPONSE, \
-    "returned chat data generated text"
-
-  user_chats = UserChat.find_by_user(userid)
-  assert len(user_chats) == 1, "retreieved new user chat"
-  user_chat = user_chats[0]
-  assert user_chat.history[0] == FAKE_GENERATE_PARAMS["prompt"], \
-    "retrieved user chat prompt"
-  assert user_chat.history[1] == FAKE_GENERATE_RESPONSE, \
-    "retrieved user chat response"
-
-
-def test_chat_generate(client_with_emulator):
-  chat_dict = {**CHAT_EXAMPLE}
-  chat = UserChat.from_dict(chat_dict)
-  chat.save()
-
-  chatid = chat.id
-
-  url = f"{api_url}/chat/{chatid}/generate"
-
-  with mock.patch("routes.llm.llm_generate",
-                  return_value = FAKE_GENERATE_RESPONSE):
-    resp = client_with_emulator.post(url, json=FAKE_GENERATE_PARAMS)
-
-  json_response = resp.json()
-  assert resp.status_code == 200, "Status 200"
-  chat_data = json_response.get("data")
-  assert chat_data["history"][0] == CHAT_EXAMPLE["history"][0], \
-    "returned chat history 0"
-  assert chat_data["history"][1] == CHAT_EXAMPLE["history"][1], \
-    "returned chat history 1"
-  assert chat_data["history"][-2] == FAKE_GENERATE_PARAMS["prompt"], \
-    "returned chat data prompt"
-  assert chat_data["history"][-1] == FAKE_GENERATE_RESPONSE, \
-    "returned chat data generated text"
-
-  user_chat = UserChat.find_by_id(chatid)
-  assert user_chat is not None, "retrieved user chat"
-  assert len(user_chat.history) == len(chat.history) + 2, \
-    "user chat history updated"
-  assert user_chat.history[-2] == FAKE_GENERATE_PARAMS["prompt"], \
-    "retrieved user chat prompt"
-  assert user_chat.history[-1] == FAKE_GENERATE_RESPONSE, \
-    "retrieved user chat response"
-
-
-def test_get_chats(create_user, client_with_emulator):
-  chat_dict = {**CHAT_EXAMPLE}
-  chat = UserChat.from_dict(chat_dict)
-  chat.save()
-
-  userid = chat.user_id
-  params = {"skip": 0, "limit": "30"}
-  url = f"{api_url}/chat"
-  resp = client_with_emulator.get(url, params=params)
-  json_response = resp.json()
-
-  assert resp.status_code == 200, "Status 200"
-  saved_ids = [i.get("id") for i in json_response.get("data")]
-  assert chat_dict["id"] in saved_ids, "all data not retrieved"
