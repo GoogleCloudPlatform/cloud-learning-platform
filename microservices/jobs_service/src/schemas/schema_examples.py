@@ -27,3 +27,22 @@ USER_EXAMPLE = {
     "user_type": "learner",
     "status": "active"
 }
+
+BATCHJOB_EXAMPLE = {
+    "id_": "fake-job-id",
+    "type": "query_engine_build",
+    "name": "fake-job-name",
+    "input_data": "fake-data",
+    "status": "active",
+    "message": "test message",
+    "generated_item_id": "asdf1234",
+    "output_gcs_path": "gs://test-path",
+    "errors": {},
+    "job_logs": {},
+    "metadata": {},
+    "result_data": {
+      "docs_processed": ["a", "b", "c"],
+      "docs_not_processed": ["a", "b", "c"]
+    },
+    "uuid": "fake-job-id"
+}
