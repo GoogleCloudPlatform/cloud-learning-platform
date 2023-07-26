@@ -503,6 +503,7 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
         "lti_content_item_id": copy_content_item_data.get("id"),
         "prev_content_item_ids": prev_content_item_ids,
         "course_work_id": None,
+        "course_work_type": lti_assignment_data.get("course_work_type"),
         "tool_id": lti_assignment_data.get("tool_id"),
         "max_points": lti_assignment_data.get("max_points"),
         "start_date": lti_assignment_start_date,
