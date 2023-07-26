@@ -224,47 +224,6 @@ In this section you successfully created the following via Terraform
 
 Follow [Firebase setup Instructions](FIREBASE.md)
 
-## 5. ML Model Preparation
-
-You'll need to copy ML model checkpoints from the `aitutor-dev` development project into your new project in order for the ML models to function.
-
-Please follow the instructions in ~/cloud-learning-platform/terraform/stages/scripts/bucket_copy.sh (repeated below)
-```bash
-export GCP_PROJECT=${PROJECT_ID}
-export ML_BUCKET=aitutor-dev
-export FIRESTORE_BUCKET=aitutor-dev
-export FIRESTORE_DEMO_FOLDER=Oct_20_2022_Demo_Course
-
-mkdir bucket_copy
-mkdir bucket_copy/ml-models
-mkdir bucket_copy/knowledge-graph
-mkdir bucket_copy/course-resources
-mkdir -p bucket_copy/firestore-export/$FIRESTORE_DEMO_FOLDER
-
-# Not needed if current user login has access to aitutor-dev buckets
-gcloud auth login <aitutor-dev bucket access account>
-
-gsutil -m cp -r gs://$ML_BUCKET/ml-models/* bucket_copy/ml-models
-gsutil -m cp -r gs://$ML_BUCKET/knowledge-graph/* bucket_copy/knowledge-graph
-gsutil -m cp -r gs://$ML_BUCKET/course-resources/* bucket_copy/course-resources
-gsutil -m cp -r gs://$FIRESTORE_BUCKET/firestore-export/$FIRESTORE_DEMO_FOLDER/* bucket_copy/firestore-export/$FIRESTORE_DEMO_FOLDER/
-
-# Not needed if current user login is same as the project user
-gcloud auth login <project owner role account>
-
-gsutil -m cp -r bucket_copy/* gs://$GCP_PROJECT
-```
-
-## 6. Firestore Deployment
-
-### Firestore Restore
-Restore the database to import sample courses as well as essential data for the application to run. It is not possible to run the application without importing this data! Contact the solutions team if you need an installation without any courses installed.
-```bash
-gcloud firestore import gs://$GCP_PROJECT/firestore-export/$FIRESTORE_DEMO_FOLDER
-```
-
-You can monitor this job from the CLI or from [the console](https://console.cloud.google.com/firestore/import-export).
-
 ### Firestore Index Creation
 Checkout the backend repo and select the latest release version you'd like to deploy to match the frontends you just deployed.
 Deploy the needed indexes to firestore. Make sure the database import is completed first.
@@ -279,7 +238,7 @@ PYTHONPATH=../common/src python firestore_indexing.py
 cd ..
 ```
 
-## 7. GKE Backend Deployment
+## 5. GKE Backend Deployment
 
 We will now run a series of `skaffold` commands to build the necessary containers in cloud build and deploy them to the GKE cluster to power the backend services.
 
@@ -315,19 +274,6 @@ export FIREBASE_API_KEY=$(gcloud alpha services api-keys get-key-string $KEY_NAM
 Set environment variables:
 ```bash
 export IS_DEVELOPMENT=false
-export GENERATED_ASSESSMENTS_PATH=gs://$PROJECT_ID/assessment_items
-export TITLE_GENERATION_SAVED_MODEL_PATH=gs://$PROJECT_ID/ml-models/title-generation/blooms/1637763009_pt
-export TRIPLE_EXTRACTION_SAVED_MODEL_PATH=gs://$PROJECT_ID/ml-models/triple-generation/checkpoints/models
-export DIALOG_SYSTEMS_KG_DATA_DEV_PATH=gs://$PROJECT_ID/knowledge-graph
-export MWP_TFSERVING_MODEL_BASE_PATH=gs://$PROJECT_ID/ml-models/hugging-face-checkpoints/distilbert-pretraining/distilbert_base_uncased/distilbert_LM_training/saved_model/saved_model_epoch_3
-export PE_TFSERVING_MODEL_BASE_PATH=gs://$PROJECT_ID/ml-models/hugging-face-checkpoints/bert-base-cased-128/
-export DKT_MODEL_WEIGHTS_PATH=gs://$PROJECT_ID/ml-models/dkt
-export NLU_CONFIG_PATH=gs://$PROJECT_ID/knowledge-graph
-export GCP_LEARNING_RESOURCE_BUCKET=$PROJECT_ID
-export DISABLE_MULTIHOP=true
-export TUTOR_NAME=Thoreau
-export IS_DIALOG_FLOW_SELECTION_REQUIRED=true
-export ENABLE_DISPLAY_CONTEXT_FOR_AAQ=false
 export IS_CLOUD_LOGGING_ENABLED=true
 export RELEASE_VERSION=$CLP_VERSION
 export SKAFFOLD_BUILD_CONCURRENCY=0
@@ -355,12 +301,7 @@ watch kubectl get po
 
 Eventually you will see the deployments stabilize:
 
-## 8. Demo Guides
-
-- [CKT Guide - upload and demo new course](https://docs.google.com/presentation/d/1ZIm7Dz-XHfKl_NeKJUUxc6RZdQcK4d68NUrBVTuZQ5g/edit#slide=id.ge5b3f7ebb2_0_1405)
-- [API CUJs](https://docs.google.com/document/d/16rDsyCRvXcMmElWaJW7dFtz9q23L_wIOPB3FpEll830/edit?resourcekey=0-jwoN2kt7W89fWJXVLOPSgw#)
-
-## 9. Scaling the cluster
+## 6. Scaling the cluster
 
 To save on cost it may be desirable to reduce GCP spend when the application is not being used or evaluated. Primarily this is achieved by turning down the GKE cluster and turning off the backend. Please not this pathway is only somewhat tested. You should test your user journeys each time you turn up the cluster.
 
