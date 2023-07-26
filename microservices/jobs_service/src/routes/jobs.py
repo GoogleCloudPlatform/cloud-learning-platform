@@ -85,8 +85,9 @@ def get_all_job_status(job_type_const: JobTypes):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def delete_batch_job_status(job_type_const: JobTypes, job_name: str):
-  """ Delete job by type and name """
+def delete_batch_job(job_type_const: JobTypes, job_name: str):
+  """ Delete batch job model by type and name.  Note this does
+      not delete the Kubernetes Job. """
   job_type = job_type_const.value
   try:
     delete_batch_job(job_type, job_name)
@@ -110,7 +111,7 @@ def delete_batch_job_status(job_type_const: JobTypes, job_name: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def update_batch_job_status(job_type_const: JobTypes, job_name: str):
+def remove_batch_job(job_type_const: JobTypes, job_name: str):
   """ Remove job and update status by type and name """
   job_type = job_type_const.value
   try:
