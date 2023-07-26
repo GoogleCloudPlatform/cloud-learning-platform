@@ -104,7 +104,7 @@ def test_delete_job(create_job, client_with_emulator):
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   job = BatchJobModel.get_by_name(BATCHJOB_EXAMPLE["name"])
-  assert job == None, "batch job model not deleted"
+  assert job is None, "batch job model not deleted"
 
 
 def test_update_job(create_job, client_with_emulator):
