@@ -14,7 +14,7 @@
 
 """Module for job related functions"""
 
-from common.models.batch_job import BatchJobModel
+from common.models.batch_job import BatchJobModel, JobStatus
 from common.utils.kf_job_app import (kube_delete_job, kube_create_job,
                                      kube_get_namespaced_deployment_image_path)
 import json
@@ -114,7 +114,7 @@ def get_all_jobs(job_type):
 
 
 def delete_batch_job(job_type, job_name):
-  """Deletes a particular batch job
+  """Deletes a particular batch job model
 
   Args:
     job_type: type of job (e.g.: skill_alignment)
@@ -150,8 +150,8 @@ def remove_job_and_update_status(job_type, job_name):
     except Exception as e:
       raise Exception("Failed to remove job from namespace: " + str(e)) from e
     try:
-      if job.status == "active":
-        job.status = "aborted"
+      if job.status == JobStatus.JOB_STATUS_ACTIVE.value:
+        job.status = JobStatus.JOB_STATUS_ABORTED.value
         job.update()
         response = {
             "success":

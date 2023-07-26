@@ -14,10 +14,20 @@
 
 """FireO model for batch jobs"""
 
+from enum import Enum
 from fireo.fields import TextField, MapField, IDField
 from common.models import GCSPathField
 from common.models import BaseModel
 from common.utils.errors import ResourceNotFoundException
+
+class JobStatus(Enum):
+  """ Enum class for JobStatus """
+  JOB_STATUS_PENDING = "pending"
+  JOB_STATUS_ACTIVE = "active"
+  JOB_STATUS_SUCCEEDED = "succeeded"
+  JOB_STATUS_FAILED = "failed"
+  JOB_STATUS_ABORTED = "aborted"
+
 
 class BatchJobModel(BaseModel):
   """Model class for batch job"""
