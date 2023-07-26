@@ -78,7 +78,7 @@ In Q1/Q2 2024, our intention is to
 
 ##  2. <a name='GettingStarted'></a>Getting Started
 
-This guide will detail how to set up your new solutions template project. See the [development guide](./DEVELOPMENT.md) for how to contribute to the project.
+This section covers the quick start steps to install and deploy CLP to a GCP project. For more details and other options in installation, see [docs/INSTALLATION.md](./docs/INSTALLATION.md).
 
 ###  2.1. <a name='Prerequisites'></a>Prerequisites
 
