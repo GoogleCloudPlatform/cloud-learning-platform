@@ -63,8 +63,8 @@ requires:
 - path: ./microservices/user_management
   configs: [user-management]
 
-- path: ./microservices/learning_record_service
-  configs: [learning-record-service]
+# - path: ./microservices/learning_record_service
+#   configs: [learning-record-service]
 
 # - path: ./microservices/learning_object_service
 #   configs: [learning-object-service]
