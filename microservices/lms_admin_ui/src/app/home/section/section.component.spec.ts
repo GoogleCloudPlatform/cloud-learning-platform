@@ -349,6 +349,7 @@ describe('SectionComponent', () => {
               "lti_content_item_id": "BQzZ4WtgxRlQ9dhHxO",
               "tool_id": "Jz9WCWupod5lDaa2q4",
               "course_work_id": "6123064097",
+              "course_work_type": "course_work",
               "max_points": 100.0,
               "start_date": "2023-05-30T18:30:00+00:00",
               "end_date": "2023-07-30T18:30:00+00:00",
