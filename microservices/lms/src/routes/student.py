@@ -726,8 +726,8 @@ def get_list_of_students_not_in_classroom(cohort_id: str):
       _type_: _description_
   """
   try:
-    cohort_result = run_query(f'''select name from {COHORT_TABLE_ID} 
-                              where cohortId="{cohort_id}"''')
+    cohort_result = run_query(f'''select name from 
+                    {COHORT_TABLE_ID} where cohortId="{cohort_id}"''')
     if cohort_result.total_rows > 0:
       query=f'''Select * from {NOT_CLASSROOM_TABLE_ID}
               where cohort_id ="{cohort_id}" and enrollment_role=\"learner\"'''
