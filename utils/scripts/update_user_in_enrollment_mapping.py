@@ -1,5 +1,5 @@
 """
-  Script to update user in course enrollment mapping 
+  Script to update user in course enrollment mapping
 """
 
 # disabling for linting to pass
