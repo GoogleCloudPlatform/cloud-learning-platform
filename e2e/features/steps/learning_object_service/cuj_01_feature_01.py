@@ -323,8 +323,6 @@ def step_8_2(context):
   with open(context.json_file_path, encoding="UTF-8") as lx_json_file:
     context.res = post_method(context.url, files={"json_file": lx_json_file})
     context.res_data = context.res.json()
-    print(context.res)
-    print(context.res_data)
 
 @behave.then("That Learning Experience JSON data should be ingested into learning object service")
 def step_8_3(context):
@@ -338,7 +336,7 @@ def step_8_3(context):
   resp = get_method(api_url, query_params=params)
   resp_data = resp.json()
   assert resp.status_code == 200, "Status not 200"
-  lx_uuids = [i.get("uuid") for i in resp_data.get("data")]
+  lx_uuids = [i.get("uuid") for i in resp_data.get("data")["records"]]
   assert set(inserted_lx_uuids).intersection(set(lx_uuids)) \
     == set(inserted_lx_uuids), "all data not retrieved"
 
@@ -664,7 +662,7 @@ def step_8_3(context):
   resp = get_method(api_url, query_params=params)
   resp_data = resp.json()
   assert resp.status_code == 200
-  lo_uuids = [i.get("uuid") for i in resp_data.get("data")]
+  lo_uuids = [i.get("uuid") for i in resp_data.get("data")["records"]]
   assert set(inserted_lo_uuids).intersection(set(lo_uuids)) == set(inserted_lo_uuids)
 
 #CREATE NEGATIVE FROM JSON----------------------------------------------------------------------------
@@ -726,7 +724,7 @@ def step_impl_5(context):
   params = {"skip": 0, "limit": 30}
   context.check = get_method(url = check_url, query_params=params)
   context.check_data = context.check.json()
-  uuids = [obj["uuid"] for obj in context.check_data["data"]]
+  uuids = [obj["uuid"] for obj in context.check_data["data"]["records"]]
   assert context.uuid in uuids
 
   #tear down part
@@ -800,7 +798,7 @@ def step_impl_5(context):
     params = {"skip": 0, "limit": 30}
     context.check = get_method(url = check_url, query_params=params)
     context.check_data = context.check.json()
-    uuids = [obj["uuid"] for obj in context.check_data["data"]]
+    uuids = [obj["uuid"] for obj in context.check_data["data"]["records"]]
     assert context.uuid in uuids
 
     #tear down part
@@ -1020,7 +1018,7 @@ def step_8_3(context):
   resp = get_method(api_url, query_params=params)
   assert resp.status_code == 200
   resp_data = resp.json()
-  lr_uuids = [i.get("uuid") for i in resp_data.get("data")]
+  lr_uuids = [i.get("uuid") for i in resp_data.get("data")["records"]]
   assert set(inserted_lr_uuids).intersection(set(lr_uuids)) == set(inserted_lr_uuids)
 
 #CREATE NEGATIVE LR FROM JSON----------------------------------------------------------------------------

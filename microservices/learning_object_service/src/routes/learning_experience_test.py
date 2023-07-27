@@ -144,8 +144,8 @@ def test_post_learning_experience(clean_firestore, create_learning_object):
   # popping id and key for equivalency test
   keys_to_delete = [
       "id", "key", "is_deleted", "created_by", "created_time",
-      "last_modified_by", "last_modified_time", "archived_by", "deleted_by",
-      "archived_at_timestamp", "deleted_at_timestamp"
+      "last_modified_by", "last_modified_time", "archived_at_timestamp",
+      "archived_by", "deleted_by", "deleted_at_timestamp"
   ]
   for key in keys_to_delete:
     loaded_learning_experience_dict.pop(key)
@@ -425,7 +425,8 @@ def test_get_learning_experiences(clean_firestore, create_learning_experience,
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status code not 200"
-  saved_names = [i.get("name") for i in json_response.get("data")]
+  saved_names = [i.get("name") for i in json_response.get(
+    "data")["records"]]
   assert learning_experience.name in saved_names, "all data not retrived"
   assert archived_learning_experience.name in saved_names, (
       "all data not retrived")
@@ -436,7 +437,8 @@ def test_get_learning_experiences(clean_firestore, create_learning_experience,
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status code not 200"
-  saved_uuids = [i.get("uuid") for i in json_response.get("data")]
+  saved_uuids = [i.get("uuid") for i in json_response.get(
+    "data")["records"]]
   assert archived_learning_experience.uuid in saved_uuids
 
   # Test archival functionality: Fetch all non archived objects
@@ -445,7 +447,8 @@ def test_get_learning_experiences(clean_firestore, create_learning_experience,
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status code not 200"
-  saved_uuids = [i.get("uuid") for i in json_response.get("data")]
+  saved_uuids = [i.get("uuid") for i in json_response.get(
+    "data")["records"]]
   assert learning_experience.uuid in saved_uuids
 
   # test get learning experiences with filters
@@ -454,9 +457,50 @@ def test_get_learning_experiences(clean_firestore, create_learning_experience,
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status code not 200"
-  saved_names = [i.get("author") for i in json_response.get("data")]
+  saved_names = [i.get("author") for i in json_response.get(
+    "data")["records"]]
   assert len(list(set(saved_names))) == 1, "Unnecessary data retrieved"
   assert list(set(saved_names))[0] == params["author"], "Wrong data retrieved"
+
+  # test get learning experiences with child node filters
+  child_learning_object = create_learning_object
+  learning_experience.child_nodes = {
+    "learning_objects": [child_learning_object.uuid]}
+  learning_experience.update()
+
+  params = {
+      "skip": 0,
+      "limit": "10",
+      "learning_object": child_learning_object.uuid
+  }
+  url = f"{api_url}s"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+  assert resp.status_code == 200, "Status code not 200"
+  saved_los = [i.get("child_nodes") for i in json_response.get(
+    "data")["records"]]
+  assert params["learning_object"] in saved_los[0][
+      "learning_objects"], "Wrong parent_learning_object retrieved"
+
+  parent_curriculum_pathway = create_curriculum_pathway
+  learning_experience.parent_nodes = {
+    "curriculum_pathways": [parent_curriculum_pathway.uuid]}
+  learning_experience.update()
+  params = {
+      "skip": 0,
+      "limit": "30",
+      "curriculum_pathway": parent_curriculum_pathway.uuid
+  }
+  url = f"{api_url}s"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+  assert resp.status_code == 200, "Status code not 200"
+  saved_cps = [i.get("parent_nodes") for i in json_response.get(
+    "data")["records"]]
+
+  assert len(saved_cps) == 1, "Unnecessary data retrieved"
+  assert saved_cps[0]["curriculum_pathways"][0] == params[
+      "curriculum_pathway"], "Wrong parent_curriculum_pathway retrieved"
 
   # To-Do: Commenting this code since parent child is not implemented in
   # credentials and pathway service and assessment service

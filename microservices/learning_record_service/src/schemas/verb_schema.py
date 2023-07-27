@@ -5,15 +5,15 @@ from typing import Optional, List
 from pydantic import BaseModel
 from schemas.schema_examples import (BASIC_VERB_MODEL_EXAMPLE,
                                      FULL_VERB_MODEL_EXAMPLE)
+from common.utils.schema_validator import BaseConfigModel
 # pylint: disable = line-too-long
 
 
-class BasicVerbModel(BaseModel):
+class BasicVerbModel(BaseConfigModel):
   """Verb Skeleton Pydantic Model"""
   name: str
-  url: Optional[str] = ""
+  url: Optional[str] = None
   canonical_data: Optional[dict] = {}
-
 
 class FullVerbDataModel(BasicVerbModel):
   """Verb Skeleton Model with uuid, created and updated time"""
@@ -30,7 +30,7 @@ class VerbModel(BasicVerbModel):
     schema_extra = {"example": BASIC_VERB_MODEL_EXAMPLE}
 
 
-class UpdateVerbModel(BaseModel):
+class UpdateVerbModel(BaseConfigModel):
   """Update Verb Pydantic Model"""
   name: Optional[str]
   url: Optional[str]
@@ -106,12 +106,15 @@ class DeleteVerb(BaseModel):
         }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullVerbDataModel]]
+  total_count: int
 
 class AllVerbsResponseModel(BaseModel):
   """Verb Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Data fetched successfully"
-  data: Optional[List[FullVerbDataModel]]
+  data: TotalCountResponseModel
 
   class Config():
     orm_mode = True
@@ -119,7 +122,10 @@ class AllVerbsResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Data fetched successfully",
-            "data": [FULL_VERB_MODEL_EXAMPLE]
+            "data": {
+                      "records":[FULL_VERB_MODEL_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

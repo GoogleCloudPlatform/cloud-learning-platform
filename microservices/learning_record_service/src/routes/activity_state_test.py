@@ -166,7 +166,8 @@ def test_get_activity_states(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  saved_agent_ids = [i.get("agent_id") for i in json_response.get("data")]
+  saved_agent_ids = [i.get("agent_id") for i in json_response.get(
+    "data")["records"]]
   assert activity_state_dict["agent_id"] in saved_agent_ids,\
     "all data not retrieved"
 
