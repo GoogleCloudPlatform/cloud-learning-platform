@@ -42,7 +42,8 @@ def test_save_roster_negative():
           "userId": "12345678900",
           "courseId": "550005555"
       }}
-  with mock.patch("service.roster_service.save_user", return_value=(False,None)):
+  with mock.patch("service.roster_service.save_user",
+                  return_value=(False,None)):
     with mock.patch("service.roster_service.insert_rows_to_bq",
                     return_value=True):
       result_1,_ = save_roster(data)

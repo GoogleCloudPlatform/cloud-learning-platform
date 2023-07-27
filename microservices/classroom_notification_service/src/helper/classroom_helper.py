@@ -15,6 +15,7 @@ REGISTER_SCOPES = [
     "https://www.googleapis.com/auth/classroom.rosters.readonly"
 ]
 SCOPES = [
+    "https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.rosters",
     "https://www.googleapis.com/auth/classroom.coursework.students.readonly",
     "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
