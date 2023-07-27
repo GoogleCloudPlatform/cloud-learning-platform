@@ -91,7 +91,8 @@ NOT_DB_TABLE_ID=(f"`{PROJECT_ID}.{BQ_DATASET}."
 NOT_CLASSROOM_TABLE_ID=(
   f"`{PROJECT_ID}.{BQ_DATASET}"
   + f".{BQ_TABLE_DICT['EXISTS_IN_DB_NOT_IN_CLASSROOM_VIEW']}`")
-
+COHORT_TABLE_ID=(f"`{PROJECT_ID}.{BQ_DATASET}."
++ f"{BQ_TABLE_DICT['BQ_COLL_COHORT_TABLE']}`")
 
 @section_student_router.get("/{section_id}/get_progress_percentage/{user}",
                             response_model=GetProgressPercentageResponseModel)
@@ -673,9 +674,9 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
-@router.get("/exists_in_classroom_not_in_db",
+@router.get("/exists_in_classroom_not_in_db/{cohort_id}",
             response_model=StudentsRecordsResponseModel)
-def get_list_of_students_not_in_db():
+def get_list_of_students_not_in_db(cohort_id: str):
   """Get list of students who doesn't exists in db
 
   Raises:
@@ -687,14 +688,18 @@ def get_list_of_students_not_in_db():
       _type_: _description_
   """
   try:
-    result= run_query(
-      query=(f"Select * from {NOT_DB_TABLE_ID} "
-             + "where roster_collection=\"courses.students\""))
-    return {
-      "data":bq_query_results_to_dict_list(result),
-      "message":
-        "Successfully fetched list of students exists in DB not in Classroom"
-        }
+    cohort_result = run_query(f'''select name from {COHORT_TABLE_ID}
+                               where cohortId="{cohort_id}"''')
+    if cohort_result.total_rows > 0:
+      query=f'''Select * from {NOT_DB_TABLE_ID} where
+        cohort_id="{cohort_id}" and roster_collection=\"courses.students\"'''
+      result= run_query(query)
+      return {
+        "data":bq_query_results_to_dict_list(result),
+        "message":
+          "Successfully fetched list of students exists in DB not in Classroom"
+          }
+    raise ResourceNotFoundException("Cohort does not exist")
   except ValidationError as ve:
     Logger.error(ve)
     raise BadRequest(str(ve)) from ve
@@ -707,9 +712,9 @@ def get_list_of_students_not_in_db():
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
-@router.get("/exists_in_db_not_in_classroom",
+@router.get("/exists_in_db_not_in_classroom/{cohort_id}",
             response_model=StudentsRecordsResponseModel)
-def get_list_of_students_not_in_classroom():
+def get_list_of_students_not_in_classroom(cohort_id: str):
   """Get list of students who doesn't exists in Classroom
 
   Raises:
@@ -721,15 +726,19 @@ def get_list_of_students_not_in_classroom():
       _type_: _description_
   """
   try:
-    result= run_query(
-      query=(f"Select * from {NOT_CLASSROOM_TABLE_ID} "
-             + "where enrollment_role=\"learner\""))
-    data=bq_query_results_to_dict_list(result)
-    return {
-      "data":data,
-      "message":
-        "Successfully fetched list of students exists in DB not in Classroom"
-        }
+    cohort_result = run_query(f'''select name from {COHORT_TABLE_ID} 
+                              where cohortId="{cohort_id}"''')
+    if cohort_result.total_rows > 0:
+      query=f'''Select * from {NOT_CLASSROOM_TABLE_ID}
+              where cohort_id ="{cohort_id}" and enrollment_role=\"learner\"'''
+      result= run_query(query)
+      data=bq_query_results_to_dict_list(result)
+      return {
+        "data":data,
+        "message":
+          "Successfully fetched list of students exists in DB not in Classroom"
+          }
+    raise ResourceNotFoundException("Cohort does not exist")
   except ValidationError as ve:
     Logger.error(ve)
     raise BadRequest(str(ve)) from ve
