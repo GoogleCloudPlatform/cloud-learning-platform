@@ -58,7 +58,7 @@ def step_impl_2(context):
 def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["message"] == "Data fetched successfully"
-  fetched_los = context.res_data["data"]
+  fetched_los = context.res_data["data"]["records"]
   for lo in fetched_los:
     assert lo["is_archived"] is True
 
@@ -102,7 +102,7 @@ def step_impl_2(context):
 def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["message"] == "Data fetched successfully"
-  fetched_los = context.res_data["data"]
+  fetched_los = context.res_data["data"]["records"]
   for lo in fetched_los:
     assert lo["is_archived"] is False
 
@@ -148,7 +148,7 @@ def step_impl_2(context):
 def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["message"] == "Data fetched successfully"
-  fetched_los = context.res_data["data"]
+  fetched_los = context.res_data["data"]["records"]
   for lo in fetched_los:
     assert lo["is_archived"] is True
 
@@ -189,7 +189,7 @@ def step_impl_2(context):
 def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["message"] == "Data fetched successfully"
-  fetched_los = context.res_data["data"]
+  fetched_los = context.res_data["data"]["records"]
   for lo in fetched_los:
     assert lo["is_archived"] is False
 
@@ -238,7 +238,7 @@ def step_impl_2(context):
 def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["message"] == "Data fetched successfully"
-  fetched_los = context.res_data["data"]
+  fetched_los = context.res_data["data"]["records"]
   for lo in fetched_los:
     assert lo["is_archived"] is True
 
@@ -281,6 +281,6 @@ def step_impl_2(context):
 def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["message"] == "Data fetched successfully"
-  fetched_los = context.res_data["data"]
+  fetched_los = context.res_data["data"]["records"]
   for lo in fetched_los:
     assert lo["is_archived"] is False

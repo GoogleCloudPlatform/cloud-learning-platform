@@ -23,4 +23,3 @@ with open("setup/port_config.yaml", "r") as stream:
 def get_baseurl(service_name):
   port = port_config_data[service_name + ".PORT"].split(":")[0]
   return f"http://localhost:{port}"
-

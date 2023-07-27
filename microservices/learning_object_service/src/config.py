@@ -1,8 +1,7 @@
 """
   Learning Object Service config file
 """
-# pylint: disable=unspecified-encoding
-# pylint: disable = invalid-name
+# pylint: disable=unspecified-encoding,invalid-name
 import os
 import json
 from typing_extensions import Literal
@@ -73,24 +72,23 @@ with open("testing/valid_themes.json") as json_file:
   json_data = json.load(json_file)
 ALLOWED_THEMES = Literal[tuple(json_data + [""])]
 
-CP_TYPES = Literal[tuple(LOS_LITERALS["CP_TYPES"])]
-CP_ALIASES = Literal[tuple(LOS_LITERALS["CP_ALIASES"])]
-LE_TYPES = Literal[tuple(LOS_LITERALS["LE_TYPES"])]
-LE_ALIASES = Literal[tuple(LOS_LITERALS["LE_ALIASES"])]
-LO_TYPES = Literal[tuple(LOS_LITERALS["LO_TYPES"])]
-LO_ALIASES = Literal[tuple(LOS_LITERALS["LO_ALIASES"])]
-LR_TYPES = Literal[tuple(LOS_LITERALS["LR_TYPES"])]
-LR_TYPES_LIST = LOS_LITERALS["LR_TYPES"]
-LR_ALIASES = Literal[tuple(LOS_LITERALS["LR_ALIASES"])]
+CP_TYPES = Literal[tuple(LOS_LITERALS["curriculum_pathways"]["type"])]
+CP_ALIASES = Literal[tuple(LOS_LITERALS["curriculum_pathways"]["alias"])]
+LE_TYPES = Literal[tuple(LOS_LITERALS["learning_experiences"]["type"])]
+LE_ALIASES = Literal[tuple(LOS_LITERALS["learning_experiences"]["alias"])]
+LO_TYPES = Literal[tuple(LOS_LITERALS["learning_objects"]["type"])]
+LO_ALIASES = Literal[tuple(LOS_LITERALS["learning_objects"]["alias"])]
+LR_TYPES = Literal[tuple(LOS_LITERALS["learning_resources"]["type"])]
+LR_TYPES_LIST = LOS_LITERALS["learning_resources"]["type"]
+LR_ALIASES = Literal[tuple(LOS_LITERALS["learning_resources"]["alias"])]
 ASSESSMENT_TYPES = Literal[tuple(ASSESSMENT_LITERALS["assessments"]["type"])]
 ASSESSMENT_ALIASES = Literal[tuple(ASSESSMENT_LITERALS["assessments"]["alias"])]
-ALL_ALIASES = LOS_LITERALS["CP_ALIASES"] + \
-              LOS_LITERALS["LE_ALIASES"] + \
-              LOS_LITERALS["LO_ALIASES"] + \
-              LOS_LITERALS["LR_ALIASES"] + \
-              ASSESSMENT_LITERALS["assessments"]["alias"]
+
 ALLOWED_RESOURCE_STATUS = Literal["initial", "draft","published","unpublished"]
 MADCAP_PATTERNS_TO_EXCLUDE = ["/Templates/","Search.htm"]
+LOS_NODES = ["curriculum_pathways", "learning_experiences",
+             "learning_objects", "learning_resources", "assessments"]
+SKILL_NODES = ["skills", "competencies"]
 
 SERVICES = {
     "user-management": {
@@ -110,3 +108,5 @@ UM_BASE_URL = f"http://{SERVICES['user-management']['host']}:" \
 ASSESSMENT_SERVICE_BASE_URL = f"http://{SERVICES['assessment-service']['host']}:" \
                f"{SERVICES['assessment-service']['port']}" \
                f"/assessment-service/api/v1"
+
+JOB_TYPES = Literal["validate_and_upload_zip"]

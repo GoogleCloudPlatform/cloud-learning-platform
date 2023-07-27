@@ -1,12 +1,14 @@
 """Helper functions to facilitate CRUD Operations"""
 from common.utils.collection_references import collection_references
+from common.models import CurriculumPathway
+from config import LOS_NODES, SKILL_NODES
 
 
 def custom_hierarchy_sort(children):
   """Function to sort the learning hierarchy in custom manner
   such that learning objects will be come first
   then learning resources
-  then assessement items
+  then assessment items
   """
   low = 0
   high = len(children) - 1
@@ -78,29 +80,83 @@ def transform_dict(data, level="curriculum_pathways"):
   return {k: v for k, v in sorted(resp_dict.items(), key=lambda x: len(x[0]))}
 
 
-def get_all_nodes_for_alias(uuid: str,
-                            level: str,
-                            final_alias: str,
-                            nodes: list):
+def get_all_nodes(uuid: str,
+                  level: str,
+                  node_type: str,
+                  nodes: list):
   """
-  This method traverses the learning hierarchy from given level uuid till the
-  final_alias and retrieves all the node where alias=final_alias.
+  This method traverses the learning hierarchy from given level uuid and fetches
+  the list of nodes of type node_type
   Args:
     uuid (str): uuid of the node from where to traverse.
     level (str): current level/type of the Node for given uuid.
-    final_alias (str): alias till which the traverse should be done.
-    nodes (list): list to be used to return list of nodes
+    node_type (str): Type of node to fetch.
+    [curriculum_pathways, learning_experiences, learning_objects,
+    learning_resources, assessments]
+    nodes (list): List to be used to return list of nodes
   Returns:
-    nodes (list): List of nodes of alias=final_alias
+    nodes (list): list of nodes of type node_type
   """
   node = collection_references[level].find_by_uuid(uuid)
   node = node.get_fields(reformat_datetime=True)
-  if node.get("alias", "") == final_alias:
-    nodes.append(node)
-    return
-  child_nodes = node.get("child_nodes", [])
+  if node_type == level:
+    if node_type == "curriculum_pathways":
+      if not node.get("child_nodes", {}).get("curriculum_pathways", []):
+        return nodes.append(node)
+    elif node_type == "learning_objects":
+      if not node.get("child_nodes", {}).get("learning_objects", []):
+        return nodes.append(node)
+    else:
+      return nodes.append(node)
+  child_nodes = node.get("child_nodes", {})
+
+  # Fetch nodes of type node_type
+  if node_type in LOS_NODES:
+    if node_type == level:
+      nodes.append(node)
+  if node_type in SKILL_NODES:
+    if node.get("references", {}) and node["references"].get(node_type, []):
+      for id_ in node["references"][node_type]:
+        nodes.append(collection_references[node_type].find_by_uuid(
+          id_).get_fields(reformat_datetime=True))
+  # Use Recursion to fetch all nodes of node_type from child_nodes
   if child_nodes:
     for child_level in child_nodes:
       for child_uuid in child_nodes[child_level]:
-        get_all_nodes_for_alias(child_uuid, child_level, final_alias, nodes)
+        get_all_nodes(child_uuid, child_level, node_type, nodes)
   return nodes
+
+
+def prerequisite_handler(uuid):
+  """Function to handle prerequisites of a node item
+  when ingesting the learning hierarchy"""
+  curriculum_pathway = CurriculumPathway.find_by_uuid(uuid)
+  level_pathways = []
+
+  if curriculum_pathway.child_nodes.get("curriculum_pathways") and len(
+      curriculum_pathway.child_nodes.get("curriculum_pathways",[])) > 1:
+
+    for level in curriculum_pathway.child_nodes.get("curriculum_pathways", []):
+      level_pathways.append(CurriculumPathway.find_by_uuid(level))
+
+    #Missing order insertion
+    for level in level_pathways:
+      if level.order is None:
+        level.order = 1
+
+    level_pathways = sorted(level_pathways, key=lambda level: level.order)
+    for node in level_pathways:
+      if node.order > 1:
+        prerequisites = []
+        for level_pathway in level_pathways:
+          if (node.uuid != level_pathway.uuid) and (level_pathway.order
+                                                    == (node.order - 1)):
+            prerequisites.append(level_pathway.uuid)
+        node.prerequisites["curriculum_pathways"] = prerequisites
+        node.update()
+  elif curriculum_pathway.child_nodes.get("curriculum_pathways") and len(
+      curriculum_pathway.child_nodes.get("curriculum_pathways", [])) == 1:
+    pathway = curriculum_pathway.child_nodes.get("curriculum_pathways")
+    level_pathway = CurriculumPathway.find_by_uuid(pathway[0])
+    level_pathway.prerequisites["curriculum_pathways"] = []
+    level_pathway.update()
