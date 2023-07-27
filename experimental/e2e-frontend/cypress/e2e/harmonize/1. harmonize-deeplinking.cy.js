@@ -1,7 +1,5 @@
 import "cypress-iframe";
 describe("Test Harmonize Deeplinking", () => {
-  let LTI_ASSIGNMENT_ID = null;
-
   const EMAIL = "e2e_7112f773_1a53_email@gmail.com";
   const PASSWORD = "!45RK&2L!m9%Ef";
   const getIframeDocument = () => {
@@ -84,7 +82,7 @@ describe("Test Harmonize Deeplinking", () => {
     cy.get('button[type="submit"]').contains("Save").click();
     cy.wait("@apiRequest").then((interception) => {
       const response = interception.response;
-      Cypress.env.LTI_ASSIGNMENT_ID = response.body.data.id;
+      Cypress.env.HARMONIZE_LTI_ASSIGNMENT_ID = response.body.data.id;
       cy.log("response.body.id", response.body.data.id);
       expect(response.statusCode).to.equal(200);
     });

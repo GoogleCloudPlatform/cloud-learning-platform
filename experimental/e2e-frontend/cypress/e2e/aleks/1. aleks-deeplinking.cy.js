@@ -1,6 +1,8 @@
 import "cypress-iframe";
 
 describe("Test ALEKS Deeplinking", () => {
+  const EMAIL = "e2e_7112f773_1a53_email@gmail.com";
+  const PASSWORD = "!45RK&2L!m9%Ef";
   const getIframeDocument = () => {
     console.log(cy.get("#ltiIframe"));
     return cy.get("#ltiIframe").its("0.contentDocument").should("exist");
@@ -24,9 +26,9 @@ describe("Test ALEKS Deeplinking", () => {
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e"
     );
 
-    // sign-in with a account
-    cy.get('[type="email"]').type("e2e_7112f773_1a53_email@gmail.com");
-    cy.get('[type="password"]').type("!45RK&2L!m9%Ef");
+    // sign in with a account
+    cy.get('[type="email"]').type(EMAIL);
+    cy.get('[type="password"]').type(PASSWORD);
     cy.contains("Login").click();
 
     // check if domain is right
@@ -35,8 +37,14 @@ describe("Test ALEKS Deeplinking", () => {
       "https://core-learning-services-dev.cloudpssolutions.com"
     );
 
+    cy.intercept(
+      "GET",
+      "https://core-learning-services-dev.cloudpssolutions.com/lms/api/v1/sections?skip=0&limit=10"
+    ).as("getAllSections");
+
     // go to section
     cy.contains("Section List").click();
+    cy.wait("@getAllSections");
     cy.get("a.text").first().click();
     cy.contains(" Add LTI Assignment").click();
     cy.get('mat-select[formcontrolname="tool_id"]').click();
@@ -49,7 +57,7 @@ describe("Test ALEKS Deeplinking", () => {
       } else {
         cy.log("no existing content item was found");
         cy.contains("Select Content").click();
-        cy.wait(15000);
+        cy.wait(20000);
 
         // check if we are on home page of aleks deeplinking
         getIframeBody().contains("ALEKS").should("be.visible");
@@ -72,7 +80,15 @@ describe("Test ALEKS Deeplinking", () => {
     // Assert that the API call was made and wait for the response
     cy.wait("@apiRequest").then((interception) => {
       const response = interception.response;
+      Cypress.env.ALEKS_LTI_ASSIGNMENT_ID = response.body.data.id;
+      cy.log("response.body.id", response.body.data.id);
       expect(response.statusCode).to.equal(200);
     });
+
+    cy.contains(" Add Teacher").click();
+    cy.get('[formcontrolname="email"]').type(
+      "test_user_1@dhodun.altostrat.com"
+    );
+    cy.get(".mat-dialog-actions button").contains(" Add ").click();
   });
 });

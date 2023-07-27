@@ -1,4 +1,6 @@
 describe("Test Honorlock Deeplinking", () => {
+  const EMAIL = "e2e_7112f773_1a53_email@gmail.com";
+  const PASSWORD = "!45RK&2L!m9%Ef";
   it("should visit the login page with username password", () => {
     const domain =
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e";
@@ -9,9 +11,9 @@ describe("Test Honorlock Deeplinking", () => {
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e"
     );
 
-    // sign-in with a account
-    cy.get('[type="email"]').type("e2e_7112f773_1a53_email@gmail.com");
-    cy.get('[type="password"]').type("!45RK&2L!m9%Ef");
+    // sign in with a account
+    cy.get('[type="email"]').type(EMAIL);
+    cy.get('[type="password"]').type(PASSWORD);
     cy.contains("Login").click();
 
     // check if domain is right
@@ -20,8 +22,14 @@ describe("Test Honorlock Deeplinking", () => {
       "https://core-learning-services-dev.cloudpssolutions.com"
     );
 
+    cy.intercept(
+      "GET",
+      "https://core-learning-services-dev.cloudpssolutions.com/lms/api/v1/sections?skip=0&limit=10"
+    ).as("getAllSections");
+
     // go to section
     cy.contains("Section List").click();
+    cy.wait("@getAllSections");
     cy.get("a.text").first().click();
     cy.contains(" Add LTI Assignment").click();
     cy.get('mat-select[formcontrolname="tool_id"]').click();
@@ -51,7 +59,15 @@ describe("Test Honorlock Deeplinking", () => {
     // Assert that the API call was made and wait for the response
     cy.wait("@apiRequest").then((interception) => {
       const response = interception.response;
+      Cypress.env.HONORLOCK_LTI_ASSIGNMENT_ID = response.body.data.id;
+      cy.log("response.body.id", response.body.data.id);
       expect(response.statusCode).to.equal(200);
     });
+
+    cy.contains(" Add Teacher").click();
+    cy.get('[formcontrolname="email"]').type(
+      "test_user_1@dhodun.altostrat.com"
+    );
+    cy.get(".mat-dialog-actions button").contains(" Add ").click();
   });
 });

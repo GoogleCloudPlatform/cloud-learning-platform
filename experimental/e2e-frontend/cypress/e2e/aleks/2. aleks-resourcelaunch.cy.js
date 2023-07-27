@@ -1,4 +1,4 @@
-describe("Test Harmonize Resource Launch", () => {
+describe("Test ALEKS Resource Launch", () => {
   it("should be able to launch the resource which was created in earlier step", () => {
     let idToken = null;
     let facultyEmail = "test_user_1@dhodun.altostrat.com";
@@ -14,7 +14,7 @@ describe("Test Harmonize Resource Launch", () => {
       idToken = res.body.data.idToken;
       cy.visit({
         method: "GET",
-        url: `https://core-learning-services-dev.cloudpssolutions.com/classroom-shim/api/v1/e2e-resource-launch?lti_assignment_id=${Cypress.env.LTI_ASSIGNMENT_ID}`,
+        url: `https://core-learning-services-dev.cloudpssolutions.com/classroom-shim/api/v1/e2e-resource-launch?lti_assignment_id=${Cypress.env.ALEKS_LTI_ASSIGNMENT_ID}`,
         headers: {
           Authorization: `Bearer ${idToken}`,
         },
