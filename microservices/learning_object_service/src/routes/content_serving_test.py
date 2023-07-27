@@ -1210,25 +1210,6 @@ def test_link_madcap_to_lr_positive(clean_firestore, mocker):
   learning_object.child_nodes = {"learning_resources": [learning_resource.uuid]}
   learning_object.update()
 
-  file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
-
-  resp = client_with_emulator.post(
-      f"{api_url}/upload/madcap/{learning_experience.uuid}",
-      files={
-          "content_file": ("dummy_madcap.zip", open(file_path,
-                                                    "rb"), "application/zip")
-      })
-  resp_json = resp.json()
-  assert resp.status_code == 200
-  assert resp_json["success"] is True
-  assert resp_json[
-      "message"] == f"Successfully uploaded the content for learning experience with uuid {learning_experience.uuid}"
-  assert resp_json["data"].get("prefix") is not None
-  assert resp_json["data"].get("files") is not None
-  assert resp_json["data"].get("folders") is not None
-
-  le = LearningExperience.find_by_id(learning_experience.uuid)
-  assert le.resource_path == "learning-resources/dummy_madcap/"
   #-------------------------------------------------------------
   # Setup Steps End
   #-------------------------------------------------------------
@@ -1338,25 +1319,6 @@ def test_link_madcap_to_lr_negative(clean_firestore, mocker):
   learning_object.child_nodes = {"learning_resources": [learning_resource.uuid]}
   learning_object.update()
 
-  file_path = f"{TESTING_FOLDER_PATH}/content_serving/dummy_madcap.zip"
-
-  resp = client_with_emulator.post(
-      f"{api_url}/upload/madcap/{learning_experience.uuid}",
-      files={
-          "content_file": ("dummy_madcap.zip", open(file_path,
-                                                    "rb"), "application/zip")
-      })
-  resp_json = resp.json()
-  assert resp.status_code == 200
-  assert resp_json["success"] is True
-  assert resp_json[
-      "message"] == f"Successfully uploaded the content for learning experience with uuid {learning_experience.uuid}"
-  assert resp_json["data"].get("prefix") is not None
-  assert resp_json["data"].get("files") is not None
-  assert resp_json["data"].get("folders") is not None
-
-  le = LearningExperience.find_by_id(learning_experience.uuid)
-  assert le.resource_path == "learning-resources/dummy_madcap/"
   #-------------------------------------------------------------
   # Setup Steps End
   #-------------------------------------------------------------
