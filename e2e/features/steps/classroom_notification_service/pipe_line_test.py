@@ -23,8 +23,14 @@ def step_impl_01(context):
     "Pipline got messages related to roster changes"
 )
 def step_impl_02(context):
-  qurey_result=run_query(f"select * from {PROJECT_ID}.{BQ_DATASET}.userCollectionView where emailAddress=\"{context.user_id}\"")
+  qurey_result=run_query(
+    f"select * from {PROJECT_ID}.{BQ_DATASET}.userCollectionView where "
+    + f"emailAddress=\"{context.user_id}\"")
+  noti_query_result = run_query(
+      f"select * from {PROJECT_ID}.{BQ_DATASET}.lms-notifications where JSON_VALUE(data.email)=\"{context.user_id}\""
+  )
   context.users=[dict(row) for row in qurey_result]
+  context.notification=[dict(row) for row in noti_query_result]
 
 
 @behave.then(
@@ -33,6 +39,7 @@ def step_impl_02(context):
 def step_impl_03(context):
   user=context.users[0]
   assert user["id"]==context.analytics_data["student_data"]["gaia_id"]
+  assert context.notification[0]["data"]["email"]==context.user_id
 
 # -------------------------------Course Work Changes-------------------------------------
 
@@ -58,7 +65,7 @@ def step_impl_06(context):
   course_work=context.course_work[0]
   assert course_work["courseId"]==context.analytics_data["course_work"]["courseId"]
   assert course_work["title"]==context.analytics_data["course_work"]["title"]
-  
+
   # -------------------------------Submitted Course Work Changes-------------------------------------
 
 @behave.given(
@@ -73,7 +80,11 @@ def step_impl_07(context):
 )
 def step_impl_08(context):
   qurey_result=run_query(f"select * from {PROJECT_ID}.{BQ_DATASET}.submittedCourseWorkCollectionView where submission_id=\"{context.submission_id}\"")
+  noti_query_result = run_query(
+      f"select * from {PROJECT_ID}.{BQ_DATASET}.lms-notifications where JSON_VALUE(data.email)=\"{context.user_id}\""
+  )
   context.submission=[dict(row) for row in qurey_result][0]
+  context.notification=[dict(row) for row in noti_query_result]
 
 
 @behave.then(
@@ -83,3 +94,4 @@ def step_impl_09(context):
   assert context.submission["submission_course_id"]==context.analytics_data["course_details"]["id"]
   assert context.submission["submission_course_work_id"]==context.analytics_data["course_work"]["id"]
   assert context.submission["submission_user_id"]==context.analytics_data["student_data"]["gaia_id"]
+  assert context.notification[0]["data"]["email"]==context.user_id

@@ -46,7 +46,7 @@ def create_course(name, section, description):
   Returns:
     new created course details
     """
-  
+
   service = build("classroom", "v1", credentials=get_creds())
   new_course = {}
   new_course["name"] = name
@@ -135,6 +135,10 @@ def patch_course_work_submission(classroom_id,course_work_id,submission_id,updat
       id=submission_id,
       updateMask=update_mask,
       body=body).execute()
+def return_course_work_submission(classroom_id,course_work_id,submission_id):
+  service = build("classroom", "v1", credentials=get_creds(True))
+  return service.course().courseWork().studentSubmissions().return_(
+      courseId=classroom_id, courseWorkId=course_work_id, id=submission_id)
 def list_coursework_submission_user(access_token,course_id,coursework_id,user_id):
   creds = Credentials(token=access_token)
   print("Credentialss ",creds)
@@ -161,7 +165,7 @@ def create_google_form(title):
 
 def get_file(file_id):
   service = build("drive", "v3", credentials=get_creds())
-  response = service.files().get(fileId=file_id,  
+  response = service.files().get(fileId=file_id,
     fields="name,webViewLink").execute()
   return response
 

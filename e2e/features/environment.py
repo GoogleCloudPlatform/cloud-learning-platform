@@ -24,7 +24,7 @@ from e2e.gke_api_tests.secrets_helper import (get_user_email_and_password_for_e2
     get_required_emails_from_secret_manager)
 from e2e.gke_api_tests.classroom_e2e_helper import (
     create_course, get_course_work_submission_list, invite_user,
-    patch_course_work_submission, create_course_work,
+    patch_course_work_submission, create_course_work,return_course_work_submission,
     enroll_teacher_in_classroom, enroll_student_classroom)
 import logging
 import sys
@@ -422,6 +422,10 @@ def create_analytics_data(context):
           "assignedGrade": 10,
           "draftGrade": 10
       })
+  return_course_work_submission(
+      classroom_id=data["submission"]["courseId"],
+      course_work_id=data["submission"]["courseWorkId"],
+      submission_id=data["submission"]["id"])
   section_rows = [{
       "sectionId": section.id,
       "courseId": section.classroom_id,
