@@ -1,3 +1,4 @@
+import json
 import os
 import behave
 import requests
@@ -40,11 +41,13 @@ def step_impl_02(context):
 def step_impl_03(context):
   user=context.users[0]
   message = context.notification[0]
+  message_data=json.loads(message["data"])
   assert user["id"]==context.analytics_data["student_data"]["gaia_id"]
   print(
       f'-----------------{context.notification}---{len(context.notification)}--------'
   )
-  print(f'-----------------{message["data"]["email"]}-----------')
+  print(f'-----------------{message}----------{message_data}--------')
+  print(f'-----------------{message_data["email"]}--------')
 
 # -------------------------------Course Work Changes-------------------------------------
 
