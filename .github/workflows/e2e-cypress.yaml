@@ -5,6 +5,7 @@ on:
 
 jobs:
   e2eTests:
+    name: Cypress Testing
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
