@@ -428,7 +428,7 @@ def create_analytics_data(context):
         course_work_id=data["submission"]["courseWorkId"],
         submission_id=data["submission"]["id"])}""")
   except Exception as e:
-    print(e)
+    print(f"return---------{e}")
   section_rows = [{
       "sectionId": section.id,
       "courseId": section.classroom_id,

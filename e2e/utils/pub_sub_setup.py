@@ -117,9 +117,9 @@ if __name__ == "__main__":
   #                   },
   create_bigquery_dataset()
   query = (
-    "CREATE TABLE IF NOT EXISTS lms_notifications (subscription_name STRING,"
+    "CREATE TABLE IF NOT EXISTS lms-notifications (subscription_name STRING,"
   + " message_id STRING, publish_time TIMESTAMP, data JSON, attributes JSON);")
-  create_table_using_sql(query,"lms_notifications")
+  create_table_using_sql(query,"lms-notifications")
   bigquery_table_id = f"{GCP_PROJECT}.{BQ_DATASET}.lms-notifications"
   bigquery_config = pubsub_v1.types.BigQueryConfig(
     table=bigquery_table_id,write_metadata=True,use_topic_schema=True)
