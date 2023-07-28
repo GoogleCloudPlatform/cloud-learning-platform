@@ -67,6 +67,7 @@ describe('SingleTemplateComponent', () => {
               "lti_content_item_id": "yFLMBn4gtkN9f9mxZo",
               "tool_id": "Jz9WXCW0pd5lDaa2q4",
               "course_work_id": "61136908897",
+              "course_work_type": "course_work",
               "max_points": 60.0,
               "start_date": "2023-05-18T18:30:00+00:00",
               "end_date": "2023-06-14T18:30:00+00:00",

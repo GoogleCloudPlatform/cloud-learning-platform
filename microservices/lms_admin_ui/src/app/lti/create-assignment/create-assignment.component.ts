@@ -39,6 +39,7 @@ export class CreateAssignmentComponent {
         this.ltiAssignmentForm = this.fb.group({
           "tool_id": [null, Validators.required],
           "lti_assignment_title": [null, Validators.required],
+          "course_work_type": [null, Validators.required],
           "lti_content_item_id": [null],
           "start_date": [null],
           "end_date": [null],
@@ -49,6 +50,7 @@ export class CreateAssignmentComponent {
         this.ltiAssignmentForm = this.fb.group({
           "tool_id": [{value:this.dialogData.extra_data.assignment.tool_id, disabled: true} , Validators.required],
           "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title, Validators.required],
+          "course_work_type": [this.dialogData.extra_data.assignment.course_work_type, Validators.required],
           "lti_content_item_id": [this.dialogData.extra_data.assignment.lti_content_item_id],
           "start_date": [this.dialogData.extra_data.assignment.start_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.start_date) : null],
           "end_date": [this.dialogData.extra_data.assignment.end_date ? this.getFormattedDatetime(this.dialogData.extra_data.assignment.end_date) : null],
