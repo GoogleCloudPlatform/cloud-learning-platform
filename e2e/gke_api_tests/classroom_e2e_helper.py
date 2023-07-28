@@ -138,7 +138,7 @@ def patch_course_work_submission(classroom_id,course_work_id,submission_id,updat
 def return_course_work_submission(classroom_id,course_work_id,submission_id):
   service = build("classroom", "v1", credentials=get_creds(True))
   return service.course().courseWork().studentSubmissions().return_(
-      courseId=classroom_id, courseWorkId=course_work_id, id=submission_id)
+      courseId=classroom_id, courseWorkId=course_work_id, id=submission_id,body={})
 def list_coursework_submission_user(access_token,course_id,coursework_id,user_id):
   creds = Credentials(token=access_token)
   print("Credentialss ",creds)
