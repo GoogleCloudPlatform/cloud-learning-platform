@@ -44,3 +44,8 @@ USER_MANAGEMENT_BASE_URL = f"http://{SERVICES['user-management']['host']}:" \
                   f"{SERVICES['user-management']['port']}" \
                   f"/user-management/api/v1"
 CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL")
+
+CONTAINER_NAME = os.getenv("CONTAINER_NAME")
+DEPLOYMENT_NAME = os.getenv("DEPLOYMENT_NAME")
+API_BASE_URL = os.getenv("API_BASE_URL")
+SERVICE_NAME = os.getenv("SERVICE_NAME")

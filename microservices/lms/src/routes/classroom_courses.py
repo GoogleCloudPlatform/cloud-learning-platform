@@ -244,8 +244,9 @@ def copy_courses(course_details: CourseDetails):
         continue
     # Create coursework in new course
     if final_coursework_material is not None:
-      classroom_crud.create_coursework_material(new_course["id"],
-                                                final_coursework_material)
+      for course_work_material in final_coursework_material:
+        classroom_crud.create_coursework_material(new_course["id"],
+                                                course_work_material)
     response={}
     response["new_course"] = new_course
     response["coursework_list"] = final_coursework
@@ -293,4 +294,29 @@ def classroom_enable_notifications_pub_sub(course_id:str):
     raise InternalServerError(str(ie)) from ie
   except Exception as e:
     Logger.error(e)
+    raise InternalServerError(str(e)) from e
+
+
+@router.post("/duplicate_course")
+def duplicate_course_using_classroom_api(course_id: str, name: str):
+  """Duplicate classroom course using the classroom course API"""
+  try:
+    # input_course_details_dict = {**course_details.dict()}
+    # course_id = input_course_details_dict["course_id"]
+    # name = input_course_details_dict["name"]
+    data = classroom_crud.copy_classroom_course(course_id, name)
+    new_course_id = data.get("id")
+    Logger.info(f"New classroom created with id {new_course_id}")
+
+    classroom_crud.update_course_state(new_course_id, "ARCHIVED")
+    Logger.info(f"Classroom with id {new_course_id} has been archived")
+
+    classroom_crud.delete_course_by_id(new_course_id)
+    Logger.info(f"Classroom with id {new_course_id} has been deleted")
+
+    return {"course_id" :new_course_id}
+
+  except Exception as e:
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
     raise InternalServerError(str(e)) from e

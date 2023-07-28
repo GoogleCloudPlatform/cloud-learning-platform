@@ -28,6 +28,7 @@ from .course_enrollment_mapping import *
 from .course_template_enrollment_mapping import *
 from .lti_assignment import *
 from .llm import *
+from .llm_query import *
 from .credential_pathway import *
 from .credential_pathway_model import *
 from .custom_fields import *

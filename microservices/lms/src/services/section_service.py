@@ -190,7 +190,6 @@ def copy_course_background_task(course_template_details,
               url_mapping=url_mapping,
               target_folder_id=target_folder_id,
               error_flag=error_flag,
-              coursework_type="coursework",
               lti_assignment_details=lti_assignment_details,
               logs=logs)
           coursework["materials"] = coursework_update_output["material"]
@@ -218,7 +217,7 @@ def copy_course_background_task(course_template_details,
             error_flag = True
             error_msg = f"Failed to update assignment {assignment_id} with course work id \
                           {coursework_id} due to error - {lti_assignment_req.text} with \
-                            status code - {lti_assignment_req.status_code}"
+                            status code - {lti_assignment_req.status_code} for course work"
 
             logs["errors"].append(error_msg)
             Logger.error(error_msg)
@@ -247,13 +246,23 @@ def copy_course_background_task(course_template_details,
     # if final_coursewok is not None:
     #   classroom_crud.create_coursework(new_course["id"],final_coursewok)
     # Get the list of courseworkMaterial
-    final_coursewok_material = []
+    # final_coursewok_material = []
     coursework_material_list = classroom_crud.get_coursework_material_list(
         course_template_details.classroom_id)
     for coursework_material in coursework_material_list:
+      coursework_material_lti_assignment_ids = []
       try:
         #Check if a coursework material is linked to a topic if yes then
         # replace the old topic id to new topic id using topic_id_map
+
+        lti_assignment_details = {
+            "section_id": section_id,
+            "coursework_title": coursework_material["title"],
+            "start_date": None,
+            "end_date": None,
+            "due_date": None
+        }
+
         if "topicId" in coursework_material.keys():
           coursework_material["topicId"] = topic_id_map[
               coursework_material["topicId"]]
@@ -265,13 +274,48 @@ def copy_course_background_task(course_template_details,
               url_mapping=url_mapping,
               target_folder_id=target_folder_id,
               error_flag=error_flag,
+              lti_assignment_details=lti_assignment_details,
               logs=logs)
 
           coursework_material["materials"] = coursework_material_update_output[
               "material"]
           error_flag = coursework_update_output["error_flag"]
+          coursework_material_lti_assignment_ids.extend(
+              coursework_update_output["lti_assignment_ids"])
           print("Updated coursework material attached")
-        final_coursewok_material.append(coursework_material)
+
+        coursework_material_data = classroom_crud.create_coursework_material(new_course["id"],
+                                                coursework_material)
+
+        for assignment_id in coursework_material_lti_assignment_ids:
+          coursework_id = coursework_material_data.get("id")
+          input_json = {"course_work_id": coursework_id}
+          # update assignment with new coursework id
+          lti_assignment_req = requests.patch(
+              f"http://classroom-shim/classroom-shim/api/v1/lti-assignment/{assignment_id}",
+              headers={
+                  "Authorization": f"Bearer {auth_client.get_id_token()}"
+              },
+              json=input_json,
+              timeout=60)
+
+          if lti_assignment_req.status_code != 200:
+            error_flag = True
+            error_msg = f"Failed to update assignment {assignment_id} with course work id \
+                          {coursework_id} due to error - {lti_assignment_req.text} with \
+                            status code - {lti_assignment_req.status_code} for course work material"
+
+            logs["errors"].append(error_msg)
+            Logger.error(error_msg)
+
+          logs["info"].append(
+              f"Updated the id for course work material for new LTI assignment - {assignment_id}"
+          )
+          Logger.info(
+              f"Updated the id course work material for new LTI assignment - {assignment_id}"
+          )
+
+        # final_coursewok_material.append(coursework_material)
       except Exception as error:
         title = coursework_material["title"]
         error_flag = True
@@ -284,10 +328,11 @@ def copy_course_background_task(course_template_details,
         error = traceback.format_exc().replace("\n", " ")
         Logger.error(error)
         continue
-    # Create coursework in new course
-    if final_coursewok_material is not None:
-      classroom_crud.create_coursework_material(new_course["id"],
-                                                final_coursewok_material)
+
+    # # Create coursework in new course
+    # if final_coursewok_material is not None:
+    #   classroom_crud.create_coursework_material(new_course["id"],
+    #                                             final_coursewok_material)
 
     # Classroom copy is successful then the section status is changed to active
     if error_flag:
@@ -724,7 +769,6 @@ def update_coursework_material(materials,
                                url_mapping,
                                target_folder_id,
                                error_flag,
-                               coursework_type=None,
                                lti_assignment_details=None,
                                logs=None):
   """Takes the material attached to any type of cursework and copy it in the
@@ -768,75 +812,60 @@ def update_coursework_material(materials,
       if material["link"]["url"] not in link_urls:
         link = material["link"]
 
-        if coursework_type == "coursework":
-          # Update lti assignment with the course work details
-          if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
-            split_url = link["url"].split(
-                "/classroom-shim/api/v1/launch?lti_assignment_id=")
-            lti_assignment_id = split_url[-1]
-            coursework_title = lti_assignment_details.get("coursework_title")
-            logs["info"].append(
-                f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'")
+        # Update lti assignment with the course work/course work material details
+        if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
+          split_url = link["url"].split(
+              "/classroom-shim/api/v1/launch?lti_assignment_id=")
+          lti_assignment_id = split_url[-1]
+          coursework_title = lti_assignment_details.get("coursework_title")
+          logs["info"].append(
+              f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'")
+          Logger.info(
+              f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'")
+          copy_assignment = requests.post(
+              "http://classroom-shim/classroom-shim/api/v1/lti-assignment/copy",
+              headers={
+                  "Authorization": f"Bearer {auth_client.get_id_token()}"
+              },
+              json={
+                  "lti_assignment_id": lti_assignment_id,
+                  "context_id": lti_assignment_details.get("section_id"),
+                  "start_date": lti_assignment_details.get("start_date"),
+                  "end_date": lti_assignment_details.get("end_date"),
+                  "due_date": lti_assignment_details.get("due_date")
+              },
+              timeout=60)
+
+          if copy_assignment.status_code == 200:
+            new_lti_assignment_id = copy_assignment.json().get("data").get(
+                "id")
+            updated_material_link_url = link["url"].replace(
+                lti_assignment_id, new_lti_assignment_id)
+            lti_assignment_ids.append(new_lti_assignment_id)
+
+            updated_material.append(
+                {"link": {
+                    "url": updated_material_link_url
+                }})
             Logger.info(
-                f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'")
-            copy_assignment = requests.post(
-                "http://classroom-shim/classroom-shim/api/v1/lti-assignment/copy",
-                headers={
-                    "Authorization": f"Bearer {auth_client.get_id_token()}"
-                },
-                json={
-                    "lti_assignment_id": lti_assignment_id,
-                    "context_id": lti_assignment_details.get("section_id"),
-                    "start_date": lti_assignment_details.get("start_date"),
-                    "end_date": lti_assignment_details.get("end_date"),
-                    "due_date": lti_assignment_details.get("due_date")
-                },
-                timeout=60)
-
-            if copy_assignment.status_code == 200:
-              new_lti_assignment_id = copy_assignment.json().get("data").get(
-                  "id")
-              updated_material_link_url = link["url"].replace(
-                  lti_assignment_id, new_lti_assignment_id)
-              lti_assignment_ids.append(new_lti_assignment_id)
-
-              updated_material.append(
-                  {"link": {
-                      "url": updated_material_link_url
-                  }})
-              Logger.info(
-                  f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}', new assignment id - {new_lti_assignment_id}"
-              )
-              logs["info"].append(
-                  f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}', new assignment id - {new_lti_assignment_id}"
-              )
-            else:
-              logs["info"].append(
-                  f"LTI Course copy failed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'"
-              )
-              error_msg = f"Copying an LTI Assignment failed for {lti_assignment_id}, coursework title - '{coursework_title}'\
-                           in the new section {lti_assignment_details.get('section_id')} with status code: \
-                           {copy_assignment.status_code} and error msg: {copy_assignment.text}"
-
-              logs["errors"].append(error_msg)
-              Logger.error(error_msg)
-              error_flag = True
+                f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}', new assignment id - {new_lti_assignment_id}"
+            )
+            logs["info"].append(
+                f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}', new assignment id - {new_lti_assignment_id}"
+            )
           else:
-            updated_material.append({"link": material["link"]})
+            logs["info"].append(
+                f"LTI Course copy failed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'"
+            )
+            error_msg = f"Copying an LTI Assignment failed for {lti_assignment_id}, coursework title - '{coursework_title}'\
+                          in the new section {lti_assignment_details.get('section_id')} with status code: \
+                          {copy_assignment.status_code} and error msg: {copy_assignment.text}"
 
+            logs["errors"].append(error_msg)
+            Logger.error(error_msg)
+            error_flag = True
         else:
-          if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
-            split_url = link["url"].split(
-                "/classroom-shim/api/v1/launch?lti_assignment_id=")
-            lti_assignment_id = split_url[-1]
-            logs["info"].append(
-                f"LTI link removed in course work material with assignment ID - '{lti_assignment_id}'"
-            )
-            Logger.info(
-                f"LTI link removed in course work material with assignment ID - '{lti_assignment_id}'"
-            )
-          else:
-            updated_material.append({"link": material["link"]})
+          updated_material.append({"link": material["link"]})
 
         link_urls.append(material["link"]["url"])
 

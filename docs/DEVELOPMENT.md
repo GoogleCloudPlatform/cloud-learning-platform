@@ -1,4 +1,5 @@
 # Development
+
 <!-- vscode-markdown-toc -->
 * 1. [Project Requirements](#ProjectRequirements)
 * 2. [Code Submission Process](#CodeSubmissionProcess)
@@ -28,10 +29,9 @@
 	* 8.2. [Local Debugging - Microservice](#LocalDebugging-Microservice)
 	* 8.3. [Minikube Microservice Debugging w/ Skaffold + Cloud Code (VS Code)](#MinikubeMicroserviceDebuggingwSkaffoldCloudCodeVSCode)
 	* 8.4. [GKE Microservice Debugging w/ Skaffold + Cloud Code (VS Code)](#GKEMicroserviceDebuggingwSkaffoldCloudCodeVSCode)
-* 9. [Development with CloudRun (serverless)](#DevelopmentwithCloudRunserverless)
-* 10. [Unit tests - microservices](#Unittests-microservices)
-		* 10.1. [Run linter locally:](#Runlinterlocally:)
-		* 10.2. [Unit test file format:](#Unittestfileformat:)
+* 9. [Unit tests - microservices](#Unittests-microservices)
+		* 9.1. [Run linter locally:](#Runlinterlocally:)
+		* 9.2. [Unit test file format:](#Unittestfileformat:)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -449,8 +449,8 @@ If you are deploying common Cloud Learning Platform services from another repo i
 
 Clone the repo:
 ```
-git glone git@github.com:GPS-Solutions/ailearning-backend.git
-cd ailearning-backend
+git glone git@github.com:GPS-Solutions/cloud-learning-platform.git
+cd cloud-learning-platform
 ```
 
 Run a skaffold dev command to build / deploy the microservice:
@@ -513,12 +513,7 @@ First, install [Cloud Code](https://marketplace.visualstudio.com/items?itemName=
 When you're done, make sure to fully disconnect the debugger so it removes the running services.
 
 
-
-##  9. <a name='DevelopmentwithCloudRunserverless'></a>Development with CloudRun (serverless)
-
-TBD
-
-##  10. <a name='Unittests-microservices'></a>Unit tests - microservices
+##  9. <a name='Unittests-microservices'></a>Unit tests - microservices
 
 Install Firebase CLI:
 ```
@@ -543,15 +538,40 @@ Run unit tests locally:
 PYTEST_ADDOPTS="--cache-clear --cov . " PYTHONPATH=$BASE_DIR/common/src python -m pytest
 ```
 
-####  10.1. <a name='Runlinterlocally:'></a>Run linter locally:
+####  9.1. <a name='Runlinterlocally:'></a>Run linter locally:
 ```
 python -m pylint $(git ls-files '*.py') --rcfile=$BASE_DIR/.pylintrc
 ```
 
-####  10.2. <a name='Unittestfileformat:'></a>Unit test file format:
+####  9.2. <a name='Unittestfileformat:'></a>Unit test file format:
 
 All unit test files follow the filename format:
 
 - Python:
   ```
   <original_filename>_test.py
+
+
+##  10.  CI/CD and Test Automation
+
+###  10.1  Github Actions
+
+###  10.2  Test Github Action workflows locally
+
+- Install Docker desktop: https://www.docker.com/products/docker-desktop/
+- Install [Act](https://github.com/nektos/act)
+
+  ```
+  # Mac
+  brew install act
+
+  # Windows
+  choco install act-cli
+  ```
+
+- Run a specific Workflow
+  ```
+  act --workflows .github/workflows/e2e_gke_api_test.yaml
+  ```
+
+
