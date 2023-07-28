@@ -732,6 +732,5 @@ def sign_up_user():
     print("firestore: user email already exists")
 
 def before_all(context):
-  pass
-  # sign_up_user()
-  # user_login()
+  sign_up_user()
+  user_login()
