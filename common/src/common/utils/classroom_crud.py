@@ -348,7 +348,7 @@ def create_coursework(course_id, coursework):
   return data
 
 
-def create_coursework_material(course_id, coursework_material_list):
+def create_coursework_material(course_id, coursework_material):
   """create coursework in a classroom course
 
   Args:
@@ -359,11 +359,11 @@ def create_coursework_material(course_id, coursework_material_list):
   """
   Logger.info("In Create coursework Material")
   service = build("classroom", "v1", credentials=get_credentials())
-  for coursework_item in coursework_material_list:
-    _ = service.courses().courseWorkMaterials().create(
-        courseId=course_id, body=coursework_item).execute()
+
+  data = service.courses().courseWorkMaterials().create(courseId=course_id,
+                                               body=coursework_material).execute()
   Logger.info("Create coursework Material worked")
-  return "success"
+  return data
 
 
 def delete_course_by_id(course_id):
@@ -828,6 +828,21 @@ def delete_course_work(course_id, course_work_id):
       f"Deleted course work - {course_work_id} in course - {course_id}")
   return data
 
+def delete_course_work_material(course_id, course_work_material_id):
+  """delete course work by course id and course work id
+  Args:
+    course_id (str): Id of the course
+    course_work_material_id (str): Id of the course work material to be deleted
+  Returns:
+    dict: empty dict if success
+  """
+  service = service = build("classroom", "v1", credentials=get_credentials())
+  data = service.courses().courseWorkMaterials().delete(courseId=course_id,
+                                               id=course_work_material_id).execute()
+  Logger.info(
+      f"Deleted course work  material- {course_work_material_id} in course - {course_id}")
+  return data
+
 
 def update_course_work(course_id, course_work_id, update_mask, updated_body):
   """update course work by course id and course work id
@@ -847,6 +862,27 @@ def update_course_work(course_id, course_work_id, update_mask, updated_body):
       updateMask=update_mask).execute()
   Logger.info(
       f"Updated course work - {course_work_id} in course - {course_id}")
+  return data
+
+
+def update_course_work_material(course_id, course_work_material_id, update_mask,
+                                updated_body):
+  """update course work material by course id and course work id
+  Args:
+    course_id (str): Id of the course
+    course_work_material_id (str): Id of the course work to be deleted
+    update_mask (str): Fields(Concat multiple fields if any) to be updated in the coursework
+    updated_body(dict): Updated field object data
+  Returns:
+    dict: empty dict if success
+  """
+  service = service = build("classroom", "v1", credentials=get_credentials())
+  data = service.courses().courseWorkMaterials().patch(
+      courseId=course_id,
+      id=course_work_material_id,
+      body=updated_body,
+      updateMask=update_mask).execute()
+  Logger.info(f"Updated course work material - {course_work_material_id} in course - {course_id}")
   return data
 
 

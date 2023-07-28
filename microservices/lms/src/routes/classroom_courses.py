@@ -244,8 +244,9 @@ def copy_courses(course_details: CourseDetails):
         continue
     # Create coursework in new course
     if final_coursework_material is not None:
-      classroom_crud.create_coursework_material(new_course["id"],
-                                                final_coursework_material)
+      for course_work_material in final_coursework_material:
+        classroom_crud.create_coursework_material(new_course["id"],
+                                                course_work_material)
     response={}
     response["new_course"] = new_course
     response["coursework_list"] = final_coursework
