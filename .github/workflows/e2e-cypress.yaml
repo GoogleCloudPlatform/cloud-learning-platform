@@ -16,9 +16,3 @@ jobs:
         with:
           start: npx run cypress
           working-directory: experimental/e2e-frontend/cypress
-
-      - name: Check status
-        uses: actions/github-status@v1
-        with:
-          status: ${{ job.status }}
-          context: Cypress E2E Tests
