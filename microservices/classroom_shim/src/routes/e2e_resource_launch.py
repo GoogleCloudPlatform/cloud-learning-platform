@@ -30,7 +30,7 @@ def login(request: Request, lti_assignment_id: str):
     lti_content_item = get_content_item(lti_assignment.lti_content_item_id)
     token = request.headers["Authorization"].split(" ")[1]
     return templates.TemplateResponse(
-        "e2e_resuorce_launch.html", {
+        "e2e_resource_launch.html", {
             "request":
                 request,
             "redirect_url":
