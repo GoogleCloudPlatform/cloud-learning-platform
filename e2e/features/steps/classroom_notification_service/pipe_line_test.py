@@ -40,14 +40,9 @@ def step_impl_02(context):
 )
 def step_impl_03(context):
   user=context.users[0]
-  message = context.notification[0]
-  message_data=json.loads(message["data"])
+  message_data = json.loads(context.notification[0]["data"])
   assert user["id"]==context.analytics_data["student_data"]["gaia_id"]
-  print(
-      f'-----------------{context.notification}---{len(context.notification)}--------'
-  )
-  print(f'-----------------{message}----------{message_data}--------')
-  print(f'-----------------{message_data["email"]}--------')
+  assert message_data["email"] == context.user_id
 
 # -------------------------------Course Work Changes-------------------------------------
 
@@ -82,6 +77,7 @@ def step_impl_06(context):
 )
 def step_impl_07(context):
   context.submission_id=context.analytics_data['submission']['id']
+  context.user_id = context.analytics_data['student_data']['email']
 
 
 @behave.when(
@@ -100,7 +96,8 @@ def step_impl_08(context):
     "Pipline get submitted course work details from classroom and store Submitted Course Work details and Push filter message to lms notifications"
 )
 def step_impl_09(context):
+  message_data = json.loads(context.notification[0]["data"])
   assert context.submission["submission_course_id"]==context.analytics_data["course_details"]["id"]
   assert context.submission["submission_course_work_id"]==context.analytics_data["course_work"]["id"]
   assert context.submission["submission_user_id"]==context.analytics_data["student_data"]["gaia_id"]
-  # assert context.notification[0]["data"]["email"]==context.user_id
+  assert message_data["email"]==context.user_id
