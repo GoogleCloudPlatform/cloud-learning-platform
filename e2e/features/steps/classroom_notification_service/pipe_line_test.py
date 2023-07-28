@@ -39,9 +39,12 @@ def step_impl_02(context):
 )
 def step_impl_03(context):
   user=context.users[0]
+  message = context.notification[0]
   assert user["id"]==context.analytics_data["student_data"]["gaia_id"]
-  print(f'-----------------{context.notification}-----------')
-  print(f'-----------------{context.notification[0]["data"]["email"]}-----------')
+  print(
+      f'-----------------{context.notification}---{len(context.notification)}--------'
+  )
+  print(f'-----------------{message["data"]["email"]}-----------')
 
 # -------------------------------Course Work Changes-------------------------------------
 
@@ -50,6 +53,7 @@ def step_impl_03(context):
 )
 def step_impl_04(context):
   context.course_work_id=context.analytics_data['course_work']['id']
+  context.user_id = context.analytics_data['student_data']['email']
 
 
 @behave.when(
