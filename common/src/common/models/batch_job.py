@@ -52,18 +52,12 @@ class BatchJobModel(BaseModel):
   @classmethod
   def find_by_name(cls, name):
     job = cls.collection.filter("name", "==", name).get()
-    if job:
-      return job
-    else:
-      raise ResourceNotFoundException(f"Invalid {cls.__name__} name: {name}")
+    return job
 
   @classmethod
   def find_by_uuid(cls, name):
     job = cls.collection.filter("uuid", "==", name).get()
-    if job:
-      return job
-    else:
-      raise ResourceNotFoundException(f"Invalid {cls.__name__} name: {name}")
+    return job
 
   @classmethod
   def find_by_job_type(cls, job_type):

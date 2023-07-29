@@ -48,7 +48,6 @@ def get_batch_job_status(job_type_const: JobTypes, job_name: str):
   job_type = job_type_const.value
   try:
     data = get_job_status(job_type, job_name)    
-    data["type"] = data["type"].value
     response = {
         "success": True,
         "message": "Successfully retrieved batch job",

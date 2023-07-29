@@ -64,18 +64,7 @@ def get_job_status(job_type, job_name):
   job = BatchJobModel.collection.filter("type", "in", [job_type]).filter(
       "uuid", "==", job_name).get()
   if job:
-    job_response = {}
-    job_response["job_name"] = job.name
-    job_response["created_by"] = job.created_by
-    job_response["created_time"] = str(job.created_time)
-    job_response["last_modified_by"] = job.last_modified_by
-    job_response["last_modified_time"] = str(job.last_modified_time)
-    job_response["input_data"] = json.loads(job.input_data)
-    job_response["status"] = job.status
-    job_response["errors"] = job.errors
-    job_response["type"] = job.type
-    if job.output_gcs_path:
-      job_response["output_gcs_path"] = job.output_gcs_path
+    job_response = job.get_fields(reformat_datetime=True)
     return job_response
   else:
     raise ResourceNotFoundException(
@@ -94,18 +83,7 @@ def get_all_jobs(job_type):
   jobs = BatchJobModel.collection.filter("type", "in", [job_type]).fetch()
   job_list = []
   for job in jobs:
-    job_response = {}
-    job_response["job_name"] = job.name
-    job_response["created_by"] = job.created_by
-    job_response["created_time"] = str(job.created_time)
-    job_response["last_modified_by"] = job.last_modified_by
-    job_response["last_modified_time"] = str(job.last_modified_time)
-    job_response["input_data"] = json.loads(job.input_data)
-    job_response["status"] = job.status
-    job_response["type"] = job.type
-    job_response["errors"] = job.errors
-    if job.output_gcs_path:
-      job_response["output_gcs_path"] = job.output_gcs_path
+    job_response = job.get_fields(reformat_datetime=True)
     job_list.append(job_response)
   return job_list
 

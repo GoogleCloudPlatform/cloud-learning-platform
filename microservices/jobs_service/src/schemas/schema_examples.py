@@ -31,7 +31,7 @@ USER_EXAMPLE = {
 BATCHJOB_EXAMPLE = {
     "id_": "fake-job-id",
     "type": "query_engine_build",
-    "name": "fake-job-name",
+    "name": "fake-job-id",
     "input_data": "{\"fake-key\":\"fake-value\"}",
     "status": "active",
     "message": "test message",
