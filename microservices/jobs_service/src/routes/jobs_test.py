@@ -77,7 +77,7 @@ def create_job(client_with_emulator):
 
 
 def test_get_job_status(create_job, client_with_emulator):
-  job = BatchJobModel.get_by_name(BATCHJOB_EXAMPLE["name"])
+  job = BatchJobModel.find_by_name(BATCHJOB_EXAMPLE["name"])
   job_name = job.name
   url = f"{api_url}/{job_name}"
   resp = client_with_emulator.get(url)
@@ -97,23 +97,25 @@ def test_get_all_jobs(create_job, client_with_emulator):
 
 
 def test_delete_job(create_job, client_with_emulator):
-  job = BatchJobModel.get_by_name(BATCHJOB_EXAMPLE["name"])
+  job = BatchJobModel.find_by_name(BATCHJOB_EXAMPLE["name"])
   job_name = job.name
   url = f"{api_url}/{job_name}"
   resp = client_with_emulator.delete(url)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  job = BatchJobModel.get_by_name(BATCHJOB_EXAMPLE["name"])
+  job = BatchJobModel.find_by_name(BATCHJOB_EXAMPLE["name"])
   assert job is None, "batch job model not deleted"
 
 
 def test_update_job(create_job, client_with_emulator):
-  job = BatchJobModel.get_by_name(BATCHJOB_EXAMPLE["name"])
+  job = BatchJobModel.find_by_name(BATCHJOB_EXAMPLE["name"])
   job_name = job.name
   url = f"{api_url}/{job_name}"
-  resp = client_with_emulator.put(url)
+  with mock.patch(
+      "common.utils.kf_job_app.kube_delete_job")
+    resp = client_with_emulator.put(url)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  job = BatchJobModel.get_by_name(BATCHJOB_EXAMPLE["name"])
+  job = BatchJobModel.find_by_name(BATCHJOB_EXAMPLE["name"])
   assert job.status == JobStatus.JOB_STATUS_ABORTED.value, \
       "all data not retrieved"

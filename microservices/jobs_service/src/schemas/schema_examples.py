@@ -32,7 +32,7 @@ BATCHJOB_EXAMPLE = {
     "id_": "fake-job-id",
     "type": "query_engine_build",
     "name": "fake-job-name",
-    "input_data": "fake-data",
+    "input_data": "{\"fake-key\":\"fake-value\"}",
     "status": "active",
     "message": "test message",
     "generated_item_id": "asdf1234",

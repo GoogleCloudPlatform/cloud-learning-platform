@@ -25,6 +25,9 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError, ResourceNotFound
 from schemas.error_schema import NotFoundErrorResponseModel
+from schemas.jobs_schema import (JobGetStatusResponse, 
+                                 AllJobsGetStatusResponse, 
+                                 JobDeleteResponse)
 from config import ERROR_RESPONSES
 # pylint: disable = broad-except
 
@@ -38,7 +41,8 @@ router = APIRouter(
     "/{job_type_const}/{job_name}",
     responses={404: {
         "model": NotFoundErrorResponseModel
-    }})
+    }},
+    response_model=JobGetStatusResponse)
 def get_batch_job_status(job_type_const: JobTypes, job_name: str):
   """ Get status of job by type and name """
   job_type = job_type_const.value
@@ -47,7 +51,7 @@ def get_batch_job_status(job_type_const: JobTypes, job_name: str):
       data = get_job_status(job_type, job_name)
       response = {
           "success": True,
-          "message": "Successfully fetched the batch job",
+          "message": "Successfully retrieved batch job",
           "data": data
       }
       return response
@@ -59,7 +63,7 @@ def get_batch_job_status(job_type_const: JobTypes, job_name: str):
     raise InternalServerError(str(e)) from e
 
 
-@router.get("/{job_type_const}")
+@router.get("/{job_type_const}", response_model=AllJobsGetStatusResponse)
 def get_all_job_status(job_type_const: JobTypes):
   """ Get status of all jobs by type """
   job_type = job_type_const.value
@@ -84,7 +88,8 @@ def get_all_job_status(job_type_const: JobTypes):
     "/{job_type_const}/{job_name}",
     responses={404: {
         "model": NotFoundErrorResponseModel
-    }})
+    }},
+    response_model=JobDeleteResponse)
 def delete_batch_job_model(job_type_const: JobTypes, job_name: str):
   """ Delete batch job model by type and name.  Note this does
       not delete the Kubernetes Job. """
@@ -94,7 +99,7 @@ def delete_batch_job_model(job_type_const: JobTypes, job_name: str):
     response = {
         "success": True,
         "message": "Successfully deleted the batch job",
-        "data": {}
+        "data": None
     }
     return response
 
@@ -110,12 +115,19 @@ def delete_batch_job_model(job_type_const: JobTypes, job_name: str):
     "/{job_type_const}/{job_name}",
     responses={404: {
         "model": NotFoundErrorResponseModel
-    }})
+    }},
+    response_model=JobDeleteResponse)
 def remove_batch_job(job_type_const: JobTypes, job_name: str):
   """ Remove job and update status by type and name """
   job_type = job_type_const.value
   try:
-    return remove_job_and_update_status(job_type, job_name)
+    remove_job_and_update_status(job_type, job_name)
+    response = {
+        "success": True,
+        "message": "Successfully removed the batch job",
+        "data": None
+    }
+    return response
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
