@@ -79,7 +79,7 @@ def create_job(client_with_emulator):
 def test_get_job_status(create_job, client_with_emulator):
   job = BatchJobModel.find_by_name(BATCHJOB_EXAMPLE["name"])
   job_name = job.name
-  url = f"{api_url}/{job_name}"
+  url = f"{api_url}/{job.type}/{job_name}"
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
@@ -99,7 +99,7 @@ def test_get_all_jobs(create_job, client_with_emulator):
 def test_delete_job(create_job, client_with_emulator):
   job = BatchJobModel.find_by_name(BATCHJOB_EXAMPLE["name"])
   job_name = job.name
-  url = f"{api_url}/{job_name}"
+  url = f"{api_url}/{job.type}/{job_name}"
   resp = client_with_emulator.delete(url)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
@@ -110,9 +110,9 @@ def test_delete_job(create_job, client_with_emulator):
 def test_update_job(create_job, client_with_emulator):
   job = BatchJobModel.find_by_name(BATCHJOB_EXAMPLE["name"])
   job_name = job.name
-  url = f"{api_url}/{job_name}"
+  url = f"{api_url}/{job.type}/{job_name}"
   with mock.patch(
-      "common.utils.kf_job_app.kube_delete_job")
+      "common.utils.kf_job_app.kube_delete_job"):
     resp = client_with_emulator.put(url)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"

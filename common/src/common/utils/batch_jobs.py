@@ -61,25 +61,25 @@ def initiate_batch_job(request_body, job_type, env_vars={}):
 
 def get_job_status(job_type, job_name):
   """returns status of the batch job"""
-  if job_name:
-    job = BatchJobModel.collection.filter("type", "in", [job_type]).filter(
-        "uuid", "==", job_name).get()
-    if job:
-      job_response = {}
-      job_response["job_name"] = job.name
-      job_response["created_by"] = job.created_by
-      job_response["created_time"] = str(job.created_time)
-      job_response["last_modified_by"] = job.last_modified_by
-      job_response["last_modified_time"] = str(job.last_modified_time)
-      job_response["input_data"] = json.loads(job.input_data)
-      job_response["status"] = job.status
-      job_response["errors"] = job.errors
-      job_response["type"] = job.type
-      if job.output_gcs_path:
-        job_response["output_gcs_path"] = job.output_gcs_path
-      return job_response
-    else:
-      raise ResourceNotFoundException("Job with this job_name does not exist")
+  job = BatchJobModel.collection.filter("type", "in", [job_type]).filter(
+      "uuid", "==", job_name).get()
+  if job:
+    job_response = {}
+    job_response["job_name"] = job.name
+    job_response["created_by"] = job.created_by
+    job_response["created_time"] = str(job.created_time)
+    job_response["last_modified_by"] = job.last_modified_by
+    job_response["last_modified_time"] = str(job.last_modified_time)
+    job_response["input_data"] = json.loads(job.input_data)
+    job_response["status"] = job.status
+    job_response["errors"] = job.errors
+    job_response["type"] = job.type
+    if job.output_gcs_path:
+      job_response["output_gcs_path"] = job.output_gcs_path
+    return job_response
+  else:
+    raise ResourceNotFoundException(
+        f"Job with name {job_name} and type {job_type} not found")
 
 
 def get_all_jobs(job_type):
@@ -107,10 +107,7 @@ def get_all_jobs(job_type):
     if job.output_gcs_path:
       job_response["output_gcs_path"] = job.output_gcs_path
     job_list.append(job_response)
-  data_response = {}
-  for i in job_list:
-    data_response[str(job_list.index(i))] = i
-  return data_response
+  return job_list
 
 
 def delete_batch_job(job_type, job_name):
@@ -130,7 +127,7 @@ def delete_batch_job(job_type, job_name):
       raise Exception("Internal server error") from e
   else:
     raise ResourceNotFoundException(
-        "Job with given name and type does not exist")
+        f"Job with name {job_name} and type {job_type} not found")
 
 
 def remove_job_and_update_status(job_type, job_name):
@@ -165,4 +162,4 @@ def remove_job_and_update_status(job_type, job_name):
       raise Exception("Failed to update status") from e
   else:
     raise ResourceNotFoundException(
-        "Job with given name and type does not exist")
+        f"Job with name {job_name} and type {job_type} not found")

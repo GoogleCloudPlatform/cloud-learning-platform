@@ -47,15 +47,16 @@ def get_batch_job_status(job_type_const: JobTypes, job_name: str):
   """ Get status of job by type and name """
   job_type = job_type_const.value
   try:
-    if job_name:
-      data = get_job_status(job_type, job_name)
-      response = {
-          "success": True,
-          "message": "Successfully retrieved batch job",
-          "data": data
-      }
-      return response
+    data = get_job_status(job_type, job_name)    
+    data["type"] = data["type"].value
+    response = {
+        "success": True,
+        "message": "Successfully retrieved batch job",
+        "data": data
+    }
+    return response
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
@@ -104,6 +105,7 @@ def delete_batch_job_model(job_type_const: JobTypes, job_name: str):
     return response
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
     Logger.error(e)
