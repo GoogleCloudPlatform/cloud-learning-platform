@@ -432,6 +432,7 @@ describe('CreateAssignmentComponent', () => {
       "lti_content_item_id": "zr0mfn2CqpAeUddaqBT",
       "tool_id": "46G7Lol0eHx1th4WJEVE",
       "course_work_id": "6135897136",
+      "course_work_type": "course_work",
       "max_points": 30.0,
       "start_date": "2023-04-01T00:00:00+00:00",
       "end_date": "2023-06-17T00:00:00+00:00",
