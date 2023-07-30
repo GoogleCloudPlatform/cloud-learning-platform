@@ -30,6 +30,9 @@ from common.utils.auth_service import validate_user, validate_token
 from common.utils.http_exceptions import add_exception_handlers
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 
+with mock.patch("common.utils.kf_job_app.kube_delete_job"):
+  from common.utils import batch_jobs
+
 from config import JOB_TYPES
 
 # assigning url
@@ -111,9 +114,7 @@ def test_update_job(create_job, client_with_emulator):
   job = BatchJobModel.find_by_name(BATCHJOB_EXAMPLE["name"])
   job_name = job.name
   url = f"{api_url}/{job.type}/{job_name}"
-  with mock.patch(
-      "common.utils.kf_job_app.kube_delete_job"):
-    resp = client_with_emulator.put(url)
+  resp = client_with_emulator.put(url)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   job = BatchJobModel.find_by_name(BATCHJOB_EXAMPLE["name"])
