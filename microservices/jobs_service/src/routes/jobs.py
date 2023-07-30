@@ -25,8 +25,8 @@ from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException
 from common.utils.http_exceptions import InternalServerError, ResourceNotFound
 from schemas.error_schema import NotFoundErrorResponseModel
-from schemas.jobs_schema import (JobGetStatusResponse, 
-                                 AllJobsGetStatusResponse, 
+from schemas.jobs_schema import (JobGetStatusResponse,
+                                 AllJobsGetStatusResponse,
                                  JobDeleteResponse)
 from config import ERROR_RESPONSES
 # pylint: disable = broad-except
@@ -47,7 +47,7 @@ def get_batch_job_status(job_type_const: JobTypes, job_name: str):
   """ Get status of job by type and name """
   job_type = job_type_const.value
   try:
-    data = get_job_status(job_type, job_name)    
+    data = get_job_status(job_type, job_name)
     response = {
         "success": True,
         "message": "Successfully retrieved batch job",

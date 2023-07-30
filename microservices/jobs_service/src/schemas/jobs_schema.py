@@ -48,7 +48,7 @@ class AllJobsGetStatusResponse(BaseModel):
     schema_extra = {
         "example": {
             "success": True,
-            "message": 
+            "message":
       f"Successfully fetched all the batch jobs of type {job_type}",
             "data": [BATCHJOB_EXAMPLE]
         }
