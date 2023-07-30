@@ -4,6 +4,7 @@ from fireo.fields import TextField, MapField, NumberField, BooleanField, ListFie
 from common.models import NodeItem, BaseModel
 from common.utils.errors import ResourceNotFoundException
 
+# pylint: disable = arguments-renamed
 LOS_LITERALS = {
   "curriculum_pathways": {
     "alias": ["program", "level", "discipline", "unit"],
@@ -26,6 +27,7 @@ LOS_LITERALS = {
 }
 
 def check_type(level):
+  """Function to check type"""
   allowed_types = LOS_LITERALS[level]["type"]
 
   def _check_type(field_val):
@@ -39,6 +41,7 @@ def check_type(level):
 
 
 def check_alias(level):
+  """Function to check alias"""
   allowed_aliases = LOS_LITERALS[level]["alias"]
 
   def _check_alias(field_val):
