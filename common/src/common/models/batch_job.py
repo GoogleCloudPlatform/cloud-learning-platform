@@ -18,7 +18,6 @@ from enum import Enum
 from fireo.fields import TextField, MapField, IDField
 from common.models import GCSPathField
 from common.models import BaseModel
-from common.utils.errors import ResourceNotFoundException
 
 class JobStatus(Enum):
   """ Enum class for JobStatus """
