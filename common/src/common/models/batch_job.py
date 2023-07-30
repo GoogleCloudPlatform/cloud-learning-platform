@@ -31,7 +31,7 @@ class JobStatus(Enum):
 
 class BatchJobModel(BaseModel):
   """Model class for batch job"""
-  id_ = IDField()
+  id = IDField()
   name = TextField(required=True, default="")
   input_data = TextField()
   type = TextField(required=True)

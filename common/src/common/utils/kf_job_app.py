@@ -284,7 +284,7 @@ def kube_create_job(job_specs, namespace="default", env_vars={}):
 
     # creating a job entry in firestore
     job_model = BatchJobModel()
-    job_model.id_ = name
+    job_model.id = name
     job_model.type = job_specs["type"]
     job_model.status = "pending"
     job_model.uuid = name
@@ -362,7 +362,7 @@ def kube_create_job(job_specs, namespace="default", env_vars={}):
 
     response = {
       "job_name": job_model.uuid,
-      "doc_id": job_model.id_,
+      "doc_id": job_model.id,
       "status": "active",
       "job logs": job_logs
     }

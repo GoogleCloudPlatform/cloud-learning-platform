@@ -84,7 +84,7 @@ def test_get_job_status(create_job, client_with_emulator):
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   job_data = json_response.get("data")
-  assert job_data.id_ == BATCHJOB_EXAMPLE["id_"], "all data not retrieved"
+  assert job_data.id == BATCHJOB_EXAMPLE["id"], "all data not retrieved"
 
 
 def test_get_all_jobs(create_job, client_with_emulator):
@@ -92,8 +92,8 @@ def test_get_all_jobs(create_job, client_with_emulator):
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  saved_ids = [i.get("id_") for i in json_response.get("data")]
-  assert BATCHJOB_EXAMPLE["id_"] in saved_ids, "all data not retrieved"
+  saved_ids = [i.get("id") for i in json_response.get("data")]
+  assert BATCHJOB_EXAMPLE["id"] in saved_ids, "all data not retrieved"
 
 
 def test_delete_job(create_job, client_with_emulator):
