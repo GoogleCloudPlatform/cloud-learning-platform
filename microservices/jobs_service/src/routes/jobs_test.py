@@ -84,7 +84,7 @@ def test_get_job_status(create_job, client_with_emulator):
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   job_data = json_response.get("data")
-  assert job_data.id == BATCHJOB_EXAMPLE["id"], "all data not retrieved"
+  assert job_data["id"] == BATCHJOB_EXAMPLE["id"], "all data not retrieved"
 
 
 def test_get_all_jobs(create_job, client_with_emulator):
