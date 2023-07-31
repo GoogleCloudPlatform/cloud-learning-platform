@@ -22,8 +22,7 @@ from schemas.schema_examples import (SUBMITTED_ASSESSMENT_EXAMPLE,
                                       BASIC_LEARNER_EXAMPLE,
                                       BASIC_LEARNER_PROFILE_EXAMPLE)
 from config import (ASSESSMENT_SUBMISSION_BASE_PATH,
-                    ASSESSMENT_AUTHORING_BASE_PATH,
-                    DATABASE_PREFIX)
+                    ASSESSMENT_AUTHORING_BASE_PATH)
 
 app = FastAPI()
 add_exception_handlers(app)
@@ -266,7 +265,7 @@ def test_upload_assessment_response_negative_2(clean_firestore, mocker):
   assert resp.status_code == 404
   assert resp_json["success"] is False
   assert resp_json[
-      "message"] == f"{DATABASE_PREFIX}assessments with id {assessment_id} is not found"
+      "message"] == f"Assessment with uuid {assessment_id} not found"
 
 
 def test_upload_assessment_response_negative_3(clean_firestore, mocker):

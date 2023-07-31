@@ -18,7 +18,7 @@ from common.models import AssessmentItem
 from common.utils.http_exceptions import add_exception_handlers
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
-from config import DATABASE_PREFIX
+
 app = FastAPI()
 add_exception_handlers(app)
 app.include_router(router, prefix="/assessment-service/api/v1")
@@ -177,8 +177,7 @@ def test_delete_assessment_item_negative(clean_firestore):
   url = f"{api_url}/{assessment_item_uuid}"
   response = {
     "success": False,
-    "message": f"{DATABASE_PREFIX}assessment_items with id"+\
-      " ASS345Dl3Ayg0PWudzhI is not found",
+    "message": "Assessment Item with uuid ASS345Dl3Ayg0PWudzhI not found",
     "data": None
   }
   resp = client_with_emulator.delete(url)
