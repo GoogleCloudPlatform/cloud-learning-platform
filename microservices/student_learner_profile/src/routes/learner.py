@@ -6,41 +6,26 @@ import traceback
 from typing import Optional
 from typing_extensions import Literal
 from fastapi import APIRouter, UploadFile, File, Query
-
-from services.json_import import json_import
-
-from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES
-
+from common.models import (Learner, User, Staff, AssociationGroup,
+                           CurriculumPathway)
+from common.utils.errors import (ResourceNotFoundException, ValidationError,
+                                 ConflictError, PayloadTooLargeError)
+from common.utils.http_exceptions import (InternalServerError, BadRequest,
+                                          ResourceNotFound, Conflict,
+                                          PayloadTooLarge)
 from common.utils.logging_handler import Logger
 from common.utils.sorting_logic import collection_sorting
-from common.models import (
-  Learner, User, Staff, AssociationGroup,
-  CurriculumPathway
-)
-from common.utils.errors import (
-  ResourceNotFoundException,
-  ValidationError,
-  ConflictError,
-  PayloadTooLargeError
-)
-from common.utils.http_exceptions import (
-  InternalServerError, BadRequest,
-  ResourceNotFound, Conflict,
-  PayloadTooLarge
-)
-
 from schemas.learner_schema import (
-  LearnerModel, GetLearnerResponseModel, PostLearnerResponseModel,
-  UpdateLearnerResponseModel, UpdateLearnerModel, DeleteLearner,
-  AllLearnersResponseModel, LearnerSearchResponseModel,
-  LearnerImportJsonResponse, BasicLearnerModel, CoachesResponseModel,
-  InstructorResponseModel, GetLearnerPathwayIdResponse,
-  GetInstructorsResponseModel
-)
-from schemas.error_schema import (
-  NotFoundErrorResponseModel,
-  PayloadTooLargeResponseModel
-)
+    LearnerModel, GetLearnerResponseModel, PostLearnerResponseModel,
+    UpdateLearnerResponseModel, UpdateLearnerModel, DeleteLearner,
+    AllLearnersResponseModel, LearnerSearchResponseModel,
+    LearnerImportJsonResponse, BasicLearnerModel, CoachesResponseModel,
+    InstructorResponseModel, GetLearnerPathwayIdResponse,
+    GetInstructorsResponseModel)
+from schemas.error_schema import (NotFoundErrorResponseModel,
+                                  PayloadTooLargeResponseModel)
+from services.json_import import json_import
+from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES
 
 # pylint: disable = broad-exception-raised
 
@@ -130,11 +115,12 @@ def get_learners(skip: int = Query(0, ge=0, le=2000),
                                   skip=skip, limit=limit)
 
     learners = [i.get_fields(reformat_datetime=True) for i in learners]
-
+    count = 10000
+    response = {"records": learners, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": learners
+        "data": response
     }
   except ValidationError as e:
     Logger.info(traceback.print_exc())
@@ -209,9 +195,9 @@ def create_learner(input_learner: LearnerModel):
 
     # Checking if a learner document already exists with the same email id
     if learner is not None:
-      raise ConflictError(f"Learner with the given email "
-      f"address {input_learner_dict.get('email_address', '').lower()} "
-      f"already exists")
+      raise ConflictError(
+          "Learner with the given email address {} already exists".format(
+              input_learner_dict.get("email_address", "").lower()))
 
     # Checking if the learner email id and backup email id are the same
     if input_learner_dict.get("email_address", "").lower() == \

@@ -16,31 +16,19 @@ from fastapi.testclient import TestClient
 from routes.learner import router
 from routes.achievement import router as achievement_router
 from routes.learner_profile import router as lp_router
-
-from testing.test_config import (
-  API_URL, TESTING_FOLDER_PATH
-)
-from testing.test_objects import (
-  TEST_USER, TEST_LEARNER,
-  TEST_DISCIPLINE, TEST_STAFF,
-  TEST_ASSOCIATION_GROUP
-)
-
-from schemas.schema_examples import (
-  BASIC_LEARNER_EXAMPLE,
-  BASIC_LEARNER_PROFILE_EXAMPLE,
-  BASIC_CURRICULUM_PATHWAY_EXAMPLE
-)
-
+from testing.test_config import (API_URL, TESTING_FOLDER_PATH)
+from testing.test_objects import (TEST_USER, TEST_LEARNER,
+                                  TEST_DISCIPLINE, TEST_STAFF,
+                                  DEL_KEYS, TEST_ASSOCIATION_GROUP)
+from schemas.schema_examples import (BASIC_LEARNER_EXAMPLE,
+                                     BASIC_ACHIEVEMENT_EXAMPLE,
+                                     BASIC_LEARNER_PROFILE_EXAMPLE,
+                                     BASIC_CURRICULUM_PATHWAY_EXAMPLE)
+from common.models import (Learner, Achievement, LearnerProfile, User, Staff,
+                           AssociationGroup, CurriculumPathway)
+from common.testing.firestore_emulator import (firestore_emulator,
+                                               clean_firestore)
 from common.utils.http_exceptions import add_exception_handlers
-from common.models import (
-  Learner, LearnerProfile, User, Staff,
-  AssociationGroup, CurriculumPathway
-)
-from common.testing.firestore_emulator import (
-  firestore_emulator, clean_firestore
-)
-
 
 app = FastAPI()
 add_exception_handlers(app)
@@ -155,8 +143,8 @@ def test_post_learner(clean_firestore):
   loaded_learner_dict.pop("last_modified_time")
   loaded_learner_dict.pop("is_deleted")
 
-#   # assert that rest of the fields are equivalent
-#   assert loaded_learner_dict == post_json_response.get("data")
+  # assert that rest of the fields are equivalent
+  assert loaded_learner_dict == post_json_response.get("data")
 
 
 def test_update_learner(clean_firestore):
@@ -300,7 +288,7 @@ def test_get_learners(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
+  retrieved_ids = [i.get("uuid") for i in json_response.get("data")["records"]]
   assert learner.id in retrieved_ids, "expected data not retrieved"
   assert deleted_learner.id not in retrieved_ids, \
     "unexpected data is retrieved"
@@ -340,7 +328,8 @@ def test_sort_learners(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
+  retrieved_ids = [i.get("uuid") for i in json_response.get(
+                              "data").get("records")]
   assert learner.id in retrieved_ids, "expected data not retrieved"
   assert deleted_learner.id not in retrieved_ids, \
     "unexpected data is retrieved"
@@ -480,10 +469,8 @@ negative_json_res_2 = {
 
 
 def mocked_requests_get(*args, **kwargs):
-  """
-  Mocked requests.get function
-  """
   class MockResponse:
+
     def __init__(self, json_data, status_code):
       self.json_data = json_data
       self.status_code = status_code

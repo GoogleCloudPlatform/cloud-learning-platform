@@ -6,9 +6,6 @@ from pydantic import BaseModel
 
 
 class NotFoundErrorResponseModel(BaseModel):
-  """
-  Response model for not found error
-  """
   success: bool = False
   message: Optional[str] = None
   data: Optional[dict] = {}
@@ -16,18 +13,15 @@ class NotFoundErrorResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Resource with uuid o1nv13n6sbu0ny not found",
-				"data": {}
-			}
+        "example": {
+            "success": False,
+            "message": "Resource with uuid o1nv13n6sbu0ny not found",
+            "data": {}
+        }
     }
 
 
 class InternalServerErrorResponseModel(BaseModel):
-  """
-  Response model for internal server error
-  """
   success: bool = False
   message: Optional[str] = "Internal Server Error"
   data: Optional[dict] = {}
@@ -35,18 +29,15 @@ class InternalServerErrorResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Internal server error",
-				"data": {}
-			}
+        "example": {
+            "success": False,
+            "message": "Internal server error",
+            "data": {}
+        }
     }
 
 
 class ValidationErrorResponseModel(BaseModel):
-  """
-  Response model for validation error
-  """
   success: bool = False
   message: Optional[str] = "Validation Failed"
   data: Optional[dict] = {}
@@ -54,18 +45,15 @@ class ValidationErrorResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Validation Failed",
-				"data": []
-			}
+        "example": {
+            "success": False,
+            "message": "Validation Failed",
+            "data": []
+        }
     }
 
 
 class ConflictResponseModel(BaseModel):
-  """
-  Response model for conflict error
-  """
   success: bool = False
   message: Optional[str] = "Conflict"
   data: Optional[dict] = {}
@@ -73,18 +61,15 @@ class ConflictResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Conflict",
-				"data": {}
-			}
+        "example": {
+            "success": False,
+            "message": "Conflict",
+            "data": {}
+        }
     }
 
 
 class PayloadTooLargeResponseModel(BaseModel):
-  """
-  Response model for payload too large error
-  """
   success: bool = False
   message: Optional[str] = ""
   data: Optional[dict] = {}
@@ -92,18 +77,15 @@ class PayloadTooLargeResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Content too large",
-				"data": {}
-			}
+        "example": {
+            "success": False,
+            "message": "Content too large",
+            "data": {}
+        }
     }
 
 
 class UnauthorizedResponseModel(BaseModel):
-  """
-  Response model for unauthorized error
-  """
   success: bool = False
   message: Optional[str] = "Unauthorized"
   data: Optional[dict] = {}
@@ -111,9 +93,9 @@ class UnauthorizedResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Unauthorized",
-				"data": {}
-			}
+        "example": {
+            "success": False,
+            "message": "Unauthorized",
+            "data": {}
+        }
     }

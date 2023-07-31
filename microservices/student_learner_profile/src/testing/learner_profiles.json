@@ -1,5 +1,4 @@
-[
-  {
+[{
     "uuid": "tzlyrXWaSDC4n2XwQabX",
     "learner_id": "Learner ID",
     "learning_goals": ["Develop Communication Skills", "Teamwork"],
@@ -16,16 +15,15 @@
     "enrollment_information": {},
     "attestation_object": {},
     "progress": {
-      "curriculum_pathways": {},
-      "learning_experiences": {},
-      "learning_objects": {},
-      "learning_resources": {},
-      "assessments": {}
+        "curriculum_pathways": {},
+        "learning_experiences": {},
+        "learning_objects": {},
+        "learning_resources": {},
+        "assessments": {}
     },
     "achievements": [],
     "tagged_skills": [],
     "tagged_competencies": [],
     "mastered_skills": [],
     "mastered_competencies": []
-  }
-]
+}]
