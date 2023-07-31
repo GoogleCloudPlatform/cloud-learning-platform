@@ -278,7 +278,8 @@ def update_assessment_item(
     # Update status, pass_status, and result based on submitted_rubrics
     evaluated = False
     if submitted_assessment_fields.get("type") in \
-      ["srl", "static_srl", "cognitive_wrapper"]:
+      ["srl", "static_srl", "cognitive_wrapper"] and \
+      submitted_assessment_fields.get("is_autogradable", False):
       # Always pass SRL assessments
       pass_status = True
       result = "Pass"
@@ -392,7 +393,7 @@ def delete_submitted_assessment(uuid: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_all_submitted_assessment_for_learner(learner_id: str,
+def get_all_submitted_assessment_for_learner(req: Request, learner_id: str,
                                         assessment_id: Optional[str] = None,
                                         skip: int = Query(0, ge=0, le=2000),
                                         limit: int = Query(10, ge=1, le=100)):
@@ -415,6 +416,7 @@ def get_all_submitted_assessment_for_learner(learner_id: str,
   """
   try:
     # Check to validate if Learner with given ID exists or not
+    header = {"Authorization": req.headers.get("authorization")}
     _ = Learner.find_by_uuid(learner_id)
     collection_manager = SubmittedAssessment.collection
     collection_manager = collection_manager.filter("is_deleted", "==",
@@ -428,7 +430,7 @@ def get_all_submitted_assessment_for_learner(learner_id: str,
         skip).fetch(limit)
     if submitted_assessments:
       submitted_assessments = [
-          submitted_assessment.get_fields(reformat_datetime=True)
+          get_submitted_assessment_data(submitted_assessment, True, header)
           for submitted_assessment in submitted_assessments
       ]
     for assessment in submitted_assessments:
@@ -677,8 +679,6 @@ def get_filtered_submitted_assessments(
             submitted_assessment_data = get_submitted_assessment_data(
                 submitted_assessment, False, None, assessment_node,
                 assessor_map)
-            submitted_assessment_data["assessment_name"] = assessment_data.get(
-              "display_name")
             submitted_assessment_data["unit_name"] = le_data.get("name", "")
             submitted_assessment_data["discipline_name"] = discipline_data.get(
               "name", "")
