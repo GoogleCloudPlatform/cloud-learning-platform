@@ -422,13 +422,6 @@ def create_analytics_data(context):
           "assignedGrade": 10,
           "draftGrade": 10
       })
-  try:
-    print(f"""res return-----{return_course_work_submission(
-        classroom_id=data["submission"]["courseId"],
-        course_work_id=data["submission"]["courseWorkId"],
-        submission_id=data["submission"]["id"])}""")
-  except Exception as e:
-    print(f"error return---------{e}")
   section_rows = [{
       "sectionId": section.id,
       "courseId": section.classroom_id,

@@ -155,24 +155,7 @@ def save_student_submission(course_id, course_work_id,
   """
   submission = get_student_submissions(
       course_id, course_work_id, submissions_id)
-  notification_message=None
-  if submission["state"] == "RETURNED":
-    course_work=get_course_work(course_id,course_work_id)
-    user = get_user(submission["userId"])
-    notification_message = {
-        "type": "user",
-        "email": user["emailAddress"],
-        "name": user["name"],
-        "classroom_id": course_id,
-        "course_work_id": course_work_id,
-        "course_work_title": course_work["title"],
-        "course_work_url": course_work["alternateLink"],
-        "assigned_grade": submission["assignedGrade"],
-        "gaia_id": submission["userId"],
-        "role": "learner",
-        "message": "Teacher returned/graded the assignment"
-    }
-
+  notification_message = get_student_submission_message(submission)
   submission["uuid"] = str(uuid.uuid4())
   submission["message_id"]=message_id
   submission["assignmentSubmission"] = convert_to_json(
@@ -189,3 +172,43 @@ def save_student_submission(course_id, course_work_id,
     rows=[submission],
     dataset=BQ_DATASET,
     table_name=BQ_TABLE_DICT["BQ_COLL_SCW_TABLE"]),notification_message
+
+def get_student_submission_message(submission):
+  """get student submission message for lms notification
+
+  Args:
+    submission (dict): student submission object
+
+  Returns:
+    dict|None: lms notification message
+  """
+  notification_message=None
+  list_of_assigned_datetime = [
+      datetime.datetime.strptime(
+        x["gradeHistory"]["gradeTimestamp"].split(".")[0],
+                        "%Y-%m-%dT%H:%M:%S")
+      for x in submission["submissionHistory"] if "gradeHistory" in x.keys()
+      if x["gradeHistory"]["gradeChangeType"] ==
+      "ASSIGNED_GRADE_POINTS_EARNED_CHANGE"
+  ]
+
+  if (datetime.datetime.strptime(
+    submission["gradeTimestamp"].split(".")[0],
+      "%Y-%m-%dT%H:%M:%S") == max(list_of_assigned_datetime)):
+    course_work = get_course_work(submission["courseId"],
+                                  submission["courseWorkId"])
+    user = get_user(submission["userId"])
+    notification_message = {
+        "type": "user",
+        "email": user["emailAddress"],
+        "name": user["name"],
+        "classroom_id": submission["courseId"],
+        "course_work_id": submission["courseWorkId"],
+        "course_work_title": course_work["title"],
+        "course_work_url": course_work["alternateLink"],
+        "assigned_grade": submission["assignedGrade"],
+        "gaia_id": submission["userId"],
+        "role": "learner",
+        "message": "Teacher graded the assignment"
+    }
+  return notification_message
