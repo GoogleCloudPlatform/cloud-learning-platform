@@ -193,7 +193,7 @@ def get_student_submission_message(submission):
   ]
 
   if (datetime.datetime.strptime(
-    submission["gradeTimestamp"].split(".")[0],
+    submission["updateTime"].split(".")[0],
       "%Y-%m-%dT%H:%M:%S") == max(list_of_assigned_datetime)):
     course_work = get_course_work(submission["courseId"],
                                   submission["courseWorkId"])

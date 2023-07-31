@@ -24,12 +24,11 @@ def step_impl_01(context):
     "Pipline got messages related to roster changes"
 )
 def step_impl_02(context):
-  q1 = f"select * from `{PROJECT_ID}.{BQ_DATASET}.lms-notifications` where JSON_VALUE(data.email)=\"{context.user_id}\""
-  q2=f"select * from {PROJECT_ID}.{BQ_DATASET}.userCollectionView where emailAddress=\"{context.user_id}\""
-  print(f"q1:---{q1},q2:----{q2}")
-  qurey_result=run_query(q2
-    )
-  noti_query_result = run_query(q1
+  qurey_result = run_query(
+      f"select * from {PROJECT_ID}.{BQ_DATASET}.userCollectionView where emailAddress=\"{context.user_id}\""
+  )
+  noti_query_result = run_query(
+      f"select * from `{PROJECT_ID}.{BQ_DATASET}.lms-notifications` where JSON_VALUE(data.email)=\"{context.user_id}\""
   )
   context.users=[dict(row) for row in qurey_result]
   context.notification=[dict(row) for row in noti_query_result]
@@ -86,7 +85,7 @@ def step_impl_07(context):
 def step_impl_08(context):
   qurey_result=run_query(f"select * from {PROJECT_ID}.{BQ_DATASET}.submittedCourseWorkCollectionView where submission_id=\"{context.submission_id}\"")
   noti_query_result = run_query(
-      f"select * from {PROJECT_ID}.{BQ_DATASET}.lms-notifications where JSON_VALUE(data.email)=\"{context.user_id}\""
+      f"select * from `{PROJECT_ID}.{BQ_DATASET}.lms-notifications` where JSON_VALUE(data.email)=\"{context.user_id}\" and JSON_VALUE(data.message)=\"Teacher graded the assignment\""
   )
   context.submission=[dict(row) for row in qurey_result][0]
   context.notification=[dict(row) for row in noti_query_result]
