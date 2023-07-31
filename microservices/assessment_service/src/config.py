@@ -1,7 +1,7 @@
 """
   Assessment Service config file
 """
-# pylint: disable=unspecified-encoding
+# pylint: disable=unspecified-encoding,invalid-name
 import os
 import json
 from typing_extensions import Literal
