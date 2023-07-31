@@ -359,6 +359,8 @@ def get_submitted_assessment_data(submitted_assessment,
     assessment_node = Assessment.find_by_uuid(
       submitted_assessment["assessment_id"])
   assessment_data = assessment_node.get_fields(reformat_datetime=True)
+  submitted_assessment["assessment_name"] = \
+    assessment_data.get("display_name", "")
 
   assessor_id = submitted_assessment.get("assessor_id")
   assessor = None
@@ -438,8 +440,7 @@ def traverse_up(node, level: str, parent_alias: str):
   parent_nodes = node.parent_nodes
   for parent_level in parent_nodes:
     for parent_uuid in parent_nodes[parent_level]:
-      parent_node = collection_references[parent_level].find_by_uuid(
-        parent_uuid)
+      parent_node = collection_references[parent_level].find_by_uuid(parent_uuid)
       return traverse_up(parent_node, parent_level, parent_alias)
 
 

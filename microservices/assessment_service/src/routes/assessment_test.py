@@ -21,7 +21,7 @@ from common.models import Assessment,LearningObject, Skill
 from common.utils.http_exceptions import add_exception_handlers
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
-
+from config import DATABASE_PREFIX
 app = FastAPI()
 add_exception_handlers(app)
 app.include_router(router, prefix="/assessment-service/api/v1")
@@ -114,21 +114,33 @@ def test_get_assessment_types(clean_firestore):
 
 
 def test_get_assessments(clean_firestore):
+  basic_skill = BASIC_SKILL_EXAMPLE
+  new_skill = Skill()
+  new_skill = new_skill.from_dict(basic_skill)
+  new_skill.uuid = ""
+  new_skill.save()
+  new_skill.uuid = new_skill.id
+  new_skill.update()
   assessment_dict = {**BASIC_ASSESSMENT_EXAMPLE}
   assessment_dict["name"] = "Questionnaire"
   assessment = Assessment.from_dict(assessment_dict)
   assessment.uuid = ""
+
+  skill_data = [{"uuid": new_skill.uuid, "name": new_skill.name}]
+  assessment.references = {"skills": skill_data}
   assessment.save()
   assessment.uuid = assessment.id
   assessment.update()
-  params = {"skip": 0, "limit": "30"}
+  params = {"skip": 0, "limit": "30",
+            "performance_indicators": [new_skill.uuid]}
 
   url = f"{api_url}s"
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   saved_names = [i.get("name") for i in json_response.get("data")["records"]]
-  assert assessment_dict["name"] in saved_names, "all data not retrived"
+  assert assessment.name in saved_names, "all data not retrived"
+  assert assessment.references.get("skills") == skill_data
 
 
 def test_get_assessments_negative(clean_firestore):
@@ -231,7 +243,8 @@ def test_delete_assessment_negative(clean_firestore):
   url = f"{api_url}/{assessment_uuid}"
   response = {
     "success": False,
-    "message": "Assessment with uuid ASS345Dl3Ayg0PWudzhI not found",
+    "message": f"{DATABASE_PREFIX}assessments with id "+\
+      "ASS345Dl3Ayg0PWudzhI is not found",
     "data": None
   }
   resp = client_with_emulator.delete(url)

@@ -37,7 +37,7 @@ def test_insert_data_to_db():
     child_ids.append(lo.id)
     ids.append(lo.id)
 
-  parent_lo = LearningObject.find_by_uuid(parent_id)
+  parent_lo = LearningObject.find_by_id(parent_id)
   parent_lo.child_nodes["learning_objects"].extend(child_ids)
   parent_lo.uuid = parent_id
   parent_lo.update()
@@ -75,7 +75,7 @@ def test_insert_cirriculum_data_to_db():
     child_ids.append(lo.id)
     ids.append(lo.id)
 
-  parent_cp = CurriculumPathway.find_by_uuid(parent_cp_id)
+  parent_cp = CurriculumPathway.find_by_id(parent_cp_id)
   parent_cp.child_nodes["curriculum_pathways"].extend(child_ids)
   parent_cp.uuid = parent_cp_id
   parent_cp.update()
@@ -187,14 +187,14 @@ def test_update_child_references_remove_add(clean_firestore, insert_data_to_db):
   ParentChildNodesHandler.update_child_references(
                           document_dict, LearningObject, operation="remove")
   for child_node in child_nodes:
-    child_document = LearningObject.find_by_uuid(child_node)
+    child_document = LearningObject.find_by_id(child_node)
     child_document_fields = child_document.get_fields(reformat_datetime=True)
     assert child_document_fields["parent_nodes"]["learning_objects"] == []
 
   ParentChildNodesHandler.update_child_references(
                             document_dict, LearningObject, operation="add")
   for child_node in child_nodes:
-    child_document = LearningObject.find_by_uuid(child_node)
+    child_document = LearningObject.find_by_id(child_node)
     child_document_fields = child_document.get_fields(reformat_datetime=True)
     assert child_document_fields["parent_nodes"]["learning_objects"] != []
 
@@ -209,14 +209,14 @@ def test_update_parent_references_remove_add(clean_firestore, insert_data_to_db)
 
   ParentChildNodesHandler.update_parent_references(
     document_dict, LearningObject, operation="remove")
-  parent_document = LearningObject.find_by_uuid(parent_id)
+  parent_document = LearningObject.find_by_id(parent_id)
   parent_document_fields = parent_document.get_fields(reformat_datetime=True)
   assert child_document_id not in parent_document_fields[
                         "child_nodes"]["learning_objects"]
 
   ParentChildNodesHandler.update_parent_references(
     document_dict, LearningObject, operation="add")
-  parent_document = LearningObject.find_by_uuid(parent_id)
+  parent_document = LearningObject.find_by_id(parent_id)
   parent_document_fields = parent_document.get_fields(reformat_datetime=True)
   assert child_document_id in parent_document_fields[
                         "child_nodes"]["learning_objects"]
@@ -236,7 +236,7 @@ def test_compare_and_update_child_nodes_references(clean_firestore, insert_data_
 
   ParentChildNodesHandler.compare_and_update_child_nodes_references(  # pylint: disable=line-too-long
     base_doc_dict, doc_dict, LearningObject, operation="remove")
-  child_document = LearningObject.find_by_uuid(child_nodes[1])
+  child_document = LearningObject.find_by_id(child_nodes[1])
   child_document_fields = child_document.get_fields(reformat_datetime=True)
   assert child_document_fields["parent_nodes"]["learning_objects"] == []
 
@@ -251,7 +251,7 @@ def test_compare_and_update_parent_nodes_references(clean_firestore, insert_data
 
   ParentChildNodesHandler.compare_and_update_parent_nodes_references( # pylint: disable=line-too-long
     child_document_dict, doc_dict, LearningObject, operation="remove")
-  parent_document = LearningObject.find_by_uuid(base_doc_dict["uuid"])
+  parent_document = LearningObject.find_by_id(base_doc_dict["uuid"])
   parent_document_fields = parent_document.get_fields(
                                   reformat_datetime=True)
   assert child_document_dict["uuid"] not in parent_document_fields[

@@ -22,7 +22,8 @@ from schemas.schema_examples import (SUBMITTED_ASSESSMENT_EXAMPLE,
                                       BASIC_LEARNER_EXAMPLE,
                                       BASIC_LEARNER_PROFILE_EXAMPLE)
 from config import (ASSESSMENT_SUBMISSION_BASE_PATH,
-                    ASSESSMENT_AUTHORING_BASE_PATH)
+                    ASSESSMENT_AUTHORING_BASE_PATH,
+                    DATABASE_PREFIX)
 
 app = FastAPI()
 add_exception_handlers(app)
@@ -70,7 +71,7 @@ class GcsCrudService:
 
 
 def create_single_submitted_assessment(assign_assessor=True):
-  """Function to create a submitted assessment"""
+  """Function to create a single submitted assessment for UT"""
   # create a submitted assessment
   with open(
       "./testing/submitted_assessment.json", encoding="UTF-8") as json_file:
@@ -265,7 +266,7 @@ def test_upload_assessment_response_negative_2(clean_firestore, mocker):
   assert resp.status_code == 404
   assert resp_json["success"] is False
   assert resp_json[
-      "message"] == f"Assessment with uuid {assessment_id} not found"
+      "message"] == f"{DATABASE_PREFIX}assessments with id {assessment_id} is not found"
 
 
 def test_upload_assessment_response_negative_3(clean_firestore, mocker):
@@ -686,10 +687,8 @@ def test_download_all_content_for_assessment_positive(clean_firestore, mocker):
 
   zip_file_location = f"{TESTING_FOLDER_PATH}/sample_zip_download.zip"
 
-  mocker.patch("services.assessment_content_helper.download_files_for_assessment",
-      return_value=[])
-  mocker.patch("services.zip_file_processor.create_zip_file",
-      return_value=zip_file_location)
+  mocker.patch("routes.assessment_content.create_zip_for_assessment_contents",
+      return_value=(zip_file_location, "sample_zip_download.zip", []))
 
   assessment = create_single_assessment()
 

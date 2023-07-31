@@ -1,395 +1,395 @@
 {
-    "curriculum_pathways": {
-        "name": "Level Up Program",
-        "display_name": "Level Up Program",
-        "description": "Level Up Program Pathway",
-        "alias": "program",
-        "child_nodes": {
-            "curriculum_pathways": [
-                {
-                    "name": "Level 1",
-                    "display_name": "Level 1",
-                    "description": "HUM102PT,HUM13507,HUM13508,HUM23509",
-                    "order": 1,
-                    "alias": "level",
-                    "achievements": [
-                        {
-                            "type": "level",
-                            "name": "Level 1",
-                            "description": "Level 1"
-                        }
-                    ],
-                    "child_nodes": {
-                        "curriculum_pathways": [
-                            {
-                                "name": "Humanity",
-                                "display_name": "Humanity",
-                                "description": "",
-                                "order": 1,
-                                "alias": "discipline",
-                                "achievements": [
-                                    {
-                                        "type": "course equate",
-                                        "name": "HUM102 Badge (course)",
-                                        "description": "HUM102 Badge (course)"
-                                    }
-                                ],
-                                "child_nodes": {
-                                    "curriculum_pathways": [
-                                        {
-                                            "name": "HUM13507",
-                                            "display_name": "HUM13507",
-                                            "description": "Unit 1:HUM13507",
-                                            "alias": "unit",
-                                            "order": 1,
-                                            "achievements": [
-                                                {
-                                                    "type": "competency",
-                                                    "name": "Competency",
-                                                    "description": "Competency"
-                                                }
-                                            ],
-                                            "child_nodes": {
-                                                "learning_experiences": [
-                                                    {
-                                                        "description": "",
-                                                        "display_name": "Humanities, Self & Society",
-                                                        "name": "Humanities, Self & Society",
-                                                        "order": 1,
-                                                        "alias": "learning_experience",
-                                                        "child_nodes": {
-                                                            "learning_objects": [
-                                                                {
-                                                                    "description": "pre-test module",
-                                                                    "display_name": "HUM102.1 Pre-test",
-                                                                    "name": "HUM102.1 Pre-test",
-                                                                    "order": 1,
-                                                                    "alias": "module",
-                                                                    "type": "pretest",
-                                                                    "is_optional": true,
-                                                                    "references": {
-                                                                        "skills": [
-                                                                            {
-                                                                                "name": "C1_S1",
-                                                                                "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
-                                                                            },
-                                                                            {
-                                                                                "name": "C1_S2",
-                                                                                "description": "Determine the utility of each of the humanities perspectives"
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    "child_nodes": {
-                                                                        "assessments": [
-                                                                            {
-                                                                                "name": "Pre-test Assessment",
-                                                                                "display_name": "Pre-test Assessment",
-                                                                                "type": "pretest",
-                                                                                "assessment_reference": {
-                                                                                    "activity_templated_id": "HUM-102-pretest-dev"
-                                                                                },
-                                                                                "order": 1,
-                                                                                "is_optional": true,
-                                                                                "pass_threshold": 0.7,
-                                                                                "references": {
-                                                                                    "skills": [
-                                                                                        {
-                                                                                            "name": "C1_S1",
-                                                                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
-                                                                                        },
-                                                                                        {
-                                                                                            "name": "C1_S2",
-                                                                                            "description": "Determine the utility of each of the humanities perspectives"
-                                                                                        }
-                                                                                    ]
-                                                                                }
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "name": "Unit Overview",
-                                                                    "display_name": "Unit Overview",
-                                                                    "description": "Module 1",
-                                                                    "order": 2,
-                                                                    "alias": "module",
-                                                                    "type": "unit_overview",
-                                                                    "child_nodes": {
-                                                                        "learning_resources": [
-                                                                            {
-                                                                                "name": "Unit Overview",
-                                                                                "display_name": "Unit Overview",
-                                                                                "type": "html",
-                                                                                "order": 1
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "name": "What Are the Humanities?",
-                                                                    "display_name": "What Are the Humanities?",
-                                                                    "description": "Module 2",
-                                                                    "order": 3,
-                                                                    "references": {
-                                                                        "skills": [
-                                                                            {
-                                                                                "name": "C1_S2",
-                                                                                "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
-                                                                            },
-                                                                            {
-                                                                                "name": "C1_S3",
-                                                                                "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    "child_nodes": {
-                                                                        "assessments": [
-                                                                            {
-                                                                                "name": "Multiple Choice Quiz - Knowledge Check",
-                                                                                "display_name": "Multiple Choice Quiz - Knowledge Check",
-                                                                                "type": "practice",
-                                                                                "order": 1,
-                                                                                "pass_threshold": 0.7,
-                                                                                "assessment_reference": {
-                                                                                    "activity_template_id": "HUM-102-pretest-dev"
-                                                                                },
-                                                                                "references": {
-                                                                                    "skills": [
-                                                                                        {
-                                                                                            "name": "C1_S2",
-                                                                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
-                                                                                        },
-                                                                                        {
-                                                                                            "name": "C1_S3",
-                                                                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
-                                                                                        }
-                                                                                    ]
-                                                                                }
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "name": "What Are the Humanities?",
-                                                                    "display_name": "What Are the Humanities?",
-                                                                    "description": "Module 3",
-                                                                    "order": 4,
-                                                                    "references": {
-                                                                        "skills": [
-                                                                            {
-                                                                                "name": "C1_S1",
-                                                                                "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    "child_nodes": {
-                                                                        "learning_resources": [
-                                                                            {
-                                                                                "name": "Module Overview",
-                                                                                "display_name": "Module Overview",
-                                                                                "type": "html",
-                                                                                "alias": "lesson",
-                                                                                "order": 1
-                                                                            },
-                                                                            {
-                                                                                "name": "Overview of the Humanities",
-                                                                                "display_name": "Overview of the Humanities",
-                                                                                "alias": "lesson",
-                                                                                "type": "html",
-                                                                                "order": 2
-                                                                            },
-                                                                            {
-                                                                                "name": "The Four Humanities Categories",
-                                                                                "display_name": "The Four Humanities Categories",
-                                                                                "alias": "lesson",
-                                                                                "type": "html",
-                                                                                "order": 2
-                                                                            },
-                                                                            {
-                                                                                "name": "The Humanities Approach",
-                                                                                "display_name": "The Humanities Approach",
-                                                                                "alias": "lesson",
-                                                                                "type": "html",
-                                                                                "order": 2
-                                                                            }
-                                                                        ],
-                                                                        "assessments": [
-                                                                            {
-                                                                                "name": "Multiple Choice Quiz - Knowledge Check",
-                                                                                "display_name": "Multiple Choice Quiz - Knowledge Check",
-                                                                                "type": "practice",
-                                                                                "order": 2,
-                                                                                "assessment_reference": {
-                                                                                    "activity_template_id": "HUM-102-pretest-dev"
-                                                                                }
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "description": "Reflect on Learning",
-                                                                    "display_name": "SRL8",
-                                                                    "name": "SRL8",
-                                                                    "type": "cognitive_wrapper",
-                                                                    "alias": "module",
-                                                                    "order": 5,
-                                                                    "is_hidden": true,
-                                                                    "child_nodes": {
-                                                                      "assessments": [
-                                                                        {
-                                                                          "name": "Cognitive wrapper assessment",
-                                                                          "display_name": "Cognitive wrapper assessment",
-                                                                          "is_hidden": true,
-                                                                          "type": "practice",
-                                                                          "assessment_reference": {
-                                                                            "activity_template_id": "SRL8-1-howdidyoudo"
-                                                                          },
-                                                                          "order": 1,
-                                                                          "alias": "assessment"
-                                                                        }
-                                                                      ]
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "name": "Final Project",
-                                                                    "display_name": "Final Project",
-                                                                    "description": "Module 4",
-                                                                    "order": 6,
-                                                                    "alias": "module",
-                                                                    "type": "project",
-                                                                    "references": {
-                                                                        "competencies": [
-                                                                            {
-                                                                                "name": "C1",
-                                                                                "description": "Differentiate the various perspectives of the humanities in relation to a topic"
-                                                                            }
-                                                                        ],
-                                                                        "skills": [
-                                                                            {
-                                                                                "name": "C1_S1",
-                                                                                "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
-                                                                            },
-                                                                            {
-                                                                                "name": "C1_S2",
-                                                                                "description": "Determine the utility of each of the humanities perspectives"
-                                                                            },
-                                                                            {
-                                                                                "name": "C1_S3",
-                                                                                "description": "Determine sources on a topic pertinent to the perspective of the humanities"
-                                                                            },
-                                                                            {
-                                                                                "name": "C1_S4",
-                                                                                "description": "Summarize relevant information from a variety of sources"
-                                                                            },
-                                                                            {
-                                                                                "name": "C1_S5",
-                                                                                "description": "Identify potential biases and assumptions related to the information about a topic"
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    "child_nodes": {
-                                                                        "assessments": [
-                                                                            {
-                                                                                "description": "HUM102.1 Exam",
-                                                                                "display_name": "Summative Assessment",
-                                                                                "name": "Summative Assessment",
-                                                                                "order": 1,
-                                                                                "type": "project",
-                                                                                "pass_threshold": 0.7
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "name": "HUM13508",
-                                            "display_name": "HUM13508",
-                                            "description": "Unit 2:HUM13508",
-                                            "alias": "unit",
-                                            "order": 2,
-                                            "achievements": [
-                                                {
-                                                    "type": "Competency",
-                                                    "name": "Competency",
-                                                    "description": "Competency"
-                                                }
-                                            ],
-                                            "child_nodes": {
-                                                "learning_experiences": [
-                                                    {
-                                                        "description": "",
-                                                        "display_name": "Analyze Written Works",
-                                                        "name": "Analyze Written Works",
-                                                        "order": 1,
-                                                        "alias": "learning_experience",
-                                                        "child_nodes": {
-                                                            "learning_objects": [
-                                                                {
-                                                                    "description": "pre-test module",
-                                                                    "display_name": "HUM13508.1 Pre-test",
-                                                                    "name": "HUM13508.1 Pre-test",
-                                                                    "order": 1,
-                                                                    "alias": "module",
-                                                                    "type": "pretest",
-                                                                    "is_optional": true,
-                                                                    "references": {
-                                                                        "skills": [
-                                                                            {
-                                                                                "name": "C1_S1",
-                                                                                "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
-                                                                            },
-                                                                            {
-                                                                                "name": "C1_S2",
-                                                                                "description": "Determine the utility of each of the humanities perspectives"
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    "child_nodes": {
-                                                                        "assessments": [
-                                                                            {
-                                                                                "name": "Pre-test Assessment",
-                                                                                "display_name": "Pre-test Assessment",
-                                                                                "type": "pretest",
-                                                                                "assessment_reference": {
-                                                                                    "activity_templated_id": "HUM-102-pretest-dev"
-                                                                                },
-                                                                                "order": 1,
-                                                                                "is_optional": true,
-                                                                                "pass_threshold": 0.7,
-                                                                                "references": {
-                                                                                    "skills": [
-                                                                                        {
-                                                                                            "name": "C1_S1",
-                                                                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
-                                                                                        },
-                                                                                        {
-                                                                                            "name": "C1_S2",
-                                                                                            "description": "Determine the utility of each of the humanities perspectives"
-                                                                                        }
-                                                                                    ]
-                                                                                }
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
+    "name": "Level Up Program",
+    "display_name": "Level Up Program",
+    "description": "Level Up Program Pathway",
+    "alias": "program",
+    "child_nodes": {
+        "curriculum_pathways": [
+            {
+                "name": "Level 1",
+                "display_name": "Level 1",
+                "description": "HUM102PT,HUM13507,HUM13508,HUM23509",
+                "order": 1,
+                "alias": "level",
+                "achievements": [
+                    {
+                        "type": "level",
+                        "name": "Level 1",
+                        "description": "Level 1"
                     }
+                ],
+                "child_nodes": {
+                    "curriculum_pathways": [
+                        {
+                            "name": "Humanity",
+                            "display_name": "Humanity",
+                            "description": "",
+                            "order": 1,
+                            "alias": "discipline",
+                            "achievements": [
+                                {
+                                    "type": "course equate",
+                                    "name": "HUM102 Badge (course)",
+                                    "description": "HUM102 Badge (course)"
+                                }
+                            ],
+                            "child_nodes": {
+                                "curriculum_pathways": [
+                                    {
+                                        "name": "HUM13507",
+                                        "display_name": "HUM13507",
+                                        "description": "Unit 1:HUM13507",
+                                        "alias": "unit",
+                                        "order": 1,
+                                        "achievements": [
+                                            {
+                                                "type": "competency",
+                                                "name": "Competency",
+                                                "description": "Competency"
+                                            }
+                                        ],
+                                        "child_nodes": {
+                                            "learning_experiences": [
+                                                {
+                                                    "description": "",
+                                                    "display_name": "Humanities, Self & Society",
+                                                    "name": "Humanities, Self & Society",
+                                                    "order": 1,
+                                                    "alias": "learning_experience",
+                                                    "child_nodes": {
+                                                        "learning_objects": [
+                                                            {
+                                                                "description": "pre-test module",
+                                                                "display_name": "HUM102.1 Pre-test",
+                                                                "name": "HUM102.1 Pre-test",
+                                                                "order": 1,
+                                                                "alias": "module",
+                                                                "type": "pretest",
+                                                                "is_optional": true,
+                                                                "references": {
+                                                                    "skills": [
+                                                                        {
+                                                                            "name": "C1_S1",
+                                                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                        },
+                                                                        {
+                                                                            "name": "C1_S2",
+                                                                            "description": "Determine the utility of each of the humanities perspectives"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "child_nodes": {
+                                                                    "assessments": [
+                                                                        {
+                                                                            "name": "Pre-test Assessment",
+                                                                            "display_name": "Pre-test Assessment",
+                                                                            "type": "pretest",
+                                                                            "assessment_reference": {
+                                                                                "activity_templated_id": "HUM-102-pretest-dev"
+                                                                            },
+                                                                            "is_autogradable": true,
+                                                                            "order": 1,
+                                                                            "is_optional": true,
+                                                                            "pass_threshold": 0.7,
+                                                                            "references": {
+                                                                                "skills": [
+                                                                                    {
+                                                                                        "name": "C1_S1",
+                                                                                        "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "C1_S2",
+                                                                                        "description": "Determine the utility of each of the humanities perspectives"
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "Unit Overview",
+                                                                "display_name": "Unit Overview",
+                                                                "description": "Module 1",
+                                                                "order": 2,
+                                                                "alias": "module",
+                                                                "type": "unit_overview",
+                                                                "child_nodes": {
+                                                                    "learning_resources": [
+                                                                        {
+                                                                            "name": "Unit Overview",
+                                                                            "display_name": "Unit Overview",
+                                                                            "type": "html",
+                                                                            "order": 1
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "What Are the Humanities?",
+                                                                "display_name": "What Are the Humanities?",
+                                                                "description": "Module 2",
+                                                                "order": 3,
+                                                                "references": {
+                                                                    "skills": [
+                                                                        {
+                                                                            "name": "C1_S2",
+                                                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                        },
+                                                                        {
+                                                                            "name": "C1_S3",
+                                                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "child_nodes": {
+                                                                    "assessments": [
+                                                                        {
+                                                                            "name": "Multiple Choice Quiz - Knowledge Check",
+                                                                            "display_name": "Multiple Choice Quiz - Knowledge Check",
+                                                                            "type": "practice",
+                                                                            "order": 1,
+                                                                            "pass_threshold": 0.7,
+                                                                            "assessment_reference": {
+                                                                                "activity_template_id": "HUM-102-pretest-dev"
+                                                                            },
+                                                                            "is_autogradable": true,
+                                                                            "references": {
+                                                                                "skills": [
+                                                                                    {
+                                                                                        "name": "C1_S2",
+                                                                                        "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "C1_S3",
+                                                                                        "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "What Are the Humanities?",
+                                                                "display_name": "What Are the Humanities?",
+                                                                "description": "Module 3",
+                                                                "order": 4,
+                                                                "references": {
+                                                                    "skills": [
+                                                                        {
+                                                                            "name": "C1_S1",
+                                                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "child_nodes": {
+                                                                    "learning_resources": [
+                                                                        {
+                                                                            "name": "Module Overview",
+                                                                            "display_name": "Module Overview",
+                                                                            "type": "html",
+                                                                            "alias": "lesson",
+                                                                            "order": 1
+                                                                        },
+                                                                        {
+                                                                            "name": "Overview of the Humanities",
+                                                                            "display_name": "Overview of the Humanities",
+                                                                            "alias": "lesson",
+                                                                            "type": "html",
+                                                                            "order": 2
+                                                                        },
+                                                                        {
+                                                                            "name": "The Four Humanities Categories",
+                                                                            "display_name": "The Four Humanities Categories",
+                                                                            "alias": "lesson",
+                                                                            "type": "html",
+                                                                            "order": 2
+                                                                        },
+                                                                        {
+                                                                            "name": "The Humanities Approach",
+                                                                            "display_name": "The Humanities Approach",
+                                                                            "alias": "lesson",
+                                                                            "type": "html",
+                                                                            "order": 2
+                                                                        }
+                                                                    ],
+                                                                    "assessments": [
+                                                                        {
+                                                                            "name": "Multiple Choice Quiz - Knowledge Check",
+                                                                            "display_name": "Multiple Choice Quiz - Knowledge Check",
+                                                                            "type": "practice",
+                                                                            "order": 2,
+                                                                            "assessment_reference": {
+                                                                                "activity_template_id": "HUM-102-pretest-dev"
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "description": "Reflect on Learning",
+                                                                "display_name": "SRL8",
+                                                                "name": "SRL8",
+                                                                "type": "cognitive_wrapper",
+                                                                "alias": "module",
+                                                                "order": 5,
+                                                                "is_hidden": true,
+                                                                "child_nodes": {
+                                                                    "assessments": [
+                                                                        {
+                                                                            "name": "Cognitive wrapper assessment",
+                                                                            "display_name": "Cognitive wrapper assessment",
+                                                                            "is_hidden": true,
+                                                                            "type": "practice",
+                                                                            "assessment_reference": {
+                                                                                "activity_template_id": "SRL8-1-howdidyoudo"
+                                                                            },
+                                                                            "order": 1,
+                                                                            "alias": "assessment"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "Final Project",
+                                                                "display_name": "Final Project",
+                                                                "description": "Module 4",
+                                                                "order": 6,
+                                                                "alias": "module",
+                                                                "type": "project",
+                                                                "references": {
+                                                                    "competencies": [
+                                                                        {
+                                                                            "name": "C1",
+                                                                            "description": "Differentiate the various perspectives of the humanities in relation to a topic"
+                                                                        }
+                                                                    ],
+                                                                    "skills": [
+                                                                        {
+                                                                            "name": "C1_S1",
+                                                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                        },
+                                                                        {
+                                                                            "name": "C1_S2",
+                                                                            "description": "Determine the utility of each of the humanities perspectives"
+                                                                        },
+                                                                        {
+                                                                            "name": "C1_S3",
+                                                                            "description": "Determine sources on a topic pertinent to the perspective of the humanities"
+                                                                        },
+                                                                        {
+                                                                            "name": "C1_S4",
+                                                                            "description": "Summarize relevant information from a variety of sources"
+                                                                        },
+                                                                        {
+                                                                            "name": "C1_S5",
+                                                                            "description": "Identify potential biases and assumptions related to the information about a topic"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "child_nodes": {
+                                                                    "assessments": [
+                                                                        {
+                                                                            "description": "HUM102.1 Exam",
+                                                                            "display_name": "Summative Assessment",
+                                                                            "name": "Summative Assessment",
+                                                                            "order": 1,
+                                                                            "type": "project",
+                                                                            "pass_threshold": 0.7
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "HUM13508",
+                                        "display_name": "HUM13508",
+                                        "description": "Unit 2:HUM13508",
+                                        "alias": "unit",
+                                        "order": 2,
+                                        "achievements": [
+                                            {
+                                                "type": "Competency",
+                                                "name": "Competency",
+                                                "description": "Competency"
+                                            }
+                                        ],
+                                        "child_nodes": {
+                                            "learning_experiences": [
+                                                {
+                                                    "description": "",
+                                                    "display_name": "Analyze Written Works",
+                                                    "name": "Analyze Written Works",
+                                                    "order": 1,
+                                                    "alias": "learning_experience",
+                                                    "child_nodes": {
+                                                        "learning_objects": [
+                                                            {
+                                                                "description": "pre-test module",
+                                                                "display_name": "HUM13508.1 Pre-test",
+                                                                "name": "HUM13508.1 Pre-test",
+                                                                "order": 1,
+                                                                "alias": "module",
+                                                                "type": "pretest",
+                                                                "is_optional": true,
+                                                                "references": {
+                                                                    "skills": [
+                                                                        {
+                                                                            "name": "C1_S1",
+                                                                            "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                        },
+                                                                        {
+                                                                            "name": "C1_S2",
+                                                                            "description": "Determine the utility of each of the humanities perspectives"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "child_nodes": {
+                                                                    "assessments": [
+                                                                        {
+                                                                            "name": "Pre-test Assessment",
+                                                                            "display_name": "Pre-test Assessment",
+                                                                            "type": "pretest",
+                                                                            "assessment_reference": {
+                                                                                "activity_templated_id": "HUM-102-pretest-dev"
+                                                                            },
+                                                                            "order": 1,
+                                                                            "is_optional": true,
+                                                                            "pass_threshold": 0.7,
+                                                                            "references": {
+                                                                                "skills": [
+                                                                                    {
+                                                                                        "name": "C1_S1",
+                                                                                        "description": "Describe the characteristics of the scientific, creative, cultural and historical humanities"
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "C1_S2",
+                                                                                        "description": "Determine the utility of each of the humanities perspectives"
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
                 }
-            ]
-        }
+            }
+        ]
     }
 }

@@ -1,7 +1,7 @@
 """
   Assessment Service config file
 """
-# pylint: disable=unspecified-encoding,invalid-name
+# pylint: disable=unspecified-encoding
 import os
 import json
 from typing_extensions import Literal
@@ -15,13 +15,14 @@ from google.cloud import secretmanager
 secrets = secretmanager.SecretManagerServiceClient()
 
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
-PROJECT_ID = os.environ.get("PROJECT_ID", "core-learning-services-dev")
+PROJECT_ID = os.environ.get("PROJECT_ID", "aitutor-dev")
 os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 USE_LEARNOSITY_SECRET = bool(os.getenv(
     "USE_LEARNOSITY_SECRET", "").lower() == "true")
 print("USE_LEARNOSITY_SECRET: ", os.getenv(
     "USE_LEARNOSITY_SECRET", ""))
+
 CONTENT_SERVING_BUCKET = os.environ.get("CONTENT_SERVING_BUCKET", "")
 SIGNURL_SA_KEY_PATH = f"./keys/{PROJECT_ID}-signurl-sa-key.json"
 
