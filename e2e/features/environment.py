@@ -24,7 +24,7 @@ from e2e.gke_api_tests.secrets_helper import (get_user_email_and_password_for_e2
     get_required_emails_from_secret_manager)
 from e2e.gke_api_tests.classroom_e2e_helper import (
     create_course, get_course_work_submission_list, invite_user,
-    patch_course_work_submission, create_course_work,return_course_work_submission,
+    patch_course_work_submission, create_course_work,
     enroll_teacher_in_classroom, enroll_student_classroom)
 import logging
 import sys
