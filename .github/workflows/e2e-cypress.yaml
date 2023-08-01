@@ -16,3 +16,4 @@ jobs:
         with:
           start: npx run cypress
           working-directory: experimental/e2e-frontend
+          browser: chrome
