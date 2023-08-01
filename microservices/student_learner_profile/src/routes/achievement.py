@@ -97,10 +97,12 @@ def get_achievements(name: str = None,
         limit)
 
     achievements = [i.get_fields(reformat_datetime=True) for i in achievements]
+    count = 10000
+    response = {"records": achievements, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": achievements
+        "data": response
     }
   except ValidationError as e:
     raise BadRequest(str(e)) from e

@@ -112,10 +112,12 @@ def get_all_learner_profiles(learning_goal: str = None,
     learner_profile_fields = [
         i.get_fields(reformat_datetime=True) for i in learner_profile
     ]
+    count = 10000
+    response = {"records": learner_profile_fields, "total_count": count}
     return {
         "success": True,
         "message": "Successfully fetched the learner profile/s",
-        "data": learner_profile_fields
+        "data": response
     }
   except ResourceNotFoundException as e:
     Logger.info(traceback.print_exc())
@@ -395,7 +397,8 @@ async def import_learner_profiles(json_file: UploadFile = File(...)):
 
   Args:
     json_file (UploadFile): Upload json file consisting of learner profiles.
-    json_schema should match PostLearnerProfileModel
+    json_schema should match PostLearnerProfileModel with learner_id as
+    an additional required field
 
   Raises:
     Exception: 500 Internal Server Error if something fails

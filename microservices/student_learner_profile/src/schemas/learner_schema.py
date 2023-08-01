@@ -5,11 +5,10 @@ import regex
 from typing import List, Optional
 from typing_extensions import Literal
 from pydantic import BaseModel, constr,validator
-from schemas.schema_examples import (
-  BASIC_LEARNER_EXAMPLE,
-  FULL_LEARNER_EXAMPLE,
-  UPDATE_LEARNER_EXAMPLE
-)
+from schemas.schema_examples import (BASIC_LEARNER_EXAMPLE,
+                                     FULL_LEARNER_EXAMPLE,
+                                     UPDATE_LEARNER_EXAMPLE
+                                     )
 
 
 class BasePhoneNumber(BaseModel):
@@ -259,10 +258,15 @@ class UpdateLearnerResponseModel(BaseModel):
     }
 
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullLearnerDataModel]]
+  total_count: int
+
+
 class AllLearnersResponseModel(BaseModel):
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the learners"
-  data: Optional[List[FullLearnerDataModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -270,7 +274,10 @@ class AllLearnersResponseModel(BaseModel):
       "example": {
         "success": True,
         "message": "Successfully fetched the learners",
-        "data": [FULL_LEARNER_EXAMPLE]
+        "data": {
+                  "records":[FULL_LEARNER_EXAMPLE],
+                  "total_count": 50
+                }
       }
     }
 
