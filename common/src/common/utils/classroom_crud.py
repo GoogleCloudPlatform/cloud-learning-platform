@@ -343,7 +343,6 @@ def get_coursework_material_list(course_id,coursework_material_state="PUBLISHED"
   Returns:
     returns list of coursework of given course in classroom
   """
-
   service = build("classroom", "v1", credentials=get_credentials())
   page_token = None
   coursework_material_list=[]
@@ -412,8 +411,7 @@ def patch_coursework_material(course_id,
   for key in update_mask_details.keys():
     update_mask=key+"," +update_mask
   
-  service = build("classroom", "v1", credentials=get_credentials(
-    ""))
+  service = build("classroom", "v1", credentials=get_credentials())
   data = service.courses().courseWorkMaterials().patch(
                               courseId=course_id,
                               id=coursework_material_id,

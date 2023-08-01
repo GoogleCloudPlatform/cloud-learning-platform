@@ -401,19 +401,31 @@ def copy_course_v2(course_template_details,
   lms_job = LmsJob.find_by_id(lms_job_id)
   logs = lms_job.logs
   try:
-    info_msg = f"LMS job ID is {lms_job_id}"
-    Logger.info(f"----------The lms job ID is {lms_job_id}")
+    # Create a new course
+    info_msg = f"Background Task started for the cohort id {cohort_details.id}\
+                course template {course_template_details.id} \
+                with section name{sections_details.name}\ LMS job Id {lms_job_id}"
+
+    logs["info"].append(info_msg)
+    Logger.info(info_msg)
     original_courseworks = classroom_crud.get_coursework_list(
       course_template_details.classroom_id)
     original_coursework_materials =  classroom_crud.get_coursework_material_list(
       course_template_details.classroom_id)
-    Logger.info(f"Source coursework list called {len(original_courseworks)} ")
-    COPY_COURSE_API_KEY = get_secret("copy-course-api-key")
-    COPY_COURSE_API_LABEL = get_secret("copy-course-api-label")
-    COPY_COURSE_API_VERSION = get_secret("copy-course-api-version")
-    Logger.info(f"{COPY_COURSE_API_KEY} {COPY_COURSE_API_LABEL} {COPY_COURSE_API_VERSION}")
-    DISCOVERY_SERVICE_URL = f"https://classroom.googleapis.com/$discovery/rest?\
-      labels={COPY_COURSE_API_LABEL}&key={COPY_COURSE_API_KEY}"
+    Logger.info(f"Origial coursework list \
+                {len(original_courseworks)}")
+    Logger.info(f"Original coursework Material list\
+                {len(original_coursework_materials)}")
+    logs["info"].append(f"Original Courseworks {len(original_courseworks)}")
+    logs["info"].append(f"Original Coursework Materials \
+                        {len(original_coursework_materials)}")
+
+    # COPY_COURSE_API_KEY = get_secret("copy-course-api-key")
+    # COPY_COURSE_API_LABEL = get_secret("copy-course-api-label")
+    # COPY_COURSE_API_VERSION = get_secret("copy-course-api-version")
+    # Logger.info(f"{COPY_COURSE_API_KEY} {COPY_COURSE_API_LABEL} {COPY_COURSE_API_VERSION}")
+    # DISCOVERY_SERVICE_URL = f"https://classroom.googleapis.com/$discovery/rest?\
+    #   labels={COPY_COURSE_API_LABEL}&key={COPY_COURSE_API_KEY}"
     # service = build(
     #     serviceName="classroom",
     #     version="v1",
@@ -428,25 +440,28 @@ def copy_course_v2(course_template_details,
     #   "title":course_template_details.name + sections_details.name,
     #   "previewVersion":COPY_COURSE_API_VERSION
     #   }    
-    alpha_service = build(
-      "classroom",
-      "v1",
-      credentials=classroom_crud.get_credentials(
-      ),
-      static_discovery=False,
-      discoveryServiceUrl=DISCOVERY_SERVICE_URL)
+  #   alpha_service = build(
+  #     "classroom",
+  #     "v1",
+  #     credentials=classroom_crud.get_credentials(
+  #     ),
+  #     static_discovery=False,
+  #     discoveryServiceUrl=DISCOVERY_SERVICE_URL)
 
-    input_data = {
-      "sourceCourseId": course_template_details.classroom_id,
-      "title": course_template_details.name + sections_details.name,
-      "previewVersion": COPY_COURSE_API_VERSION
-  }
+  #   input_data = {
+  #     "sourceCourseId": course_template_details.classroom_id,
+  #     "title": course_template_details.name + sections_details.name,
+  #     "previewVersion": COPY_COURSE_API_VERSION
+  # }
 
-    copied_course = alpha_service.courses().duplicateCourseAlpha(
-      body=input_data).execute()
+    # copied_course = alpha_service.courses().duplicateCourseAlpha(
+    #   body=input_data).execute()
+    copied_course = classroom_crud.copy_classroom_course(
+                    course_template_details.classroom_id,
+                     course_template_details.name + sections_details.name )
     classroom_id = copied_course["id"]
-    Logger.info(f"Classroom copy course api competed {copied_course}")
-    logs["info"].append(f"Classroom copy course api competed {classroom_id}")
+    Logger.info(f"Classroom copy course API competed {copied_course}")
+    logs["info"].append(f"Classroom copy course API competed {classroom_id}")
     lms_job.classroom_id = copied_course["id"]
     lms_job.start_time = datetime.datetime.utcnow()
     lms_job.status = "running"
@@ -480,15 +495,34 @@ def copy_course_v2(course_template_details,
       section.status = "FAILED_TO_PROVISION"
     else:
       section.status = "ACTIVE"
+    
+    classroom_crud.enable_notifications(copied_course["id"], "COURSE_WORK_CHANGES")
+    classroom_crud.enable_notifications(copied_course["id"],
+                                        "COURSE_ROSTER_CHANGES")
+    # add instructional designer
+    list_course_template_enrollment_mapping = CourseTemplateEnrollmentMapping\
+      .fetch_all_by_course_template(course_template_details.key)
+    if list_course_template_enrollment_mapping:
+      for course_template_mapping in list_course_template_enrollment_mapping:
+        try:
+          add_instructional_designer_into_section(section,
+                                                  course_template_mapping)
+        except Exception as error:
+          error = traceback.format_exc().replace("\n", " ")
+          Logger.error(f"Create teacher failed for \
+              for {course_template_details.instructional_designer}")
+          Logger.error(error)
 
+
+   
     section.update()
     rows=[{
       "sectionId":section_id,\
       "courseId":copied_course["id"],\
       "classroomUrl":copied_course["alternateLink"],\
-        "name":copied_course["section"],\
-        "description":copied_course["description"],\
-          "cohortId":cohort_details.id,\
+        "name":sections_details.name,\
+        "description":sections_details.description,\
+        "cohortId":cohort_details.id,\
         "courseTemplateId":course_template_details.id,\
           "status":section.status,\
         "enrollmentStatus": section.enrollment_status,
@@ -543,8 +577,10 @@ def check_copy_course_v2(original_courseworks,
   
   original_coursework_titles = sort_titles(original_courseworks)
   original_coursework_dict =  make_title_key_coursework(original_courseworks)
-  original_coursework_material_titles = sort_titles(original_coursework_materials)
-  original_coursework_material_dict =  make_title_key_coursework(original_coursework_materials)
+  original_coursework_material_titles = sort_titles(
+    original_coursework_materials)
+  original_coursework_material_dict =  make_title_key_coursework(
+    original_coursework_materials)
 
   original_coursework_titles = set(original_coursework_titles)
   original_coursework_material_titles = set(original_coursework_material_titles)
@@ -563,12 +599,12 @@ def check_copy_course_v2(original_courseworks,
     # Todo : Seperate these two conditions 
     if copied_courseworks == None :
       Logger.error("Courseworks not copied ")
-      logs["errors"].append("Courseworks copied ")
+      logs["errors"].append("Courseworks not copied ")
       error_flag = True
       continue
     if copied_coursework_materials ==None:
       Logger.error("Coursework material not copied ")
-      logs["errors"].append(" material not copied ")
+      logs["errors"].append("Coursework material not copied ")
       error_flag = True
       continue
     copied_coursework_titles = sort_titles(copied_courseworks)
@@ -596,11 +632,11 @@ def check_copy_course_v2(original_courseworks,
                               Title mismatch are {title_mismatch_coursework}")
         Logger.error(f"Missing courseworks are {missing_coursework} or\
                       Title mismatch are {title_mismatch_coursework}")
-      # TODO : ADD title mismatch conditiion and missing coursework names list to logs
       
     if copied_coursework_material_titles != original_coursework_material_titles:
       error_flag = True
       Logger.error("Length of coursework Material are not matching")
+      logs["errors"].append("Length of coursework Material are not  matching")
       missing_coursework_material = original_coursework_material_titles -\
           copied_coursework_material_titles
       title_mismatch_coursework_material =copied_coursework_material_titles -\
@@ -611,7 +647,7 @@ def check_copy_course_v2(original_courseworks,
           Title mismatch are {title_mismatch_coursework_material}")
         Logger.error(f"Missing courseworks are {missing_coursework_material} or\
                       Title mismatch are {title_mismatch_coursework_material}")
-      # TODO : ADD title mismatch conditiion and missing coursework list
+      
     lms_job.logs = logs
     lms_job.update()
 
