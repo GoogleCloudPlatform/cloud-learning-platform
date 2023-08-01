@@ -84,7 +84,7 @@ describe("Test Harmonize Deeplinking", () => {
     cy.get('button[type="submit"]').contains("Save").click();
     cy.wait("@apiRequest").then((interception) => {
       const response = interception.response;
-      Cypress.env.HARMONIZE_LTI_ASSIGNMENT_ID = response.body.data.id;
+      cy.writeFile("cypress/fixtures/HARMONIZE_LTI_ASSIGNMENT_ID.txt", response.body.data.id);
       cy.log("response.body.id", response.body.data.id);
       expect(response.statusCode).to.equal(200);
     });

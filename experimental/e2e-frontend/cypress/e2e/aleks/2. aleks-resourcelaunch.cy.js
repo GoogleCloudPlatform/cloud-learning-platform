@@ -12,14 +12,18 @@ describe("Test ALEKS Resource Launch", () => {
       }
     ).then((res) => {
       idToken = res.body.data.idToken;
-      cy.visit({
-        method: "GET",
-        url: `https://core-learning-services-dev.cloudpssolutions.com/classroom-shim/api/v1/e2e-resource-launch?lti_assignment_id=${Cypress.env.ALEKS_LTI_ASSIGNMENT_ID}`,
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-        },
-      })
+      cy.readFile("cypress/fixtures/ALEKS_LTI_ASSIGNMENT_ID.txt").then(
+        (assignmentId) => {
+          cy.visit({
+            method: "GET",
+            url: `https://core-learning-services-dev.cloudpssolutions.com/classroom-shim/api/v1/e2e-resource-launch?lti_assignment_id=${assignmentId}`,
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+            },
+          });
+        }
+      );
     });
-    cy.wait(30000)
+    cy.wait(30000);
   });
 });

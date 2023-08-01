@@ -61,7 +61,7 @@ describe("Test Honorlock Deeplinking", () => {
     // Assert that the API call was made and wait for the response
     cy.wait("@apiRequest").then((interception) => {
       const response = interception.response;
-      Cypress.env.HONORLOCK_LTI_ASSIGNMENT_ID = response.body.data.id;
+      cy.writeFile("cypress/fixtures/HONORLOCK_LTI_ASSIGNMENT_ID.txt", response.body.data.id);
       cy.log("response.body.id", response.body.data.id);
       expect(response.statusCode).to.equal(200);
     });
