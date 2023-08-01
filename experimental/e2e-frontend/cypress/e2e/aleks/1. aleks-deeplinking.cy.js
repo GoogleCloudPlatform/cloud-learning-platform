@@ -49,6 +49,8 @@ describe("Test ALEKS Deeplinking", () => {
     cy.contains(" Add LTI Assignment").click();
     cy.get('mat-select[formcontrolname="tool_id"]').click();
     cy.get("mat-option").contains("ALEKS").click();
+    cy.get('mat-select[formcontrolname="course_work_type"]').click();
+    cy.get("mat-option").contains("Coursework").click();
     cy.get('[formcontrolname="lti_assignment_title"]').type("ALEKS testing");
     cy.wait(5000);
     cy.contains("Select Content").then(($button) => {

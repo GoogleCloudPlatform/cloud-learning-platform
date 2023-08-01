@@ -34,6 +34,8 @@ describe("Test Honorlock Deeplinking", () => {
     cy.contains(" Add LTI Assignment").click();
     cy.get('mat-select[formcontrolname="tool_id"]').click();
     cy.get("mat-option").contains("Honorlock QA Tool").click();
+    cy.get('mat-select[formcontrolname="course_work_type"]').click();
+    cy.get("mat-option").contains("Coursework").click();
     cy.get('[formcontrolname="lti_assignment_title"]').type(
       "Honorlock QA Tool testing"
     );
