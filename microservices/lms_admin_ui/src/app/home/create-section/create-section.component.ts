@@ -20,6 +20,7 @@ interface LooseObject {
 export class CreateSectionComponent implements OnInit {
   addSectionForm: UntypedFormGroup
   showProgressSpinner: boolean = false
+  showProgressSpinnerAlpha : boolean = false
 
   addOnBlur = true;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
@@ -153,6 +154,68 @@ export class CreateSectionComponent implements OnInit {
       console.log('final obj', sectionObj)
     }
   }
+
+
+  createSectionAlpha() {
+    this.showProgressSpinnerAlpha = true
+    // let tempTeacherList = []
+    let sectionObj: LooseObject = {}
+    sectionObj['description'] = this.addSectionForm.value.section_description.trim()
+    sectionObj['cohort'] = this.requiredDetails.extra_data.cohort_id ? this.requiredDetails.extra_data.cohort_id : this.requiredDetails.init_data.cohort_id
+    
+
+    if (this.requiredDetails.mode == 'Edit') {
+      console.log('sec obj', sectionObj)
+      // this.requiredDetails.extra_data.instructional_desiner ? tempTeacherList.push(this.requiredDetails.extra_data.instructional_desiner) : tempTeacherList.push(this.requiredDetails.init_data.instructional_desiner)
+      sectionObj['section_name'] = this.addSectionForm.value.section_name.trim()
+      sectionObj['max_students'] = this.addSectionForm.value.max_students
+      sectionObj['id'] = this.requiredDetails.init_data.section_id
+      sectionObj['course_id'] = this.requiredDetails.init_data.classroom_id
+      this._HomeService.editSectionAlpha(sectionObj).subscribe((res: any) => {
+        if (res.success == true) {
+          this.openSuccessSnackBar('Update section', 'SUCCESS')
+          this.dialogRef.close({ data: 'success' });
+        }
+        else {
+          this.openFailureSnackBar('Update section', 'FAILED')
+          // this.dialogRef.close({ data: 'success' });
+        }
+        this.showProgressSpinnerAlpha = false
+      }, (error: any) => {
+        this.openFailureSnackBar('Update section', 'FAILED')
+        // this.dialogRef.close({ data: 'success' });
+        this.showProgressSpinnerAlpha = false
+      })
+    }
+    else {
+      sectionObj['name'] = this.addSectionForm.value.section_name.trim()
+      sectionObj['max_students'] = this.addSectionForm.value.max_students
+      sectionObj['course_template'] = this.requiredDetails.extra_data.course_template_id
+      this._HomeService.createSectionAlpha(sectionObj).subscribe((res: any) => {
+        if (res.success == true) {
+          this.openSuccessSnackBar('Create section', 'SUCCESS')
+          this.dialogRef.close({ data: 'success' });
+          const successOverviewDialogRef = this.dialog.open(SuccessOverviewDialog, {
+            width: '500px',
+            data: res.message
+          });
+        }
+        else {
+          this.openFailureSnackBar('Create section', 'FAILED')
+          this.showProgressSpinnerAlpha = false
+          // this.dialogRef.close({ data: 'success' });
+        }
+        this.showProgressSpinnerAlpha = false
+      }, (error: any) => {
+        this.openFailureSnackBar('Create section', 'FAILED')
+        // this.dialogRef.close({ data: 'success' });
+        this.showProgressSpinnerAlpha = false
+        
+      })
+      console.log('final obj', sectionObj)
+    }
+  }
+
 
 
 }
