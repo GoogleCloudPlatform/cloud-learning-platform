@@ -688,18 +688,25 @@ def get_list_of_students_not_in_db(cohort_id: str):
       _type_: _description_
   """
   try:
-    cohort_result = run_query(f'''select name from {COHORT_TABLE_ID}
-                               where cohortId="{cohort_id}"''')
-    if cohort_result.total_rows > 0:
-      query=f'''Select * from {NOT_DB_TABLE_ID} where
-        cohort_id="{cohort_id}" and roster_collection=\"courses.students\"'''
+    cohort = Cohort.find_by_id(cohort_id)
+    sections = Section.collection.filter(cohort=cohort.key,
+                                         deleted_at_timestamp=None).fetch()
+    section_list = []
+    for section in sections:
+      section_list.append("'"+section.id+"'")
+    section_list = ",".join(section_list)
+    if len(section_list) > 0:
+      query=f'''Select * from {NOT_DB_TABLE_ID}
+      where cohort_id="{cohort_id}"
+      and section_id in ({section_list})
+      and roster_collection=\"courses.students\"'''
       result= run_query(query)
       return {
         "data":bq_query_results_to_dict_list(result),
         "message":
           "Successfully fetched list of students exists in DB not in Classroom"
           }
-    raise ResourceNotFoundException("Cohort does not exist")
+    raise ResourceNotFoundException("No Section available for cohort")
   except ValidationError as ve:
     Logger.error(ve)
     raise BadRequest(str(ve)) from ve
@@ -726,11 +733,18 @@ def get_list_of_students_not_in_classroom(cohort_id: str):
       _type_: _description_
   """
   try:
-    cohort_result = run_query(f'''select name from 
-                    {COHORT_TABLE_ID} where cohortId="{cohort_id}"''')
-    if cohort_result.total_rows > 0:
+    cohort = Cohort.find_by_id(cohort_id)
+    sections = Section.collection.filter(cohort=cohort.key,
+                                         deleted_at_timestamp=None).fetch()
+    section_list = []
+    for section in sections:
+      section_list.append("'"+section.id+"'")
+    section_list = ",".join(section_list)
+    if len(section_list) > 0:
       query=f'''Select * from {NOT_CLASSROOM_TABLE_ID}
-              where cohort_id ="{cohort_id}" and enrollment_role=\"learner\"'''
+      where cohort_id ="{cohort_id}"
+      and section_id in ({section_list})
+      and enrollment_role=\"learner\"'''
       result= run_query(query)
       data=bq_query_results_to_dict_list(result)
       return {
@@ -738,7 +752,7 @@ def get_list_of_students_not_in_classroom(cohort_id: str):
         "message":
           "Successfully fetched list of students exists in DB not in Classroom"
           }
-    raise ResourceNotFoundException("Cohort does not exist")
+    raise ResourceNotFoundException("No Section available for cohort")
   except ValidationError as ve:
     Logger.error(ve)
     raise BadRequest(str(ve)) from ve
