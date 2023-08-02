@@ -80,11 +80,12 @@ def get_all_goals(goal_type: str = None,
                             .filter("is_archived", "==", fetch_archive)
     goal = collection_manager.order("-created_time").offset(skip).fetch(limit)
     goal_fields = [i.get_fields(reformat_datetime=True) for i in goal]
-
+    count = 10000
+    response = {"records": goal_fields, "total_count": count}
     return {
         "success": True,
         "message": "Successfully fetched the goal",
-        "data": goal_fields
+        "data": response
     }
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
