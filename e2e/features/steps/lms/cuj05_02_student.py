@@ -70,7 +70,7 @@ def step_impl_9(context):
 @behave.given("A user has access to portal and wants to fetch the list of students exists in Classroom not in DB using valid cohort id")
 @wait(60)
 def step_impl_10(context):
-  context.url = f'{API_URL}/cohorts/{context.section_cohort_data["cohort"]}/student_exists_in_classroom_not_in_db'
+  context.url = f'{API_URL}/cohorts/{context.section_cohort_data["cohort"]}/students_exists_in_classroom_not_in_db'
 
 
 @behave.when(
@@ -96,7 +96,7 @@ def step_impl_12(context):
     "A user has access to portal and wants to fetch the list of students exists in Classroom not in DB using invalid cohort id"
 )
 def step_impl_13(context):
-  context.url = f'{API_URL}/cohorts/cohort_id/student_exists_in_classroom_not_in_db'
+  context.url = f'{API_URL}/cohorts/cohort_id/students_exists_in_classroom_not_in_db'
 
 
 @behave.when(
@@ -118,7 +118,7 @@ def step_impl_15(context):
 )
 @wait(60)
 def step_impl_16(context):
-  context.url = f'{API_URL}/cohorts/{context.section_cohort_data["cohort"]}/student_exists_in_db_not_in_classroom'
+  context.url = f'{API_URL}/cohorts/{context.section_cohort_data["cohort"]}/students_exists_in_db_not_in_classroom'
 
 
 @behave.when(
@@ -146,7 +146,7 @@ def step_impl_18(context):
     "A user has access to portal and wants to fetch the list of students exists in DB not in classroom using invalid cohort id"
 )
 def step_impl_19(context):
-  context.url = f'{API_URL}/cohorts/cohort_id/student_exists_in_db_not_in_classroom'
+  context.url = f'{API_URL}/cohorts/cohort_id/students_exists_in_db_not_in_classroom'
 
 
 @behave.when(
@@ -160,4 +160,4 @@ def step_impl_20(context):
 
 @behave.then("API returns cohort not found by this id error")
 def step_impl_21(context):
-  assert context.status == 200, "Status 200"
+  assert context.status == 404, "Status 404"
