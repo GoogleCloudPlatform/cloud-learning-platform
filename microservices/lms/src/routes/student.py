@@ -749,7 +749,7 @@ def get_list_of_students_not_in_classroom(cohort_id: str):
     if len(section_list) > 0:
       query=f'''Select * from {NOT_CLASSROOM_TABLE_ID}
       where cohort_id ="{cohort_id}"
-      section_id in ({section_list})
+      and section_id in ({section_list})
       and enrollment_role=\"learner\"'''
       result= run_query(query)
       data=bq_query_results_to_dict_list(result)
