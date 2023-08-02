@@ -91,8 +91,6 @@ NOT_DB_TABLE_ID=(f"`{PROJECT_ID}.{BQ_DATASET}."
 NOT_CLASSROOM_TABLE_ID=(
   f"`{PROJECT_ID}.{BQ_DATASET}"
   + f".{BQ_TABLE_DICT['EXISTS_IN_DB_NOT_IN_CLASSROOM_VIEW']}`")
-COHORT_TABLE_ID=(f"`{PROJECT_ID}.{BQ_DATASET}."
-+ f"{BQ_TABLE_DICT['BQ_COLL_COHORT_TABLE']}`")
 
 @section_student_router.get("/{section_id}/get_progress_percentage/{user}",
                             response_model=GetProgressPercentageResponseModel)
