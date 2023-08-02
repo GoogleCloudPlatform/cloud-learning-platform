@@ -107,9 +107,9 @@ def step_impl_14(context):
   context.response = resp.json()
 
 
-@behave.then("List of students details will be fetched from bq views")
+@behave.then("API returns cohort not found by this id")
 def step_impl_15(context):
-  assert context.status == 404, "Status 200"
+  assert context.status == 404, "Status 404"
 
 ###---------------------Exists in db not in classroom----------------------
 #----------Postive---------
