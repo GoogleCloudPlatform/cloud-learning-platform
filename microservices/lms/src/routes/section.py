@@ -28,7 +28,8 @@ from schemas.section import (
     UpdateEnrollmentStatusSectionModel,
     DeleteFailedSectionSectionModel,UpdateInviteResponseModel)
 from schemas.update_section import UpdateSection
-from services.section_service import (copy_course_background_task,copy_course_v2,
+from services.section_service import (copy_course_background_task,
+                                copy_course_background_task_alpha,
 update_grades,add_teacher, insert_section_enrollment_to_bq)
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model, FEED_TYPES,
@@ -135,7 +136,7 @@ def create_section(sections_details: SectionDetails,
     Logger.error(error)
     Logger.error(e)
     raise InternalServerError(str(e)) from e
-@router.post("/create_duplicate_course", status_code=status.HTTP_202_ACCEPTED)
+@router.post("/alpha", status_code=status.HTTP_202_ACCEPTED)
 def create_section_dup(sections_details: SectionDetails,
                    background_tasks: BackgroundTasks):
   """Create section API
@@ -177,7 +178,7 @@ def create_section_dup(sections_details: SectionDetails,
     lms_job = LmsJob.from_dict(lms_job_input)
     lms_job.save()
     background_tasks.add_task(
-        copy_course_v2,
+        copy_course_background_task_alpha,
         course_template_details=course_template_details,
         sections_details=sections_details,
         cohort_details=cohort_details,

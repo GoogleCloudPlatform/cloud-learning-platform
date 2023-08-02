@@ -393,7 +393,8 @@ def copy_course_background_task(course_template_details,
     raise InternalServerError(str(e)) from e
 
 
-def copy_course_v2(course_template_details,
+def copy_course_background_task_alpha(
+                        course_template_details,
                                 sections_details,
                                 cohort_details,
                                 lms_job_id,
@@ -402,12 +403,6 @@ def copy_course_v2(course_template_details,
   logs = lms_job.logs
   try:
     # Create a new course
-    info_msg = f"Background Task started for the cohort id {cohort_details.id}\
-                course template {course_template_details.id} \
-                with section name{sections_details.name}\ LMS job Id {lms_job_id}"
-
-    logs["info"].append(info_msg)
-    Logger.info(info_msg)
     original_courseworks = classroom_crud.get_coursework_list(
       course_template_details.classroom_id)
     original_coursework_materials =  classroom_crud.get_coursework_material_list(
@@ -419,47 +414,11 @@ def copy_course_v2(course_template_details,
     logs["info"].append(f"Original Courseworks {len(original_courseworks)}")
     logs["info"].append(f"Original Coursework Materials \
                         {len(original_coursework_materials)}")
-
-    # COPY_COURSE_API_KEY = get_secret("copy-course-api-key")
-    # COPY_COURSE_API_LABEL = get_secret("copy-course-api-label")
-    # COPY_COURSE_API_VERSION = get_secret("copy-course-api-version")
-    # Logger.info(f"{COPY_COURSE_API_KEY} {COPY_COURSE_API_LABEL} {COPY_COURSE_API_VERSION}")
-    # DISCOVERY_SERVICE_URL = f"https://classroom.googleapis.com/$discovery/rest?\
-    #   labels={COPY_COURSE_API_LABEL}&key={COPY_COURSE_API_KEY}"
-    # service = build(
-    #     serviceName="classroom",
-    #     version="v1",
-    #     credentials=classroom_crud.get_credentials(
-    #   ),
-    #     static_discovery=False,
-    #     discoveryServiceUrl=DISCOVERY_SERVICE_URL
-    # )
-    # Logger.info(DISCOVERY_SERVICE_URL)
-    # data ={
-    #   "sourceCourseId": course_template_details.classroom_id,
-    #   "title":course_template_details.name + sections_details.name,
-    #   "previewVersion":COPY_COURSE_API_VERSION
-    #   }    
-  #   alpha_service = build(
-  #     "classroom",
-  #     "v1",
-  #     credentials=classroom_crud.get_credentials(
-  #     ),
-  #     static_discovery=False,
-  #     discoveryServiceUrl=DISCOVERY_SERVICE_URL)
-
-  #   input_data = {
-  #     "sourceCourseId": course_template_details.classroom_id,
-  #     "title": course_template_details.name + sections_details.name,
-  #     "previewVersion": COPY_COURSE_API_VERSION
-  # }
-
-    # copied_course = alpha_service.courses().duplicateCourseAlpha(
-    #   body=input_data).execute()
-    copied_course = classroom_crud.copy_classroom_course(
-                    course_template_details.classroom_id,
-                     course_template_details.name + sections_details.name )
+    Logger.info(f"This is section deatails object {sections_details.name}")
+    copied_course = classroom_crud.copy_classroom_course(course_template_details.classroom_id,
+                                          course_template_details.name+sections_details.name)
     classroom_id = copied_course["id"]
+    Logger.info(f"This is copied classroom course {copied_course}")
     Logger.info(f"Classroom copy course API competed {copied_course}")
     logs["info"].append(f"Classroom copy course API competed {classroom_id}")
     lms_job.classroom_id = copied_course["id"]
@@ -483,11 +442,10 @@ def copy_course_v2(course_template_details,
     section_id = section.save().id 
     lms_job.section_id = section_id
     lms_job.update()
-    logs["info"].append(info_msg)
     lms_job.logs = logs
     lms_job.update() 
-    # Call check_copy_course function to verify all courseworks and coursework material is copies
-    error_flag = check_copy_course_v2(original_courseworks,
+    # Call check_copy_course function to verify all courseworks and coursework material is copied
+    error_flag = check_copy_course_alpha(original_courseworks,
                                     original_coursework_materials,
                                     copied_course,lms_job_id)
     
@@ -512,8 +470,6 @@ def copy_course_v2(course_template_details,
           Logger.error(f"Create teacher failed for \
               for {course_template_details.instructional_designer}")
           Logger.error(error)
-
-
    
     section.update()
     rows=[{
@@ -545,14 +501,13 @@ def copy_course_v2(course_template_details,
       lms_job.status = "failed"
     else:
       lms_job.status = "success"
-
-    lms_job.logs = logs
-    lms_job.end_time = datetime.datetime.utcnow() 
-    lms_job.update()
     Logger.info( f"Background Task Completed for section Creation for cohort\
                 {cohort_details.id}")
     Logger.info(f"Section Details are section id {section_id},\
                 classroom id {classroom_id} {lms_job.id}")
+    lms_job.logs = logs
+    lms_job.end_time = datetime.datetime.utcnow() 
+    lms_job.update() 
     return True
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")
@@ -566,14 +521,14 @@ def copy_course_v2(course_template_details,
     raise InternalServerError(str(e)) from e
 
 
-def check_copy_course_v2(original_courseworks,
+def check_copy_course_alpha(original_courseworks,
                       original_coursework_materials,
                       copied_course,
                       lms_job_id):
   lms_job = LmsJob.find_by_id(lms_job_id)
   logs = lms_job.logs
   count = 0
-  max_count = 2
+  max_count = 3
   
   original_coursework_titles = sort_titles(original_courseworks)
   original_coursework_dict =  make_title_key_coursework(original_courseworks)
@@ -584,11 +539,12 @@ def check_copy_course_v2(original_courseworks,
 
   original_coursework_titles = set(original_coursework_titles)
   original_coursework_material_titles = set(original_coursework_material_titles)
-  while(count<max_count):
+  while count<max_count :
     Logger.info(f"Iteration  count {count} to verify copy_course process")
     logs["info"].append(f"Iteration  count {count} to verify copy_course process")
     time.sleep(60)
-    count=+1
+    count+=1
+    Logger.info(f"COunt value after increment {count}")
     error_flag = False
     copied_courseworks = classroom_crud.get_coursework_list(
       copied_course["id"],"DRAFT")
@@ -653,6 +609,7 @@ def check_copy_course_v2(original_courseworks,
 
     # If there is mistmatch in coursework name or coursework name continue to wait 
     if error_flag:
+      Logger.info(f"In error flag--- continue {count}")
       continue
   
     # make_title_key_coursework function takes the list of coursework or coursework 
@@ -668,15 +625,18 @@ def check_copy_course_v2(original_courseworks,
                                                 copied_coursework_dict,
                                                 lms_job_id
                                                 )
-        if  missing_attachment:
-          Logger.error(f"Missing attachment are {coursework_title} {missing_attachment }")
-          logs["errors"].append(f"Missing attachment are {coursework_title} {missing_attachment }") 
-          error_flag=True
-          
-      logs["info"].append(f"Missing attachment for {coursework_title} {missing_attachment}")
-      Logger.info(f"Missing attachment for {coursework_title} {missing_attachment}")
+      lms_job = LmsJob.find_by_id(lms_job_id)
+      logs = lms_job.logs
+      if  missing_attachment:
+        Logger.error(f"Missing attachment are {coursework_title} {missing_attachment }")
+        logs["errors"].append(f"Missing attachment are {coursework_title} {missing_attachment }") 
+        error_flag=True 
+      else:
+        logs["info"].append(f"Missing attachment for {coursework_title} {missing_attachment}")
+        Logger.info(f"Missing attachment for {coursework_title} {missing_attachment}")
       lms_job.logs = logs
-      lms_job.logs.update()
+      lms_job.update()
+      Logger.info("")
     #Errror in copying coursework attachments restart wait loop 
     for coursework_material_title in original_coursework_material_titles:
       
@@ -685,15 +645,18 @@ def check_copy_course_v2(original_courseworks,
                                                 original_coursework_material_dict,
                                                 copied_coursework_material_dict,
                                                 lms_job_id)
-        if  missing_attachment:
-          Logger.error(f"Missing attachment are {coursework_material_title} {missing_attachment}")
-          logs["errors"].append(f"Missing attachment are {coursework_material_title} {missing_attachment}")
-          error_flag=True
-          
-      logs["info"].append(f"Missing attachment for {coursework_material_title} {missing_attachment}")
-      Logger.info(f"Missing attachment for {coursework_material_title} {missing_attachment}")
+
+      lms_job = LmsJob.find_by_id(lms_job_id)
+      logs = lms_job.logs
+      if  missing_attachment:
+        Logger.error(f"Missing attachment are {coursework_material_title} {missing_attachment}")
+        logs["errors"].append(f"Missing attachment are {coursework_material_title} {missing_attachment}")
+        error_flag=True
+      else :
+        logs["info"].append(f"Missing attachment for {coursework_material_title} {missing_attachment}")
+        Logger.info(f"Missing attachment for {coursework_material_title} {missing_attachment}")
       lms_job.logs = logs
-      lms_job.logs.update()      
+      lms_job.update()      
     if error_flag:
       continue
     else:
@@ -738,7 +701,6 @@ def check_copy_course_v2(original_courseworks,
 
 def verifiy_attachment(title ,original_coursework_dict,
                        copied_coursework_dict,lms_job_id):
-  Logger.info(f"Verify attachment for coursework Title {title}")
   missing_attachments = set()
   original_drive_files= set()
   original_youtube_video= set()
@@ -746,48 +708,57 @@ def verifiy_attachment(title ,original_coursework_dict,
   original_form=set()
   lms_job = LmsJob.find_by_id(lms_job_id)
   logs = lms_job.logs
+  try:
+    for attachment in original_coursework_dict[title]["materials"]:
+      if "driveFile" in attachment.keys():
+        original_drive_files.add(attachment["driveFile"]["driveFile"]["title"])
+      if "youtubeVideo" in attachment.keys():
+        original_youtube_video.add(attachment["youtubeVideo"]["title"])
+      if "link" in attachment.keys():
+        Logger.error(f"coursework{title} {attachment}")
+        original_link.add(attachment["link"]["title"])
+      if "form" in attachment.keys():
+        original_form.add(attachment["form"]["title"])
+
+    copied_drive_files= set()
+    copied_youtube_video= set()
+    copied_link= set()
+    copied_form=set()
+    for attachment in copied_coursework_dict[title]["materials"]:
+      if "driveFile" in attachment.keys():
+        copied_drive_files.add(attachment["driveFile"]["driveFile"]["title"])
+      if "youtubeVideo" in attachment.keys():
+        copied_youtube_video.add(attachment["youtubeVideo"]["title"])
+      if "link" in attachment.keys():
+        copied_link.add(attachment["link"]["title"])
+      if "form" in attachment.keys():
+        copied_form.add(attachment["form"]["title"])
+    missing_attachments = []
+
+    if original_drive_files != copied_drive_files:
+      missing_drive_files = original_drive_files - copied_drive_files
+      missing_attachments.extend(missing_drive_files)
+    if original_youtube_video !=copied_youtube_video:
+      missing_youtube_video = original_youtube_video - copied_youtube_video
+      missing_attachments.extend(missing_youtube_video)
+    
+    if original_link != copied_link:
+      missing_link = original_link - copied_link
+      missing_attachments.extend(missing_link)
+
+    if original_form != copied_form:
+      missing_form = original_form - copied_form
+      missing_attachments.extend(missing_form)
+
+    return missing_attachments
+  except Exception as e:
+    error = traceback.format_exc().replace("\n", " ")
+    Logger.error(f"Error {title} in attachment -{error}")
+    logs["errors"].append(f"Error {title} in attachment -{error}")
+    lms_job.logs =logs
+    lms_job.update()
+    return attachment
   
-  for attachment in original_coursework_dict[title]["materials"]:
-    if "driveFile" in attachment.keys():
-      original_drive_files.add(attachment["driveFile"]["driveFile"]["title"])
-    if "youtubeVideo" in attachment.keys():
-      original_youtube_video.add(attachment["youtubeVideo"]["title"])
-    if "link" in attachment.keys():
-      Logger.error(f"coursework{title} {attachment}")
-      original_link.add(attachment["link"]["title"])
-    if "form" in attachment.keys():
-      original_form.add(attachment["form"]["title"])
-
-  copied_drive_files= set()
-  copied_youtube_video= set()
-  copied_link= set()
-  copied_form=set()
-  for attachment in copied_coursework_dict[title]["materials"]:
-    if "driveFile" in attachment.keys():
-      copied_drive_files.add(attachment["driveFile"]["driveFile"]["title"])
-    if "youtubeVideo" in attachment.keys():
-      copied_youtube_video.add(attachment["youtubeVideo"]["title"])
-    if "link" in attachment.keys():
-      copied_link.add(attachment["link"]["title"])
-    if "form" in attachment.keys():
-      copied_form.add(attachment["form"]["title"])
-  missing_attachments = []
-
-  if original_drive_files != copied_drive_files:
-    missing_drive_files = original_drive_files - copied_drive_files
-    missing_attachments.extend(missing_drive_files)
-  if original_youtube_video !=copied_youtube_video:
-    missing_youtube_video = original_youtube_video - copied_youtube_video
-    missing_attachments.extend(missing_youtube_video)
-  
-  if original_link != copied_link:
-    missing_link = original_link - copied_link
-    missing_attachments.extend(missing_link)
-
-  if original_form != copied_form:
-    missing_form = original_form - copied_form
-    missing_attachments.extend(missing_form)
-  return missing_attachments
 
 def make_title_key_coursework(courseworks):
   updated_coursework_dict ={}
