@@ -28,7 +28,6 @@ from schemas.progress_schema import (
   CurriculumPathwayProgressResponse
 )
 
-
 # pylint: disable = broad-except
 router = APIRouter(tags=["Learner"], responses=ERROR_RESPONSES)
 
@@ -42,7 +41,7 @@ router = APIRouter(tags=["Learner"], responses=ERROR_RESPONSES)
             ],
             responses={404: {"model": NotFoundErrorResponseModel}})
 def get_learner_progress(learner_id: str, node_id: str,
-        node_type: NodeTypeModel):
+                         node_type: NodeTypeModel):
   """Function to return learner progress for a given node
   ### Args:
   learner_id: `str`
@@ -51,7 +50,7 @@ def get_learner_progress(learner_id: str, node_id: str,
     Unique identifier for given node level
   node_type: `str`
     type of learning hierarchy node. Supports the following \
-    "curriculum_pathways", "learning_experiences", "learning_objects" and \
+    "curriculum_pathways," "learning_experiences," "learning_objects" and \
     "learning_resources"
   ### Raises:
   ResourceNotFoundException:
@@ -66,7 +65,7 @@ def get_learner_progress(learner_id: str, node_id: str,
                         CurriculumPathwayProgressResponse]
   """
   try:
-    root_node = collection_references[node_type].find_by_uuid(node_id)
+    root_node = collection_references[node_type].find_by_id(node_id)
     root_node = root_node.get_fields(reformat_datetime=True)
     learner_profile = None
     if learner_id:
@@ -76,11 +75,11 @@ def get_learner_progress(learner_id: str, node_id: str,
     # and if child nodes are to be sorted based on recent activity
     # Currently, added only when node_type == curriculum_pathways
     root_node = ParentChildNodesHandler.load_hierarchy_progress(
-        root_node, node_type, learner_profile)
+      root_node, node_type, learner_profile)
     return {
       "success": True,
       "message": f"Successfully fetched the {node_type} progress for the"
-      " given learner",
+                 " given learner",
       "data": root_node
     }
   except ResourceNotFoundException as e:

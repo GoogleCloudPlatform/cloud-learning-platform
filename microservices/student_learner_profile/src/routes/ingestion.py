@@ -9,7 +9,7 @@ router = APIRouter(prefix="/import", tags=["Ingestion API"])
 
 @router.post("/{source}")
 def import_learner_profile(source: str):
-  """Batchjob to import learner profile to firestore
+  """Batch Job to import learner profile to firestore
 
   Args:
     source(str): Source from where learner profile needs to be imported.

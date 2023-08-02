@@ -1,5 +1,5 @@
 """
-Pydantic Model for Mastery API's
+Pydantic Model for Mastery APIs
 """
 from typing import List, Optional
 from pydantic import BaseModel

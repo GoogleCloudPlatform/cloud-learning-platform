@@ -6,7 +6,7 @@ from copy import deepcopy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from routes.learner_achievements import router
-from testing.test_config import API_URL
+from testing.test_config import (API_URL, TESTING_FOLDER_PATH)
 from schemas.schema_examples import (BASIC_LEARNER_EXAMPLE,
                                     BASIC_LEARNER_PROFILE_EXAMPLE,
                                     BASIC_ACHIEVEMENT_EXAMPLE,
@@ -29,7 +29,7 @@ os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 
 
-def test_get_learner_achievements_postive(clean_firestore):
+def test_get_learner_achievements_positive(clean_firestore):
   learner_dict = BASIC_LEARNER_EXAMPLE
   learner = Learner.from_dict(learner_dict)
   learner.uuid = ""
