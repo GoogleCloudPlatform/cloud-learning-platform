@@ -14,8 +14,8 @@ roasterView.user_gaia_id
 FROM `lms_analytics.sectionEnrollmentRecordView` enrollmentView LEFT OUTER JOIN
 `lms_analytics.courseRosterEnrichmentView` roasterView
 ON enrollmentView.section_id=roasterView.section_id
-AND roasterView.user_emailAddress=enrollmentView.user_email)
-SELECT user_email,
+AND lower(roasterView.user_emailAddress)=lower(enrollmentView.user_email))
+SELECT lower(user_email),
 user_id,
 enrollment_id,
 enrollment_status,

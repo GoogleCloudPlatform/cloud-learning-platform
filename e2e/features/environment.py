@@ -542,6 +542,11 @@ def enroll_student_in_classroom_not_in_db(context):
   insert_rows_to_bq(rows=section_rows,
                     dataset=BQ_DATASET,
                     table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
+  context.section_cohort_data={
+    "cohort":section.cojort.id,
+    "section":section.id
+    }
+  yield context.section_cohort_data
 @fixture
 def enroll_student_in_db_not_in_classroom(context):
   section = use_fixture(create_section, context)
@@ -623,6 +628,11 @@ def enroll_student_in_db_not_in_classroom(context):
   insert_rows_to_bq(
             rows=enrollment_rows, dataset=BQ_DATASET,
             table_name=BQ_TABLE_DICT["BQ_ENROLLMENT_RECORD"])
+  context.section_cohort_data = {
+      "cohort": section.cojort.id,
+      "section": section.id
+  }
+  yield context.section_cohort_data
 
 @fixture
 def invite_student(context):

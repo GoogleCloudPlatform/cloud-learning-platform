@@ -199,7 +199,9 @@ def get_student_in_cohort(cohort_id: str, user: str, request: Request):
     cohort = Cohort.find_by_id(cohort_id)
     course_mapping = None
     list_section = Section.collection.filter("cohort", "==",
-                                             cohort.key).fetch()
+                                             cohort.key).filter(
+                                                 "deleted_at_timestamp", "==",
+                                                 None).fetch()
     for section in list_section:
       course_mapping = CourseEnrollmentMapping.find_course_enrollment_record(
           section_key=section.key, user_id=user_id,role="learner")
@@ -346,7 +348,8 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
   """
   try:
     cohort = Cohort.find_by_id(cohort_id)
-    sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
+    sections = Section.collection.filter("cohort", "==", cohort.key).filter(
+        "deleted_at_timestamp", "==", None).fetch()
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
     if cohort.enrolled_students_count >= cohort.max_students:
@@ -463,7 +466,8 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
     if section.enrolled_students_count >= section.max_students:
       raise ValidationError("Section Max count reached hence student cannot" +
             "be erolled in this cohort")
-    sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
+    sections = Section.collection.filter("cohort", "==", cohort.key).filter(
+        "deleted_at_timestamp", "==", None).fetch()
     sections = list(sections)
     if not student_service.check_student_can_enroll_in_cohort(
     email=input_data.email, headers=headers, sections=sections):
@@ -568,7 +572,8 @@ def invite_student(section_id: str, student_email: str, request: Request):
     if section.enrolled_students_count >= section.max_students:
       raise ValidationError("Section Max count reached hence student cannot" +
             "be erolled in this cohort")
-    sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
+    sections = Section.collection.filter("cohort", "==", cohort.key).filter(
+        "deleted_at_timestamp", "==", None).fetch()
     sections = list(sections)
     if not student_service.check_student_can_enroll_in_cohort(
     email=student_email, headers=headers, sections=sections):
@@ -626,7 +631,8 @@ def invite_student_cohort(cohort_id: str, student_email: str,
   """
   try:
     cohort = Cohort.find_by_id(cohort_id)
-    sections = Section.collection.filter("cohort", "==", cohort.key).fetch()
+    sections = Section.collection.filter("cohort", "==", cohort.key).filter(
+        "deleted_at_timestamp", "==", None).fetch()
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
     if cohort.enrolled_students_count >= cohort.max_students:
@@ -642,7 +648,7 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     section = student_service.get_section_with_minimum_student(sections)
     if section is None:
       raise Conflict(
-    "All sections in chorot are full or not open for enrollment")
+      "All sections in chorot are full or not open for enrollment")
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {student_email}")
     headers = {"Authorization": request.headers.get("Authorization")}
@@ -656,8 +662,8 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     latest_section.update()
     return {
         "message":
-  f"Successfully Added the Student with email {student_email}",
-        "data": invitation_details
+    f"Successfully Added the Student with email {student_email}",
+    "data": invitation_details
     }
   except ResourceNotFoundException as err:
     Logger.error(err)
@@ -674,8 +680,10 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
-@router.get("/exists_in_classroom_not_in_db/{cohort_id}",
-            response_model=StudentsRecordsResponseModel)
+
+@cohort_student_router.get(
+  "/{cohort_id}/students_exists_in_classroom_not_in_db",
+                           response_model=StudentsRecordsResponseModel)
 def get_list_of_students_not_in_db(cohort_id: str):
   """Get list of students who doesn't exists in db
 
@@ -689,12 +697,10 @@ def get_list_of_students_not_in_db(cohort_id: str):
   """
   try:
     cohort = Cohort.find_by_id(cohort_id)
-    sections = Section.collection.filter(cohort=cohort.key,
-                                         deleted_at_timestamp=None).fetch()
-    section_list = []
-    for section in sections:
-      section_list.append("'"+section.id+"'")
-    section_list = ",".join(section_list)
+    sections = Section.collection.filter(
+      "cohort", "==",cohort.key).filter(
+        "deleted_at_timestamp","==", None).fetch()
+    section_list = ",".join([f"\"{x.id}\"" for x in sections])
     if len(section_list) > 0:
       query=f'''Select * from {NOT_DB_TABLE_ID}
       where cohort_id="{cohort_id}"
@@ -719,7 +725,9 @@ def get_list_of_students_not_in_db(cohort_id: str):
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
-@router.get("/exists_in_db_not_in_classroom/{cohort_id}",
+
+@cohort_student_router.get(
+  "/{cohort_id}/students_exists_in_db_not_in_classroom",
             response_model=StudentsRecordsResponseModel)
 def get_list_of_students_not_in_classroom(cohort_id: str):
   """Get list of students who doesn't exists in Classroom
@@ -734,16 +742,14 @@ def get_list_of_students_not_in_classroom(cohort_id: str):
   """
   try:
     cohort = Cohort.find_by_id(cohort_id)
-    sections = Section.collection.filter(cohort=cohort.key,
-                                         deleted_at_timestamp=None).fetch()
-    section_list = []
-    for section in sections:
-      section_list.append("'"+section.id+"'")
-    section_list = ",".join(section_list)
+    sections = Section.collection.filter(
+        "cohort", "==", cohort.key).filter("deleted_at_timestamp", "==",
+                                           None).fetch()
+    section_list = ",".join([f"\"{x.id}\"" for x in sections])
     if len(section_list) > 0:
       query=f'''Select * from {NOT_CLASSROOM_TABLE_ID}
       where cohort_id ="{cohort_id}"
-      and section_id in ({section_list})
+      section_id in ({section_list})
       and enrollment_role=\"learner\"'''
       result= run_query(query)
       data=bq_query_results_to_dict_list(result)
