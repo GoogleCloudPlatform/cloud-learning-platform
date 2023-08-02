@@ -550,7 +550,7 @@ def check_copy_course_alpha(original_courseworks,
   duplicate_coursework=[]
   duplicate_coursework_material=[]
   duplicate_coursework = [
-  title for title in original_coursework_titles 
+  title for title in original_coursework_titles
     if original_coursework_titles.count(title) > 1]
   duplicate_coursework_material = [
   title for title in original_coursework_material_titles
