@@ -13,9 +13,8 @@ from common.utils.http_exceptions import (InternalServerError,
 from common.utils.errors import ValidationError
 from services import common_service
 from config import BQ_TABLE_DICT, BQ_DATASET, auth_client
-from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from common.utils.secrets import get_secret
+
 
 
 
@@ -399,6 +398,10 @@ def copy_course_background_task_alpha(
                                 cohort_details,
                                 lms_job_id,
                                 message=""):
+  """
+    This function is background function for alpha copy course
+
+  """
   lms_job = LmsJob.find_by_id(lms_job_id)
   logs = lms_job.logs
   try:
@@ -407,6 +410,7 @@ def copy_course_background_task_alpha(
       course_template_details.classroom_id)
     original_coursework_materials =  classroom_crud.get_coursework_material_list(
       course_template_details.classroom_id)
+    Logger.info(message)
     Logger.info(f"Origial coursework list \
                 {len(original_courseworks)}")
     Logger.info(f"Original coursework Material list\
@@ -415,6 +419,7 @@ def copy_course_background_task_alpha(
     logs["info"].append(f"Original Coursework Materials \
                         {len(original_coursework_materials)}")
     Logger.info(f"This is section deatails object {sections_details.name}")
+    # Call classroom copy course API in Alpha version
     copied_course = classroom_crud.copy_classroom_course(course_template_details.classroom_id,
                                           course_template_details.name+sections_details.name)
     classroom_id = copied_course["id"]
@@ -525,11 +530,17 @@ def check_copy_course_alpha(original_courseworks,
                       original_coursework_materials,
                       copied_course,
                       lms_job_id):
+  
+  """
+  This function checks if the copy course process is completed successfully 
+  It returns a boolean error flag if the error flag is True then copy course 
+  process had errors It can be missing coursework or coursework attachments
+  """
   lms_job = LmsJob.find_by_id(lms_job_id)
   logs = lms_job.logs
   count = 0
   max_count = 3
-  
+
   original_coursework_titles = sort_titles(original_courseworks)
   original_coursework_dict =  make_title_key_coursework(original_courseworks)
   original_coursework_material_titles = sort_titles(
@@ -553,12 +564,12 @@ def check_copy_course_alpha(original_courseworks,
 
     # Get course title   
     # Todo : Seperate these two conditions 
-    if copied_courseworks == None :
+    if copied_courseworks is None :
       Logger.error("Courseworks not copied ")
       logs["errors"].append("Courseworks not copied ")
       error_flag = True
       continue
-    if copied_coursework_materials ==None:
+    if copied_coursework_materials is None:
       Logger.error("Coursework material not copied ")
       logs["errors"].append("Coursework material not copied ")
       error_flag = True
@@ -697,6 +708,11 @@ def check_copy_course_alpha(original_courseworks,
 
 def verifiy_attachment(title ,original_coursework_dict,
                        copied_coursework_dict,lms_job_id):
+  """
+  This function is verifies the attachment of coursework 
+  It compares the original coursework dict and copid coursework dict 
+  returns the missing attachments in list
+  """
   missing_attachments = set()
   original_drive_files= set()
   original_youtube_video= set()
@@ -757,12 +773,17 @@ def verifiy_attachment(title ,original_coursework_dict,
   
 
 def make_title_key_coursework(courseworks):
+  """This function takes the list of coursework dict and reurns
+    update dictionary with keys as coursework titile and value as 
+    entire coursework object
+  """
   updated_coursework_dict ={}
   for coursework in courseworks:
     updated_coursework_dict[coursework["title"]]=coursework
   return updated_coursework_dict
 
 def sort_titles(courseworks):
+  "This function sorts the tiles for coursework list"
   Logger.info(f"In sort titles {len(courseworks)}")
   titles = [coursework["title"] for coursework in courseworks]
   titles.sort()

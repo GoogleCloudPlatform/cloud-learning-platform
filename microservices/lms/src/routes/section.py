@@ -12,7 +12,6 @@ from common.utils.logging_handler import Logger
 from common.utils.bq_helper import insert_rows_to_bq
 from fastapi import APIRouter, Request, BackgroundTasks, status
 from googleapiclient.errors import HttpError
-from googleapiclient.discovery import build
 from schemas.classroom_courses import EnableNotificationsResponse
 from schemas.error_schema import (ConflictResponseModel,
                                   InternalServerErrorResponseModel,
