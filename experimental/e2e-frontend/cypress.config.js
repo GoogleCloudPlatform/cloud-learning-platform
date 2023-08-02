@@ -8,6 +8,8 @@ module.exports = defineConfig({
     experimentalRunAllSpecs: true,
     chromeWebSecurity: false,
     viewportHeight: 1080,
-    viewportWidth: 1920
+    viewportWidth: 1920,
+    video: false,
+    screenshotOnRunFailure: false,
   },
 });
