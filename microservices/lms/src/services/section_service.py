@@ -567,10 +567,6 @@ def check_copy_course_alpha(original_courseworks,
     copied_coursework_material_titles = sort_titles(copied_coursework_materials)
     copied_coursework_titles = set(copied_coursework_titles)
     copied_coursework_material_titles = set(copied_coursework_material_titles)
-    Logger.info(len(copied_coursework_titles)) 
-    Logger.info(f"---{len(copied_coursework_material_titles)}---------")
-    Logger.info(f"{copied_coursework_material_titles}")
-    Logger.info("--------------------------------------------")
     missing_coursework =[]
     missing_coursework_material = []
     title_mismatch_coursework = []
@@ -753,7 +749,7 @@ def verifiy_attachment(title ,original_coursework_dict,
     return missing_attachments
   except Exception as e:
     error = traceback.format_exc().replace("\n", " ")
-    Logger.error(f"Error {title} in attachment -{error}")
+    Logger.error(f"Error {title} in attachment -{error} {e}")
     logs["errors"].append(f"Error {title} in attachment -{error}")
     lms_job.logs =logs
     lms_job.update()
