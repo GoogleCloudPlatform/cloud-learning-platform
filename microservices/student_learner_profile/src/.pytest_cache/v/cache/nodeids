@@ -1,7 +1,0 @@
-[
-  "routes/progress_test.py::test_get_learner_progress_invalid_learner",
-  "routes/progress_test.py::test_get_learner_progress_invalid_learner_profile",
-  "routes/progress_test.py::test_get_learner_progress_invalid_node_id",
-  "routes/progress_test.py::test_get_learner_progress_invalid_node_type",
-  "routes/progress_test.py::test_get_learner_progress_postive"
-]

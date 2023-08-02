@@ -2,7 +2,7 @@
   Unit tests for Learner Profile endpoints
 """
 # disabling pylint rules that conflict with pytest fixtures
-# pylint: disable=unused-argument,redefined-outer-name,unused-import
+# pylint: disable=unused-argument, redefined-outer-name,unused-import
 
 import os
 

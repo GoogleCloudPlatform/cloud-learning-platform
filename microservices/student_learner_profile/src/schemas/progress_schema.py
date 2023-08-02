@@ -14,6 +14,7 @@ from schemas.schema_examples import (
   CURRICULUM_PATHWAY_PROGRESS_RESPONSE
 )
 
+
 class NodeTypeModel(str, Enum):
   curriculum_pathways = "curriculum_pathways"
   learning_experiences = "learning_experiences"
@@ -432,6 +433,7 @@ class Assessment(BaseModel):
   alias: str
   type: str
   order: Optional[int]
+  instruction_completed: Optional[bool] = False
 
 
 class LearningResource(BaseModel):

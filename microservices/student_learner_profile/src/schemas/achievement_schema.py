@@ -1,5 +1,5 @@
 """
-Pydantic Model for Achievement API's
+Pydantic Model for Achievement APIs
 """
 # pylint: disable=invalid-name
 
@@ -32,6 +32,7 @@ class UpdateAlignments(BaseModel):
   competency_alignments: Optional[list]
   skill_alignments: Optional[list]
 
+
 class DesignConfig(BaseModel):
   """
   DesignConfig Pydantic Model
@@ -39,6 +40,7 @@ class DesignConfig(BaseModel):
   theme: Optional[str] = ""
   illustration: Optional[str] = ""
   shape: Optional[str] = ""
+
 
 class MetaData(BaseModel):
   """
@@ -107,13 +109,18 @@ class FullAchievementDataModel(BasicAchievementModel):
   last_modified_time: str
 
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullAchievementDataModel]]
+  total_count: int
+
+
 class AllAchievementsResponseModel(BaseModel):
   """
   All Achievements Response Pydantic Model
   """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the achievements"
-  data: Optional[List[FullAchievementDataModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -121,7 +128,10 @@ class AllAchievementsResponseModel(BaseModel):
       "example": {
         "success": True,
         "message": "Successfully fetched the achievements",
-        "data": [FULL_ACHIEVEMENT_EXAMPLE]
+        "data": {
+          "records": [FULL_ACHIEVEMENT_EXAMPLE],
+          "total_count": 50
+        }
       }
     }
 
@@ -151,10 +161,8 @@ class PostAchievementModel(BaseModel):
 
 
 class UpdateAchievementModel(BaseModel):
-  """
-  Update Achievement Pydantic Model
-  """
-  type: Optional[str]
+  """Update Achievement Pydantic Model"""
+  type: Optional[ALLOWED_ACHIEVEMENT_TYPES]
   name: Optional[str]
   description: Optional[str]
   alignments: Optional[UpdateAlignments]
@@ -288,6 +296,7 @@ class AchievementImportJsonResponse(BaseModel):
       }
     }
 
+
 class LearnerAchievementModel(FullAchievementDataModel):
   """
   LearnerAchievement Pydantic Model
@@ -295,6 +304,7 @@ class LearnerAchievementModel(FullAchievementDataModel):
   status: Optional[str]
   parent_node: Optional[dict] = {}
   child_achievements: Optional[List] = []
+
 
 class LearnerAchievementResponseModel(BaseModel):
   """
@@ -304,6 +314,7 @@ class LearnerAchievementResponseModel(BaseModel):
   message: Optional[str] = "Successfully fetched the learner achievements for"
   " the given pathway"
   data: Optional[List[LearnerAchievementModel]]
+
   class Config():
     orm_mode = True
     schema_extra = {

@@ -6,6 +6,7 @@ from pydantic.error_wrappers import ValidationError as PydanticValidationError
 
 from common.utils.errors import ValidationError
 
+
 # pylint: disable = broad-except
 
 
@@ -34,7 +35,7 @@ def json_import(json_file, json_schema, model_obj, object_name):
   inserting the data into the database
 
   Args:
-    json_file (json): learners content json file
+    json_file (json): learner content json file
     json_schema (dict): learners content json schema
     model_obj (object): learners content model
     object_name (object): json object name
@@ -84,8 +85,8 @@ def json_import(json_file, json_schema, model_obj, object_name):
   except PydanticValidationError as err:
     error_res = json.loads(err.json())
     req_fields = [i["loc"][-1] for i in error_res]
-    req_fields_str = "Missing required fields - "+ \
-      ",".join("'"+i+"'" for i in req_fields)
+    req_fields_str = "Missing required fields - " + \
+                     ",".join("'" + i + "'" for i in req_fields)
     raise ValidationError(req_fields_str, data=error_res) from err
 
   except Exception as err:

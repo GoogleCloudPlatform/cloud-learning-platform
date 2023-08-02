@@ -1,5 +1,5 @@
 """
-Pydantic Model for Goal API's
+Pydantic Model for Goal APIs
 """
 from typing import List, Optional
 from pydantic import BaseModel
@@ -61,22 +61,30 @@ class UpdateGoalModel(BaseModel):
     schema_extra = {"example": UPDATE_GOAL_EXAMPLE}
 
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullGoalDataModel]]
+  total_count: int
+
+
 class GetAllGoalsResponseModel(BaseModel):
   """
   Get All Goals Response Pydantic Model
   """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the goal"
-  data: Optional[List[FullGoalDataModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
     schema_extra = {
-      "example": {
-        "success": True,
-        "message": "Successfully fetched the goal",
-        "data": [FULL_GOAL_EXAMPLE]
-      }
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the goal",
+            "data": {
+                      "records":[FULL_GOAL_EXAMPLE],
+                      "total_count": 50
+                    }
+        }
     }
 
 

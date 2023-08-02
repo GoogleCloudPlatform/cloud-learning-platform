@@ -3,32 +3,33 @@ from typing import Optional
 from fastapi import APIRouter, UploadFile, File, Query
 from common.models import Achievement, LearnerProfile
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
-                                PayloadTooLargeError)
+                                 PayloadTooLargeError)
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound, PayloadTooLarge)
 from schemas.achievement_schema import (
-    PostAchievementModel, GetAchievementResponseModel,
-    PostAchievementResponseModel, UpdateAchievementResponseModel,
-    UpdateAchievementModel, DeleteAchievement, AllAchievementsResponseModel,
-    AchievementSearchResponseModel, AchievementImportJsonResponse,
-    BasicAchievementModel, ALLOWED_ACHIEVEMENT_TYPES)
+  PostAchievementModel, GetAchievementResponseModel,
+  PostAchievementResponseModel, UpdateAchievementResponseModel,
+  UpdateAchievementModel, DeleteAchievement, AllAchievementsResponseModel,
+  AchievementSearchResponseModel, AchievementImportJsonResponse,
+  BasicAchievementModel, ALLOWED_ACHIEVEMENT_TYPES)
 from schemas.error_schema import (NotFoundErrorResponseModel,
                                   PayloadTooLargeResponseModel)
 from services.json_import import json_import
 from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES
-# pylint: disable = broad-except
+
+# pylint: disable = broad-except,disable=redefined-builtin
 
 router = APIRouter(tags=["Achievement"], responses=ERROR_RESPONSES)
 
 
 @router.get(
-    "/achievement/search", response_model=AchievementSearchResponseModel)
+  "/achievement/search", response_model=AchievementSearchResponseModel)
 def search_achievement(
-    type: Optional[ALLOWED_ACHIEVEMENT_TYPES] = "Achievement"):  # pylint: disable=redefined-builtin
-  """Search for achievements based on the achievement first name
+  type: Optional[ALLOWED_ACHIEVEMENT_TYPES] = "Achievement"):
+  """Search for achievements based on the achievement firstname
 
   Args:
-      type(str): First name of the achievement. Defaults to 'Achievement'.
+      type(str): First name of the achievement. Defaults to 'Achievement.'
 
   Returns:
       AchievementSearchResponseModel: List of achievement objects
@@ -39,21 +40,21 @@ def search_achievement(
     achievement_node_items = Achievement.find_by_type(type)
     for achievement_node_item in achievement_node_items:
       achievement_node_dict = achievement_node_item.get_fields(
-          reformat_datetime=True)
+        reformat_datetime=True)
       result.append(achievement_node_dict)
     return {
-        "success": True,
-        "message": "Successfully fetched the achievements",
-        "data": result
+      "success": True,
+      "message": "Successfully fetched the achievements",
+      "data": result
     }
   else:
     raise BadRequest("Missing or invalid request parameters")
 
 
 @router.get(
-    "/achievements",
-    response_model=AllAchievementsResponseModel,
-    name="Get all Achievements")
+  "/achievements",
+  response_model=AllAchievementsResponseModel,
+  name="Get all Achievements")
 def get_achievements(name: str = None,
                      achievement_type: ALLOWED_ACHIEVEMENT_TYPES = None,
                      tag: str = None,
@@ -70,6 +71,7 @@ def get_achievements(name: str = None,
       tag (str) : tag given to achievement
       skip (int): Number of objects to be skipped
       limit (int): Size of achievement array to be returned
+      fetch_archive (bool): bool
 
   Raises:
       Exception: 500 Internal Server Error if something went wrong
@@ -90,17 +92,19 @@ def get_achievements(name: str = None,
       collection_manager = collection_manager.filter("tags", "array_contains",
                                                      tag)
     if fetch_archive is not None:
-      collection_manager = collection_manager\
-                            .filter("is_archived", "==", fetch_archive)
+      collection_manager = collection_manager \
+        .filter("is_archived", "==", fetch_archive)
 
     achievements = collection_manager.order("-created_time").offset(skip).fetch(
-        limit)
+      limit)
 
     achievements = [i.get_fields(reformat_datetime=True) for i in achievements]
+    count = 10000
+    response = {"records": achievements, "total_count": count}
     return {
-        "success": True,
-        "message": "Data fetched successfully",
-        "data": achievements
+      "success": True,
+      "message": "Data fetched successfully",
+      "data": response
     }
   except ValidationError as e:
     raise BadRequest(str(e)) from e
@@ -109,18 +113,18 @@ def get_achievements(name: str = None,
 
 
 @router.post(
-    "/achievement",
-    response_model=PostAchievementResponseModel,
-    responses={404: {
-        "model": NotFoundErrorResponseModel
-    }})
+  "/achievement",
+  response_model=PostAchievementResponseModel,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
 def create_achievement(input_achievement: PostAchievementModel):
-  """The create achievement endpoint will add the given achievement in request
+  """The created achievement endpoint will add the given achievement in request
   body to the firestore
 
   Args:
-      input_achievement (PostAchievementModel): input achievement to be
-      inserted
+      input_achievement (PostAchievementModel):
+      input achievement to be inserted
 
   Raises:
       ResourceNotFoundException: If the achievement does not exist
@@ -134,9 +138,9 @@ def create_achievement(input_achievement: PostAchievementModel):
     new_achievement = Achievement.create_object(input_achievement_dict)
     achievement_fields = new_achievement.get_fields(reformat_datetime=True)
     return {
-        "success": True,
-        "message": "Successfully created the achievement",
-        "data": achievement_fields
+      "success": True,
+      "message": "Successfully created the achievement",
+      "data": achievement_fields
     }
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
@@ -145,11 +149,11 @@ def create_achievement(input_achievement: PostAchievementModel):
 
 
 @router.get(
-    "/achievement/{uuid}",
-    response_model=GetAchievementResponseModel,
-    responses={404: {
-        "model": NotFoundErrorResponseModel
-    }})
+  "/achievement/{uuid}",
+  response_model=GetAchievementResponseModel,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
 def get_achievement(uuid: str):
   """The get achievement endpoint will return the achievement from
   firestore of which uuid is provided
@@ -168,9 +172,9 @@ def get_achievement(uuid: str):
     achievement = Achievement.find_by_uuid(uuid)
     achievement_fields = achievement.get_fields(reformat_datetime=True)
     return {
-        "success": True,
-        "message": "Successfully fetched the achievement",
-        "data": achievement_fields
+      "success": True,
+      "message": "Successfully fetched the achievement",
+      "data": achievement_fields
     }
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
@@ -179,24 +183,25 @@ def get_achievement(uuid: str):
 
 
 @router.put(
-    "/achievement/{uuid}",
-    response_model=UpdateAchievementResponseModel,
-    responses={404: {
-        "model": NotFoundErrorResponseModel
-    }})
+  "/achievement/{uuid}",
+  response_model=UpdateAchievementResponseModel,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
 def update_achievement(uuid: str, input_achievement: UpdateAchievementModel):
-  """Update a achievement with the uuid passed in the request body
+  """Update an achievement with the uuid passed in the request body
 
   Args:
-      input_achievement (UpdateAchievementModel): Required body of the
-      achievement
+    uuid: string
+    input_achievement (UpdateAchievementModel):
+    Required body of the achievement
 
   Raises:
-      ResourceNotFoundException: If the achievement does not exist
-      Exception: 500 Internal Server Error if something went wrong
+    ResourceNotFoundException: If the achievement does not exist
+    Exception: 500 Internal Server Error if something went wrong
 
   Returns:
-      UpdateAchievementResponseModel: Achievement Object
+    UpdateAchievementResponseModel: Achievement Object
   """
   try:
     existing_achievement = Achievement.find_by_uuid(uuid)
@@ -213,9 +218,9 @@ def update_achievement(uuid: str, input_achievement: UpdateAchievementModel):
     achievement_fields = existing_achievement.get_fields(reformat_datetime=True)
 
     return {
-        "success": True,
-        "message": "Successfully updated the achievement",
-        "data": achievement_fields
+      "success": True,
+      "message": "Successfully updated the achievement",
+      "data": achievement_fields
     }
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
@@ -226,13 +231,13 @@ def update_achievement(uuid: str, input_achievement: UpdateAchievementModel):
 
 
 @router.delete(
-    "/achievement/{uuid}",
-    response_model=DeleteAchievement,
-    responses={404: {
-        "model": NotFoundErrorResponseModel
-    }})
+  "/achievement/{uuid}",
+  response_model=DeleteAchievement,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
 def delete_achievement(uuid: str):
-  """Delete a achievement with the given uuid from firestore
+  """Delete an achievement with the given uuid from firestore
 
   Args:
       uuid (str): Unique id of the achievement
@@ -246,9 +251,9 @@ def delete_achievement(uuid: str):
   """
   try:
     learner_profiles_to_update = LearnerProfile.collection.filter(
-        "achievements", "array_contains", uuid).fetch()
+      "achievements", "array_contains", uuid).fetch()
     learner_profile_ids = [
-        learner_profile.uuid for learner_profile in learner_profiles_to_update
+      learner_profile.uuid for learner_profile in learner_profiles_to_update
     ]
     for learner_profile_id in learner_profile_ids:
       learner_profile = LearnerProfile.find_by_uuid(learner_profile_id)
@@ -266,12 +271,12 @@ def delete_achievement(uuid: str):
 
 
 @router.post(
-    "/achievement/import/json",
-    response_model=AchievementImportJsonResponse,
-    responses={413: {
-        "model": PayloadTooLargeResponseModel
-    }},
-    name="Import Achievements from JSON file")
+  "/achievement/import/json",
+  response_model=AchievementImportJsonResponse,
+  responses={413: {
+    "model": PayloadTooLargeResponseModel
+  }},
+  name="Import Achievements from JSON file")
 async def import_achievements(json_file: UploadFile = File(...)):
   """Create achievements from json file
 
@@ -292,10 +297,10 @@ async def import_achievements(json_file: UploadFile = File(...)):
       )
     await json_file.seek(0)
     final_output = json_import(
-        json_file=json_file,
-        json_schema=BasicAchievementModel,
-        model_obj=Achievement,
-        object_name="achievements")
+      json_file=json_file,
+      json_schema=BasicAchievementModel,
+      model_obj=Achievement,
+      object_name="achievements")
     return final_output
   except PayloadTooLargeError as e:
     raise PayloadTooLarge(str(e)) from e

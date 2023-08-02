@@ -7,27 +7,15 @@ from typing import Optional
 from typing_extensions import Literal
 from fastapi import APIRouter, UploadFile, File, Query
 
-from services.json_import import json_import
-
-from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES
-
+from common.models import (
+  Learner, User, Staff, AssociationGroup, CurriculumPathway)
+from common.utils.errors import (
+  ResourceNotFoundException, ValidationError,
+  ConflictError, PayloadTooLargeError)
+from common.utils.http_exceptions import (
+  InternalServerError, BadRequest, ResourceNotFound, Conflict, PayloadTooLarge)
 from common.utils.logging_handler import Logger
 from common.utils.sorting_logic import collection_sorting
-from common.models import (
-  Learner, User, Staff, AssociationGroup,
-  CurriculumPathway
-)
-from common.utils.errors import (
-  ResourceNotFoundException,
-  ValidationError,
-  ConflictError,
-  PayloadTooLargeError
-)
-from common.utils.http_exceptions import (
-  InternalServerError, BadRequest,
-  ResourceNotFound, Conflict,
-  PayloadTooLarge
-)
 
 from schemas.learner_schema import (
   LearnerModel, GetLearnerResponseModel, PostLearnerResponseModel,
@@ -35,12 +23,12 @@ from schemas.learner_schema import (
   AllLearnersResponseModel, LearnerSearchResponseModel,
   LearnerImportJsonResponse, BasicLearnerModel, CoachesResponseModel,
   InstructorResponseModel, GetLearnerPathwayIdResponse,
-  GetInstructorsResponseModel
-)
-from schemas.error_schema import (
-  NotFoundErrorResponseModel,
-  PayloadTooLargeResponseModel
-)
+  GetInstructorsResponseModel)
+from schemas.error_schema import (NotFoundErrorResponseModel,
+                                  PayloadTooLargeResponseModel)
+
+from services.json_import import json_import
+from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES
 
 # pylint: disable = broad-exception-raised
 
@@ -50,7 +38,7 @@ router = APIRouter(tags=["Learner"], responses=ERROR_RESPONSES)
 @router.get("/learner/search", response_model=LearnerSearchResponseModel)
 def search_learner(first_name: Optional[str] = None,
                    email_address: Optional[str] = None):
-  """Search for learners based on the learner first name and email address
+  """Search for learners based on the learner firstname and email address
 
   Args:
       first_name(str): First name of the learner. Defaults to None.
@@ -79,9 +67,9 @@ def search_learner(first_name: Optional[str] = None,
       result.append(learner_node_dict)
 
     return {
-        "success": True,
-        "message": "Successfully fetched the learners",
-        "data": result
+      "success": True,
+      "message": "Successfully fetched the learners",
+      "data": result
     }
   except ValidationError as e:
     Logger.error(e)
@@ -94,9 +82,9 @@ def search_learner(first_name: Optional[str] = None,
 
 
 @router.get(
-    "/learners",
-    response_model=AllLearnersResponseModel,
-    name="Get all Learners")
+  "/learners",
+  response_model=AllLearnersResponseModel,
+  name="Get all Learners")
 def get_learners(skip: int = Query(0, ge=0, le=2000),
                  limit: int = Query(10, ge=1, le=100),
                  fetch_archive: Optional[bool] = None,
@@ -108,7 +96,7 @@ def get_learners(skip: int = Query(0, ge=0, le=2000),
 
   Args:
       skip (int): Number of objects to be skipped
-      limit (int): Size of learner array to be returned
+      limit (int): Size of a learner array to be returned
       sort_by (str): Data Model Fields name
       sort_order (str): ascending/descending
       fetch_archive (bool): to fetch archive
@@ -130,11 +118,12 @@ def get_learners(skip: int = Query(0, ge=0, le=2000),
                                   skip=skip, limit=limit)
 
     learners = [i.get_fields(reformat_datetime=True) for i in learners]
-
+    count = 10000
+    response = {"records": learners, "total_count": count}
     return {
-        "success": True,
-        "message": "Data fetched successfully",
-        "data": learners
+      "success": True,
+      "message": "Data fetched successfully",
+      "data": response
     }
   except ValidationError as e:
     Logger.info(traceback.print_exc())
@@ -145,11 +134,11 @@ def get_learners(skip: int = Query(0, ge=0, le=2000),
 
 
 @router.get(
-    "/learner/{uuid}",
-    response_model=GetLearnerResponseModel,
-    responses={404: {
-        "model": NotFoundErrorResponseModel
-    }})
+  "/learner/{uuid}",
+  response_model=GetLearnerResponseModel,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
 def get_learner(uuid: str):
   """The get learner endpoint will return the learner from
   firestore of which uuid is provided
@@ -168,9 +157,9 @@ def get_learner(uuid: str):
     learner = Learner.find_by_uuid(uuid)
     learner_fields = learner.get_fields(reformat_datetime=True)
     return {
-        "success": True,
-        "message": "Successfully fetched the learner",
-        "data": learner_fields
+      "success": True,
+      "message": "Successfully fetched the learner",
+      "data": learner_fields
     }
   except ResourceNotFoundException as e:
     Logger.info(traceback.print_exc())
@@ -181,13 +170,13 @@ def get_learner(uuid: str):
 
 
 @router.post(
-    "/learner",
-    response_model=PostLearnerResponseModel,
-    responses={404: {
-        "model": NotFoundErrorResponseModel
-    }})
+  "/learner",
+  response_model=PostLearnerResponseModel,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
 def create_learner(input_learner: LearnerModel):
-  """The create learner endpoint will add the given learner in request body to
+  """The created learner endpoint will add the given learner in request body to
   the firestore
 
   Args:
@@ -209,13 +198,15 @@ def create_learner(input_learner: LearnerModel):
 
     # Checking if a learner document already exists with the same email id
     if learner is not None:
-      raise ConflictError(f"Learner with the given email "
-      f"address {input_learner_dict.get('email_address', '').lower()} "
-      f"already exists")
+      raise ConflictError(
+        f"Learner with the given email "
+        f"address {input_learner_dict.get('email_address', '').lower()} "
+        f"already exists")
 
     # Checking if the learner email id and backup email id are the same
-    if input_learner_dict.get("email_address", "").lower() == \
-      input_learner_dict.get("backup_email_address", "").lower():
+    if input_learner_dict.get("email_address",
+                              "").lower() == input_learner_dict.get(
+      "backup_email_address", "").lower():
       raise ValidationError(
         "Primary email address and backup email address cannot be the same.")
 
@@ -227,9 +218,9 @@ def create_learner(input_learner: LearnerModel):
     new_learner.update()
     learner_fields = new_learner.get_fields(reformat_datetime=True)
     return {
-        "success": True,
-        "message": "Successfully created the learner",
-        "data": learner_fields
+      "success": True,
+      "message": "Successfully created the learner",
+      "data": learner_fields
     }
   except ResourceNotFoundException as e:
     Logger.info(traceback.print_exc())
@@ -244,11 +235,11 @@ def create_learner(input_learner: LearnerModel):
 
 
 @router.put(
-    "/learner/{uuid}",
-    response_model=UpdateLearnerResponseModel,
-    responses={404: {
-        "model": NotFoundErrorResponseModel
-    }})
+  "/learner/{uuid}",
+  response_model=UpdateLearnerResponseModel,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
 def update_learner(uuid: str, input_learner: UpdateLearnerModel):
   """Update a learner with the uuid passed in the request body
 
@@ -275,9 +266,9 @@ def update_learner(uuid: str, input_learner: UpdateLearnerModel):
 
     # Check if the existing backup email and updated primary email are the same
     # pylint: disable=C0301
-    if (input_learner_dict.get("email_address", "").lower() == \
-      learner_fields["backup_email_address"] and \
-      learner_fields["backup_email_address"]) or \
+    if (input_learner_dict.get("email_address", "").lower() ==
+        learner_fields["backup_email_address"] and
+        learner_fields["backup_email_address"]) or \
       input_learner_dict.get("backup_email_address", "").lower() == \
       learner_fields["email_address"]:
       raise ValidationError(
@@ -299,9 +290,9 @@ def update_learner(uuid: str, input_learner: UpdateLearnerModel):
     learner_fields = existing_learner.get_fields(reformat_datetime=True)
 
     return {
-        "success": True,
-        "message": "Successfully updated the learner",
-        "data": learner_fields
+      "success": True,
+      "message": "Successfully updated the learner",
+      "data": learner_fields
     }
   except ResourceNotFoundException as e:
     Logger.error(e)
@@ -314,11 +305,11 @@ def update_learner(uuid: str, input_learner: UpdateLearnerModel):
 
 
 @router.delete(
-    "/learner/{uuid}",
-    response_model=DeleteLearner,
-    responses={404: {
-        "model": NotFoundErrorResponseModel
-    }})
+  "/learner/{uuid}",
+  response_model=DeleteLearner,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
 def delete_learner(uuid: str):
   """Delete a learner with the given uuid from firestore
 
@@ -344,12 +335,12 @@ def delete_learner(uuid: str):
 
 
 @router.post(
-    "/learner/import/json",
-    response_model=LearnerImportJsonResponse,
-    name="Import Learners from JSON file",
-    responses={413: {
-        "model": PayloadTooLargeResponseModel
-    }})
+  "/learner/import/json",
+  response_model=LearnerImportJsonResponse,
+  name="Import Learners from JSON file",
+  responses={413: {
+    "model": PayloadTooLargeResponseModel
+  }})
 async def import_learners(json_file: UploadFile = File(...)):
   """Create learners from json file
 
@@ -366,13 +357,13 @@ async def import_learners(json_file: UploadFile = File(...)):
   try:
     if len(await json_file.read()) > PAYLOAD_FILE_SIZE:
       raise PayloadTooLargeError(
-          f"File size is too large: {json_file.filename}")
+        f"File size is too large: {json_file.filename}")
     await json_file.seek(0)
     final_output = json_import(
-        json_file=json_file,
-        json_schema=BasicLearnerModel,
-        model_obj=Learner,
-        object_name="learners")
+      json_file=json_file,
+      json_schema=BasicLearnerModel,
+      model_obj=Learner,
+      object_name="learners")
     return final_output
   except PayloadTooLargeError as e:
     Logger.info(traceback.print_exc())
@@ -386,7 +377,8 @@ async def import_learners(json_file: UploadFile = File(...)):
 
 
 @router.get(
-  "/learner/{learner_id}/curriculum-pathway/{curriculum_pathway_id}/instructor",
+  "/learner/{learner_id}/curriculum-pathway/"
+  "{curriculum_pathway_id}/instructor",
   response_model=InstructorResponseModel)
 def get_instructor_details(learner_id: str, curriculum_pathway_id: str):
   """Function to fetch Instructor Details for a given learner_id and
@@ -403,14 +395,13 @@ def get_instructor_details(learner_id: str, curriculum_pathway_id: str):
   ### Returns:
       instructor_id: InstructorResponseModel
   """
-
   try:
 
     # TODO: rather then using the learner_id
     # we need to use user_id
     # Validation if Learner Exists
     Learner.find_by_uuid(learner_id)
-
+    instructors_learner_group = []
     # Validation if User of the given Learner Exists
     user_learner = User.find_by_user_type_ref(learner_id)
 
@@ -419,12 +410,11 @@ def get_instructor_details(learner_id: str, curriculum_pathway_id: str):
 
     if pathway.alias != "discipline":
       raise ValidationError(
-        f"Pathway with {curriculum_pathway_id} has alias as {pathway.alias}"\
-          " instead of discipline"
-        )
+        f"Pathway with {curriculum_pathway_id} has alias as {pathway.alias}"
+        " instead of discipline")
 
     learner_association_groups = AssociationGroup.collection.filter(
-        "association_type", "==", "learner").order("-created_time").fetch()
+      "association_type", "==", "learner").order("-created_time").fetch()
 
     learner_group = None
     for learner_association_group in learner_association_groups:
@@ -435,39 +425,38 @@ def get_instructor_details(learner_id: str, curriculum_pathway_id: str):
 
     if not learner_group:
       raise ValidationError(
-        f"Learner with User ID {user_learner.id} "\
-          "not found in any Association Groups"
-        )
+        f"Learner with User ID {user_learner.id} "
+        "not found in any Association Groups"
+      )
 
     if learner_group.associations:
       instructors_learner_group = learner_group.associations.get(
-          "instructors", [])
+        "instructors", [])
 
     instructor_id = None
     for instructor in instructors_learner_group:
       if instructor["curriculum_pathway_id"] == curriculum_pathway_id and \
-      instructor["status"] == "active":
+        instructor["status"] == "active":
         instructor_id = instructor["instructor"]
         break
 
     if instructor_id is None:
       raise ValidationError(
-        "No Active Instructors Available for the given CurriculumPathway "\
-        f"= {curriculum_pathway_id} in AssociationGroup = {learner_group.uuid}"
-        )
+        "No Active Instructors Available for the given CurriculumPathway "
+        f"= {curriculum_pathway_id} in AssociationGroup = {learner_group.uuid}")
 
     instructor_user = User.find_by_id(instructor_id)
     instructor_staff = Staff.find_by_uuid(instructor_user.user_type_ref)
 
     data = {
-          "instructor_staff_id": instructor_staff.uuid,
-          "instructor_user_id": instructor_user.user_id
-               }
+      "instructor_staff_id": instructor_staff.uuid,
+      "instructor_user_id": instructor_user.user_id
+    }
 
     return {
-        "success": True,
-        "message": "Successfully fetched instructor",
-        "data": data
+      "success": True,
+      "message": "Successfully fetched instructor",
+      "data": data
     }
 
   except ValidationError as e:
@@ -481,14 +470,13 @@ def get_instructor_details(learner_id: str, curriculum_pathway_id: str):
     raise InternalServerError(str(e)) from e
 
 
-
 @router.get(
   "/learner/{learner_id}/curriculum-pathway/{program_id}/instructors",
   response_model=GetInstructorsResponseModel)
 def get_instructor_details_for_program(learner_id: str,
                                        program_id: str):
   """Fetch All Instructor Details for given learner_id and curriculum_pathway_id
-  corresponding to program.
+  corresponding to the program.
   The details will be fetched from LearnerAssociationGroup where the given
   Learner & given program_id is associated.
 
@@ -515,23 +503,23 @@ def get_instructor_details_for_program(learner_id: str,
 
     if pathway.alias != "program":
       raise ValidationError(
-        f"Pathway with {program_id} has alias as {pathway.alias}"\
-          " instead of program"
-        )
+        f"Pathway with {program_id} has alias as {pathway.alias}"
+        " instead of program"
+      )
     filter_user = {
-      "user" :  user_learner.user_id,
+      "user": user_learner.user_id,
       "status": "active"
     }
     learner_association_group = AssociationGroup.collection.filter(
-        "associations.curriculum_pathway_id", "==", program_id).filter(
-        "users","array_contains",filter_user ).get()
+      "associations.curriculum_pathway_id", "==", program_id).filter(
+      "users", "array_contains", filter_user).get()
 
     if not learner_association_group:
       raise ValidationError(
-        f"Learner with User ID {user_learner.id} "\
-          "is not actively associated with with the given "\
-          f"program with uuid {program_id} in any Association group"
-        )
+        f"Learner with User ID {user_learner.id} "
+        "is not actively associated with with the given "
+        f"program with uuid {program_id} in any Association group"
+      )
 
     instructor_list = []
     instructors = learner_association_group.associations.get("instructors", [])
@@ -540,19 +528,19 @@ def get_instructor_details_for_program(learner_id: str,
         instructor_user = User.find_by_id(instructor["instructor"])
         instructor_staff = Staff.find_by_uuid(instructor_user.user_type_ref)
         discipline = CurriculumPathway.find_by_uuid(
-            instructor["curriculum_pathway_id"])
+          instructor["curriculum_pathway_id"])
         instructor_dict = {
           "user_id": instructor["instructor"],
           "staff_id": instructor_staff.uuid,
           "discipline_id": instructor["curriculum_pathway_id"],
           "discipline_name": discipline.name
-          }
+        }
         instructor_list.append(instructor_dict)
 
     return {
-        "success": True,
-        "message": "Successfully fetched instructor details",
-        "data": instructor_list
+      "success": True,
+      "message": "Successfully fetched instructor details",
+      "data": instructor_list
     }
 
   except ValidationError as e:
@@ -566,24 +554,23 @@ def get_instructor_details_for_program(learner_id: str,
     raise InternalServerError(str(e)) from e
 
 
-
 @router.get(
-    "/learner/{learner_id}/curriculum-pathway",
-    response_model=GetLearnerPathwayIdResponse)
+  "/learner/{learner_id}/curriculum-pathway",
+  response_model=GetLearnerPathwayIdResponse)
 def get_curriculum_pathway_for_the_learner(learner_id: str):
   """The get curriculum pathway for the given learner
   ### Args:
-      learner_id (str): Unique identifier for the learner
+    learner_id (str): Unique identifier for the learner
 
   ### Raises:
-      ResourceNotFoundException: If the learner does not exist.
+    ResourceNotFoundException: If the learner does not exist.
     Exception 500:
     Internal Server Error. Raised if something went wrong
 
   ### Returns:
-      GetLearnerPathwayIdResponse: curriculum_pathway_id belong to given learner
+    GetLearnerPathwayIdResponse: curriculum_pathway_id belongs to given learner
 
-  NOTE: To get the curriculum pathway for the given learner
+  NOTE: To get the curriculum pathway for the given learner,
   We need to make sure that the given learner should add in the learner
   association group
   """
@@ -595,7 +582,7 @@ def get_curriculum_pathway_for_the_learner(learner_id: str):
     user = User.find_by_user_type_ref(learner.uuid)
 
     learner_association_groups = AssociationGroup.collection.filter(
-        "association_type", "==", "learner").order("-created_time").fetch()
+      "association_type", "==", "learner").order("-created_time").fetch()
 
     curriculum_pathway_id = None
 
@@ -608,24 +595,25 @@ def get_curriculum_pathway_for_the_learner(learner_id: str):
       if any(user_dict["user"] == user.user_id
              for user_dict in learner_association_group.users):
         curriculum_pathway_id = learner_association_group.associations[
-            "curriculum_pathway_id"]
+          "curriculum_pathway_id"]
         break
 
     if curriculum_pathway_id is None:
       raise ResourceNotFoundException(
-        f"Given Learner with uuid {learner_id} is not "\
+        f"Given Learner with uuid {learner_id} is not "
         "present in any of the learner association group")
 
     if curriculum_pathway_id == "":
-      raise ResourceNotFoundException("No curriculum pathway id "\
-        f"found for the given Learner with uuid {learner_id}")
+      raise ResourceNotFoundException("No curriculum pathway id "
+                                      f"found for the given Learner "
+                                      f"with uuid {learner_id}")
 
     data = {"curriculum_pathway_id": curriculum_pathway_id}
 
     return {
       "success": True,
-      "message": "Successfully fetch the curriculum pathway "\
-        "for the learner",
+      "message": "Successfully fetch the curriculum pathway "
+                 "for the learner",
       "data": data
     }
   except ValidationError as e:
@@ -640,18 +628,18 @@ def get_curriculum_pathway_for_the_learner(learner_id: str):
 
 
 @router.get(
-    "/learner/{learner_id}/coach",
-    response_model=CoachesResponseModel,
-    responses={404: {
-        "model": NotFoundErrorResponseModel
-    }})
+  "/learner/{learner_id}/coach",
+  response_model=CoachesResponseModel,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
 def get_coach_details(learner_id: str):
   """
   Function to fetch Coach Details for a given learner_id.
   The details will be fetched from LearnerAssociationGroup by first
   identifying and fetching the LearnerAssociationGroup details where
   the Learner is associated. Then from the AssociationGroup the corresponding
-  coach will be identified and details of the coach will be fetched
+  coach will be identified, and details of the coach will be fetched
 
   NOTE: To get the coach details for given learner, the user_id for user
   corresponding to given learner must exist in any one learner association
@@ -675,9 +663,9 @@ def get_coach_details(learner_id: str):
 
     # Fetch all learner association groups
     learner_association_groups = AssociationGroup.collection.filter(
-                  "association_type", "==", "learner").fetch()
-    group_fields = [i.get_fields(reformat_datetime=True) for i in \
-                              learner_association_groups]
+      "association_type", "==", "learner").fetch()
+    group_fields = [i.get_fields(reformat_datetime=True) for i in
+                    learner_association_groups]
 
     # Find Learner Association Groups in which user_id for given learner exists
     learner_group = None
@@ -700,18 +688,19 @@ def get_coach_details(learner_id: str):
 
     if not coach_user_id:
       raise ValidationError("No active coach exists in Learner Association "
-        f"Group for user corresponding to given learner_id {learner_id}")
+                            f"Group for user corresponding to "
+                            f"given learner_id {learner_id}")
 
     coach_user = User.find_by_user_id(coach_user_id)
     coach_staff = Staff.find_by_uuid(coach_user.user_type_ref)
 
     return {
-        "success": True,
-        "message": "Successfully fetched the coach",
-        "data": {
-            "coach_staff_id": coach_staff.uuid,
-            "coach_user_id": coach_user.user_id
-        }
+      "success": True,
+      "message": "Successfully fetched the coach",
+      "data": {
+        "coach_staff_id": coach_staff.uuid,
+        "coach_user_id": coach_user.user_id
+      }
     }
 
   except ResourceNotFoundException as e:

@@ -16,11 +16,11 @@ class NotFoundErrorResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Resource with uuid o1nv13n6sbu0ny not found",
-				"data": {}
-			}
+      "example": {
+        "success": False,
+        "message": "Resource with uuid o1nv13n6sbu0ny not found",
+        "data": {}
+      }
     }
 
 
@@ -35,11 +35,11 @@ class InternalServerErrorResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Internal server error",
-				"data": {}
-			}
+      "example": {
+        "success": False,
+        "message": "Internal server error",
+        "data": {}
+      }
     }
 
 
@@ -54,11 +54,11 @@ class ValidationErrorResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Validation Failed",
-				"data": []
-			}
+      "example": {
+        "success": False,
+        "message": "Validation Failed",
+        "data": []
+      }
     }
 
 
@@ -73,11 +73,11 @@ class ConflictResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Conflict",
-				"data": {}
-			}
+      "example": {
+        "success": False,
+        "message": "Conflict",
+        "data": {}
+      }
     }
 
 
@@ -92,11 +92,11 @@ class PayloadTooLargeResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Content too large",
-				"data": {}
-			}
+      "example": {
+        "success": False,
+        "message": "Content too large",
+        "data": {}
+      }
     }
 
 
@@ -111,9 +111,9 @@ class UnauthorizedResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-			"example": {
-				"success": False,
-				"message": "Unauthorized",
-				"data": {}
-			}
+      "example": {
+        "success": False,
+        "message": "Unauthorized",
+        "data": {}
+      }
     }
