@@ -118,9 +118,9 @@ def get_all_learner_profiles(learning_goal: str = None,
     count = 10000
     response = {"records": learner_profile_fields, "total_count": count}
     return {
-      "success": True,
-      "message": "Successfully fetched the learner profile/s",
-      "data": response
+        "success": True,
+        "message": "Successfully fetched the learner profile/s",
+        "data": response
     }
   except ResourceNotFoundException as e:
     Logger.info(traceback.print_exc())

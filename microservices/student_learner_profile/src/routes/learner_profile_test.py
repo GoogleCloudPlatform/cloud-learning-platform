@@ -204,9 +204,9 @@ def test_get_all_learner_profiles_with_filters(clean_firestore):
   assert learner_profile.uuid in \
          retrieved_ids, "expected data not retrived"
   assert deleted_learner_profile.uuid not in \
-         retrieved_ids, "unexpected data retrived"
+    retrieved_ids, "unexpected data retrived"
   for i in json_response.get("data")["records"]:
-    assert "Teamwork" in i["learning_goals"], \
+    assert "Teamwork" in i["learning_goals"],\
       "Filtered output is wrong"
 
 
@@ -316,7 +316,7 @@ def test_post_learner_profile(clean_firestore):
   del post_json_response["data"]["last_modified_time"]
   uuid = post_json_response.get("data").get("uuid")
 
-  # now see if GET endpoint returns the same data
+  # now see if GET endpoint returns same data
   url = f"{api_url_with_learner}/{learner_id}/learner-profile"
   get_resp = client_with_emulator.get(url)
   get_json_response = json.loads(get_resp.text)
@@ -337,9 +337,8 @@ def test_post_learner_profile(clean_firestore):
   loaded_learner_profile_dict.pop("last_modified_time")
   loaded_learner_profile_dict.pop("is_deleted")
 
-  # assert that the rest of the fields are equivalent
+  # assert that rest of the fields are equivalent
   assert loaded_learner_profile_dict == post_json_response.get("data")
-
 
 def test_update_learner_profile(clean_firestore):
   achievement_dict = {**BASIC_ACHIEVEMENT_EXAMPLE}

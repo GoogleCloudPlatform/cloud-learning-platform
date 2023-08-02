@@ -143,7 +143,7 @@ def test_post_learner(clean_firestore):
   loaded_learner_dict.pop("last_modified_time")
   loaded_learner_dict.pop("is_deleted")
 
-  # assert that the rest of the fields are equivalent
+  # assert that rest of the fields are equivalent
   assert loaded_learner_dict == post_json_response.get("data")
 
 
@@ -328,7 +328,7 @@ def test_sort_learners(clean_firestore):
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   retrieved_ids = [i.get("uuid") for i in json_response.get(
-    "data").get("records")]
+                              "data").get("records")]
   assert learner.id in retrieved_ids, "expected data not retrieved"
   assert deleted_learner.id not in retrieved_ids, "unexpected data is retrieved"
   assert archived_learner.uuid not in retrieved_ids, "is_archived not working"
@@ -468,6 +468,7 @@ def mocked_requests_get(*args, **kwargs):
   Mocked requests. Get function
   """
   class MockResponse:
+
     def __init__(self, json_data, status_code):
       self.json_data = json_data
       self.status_code = status_code

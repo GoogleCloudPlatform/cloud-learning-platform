@@ -1,61 +1,37 @@
 """schema file for learner progress API"""
-# pylint: disable=invalid-name
-
 from __future__ import annotations
-
+from typing import Any, Dict, List, Optional, Union
 from enum import Enum
 from pydantic import BaseModel
-from typing import Any, Dict, List, Optional, Union
+from schemas.schema_examples import (LEARNING_RESOURCE_PROGRESS_RESPONSE,
+LEARNING_OBJECT_PROGRESS_RESPONSE,LEARNING_EXPERIENCE_PROGRESS_RESPONSE,
+CURRICULUM_PATHWAY_PROGRESS_RESPONSE)
 
-from schemas.schema_examples import (
-  LEARNING_RESOURCE_PROGRESS_RESPONSE,
-  LEARNING_OBJECT_PROGRESS_RESPONSE,
-  LEARNING_EXPERIENCE_PROGRESS_RESPONSE,
-  CURRICULUM_PATHWAY_PROGRESS_RESPONSE
-)
-
-
+#pylint: disable=missing-class-docstring,line-too-long
 class NodeTypeModel(str, Enum):
   curriculum_pathways = "curriculum_pathways"
   learning_experiences = "learning_experiences"
   learning_objects = "learning_objects"
   learning_resources = "learning_resources"
 
-
 class LearningExperienceParentNodes(BaseModel):
-  """
-  schema for learning experience parent nodes
-  """
   curriculum_pathways: List[str]
 
 
 class References(BaseModel):
-  """
-  schema for references
-  """
   skills: Optional[list]
   competencies: Optional[list]
 
-
 class ChildNodes3(BaseModel):
-  """
-  schema for child nodes
-  """
   assessments: List[str]
   learning_resources: List[str]
 
 
 class ParentNodes1(BaseModel):
-  """
-  schema for parent nodes
-  """
   learning_experiences: List[str]
 
 
 class RecentChildNode(BaseModel):
-  """
-  schema for Recent child node
-  """
   uuid: str
   name: str
   display_name: str
@@ -94,9 +70,6 @@ class RecentChildNode(BaseModel):
 
 
 class LearningExperience(BaseModel):
-  """
-  schema for learning experience
-  """
   uuid: str
   name: str
   display_name: str
@@ -135,23 +108,14 @@ class LearningExperience(BaseModel):
 
 
 class UnitCurriculumPathwayChildNodes(BaseModel):
-  """
-  schema for unit curriculum pathway child nodes
-  """
   learning_experiences: Optional[List[LearningExperience]]
 
 
 class CurriculumPathwayParentNodes(BaseModel):
-  """
-  schema for curriculum pathway parent nodes
-  """
   curriculum_pathways: Optional[List[str]]
 
 
 class UnitCurriculumPathway(BaseModel):
-  """
-  schema for unit curriculum pathway
-  """
   uuid: str
   name: str
   display_name: str
@@ -191,16 +155,10 @@ class UnitCurriculumPathway(BaseModel):
 
 
 class LevelCurriculumPathwayChildNodes(BaseModel):
-  """
-  schema for level curriculum pathway child nodes
-  """
   curriculum_pathways: Optional[List[UnitCurriculumPathway]]
 
 
 class LevelCurriculumPathway(BaseModel):
-  """
-  schema for level curriculum pathway
-  """
   uuid: str
   name: str
   display_name: str
@@ -240,16 +198,10 @@ class LevelCurriculumPathway(BaseModel):
 
 
 class DisciplineCurriculumPathwayChildNodes(BaseModel):
-  """
-  schema for discipline curriculum pathway child nodes
-  """
   curriculum_pathways: Optional[List[LevelCurriculumPathway]]
 
 
 class DisciplineCurriculumPathway(BaseModel):
-  """
-  schema for discipline curriculum pathway
-  """
   uuid: str
   name: str
   display_name: str
@@ -287,18 +239,10 @@ class DisciplineCurriculumPathway(BaseModel):
   type: str
   order: Optional[int]
 
-
 class ProgramCurriculumPathwayChildNodes(BaseModel):
-  """
-  schema for program curriculum pathway child nodes
-  """
   curriculum_pathways: Optional[List[DisciplineCurriculumPathway]]
 
-
 class ProgramCurriculumPathway(BaseModel):
-  """
-  schema for program curriculum pathway
-  """
   uuid: str
   name: str
   display_name: str
@@ -338,16 +282,10 @@ class ProgramCurriculumPathway(BaseModel):
 
 
 class ParentNodes4(BaseModel):
-  """
-  schema for parent nodes
-  """
   learning_objects: Optional[List[str]]
 
 
 class LearningResourceProgress(BaseModel):
-  """
-  schema for learning resource progress
-  """
   uuid: str
   name: str
   display_name: Any
@@ -391,16 +329,10 @@ class LearningResourceProgress(BaseModel):
 
 
 class Prerequisites(BaseModel):
-  """
-  schema for prerequisites
-  """
   learning_resources: List[str]
 
 
 class Assessment(BaseModel):
-  """
-  schema for assessment
-  """
   uuid: str
   name: str
   type: Optional[str]
@@ -437,9 +369,6 @@ class Assessment(BaseModel):
 
 
 class LearningResource(BaseModel):
-  """
-  schema for learning resource
-  """
   uuid: str
   name: str
   display_name: Any
@@ -483,26 +412,16 @@ class LearningResource(BaseModel):
 
 
 class ChildNodes4(BaseModel):
-  """
-  schema for child nodes
-  """
   assessments: Optional[list] = []
   learning_resources: Optional[list] = []
   learning_objects: Optional[list] = []
 
 
 class ParentNodes7(BaseModel):
-  """
-  schema for parent nodes
-  """
   learning_experiences: Optional[list]
   learning_objects: Optional[list]
 
-
 class LearningObjectProgress(BaseModel):
-  """
-  schema for learning object progress
-  """
   uuid: str
   name: str
   display_name: str
@@ -542,17 +461,11 @@ class LearningObjectProgress(BaseModel):
 
 
 class ChildNodes6(BaseModel):
-  """
-  schema for child nodes
-  """
   learning_resources: Optional[List[str]]
   assessments: Optional[List[str]]
 
 
 class LearningObject(BaseModel):
-  """
-  schema for learning object
-  """
   uuid: str
   name: str
   display_name: str
@@ -591,23 +504,14 @@ class LearningObject(BaseModel):
 
 
 class ChildNodes5(BaseModel):
-  """
-  schema for child nodes
-  """
   learning_objects: Optional[List[LearningObject]]
 
 
 class ParentNodes9(BaseModel):
-  """
-  schema for parent nodes
-  """
   curriculum_pathways: Optional[List[str]]
 
 
 class LearningExperienceProgress(BaseModel):
-  """
-  schema for learning experience progress
-  """
   uuid: str
   name: str
   display_name: str
@@ -645,78 +549,62 @@ class LearningExperienceProgress(BaseModel):
   order: Optional[int]
   recent_child_node: Optional[RecentChildNode] = {}
 
-
 class CurriculumPathwayProgressResponse(BaseModel):
   success: Optional[bool] = True
-  message: Optional[
-    str] = "Successfully fetched the curriculum_pathways progress for the " \
-           "given learner"
+  message: Optional[str] = "Successfully fetched the curriculum_pathways progress for the given learner"
   data: Union[Any, ProgramCurriculumPathway]
 
   class Config():
     orm_mode = True
     schema_extra = {
-      "example": {
-        "success": True,
-        "message": "Successfully fetched the curriculum_pathways progress for "
-                   "the given learner",
-        "data": CURRICULUM_PATHWAY_PROGRESS_RESPONSE
-      }
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the curriculum_pathways progress for the given learner",
+            "data": CURRICULUM_PATHWAY_PROGRESS_RESPONSE
+        }
     }
-
 
 class LearningExperienceProgressResponse(BaseModel):
   success: Optional[bool] = True
-  message: Optional[
-    str] = "Successfully fetched the learning_experiences progress for the " \
-           "given learner"
+  message: Optional[str] = "Successfully fetched the learning_experiences progress for the given learner"
   data: LearningExperienceProgress
 
   class Config():
     orm_mode = True
     schema_extra = {
-      "example": {
-        "success": True,
-        "message": "Successfully fetched the learning_experiences progress "
-                   "for the given learner",
-        "data": LEARNING_EXPERIENCE_PROGRESS_RESPONSE
-      }
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the learning_experiences progress for the given learner",
+            "data": LEARNING_EXPERIENCE_PROGRESS_RESPONSE
+        }
     }
-
 
 class LearningObjectProgressResponse(BaseModel):
   success: Optional[bool] = True
-  message: Optional[
-    str] = "Successfully fetched the learning_objects progress for the given " \
-           "learner"
+  message: Optional[str] = "Successfully fetched the learning_objects progress for the given learner"
   data: LearningObjectProgress
 
   class Config():
     orm_mode = True
     schema_extra = {
-      "example": {
-        "success": True,
-        "message": "Successfully fetched the learning_objects progress for "
-                   "the given learner",
-        "data": LEARNING_OBJECT_PROGRESS_RESPONSE
-      }
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the learning_objects progress for the given learner",
+            "data": LEARNING_OBJECT_PROGRESS_RESPONSE
+        }
     }
-
 
 class LearningResourceProgressResponse(BaseModel):
   success: Optional[bool] = True
-  message: Optional[
-    str] = "Successfully fetched the learning_resources progress for the " \
-           "given learner"
+  message: Optional[str] = "Successfully fetched the learning_resources progress for the given learner"
   data: LearningResourceProgress
 
   class Config():
     orm_mode = True
     schema_extra = {
-      "example": {
-        "success": True,
-        "message": "Successfully fetched the learning_resources progress for "
-                   "the given learner",
-        "data": LEARNING_RESOURCE_PROGRESS_RESPONSE
-      }
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the learning_resources progress for the given learner",
+            "data": LEARNING_RESOURCE_PROGRESS_RESPONSE
+        }
     }

@@ -191,7 +191,7 @@ def test_post_goal(clean_firestore):
   loaded_goal_dict.pop("last_modified_time")
   loaded_goal_dict.pop("is_deleted")
 
-  # assert that the rest of the fields are equivalent
+  # assert that rest of the fields are equivalent
   assert loaded_goal_dict == post_json_response.get("data")
 
 

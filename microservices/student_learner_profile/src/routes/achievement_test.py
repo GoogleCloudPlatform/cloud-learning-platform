@@ -68,7 +68,7 @@ def test_post_achievement(clean_firestore):
   loaded_achievement_dict.pop("last_modified_time")
   loaded_achievement_dict.pop("is_deleted")
 
-  # assert that the rest of the fields are equivalent
+  # assert that rest of the fields are equivalent
   assert loaded_achievement_dict == post_json_response.get("data")
 
 
@@ -238,13 +238,13 @@ def test_get_achievements_with_filters(clean_firestore):
 
   assert resp.status_code == 200, "Status should be 200"
   assert len(json_response.get("data")[
-               "records"]) > 0, "Results should not be empty"
+    "records"]) > 0, "Results should not be empty"
   retrieved_achievement_ids = [
     i.get("uuid") for i in json_response.get("data")["records"]]
   assert achievement.uuid in \
          retrieved_achievement_ids, "expected data not retrived"
   assert deleted_achievement.uuid not in \
-         retrieved_achievement_ids, "unexpected data retrived"
+    retrieved_achievement_ids, "unexpected data retrived"
   for i in json_response.get("data")["records"]:
     assert i["type"] == "course equate", "Filtered output is wrong"
 
@@ -256,13 +256,13 @@ def test_get_achievements_with_filters(clean_firestore):
 
   assert resp.status_code == 200, "Status should be 200"
   assert len(json_response.get("data")[
-               "records"]) > 0, "Results should not be empty"
+    "records"]) > 0, "Results should not be empty"
   retrieved_achievement_ids = [
     i.get("uuid") for i in json_response.get("data")["records"]]
   assert achievement.uuid in \
          retrieved_achievement_ids, "expected data not retrived"
   assert deleted_achievement.uuid not in \
-         retrieved_achievement_ids, "unexpected data retrived"
+    retrieved_achievement_ids, "unexpected data retrived"
   for i in json_response.get("data")["records"]:
     assert i["name"] == "ML Professional", "Filtered output is wrong"
 

@@ -89,23 +89,6 @@ def get_all_learner_achievements(parent_node, learner_profile):
 
 
 def get_achievement_fields(achievement_id, parent_node, learner_profile):
-  """
-  Returns the achievement fields for a given achievement
-  ### Args:
-  achievement_id: `str`
-    unique identifier for the achievement
-  parent_node: `dict`
-    parent node of the achievement
-  learner_profile: `LearnerProfile`
-    learner profile of the user
-  ### Raises:
-  ResourceNotFoundException:
-    If the node of node type does not exist. <br/>
-  Exception 500:
-    Internal Server Error. Raised if something went wrong
-  ### Returns:
-  LearnerAchievementResponseModel: LearnerAchievementResponseModel
-  """
   achievement = Achievement.find_by_id(
     achievement_id).get_fields(reformat_datetime=True)
   achievement["parent_node"] = parent_node

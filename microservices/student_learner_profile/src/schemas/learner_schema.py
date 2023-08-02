@@ -4,12 +4,11 @@ Pydantic Model for Learner API"s
 import regex
 from typing import List, Optional
 from typing_extensions import Literal
-from pydantic import BaseModel, constr, validator
-from schemas.schema_examples import (
-  BASIC_LEARNER_EXAMPLE,
-  FULL_LEARNER_EXAMPLE,
-  UPDATE_LEARNER_EXAMPLE
-)
+from pydantic import BaseModel, constr,validator
+from schemas.schema_examples import (BASIC_LEARNER_EXAMPLE,
+                                     FULL_LEARNER_EXAMPLE,
+                                     UPDATE_LEARNER_EXAMPLE
+                                     )
 
 
 class BasePhoneNumber(BaseModel):
@@ -281,9 +280,9 @@ class AllLearnersResponseModel(BaseModel):
         "success": True,
         "message": "Successfully fetched the learners",
         "data": {
-          "records": [FULL_LEARNER_EXAMPLE],
-          "total_count": 50
-        }
+                  "records":[FULL_LEARNER_EXAMPLE],
+                  "total_count": 50
+                }
       }
     }
 

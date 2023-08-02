@@ -4,15 +4,11 @@ Pydantic Model for Learner Profile API's
 from typing import Dict, List, Optional
 from typing_extensions import Literal
 from pydantic import BaseModel, Field, validator
-from schemas.schema_examples import (
-  POST_LEARNER_PROFILE_EXAMPLE,
-  FULL_LEARNER_PROFILE_EXAMPLE,
-  UPDATE_LEARNER_PROFILE_EXAMPLE,
-  EDUCATION_TAB_DROPDOWN_VALUES
-)
-
+from schemas.schema_examples import (POST_LEARNER_PROFILE_EXAMPLE,
+                                     FULL_LEARNER_PROFILE_EXAMPLE,
+                                     UPDATE_LEARNER_PROFILE_EXAMPLE,
+                                     EDUCATION_TAB_DROPDOWN_VALUES)
 # pylint: disable=no-self-argument
-# pylint: disable = invalid-name
 STATUS = Literal["in_progress", "not_attempted", "completed",
 "evaluation_pending", "evaluated", "non_evaluated", "skipped"]
 EMPLOYMENT_STATUS = Literal["Full-time", "Part-time", "Seeking work",
@@ -20,9 +16,7 @@ EMPLOYMENT_STATUS = Literal["Full-time", "Part-time", "Seeking work",
 
 
 class Progress(BaseModel):
-  """
-  Progress Nodes Pydantic Model
-  """
+  """Progress Nodes Pydantic Model"""
   name: str
   status: Optional[STATUS] = "not_attempted"
   # is_hidden and is_optional is applicable only for the parent_node
@@ -38,26 +32,19 @@ class Progress(BaseModel):
   ungate: Optional[bool] = False
   instruction_completed: Optional[bool]
 
-
 class LearningConstraints(BaseModel):
-  """
-  Learning Constraints Pydandic Model
-  """
+  """Learning Contraints Pydandic Model"""
   weekly_study_time: int = Field(0, ge=0, le=30)
 
 
 class ContactPreferences(BaseModel):
-  """
-  Contact Preferences Pydandic Model
-  """
+  """Contact Preferences Pydandic Model"""
   email: Optional[bool] = False
   phone: Optional[bool] = False
 
 
 class LOSNodes(BaseModel):
-  """
-  LOS Nodes Pydantic Model
-  """
+  """LOS Nodes Pydantic Model"""
   curriculum_pathways: Optional[Dict[str, Progress]] = {}
   learning_experiences: Optional[Dict[str, Progress]] = {}
   learning_objects: Optional[Dict[str, Progress]] = {}
@@ -66,9 +53,7 @@ class LOSNodes(BaseModel):
 
 
 class BasicLearnerProfileModel(BaseModel):
-  """
-  LearnerProfile Skeleton Pydantic Model
-  """
+  """LearnerProfile Skeleton Pydantic Model"""
   learner_id: str
   learning_goals: Optional[list] = []
   learning_constraints: Optional[LearningConstraints]
@@ -110,9 +95,7 @@ class BasicLearnerProfileModel(BaseModel):
 
 
 class FullLearnerProfileDataModel(BasicLearnerProfileModel):
-  """
-  LearnerProfile Skeleton Model with uuid, created and updated time
-  """
+  """LearnerProfile Skeleton Model with uuid, created and updated time"""
   uuid: str
   is_archived: bool
   created_time: str
@@ -120,9 +103,7 @@ class FullLearnerProfileDataModel(BasicLearnerProfileModel):
 
 
 class PostLearnerProfileModel(BaseModel):
-  """
-  Learner Profile Pydantic Model
-  """
+  """Learner Profile Pydantic Model"""
   learning_goals: Optional[list] = []
   learning_constraints: Optional[LearningConstraints]
   learning_preferences: Optional[dict] = {}
@@ -167,9 +148,7 @@ class PostLearnerProfileModel(BaseModel):
 
 
 class UpdateLearnerProfileModel(BaseModel):
-  """
-  Update Learner Profile Pydantic Model
-  """
+  """Update Learner Profile Pydantic Model"""
   learning_goals: Optional[list]
   learning_constraints: Optional[LearningConstraints]
   learning_preferences: Optional[dict]
@@ -220,9 +199,6 @@ class TotalCountResponseModel(BaseModel):
 
 
 class GetAllLearnerProfilesResponseModel(BaseModel):
-  """
-  Get All Learner Profiles Response Model
-  """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the learner profile"
   data: Optional[TotalCountResponseModel]
@@ -234,17 +210,14 @@ class GetAllLearnerProfilesResponseModel(BaseModel):
         "success": True,
         "message": "Successfully fetched the learner profile",
         "data": {
-          "records": [FULL_LEARNER_PROFILE_EXAMPLE],
-          "total_count": 50
-        }
+                  "records":[FULL_LEARNER_PROFILE_EXAMPLE],
+                  "total_count": 50
+                }
       }
     }
 
 
 class GetLearnerProfileResponseModel(BaseModel):
-  """
-  Get Learner Profile Response Model
-  """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the learner profile"
   data: Optional[FullLearnerProfileDataModel]
@@ -261,9 +234,6 @@ class GetLearnerProfileResponseModel(BaseModel):
 
 
 class PostLearnerProfileResponseModel(BaseModel):
-  """
-  Post Learner Profile Response Model
-  """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the learner profile"
   data: Optional[FullLearnerProfileDataModel]
@@ -280,9 +250,6 @@ class PostLearnerProfileResponseModel(BaseModel):
 
 
 class UpdateLearnerProfileResponseModel(BaseModel):
-  """
-  Update Learner Profile Response Model
-  """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully updated the learner profile"
   data: Optional[FullLearnerProfileDataModel]
@@ -299,9 +266,6 @@ class UpdateLearnerProfileResponseModel(BaseModel):
 
 
 class DeleteLearnerProfile(BaseModel):
-  """
-  Delete Learner Profile Pydantic Model
-  """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully deleted the learner profile"
 
@@ -316,9 +280,7 @@ class DeleteLearnerProfile(BaseModel):
 
 
 class LearnerProfileSearchResponseModel(BaseModel):
-  """
-  Learner Profile Search Response Pydantic Model
-  """
+  """Learner Profile Search Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the learner profiles"
   data: Optional[List[FullLearnerProfileDataModel]]
@@ -335,9 +297,7 @@ class LearnerProfileSearchResponseModel(BaseModel):
 
 
 class LearnerProfileImportJsonResponse(BaseModel):
-  """
-  Learner Profile Import Json Response Pydantic Model
-  """
+  """Learner Profile Import Json Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully created the learner profiles"
   data: Optional[List[str]]
@@ -357,18 +317,12 @@ class LearnerProfileImportJsonResponse(BaseModel):
 
 
 class EducationDropdownModel(BaseModel):
-  """
-  Education Dropdown Pydantic Model
-  """
   education_goals: Optional[list]
   employment_status: Optional[list]
   potential_career_fields: Optional[list]
 
 
 class EducationDropdownResponseModel(BaseModel):
-  """
-  Education Dropdown Response Pydantic Model
-  """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the possible options for"
   " education goals, employment status, potential career fields"

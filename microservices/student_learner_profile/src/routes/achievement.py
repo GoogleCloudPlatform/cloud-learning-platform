@@ -102,9 +102,9 @@ def get_achievements(name: str = None,
     count = 10000
     response = {"records": achievements, "total_count": count}
     return {
-      "success": True,
-      "message": "Data fetched successfully",
-      "data": response
+        "success": True,
+        "message": "Data fetched successfully",
+        "data": response
     }
   except ValidationError as e:
     raise BadRequest(str(e)) from e
