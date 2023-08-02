@@ -21,12 +21,22 @@ Feature: Delete student in a section
 
   @fixture.enroll.student.in_classroom.not_in_db
   Scenario: Retrive list of students exists in classroom not in DB
-    Given A user has access to portal and wants to fetch the list of students exists in Classroom not in DB
-    When API request is sent to get the list of students
+    Given A user has access to portal and wants to fetch the list of students exists in Classroom not in DB using valid cohort id
+    When API request is sent to get the list of students using valid cohort id
     Then List of students details will be fetched from bq views
+  
+  Scenario: Unable to Retrive list of students exists in classroom not in DB
+    Given A user has access to portal and wants to fetch the list of students exists in Classroom not in DB using invalid cohort id
+    When API request is sent to get the list of students using invalid cohort id
+    Then API returns cohort not found by this id
 
   @fixture.enroll.student.in_db.not_in_classroom
   Scenario: Retrive list of students exists in DB not in classroom
-    Given A user has access to portal and wants to fetch the list of students exists in DB not in classroom
-    When API request is sent to fetch the list of students records
+    Given A user has access to portal and wants to fetch the list of students exists in DB not in classroom using valid cohort id
+    When API request is sent to fetch the list of students records using valid cohort id
     Then List of student records will be fected from bq views
+  
+    Scenario: Unable Retrive list of students exists in DB not in classroom
+    Given A user has access to portal and wants to fetch the list of students exists in DB not in classroom using invalid cohort id
+    When API request is sent to fetch the list of students records using invalid cohort id
+    Then API returns cohort not found by this id error
