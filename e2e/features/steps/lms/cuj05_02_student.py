@@ -132,6 +132,8 @@ def step_impl_17(context):
 
 @behave.then("List of student records will be fected from bq views")
 def step_impl_18(context):
+  print(f"-------------------body:{context.response}-----------------")
+  print(f"-------------------status{context.status}-----------------")
   assert context.status == 200, "Status 200"
   assert context.response["data"][0][
       "cohort_id"] == context.section_cohort_data[
