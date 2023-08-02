@@ -275,11 +275,11 @@ def get_coursework_list(course_id,coursework_state="PUBLISHED"):
   page_token = None
   coursework_list=[]
   try:
-    while(True):
+    while True:
       response = service.courses().courseWork().list(
           courseId=course_id,pageToken=page_token,courseWorkStates=coursework_state).execute()
       coursework_list.extend(response.get("courseWork", []))
-      page_token = response.get('nextPageToken', None)
+      page_token = response.get("nextPageToken", None)
       if not page_token:
         break
     return coursework_list
@@ -347,12 +347,12 @@ def get_coursework_material_list(course_id,coursework_material_state="PUBLISHED"
   page_token = None
   coursework_material_list=[]
   try:
-    while(True):
+    while True:
       response = service.courses().courseWorkMaterials().list(
        courseId=course_id,pageToken=page_token,
        courseWorkMaterialStates=coursework_material_state).execute()
       coursework_material_list.extend(response.get("courseWorkMaterial", []))
-      page_token = response.get('nextPageToken', None)
+      page_token = response.get("nextPageToken", None)
       if not page_token:
         break
     return coursework_material_list
@@ -388,12 +388,10 @@ def patch_coursework(course_id,coursework_id,update_mask_details):
   update_mask = ""
   for key in update_mask_details.keys():
     update_mask=key+"," +update_mask
-  
   service = build("classroom", "v1", credentials=get_credentials())
   data = service.courses().courseWork().patch(courseId=course_id,id=coursework_id,
                                               updateMask=update_mask,
                                                body=update_mask_details).execute()
-  
   return data
 
 def patch_coursework_material(course_id,
@@ -410,14 +408,12 @@ def patch_coursework_material(course_id,
   update_mask = ""
   for key in update_mask_details.keys():
     update_mask=key+"," +update_mask
-  
   service = build("classroom", "v1", credentials=get_credentials())
   data = service.courses().courseWorkMaterials().patch(
                               courseId=course_id,
                               id=coursework_material_id,
                               updateMask=update_mask,
                         body=update_mask_details).execute()
-  
   return data
 
 def create_coursework_material(course_id, coursework_material):
@@ -889,8 +885,8 @@ def get_course_work(course_id, course_work_id):
     response = service.courses().courseWork().get(courseId=course_id,
                                             id=course_work_id,
                                             pageToken=page_token).execute()
-    coursework_list.extend(response.get('courseWork', []))
-    page_token = response.get('nextPageToken', None)
+    coursework_list.extend(response.get("courseWork", []))
+    page_token = response.get("nextPageToken", None)
     if not page_token:
       break
   return coursework_list
