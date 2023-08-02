@@ -547,15 +547,34 @@ def check_copy_course_alpha(original_courseworks,
     original_coursework_materials)
   original_coursework_material_dict =  make_title_key_coursework(
     original_coursework_materials)
+  duplicate_coursework=[]
+  duplicate_coursework_material=[]
+  duplicate_coursework = [
+  title for title in original_coursework_titles 
+    if original_coursework_titles.count(title) > 1]
+  duplicate_coursework_material = [
+  title for title in original_coursework_material_titles
+    if original_coursework_material_titles.count(title) > 1]
+  if duplicate_coursework or duplicate_coursework_material:
+    Logger.error(
+      f"Given course has duplicate coursework {duplicate_coursework}\
+                Duplicate coursework Material{duplicate_coursework_material}")
+    logs["errors"].append(
+      f"Given course has duplicate coursework {duplicate_coursework}\
+                Duplicate coursework Material{duplicate_coursework_material}")
+    lms_job.logs = logs
+    lms_job.update()
+    error_flag =True
+    return error_flag
 
   original_coursework_titles = set(original_coursework_titles)
   original_coursework_material_titles = set(original_coursework_material_titles)
+
   while count<max_count :
     Logger.info(f"Iteration  count {count} to verify copy_course process")
     logs["info"].append(f"Iteration  count {count} to verify copy_course process")
-    time.sleep(60)
+    time.sleep(120)
     count+=1
-    Logger.info(f"COunt value after increment {count}")
     error_flag = False
     copied_courseworks = classroom_crud.get_coursework_list(
       copied_course["id"],"DRAFT")
@@ -616,7 +635,6 @@ def check_copy_course_alpha(original_courseworks,
 
     # If there is mistmatch in coursework name or coursework name continue to wait
     if error_flag:
-      Logger.info(f"In error flag--- continue {count}")
       continue
 
     # make_title_key_coursework function takes the list of coursework or coursework
