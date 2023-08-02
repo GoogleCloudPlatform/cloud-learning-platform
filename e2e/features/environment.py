@@ -543,7 +543,7 @@ def enroll_student_in_classroom_not_in_db(context):
                     dataset=BQ_DATASET,
                     table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
   context.section_cohort_data={
-    "cohort":section.cojort.id,
+    "cohort":section.cohort.id,
     "section":section.id
     }
   yield context.section_cohort_data
@@ -629,7 +629,7 @@ def enroll_student_in_db_not_in_classroom(context):
             rows=enrollment_rows, dataset=BQ_DATASET,
             table_name=BQ_TABLE_DICT["BQ_ENROLLMENT_RECORD"])
   context.section_cohort_data = {
-      "cohort": section.cojort.id,
+      "cohort": section.cohort.id,
       "section": section.id
   }
   yield context.section_cohort_data
