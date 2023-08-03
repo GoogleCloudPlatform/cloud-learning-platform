@@ -184,5 +184,5 @@ def test_get_learner_progress_invalid_node_id(clean_firestore):
   json_response = resp.json()
   assert resp.status_code == 404, "Status should be 404"
   assert json_response["success"] is False
-  assert (json_response["message"] ==
-          "Learning Resource with uuid learning_resource.id not found")
+  assert (json_response["message"]==
+  "learning_resources with id learning_resource.id is not found")

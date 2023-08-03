@@ -48,7 +48,7 @@ def step_impl_3(context):
   resp = get_method(api_url, query_params=params)
   resp_data = resp.json()
   assert resp.status_code == 200, f"Status {resp.status_code}"
-  learner_names = [i.get("first_name") for i in resp_data.get("data")]
+  learner_names = [i.get("first_name") for i in resp_data.get("data")["records"]]
   for name in inserted_learner_names:
     assert name in learner_names
 
@@ -160,7 +160,7 @@ def step_impl_3(context):
   resp = get_method(api_url, query_params=params)
   resp_data = resp.json()
   assert resp.status_code == 200, f"Status {resp.status_code}"
-  achievement_names = [i.get("name") for i in resp_data.get("data")]
+  achievement_names = [i.get("name") for i in resp_data.get("data")["records"]]
   for name in inserted_achievement_names:
     assert name in achievement_names
 
