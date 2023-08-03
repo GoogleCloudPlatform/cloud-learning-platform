@@ -644,6 +644,7 @@ def check_copy_course_alpha(original_courseworks,
     copied_coursework_material_dict = make_title_key_coursework(
       copied_coursework_materials)
     for coursework_title in original_coursework_titles:
+      missing_attachment=[]
       if "materials" in original_coursework_dict[coursework_title]:
         missing_attachment = verifiy_attachment(coursework_title,
                                                 original_coursework_dict,
@@ -657,8 +658,8 @@ def check_copy_course_alpha(original_courseworks,
         logs["errors"].append(f"Missing attachment are {coursework_title} {missing_attachment }")
         error_flag=True
       else:
-        logs["info"].append(f"Missing attachment for {coursework_title} {missing_attachment}")
-        Logger.info(f"Missing attachment for {coursework_title} {missing_attachment}")
+        logs["info"].append(f"No Missing attachment for {coursework_title}")
+        Logger.info(f"No Missing attachment for {coursework_title}")
       lms_job.logs = logs
       lms_job.update()
       Logger.info("")
@@ -678,8 +679,8 @@ def check_copy_course_alpha(original_courseworks,
         logs["errors"].append(f"Missing attachment are {coursework_material_title} {missing_attachment}")
         error_flag=True
       else :
-        logs["info"].append(f"Missing attachment for {coursework_material_title} {missing_attachment}")
-        Logger.info(f"Missing attachment for {coursework_material_title} {missing_attachment}")
+        logs["info"].append(f"No Missing attachment for {coursework_material_title}")
+        Logger.info(f" No Missing attachment for {coursework_material_title}")
       lms_job.logs = logs
       lms_job.update()
     if error_flag:
