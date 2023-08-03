@@ -876,20 +876,14 @@ def get_course_work(course_id, course_work_id):
   Returns:
     dict: _description_
   """
-  page_token = None
-  coursework_list=[]
   service = service = build("classroom", "v1", credentials=get_credentials())
 
-  while True:
 
-    response = service.courses().courseWork().get(courseId=course_id,
+  response = service.courses().courseWork().get(courseId=course_id,
                                             id=course_work_id,
-                                            pageToken=page_token).execute()
-    coursework_list.extend(response.get("courseWork", []))
-    page_token = response.get("nextPageToken", None)
-    if not page_token:
-      break
-  return coursework_list
+                  ).execute()
+ 
+  return response
 
 def delete_course_work(course_id, course_work_id):
   """delete course work by course id and course work id
