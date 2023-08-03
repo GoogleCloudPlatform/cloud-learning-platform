@@ -878,11 +878,8 @@ def get_course_work(course_id, course_work_id):
   """
   service = service = build("classroom", "v1", credentials=get_credentials())
 
-
-  response = service.courses().courseWork().get(courseId=course_id,
-                                            id=course_work_id,
-                  ).execute()
- 
+  response =  service.courses().courseWork().get(courseId=course_id,
+                                            id=course_work_id).execute()
   return response
 
 def delete_course_work(course_id, course_work_id):
