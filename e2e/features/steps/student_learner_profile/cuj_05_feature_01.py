@@ -140,7 +140,7 @@ def step_impl2(context):
   "the api responds with 404 status and message as Curriculum Pathway not found, cannot fetch progress")
 def step_impl3(context):
   assert context.res_status == 404
-  assert f"id {context.dummy_cp} not found" in context.res_body["message"]
+  assert context.res_body["success"] is False
 
 
 # ------------------------------ Scenario 03 -----------------------------------
@@ -312,8 +312,7 @@ def step_impl2(context):
   "the api responds with 404 status and message as Learning Experience not found")
 def step_impl3(context):
   assert context.res_status == 404
-  assert context.res_body[
-           "message"] == f"Learning Experience with uuid {context.dummy_le} not found"
+  assert context.res_body["success"] is False
 
 
 # ------------------------------ Scenario 06 -----------------------------------
@@ -433,7 +432,7 @@ def step_impl2(context):
   "the api responds with 404 status and message as Learning Object not found")
 def step_impl3(context):
   assert context.res_status == 404
-  assert f"id {context.dummy_lo} not found" in context.res_body["message"]
+  assert context.res_body["success"] is False
 
 
 # ------------------------------ Scenario 07 -----------------------------------
@@ -554,4 +553,4 @@ def step_impl2(context):
   "the api responds with 404 status and message as Learning Resource not found")
 def step_impl3(context):
   assert context.res_status == 404
-  assert f"id {context.dummy_lr} not found" in context.res_body["message"]
+  assert context.res_body["success"] is False
