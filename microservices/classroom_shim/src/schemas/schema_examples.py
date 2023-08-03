@@ -2,9 +2,8 @@
 # pylint: disable=line-too-long
 import datetime
 
-INSERT_LTI_ASSIGNMENT_EXAMPLE = {
+BASE_LTI_ASSIGNMENT_EXAMPLE = {
     "context_id": "VFh6MzA4Jfq4bYN5",
-    "context_type": "section",
     "lti_content_item_id": "Kv57BaY2uqE23N",
     "lti_assignment_title": "Test Assignment",
     "tool_id": "Z3bV9qJ7p41uCX",
@@ -14,14 +13,21 @@ INSERT_LTI_ASSIGNMENT_EXAMPLE = {
     "due_date": datetime.datetime(year=2043, month=2, day=20)
 }
 
+INSERT_LTI_ASSIGNMENT_EXAMPLE = {
+    "context_type": "section",
+    "course_work_type": "course_work",
+    **BASE_LTI_ASSIGNMENT_EXAMPLE
+}
+
 LTI_ASSIGNMENT_EXAMPLE = {
     "id": "N49q6vGt29oBvn8gt",
     "course_work_id": "Px5cTmh2Xvq1Cb",
     **INSERT_LTI_ASSIGNMENT_EXAMPLE
 }
+
 UPDATE_LTI_ASSIGNMENT_EXAMPLE = {
     "course_work_id": "Px5cTmh2Xvq1Cb",
-    **INSERT_LTI_ASSIGNMENT_EXAMPLE
+    **BASE_LTI_ASSIGNMENT_EXAMPLE
 }
 
 COPY_LTI_ASSIGNMENT_EXAMPLE = {

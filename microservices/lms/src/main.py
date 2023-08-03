@@ -14,13 +14,10 @@
 """
   LMS Service Microservice
 """
-import base64
 from http.client import responses
 import asyncio
-import json
 import time
 from concurrent.futures import ThreadPoolExecutor
-from utils.pub_sub_auth import validate_pub_sub_token
 import uvicorn
 from common.utils.auth_service import validate_user
 from common.utils.logging_handler import Logger
@@ -28,7 +25,7 @@ from common.utils.http_exceptions import add_exception_handlers
 from fastapi import FastAPI, Request, Depends
 import config
 from routes import (section, student, course_template, cohort,
-                    classroom_courses, analytics, lms_job)
+                    classroom_courses, analytics, lms_job,lms_dummy)
 
 app = FastAPI()
 
@@ -95,23 +92,7 @@ api.include_router(lms_job.router)
 add_exception_handlers(app)
 add_exception_handlers(api)
 app.mount("/lms/api/v1", api)
-
-@app.post("/lms/api/test/webhook",
-          dependencies=[Depends(validate_pub_sub_token)])
-async def pub_sub_webhook(request: Request):
-  """_summary_
-
-  Args:
-      request (Request): _description_
-
-  Returns:
-      _type_: _description_
-  """
-  data = await request.json()
-  data["message"]["data"] = json.loads(
-      base64.b64decode(data["message"]["data"]).decode("utf-8"))
-  Logger.info(f"decoded data:{data}")
-  return {}
+app.include_router(lms_dummy.router)
 
 if __name__ == "__main__":
   uvicorn.run(

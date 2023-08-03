@@ -6,10 +6,10 @@ from fastapi import Depends
 from fastapi.security import HTTPBearer
 from common.utils.errors import InvalidTokenError
 from common.utils.http_exceptions import Unauthenticated, InternalServerError
-from common.utils.logging_handler import Logger
+from config import PROJECT_ID
 
 auth_scheme = HTTPBearer(auto_error=False)
-
+email=f"lms-notifications@{PROJECT_ID}.iam.gserviceaccount.com"
 def validate_pub_sub_token(token: auth_scheme = Depends()):
   """_summary_
 
@@ -38,9 +38,11 @@ def validate_pub_sub_token(token: auth_scheme = Depends()):
           timeout=60
       )
       data = res.json()
-      Logger.info(f"data: {data}")
       if res.status_code == 200:
-        return True
+        if data["email"]==email:
+          return True
+        else:
+          raise InvalidTokenError("Unauthorized")
       else:
         raise InvalidTokenError(data["error"])
     else:

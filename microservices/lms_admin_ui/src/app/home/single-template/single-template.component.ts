@@ -5,6 +5,10 @@ import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
 import { MatSort } from '@angular/material/sort';
 import { CreateAssignmentComponent } from 'src/app/lti/create-assignment/create-assignment.component';
+import { AddOrEditCcourseTemplate } from '../course-template/course-template.component';
+interface LooseObject {
+  [key: string]: any
+}
 
 @Component({
   selector: 'app-single-template',
@@ -162,6 +166,24 @@ this.instructionalDesignerList=res.data
     dialogRef.afterClosed().subscribe(result => {
       console.log("result", result)
     });
+  }
+
+  openAddOrEditIdTemplate(){
+    console.log(this.courseTemplateDetails)
+    let idData: LooseObject = {}
+    idData['course_template_name'] = this.courseTemplateDetails.name
+    idData['course_template_id'] = this.courseTemplateDetails.id
+
+    const dialogRef = this.dialog.open(AddOrEditCcourseTemplate, {
+      width: '650px',
+      data: idData
+    });
+
+    // dialogRef.afterClosed().subscribe(result => {
+    //   if (result.data == 'success') {
+    //     this.getSectionStudents()
+    //   }
+    // });
   }
 
 }

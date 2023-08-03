@@ -436,8 +436,9 @@ def test_invite_student_to_cohort_archived_section(
 
 
 def test_get_list_of_students_exists_in_db_not_in_classroom(
-  client_with_emulator):
-  url = BASE_URL + "/student/exists_in_db_not_in_classroom"
+  client_with_emulator,create_fake_data):
+  url = (BASE_URL + f"/cohorts/{create_fake_data['cohort']}"
+  + "/students_exists_in_db_not_in_classroom")
   data=STUDENT_RECORDS_MODEL.copy()
   data["user_email"]=data.pop("email")
   with mock.patch("routes.student.run_query",
@@ -447,9 +448,21 @@ def test_get_list_of_students_exists_in_db_not_in_classroom(
   assert resp.json()["data"][0]["email"] == STUDENT_RECORDS_MODEL[
     "email"], "Return data doesn't match."
 
-def test_get_list_of_students_exists_in_classroom_not_in_db(
+def test_negative_get_list_of_students_exists_in_db_not_in_classroom(
   client_with_emulator):
-  url = BASE_URL + "/student/exists_in_classroom_not_in_db"
+  url = (BASE_URL + "/cohorts/fake_id"
+  + "/students_exists_in_db_not_in_classroom")
+  data=STUDENT_RECORDS_MODEL.copy()
+  data["user_email"]=data.pop("email")
+  with mock.patch("routes.student.run_query",
+                  return_value=[data]):
+    resp = client_with_emulator.get(url)
+  assert resp.status_code == 404, "Status 404"
+
+def test_get_list_of_students_exists_in_classroom_not_in_db(
+  client_with_emulator,create_fake_data):
+  url = (BASE_URL + f"/cohorts/{create_fake_data['cohort']}"
+  + "/students_exists_in_classroom_not_in_db")
   data=STUDENT_RECORDS_MODEL.copy()
   data["user_emailAddress"]=data.pop("email")
   with mock.patch("routes.student.run_query",
@@ -458,3 +471,14 @@ def test_get_list_of_students_exists_in_classroom_not_in_db(
   assert resp.status_code == 200, "Status 200"
   assert resp.json()["data"][0]["email"] ==STUDENT_RECORDS_MODEL[
     "email"], "Return data doesn't match."
+
+def test_negative_get_list_of_students_exists_in_classroom_not_in_db(
+  client_with_emulator):
+  url = (BASE_URL + "/cohorts/fake_id"
+  + "/students_exists_in_classroom_not_in_db")
+  data=STUDENT_RECORDS_MODEL.copy()
+  data["user_emailAddress"]=data.pop("email")
+  with mock.patch("routes.student.run_query",
+                  return_value=[data]):
+    resp = client_with_emulator.get(url)
+  assert resp.status_code == 404, "Status 404"

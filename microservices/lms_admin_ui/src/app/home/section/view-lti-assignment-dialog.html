@@ -9,6 +9,8 @@
         <p><b>Course Work Id : </b> {{ltiAssignmentData["course_work_id"] ? ltiAssignmentData["course_work_id"]
             :'null'}}</p>
         <p><b>Tool Id : </b> {{ltiAssignmentData["tool_id"]}}</p>
+        <p><b>Course work type : </b> {{ltiAssignmentData["course_work_type"] ?
+            ltiAssignmentData["course_work_type"] : 'null'}}</p>
         <p><b>LTI Content Item Id : </b> {{ltiAssignmentData["lti_content_item_id"] ?
             ltiAssignmentData["lti_content_item_id"] : 'null'}}</p>
         <p><b>Start Date : </b> {{ltiAssignmentData["start_date"] ? (ltiAssignmentData["start_date"] | date:'medium') :

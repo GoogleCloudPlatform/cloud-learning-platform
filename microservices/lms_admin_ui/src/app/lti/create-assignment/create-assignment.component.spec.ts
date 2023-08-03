@@ -388,6 +388,13 @@ describe('CreateAssignmentComponent', () => {
     lti_assignment_titleInput.value = "Test Harmonize assignment 2";
     lti_assignment_titleInput.dispatchEvent(new Event('input'));
     fixture.detectChanges();
+    //Set course_work_type
+    const course_work_type_Element = fixture.debugElement.query(By.css(`mat-select[formControlName='course_work_type']`));
+    course_work_type_Element.nativeElement.click() 
+    fixture.detectChanges()
+    const course_work_type_ElementSelect = course_work_type_Element.componentInstance as MatSelect
+    course_work_type_ElementSelect.value = "Coursework";
+    course_work_type_ElementSelect.writeValue(course_work_type_ElementSelect.value);
     // set Toady's date as start_date
     let date:any = new Date()
     date = component.getFormattedDatetime(date)
@@ -432,6 +439,7 @@ describe('CreateAssignmentComponent', () => {
       "lti_content_item_id": "zr0mfn2CqpAeUddaqBT",
       "tool_id": "46G7Lol0eHx1th4WJEVE",
       "course_work_id": "6135897136",
+      "course_work_type": "course_work",
       "max_points": 30.0,
       "start_date": "2023-04-01T00:00:00+00:00",
       "end_date": "2023-06-17T00:00:00+00:00",

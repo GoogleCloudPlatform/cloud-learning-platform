@@ -16,7 +16,10 @@ Pydantic Model for LLM API's
 """
 from typing import List, Optional
 from pydantic import BaseModel
-from schemas.schema_examples import LLM_GENERATE_EXAMPLE
+from schemas.schema_examples import (LLM_GENERATE_EXAMPLE,
+                                     QUERY_EXAMPLE,
+                                     QUERY_ENGINE_EXAMPLE,
+                                     QUERY_RESULT_EXAMPLE)
 
 class ChatModel(BaseModel):
   id: Optional[str] = None
@@ -31,6 +34,8 @@ class ChatModel(BaseModel):
 class ChatUpdateModel(BaseModel):
   title: str
 
+class UserQueryUpdateModel(BaseModel):
+  title: str
 
 class LLMGetTypesResponse(BaseModel):
   """LLM Get types model"""
@@ -49,6 +54,22 @@ class LLMGetTypesResponse(BaseModel):
     }
 
 
+class LLMGetQueryEnginesResponse(BaseModel):
+  """LLM Get types model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully retrieved query engine types"
+  data: Optional[list[dict]] = []
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully retrieved query engine types",
+            "data": []
+        }
+    }
+
 class LLMGenerateModel(BaseModel):
   """LLM Generate model"""
   prompt: str
@@ -60,6 +81,98 @@ class LLMGenerateModel(BaseModel):
     orm_mode = True
     schema_extra = {
         "example": LLM_GENERATE_EXAMPLE
+    }
+
+
+class LLMQueryModel(BaseModel):
+  """LLM Query model"""
+  prompt: str
+  llm_type: Optional[str]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": QUERY_EXAMPLE
+    }
+
+
+class LLMQueryEngineModel(BaseModel):
+  """LLM Query Engine model"""
+  doc_url: str
+  query_engine: str
+  llm_type: Optional[str]
+  is_public: Optional[bool]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": QUERY_ENGINE_EXAMPLE
+    }
+
+
+class LLMQueryEngineResponse(BaseModel):
+  """LLM Generate Response model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully generated text"
+  data: Optional[str] = ""
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully generated text",
+            "data": None
+        }
+    }
+
+class LLMQueryResponse(BaseModel):
+  """LLM Query Response model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully performed query"
+  data: Optional[dict] = {}
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully performed query",
+            "data": QUERY_RESULT_EXAMPLE
+        }
+    }
+
+class LLMUserQueryResponse(BaseModel):
+  """LLM Retrieve User Query Response model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully retrieved query"
+  data: Optional[dict] = {}
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully retrieved query",
+            "data": None
+        }
+    }
+
+
+class LLMUserAllQueriesResponse(BaseModel):
+  """LLM Get Queries Response model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully retrieved queries"
+  data: List[dict] = []
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully retrieved queries",
+            "data": None
+        }
     }
 
 
@@ -106,7 +219,7 @@ class LLMUserAllChatsResponse(BaseModel):
     schema_extra = {
         "example": {
             "success": True,
-            "message": "Successfully generated text",
+            "message": "Successfully retrieved chats",
             "data": None
         }
     }
