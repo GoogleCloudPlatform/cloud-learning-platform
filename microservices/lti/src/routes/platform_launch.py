@@ -6,7 +6,6 @@ from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
 from fastapi import APIRouter
 from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
-from starlette.responses import RedirectResponse
 from common.models import Tool, LTIContentItem
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  TokenNotFoundError)
