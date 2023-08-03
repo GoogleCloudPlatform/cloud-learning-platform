@@ -710,7 +710,6 @@ def check_copy_course_alpha(original_courseworks,
         for material in coursework["materials"]:
           if "link" in material.keys():
             link = material["link"]
-            Logger.info(f"cw link - {link}")
             if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
               copy_resp = copy_lti_shim_assignment(link["url"], lti_assignment_details, logs)
               logs = copy_resp["logs"]
@@ -751,7 +750,6 @@ def check_copy_course_alpha(original_courseworks,
         for material in coursework_material["materials"]:
           if "link" in material.keys():
             link = material["link"]
-            Logger.info(f"cw link - {link}")
             if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
               copy_resp = copy_lti_shim_assignment(link["url"], lti_assignment_details, logs)
               logs = copy_resp["logs"]
