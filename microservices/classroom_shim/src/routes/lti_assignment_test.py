@@ -251,6 +251,8 @@ def test_copy_lti_assignment(mock_get_lti_tool, mock_list_content_items,
   req_body = {
       **COPY_LTI_ASSIGNMENT_EXAMPLE, "lti_assignment_id":
           lti_assignment_details.id,
+      "source_context_id":
+          INSERT_LTI_ASSIGNMENT_EXAMPLE["context_id"],
       "start_date":
           str(COPY_LTI_ASSIGNMENT_EXAMPLE["start_date"]),
       "end_date":
@@ -318,6 +320,8 @@ def test_copy_lti_assignment_allow_everytime(mock_get_lti_tool,
   req_body = {
       **COPY_LTI_ASSIGNMENT_EXAMPLE, "lti_assignment_id":
           lti_assignment_details.id,
+      "source_context_id":
+          INSERT_LTI_ASSIGNMENT_EXAMPLE["context_id"],
       "start_date":
           str(COPY_LTI_ASSIGNMENT_EXAMPLE["start_date"]),
       "end_date":

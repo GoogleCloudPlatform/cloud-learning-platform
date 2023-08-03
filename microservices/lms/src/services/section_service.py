@@ -657,7 +657,7 @@ def check_copy_course_alpha(original_courseworks,
 
       lms_job = LmsJob.find_by_id(lms_job_id)
       logs = lms_job.logs
-      if  missing_attachment:
+      if missing_attachment:
         Logger.error(f"Missing attachment are {coursework_title} {missing_attachment }")
         logs["errors"].append(f"Missing attachment are {coursework_title} {missing_attachment }")
         error_flag=True
@@ -707,16 +707,18 @@ def check_copy_course_alpha(original_courseworks,
       }
       material_update = False
       if "materials" in coursework.keys():
-        if "link" in coursework["materials"].keys():
-          link = coursework["materials"]["link"]
-          if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
-            copy_resp = copy_lti_shim_assignment(link["url"], lti_assignment_details, logs)
-            logs = copy_resp["logs"]
-            if copy_resp.get("copy_resp_status") == 200:
-              material_update = True
-              coursework["materials"]["link"] = copy_resp.get("updated_lti_link")
-            else:
-              error_flag = True
+        for material in coursework["materials"]:
+          if "link" in material.keys():
+            link = material["link"]
+            Logger.info(f"cw link - {link}")
+            if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
+              copy_resp = copy_lti_shim_assignment(link["url"], lti_assignment_details, logs)
+              logs = copy_resp["logs"]
+              if copy_resp.get("copy_resp_status") == 200:
+                material_update = True
+                material["link"]["url"] = copy_resp.get("updated_lti_link")
+              else:
+                error_flag = True
       try:
         updated_data = {"state": "PUBLISHED"}
         if material_update:
@@ -746,16 +748,18 @@ def check_copy_course_alpha(original_courseworks,
       }
       material_update = False
       if "materials" in coursework_material.keys():
-        if "link" in coursework_material["materials"].keys():
-          link = coursework_material["materials"]["link"]
-          if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
-            copy_resp = copy_lti_shim_assignment(link["url"], lti_assignment_details, logs)
-            logs = copy_resp["logs"]
-            if copy_resp.get("copy_resp_status") == 200:
-              material_update = True
-              coursework_material["materials"]["link"] = copy_resp.get("updated_lti_link")
-            else:
-              error_flag = True
+        for material in coursework_material["materials"]:
+          if "link" in material.keys():
+            link = material["link"]
+            Logger.info(f"cw link - {link}")
+            if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
+              copy_resp = copy_lti_shim_assignment(link["url"], lti_assignment_details, logs)
+              logs = copy_resp["logs"]
+              if copy_resp.get("copy_resp_status") == 200:
+                material_update = True
+                material["link"]["url"] = copy_resp.get("updated_lti_link")
+              else:
+                error_flag = True
       try:
         updated_data = {"state": "PUBLISHED"}
         if material_update:
@@ -1211,10 +1215,11 @@ def insert_section_enrollment_to_bq(enrollment_record,section):
   insert_rows_to_bq(
             rows=rows, dataset=BQ_DATASET,
             table_name=BQ_TABLE_DICT["BQ_ENROLLMENT_RECORD"])
+
+
 def copy_lti_shim_assignment(link, lti_assignment_details, logs):
   """Makes a copy of the given LTI Assignment in the new context"""
-  split_url = link["url"].split(
-      "/classroom-shim/api/v1/launch?lti_assignment_id=")
+  split_url = link.split("/classroom-shim/api/v1/launch?lti_assignment_id=")
   lti_assignment_id = split_url[-1]
   coursework_title = lti_assignment_details.get("coursework_title")
   logs["info"].append(
@@ -1241,8 +1246,8 @@ def copy_lti_shim_assignment(link, lti_assignment_details, logs):
 
   if copy_resp_status == 200:
     new_lti_assignment_id = copy_assignment.json().get("data").get("id")
-    updated_material_link_url = link["url"].replace(lti_assignment_id,
-                                                    new_lti_assignment_id)
+    updated_material_link_url = link.replace(lti_assignment_id,
+                                             new_lti_assignment_id)
     Logger.info(
         f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}', new assignment id - {new_lti_assignment_id}"
     )
