@@ -394,27 +394,58 @@ def patch_coursework(course_id,coursework_id,update_mask_details):
                                                body=update_mask_details).execute()
   return data
 
-def patch_coursework_material(course_id,
-                              coursework_material_id,
-                              update_mask_details):
+def patch_coursework_alpha(course_id, coursework_id, update_mask, updated_data):
   """Update a coursework in a classroom course
 
   Args:
-    course_id: where coursework need to be created
-    coursework : list of dictionary of coursework to be created
+    course_id: ID of the classroom course
+    coursework_id: ID of the coursework in the classroom
+    update_mask: update mask contains the fields to be updated
+    updated_data: Data that needs to be updated in the coursework
   Returns:
     returns success
   """
-  update_mask = ""
-  for key in update_mask_details.keys():
-    update_mask=key+"," +update_mask
-  service = build("classroom", "v1", credentials=get_credentials())
-  data = service.courses().courseWorkMaterials().patch(
-                              courseId=course_id,
-                              id=coursework_material_id,
-                              updateMask=update_mask,
-                        body=update_mask_details).execute()
+  service = build(
+      "classroom",
+      "v1",
+      credentials=get_credentials(),
+      static_discovery=False,
+      discoveryServiceUrl=DISCOVERY_SERVICE_URL)
+  data = service.courses().courseWork().patch(
+      courseId=course_id,
+      id=coursework_id,
+      updateMask=update_mask,
+      previewVersion=COPY_COURSE_API_VERSION,
+      body=updated_data).execute()
   return data
+
+
+def patch_coursework_material_alpha(course_id, coursework_material_id,
+                                    update_mask, updated_data):
+  """Update a coursework in a classroom course
+
+  Args:
+    course_id: ID of the classroom course
+    coursework_material_id: ID of the coursework material in the classroom
+    update_mask: update mask contains the fields to be updated
+    updated_data: Data that needs to be updated in the coursework material
+  Returns:
+    returns success
+  """
+  service = build(
+      "classroom",
+      "v1",
+      credentials=get_credentials(),
+      static_discovery=False,
+      discoveryServiceUrl=DISCOVERY_SERVICE_URL)
+  data = service.courses().courseWorkMaterials().patch(
+      courseId=course_id,
+      id=coursework_material_id,
+      updateMask=update_mask,
+      previewVersion=COPY_COURSE_API_VERSION,
+      body=updated_data).execute()
+  return data
+
 
 def create_coursework_material(course_id, coursework_material):
   """create coursework in a classroom course
