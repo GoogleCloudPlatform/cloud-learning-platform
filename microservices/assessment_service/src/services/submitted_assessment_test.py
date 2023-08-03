@@ -188,6 +188,7 @@ def test_submit_assessment(clean_firestore, mocker, input_submitted_assessment,
   submission_output = submit_assessment(input_submitted_assessment, "token")
   assert submission_output["timer_start_time"] == submission_output[
       "created_time"]
+  del submission_output["id"]
   del submission_output["timer_start_time"]
   del submission_output["created_time"]
   del submission_output["last_modified_time"]

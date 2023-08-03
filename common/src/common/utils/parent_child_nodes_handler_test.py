@@ -132,7 +132,6 @@ def test_get_document_from_collection(clean_firestore, insert_data_to_db):
   collection = "learning_objects"
   func_output = ParentChildNodesHandler.get_document_from_collection(
     collection, document_dict["uuid"])
-  del document_dict["id"]
   del document_dict["key"]
   del document_dict["created_time"]
   del document_dict["last_modified_time"]

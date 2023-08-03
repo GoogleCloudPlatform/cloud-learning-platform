@@ -87,6 +87,9 @@ requires:
 - path: ./microservices/prior_learning_assessment
   configs: [prior-learning-assessment]
 
+- path: ./microservices/jobs_service
+  configs: [jobs-service]
+
 build:
   googleCloudBuild: {}
 ---
