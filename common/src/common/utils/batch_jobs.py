@@ -14,7 +14,7 @@
 
 """Module for job related functions"""
 
-from common.models.batch_job import BatchJobModel
+from common.models.batch_job import BatchJobModel, JobStatus
 from common.utils.kf_job_app import (kube_delete_job, kube_create_job,
                                      kube_get_namespaced_deployment_image_path)
 import json
@@ -61,25 +61,14 @@ def initiate_batch_job(request_body, job_type, env_vars={}):
 
 def get_job_status(job_type, job_name):
   """returns status of the batch job"""
-  if job_name:
-    job = BatchJobModel.collection.filter("type", "in", [job_type]).filter(
-        "uuid", "==", job_name).get()
-    if job:
-      job_response = {}
-      job_response["job_name"] = job.name
-      job_response["created_by"] = job.created_by
-      job_response["created_time"] = str(job.created_time)
-      job_response["last_modified_by"] = job.last_modified_by
-      job_response["last_modified_time"] = str(job.last_modified_time)
-      job_response["input_data"] = json.loads(job.input_data)
-      job_response["status"] = job.status
-      job_response["errors"] = job.errors
-      job_response["type"] = job.type
-      if job.output_gcs_path:
-        job_response["output_gcs_path"] = job.output_gcs_path
-      return job_response
-    else:
-      raise ResourceNotFoundException("Job with this job_name does not exist")
+  job = BatchJobModel.collection.filter("type", "in", [job_type]).filter(
+      "uuid", "==", job_name).get()
+  if job:
+    job_response = job.get_fields(reformat_datetime=True)
+    return job_response
+  else:
+    raise ResourceNotFoundException(
+        f"Job with name {job_name} and type {job_type} not found")
 
 
 def get_all_jobs(job_type):
@@ -94,27 +83,13 @@ def get_all_jobs(job_type):
   jobs = BatchJobModel.collection.filter("type", "in", [job_type]).fetch()
   job_list = []
   for job in jobs:
-    job_response = {}
-    job_response["job_name"] = job.name
-    job_response["created_by"] = job.created_by
-    job_response["created_time"] = str(job.created_time)
-    job_response["last_modified_by"] = job.last_modified_by
-    job_response["last_modified_time"] = str(job.last_modified_time)
-    job_response["input_data"] = json.loads(job.input_data)
-    job_response["status"] = job.status
-    job_response["type"] = job.type
-    job_response["errors"] = job.errors
-    if job.output_gcs_path:
-      job_response["output_gcs_path"] = job.output_gcs_path
+    job_response = job.get_fields(reformat_datetime=True)
     job_list.append(job_response)
-  data_response = {}
-  for i in job_list:
-    data_response[str(job_list.index(i))] = i
-  return data_response
+  return job_list
 
 
 def delete_batch_job(job_type, job_name):
-  """Deletes a particular batch job
+  """Deletes a particular batch job model
 
   Args:
     job_type: type of job (e.g.: skill_alignment)
@@ -130,7 +105,7 @@ def delete_batch_job(job_type, job_name):
       raise Exception("Internal server error") from e
   else:
     raise ResourceNotFoundException(
-        "Job with given name and type does not exist")
+        f"Job with name {job_name} and type {job_type} not found")
 
 
 def remove_job_and_update_status(job_type, job_name):
@@ -150,8 +125,8 @@ def remove_job_and_update_status(job_type, job_name):
     except Exception as e:
       raise Exception("Failed to remove job from namespace: " + str(e)) from e
     try:
-      if job.status == "active":
-        job.status = "aborted"
+      if job.status == JobStatus.JOB_STATUS_ACTIVE.value:
+        job.status = JobStatus.JOB_STATUS_ABORTED.value
         job.update()
         response = {
             "success":
@@ -165,4 +140,4 @@ def remove_job_and_update_status(job_type, job_name):
       raise Exception("Failed to update status") from e
   else:
     raise ResourceNotFoundException(
-        "Job with given name and type does not exist")
+        f"Job with name {job_name} and type {job_type} not found")

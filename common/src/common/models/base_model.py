@@ -88,6 +88,8 @@ class BaseModel(Model):
   def get_fields(self, reformat_datetime=False):
     """overrides default method to fix data type for datetime fields"""
     fields = super()._get_fields()
+    if "id" in self.to_dict().keys():
+      fields["id"] = self.id
     if reformat_datetime:
       fields["created_time"] = str(fields["created_time"])
       fields["last_modified_time"] = str(fields["last_modified_time"])

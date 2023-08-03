@@ -15,15 +15,15 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Unit test & lint for LLM Service
+name: Unit test & lint for Jobs Service
 on:
   pull_request:
     branches:
       - main
     paths:
-      - 'microservices/llm_service/**'
+      - 'microservices/jobs_service/**'
       - 'common/**'
-      - '.github/workflows/unit_test_linter_llm_service.yaml'
+      - '.github/workflows/unit_test_linter_jobs_service.yaml'
       - '.pylintrc'
   workflow_dispatch:
 
@@ -40,7 +40,7 @@ jobs:
       matrix:
         python-version: [3.9]
         target-folder: [
-          microservices/llm_service,
+          microservices/jobs_service,
         ]
     steps:
     - uses: actions/checkout@v3
@@ -90,7 +90,7 @@ jobs:
       matrix:
         python-version: [3.9]
         target-folder: [
-          microservices/llm_service,
+          microservices/jobs_service,
         ]
     steps:
     - uses: actions/checkout@v3
