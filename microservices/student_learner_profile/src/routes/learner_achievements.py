@@ -16,11 +16,11 @@ router = APIRouter(tags=["Learner"], responses=ERROR_RESPONSES)
 
 
 @router.get(
-  "/learner/{learner_id}/achievements",
-  response_model=LearnerAchievementResponseModel,
-  responses={404: {
-    "model": NotFoundErrorResponseModel
-  }})
+    "/learner/{learner_id}/achievements",
+    response_model = LearnerAchievementResponseModel,
+    responses={404: {
+        "model": NotFoundErrorResponseModel
+    }})
 def get_learner_achievements(learner_id: str, program_pathway_id: str):
   """Endpoint to return learner achievements for a program
   ### Args:
@@ -44,12 +44,12 @@ def get_learner_achievements(learner_id: str, program_pathway_id: str):
     pathway_node = pathway_node.get_fields(reformat_datetime=True)
     learner_profile = LearnerProfile.find_by_learner_id(learner_id)
     learner_achievements = get_all_learner_achievements(
-      pathway_node, learner_profile)
+  pathway_node, learner_profile)
     return {
-      "success": True,
-      "message": "Successfully fetched the learner achievements"
-                 " for the given pathway",
-      "data": learner_achievements
+        "success": True,
+        "message": "Successfully fetched the learner achievements"
+        " for the given pathway",
+        "data": learner_achievements
     }
   except ResourceNotFoundException as e:
     Logger.error(e)
@@ -60,14 +60,13 @@ def get_learner_achievements(learner_id: str, program_pathway_id: str):
     Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
-
 def get_all_learner_achievements(parent_node, learner_profile):
   """Returns all achievements for a given pathway node"""
   achievements_list = []
-  if len(parent_node.get("achievements", [])) > 0:
+  if len(parent_node.get("achievements",[])) > 0:
     with concurrent.futures.ThreadPoolExecutor() as executor:
       futures = []
-      for achievement_id in parent_node.get("achievements", []):
+      for achievement_id in parent_node.get("achievements",[]):
         future = executor.submit(
           get_achievement_fields, achievement_id, parent_node, learner_profile)
         futures.append(future)
@@ -78,7 +77,7 @@ def get_all_learner_achievements(parent_node, learner_profile):
 
   else:
     for child_node_id in parent_node.get(
-      "child_nodes", {}).get("curriculum_pathways", []):
+        "child_nodes",{}).get("curriculum_pathways",[]):
       child_node = CurriculumPathway.find_by_id(
         child_node_id)
       child_node = child_node.get_fields(reformat_datetime=True)
@@ -87,8 +86,24 @@ def get_all_learner_achievements(parent_node, learner_profile):
       ))
   return achievements_list
 
-
 def get_achievement_fields(achievement_id, parent_node, learner_profile):
+  """
+  Returns the achievement fields for a given achievement
+  ### Args:
+  achievement_id: `str`
+    unique identifier for the achievement
+  parent_node: `dict`
+    parent node of the achievement
+  learner_profile: `LearnerProfile`
+    learner profile of the user
+  ### Raises:
+  ResourceNotFoundException:
+    If the node of node type does not exist. <br/>
+  Exception 500:
+    Internal Server Error. Raised if something went wrong
+  ### Returns:
+  LearnerAchievementResponseModel: LearnerAchievementResponseModel
+  """
   achievement = Achievement.find_by_id(
     achievement_id).get_fields(reformat_datetime=True)
   achievement["parent_node"] = parent_node
@@ -98,7 +113,7 @@ def get_achievement_fields(achievement_id, parent_node, learner_profile):
     achievement["status"] = "not completed"
   achievement["child_achievements"] = []
   for child_node_id in parent_node.get(
-    "child_nodes", {}).get("curriculum_pathways", []):
+      "child_nodes",{}).get("curriculum_pathways",[]):
     child_node = CurriculumPathway.find_by_id(
       child_node_id)
     child_node = child_node.get_fields(reformat_datetime=True)

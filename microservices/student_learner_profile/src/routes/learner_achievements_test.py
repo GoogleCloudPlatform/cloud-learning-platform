@@ -29,7 +29,7 @@ os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 
 
-def test_get_learner_achievements_positive(clean_firestore):
+def test_get_learner_achievements_postive(clean_firestore):
   learner_dict = BASIC_LEARNER_EXAMPLE
   learner = Learner.from_dict(learner_dict)
   learner.uuid = ""

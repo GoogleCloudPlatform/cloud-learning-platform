@@ -11,21 +11,27 @@ import os
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 """
-import config
 import time
+import config
 import uvicorn
+
 from fastapi import FastAPI, Depends, Request
+
+from common.utils.logging_handler import Logger
+from common.utils.auth_service import validate_token
+from common.utils.http_exceptions import add_exception_handlers
+
 from routes import (learner, learner_profile, mastery, goal, achievement,
                     ingestion, education_fields, progress, learner_achievements)
-from common.utils.http_exceptions import add_exception_handlers
-from common.utils.auth_service import validate_token
-from common.utils.logging_handler import Logger
 
 app = FastAPI()
 
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
+  """
+  Add process time header to every request
+  """
   method = request.method
   path = request.scope.get("path")
   start_time = time.time()
@@ -39,19 +45,22 @@ async def add_process_time_header(request: Request, call_next):
 
 @app.get("/ping")
 def health_check():
+  """
+  Health Check
+  """
   return {
-      "success": True,
-      "message": "Successfully reached student learner profile microservice",
-      "data": {}
+    "success": True,
+    "message": "Successfully reached student learner profile microservice",
+    "data": {}
   }
 
 
 api = FastAPI(
-    title="Student Learner Profile Service API",
-    version="latest",
-    docs_url=None,
-    redoc_url=None,
-    dependencies=[Depends(validate_token)]
+  title="Student Learner Profile Service API",
+  version="latest",
+  docs_url=None,
+  redoc_url=None,
+  dependencies=[Depends(validate_token)]
 )
 
 api.include_router(learner.router)
@@ -70,8 +79,8 @@ app.mount("/learner-profile-service/api/v1", api)
 
 if __name__ == "__main__":
   uvicorn.run(
-      "main:app",
-      host="0.0.0.0",
-      port=int(config.PORT),
-      log_level="debug",
-      reload=True)
+    "main:app",
+    host="0.0.0.0",
+    port=int(config.PORT),
+    log_level="debug",
+    reload=config.IS_DEVELOPMENT)

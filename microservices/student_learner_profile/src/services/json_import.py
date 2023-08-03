@@ -1,13 +1,24 @@
 """ Import of the JSON file """
 import json
-from pydantic.error_wrappers import ValidationError as PydanticValidationError
+
 from json.decoder import JSONDecodeError
+from pydantic.error_wrappers import ValidationError as PydanticValidationError
+
 from common.utils.errors import ValidationError
+
 # pylint: disable = broad-except
 
 
 def add_data_to_db(content, new_content_obj):
-  '''Insert the data into the database'''
+  """
+    Insert the data into the database
+    Args:
+      content (dict): learners content
+      new_content_obj (object): firestore object
+
+    Returns:
+      str: content uuid
+  """
   new_content_obj = new_content_obj.from_dict(content)
   new_content_obj.uuid = ""
   new_content_obj.save()
@@ -23,7 +34,7 @@ def json_import(json_file, json_schema, model_obj, object_name):
   inserting the data into the database
 
   Args:
-    json_file (json): learner content json file
+    json_file (json): learners content json file
     json_schema (dict): learners content json schema
     model_obj (object): learners content model
     object_name (object): json object name
@@ -62,9 +73,9 @@ def json_import(json_file, json_schema, model_obj, object_name):
         new_content_uuid = add_data_to_db(contents, new_content_obj)
         inserted_data.append(new_content_uuid)
       return {
-          "success": True,
-          "message": f"Successfully created the {object_name}",
-          "data": inserted_data
+        "success": True,
+        "message": f"Successfully created the {object_name}",
+        "data": inserted_data
       }
 
   except JSONDecodeError as e:
@@ -74,7 +85,7 @@ def json_import(json_file, json_schema, model_obj, object_name):
     error_res = json.loads(err.json())
     req_fields = [i["loc"][-1] for i in error_res]
     req_fields_str = "Missing required fields - "+ \
-        ",".join("'"+i+"'" for i in req_fields)
+      ",".join("'"+i+"'" for i in req_fields)
     raise ValidationError(req_fields_str, data=error_res) from err
 
   except Exception as err:

@@ -1,5 +1,5 @@
 {
-  "education_goals" : [
+  "education_goals": [
     "To be able to do what I love",
     "To start a new career",
     "To make more money",
@@ -9,15 +9,13 @@
     "To make my family proud of me",
     "To make the world a better place"
   ],
-
-  "employment_status" : [
+  "employment_status": [
     "Full-time",
     "Part-time",
     "Seeking work",
     "Unemployed"
   ],
-
-  "potential_career_fields" : [
+  "potential_career_fields": [
     {
       "field_name": "Architecture, engineering",
       "examples": "e.g., architect, drafter, electrical engineer"
@@ -63,7 +61,8 @@
       "examples": "e.g., HVAC technician, auto mechanic, locksmith"
     },
     {
-      "field_name": "Legal", "examples": "e.g., lawyer, paralegal"
+      "field_name": "Legal",
+      "examples": "e.g., lawyer, paralegal"
     },
     {
       "field_name": "Personal care, service",
@@ -86,7 +85,8 @@
       "examples": "e.g., executive secretary, proofreader, data entry clerk"
     },
     {
-      "field_name": "Something else not listed here", "examples": ""
+      "field_name": "Something else not listed here",
+      "examples": ""
     }
   ]
 }

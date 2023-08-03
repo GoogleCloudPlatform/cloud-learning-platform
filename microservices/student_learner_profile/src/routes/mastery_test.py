@@ -1,16 +1,24 @@
 """
   Unit tests for Learner Profile endpoints
 """
-import os
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
+
+import os
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
 from testing.test_config import API_URL
+
 from routes.mastery import router
-from common.testing.firestore_emulator import (firestore_emulator,
-                                               clean_firestore)
+
 from common.utils.http_exceptions import add_exception_handlers
+
+from common.testing.firestore_emulator import (
+  firestore_emulator,
+  clean_firestore
+)
 
 app = FastAPI()
 add_exception_handlers(app)

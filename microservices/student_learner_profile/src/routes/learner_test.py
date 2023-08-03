@@ -122,7 +122,7 @@ def test_post_learner(clean_firestore):
 
   uuid = post_json_response.get("data").get("uuid")
 
-  # now see if GET endpoint returns the same data
+  # now see if GET endpoint returns same data
   url = f"{api_url}/{uuid}"
   get_resp = client_with_emulator.get(url)
   get_json_response = json.loads(get_resp.text)
@@ -145,7 +145,6 @@ def test_post_learner(clean_firestore):
 
   # assert that rest of the fields are equivalent
   # assert loaded_learner_dict == post_json_response.get("data")
-
 
 
 def test_update_learner(clean_firestore):
@@ -196,8 +195,8 @@ def test_delete_learner(clean_firestore):
   learner.update()
   learner_dict["uuid"] = learner.id
 
-  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE,
-                          "learner_id": learner.id}
+  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE}
+  learner_profile_dict["learner_id"] = learner.id
   learner_profile = LearnerProfile.from_dict(learner_profile_dict)
   learner_profile.uuid = ""
   learner_profile.save()
@@ -291,7 +290,8 @@ def test_get_learners(clean_firestore):
   assert resp.status_code == 200, "Status 200"
   retrieved_ids = [i.get("uuid") for i in json_response.get("data")["records"]]
   assert learner.id in retrieved_ids, "expected data not retrieved"
-  assert deleted_learner.id not in retrieved_ids, "unexpected data is retrieved"
+  assert deleted_learner.id not in retrieved_ids, \
+    "unexpected data is retrieved"
   assert archived_learner.uuid not in retrieved_ids, "is_archived not working"
 
 
@@ -331,7 +331,8 @@ def test_sort_learners(clean_firestore):
   retrieved_ids = [i.get("uuid") for i in json_response.get(
                               "data").get("records")]
   assert learner.id in retrieved_ids, "expected data not retrieved"
-  assert deleted_learner.id not in retrieved_ids, "unexpected data is retrieved"
+  assert deleted_learner.id not in retrieved_ids, \
+    "unexpected data is retrieved"
   assert archived_learner.uuid not in retrieved_ids, "is_archived not working"
 
 
@@ -375,7 +376,8 @@ def test_search_learner(clean_firestore):
   assert resp.status_code == 200, "Status 200"
   retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
   assert learner.id in retrieved_ids, "expected data not retrieved"
-  assert deleted_learner.id not in retrieved_ids, "unexpected data is retrieved"
+  assert deleted_learner.id not in retrieved_ids, \
+    "unexpected data is retrieved"
 
   # Search by email_address:
   params = {"email_address": "search_learner@email.com"}
@@ -384,7 +386,8 @@ def test_search_learner(clean_firestore):
   assert resp.status_code == 200, "Status 200"
   retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
   assert learner.id in retrieved_ids, "expected data not retrieved"
-  assert deleted_learner.id not in retrieved_ids, "unexpected data is retrieved"
+  assert deleted_learner.id not in retrieved_ids, \
+    "unexpected data is retrieved"
 
 
 def test_search_learner_negative_1(clean_firestore):
@@ -407,17 +410,18 @@ def test_archive_learner(clean_firestore):
   learner.update()
   learner_uuid = learner.id
 
-  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE,
-                          "learner_id": learner_uuid}
+  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE}
+  learner_profile_dict["learner_id"] = learner_uuid
   learner_profile = LearnerProfile.from_dict(learner_profile_dict)
   learner_profile.uuid = ""
-  learner_profile.is_archived = False
+  learner_profile.is_archived = False  # learner profile not archived initially
   learner_profile.save()
   learner_profile.uuid = learner_profile.id
   learner_profile.update()
 
   url = f"{api_url}/{learner_uuid}"
-  updated_data = {"is_archived": True}
+  updated_data = {}
+  updated_data["is_archived"] = True  # archive learner
   resp = client_with_emulator.put(url, json=updated_data)
   json_response_update_req = resp.json()
 
@@ -436,7 +440,7 @@ def test_archive_learner(clean_firestore):
     "learner-profile is not archived"
 
 
-# Fetch Learning Hierarchy with learner id
+# Fetch Learning Heirarchy with learner id
 positive_json_res = {
   "success": "true",
   "message": "Successfully fetched the curriculum pathway",
@@ -466,10 +470,9 @@ negative_json_res_2 = {
 
 def mocked_requests_get(*args, **kwargs):
   """
-  Mocked requests. Get function
+  Mocked requests.get function
   """
   class MockResponse:
-
     def __init__(self, json_data, status_code):
       self.json_data = json_data
       self.status_code = status_code
@@ -575,7 +578,7 @@ def test_get_instructor(clean_firestore):
   resp_data = resp.json()
   assert resp.status_code == 404, f"Status Code = {resp.status_code}"
   assert resp_data["message"] == "Learner with uuid learner not found", \
-                                 f"Received message = {resp_data['message']}"
+    f"Received message = {resp_data['message']}"
 
   # Negative Scenario when CP ID not found
   url = f"{api_url}/{learner.id}/curriculum-pathway/discipline/instructor"
@@ -584,7 +587,7 @@ def test_get_instructor(clean_firestore):
   assert resp.status_code == 404, f"Status Code = {resp.status_code}"
   assert resp_data["message"] == \
          "Curriculum Pathway with uuid discipline not found", \
-         f"Received message = {resp_data['message']}"
+    f"Received message = {resp_data['message']}"
 
   # Test for Validations
   # 1. Validating if the Learner exists in any of the groups
@@ -612,7 +615,7 @@ def test_get_instructor(clean_firestore):
   assert resp_data["message"] == \
          f"Learner with User ID {new_learner_user.id} not " + \
          "found in any Association Groups", \
-         f"Received message = {resp_data['message']}"
+    f"Received message = {resp_data['message']}"
 
   # 2. Validating if the curriculum pathway has the alias as `discipline`
   discipline.alias = "program"
@@ -625,7 +628,7 @@ def test_get_instructor(clean_firestore):
   assert resp_data["message"] == \
          f"Pathway with {discipline.id} has alias as " + \
          f"{discipline.alias} instead of discipline", \
-         f"Received message = {resp_data['message']}"
+    f"Received message = {resp_data['message']}"
   discipline.alias = "discipline"
   discipline.update()
 
@@ -647,7 +650,7 @@ def test_get_instructor(clean_firestore):
   assert resp_data["message"] == \
          "No Active Instructors Available for the given CurriculumPathway " + \
          f"= {discipline.id} in AssociationGroup = {lag.id}", \
-         f"Received message = {resp_data['message']}"
+    f"Received message = {resp_data['message']}"
 
 
 def test_get_instructors(clean_firestore):
@@ -761,7 +764,7 @@ def test_get_instructors(clean_firestore):
   assert resp_json["discipline_id"] == discipline.uuid
 
   # Check if API was successfully hit
-  # a Negative scenario when learner not \
+  # Negative scenario when learner not \
   # actively associated with program in any LAG
   url = f"{api_url}/{learner_2.id}/curriculum-pathway/{program.id}/instructors"
   resp = client_with_emulator.get(url)
@@ -773,7 +776,7 @@ def test_get_instructors(clean_firestore):
   resp_data = resp.json()
   assert resp.status_code == 404, f"Status Code = {resp.status_code}"
   assert resp_data["message"] == "Learner with uuid learner not found", \
-                                 f"Received message = {resp_data['message']}"
+    f"Received message = {resp_data['message']}"
 
   # Negative Scenario when CP ID not found
   url = f"{api_url}/{learner.id}/curriculum-pathway/program/instructors"
@@ -782,7 +785,7 @@ def test_get_instructors(clean_firestore):
   assert resp.status_code == 404, f"Status Code = {resp.status_code}"
   assert resp_data["message"] == \
          "Curriculum Pathway with uuid program not found", \
-         f"Received message = {resp_data['message']}"
+    f"Received message = {resp_data['message']}"
 
 
 def test_get_coach_details(clean_firestore):
@@ -794,8 +797,9 @@ def test_get_coach_details(clean_firestore):
   learner.uuid = learner.id
   learner.update()
 
-  learner_user_dict = {**TEST_USER, "user_type": "learner",
-                       "user_type_ref": learner.uuid}
+  learner_user_dict = {**TEST_USER}
+  learner_user_dict["user_type"] = "learner"
+  learner_user_dict["user_type_ref"] = learner.uuid
   learner_user = User.from_dict(learner_user_dict)
   learner_user.user_id = ""
   learner_user.save()
@@ -811,8 +815,9 @@ def test_get_coach_details(clean_firestore):
   staff.uuid = staff.id
   staff.update()
 
-  staff_user_dict = {**TEST_USER, "user_type": "coach",
-                     "user_type_ref": staff.uuid}
+  staff_user_dict = {**TEST_USER}
+  staff_user_dict["user_type"] = "coach"
+  staff_user_dict["user_type_ref"] = staff.uuid
   staff_user = User.from_dict(staff_user_dict)
   staff_user.user_id = ""
   staff_user.save()
@@ -820,15 +825,15 @@ def test_get_coach_details(clean_firestore):
   staff_user.update()
 
   # Create Association Group
-  association_group_dict = {**TEST_ASSOCIATION_GROUP,
-                            "association_type": "learner"}
+  association_group_dict = {**TEST_ASSOCIATION_GROUP}
+  association_group_dict["association_type"] = "learner"
   association_group = AssociationGroup.from_dict(association_group_dict)
   association_group.uuid = ""
   association_group.save()
   association_group.uuid = association_group.id
   association_group.update()
 
-  # Update the user & coach in a learner association group
+  # Update the user & coach in learner association group
   association_group.users = [{"user": learner_user.user_id, "status": "active"}]
   association_group.associations = {
     "coaches": [{"coach": staff_user.user_id, "status": "active"}],
@@ -856,8 +861,9 @@ def test_get_coach_details_negative_1(clean_firestore):
   learner.uuid = learner.id
   learner.update()
 
-  learner_user_dict = {**TEST_USER, "user_type": "learner",
-                       "user_type_ref": learner.uuid}
+  learner_user_dict = {**TEST_USER}
+  learner_user_dict["user_type"] = "learner"
+  learner_user_dict["user_type_ref"] = learner.uuid
   learner_user = User.from_dict(learner_user_dict)
   learner_user.user_id = ""
   learner_user.save()
@@ -873,8 +879,9 @@ def test_get_coach_details_negative_1(clean_firestore):
   staff.uuid = staff.id
   staff.update()
 
-  staff_user_dict = {**TEST_USER, "user_type": "coach",
-                     "user_type_ref": staff.uuid}
+  staff_user_dict = {**TEST_USER}
+  staff_user_dict["user_type"] = "coach"
+  staff_user_dict["user_type_ref"] = staff.uuid
   staff_user = User.from_dict(staff_user_dict)
   staff_user.user_id = ""
   staff_user.save()
@@ -882,15 +889,15 @@ def test_get_coach_details_negative_1(clean_firestore):
   staff_user.update()
 
   # Create Association Group
-  association_group_dict = {**TEST_ASSOCIATION_GROUP,
-                            "association_type": "learner"}
+  association_group_dict = {**TEST_ASSOCIATION_GROUP}
+  association_group_dict["association_type"] = "learner"
   association_group = AssociationGroup.from_dict(association_group_dict)
   association_group.uuid = ""
   association_group.save()
   association_group.uuid = association_group.id
   association_group.update()
 
-  # Update the user & coach in a learner association group
+  # Update the user & coach in learner association group
   association_group.users = [{"user": learner_user.user_id, "status": "active"}]
   association_group.associations = {
     "coaches": [{"coach": staff_user.user_id, "status": "active"}],
@@ -919,8 +926,9 @@ def test_get_coach_details_negative_2(clean_firestore):
   learner.uuid = learner.id
   learner.update()
 
-  learner_user_dict = {**TEST_USER, "user_type": "learner",
-                       "user_type_ref": learner.uuid}
+  learner_user_dict = {**TEST_USER}
+  learner_user_dict["user_type"] = "learner"
+  learner_user_dict["user_type_ref"] = learner.uuid
   learner_user = User.from_dict(learner_user_dict)
   learner_user.user_id = ""
   learner_user.save()
@@ -936,8 +944,9 @@ def test_get_coach_details_negative_2(clean_firestore):
   staff.uuid = staff.id
   staff.update()
 
-  staff_user_dict = {**TEST_USER, "user_type": "coach",
-                     "user_type_ref": staff.uuid}
+  staff_user_dict = {**TEST_USER}
+  staff_user_dict["user_type"] = "coach"
+  staff_user_dict["user_type_ref"] = staff.uuid
   staff_user = User.from_dict(staff_user_dict)
   staff_user.user_id = ""
   staff_user.save()
@@ -945,15 +954,15 @@ def test_get_coach_details_negative_2(clean_firestore):
   staff_user.update()
 
   # Create Association Group
-  association_group_dict = {**TEST_ASSOCIATION_GROUP,
-                            "association_type": "learner"}
+  association_group_dict = {**TEST_ASSOCIATION_GROUP}
+  association_group_dict["association_type"] = "learner"
   association_group = AssociationGroup.from_dict(association_group_dict)
   association_group.uuid = ""
   association_group.save()
   association_group.uuid = association_group.id
   association_group.update()
 
-  # Update the user & coach in a learner association group
+  # Update the user & coach in learner association group
   association_group.users = [{"user": learner_user.user_id, "status": "active"}]
   association_group.associations = {
     "coaches": [{"coach": staff_user.user_id, "status": "active"}],
@@ -971,9 +980,10 @@ def test_get_coach_details_negative_2(clean_firestore):
   learner_2.uuid = learner_2.id
   learner_2.update()
 
-  learner_user_dict_2 = {**TEST_USER, "email": "another.learner@email.com",
-                         "user_type": "learner",
-                         "user_type_ref": learner_2.uuid}
+  learner_user_dict_2 = {**TEST_USER}
+  learner_user_dict_2["email"] = "another.learner@email.com"
+  learner_user_dict_2["user_type"] = "learner"
+  learner_user_dict_2["user_type_ref"] = learner_2.uuid
   learner_user_2 = User.from_dict(learner_user_dict_2)
   learner_user_2.user_id = ""
   learner_user_2.save()
@@ -1000,8 +1010,9 @@ def test_get_coach_details_negative_3(clean_firestore):
   learner.uuid = learner.id
   learner.update()
 
-  learner_user_dict = {**TEST_USER, "user_type": "learner",
-                       "user_type_ref": learner.uuid}
+  learner_user_dict = {**TEST_USER}
+  learner_user_dict["user_type"] = "learner"
+  learner_user_dict["user_type_ref"] = learner.uuid
   learner_user = User.from_dict(learner_user_dict)
   learner_user.user_id = ""
   learner_user.save()
@@ -1017,8 +1028,9 @@ def test_get_coach_details_negative_3(clean_firestore):
   staff.uuid = staff.id
   staff.update()
 
-  staff_user_dict = {**TEST_USER, "user_type": "coach",
-                     "user_type_ref": staff.uuid}
+  staff_user_dict = {**TEST_USER}
+  staff_user_dict["user_type"] = "coach"
+  staff_user_dict["user_type_ref"] = staff.uuid
   staff_user = User.from_dict(staff_user_dict)
   staff_user.user_id = ""
   staff_user.save()
@@ -1026,15 +1038,15 @@ def test_get_coach_details_negative_3(clean_firestore):
   staff_user.update()
 
   # Create Association Group
-  association_group_dict = {**TEST_ASSOCIATION_GROUP,
-                            "association_type": "learner"}
+  association_group_dict = {**TEST_ASSOCIATION_GROUP}
+  association_group_dict["association_type"] = "learner"
   association_group = AssociationGroup.from_dict(association_group_dict)
   association_group.uuid = ""
   association_group.save()
   association_group.uuid = association_group.id
   association_group.update()
 
-  # Update the user & coach in a learner association group
+  # Update the user & coach in learner association group
   association_group.users = [{"user": learner_user.user_id, "status": "active"}]
   association_group.associations = {
     "coaches": [],
@@ -1114,7 +1126,7 @@ def test_get_curriculum_pathway_id_for_the_invalid_learner(clean_firestore):
   resp_data = resp.json()
   assert resp.status_code == 404, f"Status Code = {resp.status_code}"
   assert resp_data["message"] == "Learner with uuid learner not found", \
-                                 f"Received message = {resp_data['message']}"
+    f"Received message = {resp_data['message']}"
 
 
 def test_get_curriculum_pathway_id_for_the_learner_negative(clean_firestore):
@@ -1167,7 +1179,7 @@ def test_get_curriculum_pathway_id_for_the_learner_negative(clean_firestore):
 
 
 def test_get_curriculum_pathway_id_for_the_learner_negative2(clean_firestore):
-  # When learner isn't added in the learner association group
+  # When learner not added in the learner association group
   # ADD Learner Details
   learner = Learner.from_dict(TEST_LEARNER)
   learner.uuid = ""
