@@ -165,7 +165,7 @@ def create_section_apha(sections_details: SectionDetails,
           f" {course_template_details.classroom_id} is not found")
 
     lms_job_input = {
-        "job_type": "course_copy",
+        "job_type": "course_copy_alpha",
         "status": "ready",
         "input_data": {**sections_details.dict()},
         "logs": {
