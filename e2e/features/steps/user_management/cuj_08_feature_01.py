@@ -152,7 +152,7 @@ def step_impl_2(context):
 
 @then("module object will not be created and a conflict error is thrown")
 def step_impl_3(context):
-  assert context.res.status_code == 500
+  assert context.res.status_code == 409
   context.res_data = context.res.json()
   assert context.res_data["success"] is False
   assert context.res_data["message"] == \
@@ -451,7 +451,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.status_code == 200
   assert context.res.json()["success"] is True
   assert context.res.json()["message"] == "Data fetched successfully"
-  assert type(context.res.json()["data"]) is list
+  assert type(context.res.json()["data"]["records"]) is list
 
 
 @given("fetch all the modules for incorrect query params")

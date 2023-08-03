@@ -161,7 +161,8 @@ def step_impl_1(context: Context) -> None:
   data = get_method(url=fetch_url, query_params=query_params)
   if data.status_code == 200:
     delete_url = f"{UM_API_URL}/permission"
-    [delete_method(url=f"{delete_url}/{i['uuid']}") for i in data.json()["data"]
+    [delete_method(url=f"{delete_url}/{i['uuid']}") for i in data.json()[
+      "data"]["records"]
      if i["application_id"] == "1212122ed3d33d" or i["module_id"] == "wewewewedn3211"]
   context.url = f"{UM_API_URL}/permission/search"
   context.query_params = {"search_query": "create"}
@@ -179,8 +180,6 @@ def step_impl_2(context: Context) -> None:
   None
   """
   context.res = get_method(url=context.url, query_params=context.query_params)
-  print(context.res)
-  print(context.res.json())
 
 
 @then("the permissions is failed to fetch for action name")
@@ -197,7 +196,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.status_code == 200
   assert context.res.json()["success"] is True
   assert context.res.json()["message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]) is list
+  assert type(context.res.json()["data"]["records"]) is list
 
 
 @given("fetch all the permissions for module name")
@@ -245,7 +244,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.json()["success"] is True
   assert context.res.json()[
     "message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]) is list
+  assert type(context.res.json()["data"]["records"]) is list
 
 
 @given("fetch all the permissions for application name")
@@ -295,7 +294,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.json()["success"] is True
   assert context.res.json()[
     "message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]) is list
+  assert type(context.res.json()["data"]["records"]) is list
 
 
 @given("fetch all the permissions for permission name")
@@ -345,7 +344,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.json()["success"] is True
   assert context.res.json()[
     "message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]) is list
+  assert type(context.res.json()["data"]["records"]) is list
 
 
 @given("fetch all the permissions for group name")
@@ -393,7 +392,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.json()["success"] is True
   assert context.res.json()[
     "message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]) is list
+  assert type(context.res.json()["data"]["records"]) is list
 
 
 @given("fetch all the permissions for incorrect search query")
@@ -442,7 +441,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.json()["success"] is True
   assert context.res.json()[
     "message"] == "Successfully fetched the permissions"
-  assert type(context.res.json()["data"]) is list
+  assert type(context.res.json()["data"]["records"]) is list
 
 
 @given("user want to update their permission with correct permission ID")
@@ -744,7 +743,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.status_code == 200
   assert context.res.json()["success"] is True
   assert context.res.json()["message"] == "Data fetched successfully"
-  assert type(context.res.json()["data"]) is list
+  assert type(context.res.json()["data"]["records"]) is list
 
 
 @given("fetch all the permissions from the datastore for a given application_id")
@@ -827,7 +826,7 @@ def step_impl_3(context: Context) -> None:
   assert context.res.status_code == 200
   assert context.res.json()["success"] is True
   assert context.res.json()["message"] == "Data fetched successfully"
-  assert context.res.json()["data"][0][
+  assert context.res.json()["data"]["records"][0][
     "application_id"] == context.permission_dict["application_id"]
 
 @given("fetch all the permissions for incorrect query params")
@@ -1009,7 +1008,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]) == 1
+  assert len(context.res_data["data"]["records"]) == 1
 
 
 # --- Positive Scenario 2 ---
@@ -1113,7 +1112,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]) == 1
+  assert len(context.res_data["data"]["records"]) == 1
 
 
 # --- Positive Scenario 3 ---
@@ -1229,7 +1228,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]) == 2
+  assert len(context.res_data["data"]["records"]) == 2
 
 
 # --- Negative Scenario 1 ---
@@ -1334,7 +1333,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]) == 0
+  assert len(context.res_data["data"]["records"]) == 0
 
 
 # --- Negative Scenario 2 ---
@@ -1415,7 +1414,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]) == 0
+  assert len(context.res_data["data"]["records"]) == 0
 
 
 # --- Negative Scenario 3 ---
@@ -1486,7 +1485,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert len(context.res_data["data"]) == 0
+  assert len(context.res_data["data"]["records"]) == 0
 
 @given("Retrieve all unique applications, modules, actions and user groups")
 def step_impl_1(context):
@@ -1509,10 +1508,150 @@ def step_impl_1(context):
 def step_impl_2(context):
   url = f"{UM_API_URL}/permission_filter/unique"
   unique_records = get_method(url)
-  print(unique_records)
   context.unique_records_res = unique_records.json()
 
 @then("Object will be returned with unique values")
 def step_impl_3(context):
   assert context.unique_records_res["success"] is True
   assert context.unique_records_res["message"] == "Successfully fetched the unique values for applications, modules, actions and user_groups."
+
+@given("A user has access to user management and needs to fetch permissions using sort by and sort order params")
+def step_impl_1(context):
+  application_url = f"{UM_API_URL}/application"
+  application_dict = deepcopy(TEST_APPLICATION)
+  application_dict["name"] = f"app-{uuid4()}"
+  post_application = post_method(
+    url=application_url,
+    request_body=application_dict
+  )
+  post_application_res = post_application.json()
+  context.application_id = post_application_res["data"]["uuid"]
+  assert post_application.status_code == 200
+
+  application_dict = deepcopy(TEST_APPLICATION)
+  application_dict["name"] = f"app-{uuid4()}"
+  post_application = post_method(
+    url=application_url,
+    request_body=application_dict
+  )
+  post_application_res1 = post_application.json()
+  context.application_id1 = post_application_res1["data"]["uuid"]
+  assert post_application.status_code == 200
+
+  module_url = f"{UM_API_URL}/module"
+  module_dict = deepcopy(TEST_MODULE)
+  module_dict["name"] = f"module-{uuid4()}"
+  post_module = post_method(
+    url=module_url,
+    request_body=module_dict
+  )
+  post_module_res = post_module.json()
+  context.module_id = post_module_res["data"]["uuid"]
+  assert post_module.status_code == 200
+
+  action_url = f"{UM_API_URL}/action"
+  action_dict = deepcopy(TEST_ACTION)
+  action_dict["name"] = f"action-{uuid4()}"
+  post_action = post_method(
+    url=action_url,
+    request_body=action_dict
+  )
+  post_action_res = post_action.json()
+  context.action_id = post_action_res["data"]["uuid"]
+  assert post_action.status_code == 200
+
+  permission_url = f"{UM_API_URL}/permission"
+  permission_dict = deepcopy(TEST_PERMISSION)
+  permission_dict["application_id"] = context.application_id
+  permission_dict["module_id"] = context.module_id
+  permission_dict["action_id"] = context.action_id
+  del permission_dict["user_groups"]
+  post_permission = post_method(
+    url=permission_url,
+    request_body=permission_dict
+  )
+  assert post_permission.status_code == 200
+
+  permission_dict = deepcopy(TEST_PERMISSION)
+  permission_dict["application_id"] = context.application_id1
+  permission_dict["module_id"] = context.module_id
+  permission_dict["action_id"] = context.action_id
+  del permission_dict["user_groups"]
+  post_permission = post_method(
+    url=permission_url,
+    request_body=permission_dict
+  )
+  assert post_permission.status_code == 200
+
+@when("API request is sent to fetch permissions by providing sort by and sort order params")
+def step_impl_2(context):
+  context.url = f"{UM_API_URL}/permissions"
+  params = {
+    "skip": 0,
+    "limit": 10,
+    "fetch_tree": True,
+    "sort_by": "application",
+    "sort_order": "descending"
+  }
+  context.res = get_method(url=context.url, query_params=params)
+  context.res_data = context.res.json()
+
+@then("API will return list of permissions sorted by provided sort by and sort order params")
+def step_impl_3(context):
+  assert context.res.status_code == 200
+  assert context.res_data["success"] is True, "Success is not True"
+  assert context.res_data["message"] == "Data fetched successfully"
+
+@given("A user has access to user management and needs to fetch permissions using user groups as sort by param")
+def step_impl_1(context):
+  action_dict = {**TEST_ACTION, "name": str(uuid4())}
+  action_url = f"{UM_API_URL}/action"
+  action_res = post_method(url=action_url, request_body=action_dict)
+  action_data = action_res.json()["data"]
+  action_id = action_data["uuid"]
+
+  module_dict = {**TEST_MODULE, "name": str(uuid4())}
+  module_dict["actions"] = [action_id]
+  module_url = f"{UM_API_URL}/module"
+  module_res = post_method(url=module_url, request_body=module_dict)
+  module_id = module_res.json()["data"]["uuid"]
+
+  app_dict = {**TEST_APPLICATION, "name": str(uuid4())}
+  app_dict["modules"] = [module_id]
+  app_url = f"{UM_API_URL}/application"
+  app_res = post_method(url=app_url, request_body=app_dict)
+  app_id = app_res.json()["data"]["uuid"]
+
+  group_dict = {**TEST_USER_GROUP, "name": f"{uuid4()}"}
+  post_group = post_method(url=f"{UM_API_URL}/user-group",
+                           request_body=group_dict)
+  post_group_data = post_group.json()
+  context.group_uuid = post_group_data["data"]["uuid"]
+
+  context.permission_dict = {**TEST_PERMISSION, "application_id": app_id, "module_id": module_id,
+    "action_id": action_id}
+  del context.permission_dict["user_groups"]
+
+  post_url = f"{UM_API_URL}/permission"
+  post_permission = post_method(url=post_url,
+                                request_body=context.permission_dict)
+
+  assert post_permission.status_code == 200
+
+@when("API request is sent to fetch permissions by providing sort by as user group param")
+def step_impl_2(context):
+  context.url = f"{UM_API_URL}/permissions"
+  params = {
+    "skip": 0,
+    "limit": 30,
+    "fetch_tree": True,
+    "sort_by": "user_groups",
+    "sort_order": "descending"
+  }
+  context.res = get_method(url=context.url, query_params=params)
+  context.res_data = context.res.json()
+
+@then("API will return list of permissions sorted by provided user group as sort by param")
+def step_impl_3(context):
+  assert context.res.status_code == 200
+  assert context.res_data["message"] == "Data fetched successfully"

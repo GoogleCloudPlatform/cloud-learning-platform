@@ -142,4 +142,5 @@ def get_unique_records(list_of_dicts, keys):
     key_set = set(subVal.keys()) and set(keys)
     if subVal not in distinct_records:
       distinct_records.append({key: subVal[key] for key in key_set})
+  distinct_records = sorted(distinct_records, key=lambda i: i["name"])
   return distinct_records

@@ -34,7 +34,7 @@ class Progress(BaseModel):
   child_count: Optional[int]
   completed_child_count: Optional[int]
   ungate: Optional[bool] = False
-
+  instruction_completed: Optional[bool]
 
 class LearningConstraints(BaseModel):
   """
@@ -209,13 +209,18 @@ class UpdateLearnerProfileModel(BaseModel):
     schema_extra = {"example": UPDATE_LEARNER_PROFILE_EXAMPLE}
 
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullLearnerProfileDataModel]]
+  total_count: int
+
+
 class GetAllLearnerProfilesResponseModel(BaseModel):
   """
   Get All Learner Profiles Response Model
   """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the learner profile"
-  data: Optional[List[FullLearnerProfileDataModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -223,7 +228,10 @@ class GetAllLearnerProfilesResponseModel(BaseModel):
       "example": {
         "success": True,
         "message": "Successfully fetched the learner profile",
-        "data": [FULL_LEARNER_PROFILE_EXAMPLE]
+        "data": {
+                  "records":[FULL_LEARNER_PROFILE_EXAMPLE],
+                  "total_count": 50
+                }
       }
     }
 

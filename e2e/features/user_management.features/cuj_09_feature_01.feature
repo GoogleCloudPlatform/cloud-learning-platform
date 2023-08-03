@@ -30,6 +30,96 @@ Feature: CRUD for managing Learner Association Group in user management
             When API request is sent to fetch Learner Association Group by providing uuid for Discipline Association Group
                 Then Learner Association Group object will not be returned and Validation error will be thrown by User management
 
+    Scenario: Retrieve Learner ids of Learner Association Group from User management by giving valid group uuid
+        Given A user has access privileges to User management and needs to fetch learner ids of a Learner Association Group
+            When API request is sent to fetch learner ids of Learner Association Group by providing correct group uuid
+                Then Learner ids belonging to Learner Association Group corresponding to given uuid will be returned successfully
+
+    Scenario: Retrieve Learners of Learner Association Group from User management by giving valid group uuid
+        Given A user has access privileges to User management and needs to fetch learners of a Learner Association Group
+            When API request is sent to fetch learners of Learner Association Group by providing correct group uuid
+                Then Learners belonging to Learner Association Group corresponding to given uuid will be returned successfully
+    
+    Scenario: Retrieve Learners of Learner Association Group from User management by giving valid group uuid and status
+        Given A user has access privileges to User management and needs to fetch learners of a Learner Association Group of given status
+            When API request is sent to fetch learners of Learner Association Group by providing correct group uuid and status
+                Then Learners belonging to Learner Association Group corresponding to given uuid and status will be returned successfully
+
+    Scenario: Sort Learners of Learner Association Group from User management by giving valid group uuid
+        Given A user has access privileges to User management and needs to sort learners of a Learner Association Group
+            When API request is sent to sort learners of Learner Association Group by providing correct group uuid
+                Then sort Learners belonging to Learner Association Group corresponding to given uuid will be returned successfully
+
+    Scenario: Unable to retrieve Learners of Learner Association Group when incorrect group uuid is given
+        Given A user has access to User management and needs to fetch learners of a Learner Association Group
+            When API request is sent to fetch learners of Learner Association Group by providing invalid group uuid
+                Then Learners of Learner Association Group will not be returned and Resource not found error will be thrown by User management
+
+    Scenario: Unable to retrieve Learners of Learner Association Group when uuid for Discipline Association Group is given
+        Given A user has access to User management and needs to fetch learners of an Association Group of Learner Type
+            When API request is sent to fetch learners of Learner Association Group by providing uuid for Discipline Association Group
+                Then Learners of Learner Association Group will not be returned and Validation error will be thrown by User management
+
+    Scenario: Retrieve Coach ids of Learner Association Group from User management by giving valid group uuid
+        Given A user has access privileges to User management and needs to fetch coach ids of a Learner Association Group
+            When API request is sent to fetch coach ids of Learner Association Group by providing correct group uuid
+                Then Coach ids belonging to Learner Association Group corresponding to given uuid will be returned successfully
+
+    Scenario: Sort Coach from Learner Association Group from User management by giving valid group uuid
+        Given A user has access privileges to User management and needs to sort coach from a Learner Association Group
+            When API request is sent to sort coach from Learner Association Group by providing correct group uuid
+                Then Coach belonging to Learner Association Group corresponding to given uuid will be returned successfully for given sort order
+
+    Scenario: Retrieve Coaches of Learner Association Group from User management by giving valid group uuid
+        Given A user has access privileges to User management and needs to fetch coaches of a Learner Association Group
+            When API request is sent to fetch coaches of Learner Association Group by providing correct group uuid
+                Then Coaches belonging to Learner Association Group corresponding to given uuid will be returned successfully
+
+     Scenario: Retrieve Coaches of Learner Association Group from User management by giving valid group uuid and status
+        Given A user has access privileges to User management and needs to fetch coaches of a Learner Association Group by status
+            When API request is sent to fetch coaches of Learner Association Group by providing correct group uuid and status
+                Then Coaches belonging to Learner Association Group corresponding to given uuid and status will be returned successfully
+
+    Scenario: Unable to retrieve Coaches of Learner Association Group when incorrect group uuid is given
+        Given A user has access to User management and needs to fetch coaches of a Learner Association Group
+            When API request is sent to fetch coaches of Learner Association Group by providing invalid group uuid
+                Then Coaches of Learner Association Group will not be returned and Resource not found error will be thrown by User management
+
+    Scenario: Unable to retrieve Coaches of Learner Association Group when uuid for Discipline Association Group is given
+        Given A user has access to User management and needs to fetch coaches of an Association Group of Learner Type
+            When API request is sent to fetch coaches of Learner Association Group by providing uuid for Discipline Association Group
+                Then Coaches of Learner Association Group will not be returned and Validation error will be thrown by User management
+
+    Scenario: Retrieve Instructor ids of Learner Association Group from User management by giving valid group uuid
+        Given A user has access privileges to User management and needs to fetch instructor ids of a Learner Association Group
+            When API request is sent to fetch instructor ids of Learner Association Group by providing correct group uuid
+                Then Instructor ids belonging to Learner Association Group corresponding to given uuid will be returned successfully
+
+    Scenario: Sort Instructors from Learner Association Group from User management by giving valid group uuid
+        Given A user has access privileges to User management and needs to sort instructor from a Learner Association Group
+            When API request is sent to fetch instructor of Learner Association Group by providing correct group uuid with given sort order
+                Then sorted Instructor belonging to Learner Association Group corresponding to given uuid will be returned successfully
+
+    Scenario: Retrieve Instructors of Learner Association Group from User management by giving valid group uuid
+        Given A user has access privileges to User management and needs to fetch instructors of a Learner Association Group
+            When API request is sent to fetch instructors of Learner Association Group by providing correct group uuid
+                Then Instructors belonging to Learner Association Group corresponding to given uuid will be returned successfully
+
+    Scenario: Retrieve Instructors of Learner Association Group from User management by giving valid group uuid and status
+        Given A user has access privileges to User management and needs to fetch instructors of a Learner Association Group by status
+            When API request is sent to fetch instructors of Learner Association Group by providing correct group uuid and status
+                Then Instructors belonging to Learner Association Group corresponding to given uuid and status will be returned successfully
+
+    Scenario: Unable to retrieve Instructors of Learner Association Group when incorrect group uuid is given
+        Given A user has access to User management and needs to fetch instructors of a Learner Association Group
+            When API request is sent to fetch instructors of Learner Association Group by providing invalid group uuid
+                Then Instructors of Learner Association Group will not be returned and Resource not found error will be thrown by User management
+
+    Scenario: Unable to retrieve Instructors of Learner Association Group when uuid for Discipline Association Group is given
+        Given A user has access to User management and needs to fetch instructors of an Association Group of Learner Type
+            When API request is sent to fetch instructors of Learner Association Group by providing uuid for Discipline Association Group
+                Then Instructors of Learner Association Group will not be returned and Validation error will be thrown by User management
+
     @filter-api
     Scenario: Retrieve all Learner Association Groups from User management
         Given A user has access to User management and needs to fetch all Learner Association Groups
@@ -156,3 +246,21 @@ Feature: CRUD for managing Learner Association Group in user management
         Given A user had permission to access user management, create incorrect request payload to add instructor
             When API request sent to add instructor in the learning association group incorrect discipline_id in the payload
                 Then validation error will thrown
+
+    @filter-api
+    Scenario: Deactivate an assessor from Discipline Association Group when multiple assessors exists
+        Given A Discipline Association Group exists with actively associated multiple assessor users
+            When API request is sent to deactivate an assessor where multiple assessors exist in DAG
+                Then the assessor linked to submitted assessments will be replaced
+
+    @filter-api
+    Scenario: Deactivate an assessor from Discipline Association Group when single assessor exists
+        Given A Discipline Association Group exists with only one actively associated assessor user
+            When API request is sent to deactivate an assessor where singe assessor exist in DAG
+                Then the assessor linked to submitted assessments will be removed
+
+    @filter-api
+    Scenario: Deactivate a discipline from Discipline Association Group when multiple assessors exists
+        Given A Discipline Association Group exists with one active discipline assoication group
+            When API request is sent to deactivate a curriculum pathway
+                Then the assessors linked to submitted assessments will be removed

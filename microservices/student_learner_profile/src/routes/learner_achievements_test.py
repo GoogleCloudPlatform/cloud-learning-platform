@@ -6,7 +6,7 @@ from copy import deepcopy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from routes.learner_achievements import router
-from testing.test_config import API_URL
+from testing.test_config import (API_URL, TESTING_FOLDER_PATH)
 from schemas.schema_examples import (BASIC_LEARNER_EXAMPLE,
                                     BASIC_LEARNER_PROFILE_EXAMPLE,
                                     BASIC_ACHIEVEMENT_EXAMPLE,

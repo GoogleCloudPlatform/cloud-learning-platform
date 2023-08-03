@@ -1,38 +1,46 @@
 """Association Group endpoints """
 from traceback import print_exc
+import traceback
 from fastapi import APIRouter, Query
+
 from typing import Optional
+from typing_extensions import Literal
+
 from common.models import AssociationGroup, CurriculumPathway, User
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  ConflictError)
+from common.utils.sorting_logic import collection_sorting
 from common.utils.http_exceptions import (InternalServerError, Conflict,
                                           BadRequest, ResourceNotFound)
+
 from schemas.association_group_schema import (
-                  GetAllAssociationGroupResponseModel,
-                  GetAssociationGroupResponseModel,
-                  ImmutableAssociationGroupModel,
-                  PostImmutableAssociationGroupResponseModel,
-                  AutoUpdateAllAssociationGroupDisciplines,
-                  AutoUpdateAllAssociationGroupsResponseModel,
-                  UserTypeResponseModel)
+  GetAllAssociationGroupResponseModel,
+  GetAssociationGroupResponseModel,
+  ImmutableAssociationGroupModel,
+  PostImmutableAssociationGroupResponseModel,
+  AutoUpdateAllAssociationGroupDisciplines,
+  AutoUpdateAllAssociationGroupsResponseModel,
+  UserTypeResponseModel)
 from schemas.error_schema import (NotFoundErrorResponseModel,
                                   ConflictResponseModel)
 from config import ERROR_RESPONSES
-
 
 router = APIRouter(
   tags=["Association Group"],
   prefix="/association-groups",
   responses=ERROR_RESPONSES)
 
-@router.get("",
-            response_model=GetAllAssociationGroupResponseModel,
+
+@router.get("", response_model=GetAllAssociationGroupResponseModel,
             name="Get All Association Groups")
-def get_association_groups(
-                          skip: int = Query(0, ge=0, le=2000),
-                          limit: int = Query(10, ge=1, le=100),
-                          association_type: Optional[str] = None):
+def get_association_groups(skip: int = Query(0, ge=0, le=2000),
+                           limit: int = Query(10, ge=1, le=100),
+                           association_type: Optional[str] = None,
+                           sort_by: Optional[Literal["name",  "created_time",
+                           "association_type"]] = "created_time",
+                           sort_order: Optional[Literal["ascending",
+                           "descending"]] = "descending"):
   """The get association groups endpoint will return an array of
   association groups from firestore
 
@@ -40,7 +48,8 @@ def get_association_groups(
       skip (int): Number of objects to be skipped
       limit (int): Size of group array to be returned
       association_type (str): To get the association type
-
+      sort_by (str): sorting field name
+      sort_order (str): ascending / descending
   ### Raises:
       Exception: 500 Internal Server Error if something went wrong
 
@@ -51,32 +60,41 @@ def get_association_groups(
     collection_manager = AssociationGroup.collection
     if association_type:
       collection_manager = collection_manager.filter(
-                              "association_type", "==", association_type)
+        "association_type", "==", association_type)
 
-    groups = collection_manager.order("-created_time").offset(skip).fetch(limit)
+    groups = collection_sorting(collection_manager=collection_manager,
+                               sort_by=sort_by, sort_order=sort_order,
+                               skip=skip, limit=limit)
 
-    association_groups = [i.get_fields(reformat_datetime=True) for i \
-                          in groups]
+    association_groups = [i.get_fields(reformat_datetime=True) for i in groups]
+    count = 10000
+    response = {"records": association_groups, "total_count": count}
+
     return {
-        "success": True,
-        "message": "Successfully fetched the association groups",
-        "data": association_groups
+      "success": True,
+      "message": "Successfully fetched the association groups",
+      "data": response
     }
+
   except ValidationError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
 @router.get(
-    "/search",
-    response_model=GetAssociationGroupResponseModel,
-    responses={404: {
-        "model": NotFoundErrorResponseModel
-    }})
+  "/search",
+  response_model=GetAssociationGroupResponseModel,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
 def search_association_group(search_query: str,
-                            skip: int = Query(0, ge=0, le=2000),
-                            limit: int = Query(10, ge=1, le=100)):
+                             skip: int = Query(0, ge=0, le=2000),
+                             limit: int = Query(10, ge=1, le=100)):
   """Search association group endpoint will return the association
   group for the given search query from firestore regardless of the
   type of group
@@ -95,10 +113,10 @@ def search_association_group(search_query: str,
     if len(search_query) < 1:
       raise ValidationError("search_query cannot be empty")
     filtered_association_list = []
-    fetch_length = skip+limit
+    fetch_length = skip + limit
 
     association_groups = AssociationGroup.collection.order(
-                          "-created_time").fetch()
+      "-created_time").fetch()
 
     for association_group in association_groups:
       association_dict = association_group.get_fields(reformat_datetime=True)
@@ -113,11 +131,12 @@ def search_association_group(search_query: str,
         break
 
     result = filtered_association_list[skip:fetch_length]
-
+    count = 10000
+    response = {"records": result, "total_count": count}
     return {
-        "success": True,
-        "message": "Successfully fetched the association group",
-        "data": result
+      "success": True,
+      "message": "Successfully fetched the association group",
+      "data": response
     }
 
   except ResourceNotFoundException as e:
@@ -133,7 +152,7 @@ def search_association_group(search_query: str,
              response_model=PostImmutableAssociationGroupResponseModel,
              responses={409: {"model": ConflictResponseModel}})
 def create_immutable_association_group(input_group:
-                                       ImmutableAssociationGroupModel):
+ImmutableAssociationGroupModel):
   """
   The create immutable association group endpoint will add the immutable
   association group in request body to the firestore
@@ -166,9 +185,9 @@ def create_immutable_association_group(input_group:
     new_group.update()
     group_fields = new_group.get_fields(reformat_datetime=True)
     return {
-        "success": True,
-        "message": "Successfully created the association group",
-        "data": group_fields
+      "success": True,
+      "message": "Successfully created the association group",
+      "data": group_fields
     }
   except ConflictError as e:
     Logger.error(e)
@@ -181,13 +200,13 @@ def create_immutable_association_group(input_group:
 
 
 @router.put(
-    "/active-curriculum-pathway/update-all",
-    response_model=AutoUpdateAllAssociationGroupsResponseModel,
-    responses={404: {
-        "model": NotFoundErrorResponseModel
-    }})
+  "/active-curriculum-pathway/update-all",
+  response_model=AutoUpdateAllAssociationGroupsResponseModel,
+  responses={404: {
+    "model": NotFoundErrorResponseModel
+  }})
 def update_disciplines_with_active_pathway(
-                nodes: AutoUpdateAllAssociationGroupDisciplines):
+  nodes: AutoUpdateAllAssociationGroupDisciplines):
   """Update curriculum_pathway_id across all association groups
 
   ### Args:
@@ -246,9 +265,9 @@ def update_disciplines_with_active_pathway(
       update_groups.append(group.id)
 
     return {
-          "success": True,
-          "message": "Successfully updated the following association groups",
-          "data": update_groups
+      "success": True,
+      "message": "Successfully updated the following association groups",
+      "data": update_groups
     }
 
   except ResourceNotFoundException as e:
@@ -263,8 +282,8 @@ def update_disciplines_with_active_pathway(
 
 
 @router.get(
-    "/{uuid}/addable-users", response_model=UserTypeResponseModel,
-    name="Get users by user_type")
+  "/{uuid}/addable-users", response_model=UserTypeResponseModel,
+  name="Get users by user_type")
 def get_users_by_usertype(user_type: str, uuid: str):
   """The endpoint returns a list of users for the given user_type which
   are not part of given association group.
@@ -282,12 +301,14 @@ def get_users_by_usertype(user_type: str, uuid: str):
   try:
     user_collections = User.collection.filter(
       "user_type", "==", user_type).filter(
-      "is_deleted", "==", False).fetch()
+      "is_deleted", "==", False).filter(
+      "status", "==", "active"
+      ).fetch()
     users = [i.get_fields(reformat_datetime=True) for i \
-                          in user_collections]
+             in user_collections]
 
     existing_association_group = AssociationGroup.find_by_uuid(
-                                  uuid)
+      uuid)
     group_fields = existing_association_group.get_fields()
 
     existing_users = []
@@ -302,16 +323,16 @@ def get_users_by_usertype(user_type: str, uuid: str):
         existing_users = [i["instructor"] for i in \
                           group_fields["associations"]["instructors"]]
     elif group_fields["association_type"] == "discipline":
-      if user_type in ["assessor","instructor"]:
+      if user_type in ["assessor", "instructor"]:
         existing_users = [i["user"] for i in group_fields["users"] if \
                           i["user_type"] == user_type]
     users = [user for user in users if user["user_id"] not in existing_users]
 
     if user_type == "learner":
       learner_association_groups = AssociationGroup.collection.filter(
-                                    "association_type", "==","learner").fetch()
+        "association_type", "==", "learner").fetch()
       learner_associations = [i.get_fields(reformat_datetime=True) for i \
-                          in learner_association_groups]
+                              in learner_association_groups]
       existing_learners = []
       for learners in learner_associations:
         if learners["users"] is not None:
@@ -322,9 +343,9 @@ def get_users_by_usertype(user_type: str, uuid: str):
                user["user_id"] not in existing_learners]
 
     return {
-        "success": True,
-        "message": "Successfully fetched users",
-        "data": users
+      "success": True,
+      "message": "Successfully fetched users",
+      "data": users
     }
   except ValidationError as e:
     raise BadRequest(str(e)) from e

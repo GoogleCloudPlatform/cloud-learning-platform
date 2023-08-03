@@ -118,10 +118,12 @@ def get_learning_resources(display_name: str = None,
         for i in learning_resources
         if i.name
     ]
+    count = 10000
+    response = {"records": learning_resources, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": learning_resources
+        "data": response
     }
   except ValidationError as e:
     Logger.error(e)

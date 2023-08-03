@@ -9,6 +9,7 @@ from schemas.schema_examples import (BASIC_ASSOCIATION_GROUP_EXAMPLE,
                                   FULL_DISCIPLINE_ASSOCIATION_GROUP_EXAMPLE,
                                   UPDATE_DISCIPLINE_ASSOCIATION_STATUS_EXAMPLE,
                                   ADD_USER_EXAMPLE, REMOVE_USER_EXAMPLE)
+from common.utils.schema_validator import BaseConfigModel
 
 #pylint: disable=no-self-argument
 STATUS = Literal["active", "inactive"]
@@ -29,7 +30,7 @@ class DisciplineGroupAssociations(BaseModel):
   """Discipline Association Group Type Pydantic Model"""
   curriculum_pathways: Optional[List[CurriculumPathwayModel]] = []
 
-class BasicDisciplineAssociationGroupModel(BaseModel):
+class BasicDisciplineAssociationGroupModel(BaseConfigModel):
   """Association Group Skeleton Pydantic Model"""
   name: constr(max_length=100, regex=r"[a-zA-Z0-9`!#&*%_[\]{}\\;:'\,.\?\s-]+$")
   description: str
@@ -55,7 +56,7 @@ class DisciplineAssociationGroupModel(BasicDisciplineAssociationGroupModel):
     schema_extra = {"example": BASIC_ASSOCIATION_GROUP_EXAMPLE}
 
 
-class UpdateDisciplineAssociationGroupModel(BaseModel):
+class UpdateDisciplineAssociationGroupModel(BaseConfigModel):
   """Update Association Group Pydantic Request Model"""
   name: Optional[constr(
     max_length=100, regex=r"[a-zA-Z0-9`!#&*%_[\]{}\\;:'\,.\?\s-]+$")] = None
@@ -147,11 +148,16 @@ class AddDisciplineToAssociationGroupModel(
   """AddDiscipline to Association Group Data Model"""
   status: Literal[STATUS]
 
+
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullDisciplineAssociationGroupModel]]
+  total_count: int
+
 class AllAssociationGroupResponseModel(BaseModel):
   """Association Group Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the association groups"
-  data: Optional[List[FullDisciplineAssociationGroupModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -159,7 +165,10 @@ class AllAssociationGroupResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully fetched the association groups",
-            "data": [FULL_DISCIPLINE_ASSOCIATION_GROUP_EXAMPLE]
+            "data": {
+                      "records":[FULL_DISCIPLINE_ASSOCIATION_GROUP_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

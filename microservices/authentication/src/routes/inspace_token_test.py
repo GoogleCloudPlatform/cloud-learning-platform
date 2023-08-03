@@ -95,8 +95,12 @@ def test_get_inspace_token_without_inspace_user(mock_validate_token,
   assert json_response["data"]["token"] == "evbjguynkmjkj"
   assert json_response["message"] == "Successfully fetched the inspace token"
 
+
+@mock.patch("routes.inspace_token.is_inspace_enabled",
+            return_value=True)
 @mock.patch("routes.inspace_token.validate_token", return_value=True)
 def test_get_inspace_token_with_inspace_user_false(mock_validate_token,
+                                                   mock_inspace_api_call,
                                                    clean_firestore):
   "Should not get token with inspace user false"
   user_dict = {**BASIC_USER_MODEL_EXAMPLE}
@@ -118,4 +122,4 @@ def test_get_inspace_token_with_inspace_user_false(mock_validate_token,
   url = f"{api_url}/token/{user.user_id}"
   resp = client_with_emulator.get(url, headers=headers)
 
-  assert resp.status_code == 500
+  assert resp.status_code == 404

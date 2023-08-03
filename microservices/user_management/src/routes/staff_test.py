@@ -137,7 +137,7 @@ def test_update_staff_negative(clean_firestore):
 def test_import_staff(clean_firestore):
   url = f"{api_url}/import/json"
   file_path = os.path.join(
-    os.getcwd(), "testing/", "staffs.json")
+    os.getcwd(), "../../../e2e/testing_objects/", "staffs.json")
   with open(file_path, "rb") as file:
     resp = client_with_emulator.post(url, files={"json_file": file})
 
@@ -157,7 +157,8 @@ def test_get_staffs_positive(clean_firestore):
   resp = client_with_emulator.get(f"{api_url}s", params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  saved_bios = [i.get("bio") for i in json_response.get("data")]
+  saved_bios = [i.get("bio") for i in json_response.get(
+    "data")["records"]]
   assert staff_dict["bio"] in saved_bios, "all data not retrieved"
 
 

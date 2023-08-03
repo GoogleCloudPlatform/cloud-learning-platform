@@ -5,9 +5,9 @@ from typing import Optional, List
 from pydantic import BaseModel
 from schemas.schema_examples import (BASIC_ACTIVITY_STATE_MODEL_EXAMPLE,
                                      FULL_ACTIVITY_STATE_MODEL_EXAMPLE)
+from common.utils.schema_validator import BaseConfigModel
 
-
-class BasicActivityStateModel(BaseModel):
+class BasicActivityStateModel(BaseConfigModel):
   """ActivityState Skeleton Pydantic Model"""
   agent_id: str
   activity_id: str
@@ -104,12 +104,15 @@ class DeleteActivityState(BaseModel):
         }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullActivityStateDataModel]]
+  total_count: int
 
 class AllActivityStateResponseModel(BaseModel):
   """ActivityState Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Data fetched successfully"
-  data: Optional[List[FullActivityStateDataModel]]
+  data: TotalCountResponseModel
 
   class Config():
     orm_mode = True
@@ -117,7 +120,10 @@ class AllActivityStateResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Data fetched successfully",
-            "data": [FULL_ACTIVITY_STATE_MODEL_EXAMPLE]
+            "data": {
+                      "records":[FULL_ACTIVITY_STATE_MODEL_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

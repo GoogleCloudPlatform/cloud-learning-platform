@@ -6,7 +6,6 @@ Feature: Integration with 3rd Party Tool | Frost (learning experience storage)
       When they filter for learning objects within that tool with correct parameters
         Then LOS will serve up the most relevant search results based on the filter
   
-  @filter-api
   Scenario: LXE/CD wants to filter on learning object with multiple parametes on parent/child nodes
     Given that an LXE or CD has access to the content authoring tool to filter learning objects with multiple parent/child node parameters
       When they filter for learning objects within that tool with multiple parameters on parent/child nodes
@@ -23,7 +22,6 @@ Feature: Integration with 3rd Party Tool | Frost (learning experience storage)
     When they filter for learning experiences within that tool with correct parameters
       Then LOS will serve up the most relevant learning experiences based on the filter
 
-  @filter-api
   Scenario: LXE/CD wants to filter on learning experience with multiple parametes on parent/child nodes
     Given that an LXE or CD has access to the content authoring tool to filter learning objects with multiple parent/child node parameters
       When they filter for learning objects within that tool with multiple parameters on parent/child nodes

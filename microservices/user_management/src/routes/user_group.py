@@ -23,7 +23,8 @@ from schemas.error_schema import NotFoundErrorResponseModel
 from services.collection_handler import CollectionHandler
 from services.permissions import (update_permissions_with_user_group,
                                   validate_permission_with_application,
-                                  filter_and_update_permissions_of_applications)
+                                 filter_and_update_permissions_of_applications)
+from services.helper import get_data_for_fetch_tree
 from config import ERROR_RESPONSES, IMMUTABLE_USER_GROUPS
 
 router = APIRouter(tags=["UserGroup"], responses=ERROR_RESPONSES)
@@ -91,20 +92,18 @@ def get_user_groups(skip: int = Query(0, ge=0, le=2000),
       collection_manager = collection_manager.filter("is_immutable", "==",
                                                      is_immutable)
 
-    total_user_groups= collection_manager.fetch()
-    count = 0
-    for idx, _ in enumerate(total_user_groups):
-      count = idx + 1
+    # total_user_groups= collection_manager.fetch()
+    # count = 0
+    # for idx, _ in enumerate(total_user_groups):
+    #   count = idx + 1
+    count = 10000
 
     groups = collection_sorting(collection_manager=collection_manager,
                                 sort_by=sort_by, sort_order=sort_order,
                                 skip=skip, limit=limit)
 
     if fetch_tree:
-      groups = [
-          CollectionHandler.loads_field_data_from_collection(
-              i.get_fields(reformat_datetime=True)) for i in groups
-      ]
+      groups = get_data_for_fetch_tree(groups, sort_by, sort_order)
     else:
       groups = [i.get_fields(reformat_datetime=True) for i in groups]
 
@@ -116,8 +115,12 @@ def get_user_groups(skip: int = Query(0, ge=0, le=2000),
         "data": response
     }
   except ValidationError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -268,6 +271,10 @@ def update_user_group(uuid: str, input_group: UpdateUserGroupModel):
     Logger.error(e)
     Logger.error(traceback.print_exc())
     raise BadRequest(str(e)) from e
+  except ConflictError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise Conflict(str(e)) from e
   except Exception as e:
     Logger.error(e)
     Logger.error(traceback.print_exc())
@@ -363,6 +370,9 @@ def add_users_to_user_group(uuid: str,
     user_data = []
     for user in input_users_dict.get("user_ids"):
       user = User.find_by_uuid(user)
+      if user.status == "inactive":
+        raise ValidationError("Only active users can be added to user group. "\
+                              "Few of the given users are inactive")
       if validate_users_with_user_group \
       and not user.user_type == user_group.name:
         raise ValidationError(f"User with user_type {user.user_type} "\
@@ -709,9 +719,13 @@ def users_add_to_user_group(uuid: str):
     if user_group.is_immutable:
       users_list = User.collection.filter(
         "user_type", "==", user_group.name).filter(
-        "is_deleted", "==", False).fetch()
+        "is_deleted", "==", False).filter(
+        "status", "==", "active"
+        ).fetch()
     else:
-      users_list = User.collection.filter("is_deleted", "==", False).fetch()
+      users_list = User.collection.filter(
+        "is_deleted", "==", False).filter(
+        "status", "==", "active").fetch()
 
     result = [
       user.get_fields(reformat_datetime=True)

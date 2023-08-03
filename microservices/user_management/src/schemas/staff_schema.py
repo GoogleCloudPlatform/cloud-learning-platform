@@ -9,6 +9,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, constr, Extra, validator
 from schemas.schema_examples import (BASIC_STAFF_EXAMPLE, FULL_STAFF_EXAMPLE,
                                      PROFILE_FIELDS)
+from common.utils.schema_validator import BaseConfigModel
 
 with open("./data/profile_fields.json", "r", encoding="utf-8") as f:
   fields = json.load(f)
@@ -28,7 +29,7 @@ class AvailabilityModel(BaseModel):
   end_time: str
 
 
-class BasicStaffModel(BaseModel):
+class BasicStaffModel(BaseConfigModel):
   """Staff Skeleton Pydantic Model"""
   first_name: str
   last_name: str
@@ -36,19 +37,21 @@ class BasicStaffModel(BaseModel):
       min_length=7,
       max_length=128,
       regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b")
-  preferred_name: Optional[str] = ""
-  bio: Optional[str] = ""
+  preferred_name: Optional[str] = None
+  bio: Optional[str] = None
   pronoun: Optional[PRONOUNS]
-  phone_number: Optional[str] = ""
-  shared_inboxes: Optional[str] = ""
+  phone_number: Optional[str] = None
+  shared_inboxes: Optional[str] = None
   timezone: Optional[TIMEZONES]
   office_hours: Optional[List[AvailabilityModel]] = []
-  photo_url: Optional[str] = ""
+  photo_url: Optional[str] = None
+  calendly_url: Optional[str] = None
 
   # pylint: disable=no-self-argument
   @validator("preferred_name")
   def validate_preferred_name(cls, v):
-    assert v == "" or re.match(r"[a-zA-Z0-9`!#&*%_[\]{}\\;:'\,.\?\s-]+$", v),\
+    assert v == "" or v is None or re.match(
+      r"[a-zA-Z0-9`!#&*%_[\]{}\\;:'\,.\?\s-]+$", v),\
       "Invalid format for preferred_name"
     return v
   @validator("first_name")
@@ -93,7 +96,7 @@ class StaffSearchResponseModel(BaseModel):
     }
 
 
-class UpdateStaffModel(BaseModel):
+class UpdateStaffModel(BaseConfigModel):
   """Update Staff Pydantic Model"""
   first_name: Optional[str] = None
   last_name: Optional[str] = None
@@ -107,6 +110,7 @@ class UpdateStaffModel(BaseModel):
   timezone: Optional[TIMEZONES]
   office_hours: Optional[List[AvailabilityModel]] = []
   photo_url: Optional[str]
+  calendly_url: Optional[str]
   email : Optional[constr(
       min_length=7,
       max_length=128,
@@ -194,12 +198,15 @@ class DeleteStaffReponseModel(BaseModel):
         }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullStaffModel]]
+  total_count: int
 
 class AllStaffResponseModel(BaseModel):
   """Get All Staff Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Data fetched successfully"
-  data: Optional[List[FullStaffModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -207,7 +214,10 @@ class AllStaffResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Data fetched successfully",
-            "data": [FULL_STAFF_EXAMPLE]
+            "data": {
+                      "records":[FULL_STAFF_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

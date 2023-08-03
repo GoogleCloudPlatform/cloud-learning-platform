@@ -9,8 +9,11 @@ from schemas.schema_examples import (BASIC_ASSOCIATION_GROUP_EXAMPLE,
   UPDATE_LEARNER_ASSOCIATION_STATUS_EXAMPLE,
   ADD_USER_EXAMPLE, REMOVE_USER_EXAMPLE, ADD_COACH_EXAMPLE,
   REMOVE_COACH_EXAMPLE, ADD_INSTRUCTOR_LEARNER_ASSOCIATION_GROUP_EXAMPLE,
-  REMOVE_INSTRUCTOR_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
-
+  REMOVE_INSTRUCTOR_LEARNER_ASSOCIATION_GROUP_EXAMPLE,
+  BASIC_USERS_OF_LEARNER_ASSOCIATION_GROUP_EXAMPLE,
+  BASIC_COACHES_OF_LEARNER_ASSOCIATION_GROUP_EXAMPLE,
+  BASIC_INSTRUCTORS_OF_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+from common.utils.schema_validator import BaseConfigModel
 
 #pylint: disable=no-self-argument
 STATUS = Literal["active", "inactive"]
@@ -41,7 +44,7 @@ class LearnerGroupAssociations(BaseModel):
   curriculum_pathway_id: Optional[Union[str, dict]] = ""
 
 
-class BasicLearnerAssociationGroupModel(BaseModel):
+class BasicLearnerAssociationGroupModel(BaseConfigModel):
   """Association Group Skeleton Pydantic Model"""
   name: constr(max_length=100, regex=r"[a-zA-Z0-9`!#&*%_[\]{}\\;:'\,.\?\s-]+$")
   description: str
@@ -67,7 +70,7 @@ class LearnerAssociationGroupModel(BasicLearnerAssociationGroupModel):
     schema_extra = {"example": BASIC_ASSOCIATION_GROUP_EXAMPLE}
 
 
-class UpdateLearnerAssociationGroupModel(BaseModel):
+class UpdateLearnerAssociationGroupModel(BaseConfigModel):
   """Update Association Group Pydantic Request Model"""
   name: Optional[constr(
     max_length=100, regex=r"[a-zA-Z0-9`!#&*%_[\]{}\\;:'\,.\?\s-]+$")] = None
@@ -77,6 +80,85 @@ class UpdateLearnerAssociationGroupModel(BaseModel):
     orm_mode = True
     extra = Extra.forbid
     schema_extra = {"example": BASIC_ASSOCIATION_GROUP_EXAMPLE}
+
+
+class TotalLearnerCountResponseModel(BaseModel):
+  records: Optional[List[UserModel]]
+  total_count: int
+
+
+class GetLearnerAssociationGroupLearnersResponseModel(BaseModel):
+  """Fetch Association Group Response Pydantic Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully fetched the learners"
+  data: Optional[TotalLearnerCountResponseModel]
+
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the learners",
+            "data": {
+                      "records":[
+                        BASIC_USERS_OF_LEARNER_ASSOCIATION_GROUP_EXAMPLE],
+                      "total_count": 50
+                    }
+        }
+    }
+
+
+class TotalCoachCountResponseModel(BaseModel):
+  records: Optional[List[CoachModel]]
+  total_count: int
+
+
+class GetLearnerAssociationGroupCoachesResponseModel(BaseModel):
+  """Fetch Association Group Response Pydantic Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully fetched the coaches"
+  data: Optional[TotalCoachCountResponseModel]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the coaches",
+            "data": {
+                      "records":[
+                        BASIC_COACHES_OF_LEARNER_ASSOCIATION_GROUP_EXAMPLE],
+                      "total_count": 50
+                    }
+        }
+    }
+
+
+class TotalInstructorCountResponseModel(BaseModel):
+  records: Optional[List[InstructorModel]]
+  total_count: int
+
+
+class GetLearnerAssociationGroupInstructorsResponseModel(BaseModel):
+  """Fetch Association Group Response Pydantic Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully fetched the instructors"
+  data: Optional[TotalInstructorCountResponseModel]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the instructors",
+            "data": {
+                      "records":[
+                        BASIC_INSTRUCTORS_OF_LEARNER_ASSOCIATION_GROUP_EXAMPLE],
+                      "total_count": 50
+                    }
+        }
+    }
 
 
 class GetLearnerAssociationGroupResponseModel(BaseModel):

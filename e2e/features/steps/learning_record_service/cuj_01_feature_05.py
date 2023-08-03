@@ -3,10 +3,10 @@ Feature 05 - CRUD APIs for managing Statement data in Learning Record Service
 """
 import behave
 import sys
+from copy import deepcopy
 sys.path.append("../")
 from uuid import uuid4
 from e2e.setup import post_method, get_method, set_cache, get_cache, setup_rules_engine_data
-from copy import deepcopy
 from e2e.gke_api_tests.endpoint_proxy import get_baseurl
 from e2e.test_object_schemas import TEST_ACTIVITY, TEST_AGENT, TEST_LEARNING_EXPERIENCE, TEST_VERB, TEST_XAPI_STATEMENT_1, TEST_XAPI_STATEMENT_2, TEST_SESSION
 from e2e.test_config import API_URL_LEARNING_RECORD_SERVICE, API_URL_LEARNING_OBJECT_SERVICE, API_URL_USER_MANAGEMENT, DEL_KEYS
@@ -268,7 +268,7 @@ def step_impl_1(context):
     "API request is sent to fetch all the xAPI Statements with correct request parameters"
 )
 def step_impl_2(context):
-  query_params = {"skip": 0, "limit": 1}
+  query_params = {"skip": 0, "limit": 10}
   context.get_res = get_method(url=context.get_url, query_params=query_params)
   context.get_res_data = context.get_res.json()
 
@@ -281,7 +281,8 @@ def step_impl_3(context):
   assert context.get_res_data["success"]
   assert context.get_res_data["message"] ==\
       "Successfully fetched the statements"
-  assert temp[0] in [statement["uuid"] for statement in context.get_res_data["data"]] 
+  assert temp[0] in [statement["uuid"] for statement in context.get_res_data[
+    "data"]["records"]] 
 
 
 #------------------------------GET ALL STATEMENTS-------------------------------

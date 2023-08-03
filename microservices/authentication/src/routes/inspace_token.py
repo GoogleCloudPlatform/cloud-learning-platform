@@ -58,7 +58,8 @@ def get_token(user_id: str, token: auth_scheme = Depends()):
     user = TempUser.find_by_user_id(user_id)
     if user.inspace_user is None or \
       user.inspace_user["is_inspace_user"] is False:
-      raise Exception(f"Inspace user does not exist for user id {user_id}")
+      raise ResourceNotFoundException(
+        f"Inspace user does not exist for user id {user_id}")
 
     if user.inspace_user["inspace_user_id"] != "":
       token_response = get_inspace_token(user_id)
@@ -76,7 +77,8 @@ def get_token(user_id: str, token: auth_scheme = Depends()):
         if create_inspace_user_helper(user):
           token_response = get_inspace_token(user_id)
         else:
-          raise Exception(f"Inspace user does not exist for user id {user_id}")
+          raise ResourceNotFoundException(
+            f"Inspace user does not exist for user id {user_id}")
 
     if token_response.status_code == 200:
       return {
@@ -92,6 +94,8 @@ def get_token(user_id: str, token: auth_scheme = Depends()):
     Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
   except TokenNotFoundError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise BadRequest(str(e)) from e
   except Exception as e:
     Logger.error(e)

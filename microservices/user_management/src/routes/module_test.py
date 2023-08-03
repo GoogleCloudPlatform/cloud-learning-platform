@@ -80,7 +80,8 @@ def test_get_all_modules(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status should be 200"
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
+  retrieved_ids = [
+    i.get("uuid") for i in json_response.get("data")["records"]]
   assert module.uuid in retrieved_ids, "expected data not retrieved"
 
 def test_get_all_modules_negative_param(clean_firestore):
@@ -182,7 +183,7 @@ def test_post_module_negative1(clean_firestore):
   post_resp_json = post_resp.json()
 
   assert post_resp_json.get("success") is False, "Success not False"
-  assert post_resp.status_code == 500
+  assert post_resp.status_code == 409
   assert post_resp_json.get("message") == \
     "Module with the given name: learning resource already exists"
 
@@ -257,7 +258,7 @@ def test_update_module_negative2(clean_firestore):
   resp = client_with_emulator.put(url, json=module_dict)
   json_response = resp.json()
 
-  assert resp.status_code == 500, "Status not 500"
+  assert resp.status_code == 409, "Status not 409"
   assert json_response == response, "Expected response not same"
 
 def test_delete_module(clean_firestore):

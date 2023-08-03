@@ -359,6 +359,8 @@ def get_submitted_assessment_data(submitted_assessment,
     assessment_node = Assessment.find_by_uuid(
       submitted_assessment["assessment_id"])
   assessment_data = assessment_node.get_fields(reformat_datetime=True)
+  submitted_assessment["assessment_name"] = \
+    assessment_data.get("display_name", "")
 
   assessor_id = submitted_assessment.get("assessor_id")
   assessor = None

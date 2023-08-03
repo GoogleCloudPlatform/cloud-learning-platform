@@ -157,10 +157,12 @@ def get_learning_experiences(display_name: str = None,
     learning_experiences = [
         i.get_fields(reformat_datetime=True) for i in learning_experiences
     ]
+    count = 10000
+    response = {"records": learning_experiences, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": learning_experiences
+        "data": response
     }
 
   except ValidationError as e:

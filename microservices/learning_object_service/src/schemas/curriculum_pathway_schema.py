@@ -256,17 +256,21 @@ class CurriculumPathwaySearchResponseModel(BaseModel):
     }
 
 
-class CurriculumPathwayAliasModel(BaseModel):
+class GetLearningHierarchyNodesModel(BaseModel):
   """Fetch Curriculum Pathway by Alias Response Pydantic Model"""
   uuid: str
+  collection: str
+  description: str
   name: str
-  alias: str
+  alias: Optional[str] = None
+  type: Optional[str] = None
+  is_autogradable: Optional[str] = None
 
-class GetCurriculumPathwayAliasResponseModel(BaseModel):
+class GetLearningHierarchyNodesResponseModel(BaseModel):
   """Fetch Curriculum Pathway by Alias Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the nodes"
-  data: List[CurriculumPathwayAliasModel]
+  data: List[GetLearningHierarchyNodesModel]
 
   class Config():
     orm_mode = True
@@ -278,11 +282,15 @@ class GetCurriculumPathwayAliasResponseModel(BaseModel):
         }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullCurriculumPathwayModel]]
+  total_count: int
+
 class AllCurriculumPathwaysResponseModel(BaseModel):
   """Curriculum Pathway Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Data fetched successfully"
-  data: List[FullCurriculumPathwayModel]
+  data: TotalCountResponseModel
 
   class Config():
     orm_mode = True
@@ -290,7 +298,10 @@ class AllCurriculumPathwaysResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Data fetched successfully",
-            "data": [FULL_CURRICULUM_PATHWAY_EXAMPLE]
+            "data": {
+                      "records":[FULL_CURRICULUM_PATHWAY_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

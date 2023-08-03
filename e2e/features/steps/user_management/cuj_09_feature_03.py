@@ -7,9 +7,10 @@ from copy import deepcopy
 from uuid import uuid4
 
 sys.path.append("../")
+from common.models import AssociationGroup, UserGroup, User
 from e2e.test_object_schemas import TEST_USER, TEST_USER_GROUP, TEST_ASSOCIATION_GROUP
 from e2e.test_config import API_URL_USER_MANAGEMENT
-from e2e.setup import post_method, get_method
+from e2e.setup import create_immutable_user_groups, post_method, get_method
 
 UM_API_URL = f"{API_URL_USER_MANAGEMENT}/association-groups"
 
@@ -37,8 +38,17 @@ def step_impl_1(context):
   context.url = f"{API_URL_USER_MANAGEMENT}/user"
   context.post_user_res = post_method(
       url=context.url, request_body=context.user_dict)
+  print(context.post_user_res.json())
   assert context.post_user_res.status_code == 200
   context.user_id = context.post_user_res.json()["data"]["user_id"]
+  learner_user_group_id = create_immutable_user_groups("learner")
+  user_group = UserGroup.find_by_uuid(learner_user_group_id)
+  print(user_group)
+  setattr(user_group, 'users', [context.user_id])
+
+  existing_user = User.find_by_uuid(context.user_id)
+  setattr(existing_user, 'user_groups', [user_group.uuid])
+  existing_user.update()
 
 
 @behave.when(
@@ -124,6 +134,14 @@ def step_impl_1(context):
       url=context.url, request_body=context.user_dict)
   assert context.post_user_res.status_code == 200
   context.user_id = context.post_user_res.json()["data"]["user_id"]
+  learner_user_group_id = create_immutable_user_groups("learner")
+  user_group = UserGroup.find_by_uuid(learner_user_group_id)
+  print(user_group)
+  setattr(user_group, 'users', [context.user_id])
+
+  existing_user = User.find_by_uuid(context.user_id)
+  setattr(existing_user, 'user_groups', [user_group.uuid])
+  existing_user.update()
 
   # Add learner to Learner association group
   add_user_url = f"{UM_API_URL}/learner-association/{context.learner_association_uuid}/users/add"
@@ -223,6 +241,14 @@ def step_impl_1(context):
       url=context.url, request_body=context.user_dict)
   assert context.post_user_res.status_code == 200
   context.coach_id = context.post_user_res.json()["data"]["user_id"]
+  coach_user_group_id = create_immutable_user_groups("coach")
+  user_group = UserGroup.find_by_uuid(coach_user_group_id)
+  print(user_group)
+  setattr(user_group, 'users', [context.coach_id])
+
+  existing_user = User.find_by_uuid(context.coach_id)
+  setattr(existing_user, 'user_groups', [user_group.uuid])
+  existing_user.update()
 
 
 @behave.when(
@@ -309,6 +335,14 @@ def step_impl_1(context):
       url=context.url, request_body=context.user_dict)
   assert context.post_user_res.status_code == 200
   context.coach_id = context.post_user_res.json()["data"]["user_id"]
+  coach_user_group_id = create_immutable_user_groups("coach")
+  user_group = UserGroup.find_by_uuid(coach_user_group_id)
+  print(user_group)
+  setattr(user_group, 'users', [context.coach_id])
+
+  existing_user = User.find_by_uuid(context.coach_id)
+  setattr(existing_user, 'user_groups', [user_group.uuid])
+  existing_user.update()
 
   # Add coach to Learner association group
   add_coach_url = f"{UM_API_URL}/learner-association/{context.learner_association_uuid}/coaches/add"

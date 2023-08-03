@@ -16,7 +16,7 @@ from testing.testing_objects import (
 
 @pytest.fixture(name="add_data")
 def add_data():
-  """Function to add data"""
+  """Fixture to add data for Unit Tests"""
   # Add test learner
   test_learner = Learner()
   test_learner = test_learner.from_dict(TEST_LEARNER)

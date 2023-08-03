@@ -202,7 +202,8 @@ def test_get_agents(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  saved_user_ids = [i.get("user_id") for i in json_response.get("data")]
+  saved_user_ids = [i.get("user_id") for i in json_response.get(
+    "data")["records"]]
   assert agent_dict["user_id"] in saved_user_ids,\
     "all data not retrieved"
 
@@ -239,6 +240,7 @@ def test_get_agent_for_user(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  saved_user_ids = [i.get("user_id") for i in json_response.get("data")]
+  saved_user_ids = [i.get("user_id") for i in json_response.get(
+    "data")["records"]]
   assert agent_dict["user_id"] in saved_user_ids,\
     "all data not retrieved"
