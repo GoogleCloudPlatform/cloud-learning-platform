@@ -378,8 +378,8 @@ def delete_lti_assignment(lti_assignment_id: str):
         classroom_crud.delete_course_work(course_id,
                                           lti_assignment.course_work_id)
       elif course_work_type == "course_work_material":
-        classroom_crud.delete_course_work_material(course_id,
-                                          lti_assignment.course_work_id)
+        classroom_crud.delete_course_work_material(
+            course_id, lti_assignment.course_work_id)
     except Exception as e:
       Logger.error(
           f"Error deleting assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
@@ -431,6 +431,17 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     content_item_id = lti_assignment_data.get("lti_content_item_id")
     prev_context_id = lti_assignment_data.get("context_id")
 
+    source_context_id = input_data_dict.get("source_context_id")
+    if prev_context_id != source_context_id:
+      Logger.error(
+          f"LTI Assignment '{lti_assignment.id}' is tagged to context - \
+            '{prev_context_id}' but doesn't match with the given source \
+              context id - {source_context_id}"
+      )
+      raise ValidationError(
+          f"Provided LTI Assignment '{lti_assignment.id}' doesn't belong to \
+            given context: '{source_context_id}'"
+      )
     content_item_data = get_content_item(content_item_id)
 
     # create a copy of above content item

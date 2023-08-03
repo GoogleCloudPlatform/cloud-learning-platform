@@ -129,6 +129,7 @@ def copy_course_background_task(course_template_details,
 
         lti_assignment_details = {
             "section_id": section_id,
+            "source_context_id": course_template_details.id,
             "coursework_title": coursework["title"],
             "start_date": None,
             "end_date": None,
@@ -256,6 +257,7 @@ def copy_course_background_task(course_template_details,
 
         lti_assignment_details = {
             "section_id": section_id,
+            "source_context_id": course_template_details.id,
             "coursework_title": coursework_material["title"],
             "start_date": None,
             "end_date": None,
@@ -449,10 +451,12 @@ def copy_course_background_task_alpha(
     lms_job.update()
     lms_job.logs = logs
     lms_job.update()
+    course_template_id = course_template_details.id
     # Call check_copy_course function to verify all courseworks and coursework material is copied
     error_flag = check_copy_course_alpha(original_courseworks,
                                     original_coursework_materials,
-                                    copied_course,lms_job_id)
+                                    copied_course,lms_job_id, section_id,
+                                    course_template_id)
 
     if error_flag:
       section.status = "FAILED_TO_PROVISION"
@@ -529,7 +533,7 @@ def copy_course_background_task_alpha(
 def check_copy_course_alpha(original_courseworks,
                       original_coursework_materials,
                       copied_course,
-                      lms_job_id):
+                      lms_job_id, section_id,course_template_id):
 
   """
   This function checks if the copy course process is completed successfully
@@ -650,6 +654,7 @@ def check_copy_course_alpha(original_courseworks,
                                                 copied_coursework_dict,
                                                 lms_job_id
                                                 )
+
       lms_job = LmsJob.find_by_id(lms_job_id)
       logs = lms_job.logs
       if  missing_attachment:
@@ -691,10 +696,35 @@ def check_copy_course_alpha(original_courseworks,
   if not error_flag:
     for coursework in copied_courseworks:
       coursework_title = coursework["title"]
+
+      lti_assignment_details = {
+          "section_id": section_id,
+          "coursework_title": coursework_title,
+          "source_context_id": course_template_id,
+          "start_date": None,
+          "end_date": None,
+          "due_date": None
+      }
+      material_update = False
+      if "materials" in coursework.keys():
+        if "link" in coursework["materials"].keys():
+          link = coursework["materials"]["link"]
+          if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
+            copy_resp = copy_lti_shim_assignment(link["url"], lti_assignment_details, logs)
+            logs = copy_resp["logs"]
+            if copy_resp.get("copy_resp_status") == 200:
+              material_update = True
+              coursework["materials"]["link"] = copy_resp.get("updated_lti_link")
+            else:
+              error_flag = True
       try:
-        classroom_crud.patch_coursework(copied_course["id"],
-                                        coursework["id"],
-                                       {"state":"PUBLISHED"} )
+        updated_data = {"state": "PUBLISHED"}
+        if material_update:
+          updated_data["materials"] = coursework["materials"]
+        update_mask = ",".join(updated_data)
+        classroom_crud.patch_coursework_alpha(copied_course["id"],
+                                              coursework["id"], update_mask,
+                                              updated_data)
         logs["info"].append(f"Coursework published for {coursework_title}")
         Logger.info(f"Coursework published for {coursework_title}")
       except HttpError as error:
@@ -705,10 +735,35 @@ def check_copy_course_alpha(original_courseworks,
 
     for coursework_material in copied_coursework_materials:
       coursework_material_title = coursework_material["title"]
+
+      lti_assignment_details = {
+          "section_id": section_id,
+          "coursework_title": coursework_material_title,
+          "source_context_id": course_template_id,
+          "start_date": None,
+          "end_date": None,
+          "due_date": None
+      }
+      material_update = False
+      if "materials" in coursework_material.keys():
+        if "link" in coursework_material["materials"].keys():
+          link = coursework_material["materials"]["link"]
+          if "/classroom-shim/api/v1/launch?lti_assignment_id=" in link["url"]:
+            copy_resp = copy_lti_shim_assignment(link["url"], lti_assignment_details, logs)
+            logs = copy_resp["logs"]
+            if copy_resp.get("copy_resp_status") == 200:
+              material_update = True
+              coursework_material["materials"]["link"] = copy_resp.get("updated_lti_link")
+            else:
+              error_flag = True
       try:
-        classroom_crud.patch_coursework_material(copied_course["id"],
-                                        coursework_material["id"],
-                                       {"state":"PUBLISHED"} )
+        updated_data = {"state": "PUBLISHED"}
+        if material_update:
+          updated_data["materials"] = coursework_material["materials"]
+        update_mask = ",".join(updated_data)
+        classroom_crud.patch_coursework_material_alpha(
+            copied_course["id"], coursework_material["id"], update_mask,
+            updated_data)
         logs["info"].append(
           f"Coursework Material published for {coursework_material_title}")
         Logger.info(
@@ -872,6 +927,7 @@ def update_coursework_material(materials,
               json={
                   "lti_assignment_id": lti_assignment_id,
                   "context_id": lti_assignment_details.get("section_id"),
+                  "source_context_id": lti_assignment_details.get("source_context_id"),
                   "start_date": lti_assignment_details.get("start_date"),
                   "end_date": lti_assignment_details.get("end_date"),
                   "due_date": lti_assignment_details.get("due_date")
@@ -1155,3 +1211,54 @@ def insert_section_enrollment_to_bq(enrollment_record,section):
   insert_rows_to_bq(
             rows=rows, dataset=BQ_DATASET,
             table_name=BQ_TABLE_DICT["BQ_ENROLLMENT_RECORD"])
+def copy_lti_shim_assignment(link, lti_assignment_details, logs):
+  """Makes a copy of the given LTI Assignment in the new context"""
+  split_url = link["url"].split(
+      "/classroom-shim/api/v1/launch?lti_assignment_id=")
+  lti_assignment_id = split_url[-1]
+  coursework_title = lti_assignment_details.get("coursework_title")
+  logs["info"].append(
+      f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'"
+  )
+  Logger.info(
+      f"LTI Course copy started for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'"
+  )
+  copy_assignment = requests.post(
+      "http://classroom-shim/classroom-shim/api/v1/lti-assignment/copy",
+      headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
+      json={
+          "lti_assignment_id": lti_assignment_id,
+          "context_id": lti_assignment_details.get("section_id"),
+          "source_context_id": lti_assignment_details.get("source_context_id"),
+          "start_date": lti_assignment_details.get("start_date"),
+          "end_date": lti_assignment_details.get("end_date"),
+          "due_date": lti_assignment_details.get("due_date")
+      },
+      timeout=60)
+
+  copy_resp_status = copy_assignment.status_code
+  final_resp = {"copy_resp_status": copy_resp_status}
+
+  if copy_resp_status == 200:
+    new_lti_assignment_id = copy_assignment.json().get("data").get("id")
+    updated_material_link_url = link["url"].replace(lti_assignment_id,
+                                                    new_lti_assignment_id)
+    Logger.info(
+        f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}', new assignment id - {new_lti_assignment_id}"
+    )
+    logs["info"].append(
+        f"LTI Course copy completed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}', new assignment id - {new_lti_assignment_id}"
+    )
+    final_resp["updated_lti_link"] = updated_material_link_url
+  else:
+    logs["info"].append(
+        f"LTI Course copy failed for assignment - {lti_assignment_id}, coursework title - '{coursework_title}'"
+    )
+    error_msg = f"Copying an LTI Assignment failed for {lti_assignment_id}, coursework title - '{coursework_title}'\
+                  in the new section {lti_assignment_details.get('section_id')} with status code: \
+                  {copy_resp_status} and error msg: {copy_assignment.text}"
+
+    logs["errors"].append(error_msg)
+    Logger.error(error_msg)
+  final_resp["logs"] = logs
+  return final_resp
