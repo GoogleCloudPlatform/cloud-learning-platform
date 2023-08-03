@@ -16,7 +16,6 @@ client_with_emulator = TestClient(app)
 # assigning url
 api_url = f"{API_URL}/learner-profile/education-fields"
 
-
 def test_get_education_fields():
   url = api_url
   resp = client_with_emulator.get(url)

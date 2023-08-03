@@ -44,8 +44,8 @@ def test_get_learner_profile(clean_firestore):
   learner.update()
   learner_id = learner.id
 
-  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE,
-                          "learner_id": learner_id}
+  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE}
+  learner_profile_dict["learner_id"] = learner_id
   learner_profile = LearnerProfile.from_dict(learner_profile_dict)
   learner_profile.uuid = ""
   learner_profile.save()
@@ -77,9 +77,9 @@ def test_get_learner_profile_negative_1(clean_firestore):
 
   url = f"{api_url_with_learner}/{learner_id}/learner-profile"
   expected_response = {
-    "success": False,
-    "message": f"LearnerProfile with learner id {learner_id} not found",
-    "data": None
+      "success": False,
+      "message": f"LearnerProfile with learner id {learner_id} not found",
+      "data": None
   }
 
   resp = client_with_emulator.get(url)
@@ -99,8 +99,8 @@ def test_get_learner_profile_negative_2(clean_firestore):
   learner.update()
   learner_id = learner.id
 
-  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE,
-                          "learner_id": learner_id}
+  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE}
+  learner_profile_dict["learner_id"] = learner_id
   learner_profile = LearnerProfile.from_dict(learner_profile_dict)
   learner_profile.uuid = ""
   learner_profile.is_deleted = True
@@ -115,9 +115,9 @@ def test_get_learner_profile_negative_2(clean_firestore):
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   expected_response = {
-    "success": False,
-    "message": f"LearnerProfile with learner id {learner_id} not found",
-    "data": None
+      "success": False,
+      "message": f"LearnerProfile with learner id {learner_id} not found",
+      "data": None
   }
 
   assert resp.status_code == 404, "Status 404"
@@ -129,7 +129,7 @@ def test_get_all_learner_profiles(clean_firestore):
 
   if "Teamwork" not in learner_profile_dict["learning_goals"]:
     learner_profile_dict["learning_goals"] = learner_profile_dict[
-      "learning_goals"].append("Teamwork")
+        "learning_goals"].append("Teamwork")
 
   # learner_profile
   learner_profile = LearnerProfile.from_dict(learner_profile_dict)
@@ -164,11 +164,11 @@ def test_get_all_learner_profiles(clean_firestore):
   assert len(retrieved_ids) > 0, \
     "Atleast one result should be there"
   assert learner_profile.uuid in \
-         retrieved_ids, "expected data not retrived"
+    retrieved_ids, "expected data not retrived"
   assert deleted_learner_profile.uuid not in \
-         retrieved_ids, "unexpected data retrived"
-  assert archived_learner_profile.uuid not in retrieved_ids, \
-    "is_archived not working"
+    retrieved_ids, "unexpected data retrived"
+  assert archived_learner_profile.uuid not in retrieved_ids,\
+      "is_archived not working"
 
 
 def test_get_all_learner_profiles_with_filters(clean_firestore):
@@ -202,7 +202,7 @@ def test_get_all_learner_profiles_with_filters(clean_firestore):
   assert len(
     json_response.get("data")["records"]) > 0, "Results should not be empty"
   assert learner_profile.uuid in \
-         retrieved_ids, "expected data not retrived"
+    retrieved_ids, "expected data not retrived"
   assert deleted_learner_profile.uuid not in \
     retrieved_ids, "unexpected data retrived"
   for i in json_response.get("data")["records"]:
@@ -218,8 +218,8 @@ def test_get_all_learner_profiles_with_filters_negative(clean_firestore):
   json_response = resp.json()
   assert resp.status_code == 422, "Status should be 422"
   assert json_response.get(
-    "message"
-    # pylint: disable-next = line-too-long
+      "message"
+      # pylint: disable-next = line-too-long
   ) == "Validation Failed"
 
 
@@ -234,8 +234,8 @@ def test_get_learner_profile_with_learner_id(clean_firestore):
   learner_id = learner.id
 
   # learner_profile
-  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE,
-                          "learner_id": learner_id}
+  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE}
+  learner_profile_dict["learner_id"] = learner_id
   learner_profile = LearnerProfile.from_dict(learner_profile_dict)
   learner_profile.uuid = ""
   learner_profile.save()
@@ -248,7 +248,7 @@ def test_get_learner_profile_with_learner_id(clean_firestore):
   json_response = resp.json()
   assert resp.status_code == 200, "Status should be 200"
   assert json_response.get("data").get(
-    "uuid") == learner_profile_id, "Learner profile id does not match"
+      "uuid") == learner_profile_id, "Learner profile id does not match"
 
 
 def test_get_learner_profile_with_learner_id_negative1(clean_firestore):
@@ -262,8 +262,8 @@ def test_get_learner_profile_with_learner_id_negative1(clean_firestore):
   learner_id = learner.id
 
   # deleted learner profile
-  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE,
-                          "learner_id": learner_id}
+  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE}
+  learner_profile_dict["learner_id"] = learner_id
   deleted_learner_profile = LearnerProfile.from_dict(learner_profile_dict)
   deleted_learner_profile.uuid = ""
   deleted_learner_profile.is_deleted = True
@@ -275,8 +275,9 @@ def test_get_learner_profile_with_learner_id_negative1(clean_firestore):
   resp = client_with_emulator.get(url)
   json_response = resp.json()
   assert resp.status_code == 404, "Status should be 404"
-  assert json_response.get("message") == (f"LearnerProfile with learner id "
-                                          f"{learner_id} not found"), \
+  assert json_response.get(
+      "message"
+  ) == f"LearnerProfile with learner id {learner_id} not found", \
     "LearnerProfile should be present with the given learner id"
 
 
@@ -288,7 +289,7 @@ def test_get_learner_profile_with_learner_id_negative2(clean_firestore):
 
   assert resp.status_code == 404, "Status should be 404"
   assert json_response.get(
-    "message"
+      "message"
   ) == f"Learner with uuid {learner_id} not found", \
     "Learner should be present with the given learner id"
 
@@ -340,7 +341,6 @@ def test_post_learner_profile(clean_firestore):
   # assert that rest of the fields are equivalent
   # assert loaded_learner_profile_dict == post_json_response.get("data")
 
-
 def test_update_learner_profile(clean_firestore):
   achievement_dict = {**BASIC_ACHIEVEMENT_EXAMPLE}
   achievement = Achievement.from_dict(achievement_dict)
@@ -359,8 +359,8 @@ def test_update_learner_profile(clean_firestore):
   learner.update()
   learner_id = learner.id
 
-  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE,
-                          "learner_id": learner_id}
+  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE}
+  learner_profile_dict["learner_id"] = learner_id
   learner_profile = LearnerProfile.from_dict(learner_profile_dict)
   learner_profile.uuid = ""
   learner_profile.save()
@@ -379,11 +379,10 @@ def test_update_learner_profile(clean_firestore):
 
   assert resp.status_code == 200, "Status should be 200"
   assert json_response_update_req.get(
-    "message"
+      "message"
   ) == "Successfully updated the learner profile", "Expected response not same"
   assert achievement_uuid in json_response_update_req.get("data").get(
-    "achievements")
-
+      "achievements")
 
 def test_update_learner_profile_negative_1(clean_firestore):
   learner_dict = BASIC_LEARNER_EXAMPLE
@@ -395,8 +394,8 @@ def test_update_learner_profile_negative_1(clean_firestore):
   learner.update()
   learner_id = learner.id
 
-  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE,
-                          "learner_id": learner_id}
+  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE}
+  learner_profile_dict["learner_id"] = learner_id
   learner_profile = LearnerProfile.from_dict(learner_profile_dict)
   learner_profile.uuid = ""
   learner_profile.save()
@@ -407,7 +406,7 @@ def test_update_learner_profile_negative_1(clean_firestore):
   url = f"{api_url_with_learner}/{learner_id}/learner-profile"
   updated_data = learner_profile_dict
   updated_data["education_history"] = {
-    "degree": "Associate Degree in Computer Science"
+      "degree": "Associate Degree in Computer Science"
   }
   del updated_data["enrollment_information"]
   del updated_data["learner_id"]
@@ -415,7 +414,6 @@ def test_update_learner_profile_negative_1(clean_firestore):
   resp = client_with_emulator.put(url, json=updated_data)
 
   assert resp.status_code == 422, "Status should be 422"
-
 
 def test_update_learner_profile_negative_2(clean_firestore):
   learner_dict = BASIC_LEARNER_EXAMPLE
@@ -427,8 +425,8 @@ def test_update_learner_profile_negative_2(clean_firestore):
   learner.update()
   learner_id = learner.id
 
-  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE,
-                          "learner_id": learner_id}
+  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE}
+  learner_profile_dict["learner_id"] = learner_id
   learner_profile = LearnerProfile.from_dict(learner_profile_dict)
   learner_profile.uuid = ""
   learner_profile.save()
@@ -442,9 +440,9 @@ def test_update_learner_profile_negative_2(clean_firestore):
   # pylint: disable-next = line-too-long
   url = f"{api_url_with_learner}/{random_learner_id}/learner-profile"
   response = {
-    "success": False,
-    "message": "Learner with uuid U2DDBkl3Ayg0PWudzhI not found",
-    "data": None
+      "success": False,
+      "message": "Learner with uuid U2DDBkl3Ayg0PWudzhI not found",
+      "data": None
   }
 
   resp = client_with_emulator.put(url, json=learner_profile_dict)
@@ -464,8 +462,8 @@ def test_delete_learner_profile(clean_firestore):
   learner.update()
   learner_id = learner.id
 
-  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE,
-                          "learner_id": learner_id}
+  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE}
+  learner_profile_dict["learner_id"] = learner_id
   learner_profile = LearnerProfile.from_dict(learner_profile_dict)
   learner_profile.uuid = ""
   learner_profile.save()
@@ -481,11 +479,11 @@ def test_delete_learner_profile(clean_firestore):
   del_json_response = resp.json()
 
   expected_data = {
-    "success": True,
-    "message": "Successfully deleted the learner profile"
+      "success": True,
+      "message": "Successfully deleted the learner profile"
   }
   deleted_learner_profile = LearnerProfile.find_by_uuid(
-    learner_profile.uuid, is_deleted=True)
+      learner_profile.uuid, is_deleted=True)
   assert resp.status_code == 200, "Status code not 200"
   assert deleted_learner_profile.is_deleted is True, "Document was not deleted"
   assert del_json_response == expected_data, "Expected response not same"
@@ -504,9 +502,9 @@ def test_delete_learner_profile_negative(clean_firestore):
   # pylint: disable-next = line-too-long
   url = f"{api_url_with_learner}/{random_learner_id}/learner-profile"
   response = {
-    "success": False,
-    "message": "Learner with uuid U2DDBkl3Ayg0PWudzhI not found",
-    "data": None
+      "success": False,
+      "message": "Learner with uuid U2DDBkl3Ayg0PWudzhI not found",
+      "data": None
   }
   resp = client_with_emulator.delete(url)
   json_response = resp.json()
@@ -517,10 +515,10 @@ def test_delete_learner_profile_negative(clean_firestore):
 def test_import_learner_profiles(clean_firestore):
   url = f"{api_url}/import/json"
   with open(
-    LEARNER_PROFILE_TESTDATA_FILENAME,
-    encoding="UTF-8") as learner_profiles_json_file:
+      LEARNER_PROFILE_TESTDATA_FILENAME,
+      encoding="UTF-8") as learner_profiles_json_file:
     resp = client_with_emulator.post(
-      url, files={"json_file": learner_profiles_json_file})
+        url, files={"json_file": learner_profiles_json_file})
 
   json_response = resp.json()
   assert resp.status_code == 200, "Status not 200"
@@ -537,8 +535,8 @@ def test_search_learner_profile(clean_firestore):
   learner.uuid = learner.id
   learner.update()
 
-  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE,
-                          "learner_id": learner.id}
+  learner_profile_dict = {**BASIC_LEARNER_PROFILE_EXAMPLE}
+  learner_profile_dict["learner_id"] = learner.id
   learner_profile = LearnerProfile.from_dict(learner_profile_dict)
   learner_profile.uuid = ""
   learner_profile.save()
@@ -562,8 +560,8 @@ def test_search_learner_profile(clean_firestore):
   assert resp.status_code == 200, "Status 200"
   retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
   assert learner_profile.uuid in \
-         retrieved_ids, "expected data not retrived"
+    retrieved_ids, "expected data not retrived"
   assert deleted_learner_profile.uuid not in \
-         retrieved_ids, "unexpected data retrived"
+    retrieved_ids, "unexpected data retrived"
   assert json_response.get("data")[0].get(
-    "learner_id") == learner.id, "Response received"
+      "learner_id") == learner.id, "Response received"

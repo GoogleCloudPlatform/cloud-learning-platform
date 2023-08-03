@@ -5,22 +5,23 @@ import regex
 from typing import List, Optional
 from typing_extensions import Literal
 from pydantic import BaseModel, constr,validator
-from schemas.schema_examples import (BASIC_LEARNER_EXAMPLE,
-                                     FULL_LEARNER_EXAMPLE,
-                                     UPDATE_LEARNER_EXAMPLE
-                                     )
+from schemas.schema_examples import (
+  BASIC_LEARNER_EXAMPLE,
+  FULL_LEARNER_EXAMPLE,
+  UPDATE_LEARNER_EXAMPLE
+)
 
 
 class BasePhoneNumber(BaseModel):
   """Base Phone number Pydandic Model"""
   phone_number_type: Optional[Literal["Home", "Work", "Mobile", "Fax",
-  "Other"]] = "Work"
+                                      "Other"]] = "Work"
   primary_phone_number_indicator: Optional[Literal["Yes", "No"]] = "Yes"
   phone_number: Optional[constr(max_length=24)] = ""
   phone_do_not_publish_indicator: Optional[Literal["Yes", "No",
-  "Unknown"]] = "Yes"
+                                                   "Unknown"]] = "Yes"
   phone_number_listed_status: Optional[Literal["Listed", "Unlisted",
-  "Unknown"]] = "Listed"
+                                               "Unknown"]] = "Listed"
 
 
 class PhoneNumber(BaseModel):
@@ -33,8 +34,8 @@ class BasicLearnerModel(BaseModel):
   """Learner Skeleton Pydantic Model"""
   first_name: str
   middle_name: Optional[constr(
-    max_length=60,
-    regex=r"[a-zA-Z0-9`!#&*%_[\]{}\\;:'\,.\?\s-]*$")] = ""
+      max_length=60,
+      regex=r"[a-zA-Z0-9`!#&*%_[\]{}\\;:'\,.\?\s-]*$")] = ""
   last_name: str
   suffix: Optional[constr(max_length=10, regex="^[a-zA-Z0-9]*$")] = ""
   prefix: Optional[constr(max_length=30, regex="^[a-zA-Z0-9]*$")] = ""
@@ -47,10 +48,10 @@ class BasicLearnerModel(BaseModel):
   preferred_last_name: Optional[constr(max_length=100,
                                        regex="^[a-zA-Z0-9]*$")] = ""
   preferred_name_type: Optional[Literal["Alias", "NickName", "PreferredName",
-  "PreviousLegalName",
-  "PreferredFamilyName",
-  "PreferredGivenName",
-  "FullName"]] = "PreferredName"
+                                        "PreviousLegalName",
+                                        "PreferredFamilyName",
+                                        "PreferredGivenName",
+                                        "FullName"]] = "PreferredName"
   preferred_pronoun: Optional[str] = ""
 
   student_identifier: Optional[constr(max_length=40)] = ""
@@ -70,16 +71,16 @@ class BasicLearnerModel(BaseModel):
   longitude: Optional[constr(max_length=20)] = ""
   country_ansi_code: Optional[int] = 10000
   address_do_not_publish_indicator: Optional[Literal["Yes", "No",
-  "Unknown"]] = "Yes"
+                                                     "Unknown"]] = "Yes"
   phone_number: Optional[PhoneNumber] = {}
   email_address_type: Optional[Literal["Home", "Work", "Organizational",
-  "Other"]] = "Work"
+                                       "Other"]] = "Work"
   email_address: constr(
     min_length=7,
     max_length=128,
     regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")
   email_do_not_publish_indicator: Optional[Literal["Yes", "No",
-  "Unknown"]] = "Yes"
+                                                   "Unknown"]] = "Yes"
   backup_email_address: Optional[str] = ""
 
   birth_date: Optional[str]
@@ -100,19 +101,17 @@ class BasicLearnerModel(BaseModel):
     max_length=128,
     regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")] = (
     "test@mail.com")
-
   # pylint: disable=no-self-argument
   @validator("first_name")
-  def name_regex(cls, value):
+  def name_regex(cls,value):
     result = regex.fullmatch(r"[\D\p{L}\p{N}\s]+$", value)
-    if len(value) <= 60 and result:
+    if len(value)<=60 and result:
       return value
     raise ValueError("Invalid first format")
-
   @validator("last_name")
-  def last_name_regex(cls, value):
+  def last_name_regex(cls,value):
     result = regex.fullmatch(r"[\D\p{L}\p{N}\s]+$", value)
-    if len(value) <= 60 and result:
+    if len(value)<=60 and result:
       return value
     raise ValueError("Invalid last name format")
 
@@ -144,9 +143,9 @@ class UpdateLearnerModel(BaseModel):
   preferred_last_name: Optional[constr(max_length=100, regex="^[a-zA-Z0-9]*$")]
 
   preferred_name_type: Optional[Literal["Alias", "NickName", "PreferredName",
-  "PreviousLegalName",
-  "PreferredFamilyName",
-  "PreferredGivenName", "FullName"]]
+                                        "PreviousLegalName",
+                                        "PreferredFamilyName",
+                                        "PreferredGivenName", "FullName"]]
   preferred_pronoun: Optional[str]
   student_identifier: Optional[constr(max_length=40)]
   student_identification_system: Optional[constr(max_length=15)]
@@ -168,7 +167,7 @@ class UpdateLearnerModel(BaseModel):
 
   phone_number: Optional[PhoneNumber]
   email_address_type: Optional[Literal["Home", "Work", "Organizational",
-  "Other"]]
+                                       "Other"]]
   email_address: Optional[constr(
     min_length=7,
     max_length=128,
@@ -193,19 +192,17 @@ class UpdateLearnerModel(BaseModel):
     min_length=7,
     max_length=128,
     regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")]
-
   # pylint: disable=no-self-argument
   @validator("first_name")
-  def name_regex(cls, value):
+  def name_regex(cls,value):
     result = regex.fullmatch(r"[\D\p{L}\p{N}\s]+$", value)
-    if len(value) <= 60 and result:
+    if len(value)<=60 and result:
       return value
     raise ValueError("Invalid first format")
-
   @validator("last_name")
-  def last_name_regex(cls, value):
+  def last_name_regex(cls,value):
     result = regex.fullmatch(r"[\D\p{L}\p{N}\s]+$", value)
-    if len(value) <= 60 and result:
+    if len(value)<=60 and result:
       return value
     raise ValueError("Invalid last name format")
 
@@ -213,7 +210,6 @@ class UpdateLearnerModel(BaseModel):
     orm_mode = True
     extra = "forbid"
     schema_extra = {"example": UPDATE_LEARNER_EXAMPLE}
-
 
 class GetLearnerResponseModel(BaseModel):
   success: Optional[bool] = True
@@ -344,8 +340,8 @@ class LearnerPathwayId(BaseModel):
 
 class GetLearnerPathwayIdResponse(BaseModel):
   success: Optional[bool] = True
-  message: Optional[str] = "Successfully fetch the curriculum " \
-                           "pathway for the learner"
+  message: Optional[str] = "Successfully fetch the curriculum "\
+    "pathway for the learner"
   data: Optional[LearnerPathwayId]
 
   class Config():
@@ -353,8 +349,8 @@ class GetLearnerPathwayIdResponse(BaseModel):
     schema_extra = {
       "example": {
         "success": True,
-        "message": "Successfully fetch the curriculum "
-                   "pathway id for the learner",
+        "message": "Successfully fetch the curriculum "\
+          "pathway id for the learner",
         "data": {
           "curriculum_pathway_id": "44qxEpc35pVMb6AkZGbi"
         }
@@ -366,7 +362,6 @@ class InstructorModel(BaseModel):
   """Instructor Detail Pydantic Model"""
   instructor_staff_id: str = ""
   instructor_user_id: str = ""
-
 
 class InstructorResponseModel(BaseModel):
   """Instructor Details Response Model"""
@@ -382,16 +377,14 @@ class InstructorResponseModel(BaseModel):
         "message": "Successfully fetched instructor details",
         "data": {
           "instructor_staff_id": "44qxEpc35pVMb6AkZGbi",
-          "instructor_user_id": "00MPqUhCbyPe1BcevQDr"
+          "instructor_user_id" : "00MPqUhCbyPe1BcevQDr"
         }
       }
     }
 
-
 class CoachIdResponse(BaseModel):
   coach_staff_id: str = ""
   coach_user_id: str = ""
-
 
 class CoachesResponseModel(BaseModel):
   """Get Coaches Response Pydantic Model"""
@@ -402,16 +395,15 @@ class CoachesResponseModel(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-      "example": {
-        "success": True,
-        "message": "Successfully fetched the coach",
-        "data": {
-          "coach_staff_id": "44qxEpc35pVMb6AkZGbi",
-          "coach_user_id": "lQRzcrRuDpJ9IoW8bCHu"
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the coach",
+            "data": {
+              "coach_staff_id": "44qxEpc35pVMb6AkZGbi",
+              "coach_user_id": "lQRzcrRuDpJ9IoW8bCHu"
+            }
         }
-      }
     }
-
 
 class GetInstructorsModel(BaseModel):
   """Instructor Detail Pydantic Model"""
@@ -439,7 +431,7 @@ class GetInstructorsResponseModel(BaseModel):
             "staff_id": "Qh49RVbvHRIRAFx304YL",
             "discipline_id": "gMXvlgMXoNQCRUKuXxLC",
             "discipline_name": "Humanities"
-          }
+        }
         ]
       }
     }

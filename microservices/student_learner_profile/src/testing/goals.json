@@ -1,4 +1,5 @@
-[{
+[
+  {
     "uuid": "44qxEpc35pVMb6AkZGbi",
     "name": "Intellectual Skills",
     "description": "",
@@ -7,4 +8,5 @@
     "aligned_workforces": [],
     "aligned_credentials": [],
     "aligned_learning_experiences": []
-}]
+  }
+]

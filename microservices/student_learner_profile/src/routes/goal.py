@@ -60,10 +60,9 @@ def get_all_goals(goal_type: str = None,
   along with the provided filters
 
   Args:
-      goal_type (str): name of the goal type to be filtered for goal
+      goal_type (str) : name of the goal type to be filtered for goal
       skip (int): Number of objects to be skipped
-      limit (int): Size of a learner array to be returned
-      fetch_archive: bool
+      limit (int): Size of learner array to be returned
 
   Raises:
       ResourceNotFoundException: If the goal does not exist
@@ -137,7 +136,7 @@ def get_goal(uuid: str):
         "model": NotFoundErrorResponseModel
     }})
 def create_goal(input_goal: GoalModel):
-  """The created goal endpoint will add the given goal in request body to the
+  """The create goal endpoint will add the given goal in request body to the
   firestore
 
   Args:
@@ -181,7 +180,7 @@ def update_goal(uuid: str, input_goal: UpdateGoalModel):
   """Update a goal with the uuid passed in the request body
 
   Args:
-      uuid (str): Unique id of the goal
+      uuid (str) : Unique id of the goal
       input_goal (UpdateGoalModel): Required body of the goal
 
   Raises:
