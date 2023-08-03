@@ -7,9 +7,23 @@ from copy import deepcopy
 from uuid import uuid4
 
 sys.path.append("../")
-from common.models import CurriculumPathway, AssociationGroup, User
-from e2e.test_object_schemas import TEST_ASSOCIATION_GROUP, TEST_CURRICULUM_PATHWAY, TEST_USER
-from e2e.test_config import API_URL_USER_MANAGEMENT, DEL_KEYS
+from common.models import (CurriculumPathway,
+                            AssociationGroup,
+                            User,
+                            LearningExperience,
+                            LearningObject,
+                            Assessment,
+                            SubmittedAssessment)
+from e2e.test_object_schemas import (TEST_ASSOCIATION_GROUP,
+                                  TEST_CURRICULUM_PATHWAY,
+                                  TEST_USER,
+                                  TEST_LEARNING_EXPERIENCE,
+                                  TEST_LEARNING_OBJECT,
+                                  TEST_FINAL_ASSESSMENT,
+                                  TEST_SUBMITTED_ASSESSMENT_INPUT)
+from e2e.test_config import (API_URL_USER_MANAGEMENT,
+                          DEL_KEYS,
+                          API_URL_ASSESSMENT_SERVICE)
 from e2e.setup import post_method, get_method, put_method, delete_method
 
 UM_API_URL = f"{API_URL_USER_MANAGEMENT}/association-groups"
@@ -285,19 +299,115 @@ def step_impl_1(context):
   user_dict_1["user_id"] = user_1.id
   context.instructor_id = user_1.user_id
 
+  # Create Assessor 1
+  email_1 = str(uuid4())
+  user_dict_1 = {**TEST_USER}
+  user_dict_1["email"] = f"{email_1}@gmail.com"
+  user_dict_1["user_type"] = "assessor"
+  user_dict_1["user_type_ref"] = ""
+  user_1 = User.from_dict(user_dict_1)
+  user_1.user_id = ""
+  user_1.save()
+  user_1.user_id = user_1.id
+  user_1.update()
+  user_dict_1["user_id"] = user_1.id
+  context.assessor_id_1 = user_1.user_id
+
+  # Create Learner
+  email_3 = str(uuid4())
+  user_dict_3 = {**TEST_USER}
+  user_dict_3["email"] = f"{email_3}@gmail.com"
+  for key in DEL_KEYS:
+    if key in user_dict_3:
+      del user_dict_3[key]
+
+  res = post_method(
+                    url = f"{API_URL_USER_MANAGEMENT}/user",
+                    request_body=user_dict_3                
+                  )
+  assert res.status_code == 200
+  res_json = res.json()
+  context.learner_id = res_json["data"]["user_type_ref"]
+
   # Create Curriculum Pathway - Discipline
   pathway_dict = deepcopy(TEST_CURRICULUM_PATHWAY)
-
   pathway_dict["alias"] = "discipline"
   for key in DEL_KEYS:
     if key in pathway_dict:
       del pathway_dict[key]
-  cp = CurriculumPathway.from_dict(pathway_dict)
-  cp.uuid = ""
-  cp.save()
-  cp.uuid = cp.id
-  cp.update()
-  context.discipline_id = cp.id
+  discipline = CurriculumPathway.from_dict(pathway_dict)
+  discipline.uuid = ""
+  discipline.save()
+  discipline.uuid = discipline.id
+  discipline.update()
+  context.discipline_id = discipline.id
+
+  # Create Unit
+  pathway_dict = deepcopy(TEST_CURRICULUM_PATHWAY)
+  pathway_dict["alias"] = "unit"
+  for key in DEL_KEYS:
+    if key in pathway_dict:
+      del pathway_dict[key]
+  unit = CurriculumPathway.from_dict(pathway_dict)
+  unit.uuid = ""
+  unit.save()
+  unit.uuid = unit.id
+  unit.parent_nodes = {"curriculum_pathways": [discipline.uuid]}
+  unit.update()
+  context.unit_id = unit.uuid
+
+  discipline = CurriculumPathway.find_by_uuid(context.discipline_id)
+  discipline.child_nodes["curriculum_pathways"] = [unit.uuid]
+  discipline.update()
+
+  # Create Learning Experience
+  learning_experience_dict = deepcopy(TEST_LEARNING_EXPERIENCE)
+  for key in DEL_KEYS:
+    if key in learning_experience_dict:
+      del learning_experience_dict[key]
+  le = LearningExperience.from_dict(learning_experience_dict)
+  le.uuid = ""
+  le.save()
+  le.uuid = le.id
+  le.parent_nodes={"curriculum_pathways": [unit.uuid]}
+  le.update()
+  context.le_id = le.uuid
+
+  unit = CurriculumPathway.find_by_uuid(context.unit_id)
+  unit.child_nodes["learning_experiences"] = [le.uuid]
+  unit.update()
+
+  # Create Learning Object
+  learning_object_dict = deepcopy(TEST_LEARNING_OBJECT)
+  for key in DEL_KEYS:
+    if key in learning_object_dict:
+      del learning_object_dict[key]
+  lo = LearningObject.from_dict(learning_object_dict)
+  lo.uuid = ""
+  lo.save()
+  lo.uuid = lo.id
+  lo.parent_nodes = {"learning_experiences": [le.uuid]}
+  lo.update()
+  context.lo_id = lo.uuid
+
+  le = LearningExperience.find_by_uuid(context.le_id)
+  le.child_nodes["learning_objects"] = [lo.uuid]
+  le.update()
+
+  # Create Human Graded Assessment
+  test_assessment = {**TEST_FINAL_ASSESSMENT}
+  assessment = Assessment()
+  assessment = assessment.from_dict(test_assessment)
+  assessment.uuid = ""
+  assessment.parent_nodes = {"learning_objects": [context.lo_id]}
+  assessment.save()
+  assessment.uuid = assessment.id
+  assessment.update()
+  context.assessment_id = assessment.uuid
+
+  lo = LearningObject.find_by_uuid(context.lo_id)
+  lo.child_nodes["assessments"] = [context.assessment_id]
+  lo.update()
 
   # Create discipline association group
   association_group_dict = deepcopy(TEST_ASSOCIATION_GROUP)
@@ -309,11 +419,40 @@ def step_impl_1(context):
   assert post_group.status_code == 200
 
   group = AssociationGroup.find_by_uuid(context.group_uuid)
-  group.users = [{"user": context.instructor_id, "user_group_type": "instructor", "status": "active"}]
+  group.users = [
+                  {
+                    "user": context.instructor_id,
+                    "user_group_type": "instructor",
+                    "status": "active"
+                  },
+                  {
+                    "user": context.assessor_id_1,
+                    "user_type": "assessor",
+                    "status": "active"
+                  }
+                ]
   group.associations = {
     "curriculum_pathways": [{"curriculum_pathway_id": context.discipline_id, "status": "active"}]
   }
   group.update()
+
+  # Create Submitted Assessment
+  test_submission_request = {**TEST_SUBMITTED_ASSESSMENT_INPUT}
+  submitted_assessment = SubmittedAssessment()
+  submitted_assessment = submitted_assessment.from_dict(test_submission_request)
+  submitted_assessment.assessment_id = context.assessment_id
+  submitted_assessment.assessor_id = context.assessor_id_1
+  submitted_assessment.learner_id = context.learner_id
+  submitted_assessment.attempt_no = 1
+  submitted_assessment.type = "project"
+  submitted_assessment.uuid = ""
+  submitted_assessment.status = "evaluation_pending"
+  submitted_assessment.result = "Pass"
+  submitted_assessment.is_autogradable = False
+  submitted_assessment.save()
+  submitted_assessment.uuid = submitted_assessment.id
+  submitted_assessment.update()
+  context.submitted_assessment_id = submitted_assessment.id
 
   # Create Learner association group
   association_group_dict = deepcopy(TEST_ASSOCIATION_GROUP)
@@ -344,8 +483,6 @@ def step_impl_2(context):
 
   context.res = post_method(url=context.url, request_body=remove_discipline)
   context.res_data = context.res.json()
-  print(context.res)
-  print(context.res_data)
 
 
 @behave.then("discipline will get removed from the corresponding discipline association group object")
@@ -364,3 +501,14 @@ def step_impl_3(context):
   get_response_data = get_response.json()
   assert get_response.status_code == 200
   assert len(get_response_data["data"]["associations"]["instructors"]) == 0
+
+@behave.then("the user of assessor type associated to the discipline will also get removed from all submitted assessments where it exists")
+def step_impl_4(context):
+  res = get_method(f"{API_URL_ASSESSMENT_SERVICE}/submitted-assessment/{context.submitted_assessment_id}")
+  res_json = res.json()
+  print(res_json)
+  assert res.status_code == 200
+  assert res_json["success"] == True
+  assert res_json["message"] == "Successfully fetched the submitted assessment."
+  assert res_json["data"]["assessor_id"] != context.assessor_id_1
+  assert res_json["data"]["assessor_id"] == ""

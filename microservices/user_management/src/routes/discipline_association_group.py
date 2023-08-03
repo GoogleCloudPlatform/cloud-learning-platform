@@ -3,12 +3,15 @@ import traceback
 from fastapi import APIRouter, Query
 from typing import Optional
 from typing_extensions import Literal
-from common.models import AssociationGroup, User, CurriculumPathway
+from common.models import AssociationGroup, User, CurriculumPathway, UserGroup
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                 ConflictError)
 from common.utils.logging_handler import Logger
 from common.utils.http_exceptions import (Conflict, InternalServerError,
                                           BadRequest, ResourceNotFound)
+from common.utils.assessor_handler import (
+  update_assessor_of_submitted_assessments_of_a_discipline
+)
 from schemas.discipline_association_group_schema import (
   GetDisciplineAssociationGroupResponseModel, DisciplineAssociationGroupModel,
   PostDisciplineAssociationGroupResponseModel, DeleteDisciplineAssociationGroup,
@@ -75,10 +78,12 @@ def get_discipline_association_groups(skip: int = Query(0, ge=0, le=2000),
     else:
       association_groups = [i.get_fields(reformat_datetime=True) for i \
                           in groups]
+    count = 10000
+    response = {"records": association_groups, "total_count": count}
     return {
         "success": True,
         "message": "Successfully fetched the association groups",
-        "data": association_groups
+        "data": response
     }
   except ValidationError as e:
     Logger.info(traceback.print_exc())
@@ -453,6 +458,12 @@ def add_user_to_discipline_association_group(uuid: str,
 
     discipline_users = [i["user"] for i in group_fields["users"]]
 
+    filtered_user_groups = UserGroup.collection.filter(
+        "name", "in", ["instructor", "assessor"]).fetch()
+
+    filtered_user_groups = [i.get_fields(reformat_datetime=True)["uuid"] for i \
+                          in filtered_user_groups]
+
     for user in input_users_dict.get("users"):
 
       if user in discipline_users:
@@ -465,15 +476,16 @@ def add_user_to_discipline_association_group(uuid: str,
 
       add_user_fields = add_user.get_fields(reformat_datetime=True)
 
-      if add_user_fields.get("user_type") not in ["instructor", "assessor"]:
-        raise ValidationError(
-          f"User for given user_id {user} is not instructor or assessor")
+      instructor_assessor =  False
+      for user_group in add_user_fields["user_groups"]:
+        if user_group in filtered_user_groups:
+          instructor_assessor =  True
+          break
 
-      # FIXME: To add validation wheather that user belongs
-      # to instructor or assessor user-group or not
+      if instructor_assessor is False:
+        raise ValidationError(f"User for given user_id {user} "
+                              "is not instructor or assessor")
 
-      # Only insert the User if its not exist in the discipline
-      # association group
       if not any(users["user"] == user for users in group_fields["users"]):
         group_fields["users"].append({
             "user": user,
@@ -648,6 +660,13 @@ def remove_discipline_from_discipline_association_group(uuid: str,
         association_group.associations = association_group_fields[
           "associations"]
         association_group.update()
+
+        # Update submitted assessments
+        update_assessor_of_submitted_assessments_of_a_discipline(
+            uuid,
+            input_discipline["curriculum_pathway_id"]
+          )
+
       else:
         raise ValidationError(
           f"""Discipline ID = {input_discipline[
@@ -715,19 +734,24 @@ def remove_user_from_discipline_association_group(uuid: str,
     if isinstance(group_fields.get("users"), list):
       # Identify if user being deleted is instructor type
       is_instructor = False
+      is_assessor = False
       for user_dict in group_fields.get("users"):
-        if input_users_dict["user"] == user_dict["user"] and \
-          user_dict["user_type"] == "instructor":
-          is_instructor = True
-          break
+        if input_users_dict["user"] == user_dict["user"]:
+          if user_dict["user_type"] == "instructor":
+            is_instructor = True
+            break
+          elif user_dict["user_type"] == "assessor":
+            is_assessor = True
+            break
 
       # The filter returns an iterator containing all the users
       group_fields["users"][:] = filter(
           lambda x: x["user"] != input_users_dict["user"],
           group_fields.get("users"))
 
-      # Logic to remove instructor associated from learner association group
-      if is_instructor and group_fields.get("associations"):
+      if group_fields.get("associations"):
+        Logger.info("""found associations""")
+        Logger.info(group_fields.get("associations"))
         # Get active curriculum_pathway_id for discipline from Discipline Group
         for pathway_dict in group_fields.get("associations").get(
           "curriculum_pathways"):
@@ -735,33 +759,44 @@ def remove_user_from_discipline_association_group(uuid: str,
             discipline_id = pathway_dict["curriculum_pathway_id"]
             break
 
-        # Fetch all learner association groups
-        learner_association_groups = AssociationGroup.collection.filter(
-                      "association_type", "==", "learner").fetch()
-        learner_group_fields = [i.get_fields() for i in \
-                                  learner_association_groups]
+        if is_instructor:
+          # Logic to remove instructor associated from learner association group
+          # Fetch all learner association groups
+          learner_association_groups = AssociationGroup.collection.filter(
+                        "association_type", "==", "learner").fetch()
+          learner_group_fields = [i.get_fields() for i in \
+                                    learner_association_groups]
 
-        # Find Learner Association Group in which given instructor exists
-        learner_group = None
-        for group in learner_group_fields:
-          for instructor_dict in group.get("associations").get("instructors"):
-            if input_users_dict["user"] == instructor_dict["instructor"] and \
-              instructor_dict["curriculum_pathway_id"] == discipline_id:
-              learner_group = group
-              break
-        # Remove instructor from Learner Association Group
-        if learner_group:
-          learner_group.get("associations").get("instructors")[:] = [
-            instructor for instructor in learner_group.get("associations").get(
-            "instructors") if instructor.get("instructor") != input_users_dict[
-            "user"] and instructor.get("curriculum_pathway_id") != discipline_id
-          ]
-          learner_association_group_object = AssociationGroup.find_by_uuid(
-            learner_group["uuid"])
-          for key, value in learner_group.items():
-            setattr(learner_association_group_object, key, value)
-          learner_association_group_object.update()
+          # Find Learner Association Group in which given instructor exists
+          learner_group = None
+          for group in learner_group_fields:
+            for instructor_dict in group.get("associations").get("instructors"):
+              if input_users_dict["user"] == instructor_dict["instructor"] and \
+                instructor_dict["curriculum_pathway_id"] == discipline_id:
+                learner_group = group
+                break
 
+          # pylint: disable=line-too-long
+          # Remove instructor from Learner Association Group
+          if learner_group:
+            learner_group.get("associations").get("instructors")[:] = [
+              instructor for instructor in learner_group.get("associations").get(
+              "instructors") if instructor.get("instructor") != input_users_dict[
+              "user"] and instructor.get("curriculum_pathway_id") != discipline_id
+            ]
+            learner_association_group_object = AssociationGroup.find_by_uuid(
+              learner_group["uuid"])
+            for key, value in learner_group.items():
+              setattr(learner_association_group_object, key, value)
+            learner_association_group_object.update()
+        elif is_assessor:
+          # Logic to remove assessor from submitted assessments
+          Logger.info("About to trigger update assessor reference function")
+          update_assessor_of_submitted_assessments_of_a_discipline(
+            uuid,
+            discipline_id,
+            input_users_dict
+          )
     else:
       # No users exist
       raise ValidationError(
@@ -835,6 +870,9 @@ def update_discipline_association_status(
       if key == "user" and val:
         is_user_present = False
         is_user_instructor = False
+        is_user_assessor = False
+        assessor_id = None
+        deactivate_assessor = False
         for user in group_fields["users"]:
           if val.get("user_id") == user["user"]:
             is_user_present = True
@@ -842,12 +880,18 @@ def update_discipline_association_status(
               user["status"] = val["status"]
               if user["user_type"] == "instructor":
                 is_user_instructor = True
+              elif user["user_type"] == "assessor":
+                is_user_assessor = True
+                assessor_id = val.get("user_id")
+                if user["status"] == "inactive":
+                  deactivate_assessor = True
         if not is_user_present:
           raise ValidationError("User for given user_id is not present "
                                 "in the discipline association group")
 
         # Logic to de-activate instructor in learner association group as well
-        if is_user_instructor and group_fields.get("associations") and \
+        if (is_user_instructor or is_user_assessor) and \
+          group_fields.get("associations") and \
           val.get("status") == "inactive":
           # Get active curriculum_pathway_id from Discipline Group
           for pathway_dict in group_fields.get("associations").get(
@@ -857,6 +901,17 @@ def update_discipline_association_status(
               break
           # Fetch all learner association groups
           learner_group_fields = get_all_learner_association_groups()
+
+          if is_user_assessor and deactivate_assessor:
+            # Logic to remove assessor from submitted assessments
+            Logger.info("About to trigger update assessor reference function")
+            update_assessor_of_submitted_assessments_of_a_discipline(
+              uuid,
+              discipline_id,
+              {
+                "user":assessor_id
+              }
+            )
 
           # Find Learner Association Group in which given instructor exists
           learner_group = None
@@ -888,6 +943,15 @@ def update_discipline_association_status(
             is_pathway_present = True
             if val.get("status") != pathway["status"]:
               pathway["status"] = val["status"]
+
+              if pathway["status"] == "inactive":
+                # Logic to remove assessor from submitted assessments
+                msg = "About to trigger update assessor reference function"
+                Logger.info(msg)
+                update_assessor_of_submitted_assessments_of_a_discipline(
+                  uuid,
+                  pathway["curriculum_pathway_id"]
+                )
 
             # Logic to de-activate instructor in learner association group
             if val.get("status") == "inactive":

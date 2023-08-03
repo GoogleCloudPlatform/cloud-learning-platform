@@ -8,7 +8,11 @@ from common.utils.bq_client import bq_client
 
 
 def insert_data_to_bq(table_name, rows_to_insert):
-  """Function to insert data into BigQuery Table"""
+  """Function to insert data into BQ
+  Args:
+    table_name(str): Name of the BQ table
+    rows_to_insert(int): Number of rows to insert"""
+
   try:
     table_id = f"{PROJECT_ID}.{BQ_LRS_DATASET}.{table_name}"
     client = bq_client()
@@ -37,7 +41,11 @@ def fetch_all_data_from_bq(table_name,
                            selected_fields=None,
                            skip=None,
                            limit=None):
-  """Function to fetch all data from BigQuery Table"""
+  """Function to fetch all data from BQ
+  Args:
+    table_name(str): Name of the BQ table
+    selected_fields(list): List of fields that needs to be selected
+    """
   try:
     table_id = f"{PROJECT_ID}.{BQ_LRS_DATASET}.{table_name}"
     client = bq_client()
@@ -63,7 +71,7 @@ def fetch_all_data_from_bq(table_name,
 
 
 def fetch_data_using_query_from_bq(query_string):
-  """Function to fetch data for given query from BigQuery Table"""
+  """Function to fetch data from BQ using a query"""
   try:
     client = bq_client()
     query_job = client.query(query_string)

@@ -1,31 +1,23 @@
-"""
-test file for progress.py
-"""
-
-# disabling pylint rules that conflict with pytest fixtures
-# pylint: disable=unused-argument,redefined-outer-name,unused-import
-
+"""test file for progress.py"""
 import os
 from copy import deepcopy
-
+# disabling pylint rules that conflict with pytest fixtures
+# pylint: disable=unused-argument,redefined-outer-name,unused-import
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from routes.learner import router
 from routes.progress import router as progress_router
-from testing.test_config import API_URL
-from schemas.schema_examples import (
-  BASIC_LEARNER_EXAMPLE,
-  BASIC_LEARNER_PROFILE_EXAMPLE,
-  BASIC_LEARNING_RESOURCE_EXAMPLE,
-)
+from routes.achievement import router as achievement_router
+from routes.learner_profile import router as lp_router
+from testing.test_config import (API_URL, TESTING_FOLDER_PATH)
+from schemas.schema_examples import (BASIC_LEARNER_EXAMPLE,
+                                    BASIC_LEARNER_PROFILE_EXAMPLE,
+                                    BASIC_LEARNING_RESOURCE_EXAMPLE,
+                                    BASIC_CURRICULUM_PATHWAY_EXAMPLE)
 from common.models import (Learner,LearnerProfile,LearningResource)
-
+from common.testing.firestore_emulator import (firestore_emulator,
+                                               clean_firestore)
 from common.utils.http_exceptions import add_exception_handlers
-
-from common.testing.firestore_emulator import (
-  firestore_emulator,
-  clean_firestore
-)
 
 app = FastAPI()
 add_exception_handlers(app)
@@ -40,7 +32,7 @@ os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 
 
-def test_get_learner_progress_postive(clean_firestore):
+def test_get_learner_progress_positive(clean_firestore):
   learner_dict = BASIC_LEARNER_EXAMPLE
   learner = Learner.from_dict(learner_dict)
   learner.uuid = ""
@@ -69,14 +61,15 @@ def test_get_learner_progress_postive(clean_firestore):
   learning_resource_dict["uuid"] = learning_resource.id
 
   url = f"{api_url}/{learner.uuid}/progress"
-  params = {"node_id": learning_resource.id,"node_type": "learning_resources"}
-  resp = client_with_emulator.get(url,params = params)
+  params = {"node_id": learning_resource.id, "node_type": "learning_resources"}
+  resp = client_with_emulator.get(url, params=params)
 
   json_response = resp.json()
   assert resp.status_code == 200, "Status should be 200"
   assert json_response["data"]["progress"] == 0, "Progress should be 0"
-  assert json_response["data"]["status"] == "not_attempted",(
+  assert json_response["data"]["status"] == "not_attempted", (
     "Status should be not_attempted")
+
 
 def test_get_learner_progress_invalid_learner(clean_firestore):
   learning_resource_dict = deepcopy(BASIC_LEARNING_RESOURCE_EXAMPLE)
@@ -88,14 +81,15 @@ def test_get_learner_progress_invalid_learner(clean_firestore):
   learning_resource_dict["uuid"] = learning_resource.id
 
   url = f"{api_url}/test_learner_id/progress"
-  params = {"node_id": learning_resource.id,"node_type": "learning_resources"}
-  resp = client_with_emulator.get(url,params = params)
+  params = {"node_id": learning_resource.id, "node_type": "learning_resources"}
+  resp = client_with_emulator.get(url, params=params)
 
   json_response = resp.json()
   assert resp.status_code == 404, "Status should be 404"
   assert json_response["success"] is False
-  assert (json_response["message"]==
-  "Learner with uuid test_learner_id not found")
+  assert (json_response["message"] ==
+          "Learner with uuid test_learner_id not found")
+
 
 def test_get_learner_progress_invalid_learner_profile(clean_firestore):
   learner_dict = BASIC_LEARNER_EXAMPLE
@@ -114,14 +108,15 @@ def test_get_learner_progress_invalid_learner_profile(clean_firestore):
   learning_resource_dict["uuid"] = learning_resource.id
 
   url = f"{api_url}/{learner.uuid}/progress"
-  params = {"node_id": learning_resource.id,"node_type": "learning_resources"}
-  resp = client_with_emulator.get(url,params = params)
+  params = {"node_id": learning_resource.id, "node_type": "learning_resources"}
+  resp = client_with_emulator.get(url, params=params)
 
   json_response = resp.json()
   assert resp.status_code == 404, "Status should be 404"
   assert json_response["success"] is False
-  assert (json_response["message"]==
-  f"LearnerProfile with learner id {learner.id} not found")
+  assert (json_response["message"] ==
+          f"LearnerProfile with learner id {learner.id} not found")
+
 
 def test_get_learner_progress_invalid_node_type(clean_firestore):
   learner_dict = BASIC_LEARNER_EXAMPLE
@@ -152,13 +147,14 @@ def test_get_learner_progress_invalid_node_type(clean_firestore):
   learning_resource_dict["uuid"] = learning_resource.id
 
   url = f"{api_url}/{learner.uuid}/progress"
-  params = {"node_id": learning_resource.id,"node_type": "learning_resource"}
-  resp = client_with_emulator.get(url,params = params)
+  params = {"node_id": learning_resource.id, "node_type": "learning_resource"}
+  resp = client_with_emulator.get(url, params=params)
 
   json_response = resp.json()
   assert resp.status_code == 422, "Status should be 422"
   assert json_response["success"] is False
-  assert json_response["message"]=="Validation Failed"
+  assert json_response["message"] == "Validation Failed"
+
 
 def test_get_learner_progress_invalid_node_id(clean_firestore):
   learner_dict = BASIC_LEARNER_EXAMPLE
@@ -181,8 +177,9 @@ def test_get_learner_progress_invalid_node_id(clean_firestore):
   learner_profile.update()
 
   url = f"{api_url}/{learner.uuid}/progress"
-  params = {"node_id": "learning_resource.id","node_type": "learning_resources"}
-  resp = client_with_emulator.get(url,params = params)
+  params = {"node_id": "learning_resource.id",
+            "node_type": "learning_resources"}
+  resp = client_with_emulator.get(url, params=params)
 
   json_response = resp.json()
   assert resp.status_code == 404, "Status should be 404"

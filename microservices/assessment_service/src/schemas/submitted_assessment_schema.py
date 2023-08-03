@@ -47,7 +47,7 @@ class UpdateAssessorIdRequestModel(BaseModel):
 class Comment(BaseModel):
   """Comment Pydantic Model"""
   comment: str
-  type: Literal["non-eval", "flag"]
+  type: Literal["non-eval", "flag", "instructor_comment"]
   access: str
   author: str
   created_time: Optional[str]
@@ -143,23 +143,6 @@ class UpdateSubmittedAssessmentModel(BaseModel):
     schema_extra = {"example": UPDATE_SUBMITTED_ASSESSMENT_EXAMPLE}
 
 
-class SubmittedAssessmentResponseModel(BaseModel):
-  """SubmittedAssessment Response Pydantic Model"""
-  success: Optional[bool] = True
-  message: Optional[str] = "Successfully created the submitted_assessment"
-  data: Optional[FullSubmittedAssessmentModel]
-
-class TotalCountFullResponseModel(BaseModel):
-  records: Optional[List[FullSubmittedAssessmentModel]]
-  total_count: int
-
-class AllSubmittedAssessmentResponseModel(BaseModel):
-  """SubmittedAssessment Response Pydantic Model"""
-  success: Optional[bool] = True
-  message: Optional[str] = "Successfully fetched the submitted_assessment"
-  data: Optional[TotalCountFullResponseModel]
-
-
 class ReadyForEvaluationModel(FullSubmittedAssessmentModel):
   assessment_name: Optional[str]
   unit_name: Optional[str] = ""
@@ -170,6 +153,23 @@ class ReadyForEvaluationModel(FullSubmittedAssessmentModel):
   instructor_id: Optional[str] = ""
   max_attempts: Optional[int] = 3
   is_autogradable: Optional[bool] = False
+
+
+class SubmittedAssessmentResponseModel(BaseModel):
+  """SubmittedAssessment Response Pydantic Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully created the submitted_assessment"
+  data: Optional[FullSubmittedAssessmentModel]
+
+class TotalCountFullResponseModel(BaseModel):
+  records: Optional[List[ReadyForEvaluationModel]]
+  total_count: int
+
+class AllSubmittedAssessmentResponseModel(BaseModel):
+  """SubmittedAssessment Response Pydantic Model"""
+  success: Optional[bool] = True
+  message: Optional[str] = "Successfully fetched the submitted_assessment"
+  data: Optional[TotalCountFullResponseModel]
 
 
 class SubmittedAssessmentAssessorResponseModel(BaseModel):

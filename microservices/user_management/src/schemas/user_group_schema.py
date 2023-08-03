@@ -11,11 +11,13 @@ from schemas.schema_examples import (FULL_GROUP_MODEL_EXAMPLE,
                                      FULL_USER_MODEL_EXAMPLE)
 from schemas.user_schema import FullUserDataModel
 from config import IMMUTABLE_USER_GROUPS
+from common.utils.schema_validator import BaseConfigModel
 
 # pylint: disable=invalid-name
 ALLOWED_IMMUTABLE_GROUPS = Literal[tuple(IMMUTABLE_USER_GROUPS)]
 
-class BasicUserGroupModel(BaseModel):
+
+class BasicUserGroupModel(BaseConfigModel):
   """UserGroup Skeleton Pydantic Model"""
   name: str
   description: str
@@ -51,7 +53,7 @@ class ImmutableUserGroupModel(BasicUserGroupModel):
     schema_extra = {"example": POST_USERGROUP_MODEL_EXAMPLE}
 
 
-class UpdateUserGroupModel(BaseModel):
+class UpdateUserGroupModel(BaseConfigModel):
   """Update UserGroup Pydantic Request Model"""
   name: Optional[str]
   description: Optional[str]
@@ -290,8 +292,8 @@ class UpdateApplicationsOfGroupResponseModel(BaseModel):
 class UpdatePermissionsOfGroupResponseModel(BaseModel):
   """Group Response Pydantic Model"""
   success: Optional[bool] = True
-  message: Optional[str] = "Successfully updated permissions \
-              for the applcation of a user group"
+  message: Optional[str] = "Successfully updated permissions "\
+              "for the applcation of a user group"
 
   data: Optional[FullUserGroupDataModel]
 
@@ -300,8 +302,8 @@ class UpdatePermissionsOfGroupResponseModel(BaseModel):
     schema_extra = {
         "example": {
             "success": True,
-            "message": "Successfully updated permissions \
-              for the applcation of a user group",
+            "message": "Successfully updated permissions "\
+              "for the applcation of a user group",
             "data": FULL_GROUP_MODEL_EXAMPLE
         }
     }

@@ -7,17 +7,13 @@ BASIC_USER_MODEL_EXAMPLE = {
   "last_name": "jobs",
   "email": "steve.jobs@example.com",
   "user_type": "learner",
-  "user_groups": ["44qxEpc35pVMb6AkZGbi"],
+  "user_groups": [],
   "status": "active",
   "is_registered": True,
   "failed_login_attempts_count": 0,
   "access_api_docs": False,
   "gaia_id": "F2GGRg5etyty",
   "photo_url" :"//lh3.googleusercontent.com/a/default-user",
-  "inspace_user": {
-    "is_inspace_user": False,
-    "inspace_user_id": ""
-  },
   "is_deleted": False
 }
 
@@ -228,14 +224,15 @@ BASIC_STAFF_EXAMPLE = {
   "first_name": "Ted",
   "last_name": "Turner",
   "preferred_name": "staff",
-  "bio": "",
+  "bio": "staff bio",
   "pronoun": "he/him/his",
   "email": "ted.turner@email.com",
   "phone_number": "0000000000",
-  "shared_inboxes": "",
+  "shared_inboxes": "example1@email.com",
   "timezone": "Eastern (ET) - Washington, DC",
   "office_hours": [],
-  "photo_url" :"//lh3.googleusercontent.com/a/default-user"
+  "photo_url": "//lh3.googleusercontent.com/a/default-user",
+  "calendly_url": "calendly.com/sample-url"
 }
 
 FULL_STAFF_EXAMPLE = {
@@ -265,6 +262,19 @@ GET_APPLICATIONS_OF_USER = {
       "application_id": "RT34swyyiutdhjiiou"
   }]
 }
+
+GET_USERGROUPS_OF_USER = [
+    {
+        "name": "learner",
+        "uuid": "44qxEpc35pVMb6AkZGbi",
+        "description": "group of learners"
+    },
+    {
+        "name": "assessor",
+        "uuid": "1qchPPgeBXs2ZvK7QIjy",
+        "description": "group of assessors"
+    }
+]
 
 TEST_CURRICULUM_PATHWAY = {
     "name": "Kubernetes",
@@ -333,6 +343,65 @@ BASIC_CURRICULUM_PATHWAY_EXAMPLE = {
   "order": 1,
 }
 
+BASIC_LEARNER_EXAMPLE = {
+  "first_name": "Jon",
+  "middle_name": "Jon",
+  "last_name": "Doe",
+  "suffix": "",
+  "prefix": "",
+  "preferred_name": "",
+  "preferred_first_name": "",
+  "preferred_middle_name": "",
+  "preferred_last_name": "",
+  "preferred_name_type": "PreferredName",
+  "preferred_pronoun": "",
+  "student_identifier": "",
+  "student_identification_system": "",
+  "personal_information_verification": "",
+  "personal_information_type": "",
+  "address_type": "",
+  "street_number_and_name": "",
+  "apartment_room_or_suite_number": "",
+  "city": "",
+  "state_abbreviation": "",
+  "postal_code": "",
+  "country_name": "",
+  "country_code": "",
+  "latitude": "",
+  "longitude": "",
+  "country_ansi_code": 10000,
+  "address_do_not_publish_indicator": "Yes",
+  "phone_number": {
+    "mobile": {
+      "phone_number_type": "Work",
+      "primary_phone_number_indicator": "Yes",
+      "phone_number": "",
+      "phone_do_not_publish_indicator": "Yes",
+      "phone_number_listed_status": "Listed"
+    },
+    "telephone": {
+      "phone_number_type": "Home",
+      "primary_phone_number_indicator": "No",
+      "phone_number": "",
+      "phone_do_not_publish_indicator": "Yes",
+      "phone_number_listed_status": "Listed"
+    }
+  },
+  "email_address_type": "Work",
+  "email_address": "jon.doe@gmail.com",
+  "email_do_not_publish_indicator": "Yes",
+  "backup_email_address": "jon.doe2@gmail.com",
+  "birth_date": "",
+  "gender": "NotSelected",
+  "country_of_birth_code": "",
+  "ethnicity": "",
+  "employer_id": "test_employer_id",
+  "employer": "",
+  "employer_email": "testid@employer.com",
+  "organisation_email_id": "jon.doe@foobar.com",
+  "affiliation": ""
+}
+
 ADD_INSTRUCTOR_LEARNER_ASSOCIATION_GROUP_EXAMPLE = {
   "instructors": ["evz38z0IVuj719DrdUXg"],
   "curriculum_pathway_id": "t0U9eJzsxCtB7Z3LLwdK",
@@ -342,6 +411,22 @@ ADD_INSTRUCTOR_LEARNER_ASSOCIATION_GROUP_EXAMPLE = {
 REMOVE_INSTRUCTOR_LEARNER_ASSOCIATION_GROUP_EXAMPLE = {
   "instructor": "evz38z0IVuj719DrdUXg",
   "curriculum_pathway_id": "t0U9eJzsxCtB7Z3LLwdK",
+}
+
+BASIC_USERS_OF_LEARNER_ASSOCIATION_GROUP_EXAMPLE = {
+  "user": "1qchPPgeBXs2ZvK7QIjy",
+  "status": "active"
+}
+
+BASIC_COACHES_OF_LEARNER_ASSOCIATION_GROUP_EXAMPLE = {
+  "coach": "1qchPPgeBXs2ZvK7QIjy",
+  "status": "active"
+}
+
+BASIC_INSTRUCTORS_OF_LEARNER_ASSOCIATION_GROUP_EXAMPLE = {
+  "instructor": "1AZ9XzTXXahaCbPOSrep",
+  "curriculum_pathway_id": "0JDAEH6cvbNFLHxxsDN8",
+  "status": "active"
 }
 
 with open("./data/profile_fields.json", "r", encoding="utf-8") as f:

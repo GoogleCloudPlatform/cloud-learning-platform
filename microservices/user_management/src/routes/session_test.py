@@ -132,7 +132,8 @@ def test_get_all_sessions(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  retrieved_ids = [i.get("session_id") for i in json_response.get("data")]
+  retrieved_ids = [i.get("session_id") for i in json_response.get(
+    "data")["records"]]
 
   assert len(retrieved_ids) > 0, \
     "At least one result should be there"
@@ -199,7 +200,8 @@ def test_get_all_sessions_1(clean_firestore):
   json_response = resp.json()
 
   assert resp.status_code == 200, "Status 200"
-  retrieved_ids = [i.get("session_id") for i in json_response.get("data")]
+  retrieved_ids = [i.get("session_id") for i in json_response.get(
+    "data")["records"]]
 
   assert len(retrieved_ids) > 0, \
     "At least one result should be there"

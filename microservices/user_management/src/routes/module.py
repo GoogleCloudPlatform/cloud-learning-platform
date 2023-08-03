@@ -1,17 +1,20 @@
 """ Module endpoints """
+import traceback
 from fastapi import APIRouter, Query
 from typing import Optional
 from common.models import Module, Action
+from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError, \
   ConflictError
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
-                                          ResourceNotFound)
+                                          ResourceNotFound, Conflict)
 from schemas.module_schema import (AllModuleResponseModel,
                                    GetModuleResponseModel, ModuleModel,
                                    PostModuleResponseModel, UpdateModuleModel,
                                    UpdateModuleResponseModel, DeleteModule)
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.collection_handler import CollectionHandler
+from services.helper import get_data_for_fetch_tree
 from config import ERROR_RESPONSES
 
 router = APIRouter(tags=["Module"], responses=ERROR_RESPONSES)
@@ -42,20 +45,23 @@ def get_modules(skip: int = Query(0, ge=0, le=2000),
     modules = collection_manager.order("-created_time").offset(
         skip).fetch(limit)
     if fetch_tree:
-      modules = [
-          CollectionHandler.loads_field_data_from_collection(
-              i.get_fields(reformat_datetime=True)) for i in modules
-      ]
+      modules =  get_data_for_fetch_tree(modules)
     else:
       modules = [i.get_fields(reformat_datetime=True) for i in modules]
+    count = 10000
+    response = {"records": modules, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": modules
+        "data": response
     }
   except ValidationError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -95,8 +101,12 @@ def get_module(uuid: str, fetch_tree: Optional[bool] = False):
     }
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -144,8 +154,16 @@ def create_module(input_module: ModuleModel):
     }
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
+  except ConflictError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise Conflict(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -178,7 +196,7 @@ def update_module(uuid: str, input_module: UpdateModuleModel):
 
     existing_module = Module.find_by_uuid(uuid)
 
-    input_module_dict = {**input_module.dict()}
+    input_module_dict = {**input_module.dict(exclude_unset=True)}
 
     if "actions" in input_module_dict and input_module.actions != []:
       for action in input_module.actions:
@@ -201,8 +219,16 @@ def update_module(uuid: str, input_module: UpdateModuleModel):
     }
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
+  except ConflictError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise Conflict(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -233,6 +259,10 @@ def delete_module(uuid: str):
     return {"success": True, "message": "Successfully deleted the module"}
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e

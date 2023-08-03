@@ -126,8 +126,7 @@ def test_get_all_goals(clean_firestore):
 
 
 def test_get_all_goals_with_filter(clean_firestore):
-  goal_dict = {**BASIC_GOAL_EXAMPLE}
-  goal_dict["type"] = "Long-term"
+  goal_dict = {**BASIC_GOAL_EXAMPLE, "type": "Long-term"}
   # goal
   goal = Goal.from_dict(goal_dict)
   goal.uuid = ""
@@ -143,7 +142,6 @@ def test_get_all_goals_with_filter(clean_firestore):
   deleted_goal.uuid = deleted_goal.id
   deleted_goal.update()
 
-  url = f"{api_url}"
   goal_type = "Long-term"
   url = f"{api_url}?goal_type={goal_type}"
   resp = client_with_emulator.get(url)
@@ -327,7 +325,7 @@ def test_archive_goal(clean_firestore):
   goal_dict = {**BASIC_GOAL_EXAMPLE}
   goal = Goal.from_dict(goal_dict)
   goal.uuid = ""
-  goal.is_archived = False  # goal not archived initially
+  goal.is_archived = False  # goal isn't archived initially
   goal.save()
   goal.uuid = goal.id
   goal.update()

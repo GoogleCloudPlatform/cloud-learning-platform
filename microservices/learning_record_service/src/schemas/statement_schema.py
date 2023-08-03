@@ -6,6 +6,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from schemas.schema_examples import (BASIC_XAPI_STATEMENT, FULL_XAPI_STATEMENT)
 from typing_extensions import Literal
+from common.utils.schema_validator import BaseConfigModel
 # pylint: disable=line-too-long
 
 
@@ -97,7 +98,7 @@ class ActivityModel(BaseModel):
   canonical_data: Optional[dict] = {}
 
 
-class BasicStatementModel(BaseModel):
+class BasicStatementModel(BaseConfigModel):
   """Basic xAPI Statement Pydantic Model"""
   actor: AgentModel
   verb: VerbModel
@@ -193,12 +194,15 @@ class GetStatementResponseModel(BaseModel):
         }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullStatementModel]]
+  total_count: int
 
 class GetAllStatementsResponseModel(BaseModel):
   """Get all Statements Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the statements"
-  data: List[FullStatementModel]
+  data: TotalCountResponseModel
 
   class Config():
     orm_mode = True
@@ -206,7 +210,10 @@ class GetAllStatementsResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully fetched the statements",
-            "data": [FULL_XAPI_STATEMENT]
+            "data": {
+                      "records":[FULL_XAPI_STATEMENT],
+                      "total_count": 50
+                    }
         }
     }
 

@@ -166,7 +166,8 @@ def test_get_verbs(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  saved_names = [i.get("name") for i in json_response.get("data")]
+  saved_names = [i.get("name") for i in json_response.get(
+    "data")["records"]]
   assert verb_dict["name"] in saved_names, "all data not retrieved"
 
 

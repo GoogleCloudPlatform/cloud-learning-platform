@@ -114,21 +114,33 @@ def test_get_assessment_types(clean_firestore):
 
 
 def test_get_assessments(clean_firestore):
+  basic_skill = BASIC_SKILL_EXAMPLE
+  new_skill = Skill()
+  new_skill = new_skill.from_dict(basic_skill)
+  new_skill.uuid = ""
+  new_skill.save()
+  new_skill.uuid = new_skill.id
+  new_skill.update()
   assessment_dict = {**BASIC_ASSESSMENT_EXAMPLE}
   assessment_dict["name"] = "Questionnaire"
   assessment = Assessment.from_dict(assessment_dict)
   assessment.uuid = ""
+
+  skill_data = [{"uuid": new_skill.uuid, "name": new_skill.name}]
+  assessment.references = {"skills": skill_data}
   assessment.save()
   assessment.uuid = assessment.id
   assessment.update()
-  params = {"skip": 0, "limit": "30"}
+  params = {"skip": 0, "limit": "30",
+            "performance_indicators": [new_skill.uuid]}
 
   url = f"{api_url}s"
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   saved_names = [i.get("name") for i in json_response.get("data")["records"]]
-  assert assessment_dict["name"] in saved_names, "all data not retrived"
+  assert assessment.name in saved_names, "all data not retrived"
+  assert assessment.references.get("skills") == skill_data
 
 
 def test_get_assessments_negative(clean_firestore):

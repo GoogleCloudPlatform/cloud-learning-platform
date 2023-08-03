@@ -87,7 +87,7 @@ def link_content_and_create_version(parent_uuid, resource_path, resource_type):
 
 
 def lazy_sync(content_version_uuid, linked_version_uuid):
-  """Lazy-sync of content version with linked version"""
+  """Function to sync data on firestore"""
   current_content_data = LearningResource.find_by_uuid(content_version_uuid)
   linked_content_data = LearningResource.find_by_uuid(linked_version_uuid)
   linked_content_dict = linked_content_data.get_fields()
@@ -102,7 +102,7 @@ def lazy_sync(content_version_uuid, linked_version_uuid):
 
 def update_hierarchy_references(existing_document_dict, input_document_dict,
                                 collection):
-  """Update the hierarchy references for the given document"""
+  """Function to update references while ingestion of learning hierarchy"""
   ParentChildNodesHandler.update_child_references(existing_document_dict,
                                                   collection, "remove")
   ParentChildNodesHandler.update_child_references(input_document_dict,
@@ -117,7 +117,9 @@ def update_hierarchy_references(existing_document_dict, input_document_dict,
 
 
 def unpublish_other_versions(content_version_uuid):
-  """Unpublish other versions"""
+  """Function to unpublish all versions of the given
+  content_version_uuid except the ID itself"""
+
   content_dict = LearningResource.find_by_uuid(content_version_uuid)
   root_version_uuid = content_dict.root_version_uuid
 
@@ -360,7 +362,7 @@ def get_content_versions(lr_uuid, status, skip, limit):
     raise InternalServerException(str(e)) from e
 
 def update_lr_resource_path(le_uuid,new_file_paths):
-  """Update the learning resource path"""
+  """Function to update the learning resource path"""
   new_file_name_list = [ path.split("/")[-1] for path in new_file_paths]
   lr_list = get_all_lr_for_le(le_uuid)
 

@@ -4,22 +4,24 @@ Pydantic Model for Bulk Upload Pathway API's
 from __future__ import annotations
 from typing import List, Optional
 from pydantic import BaseModel
-from config import (CP_TYPES, LE_TYPES, LO_TYPES,
-                    ASSESSMENT_TYPES, LR_TYPES,
-                    CP_ALIASES, LE_ALIASES, LO_ALIASES,
-                    ASSESSMENT_ALIASES, LR_ALIASES,
-                    ALLOWED_THEMES, ALLOWED_RESOURCE_STATUS)
+from config import (CP_TYPES, LE_TYPES, LO_TYPES, ASSESSMENT_TYPES, LR_TYPES,
+                    CP_ALIASES, LE_ALIASES, LO_ALIASES, ASSESSMENT_ALIASES,
+                    LR_ALIASES, ALLOWED_THEMES, ALLOWED_RESOURCE_STATUS)
 from typing_extensions import Literal
+
 SOURCE = Literal["learnosity"]
+
 
 class DesignConfig(BaseModel):
   """DesignConfig Pydantic Model"""
   theme: Optional[ALLOWED_THEMES] = ""
   illustration: Optional[str] = ""
 
+
 class MetaData(BaseModel):
   """Metadata Pydantic Model"""
   design_config: Optional[DesignConfig] = {}
+
 
 class AssessmentReference(BaseModel):
   activity_template_id: Optional[str] = ""
@@ -40,6 +42,11 @@ class SkillParentNodes(BaseModel):
   competencies: Optional[list] = []
 
 
+class SkillChildNodes(BaseModel):
+  """Child Nodes Pydantic Model"""
+  skills: Optional[list] = []
+
+
 class SkillModel(BaseModel):
   """Skill Skeleton Pydantic Model"""
   name: str
@@ -54,6 +61,7 @@ class SkillModel(BaseModel):
   onet_job: Optional[str] = ""
   type: Optional[dict] = {}
   parent_nodes: Optional[SkillParentNodes] = {}
+  child_nodes: Optional[SkillChildNodes] = {}
   reference_id: Optional[str] = ""
   source_uri: Optional[str] = ""
   source_name: Optional[str] = ""
@@ -111,7 +119,7 @@ class AssessmentModel(BaseModel):
   assessor_id: Optional[str] = ""
   assessment_reference: Optional[AssessmentReference] = {}
   max_attempts: Optional[int]
-  pass_threshold: Optional[float] = 0.7
+  pass_threshold: Optional[float] = 0
   is_optional: Optional[bool] = False
   is_locked: Optional[bool] = False
   is_hidden: Optional[bool] = False
@@ -139,14 +147,9 @@ class LearningResourceChildNodes(BaseModel):
   concepts: Optional[list] = []
 
 
-class LearningResourceParentNodes(BaseModel):
-  """Learning Resource Parent Nodes Pydantic Model"""
-  learning_objects: Optional[List[LearningObjectModel]] = []
-
-
 class LearningResourceModel(BaseModel):
   """Learning Resource Pydantic Model"""
-  name: Optional[str]
+  name: str
   display_name: Optional[str]
   description: Optional[str] = ""
   type: Optional[LR_TYPES] = ""
@@ -161,13 +164,14 @@ class LearningResourceModel(BaseModel):
   achievements: Optional[list] = []
   completion_criteria: Optional[LOSNodes] = {}
   child_nodes: Optional[LearningResourceChildNodes] = {}
-  parent_nodes: Optional[LearningResourceParentNodes] = {}
+  parent_nodes: Optional[dict] = {}
   status: Optional[ALLOWED_RESOURCE_STATUS] = "initial"
   current_content_version: Optional[str] = ""
   metadata: Optional[MetaData]
   alias: Optional[LR_ALIASES]
   order: Optional[int] = 1
   duration: Optional[int] = 15
+
 
 class LearningObjectChildNodes(BaseModel):
   """Learning Object Child Nodes Pydantic Model"""
@@ -176,14 +180,9 @@ class LearningObjectChildNodes(BaseModel):
   assessments: Optional[List[AssessmentModel]] = []
 
 
-class LearningObjectParentNodes(BaseModel):
-  """Learning Object Parent Nodes Pydantic Model"""
-  learning_experiences: Optional[List[LearningExperienceModel]] = []
-
-
 class LearningObjectModel(BaseModel):
   """Learning Object Pydantic Model"""
-  name: Optional[str]
+  name: str
   display_name: Optional[str]
   description: Optional[str] = ""
   author: Optional[str] = ""
@@ -195,7 +194,7 @@ class LearningObjectModel(BaseModel):
   achievements: Optional[list] = []
   completion_criteria: Optional[LOSNodes] = {}
   child_nodes: Optional[LearningObjectChildNodes] = {}
-  parent_nodes: Optional[LearningObjectParentNodes] = {}
+  parent_nodes: Optional[dict] = {}
   metadata: Optional[MetaData]
   alias: Optional[LO_ALIASES]
   order: Optional[int] = 1
@@ -210,15 +209,9 @@ class LearningExperienceChildNodes(BaseModel):
   assessments: Optional[List[AssessmentModel]] = []
 
 
-class LearningExperienceParentNodes(BaseModel):
-  """Learning Experience Parent Nodes Pydantic Model"""
-  learning_opportunities: Optional[list] = []
-  curriculum_pathways: Optional[List[UploadPathwayModel]] = []
-
-
 class LearningExperienceModel(BaseModel):
   """Learning Experience Pydantic Model"""
-  name: Optional[str]
+  name: str
   display_name: Optional[str]
   description: Optional[str] = ""
   author: Optional[str] = ""
@@ -230,7 +223,7 @@ class LearningExperienceModel(BaseModel):
   achievements: Optional[list] = []
   completion_criteria: Optional[LOSNodes] = {}
   child_nodes: Optional[LearningExperienceChildNodes] = {}
-  parent_nodes: Optional[LearningExperienceParentNodes] = {}
+  parent_nodes: Optional[dict] = {}
   metadata: Optional[MetaData]
   alias: Optional[LE_ALIASES]
   type: Optional[LE_TYPES]
@@ -246,15 +239,9 @@ class ChildNodes(BaseModel):
   curriculum_pathways: Optional[List[UploadPathwayModel]] = []
 
 
-class ParentNodes(BaseModel):
-  """Parent Nodes Pydantic Model"""
-  learning_opportunities: Optional[list] = []
-  curriculum_pathways: Optional[UploadPathwayModel] = []
-
-
 class UploadPathwayModel(BaseModel):
   """UploadPathwayModel Pydantic Model"""
-  name: Optional[str]
+  name: str
   display_name: Optional[str] = ""
   description: Optional[str] = ""
   author: Optional[str] = ""
@@ -265,7 +252,7 @@ class UploadPathwayModel(BaseModel):
   is_hidden: Optional[bool] = False
   references: Optional[Reference]
   child_nodes: Optional[ChildNodes] = {}
-  parent_nodes: Optional[ParentNodes] = {}
+  parent_nodes: Optional[dict] = {}
   metadata: Optional[MetaData]
   achievements: Optional[list] = []
   completion_criteria: Optional[LOSNodes] = {}
@@ -293,9 +280,5 @@ class PathwayImportJsonResponse(BaseModel):
     }
 
 
-LearningExperienceParentNodes.update_forward_refs()
 ChildNodes.update_forward_refs()
-ParentNodes.update_forward_refs()
 LearningObjectChildNodes.update_forward_refs()
-LearningResourceParentNodes.update_forward_refs()
-LearningObjectParentNodes.update_forward_refs()

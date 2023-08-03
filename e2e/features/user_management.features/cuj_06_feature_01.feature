@@ -115,3 +115,13 @@ Feature: CRUD for managing permissions in user management
     Given Retrieve all unique applications, modules, actions and user groups
        When API request is sent to fetch unique records
           Then Object will be returned with unique values
+
+  Scenario: Retrieve permissions within User management by providing sort by and sort order params
+    Given A user has access to user management and needs to fetch permissions using sort by and sort order params
+      When API request is sent to fetch permissions by providing sort by and sort order params
+        Then API will return list of permissions sorted by provided sort by and sort order params
+
+  Scenario: Retrieve permissions within User management by providing user groups as sort by param
+    Given A user has access to user management and needs to fetch permissions using user groups as sort by param
+      When API request is sent to fetch permissions by providing sort by as user group param
+        Then API will return list of permissions sorted by provided user group as sort by param

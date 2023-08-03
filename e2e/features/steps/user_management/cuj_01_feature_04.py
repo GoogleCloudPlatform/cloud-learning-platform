@@ -245,3 +245,93 @@ def step_impl_3(context):
   assert get_group_res.status_code == 200
   get_group_res_dict = get_group_res.json()["data"]
   assert not context.user_id in get_group_res_dict.get("users", [])
+
+'''
+Scenario : Get user groups of a user
+'''
+@behave.given(
+    "A user is part of multiple usergroups"
+)
+def step_impl_1(context):
+  #create group
+  immutable_group_dict = {**TEST_USER_GROUP, "name": "learner"}
+  immutable_group = post_method(url=f"{UM_API_URL}/user-group/immutable", request_body=immutable_group_dict)
+  immutable_group_data = immutable_group.json()
+  assert immutable_group.status_code in [200, 409]
+  if immutable_group.status_code == 200:
+    context.immutable_group_uuid = immutable_group_data["data"]["uuid"]
+  if immutable_group.status_code == 409:
+    user_group = UserGroup.find_by_name(immutable_group_dict["name"])
+    user_group.is_immutable = True
+    user_group.update()
+    context.immutable_group_uuid = user_group.id
+
+  mutable_group_dict = {**TEST_USER_GROUP, "name": f"{uuid4()}"}
+  mutable_group_res = post_method(url=f"{UM_API_URL}/user-group", request_body=mutable_group_dict)
+  mutable_res_data = mutable_group_res.json() 
+  context.mutable_group_uuid = mutable_res_data["data"]["uuid"] 
+
+  user_dict = deepcopy({
+      **TEST_USER, "user_groups": [context.immutable_group_uuid]
+  })
+  user_dict["email"] = f"{uuid4()}@gmail.com"
+
+  post_user_res = post_method(
+      url=f"{UM_API_URL}/user", request_body=user_dict)
+  assert post_user_res.status_code == 200
+  post_user_res_dict = post_user_res.json()["data"]
+  context.user_id = post_user_res_dict.get("user_id", "")
+
+  add_user_to_mutable_group = post_method(
+      url=f"{UM_API_URL}/user-group/{context.mutable_group_uuid}/users/add", 
+      request_body={"user_ids": [context.user_id]})
+  assert add_user_to_mutable_group.status_code == 200
+
+  context.url = f"{UM_API_URL}/user/{context.user_id}/user-groups"
+
+
+@behave.when("A API request is sent to user management to get usergroups of the user")
+def step_impl_2(context):
+
+  context.immutable_user_groups_of_user = get_method(
+      url=context.url, query_params={"immutable": True})
+  context.mutable_user_groups_of_user = get_method(
+      url=context.url, query_params={"immutable": False})
+  context.all_user_groups_of_user = get_method(
+      url=context.url)
+
+
+@behave.then("the user management will return usergroups of user based on queryparams")
+def step_impl_3(context):
+  assert context.immutable_user_groups_of_user.status_code == 200
+  context.immutable_user_groups_of_user = context.immutable_user_groups_of_user.json()
+  assert context.immutable_group_uuid in [
+    i.get("uuid")
+    for i in context.immutable_user_groups_of_user.get("data")
+  ]
+  assert context.mutable_group_uuid not in [
+    i.get("uuid")
+    for i in context.immutable_user_groups_of_user.get("data")
+  ]
+
+  assert context.mutable_user_groups_of_user.status_code == 200
+  context.mutable_user_groups_of_user = context.mutable_user_groups_of_user.json()
+  assert context.mutable_group_uuid in [
+    i.get("uuid")
+    for i in context.mutable_user_groups_of_user.get("data")
+  ]
+  assert context.immutable_group_uuid not in [
+    i.get("uuid")
+    for i in context.mutable_user_groups_of_user.get("data")
+  ]
+
+  assert context.all_user_groups_of_user.status_code == 200
+  context.all_user_groups_of_user = context.all_user_groups_of_user.json()
+  assert context.mutable_group_uuid in [
+    i.get("uuid")
+    for i in context.all_user_groups_of_user.get("data")
+  ]
+  assert context.immutable_group_uuid in [
+    i.get("uuid")
+    for i in context.all_user_groups_of_user.get("data")
+  ]

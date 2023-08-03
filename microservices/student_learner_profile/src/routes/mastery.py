@@ -19,15 +19,15 @@ def compute_mastery_score(learner_profile_id: str):
   given student learner profile
 
   Args:
-      learner_profile_id: learner profile id for which the score needs to be
-      computed
+      learner_profile_id:
+      learner profile id for which the score needs to be computed
 
   Raises:
       ResourceNotFoundException: If the learner profile id does not exist
       Exception: 500 Internal Server Error if something went wrong
 
   Returns:
-      str: UUID(Unique identifier for learner profile)
+      str: UUID (Unique identifier for learner profile)
   """
   raise APINotImplemented()
 

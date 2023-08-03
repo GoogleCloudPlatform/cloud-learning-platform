@@ -1,14 +1,12 @@
 """
-Pydantic Model for Mastery API's
+Pydantic Model for Mastery APIs
 """
 from typing import List, Optional
 from pydantic import BaseModel
 
 
 class MasteryScores(BaseModel):
-  """
-  Mastery Scores Pydantic Model
-  """
+  """Mastery Scores Pydantic Model"""
   pass
 
   class Config():
@@ -17,9 +15,6 @@ class MasteryScores(BaseModel):
 
 
 class MasteryScoresResponse(BaseModel):
-  """
-  Mastery Scores Response Pydantic Model
-  """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the mastery scores"
   data: Optional[List[MasteryScores]]

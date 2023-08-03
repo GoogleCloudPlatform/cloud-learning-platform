@@ -1,15 +1,18 @@
 """
   Unit tests for Achievement endpoints
 """
-import os
-import json
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
+import os
+import json
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
 from routes.achievement import router
 from testing.test_config import (API_URL, TESTING_FOLDER_PATH)
 from schemas.schema_examples import BASIC_ACHIEVEMENT_EXAMPLE
+
 from common.models import Achievement
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
@@ -44,7 +47,7 @@ def test_post_achievement(clean_firestore):
   del post_json_response["data"]["last_modified_time"]
   uuid = post_json_response.get("data").get("uuid")
 
-  # now see if GET endpoint returns same data
+  # now see if GET endpoint returns the same data
   url = f"{api_url}/{uuid}"
   get_resp = client_with_emulator.get(url)
   get_json_response = json.loads(get_resp.text)
@@ -86,10 +89,10 @@ def test_update_achievement(clean_firestore):
 
   assert json_response_update_req.get("success") is True, "Success not true"
   assert json_response_update_req.get(
-      "message"
+    "message"
   ) == "Successfully updated the achievement", "Expected response not same"
   assert json_response_update_req.get("data").get(
-      "type") == "competency", "Expected response not same"
+    "type") == "competency", "Expected response not same"
 
 
 def test_update_achievement_negative(clean_firestore):
@@ -103,9 +106,9 @@ def test_update_achievement_negative(clean_firestore):
 
   url = f"{api_url}/{achievement_uuid}"
   response = {
-      "success": False,
-      "message": "Achievement with uuid U2DDBkl3Ayg0PWudzhI not found",
-      "data": None
+    "success": False,
+    "message": "Achievement with uuid U2DDBkl3Ayg0PWudzhI not found",
+    "data": None
   }
   resp = client_with_emulator.put(url, json=achievement_dict)
   json_response = resp.json()
@@ -128,11 +131,11 @@ def test_delete_achievement(clean_firestore):
   del_json_response = resp.json()
 
   expected_data = {
-      "success": True,
-      "message": "Successfully deleted the achievement"
+    "success": True,
+    "message": "Successfully deleted the achievement"
   }
   deleted_achievement = Achievement.find_by_uuid(
-      achievement.uuid, is_deleted=True)
+    achievement.uuid, is_deleted=True)
   assert resp.status_code == 200, "Status code not 200"
   assert deleted_achievement.is_deleted is True, "Document was not deleted"
   assert del_json_response == expected_data, "Expected response not same"
@@ -142,9 +145,9 @@ def test_delete_achievement_negative(clean_firestore):
   achievement_uuid = "U2DDBkl3Ayg0PWudzhI"
   url = f"{api_url}/{achievement_uuid}"
   response = {
-      "success": False,
-      "message": "Achievement with uuid U2DDBkl3Ayg0PWudzhI not found",
-      "data": None
+    "success": False,
+    "message": "Achievement with uuid U2DDBkl3Ayg0PWudzhI not found",
+    "data": None
   }
   resp = client_with_emulator.delete(url)
   json_response = resp.json()
@@ -156,10 +159,10 @@ def test_delete_achievement_negative(clean_firestore):
 def test_import_achievements(clean_firestore):
   url = f"{api_url}/import/json"
   with open(
-      ACHIEVEMENT_TESTDATA_FILENAME,
-      encoding="UTF-8") as achievements_json_file:
+    ACHIEVEMENT_TESTDATA_FILENAME,
+    encoding="UTF-8") as achievements_json_file:
     resp = client_with_emulator.post(
-        url, files={"json_file": achievements_json_file})
+      url, files={"json_file": achievements_json_file})
 
   json_response = resp.json()
   assert resp.status_code == 200, "Status not 200"
@@ -168,8 +171,7 @@ def test_import_achievements(clean_firestore):
 
 
 def test_get_achievements(clean_firestore):
-  achievement_dict = {**BASIC_ACHIEVEMENT_EXAMPLE}
-  achievement_dict["type"] = "course equate"
+  achievement_dict = {**BASIC_ACHIEVEMENT_EXAMPLE, "type": "course equate"}
 
   # achievement
   achievement = Achievement.from_dict(achievement_dict)
@@ -203,16 +205,15 @@ def test_get_achievements(clean_firestore):
   retrieved_achievement_ids = [
     i.get("uuid") for i in json_response.get("data")["records"]]
   assert achievement.uuid in \
-    retrieved_achievement_ids, "expected data not retrived"
+         retrieved_achievement_ids, "expected data not retrived"
   assert deleted_achievement.uuid not in \
-    retrieved_achievement_ids, "unexpected data retrived"
+         retrieved_achievement_ids, "unexpected data retrived"
   assert archived_achievement.uuid not in \
-    retrieved_achievement_ids, "is_archived not working"
+         retrieved_achievement_ids, "is_archived not working"
 
 
 def test_get_achievements_with_filters(clean_firestore):
-  achievement_dict = {**BASIC_ACHIEVEMENT_EXAMPLE}
-  achievement_dict["type"] = "course equate"
+  achievement_dict = {**BASIC_ACHIEVEMENT_EXAMPLE, "type": "course equate"}
 
   # achievement
   achievement = Achievement.from_dict(achievement_dict)
@@ -241,7 +242,7 @@ def test_get_achievements_with_filters(clean_firestore):
   retrieved_achievement_ids = [
     i.get("uuid") for i in json_response.get("data")["records"]]
   assert achievement.uuid in \
-    retrieved_achievement_ids, "expected data not retrived"
+         retrieved_achievement_ids, "expected data not retrived"
   assert deleted_achievement.uuid not in \
     retrieved_achievement_ids, "unexpected data retrived"
   for i in json_response.get("data")["records"]:
@@ -259,7 +260,7 @@ def test_get_achievements_with_filters(clean_firestore):
   retrieved_achievement_ids = [
     i.get("uuid") for i in json_response.get("data")["records"]]
   assert achievement.uuid in \
-    retrieved_achievement_ids, "expected data not retrived"
+         retrieved_achievement_ids, "expected data not retrived"
   assert deleted_achievement.uuid not in \
     retrieved_achievement_ids, "unexpected data retrived"
   for i in json_response.get("data")["records"]:
@@ -301,7 +302,7 @@ def test_archive_achievement(clean_firestore):
 
   assert json_response_update_req.get("success") is True, "Success not true"
   assert json_response_update_req.get(
-      "message"
+    "message"
   ) == "Successfully updated the achievement", "Expected response not same"
   assert json_response_update_req.get("data").get(
-      "is_archived") is True, "Expected response not same"
+    "is_archived") is True, "Expected response not same"

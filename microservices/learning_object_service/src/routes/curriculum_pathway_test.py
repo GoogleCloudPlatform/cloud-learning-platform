@@ -451,7 +451,8 @@ def test_get_curriculum_pathways(clean_firestore, create_curriculum_pathway,
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status code not 200"
-  saved_names = [i.get("name") for i in json_response.get("data")]
+  saved_names = [i.get("name") for i in json_response.get(
+    "data")["records"]]
   assert curriculum_pathway.name in saved_names, "all data not retrived"
   assert archived_curriculum_pathway.name in saved_names, (
       "all data not retrived")
@@ -462,7 +463,8 @@ def test_get_curriculum_pathways(clean_firestore, create_curriculum_pathway,
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status code not 200"
-  saved_uuids = [i.get("uuid") for i in json_response.get("data")]
+  saved_uuids = [i.get("uuid") for i in json_response.get(
+    "data")["records"]]
   assert archived_curriculum_pathway.uuid in saved_uuids
 
   # Test archival functionality: Fetch all non archived objects
@@ -471,7 +473,8 @@ def test_get_curriculum_pathways(clean_firestore, create_curriculum_pathway,
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status code not 200"
-  saved_uuids = [i.get("uuid") for i in json_response.get("data")]
+  saved_uuids = [i.get("uuid") for i in json_response.get(
+    "data")["records"]]
   assert curriculum_pathway.uuid in saved_uuids
 
   # test get curriculum pathways with filters
@@ -480,9 +483,49 @@ def test_get_curriculum_pathways(clean_firestore, create_curriculum_pathway,
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status code not 200"
-  saved_names = [i.get("author") for i in json_response.get("data")]
+  saved_names = [i.get("author") for i in json_response.get(
+    "data")["records"]]
   assert len(list(set(saved_names))) == 1, "Unnecessary data retrieved"
   assert list(set(saved_names))[0] == params["author"], "Wrong data retrieved"
+
+  # test get curriculum pathways with child node filters
+  child_learning_experience = create_learning_experience
+  curriculum_pathway.child_nodes = {
+    "learning_experiences": [child_learning_experience.uuid]}
+  curriculum_pathway.update()
+
+  params = {
+      "skip": 0,
+      "limit": "10",
+      "learning_experience": child_learning_experience.uuid
+  }
+  url = f"{api_url}s"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+  assert resp.status_code == 200, "Status code not 200"
+  saved_les = [i.get("child_nodes") for i in json_response.get(
+    "data")["records"]]
+  assert params["learning_experience"] in saved_les[0][
+      "learning_experiences"], "Wrong parent_curriculum_pathway retrieved"
+
+  # Test to get child curriculum pathway
+  child_curriculum_pathway = create_curriculum_pathway
+  curriculum_pathway.child_nodes = {
+    "curriculum_pathways": [child_curriculum_pathway.uuid]}
+  curriculum_pathway.update()
+  params = {
+      "skip": 0,
+      "limit": "10",
+      "child_curriculum_pathway": child_curriculum_pathway.uuid
+  }
+  url = f"{api_url}s"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+  assert resp.status_code == 200, "Status code not 200"
+  saved_les = [i.get("child_nodes") for i in json_response.get(
+    "data")["records"]]
+  assert params["child_curriculum_pathway"] in saved_les[0][
+      "curriculum_pathways"], "Wrong child_curriculum_pathway retrieved"
 
 
 @pytest.mark.parametrize(
@@ -536,7 +579,8 @@ def test_get_pathway_tree(clean_firestore):
   assert resp_json["data"] is not None, "Data is not returned"
 
 
-def test_fetch_all_nodes_for_alias(clean_firestore):
+def fetch_child_nodes_with_filters(clean_firestore):
+  """Test for pathway filters"""
   curriculum_pathway_dict = copy.deepcopy(BASIC_CURRICULUM_PATHWAY_EXAMPLE)
   curriculum_pathway_dict["name"] = "Pathway - Program"
   curriculum_pathway_dict["alias"] = "program"
@@ -580,7 +624,8 @@ def test_fetch_all_nodes_for_alias(clean_firestore):
   curriculum_pathway_discipline.child_nodes = {}
   curriculum_pathway_discipline.update()
 
-  url = f"{api_url}/{curriculum_pathway_program.uuid}/nodes"
+  url = f"{api_url}s/{curriculum_pathway_program.uuid}" + \
+            "/nodes/curriculum-pathways?alias=discipline"
   resp = client_with_emulator.get(url)
   resp_json = resp.json()
   assert resp.status_code == 200

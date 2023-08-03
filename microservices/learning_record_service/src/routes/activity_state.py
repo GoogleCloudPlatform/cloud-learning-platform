@@ -21,7 +21,6 @@ router = APIRouter(
     tags=["Activity State"],
     responses=ERROR_RESPONSES)
 
-
 @router.get(
     "/activity-states",
     response_model=AllActivityStateResponseModel,
@@ -45,10 +44,12 @@ def get_all_activity_states(skip: int = Query(0, ge=0, le=2000),
     activity_states = [
         i.get_fields(reformat_datetime=True) for i in activity_states
     ]
+    count = 10000
+    response = {"records": activity_states, "total_count": count}
     return {
         "success": True,
         "message": "Successfully fetched the activity states",
-        "data": activity_states
+        "data": response
     }
   except ValidationError as e:
     raise BadRequest(str(e), data=e.data) from e

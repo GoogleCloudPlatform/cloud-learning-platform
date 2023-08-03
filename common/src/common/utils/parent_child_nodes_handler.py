@@ -120,6 +120,12 @@ class ParentChildNodesHandler():
             child_document_fields["recent_child_node"] = {}
           del child_document_fields["child_nodes"]
           document_id_list[list_index] = child_document_fields
+        elif (coll_name=="learning_objects" and
+        collection_name=="assessments"
+        and not child_document_fields.get("is_autogradable")):
+          child_document_fields = \
+          cls.load_child_nodes_data(child_document_fields)
+          document_id_list[list_index] = child_document_fields
         else:
           document_id_list[list_index] = child_document_fields
       all_child_nodes[collection_name] = cls.sort_nodes_by_recent_activity(
@@ -358,9 +364,15 @@ class ParentChildNodesHandler():
 
           if operation == "add":
             if doc_dict.get(
-                "uuid") not in child_document.parent_nodes[collection_name]:
-              child_document.parent_nodes[collection_name].append(
+                "uuid") not in child_document.parent_nodes.get(
+              collection_name,[]):
+              if isinstance(child_document.parent_nodes.get(
+                collection_name),list):
+                child_document.parent_nodes[collection_name].append(
                   doc_dict.get("uuid"))
+              else:
+                child_document.parent_nodes[collection_name] = \
+                  [doc_dict.get("uuid")]
           if operation == "remove":
             if base_doc_dict.get(
                 "uuid") in child_document.parent_nodes[collection_name]:
@@ -509,7 +521,11 @@ class ParentChildNodesHandler():
           collection_type, {}).get(doc_id,
                                    {}).get("is_optional",
                                            node_dict.get("is_optional"))
-
+      instruction_completed = learner_profile.progress.get(
+          collection_type, {}).get(doc_id,
+                                   {}).get("instruction_completed",
+                                           node_dict.get(
+                                          "instruction_completed"))
       progress_parent = learner_profile.progress.get(
         collection_type, {}).get(doc_id, {}).get("parent_node", "")
       if not progress_parent:
@@ -542,6 +558,7 @@ class ParentChildNodesHandler():
         node_dict["is_hidden"] = is_hidden
         node_dict["is_locked"] = is_locked
         node_dict["is_optional"] = is_optional
+        node_dict["instruction_completed"] = instruction_completed
         if collection_type == "assessments":
           node_dict["num_attempts"] = learner_profile.progress.get(
         collection_type, {}).get(doc_id, {}).get("num_attempts", 0)
@@ -572,6 +589,29 @@ class ParentChildNodesHandler():
       for achievement in achievement_intersection:
         node_dict["earned_achievements"].append(
             cls.get_document_from_collection("achievements", achievement))
+    # Logic block to ungate assessments of type project
+    # This is used to show the Mark as Complete button on the Intro LR of
+    # the project module
+    if learner_profile is not None and \
+      node_dict["type"] == "project" and collection_type == "assessments":
+      prereqs = node_dict.get("prerequisites", {})
+      if prereqs:
+        for k, v in prereqs.items():
+          if k != "learning_resources":
+            for id_ in v:
+              if learner_profile.progress and \
+                isinstance(learner_profile.progress, dict) and \
+                learner_profile.progress.get(k, {}).get(id_, {}).get("status") \
+                  == "completed" or \
+                learner_profile.progress.get(k, {}).get(id_, {}).get("ungate") \
+                  or (not learner_profile.progress.get(k, {}).get(id_, {}).get(
+                "is_locked") and learner_profile.progress.get(k, {}).get(
+                id_, {}).get("is_hidden")):
+                node_dict["ungate"] = True
+              else:
+                node_dict["ungate"] = False
+                break
+
     return node_dict
 
   @classmethod

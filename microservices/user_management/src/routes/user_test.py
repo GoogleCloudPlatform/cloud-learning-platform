@@ -16,10 +16,11 @@ with mock.patch(
   from routes.user import router
 from testing.test_config import (API_URL, TESTING_FOLDER_PATH)
 from schemas.schema_examples import (BASIC_GROUP_MODEL_EXAMPLE,
-                                     BASIC_USER_MODEL_EXAMPLE,
-                                     BASIC_APPLICATION_MODEL_EXAMPLE)
+                                    BASIC_USER_MODEL_EXAMPLE,
+                                    BASIC_APPLICATION_MODEL_EXAMPLE,
+                                    BASIC_LEARNER_EXAMPLE)
 from common.utils.errors import ResourceNotFoundException
-from common.models import User, UserGroup, Application, Staff
+from common.models import User, UserGroup, Application, Staff, Learner
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
 from common.utils.http_exceptions import add_exception_handlers
@@ -48,14 +49,28 @@ class Request:
 
 
 def test_get_user(clean_firestore):
-  user_dict = {**BASIC_USER_MODEL_EXAMPLE}
+
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "inspace_user":
+              {"is_inspace_user": False, "inspace_user_id": ""}}
   user_dict["user_type_ref"] = ""
   user_dict["user_groups"] = []
   user = User.from_dict(user_dict)
   user.user_id = ""
   user.save()
+
+  learner_dict = BASIC_LEARNER_EXAMPLE
+  learner = Learner.from_dict(learner_dict)
+  learner.uuid = ""
+  learner.save()
+  learner.uuid = learner.id
+  learner.update()
+  learner_dict["uuid"] = learner.id
+  learner_dict["is_archived"] = False
+
   user.user_id = user.id
+  user.user_type_ref = learner_dict["uuid"]
   user.update()
+  user_dict["user_type_ref"] = user.user_type_ref
   user_dict["user_id"] = user.id
 
   url = f"{api_url}/{user.user_id}"
@@ -64,6 +79,8 @@ def test_get_user(clean_firestore):
   del json_response["data"]["created_time"]
   del json_response["data"]["last_modified_time"]
   assert resp.status_code == 200, "Status 200"
+  print(json_response.get("data"))
+  print(user_dict)
   assert json_response.get("data") == user_dict, "Response received"
 
 
@@ -90,7 +107,18 @@ def test_get_all_users(clean_firestore):
   user = User.from_dict(user_dict)
   user.user_id = ""
   user.save()
+
+  learner_dict = BASIC_LEARNER_EXAMPLE
+  learner = Learner.from_dict(learner_dict)
+  learner.uuid = ""
+  learner.save()
+  learner.uuid = learner.id
+  learner.update()
+  learner_dict["uuid"] = learner.id
+  learner_dict["is_archived"] = False
+
   user.user_id = user.id
+  user.user_type_ref = learner_dict["uuid"]
   user.update()
 
   params = {"skip": 0, "limit": "30"}
@@ -182,7 +210,18 @@ def test_get_all_users_with_filter(clean_firestore):
   user = User.from_dict(user_dict)
   user.user_id = ""
   user.save()
+
+  learner_dict = BASIC_LEARNER_EXAMPLE
+  learner = Learner.from_dict(learner_dict)
+  learner.uuid = ""
+  learner.save()
+  learner.uuid = learner.id
+  learner.update()
+  learner_dict["uuid"] = learner.id
+  learner_dict["is_archived"] = False
+
   user.user_id = user.id
+  user.user_type_ref = learner_dict["uuid"]
   user.update()
 
   user_type = user.user_type
@@ -208,7 +247,6 @@ def test_get_all_users_by_user_group(clean_firestore):
   group1 = UserGroup.from_dict(group_dict)
   group1.uuid = ""
   group1.save()
-  group1.uuid = group1.id
   group1.update()
 
   group_dict = {**BASIC_GROUP_MODEL_EXAMPLE, "name": "coach",
@@ -240,6 +278,17 @@ def test_get_all_users_by_user_group(clean_firestore):
     create_user.user_id = create_user.id
     if ref_grp in user.get("user_groups"):
       ref_user_id = create_user.user_id
+
+    learner_dict = BASIC_LEARNER_EXAMPLE
+    learner = Learner.from_dict(learner_dict)
+    learner.uuid = ""
+    learner.save()
+    learner.uuid = learner.id
+    learner.update()
+    learner_dict["uuid"] = learner.id
+    learner_dict["is_archived"] = False
+
+    create_user.user_type_ref = learner_dict["uuid"]
     create_user.update()
 
   url = f"{api_url}s"
@@ -273,6 +322,17 @@ def test_get_all_users_by_status(clean_firestore):
     create_user.user_id = create_user.id
     if create_user.status == "active":
       ref_user_id = create_user.user_id
+
+    learner_dict = BASIC_LEARNER_EXAMPLE
+    learner = Learner.from_dict(learner_dict)
+    learner.uuid = ""
+    learner.save()
+    learner.uuid = learner.id
+    learner.update()
+    learner_dict["uuid"] = learner.id
+    learner_dict["is_archived"] = False
+
+    create_user.user_type_ref = learner_dict["uuid"]
     create_user.update()
 
   url = f"{api_url}s"
@@ -299,7 +359,6 @@ def test_get_all_users_by_status(clean_firestore):
 def test_post_user(mock_learner, mock_learner_profile, mock_agent,
                    mock_inspace_api, clean_firestore):
   input_user = deepcopy(BASIC_USER_MODEL_EXAMPLE)
-  del input_user["inspace_user"]
   del input_user["is_deleted"]
   input_user["user_groups"] = []
   url = api_url
@@ -353,7 +412,6 @@ def test_post_user_and_inspace_user(mock_learner, mock_learner_profile,
                                     mock_agent, mock_inspace_user,
                                     mock_inspace_api, clean_firestore):
   input_user = deepcopy(BASIC_USER_MODEL_EXAMPLE)
-  del input_user["inspace_user"]
   del input_user["is_deleted"]
   input_user["user_groups"] = []
   url = api_url
@@ -376,7 +434,6 @@ def test_post_user_and_inspace_user_negative(mock_learner,
                                              mock_inspace_user,
                                              mock_inspace_api, clean_firestore):
   input_user = deepcopy(BASIC_USER_MODEL_EXAMPLE)
-  del input_user["inspace_user"]
   del input_user["is_deleted"]
   input_user["user_groups"] = []
   url = api_url
@@ -396,7 +453,6 @@ def test_post_user_and_inspace_user_negative(mock_learner,
 def test_post_user_faculty(mock_learner, mock_learner_profile, mock_agent,
                            mock_inspace_api, clean_firestore):
   input_user = deepcopy(BASIC_USER_MODEL_EXAMPLE)
-  del input_user["inspace_user"]
   del input_user["is_deleted"]
   input_user["user_groups"] = []
   input_user["user_type"] = "coach"
@@ -454,7 +510,6 @@ def test_post_user_correct_first_name(mock_learner, mock_learner_profile,
                                       clean_firestore):
   input_user = deepcopy(BASIC_USER_MODEL_EXAMPLE)
   input_user["user_groups"] = []
-  del input_user["inspace_user"]
   del input_user["is_deleted"]
   input_user["first_name"] = "Test@Userした"
   url = api_url
@@ -522,7 +577,6 @@ def test_post_user_with_group(mock_learner, mock_learner_profile, mock_agent,
     **BASIC_USER_MODEL_EXAMPLE,
     "user_groups": [group_uuid]
   }
-  del input_user["inspace_user"]
   del input_user["is_deleted"]
   url = api_url
   post_resp = client_with_emulator.post(url, json=input_user)
@@ -584,6 +638,18 @@ def test_update_groups_for_user(mock_get_agent, mock_update_agent,
   user.user_id = ""
   user.save()
   user.user_id = user.id
+
+  learner_dict = BASIC_LEARNER_EXAMPLE
+  learner = Learner.from_dict(learner_dict)
+  learner.uuid = ""
+  learner.save()
+  learner.uuid = learner.id
+  learner.update()
+  learner_dict["uuid"] = learner.id
+  learner_dict["is_archived"] = False
+
+  user.user_id = user.id
+  user.user_type_ref = learner_dict["uuid"]
   user.update()
   user_user_id = user.id
 
@@ -624,7 +690,18 @@ def test_update_user(mock_get_agent, mock_update_agent, mock_update_learner,
   user = User.from_dict(user_dict)
   user.user_id = ""
   user.save()
+
+  learner_dict = BASIC_LEARNER_EXAMPLE
+  learner = Learner.from_dict(learner_dict)
+  learner.uuid = ""
+  learner.save()
+  learner.uuid = learner.id
+  learner.update()
+  learner_dict["uuid"] = learner.id
+  learner_dict["is_archived"] = False
+
   user.user_id = user.id
+  user.user_type_ref = learner_dict["uuid"]
   user.update()
   user_user_id = user.id
 
@@ -652,7 +729,6 @@ def test_update_user_staff(mock_create_learner, mock_create_learner_profile,
                            mock_update_learner, mock_inspace_api,
                            clean_firestore):
   user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_groups": []}
-  del user_dict["inspace_user"]
   del user_dict["is_deleted"]
   user_dict["user_type"] = "coach"
   post_resp = client_with_emulator.post(api_url, json=user_dict)
@@ -734,7 +810,6 @@ def test_delete_user_faculty(mock_learner, mock_learner_profile, mock_agent,
                              mock_del_agent, mock_get_agent,
                              mock_inspace_api, clean_firestore):
   user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_groups": []}
-  del user_dict["inspace_user"]
   del user_dict["is_deleted"]
   user_dict["user_type"] = "coach"
   post_resp = client_with_emulator.post(api_url, json=user_dict)
@@ -779,7 +854,18 @@ def test_search_user_by_email(clean_firestore):
   user = User.from_dict(user_dict)
   user.user_id = ""
   user.save()
+
+  learner_dict = BASIC_LEARNER_EXAMPLE
+  learner = Learner.from_dict(learner_dict)
+  learner.uuid = ""
+  learner.save()
+  learner.uuid = learner.id
+  learner.update()
+  learner_dict["uuid"] = learner.id
+  learner_dict["is_archived"] = False
+
   user.user_id = user.id
+  user.user_type_ref = learner_dict["uuid"]
   user.update()
   user_dict["user_id"] = user.id
 
@@ -813,17 +899,20 @@ def test_update_user_status_to_inactive(clean_firestore):
   user = User.from_dict(user_dict)
   user.user_id = ""
   user.save()
+
+  learner_dict = BASIC_LEARNER_EXAMPLE
+  learner = Learner.from_dict(learner_dict)
+  learner.uuid = ""
+  learner.save()
+  learner.uuid = learner.id
+  learner.update()
+  learner_dict["uuid"] = learner.id
+  learner_dict["is_archived"] = False
+
   user.user_id = user.id
+  user.user_type_ref = learner_dict["uuid"]
   user.update()
   user_user_id = user.id
-
-  group_dict = {**BASIC_GROUP_MODEL_EXAMPLE, "users": [user_user_id]}
-  group = UserGroup.from_dict(group_dict)
-  group.uuid = ""
-  group.save()
-  group.uuid = "test_group_id"
-  group.update()
-  group_dict["uuid"] = "test_group_id"
 
   url = f"{api_url}/{user_user_id}/status"
   updated_data = {"status": "inactive"}
@@ -847,7 +936,18 @@ def test_update_user_status_to_active(clean_firestore):
   user = User.from_dict(user_dict)
   user.user_id = ""
   user.save()
+
+  learner_dict = BASIC_LEARNER_EXAMPLE
+  learner = Learner.from_dict(learner_dict)
+  learner.uuid = ""
+  learner.save()
+  learner.uuid = learner.id
+  learner.update()
+  learner_dict["uuid"] = learner.id
+  learner_dict["is_archived"] = False
+
   user.user_id = user.id
+  user.user_type_ref = learner_dict["uuid"]
   user.update()
   user_user_id = user.id
 
@@ -870,8 +970,20 @@ def test_search_users(clean_firestore):
   user = User.from_dict(user_dict)
   user.user_id = ""
   user.save()
+
+  learner_dict = BASIC_LEARNER_EXAMPLE
+  learner = Learner.from_dict(learner_dict)
+  learner.uuid = ""
+  learner.save()
+  learner.uuid = learner.id
+  learner.update()
+  learner_dict["uuid"] = learner.id
+  learner_dict["is_archived"] = False
+
   user.user_id = user.id
+  user.user_type_ref = learner_dict["uuid"]
   user.update()
+
 
   filter_key = user.first_name
   url = f"{api_url}/search"
@@ -906,7 +1018,7 @@ def test_search_users_negative(clean_firestore):
 
 def test_get_user_applications(clean_firestore):
   user_dict = {
-    **BASIC_USER_MODEL_EXAMPLE, "status": "inactive",
+    **BASIC_USER_MODEL_EXAMPLE, "status": "active",
     "user_groups": []
   }
   user = User.from_dict(user_dict)
@@ -950,6 +1062,157 @@ def test_get_user_applications(clean_firestore):
     for i in applications_res.get("data")["applications"]
   ]
 
+def test_get_immutable_user_groups_of_user(clean_firestore):
+  user_dict = {
+    **BASIC_USER_MODEL_EXAMPLE, "status": "active",
+    "user_groups": []
+  }
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+  user_user_id = user.id
+
+  immutable_group_dict = {
+    **BASIC_GROUP_MODEL_EXAMPLE, "users": [user.id],
+    "applications": [], "is_immutable": True
+  }
+  immutable_group = UserGroup.from_dict(immutable_group_dict)
+  immutable_group.uuid = ""
+  immutable_group.save()
+  immutable_group.uuid = immutable_group.id
+  immutable_group.update()
+
+  mutable_group_dict = {
+    **BASIC_GROUP_MODEL_EXAMPLE, "users": [user.id],
+    "applications": [], "is_immutable": False
+  }
+  mutable_group = UserGroup.from_dict(mutable_group_dict)
+  mutable_group.uuid = ""
+  mutable_group.save()
+  mutable_group.uuid = mutable_group.id
+  mutable_group.update()
+
+  user.user_groups = [mutable_group.id,immutable_group.id]
+  user.update()
+
+  query_params = {
+    "immutable": True
+  }
+  url = f"{api_url}/{user_user_id}/user-groups"
+  resp = client_with_emulator.get(url, params=query_params)
+  user_groups_res = resp.json()
+
+  assert user_groups_res.get("success") is True, "Success not true"
+  assert user_groups_res.get(
+    "message") == "Successfully fetched user groups of the user", \
+    "Expected response not same"
+  assert immutable_group.id in [
+    i.get("uuid")
+    for i in user_groups_res.get("data")
+  ]
+
+def test_get_all_user_groups_of_user(clean_firestore):
+  user_dict = {
+    **BASIC_USER_MODEL_EXAMPLE, "status": "active",
+    "user_groups": []
+  }
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+  user_user_id = user.id
+
+  immutable_group_dict = {
+    **BASIC_GROUP_MODEL_EXAMPLE, "users": [user.id],
+    "applications": [], "is_immutable": True
+  }
+  immutable_group = UserGroup.from_dict(immutable_group_dict)
+  immutable_group.uuid = ""
+  immutable_group.save()
+  immutable_group.uuid = immutable_group.id
+  immutable_group.update()
+
+  mutable_group_dict = {
+    **BASIC_GROUP_MODEL_EXAMPLE, "users": [user.id],
+    "applications": [], "is_immutable": False
+  }
+  mutable_group = UserGroup.from_dict(mutable_group_dict)
+  mutable_group.uuid = ""
+  mutable_group.save()
+  mutable_group.uuid = mutable_group.id
+  mutable_group.update()
+
+  user.user_groups = [mutable_group.id,immutable_group.id]
+  user.update()
+
+  url = f"{api_url}/{user_user_id}/user-groups"
+  resp = client_with_emulator.get(url)
+  user_groups_res = resp.json()
+
+  assert user_groups_res.get("success") is True, "Success not true"
+  assert user_groups_res.get(
+    "message") == "Successfully fetched user groups of the user", \
+    "Expected response not same"
+  assert [mutable_group.id,immutable_group.id] == [
+    i.get("uuid")
+    for i in user_groups_res.get("data")
+  ]
+
+def test_get_mutable_user_groups_of_user(clean_firestore):
+  user_dict = {
+    **BASIC_USER_MODEL_EXAMPLE, "status": "active",
+    "user_groups": []
+  }
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+  user_user_id = user.id
+
+  immutable_group_dict = {
+    **BASIC_GROUP_MODEL_EXAMPLE, "users": [user.id],
+    "applications": [], "is_immutable": True
+  }
+  immutable_group = UserGroup.from_dict(immutable_group_dict)
+  immutable_group.uuid = ""
+  immutable_group.save()
+  immutable_group.uuid = immutable_group.id
+  immutable_group.update()
+
+  mutable_group_dict = {
+    **BASIC_GROUP_MODEL_EXAMPLE, "users": [user.id],
+    "applications": [], "is_immutable": False
+  }
+  mutable_group = UserGroup.from_dict(mutable_group_dict)
+  mutable_group.uuid = ""
+  mutable_group.save()
+  mutable_group.uuid = mutable_group.id
+  mutable_group.update()
+
+  user.user_groups = [mutable_group.id,immutable_group.id]
+  user.update()
+  query_params = {"immutable": False}
+  url = f"{api_url}/{user_user_id}/user-groups"
+  resp = client_with_emulator.get(url, params=query_params)
+  user_groups_res = resp.json()
+
+  assert user_groups_res.get("success") is True, "Success not true"
+  assert user_groups_res.get(
+    "message") == "Successfully fetched user groups of the user", \
+    "Expected response not same"
+  assert mutable_group.id in [
+    i.get("uuid")
+    for i in user_groups_res.get("data")
+  ]
+  assert immutable_group.id not in [
+    i.get("uuid")
+    for i in user_groups_res.get("data")
+  ]
+
 
 @mock.patch(
   "services.json_import.create_learner", return_value="test_learner_id")
@@ -970,7 +1233,6 @@ def test_update_inspace_user_positive(mock_learner, mock_learner_profile,
                                       mock_update_inspace_user,
                                       mock_inspace_api, clean_firestore):
   input_user = deepcopy(BASIC_USER_MODEL_EXAMPLE)
-  del input_user["inspace_user"]
   del input_user["is_deleted"]
   input_user["user_groups"] = []
   url = api_url
@@ -1019,7 +1281,6 @@ def test_update_inspace_user_negative(mock_learner, mock_learner_profile,
                                       mock_update_inspace_user,
                                       mock_inspace_call, clean_firestore):
   input_user = deepcopy(BASIC_USER_MODEL_EXAMPLE)
-  del input_user["inspace_user"]
   del input_user["is_deleted"]
   input_user["user_groups"] = []
   url = api_url
@@ -1072,7 +1333,6 @@ def test_delete_inspace_user_positive(mock_learner, mock_learner_profile,
                                       mock_delete_inspace_usere,
                                       mock_inspace_call, clean_firestore):
   input_user = deepcopy(BASIC_USER_MODEL_EXAMPLE)
-  del input_user["inspace_user"]
   del input_user["is_deleted"]
   input_user["user_groups"] = []
   url = api_url
@@ -1119,7 +1379,6 @@ def test_delete_inspace_user_negative(mock_learner, mock_learner_profile,
                                       mock_delete_inspace_usere,
                                       mock_inspace_call, clean_firestore):
   input_user = deepcopy(BASIC_USER_MODEL_EXAMPLE)
-  del input_user["inspace_user"]
   del input_user["is_deleted"]
   input_user["user_groups"] = []
   url = api_url

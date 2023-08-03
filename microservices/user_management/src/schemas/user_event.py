@@ -3,9 +3,10 @@ Pydantic Model for UserEvent API's
 """
 from typing import Optional, List
 from pydantic import BaseModel, Extra
+from common.utils.schema_validator import BaseConfigModel
 
 
-class UserEventModel(BaseModel):
+class UserEventModel(BaseConfigModel):
   """User Pydantic Model"""
   session_ref: Optional[str]
   raw_response: Optional[dict]
@@ -77,7 +78,7 @@ class UserEventModelResponse(BaseModel):
     }
   }
 
-class UpdateUserEventModel(BaseModel):
+class UpdateUserEventModel(BaseConfigModel):
   """User Pydantic Model"""
   session_ref: Optional[str]
   raw_response: Optional[dict]

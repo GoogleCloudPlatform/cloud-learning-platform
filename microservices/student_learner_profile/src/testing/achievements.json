@@ -1,5 +1,4 @@
-[
-  {
+[{
     "type": "course equate",
     "name": "Nursing",
     "description": "",
@@ -21,16 +20,13 @@
     },
     "credits_available": 0,
     "field_of_study": "",
-    "metadata": {
-      "design_config" : {
-        "shape" : "",
-        "theme": "",
-        "illustration": ""
-      }
-    },
+"metadata": {"design_config" : {
+                           "shape" : "",
+                           "theme": "",
+                           "illustration": ""
+}},
     "image": "",
     "result_descriptions": [],
     "tags": [],
     "timestamp": ""
-  }
-]
+}]

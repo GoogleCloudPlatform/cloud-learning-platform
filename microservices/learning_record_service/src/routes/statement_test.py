@@ -162,14 +162,14 @@ def test_get_all_xapi_statement(mocker):
       "routes.statement.fetch_data_using_query_from_bq", return_value=json_dict)
   resp = client_with_emulator.get(url, params=query_params)
   resp_data = resp.json()
-  del resp_data["data"][0]["stored"]
-  del resp_data["data"][0]["timestamp"]
+  del resp_data["data"]["records"][0]["stored"]
+  del resp_data["data"]["records"][0]["timestamp"]
   del expected_data["stored"]
   del expected_data["timestamp"]
   assert resp.status_code == 200, "Status code is not 200"
   assert resp_data["success"] is True, "Success is not True"
   assert resp_data["message"] == "Successfully fetched the statements"
-  assert expected_data in resp_data["data"]
+  assert expected_data in resp_data["data"]["records"]
 
 
 def test_get_all_xapi_statement_negative(mocker):
