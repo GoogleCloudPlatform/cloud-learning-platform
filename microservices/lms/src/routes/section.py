@@ -28,6 +28,7 @@ from schemas.section import (
     DeleteFailedSectionSectionModel,UpdateInviteResponseModel)
 from schemas.update_section import UpdateSection
 from services.section_service import (copy_course_background_task,
+                                copy_course_background_task_alpha,
 update_grades,add_teacher, insert_section_enrollment_to_bq)
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model, FEED_TYPES,
@@ -103,6 +104,80 @@ def create_section(sections_details: SectionDetails,
 
     background_tasks.add_task(
         copy_course_background_task,
+        course_template_details=course_template_details,
+        sections_details=sections_details,
+        cohort_details=cohort_details,
+        lms_job_id=lms_job.id,
+        message="Create section background task completed")
+    info_msg = f"Background Task called for the cohort id {cohort_details.id}\
+                course template {course_template_details.id} with\
+                 section name {sections_details.name}"
+    Logger.info(info_msg)
+
+    lms_job.logs["info"].append(info_msg)
+    lms_job.update()
+
+    return {
+        "success": True,
+        "message": "Section will be created shortly, " +
+                    f"use this job id - '{lms_job.id}' for more info",
+        "data": None
+    }
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except HttpError as hte:
+    Logger.error(hte)
+    raise ClassroomHttpException(status_code=hte.resp.status,
+                                 message=str(hte)) from hte
+  except Exception as e:
+    error = traceback.format_exc().replace("\n", " ")
+    Logger.error(error)
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+@router.post("/alpha/v1", status_code=status.HTTP_202_ACCEPTED)
+def create_section_apha(sections_details: SectionDetails,
+                   background_tasks: BackgroundTasks):
+  """Create section API
+  Args:
+    name (section): Section name
+    description (str):Description
+    classroom_template_id(str):course_template_id id from firestore
+    cohort_id(str):cohort id from firestore
+    teachers(list):List of teachers to be added
+  Raises:
+    HTTPException: 500 Internal Server Error if something fails
+
+  Returns:
+    {"status":"Success","new_course":{}}: Returns new course details,
+    {'status': 'Failed'} if the user creation raises an exception
+  """
+  try:
+    course_template_details = CourseTemplate.find_by_id(
+        sections_details.course_template)
+    cohort_details = Cohort.find_by_id(sections_details.cohort)
+    # Get course by course id for copying from master course
+    current_course = classroom_crud.get_course_by_id(
+        course_template_details.classroom_id)
+    if current_course is None:
+      raise ResourceNotFoundException(
+          "classroom with id" +
+          f" {course_template_details.classroom_id} is not found")
+
+    lms_job_input = {
+        "job_type": "course_copy",
+        "status": "ready",
+        "input_data": {**sections_details.dict()},
+        "logs": {
+            "info": [],
+            "errors": []
+        }
+    }
+
+    lms_job = LmsJob.from_dict(lms_job_input)
+    lms_job.save()
+    background_tasks.add_task(
+        copy_course_background_task_alpha,
         course_template_details=course_template_details,
         sections_details=sections_details,
         cohort_details=cohort_details,
@@ -924,3 +999,4 @@ f"Cannot update invitation status for{user_ref.email}\
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
+
