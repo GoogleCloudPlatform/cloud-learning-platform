@@ -163,12 +163,10 @@ class GoalImportJsonResponse(BaseModel):
   class Config():
     orm_mode = True
     schema_extra = {
-        "example": {
-            "success":
-                True,
-            "message":
-                "Successfully created the goals",
-            "data": [
+      "example": {
+        "success": True,
+        "message": "Successfully created the goals",
+        "data": [
                 "44qxEpc35pVMb6AkZGbi", "00MPqUhCbyPe1BcevQDr",
                 "lQRzcrRuDpJ9IoW8bCHu"
             ]
