@@ -420,13 +420,10 @@ def copy_course_background_task_alpha(
     logs["info"].append(f"Original Courseworks {len(original_courseworks)}")
     logs["info"].append(f"Original Coursework Materials \
                         {len(original_coursework_materials)}")
-    Logger.info(f"This is section deatails object {sections_details.name}")
     # Call classroom copy course API in Alpha version
     copied_course = classroom_crud.copy_classroom_course(course_template_details.classroom_id,
-                                          course_template_details.name+sections_details.name)
+                                          course_template_details.name)
     classroom_id = copied_course["id"]
-    Logger.info(f"This is copied classroom course {copied_course}")
-    Logger.info(f"Classroom copy course API competed {copied_course}")
     logs["info"].append(f"Classroom copy course API competed {classroom_id}")
     lms_job.classroom_id = copied_course["id"]
     lms_job.start_time = datetime.datetime.utcnow()
@@ -720,7 +717,13 @@ def check_copy_course_alpha(original_courseworks,
               else:
                 error_flag = True
       try:
-        updated_data = {"state": "PUBLISHED"}
+        if "dueDate" and "dueTime" in \
+          original_coursework_dict[coursework_title].keys():
+          updated_data = {"state": "PUBLISHED",
+          "dueDate":original_coursework_dict[coursework_title]["dueDate"],
+          "dueTime":original_coursework_dict[coursework_title]["dueTime"]}
+        else :
+          updated_data = {"state": "PUBLISHED"}
         if material_update:
           updated_data["materials"] = coursework["materials"]
         update_mask = ",".join(updated_data)
@@ -731,6 +734,7 @@ def check_copy_course_alpha(original_courseworks,
         Logger.info(f"Coursework published for {coursework_title}")
       except HttpError as error:
         Logger.error(error)
+        error_flag=True
         logs["errors"].append(
           f"Coursework state update failed for {coursework_title}\
                               {error}")
