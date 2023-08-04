@@ -420,13 +420,10 @@ def copy_course_background_task_alpha(
     logs["info"].append(f"Original Courseworks {len(original_courseworks)}")
     logs["info"].append(f"Original Coursework Materials \
                         {len(original_coursework_materials)}")
-    Logger.info(f"This is section deatails object {sections_details.name}")
     # Call classroom copy course API in Alpha version
     copied_course = classroom_crud.copy_classroom_course(course_template_details.classroom_id,
-                                          course_template_details.name+sections_details.name)
+                                          course_template_details.name)
     classroom_id = copied_course["id"]
-    Logger.info(f"This is copied classroom course {copied_course}")
-    Logger.info(f"Classroom copy course API competed {copied_course}")
     logs["info"].append(f"Classroom copy course API competed {classroom_id}")
     lms_job.classroom_id = copied_course["id"]
     lms_job.start_time = datetime.datetime.utcnow()
@@ -648,6 +645,7 @@ def check_copy_course_alpha(original_courseworks,
     copied_coursework_material_dict = make_title_key_coursework(
       copied_coursework_materials)
     for coursework_title in original_coursework_titles:
+      missing_attachment=[]
       if "materials" in original_coursework_dict[coursework_title]:
         missing_attachment = verifiy_attachment(coursework_title,
                                                 original_coursework_dict,
@@ -662,14 +660,14 @@ def check_copy_course_alpha(original_courseworks,
         logs["errors"].append(f"Missing attachment are {coursework_title} {missing_attachment }")
         error_flag=True
       else:
-        logs["info"].append(f"Missing attachment for {coursework_title} {missing_attachment}")
-        Logger.info(f"Missing attachment for {coursework_title} {missing_attachment}")
+        logs["info"].append(f"No Missing attachment for {coursework_title}")
+        Logger.info(f"No Missing attachment for {coursework_title}")
       lms_job.logs = logs
       lms_job.update()
       Logger.info("")
     #Errror in copying coursework attachments restart wait loop
     for coursework_material_title in original_coursework_material_titles:
-
+      missing_attachment=[]
       if "materials" in original_coursework_material_dict[coursework_material_title]:
         missing_attachment = verifiy_attachment(coursework_material_title,
                                                 original_coursework_material_dict,
@@ -683,8 +681,8 @@ def check_copy_course_alpha(original_courseworks,
         logs["errors"].append(f"Missing attachment are {coursework_material_title} {missing_attachment}")
         error_flag=True
       else :
-        logs["info"].append(f"Missing attachment for {coursework_material_title} {missing_attachment}")
-        Logger.info(f"Missing attachment for {coursework_material_title} {missing_attachment}")
+        logs["info"].append(f"No Missing attachment for {coursework_material_title}")
+        Logger.info(f" No Missing attachment for {coursework_material_title}")
       lms_job.logs = logs
       lms_job.update()
     if error_flag:
@@ -719,7 +717,13 @@ def check_copy_course_alpha(original_courseworks,
               else:
                 error_flag = True
       try:
-        updated_data = {"state": "PUBLISHED"}
+        if "dueTime" in original_coursework_dict[coursework_title].keys()\
+            or "dueDate" in original_coursework_dict[coursework_title].keys()  :
+          updated_data = {"state": "PUBLISHED",
+          "dueDate":original_coursework_dict[coursework_title].get("dueDate"),
+          "dueTime":original_coursework_dict[coursework_title].get("dueTime")}
+        else :
+          updated_data = {"state": "PUBLISHED"}
         if material_update:
           updated_data["materials"] = coursework["materials"]
         update_mask = ",".join(updated_data)
@@ -730,6 +734,7 @@ def check_copy_course_alpha(original_courseworks,
         Logger.info(f"Coursework published for {coursework_title}")
       except HttpError as error:
         Logger.error(error)
+        error_flag=True
         logs["errors"].append(
           f"Coursework state update failed for {coursework_title}\
                               {error}")
