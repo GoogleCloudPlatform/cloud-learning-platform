@@ -47,9 +47,6 @@ export class HomeService {
   editSection(data: any) {
     return this.http.patch(`${environment.apiurl}sections`, data)
   }
-  editSectionAlpha(data: any) {
-    return this.http.patch(`${environment.apiurl}sections/alpha`, data)
-  }
   getStudentsInSection(sectionId: any) {
     return this.http.get(`${environment.apiurl}sections/${sectionId}/students`)
   }
