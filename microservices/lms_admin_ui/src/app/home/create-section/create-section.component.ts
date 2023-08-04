@@ -171,7 +171,7 @@ export class CreateSectionComponent implements OnInit {
       sectionObj['max_students'] = this.addSectionForm.value.max_students
       sectionObj['id'] = this.requiredDetails.init_data.section_id
       sectionObj['course_id'] = this.requiredDetails.init_data.classroom_id
-      this._HomeService.editSectionAlpha(sectionObj).subscribe((res: any) => {
+      this._HomeService.editSection(sectionObj).subscribe((res: any) => {
         if (res.success == true) {
           this.openSuccessSnackBar('Update section', 'SUCCESS')
           this.dialogRef.close({ data: 'success' });
