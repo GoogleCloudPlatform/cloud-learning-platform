@@ -85,6 +85,7 @@ def save_user(user_id,course_id,message_id,event_type,collection):
         "gaia_id": user_id,
         "role": role_dict[collection.split(".")[1]],
         "classroom_id": course_id,
+        "course_title": course["name"],
         "classroom_url":course["alternateLink"],
         "message": ("User is successfully enrolled in classroom "
                     + f"{course['name']}")

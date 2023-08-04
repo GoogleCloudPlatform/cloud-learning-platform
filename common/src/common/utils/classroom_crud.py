@@ -376,23 +376,7 @@ def create_coursework(course_id, coursework):
                                                body=coursework).execute()
   Logger.info("Create coursework method worked")
   return data
-def patch_coursework(course_id,coursework_id,update_mask_details):
-  """Update a coursework in a classroom course
 
-  Args:
-    course_id: where coursework need to be created
-    coursework : list of dictionary of coursework to be created
-  Returns:
-    returns success
-  """
-  update_mask = ""
-  for key in update_mask_details.keys():
-    update_mask=key+"," +update_mask
-  service = build("classroom", "v1", credentials=get_credentials())
-  data = service.courses().courseWork().patch(courseId=course_id,id=coursework_id,
-                                              updateMask=update_mask,
-                                               body=update_mask_details).execute()
-  return data
 
 def patch_coursework_alpha(course_id, coursework_id, update_mask, updated_data):
   """Update a coursework in a classroom course
