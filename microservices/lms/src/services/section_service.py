@@ -667,7 +667,7 @@ def check_copy_course_alpha(original_courseworks,
       Logger.info("")
     #Errror in copying coursework attachments restart wait loop
     for coursework_material_title in original_coursework_material_titles:
-
+      missing_attachment=[]
       if "materials" in original_coursework_material_dict[coursework_material_title]:
         missing_attachment = verifiy_attachment(coursework_material_title,
                                                 original_coursework_material_dict,
@@ -717,11 +717,11 @@ def check_copy_course_alpha(original_courseworks,
               else:
                 error_flag = True
       try:
-        if "dueDate" and "dueTime" in \
-          original_coursework_dict[coursework_title].keys():
+        if "dueTime" in original_coursework_dict[coursework_title].keys()\
+            or "dueDate" in original_coursework_dict[coursework_title].keys()  :
           updated_data = {"state": "PUBLISHED",
-          "dueDate":original_coursework_dict[coursework_title]["dueDate"],
-          "dueTime":original_coursework_dict[coursework_title]["dueTime"]}
+          "dueDate":original_coursework_dict[coursework_title].get("dueDate"),
+          "dueTime":original_coursework_dict[coursework_title].get("dueTime")}
         else :
           updated_data = {"state": "PUBLISHED"}
         if material_update:
