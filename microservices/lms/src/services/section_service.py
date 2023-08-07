@@ -701,6 +701,7 @@ def check_copy_course_alpha(original_courseworks,
         lti_assignment_details = {
             "section_id": section_id,
             "coursework_title": coursework_title,
+            "coursework_id": coursework["id"],
             "source_context_id": course_template_id,
             "start_date": None,
             "end_date": None,
@@ -753,6 +754,7 @@ def check_copy_course_alpha(original_courseworks,
         lti_assignment_details = {
             "section_id": section_id,
             "coursework_title": coursework_material_title,
+            "coursework_id": coursework_material["id"],
             "source_context_id": course_template_id,
             "start_date": None,
             "end_date": None,
@@ -1253,6 +1255,7 @@ def copy_lti_shim_assignment(link, lti_assignment_details, logs):
           "lti_assignment_id": lti_assignment_id,
           "context_id": lti_assignment_details.get("section_id"),
           "source_context_id": lti_assignment_details.get("source_context_id"),
+          "course_work_id": lti_assignment_details.get("coursework_id"),
           "start_date": lti_assignment_details.get("start_date"),
           "end_date": lti_assignment_details.get("end_date"),
           "due_date": lti_assignment_details.get("due_date")
