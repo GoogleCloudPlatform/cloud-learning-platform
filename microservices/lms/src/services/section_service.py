@@ -459,11 +459,6 @@ def copy_course_background_task_alpha(
                                     copied_course,lms_job_id, section_id,
                                     course_template_id)
 
-    if error_flag:
-      section.status = "FAILED_TO_PROVISION"
-    else:
-      section.status = "ACTIVE"
-
     classroom_crud.enable_notifications(copied_course["id"], "COURSE_WORK_CHANGES")
     classroom_crud.enable_notifications(copied_course["id"],
                                         "COURSE_ROSTER_CHANGES")
@@ -474,14 +469,12 @@ def copy_course_background_task_alpha(
       for course_template_mapping in list_course_template_enrollment_mapping:
         try:
           add_instructional_designer_into_section(section,
-                                                  course_template_mapping)
+                                            course_template_mapping)
         except Exception as error:
           error = traceback.format_exc().replace("\n", " ")
           Logger.error(f"Create teacher failed for \
               for {course_template_details.instructional_designer}")
           Logger.error(error)
-
-    section.update()
     rows=[{
       "sectionId":section_id,\
       "courseId":copied_course["id"],\
@@ -499,6 +492,11 @@ def copy_course_background_task_alpha(
         rows=rows,
         dataset=BQ_DATASET,
         table_name=BQ_TABLE_DICT["BQ_COLL_SECTION_TABLE"])
+    if error_flag:
+      section.status = "FAILED_TO_PROVISION"
+    else:
+      section.status = "ACTIVE"
+    section.update()
     lms_job = LmsJob.find_by_id(lms_job_id)
     logs = lms_job.logs
     logs["info"].append(
@@ -541,13 +539,12 @@ def check_copy_course_alpha(original_courseworks,
   It returns a boolean error flag if the error flag is True then copy course
   process had errors It can be missing coursework or coursework attachments
   """
-  
+
   lms_job = LmsJob.find_by_id(lms_job_id)
   logs = lms_job.logs
   try:
     count = 0
     max_count = 3
-
     original_coursework_titles = sort_titles(original_courseworks)
     original_coursework_dict =  make_title_key_coursework(original_courseworks)
     original_coursework_material_titles = sort_titles(
