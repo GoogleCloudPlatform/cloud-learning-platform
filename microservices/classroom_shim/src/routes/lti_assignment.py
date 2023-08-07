@@ -504,33 +504,45 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     # if input_data_dict.get("due_date"):
     #   lti_assignment_due_date = input_data_dict.get("due_date")
 
-    # TODO: Check if the assignment for the given coursework has already been created
+    # Checks if the assignment for the given coursework has already been created
     fetch_lti_assignment = LTIAssignment.collection.filter(
         "tool_id", "==", lti_assignment_data.get("tool_id")).filter(
-            "context_id", "==",
-            input_data_dict.get("context_id").filter(
+            "context_id", "==", input_data_dict.get("context_id")).filter(
                 "course_work_id", "==",
                 input_data_dict.get("course_work_id")).filter(
                     "lti_assignment_title", "==",
-                    lti_assignment_data.get("lti_assignment_title"))).get()
+                    lti_assignment_data.get("lti_assignment_title")).get()
 
     if fetch_lti_assignment:
       new_lti_assignment_item = fetch_lti_assignment.to_dict()
     else:
       new_lti_assignment_data = {
-          "lti_assignment_title": lti_assignment_data.get("lti_assignment_title"),
-          "context_type": "section",
-          "context_id": input_data_dict.get("context_id"),
-          "prev_context_ids": prev_context_ids,
-          "lti_content_item_id": copy_content_item_data.get("id"),
-          "prev_content_item_ids": prev_content_item_ids,
-          "course_work_id": input_data_dict.get("course_work_id"),
-          "course_work_type": lti_assignment_data.get("course_work_type"),
-          "tool_id": lti_assignment_data.get("tool_id"),
-          "max_points": lti_assignment_data.get("max_points"),
-          "start_date": lti_assignment_start_date,
-          "end_date": lti_assignment_end_date,
-          "due_date": lti_assignment_due_date
+          "lti_assignment_title":
+              lti_assignment_data.get("lti_assignment_title"),
+          "context_type":
+              "section",
+          "context_id":
+              input_data_dict.get("context_id"),
+          "prev_context_ids":
+              prev_context_ids,
+          "lti_content_item_id":
+              copy_content_item_data.get("id"),
+          "prev_content_item_ids":
+              prev_content_item_ids,
+          "course_work_id":
+              input_data_dict.get("course_work_id"),
+          "course_work_type":
+              lti_assignment_data.get("course_work_type"),
+          "tool_id":
+              lti_assignment_data.get("tool_id"),
+          "max_points":
+              lti_assignment_data.get("max_points"),
+          "start_date":
+              lti_assignment_start_date,
+          "end_date":
+              lti_assignment_end_date,
+          "due_date":
+              lti_assignment_due_date
       }
 
       new_lti_assignment = LTIAssignment.from_dict(new_lti_assignment_data)
