@@ -18,7 +18,7 @@
 name: Unit test & lint for Classroom Notification Services
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "59 23 * * *"
 
 env:
   PROJECT_ID: core-learning-services-dev
