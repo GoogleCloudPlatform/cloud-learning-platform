@@ -24,7 +24,7 @@ Install the following tools:
 
 ## 2. Project Bootstrap
 
-You will use a provided Terraform module to perform the following:
+Please make sure that you have the project `Owner` role to be able to update the organizational policies for CLP deployment. You will use a provided Terraform module to perform the following:
 - Bootstrap a project in your organization
 - Create a Terraform service account and Terraform state bucket in the project for further Terraform scripts
 
