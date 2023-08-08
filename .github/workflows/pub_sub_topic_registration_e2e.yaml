@@ -19,6 +19,7 @@ name: Pub Sub registeration workflow for e2e
 on:
   schedule:
     - cron: "0 0 * * *"
+  workflow_dispatch:
 
 env:
   PROJECT_ID: core-learning-services-dev
