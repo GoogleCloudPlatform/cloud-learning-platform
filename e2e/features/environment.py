@@ -400,7 +400,7 @@ def create_analytics_data(context):
       "description": "test desc",
       "workType": "ASSIGNMENT",
       "state": "PUBLISHED",
-      "maxPoints": 99.9,
+      "maxPoints": 100,
       "associatedWithDeveloper": True
   }
   result = create_course_work(classroom_id=section.classroom_id,

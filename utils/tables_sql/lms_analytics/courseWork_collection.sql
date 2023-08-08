@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS courseWorkCollection (
         dueDate STRUCT<`year` INTEGER, `month` INTEGER, `day` INTEGER>,
         dueTime STRUCT<`hours` INTEGER,`minutes` INTEGER,`seconds` INTEGER,`nanos` INTEGER>,
         scheduledTime STRING,
-        maxPoints NUMERIC,
+        maxPoints INTEGER,
         workType STRING,
         associatedWithDeveloper BOOL,
         `assigneeMode` STRING,
