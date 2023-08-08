@@ -400,7 +400,7 @@ def create_analytics_data(context):
       "description": "test desc",
       "workType": "ASSIGNMENT",
       "state": "PUBLISHED",
-      "maxPoints": 100,
+      "maxPoints": 99.9,
       "associatedWithDeveloper": True
   }
   result = create_course_work(classroom_id=section.classroom_id,
@@ -419,8 +419,8 @@ def create_analytics_data(context):
       submission_id=data["submission"]["id"],
       update_mask="assignedGrade,draftGrade",
       body={
-          "assignedGrade": 10,
-          "draftGrade": 10
+          "assignedGrade": 10.78,
+          "draftGrade": 10.67
       })
   section_rows = [{
       "sectionId": section.id,
