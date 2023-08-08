@@ -25,7 +25,8 @@ from common.utils.http_exceptions import add_exception_handlers
 from fastapi import FastAPI, Request, Depends
 import config
 from routes import (section, student, course_template, cohort,
-                    classroom_courses, analytics, lms_job,lms_dummy, lms_notification)
+                    classroom_courses, analytics,
+                    lms_job,lms_dummy, lms_notification)
 
 app = FastAPI()
 
