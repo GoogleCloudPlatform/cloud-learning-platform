@@ -33,7 +33,7 @@ def test_replay_notifications(client_with_emulator):
 
 def test_replay_notifications_negative(client_with_emulator):
   negative_input = {
-    "start_date":"2023-07-26", # incorrect, not datetime 
+    "start_date":"2023-07-26", # incorrect, not datetime
     "end_date":"2023-07-28T00:00:00+00:00" # correct, datetime
   }
   with mock.patch("routes.lms_notification.Logger"):

@@ -1,6 +1,6 @@
 @fixture.create.analytics.data
 @fixture.get.header
-Feature: Get Anaytics data
+Feature: Lms Notification Replay
   Scenario: Replay All the lms-notification messages
     Given A user has access to the portal and wants to replay all messages
     When API request is send replay lms-notification using valid start-date end-date

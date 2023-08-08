@@ -45,7 +45,7 @@ def replay_notifications(input_dates: InputReplayNotificationModel,
 
       Raises:
           Exception: 500 Internal Server Error if something went wrong
-          Exception: 422 Unprocessable Entity if input date is invalid(ie. 
+          Exception: 422 Unprocessable Entity if input date is invalid(ie.
           not a timestamp)
       Returns:
           ReplayNotificationResponseModel: On successful publish of messages

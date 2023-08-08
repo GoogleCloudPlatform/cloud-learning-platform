@@ -22,7 +22,8 @@ def step_impl_01(context):
              )
 def step_impl_02(context):
 
-  resp = requests.post(context.url, headers=context.header, )
+  resp = requests.post(context.url, headers=context.header,
+                       json=context.payload)
   context.status = resp.status_code
   context.response = resp.json()
 
