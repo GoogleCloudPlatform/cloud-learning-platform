@@ -193,7 +193,7 @@ def get_student_submission_message(submission):
       "ASSIGNED_GRADE_POINTS_EARNED_CHANGE"
   ]
   if (submission["state"]=="RETURNED"
-      or submission["assignedGrade"] or list_of_assigned_datetime):
+      or "assignedGrade" in submission.keys() or list_of_assigned_datetime):
     if (datetime.datetime.strptime(
       submission["updateTime"].split(".")[0],
         "%Y-%m-%dT%H:%M:%S") == max(list_of_assigned_datetime)):
