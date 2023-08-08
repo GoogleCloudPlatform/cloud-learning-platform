@@ -192,24 +192,25 @@ def get_student_submission_message(submission):
       if x["gradeHistory"]["gradeChangeType"] ==
       "ASSIGNED_GRADE_POINTS_EARNED_CHANGE"
   ]
-
-  if (datetime.datetime.strptime(
-    submission["updateTime"].split(".")[0],
-      "%Y-%m-%dT%H:%M:%S") == max(list_of_assigned_datetime)):
-    course_work = get_course_work(submission["courseId"],
-                                  submission["courseWorkId"])
-    user = get_user(submission["userId"])
-    notification_message = {
-        "type": "user",
-        "email": user["emailAddress"],
-        "name": user["name"],
-        "classroom_id": submission["courseId"],
-        "course_work_id": submission["courseWorkId"],
-        "course_work_title": course_work["title"],
-        "course_work_url": course_work["alternateLink"],
-        "assigned_grade": submission["assignedGrade"],
-        "gaia_id": submission["userId"],
-        "role": "learner",
-        "message": "Teacher graded the assignment"
-    }
+  if (submission["state"]=="RETURNED"
+      or submission["assignedGrade"] or list_of_assigned_datetime):
+    if (datetime.datetime.strptime(
+      submission["updateTime"].split(".")[0],
+        "%Y-%m-%dT%H:%M:%S") == max(list_of_assigned_datetime)):
+      course_work = get_course_work(submission["courseId"],
+                                    submission["courseWorkId"])
+      user = get_user(submission["userId"])
+      notification_message = {
+          "type": "user",
+          "email": user["emailAddress"],
+          "name": user["name"],
+          "classroom_id": submission["courseId"],
+          "course_work_id": submission["courseWorkId"],
+          "course_work_title": course_work["title"],
+          "course_work_url": course_work["alternateLink"],
+          "assigned_grade": submission["assignedGrade"],
+          "gaia_id": submission["userId"],
+          "role": "learner",
+          "message": "Teacher graded the assignment"
+      }
   return notification_message
