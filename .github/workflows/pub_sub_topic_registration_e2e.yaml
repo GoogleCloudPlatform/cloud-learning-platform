@@ -15,10 +15,10 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Unit test & lint for Classroom Notification Services
+name: Pub Sub registeration workflow for e2e
 on:
   schedule:
-    - cron: "59 23 * * *"
+    - cron: "0 0 * * *"
 
 env:
   PROJECT_ID: core-learning-services-dev
