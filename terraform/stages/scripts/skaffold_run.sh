@@ -43,27 +43,7 @@ export FIREBASE_API_KEY=$(gcloud alpha services api-keys get-key-string "${KEY_N
 echo ${FIREBASE_API_KEY}
 export BACKEND_API=https://${PROJECT_ID}-api.cloudpssolutions.com
 
-API_KEY_DISPLAY_NAME="knowledge-graph-api-key"
-gcloud alpha services api-keys create --display-name=${API_KEY_DISPLAY_NAME} --api-target="service=kgsearch.googleapis.com"
-KEY_NAME=$(gcloud alpha services api-keys list --filter="displayName='${API_KEY_DISPLAY_NAME}'" --format="value(name)")
-export KGS_API_KEY=$(gcloud alpha services api-keys get-key-string "${KEY_NAME}" --format="value(keyString)")
-echo "${KGS_API_KEY}" | gcloud secrets versions add "google-kg-api-key" --data-file=-
-
 export IS_DEVELOPMENT=false
-export GENERATED_ASSESSMENTS_PATH=gs://${PROJECT_ID}/assessment_items
-export TITLE_GENERATION_SAVED_MODEL_PATH=gs://${PROJECT_ID}/ml-models/title-generation/blooms/1637763009_pt
-export TRIPLE_EXTRACTION_SAVED_MODEL_PATH=gs://${PROJECT_ID}/ml-models/triple-generation/checkpoints/models
-export DIALOG_SYSTEMS_KG_DATA_DEV_PATH=gs://${PROJECT_ID}/knowledge-graph
-export SAVED_MODEL=distilbert-pretraining/distilbert_base_uncased/distilbert_LM_training/saved_model/saved_model_epoch_3
-export MWP_TFSERVING_MODEL_BASE_PATH=gs://${PROJECT_ID}/ml-models/hugging-face-checkpoints/${SAVED_MODEL}
-export PE_TFSERVING_MODEL_BASE_PATH=gs://${PROJECT_ID}/ml-models/hugging-face-checkpoints/bert-base-cased-128/
-export DKT_MODEL_WEIGHTS_PATH=gs://${PROJECT_ID}/ml-models/dkt
-export NLU_CONFIG_PATH=gs://${PROJECT_ID}/knowledge-graph
-export GCP_LEARNING_RESOURCE_BUCKET=${PROJECT_ID}
-export DISABLE_MULTIHOP=true
-export TUTOR_NAME=Thoreau
-export IS_DIALOG_FLOW_SELECTION_REQUIRED=true
-export ENABLE_DISPLAY_CONTEXT_FOR_AAQ=false
 export IS_CLOUD_LOGGING_ENABLED=true
 export RELEASE_VERSION=${CLP_VERSION}
 
