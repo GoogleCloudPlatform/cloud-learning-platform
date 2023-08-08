@@ -112,10 +112,12 @@ def get_all_learner_profiles(learning_goal: str = None,
     learner_profile_fields = [
         i.get_fields(reformat_datetime=True) for i in learner_profile
     ]
+    count = 10000
+    response = {"records": learner_profile_fields, "total_count": count}
     return {
         "success": True,
         "message": "Successfully fetched the learner profile/s",
-        "data": learner_profile_fields
+        "data": response
     }
   except ResourceNotFoundException as e:
     Logger.info(traceback.print_exc())

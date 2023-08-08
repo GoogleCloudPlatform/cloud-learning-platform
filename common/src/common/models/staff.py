@@ -17,7 +17,7 @@ def validate_name(name):
 
 def validate_name_for_non_required(name):
   """Validator method to validate name"""
-  if name == "" or regex.fullmatch(r"[\D\p{L}\p{N}\s]+$", name):
+  if name == "" or name is None or regex.fullmatch(r"[\D\p{L}\p{N}\s]+$", name):
     return True
   else:
     return (False, "Invalid name format")
@@ -33,7 +33,7 @@ def validate_email(email):
 
 def validate_email_for_non_required(email):
   """Validator method to validate email"""
-  if email == "" or re.match(
+  if email == "" or email is None or re.match(
     r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b", email):
     return True
   else:

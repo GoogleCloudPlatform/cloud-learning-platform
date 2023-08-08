@@ -51,3 +51,11 @@ LOS_COLLECTIONS = [
     "curriculum_pathways", "learning_experiences", "learning_objects",
     "learning_resources", "assessments"
 ]
+
+child_parent_dict = {
+      "learning_resources": "learning_objects",
+      "assessments": "learning_objects",
+      "learning_objects": "learning_experiences",
+      "learning_experiences": "curriculum_pathways",
+      "curriculum_pathways": "curriculum_pathways"
+    }

@@ -6,11 +6,11 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Extra
 from schemas.schema_examples import (BASIC_ACTION_MODEL_EXAMPLE,
                                      FULL_ACTION_MODEL_EXAMPLE)
-
-# pylint: disable=invalid-name
+from common.utils.schema_validator import BaseConfigModel
+# pylint: disable = invalid-name
 ALLOWED_ACTION_TYPES = Literal["main","other"]
 
-class BasicActionModel(BaseModel):
+class BasicActionModel(BaseConfigModel):
   """Action Skeleton Pydantic Model"""
   # uuid: str
   name: str
@@ -34,7 +34,7 @@ class ActionModel(BasicActionModel):
     schema_extra = {"example": BASIC_ACTION_MODEL_EXAMPLE}
 
 
-class UpdateActionModel(BaseModel):
+class UpdateActionModel(BaseConfigModel):
   """Update Action Pydantic Request Model"""
   name: Optional[str]
   description: Optional[str]
@@ -111,12 +111,15 @@ class DeleteAction(BaseModel):
         }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullActionDataModel]]
+  total_count: int
 
 class AllActionResponseModel(BaseModel):
   """Action Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Data fetched successfully"
-  data: Optional[List[FullActionDataModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -124,7 +127,10 @@ class AllActionResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Data fetched successfully",
-            "data": [FULL_ACTION_MODEL_EXAMPLE]
+            "data": {
+                      "records":[FULL_ACTION_MODEL_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

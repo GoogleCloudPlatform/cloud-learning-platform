@@ -1,6 +1,10 @@
 """Functions to fetch data from association groups"""
+import math
+import traceback
 from services.collection_handler import CollectionHandler
 from common.models import AssociationGroup
+from common.utils.logging_handler import Logger
+from common.utils.http_exceptions import InternalServerError
 from concurrent.futures import ThreadPoolExecutor
 # pylint:disable=line-too-long
 
@@ -38,50 +42,66 @@ def check_instructor_discipline_association(instructor_id,
   return is_instructor_active
 
 
-def fetch_firestore_doc(data: dict, collection: str=None, key_name: str=None):
-  doc_fields = CollectionHandler.get_document_from_collection(
-            collection, data.get(key_name))
-  if key_name == "instructor":
-    if data.get("curriculum_pathway_id"):
-      curriculum_pathway_fields = CollectionHandler.get_document_from_collection(
-          "curriculum_pathways", data.get("curriculum_pathway_id"))
-      doc_fields["curriculum_pathway_id"] = curriculum_pathway_fields
-  data[key_name] = doc_fields
+def fetch_firestore_doc(data: list, collection: str=None, key_name: str=None):
+  """Fetches the firestore doc for a given collection"""
+  for record in data:
+    doc_fields = CollectionHandler.get_document_from_collection(
+              collection, record.get(key_name))
+    record[key_name] = doc_fields
+
+    if key_name == "instructor":
+      if record.get("curriculum_pathway_id"):
+        curriculum_pathway_fields = CollectionHandler.get_document_from_collection(
+            "curriculum_pathways", record.get("curriculum_pathway_id"))
+        record["curriculum_pathway_id"] = curriculum_pathway_fields
+
   return data
 
-def load_learner_group_field_data(association_group_fields):
+
+def process_threads(data: list, collection_type: str=None, key_name: str=None):
+  """Process a collection from the database with threads"""
+  try:
+    expanded_details = []
+    child_count = 0
+    child_count = len(data)
+
+    workers = math.ceil(child_count / 50)
+    if workers == 0:
+      workers = 1
+
+    executor = ThreadPoolExecutor(max_workers=workers)
+    for batch_index in range(workers):
+      start_index = batch_index * 50
+      end_index = (batch_index + 1) * 50
+      future = executor.submit(fetch_firestore_doc,
+                    data[start_index: end_index], collection_type, key_name)
+      expanded_details.extend(future.result())
+    executor.shutdown(wait=True)
+
+    return expanded_details
+
+  except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise InternalServerError(str(e)) from e
+
+
+def load_learner_group_field_data(association_group_fields, fetch_details = True):
   """Fetches entire documents from respective collections for fields in
   association group of learner type"""
-  if association_group_fields.get("users"):
-    user_details = []
+  if fetch_details and association_group_fields.get("users"):
+    association_group_fields["users"] = process_threads(
+          association_group_fields.get("users"), "users", "user")
 
-    child_count = len(association_group_fields.get("users"))
-    with ThreadPoolExecutor(max_workers=child_count) as executor:
-      user_details = list(
-        executor.map(fetch_firestore_doc,
-                     association_group_fields.get("users"), "users", "user"))
+  if fetch_details and association_group_fields.get("associations").get("coaches"):
+    association_group_fields["associations"]["coaches"] = process_threads(
+          association_group_fields.get("associations").get("coaches"),
+          "users", "coach")
 
-    association_group_fields["users"] = user_details
-
-  if association_group_fields.get("associations").get("coaches"):
-    coaches_list = association_group_fields.get("associations").get("coaches")
-    coach_details = []
-
-    child_count = len(coaches_list)
-    with ThreadPoolExecutor(max_workers=child_count) as executor:
-      coach_details = list(executor.map(
-        fetch_firestore_doc, coaches_list, "users", "coach"))
-    association_group_fields["associations"]["coaches"] = coach_details
-
-  if association_group_fields.get("associations").get("instructors"):
-    instructors_list = association_group_fields.get("associations").get(
-        "instructors")
-    instructor_details = []
-
-    with ThreadPoolExecutor(max_workers=child_count) as executor:
-      instructor_details = list(executor.map(
-        fetch_firestore_doc, instructors_list, "users", "instructor"))
-    association_group_fields["associations"]["instructors"] = instructor_details
+  if fetch_details and association_group_fields.get("associations").get("instructors"):
+    association_group_fields["associations"]["instructors"] = process_threads(
+          association_group_fields.get("associations").get("instructors"),
+          "users", "instructor")
 
   if association_group_fields.get("associations").get("curriculum_pathway_id"):
     curriculum_pathway_id = association_group_fields.get("associations").get(
@@ -99,26 +119,14 @@ def load_discipline_group_field_data(association_group_fields):
   """Fetches entire documents from respective collections for fields in
   association group of discipline type"""
   if association_group_fields["users"]:
-    user_details = []
-
-    child_count = len(association_group_fields.get("users"))
-    with ThreadPoolExecutor(max_workers=child_count) as executor:
-      user_details = list(
-        executor.map(fetch_firestore_doc,
-                     association_group_fields.get("users"), "users", "user"))
-    association_group_fields["users"] = user_details
+    association_group_fields["users"] = process_threads(
+          association_group_fields.get("users"), "users", "user")
 
   if association_group_fields.get("associations").get("curriculum_pathways"):
-    curriculum_pathway_list = association_group_fields.get("associations").get(
-        "curriculum_pathways")
-    curriculum_pathway_details = []
-
-    with ThreadPoolExecutor(max_workers=child_count) as executor:
-      user_details = list(
-        executor.map(fetch_firestore_doc,
-                     curriculum_pathway_list, "curriculum_pathways", "curriculum_pathway_id"))
     association_group_fields["associations"]["curriculum_pathways"] = \
-      curriculum_pathway_details
+      process_threads(association_group_fields.get("associations").get(
+            "curriculum_pathways"),
+            "curriculum_pathways", "curriculum_pathway_id")
 
   return association_group_fields
 
@@ -143,7 +151,7 @@ def instructor_exists_in_lag(association_grp, instructor_uuid):
   return False
 
 def remove_instructor_from_lag(instructor_uuid):
-  """Function to remove instructor from learner association groups"""
+  """Remove an instructor from the learner association group"""
   # Filter Learner Association Groups
   association_grp_manager = AssociationGroup.collection
   association_grp_manager = association_grp_manager.filter(
@@ -168,7 +176,7 @@ def remove_instructor_from_lag(instructor_uuid):
       learner_association_grp.update()
 
 def remove_instructor_from_dag(instructor_uuid, instructor_status):
-  """Function to remove instructor from discipline association groups"""
+  """Remove an instructor from the discipline association group"""
   comparison_key = "users"
   comparator = {
           "status": instructor_status,

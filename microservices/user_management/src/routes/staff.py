@@ -2,15 +2,18 @@
 
 import traceback
 import re
+import math
 import json
+from concurrent.futures import ThreadPoolExecutor
 from fastapi import APIRouter, UploadFile, File, Query
-from common.models import Staff
+from common.models import Staff, User
 from common.utils.logging_handler import Logger
 from common.utils.errors import (ConflictError, ResourceNotFoundException,
                                 ValidationError, PayloadTooLargeError)
 from common.utils.http_exceptions import (Conflict, InternalServerError,
                                           BadRequest, ResourceNotFound,
                                           PayloadTooLarge)
+from common.utils.inspace import update_inspace_user_helper
 from schemas.staff_schema import (StaffSearchResponseModel,
                                   AllStaffResponseModel,
                                   GetStaffResponseModel,
@@ -91,10 +94,12 @@ def get_staffs(skip: int = Query(0, ge=0, le=2000),
 
     staffs = collection_manager.order("-created_time").offset(skip).fetch(limit)
     staffs = [i.get_fields(reformat_datetime=True) for i in staffs]
+    count = 10000
+    response = {"records": staffs, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": staffs
+        "data": response
     }
   except ValidationError as e:
     Logger.error(e)
@@ -199,9 +204,28 @@ def update_staff_api(uuid: str, input_staff: UpdateStaffModel):
   try:
     staff_fields = update_staff(uuid, input_staff)
 
+    response_msg = "Successfully updated the staff"
+
+    input_staff_dict = {**input_staff.dict(exclude_unset=True)}
+    if input_staff_dict.get("calendly_url") is not None:
+      update_payload = {}
+
+      user_fields = User.find_by_user_type_ref(uuid)
+      update_payload["userProperties"] = {"SNHU_CALENDLY_URL"
+                                          : input_staff_dict["calendly_url"]}
+
+      is_update_successful = update_inspace_user_helper(user_fields,
+                                                            update_payload)
+      if is_update_successful is True:
+        response_msg = "Successfully updated the Staff and corresponding"
+        response_msg += " calendly_url in Inspace"
+      else:
+        response_msg = "Successfully updated the Staff but corresponding"
+        response_msg += " calendly_url in Inspace couldn't be updated"
+
     return {
         "success": True,
-        "message": "Successfully updated the staff",
+        "message": response_msg,
         "data": staff_fields
     }
   except ResourceNotFoundException as e:
@@ -322,4 +346,61 @@ def get_profile_fields():
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    raise InternalServerError(str(e)) from e
+
+
+@router.put(
+    "/staff/calendly_url/developer-api",
+    include_in_schema=False)
+def update_calendly_url_field():
+  """This endpoint will add the calendly_url field in Staff documents if it
+      doesn't exist.
+
+    ### Raises:
+      Exception: 500 Internal Server Error if something went wrong
+  """
+  try:
+    staff = list(Staff.collection.order("-created_time").fetch())
+
+    # list of staff documents which are updated with the calendly_url field
+    updated_staff = []
+
+    # total count of all staff records
+    staff_count = 0
+    for i in enumerate(staff):
+      staff_count+=1
+
+    # calculate number of workers required (100 docs per worker)
+    workers = math.ceil(staff_count / 100)
+
+    # function to update the document
+    def update_field(staff_list):
+      for staff in staff_list:
+        if staff.calendly_url is None:
+          staff.calendly_url = ""
+          staff.update()
+          Logger.info(f"Updated {staff.uuid}: \
+                      calendly_url={staff.calendly_url}")
+          updated_staff.append(staff.uuid)
+        else:
+          Logger.info(f"{Staff.uuid}: calendly_url={Staff.calendly_url}")
+
+    # initialize executor
+    executor = ThreadPoolExecutor(max_workers=workers)
+
+    for i in range(workers):
+      executor.submit(update_field, staff[i*100:(i+1)*100])
+
+    executor.shutdown(wait=True)
+
+    return {
+      "success": True,
+      "message": "Successfully added calendly_url field",
+      "data": {
+        "updated_staff": updated_staff
+      }
+    }
+  except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e

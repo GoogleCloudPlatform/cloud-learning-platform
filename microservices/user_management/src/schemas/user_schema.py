@@ -6,11 +6,14 @@ from typing import List, Optional
 from typing_extensions import Literal
 from pydantic import BaseModel, constr, Extra, validator
 from common.models import USER_TYPES
+from common.utils.schema_validator import BaseConfigModel
 from schemas.schema_examples import (BASIC_USER_MODEL_EXAMPLE,
                                      FULL_USER_MODEL_EXAMPLE,
+                                     GET_USERGROUPS_OF_USER,
                                      UPDATE_USER_MODEL_EXAMPLE,
                                      GET_APPLICATIONS_OF_USER)
-class BasicUserModel(BaseModel):
+
+class BasicUserModel(BaseConfigModel):
   """User Skeleton Pydantic Model"""
   first_name: str
   last_name: str
@@ -47,13 +50,29 @@ class InspaceUserModel(BaseModel):
   is_inspace_user: bool = False
   inspace_user_id: str = ""
 
+class BasicUserResponseModel(BaseModel):
+  """User Skeleton Pydantic Model"""
+  first_name: str
+  last_name: str
+  email: constr(
+      min_length=7,
+      max_length=128,
+      regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")
+  user_type: Optional[Literal[tuple(USER_TYPES)]]
+  user_groups: Optional[list] = []
+  status: Optional[Literal["active", "inactive"]] = "active"
+  is_registered: Optional[bool] = True
+  failed_login_attempts_count: Optional[int] = 0
+  access_api_docs: Optional[bool] = False
+  gaia_id: Optional[str] = ""
+  photo_url: Optional[str] = ""
 
-class FullUserDataModel(BasicUserModel):
+class FullUserDataModel(BasicUserResponseModel):
   """User Model with user_id, created and updated time"""
   user_id: str
   created_time: str
   last_modified_time: str
-  user_type_ref: str
+  user_type_ref: str = None
   inspace_user: Optional[InspaceUserModel]
   # FIXME: remove optional after all docs get this field
   is_deleted: Optional[bool] = False
@@ -85,7 +104,7 @@ class UserSearchResponseModel(BaseModel):
     }
 
 
-class UpdateUserModel(BaseModel):
+class UpdateUserModel(BaseConfigModel):
   """Update User Pydantic Request Model"""
   first_name: Optional[str] = None
   last_name: Optional[str] = None
@@ -274,5 +293,26 @@ class GetApplicationsOfUser(BaseModel):
             "success": True,
             "message": "Successfully fetched applications assigned to the user",
             "data": GET_APPLICATIONS_OF_USER
+        }
+    }
+
+class UserGroupsOfUser(BaseModel):
+  uuid: str
+  name: str
+  description: str
+class GetUserGroupsOfUser(BaseModel):
+  """Get Applications Assigned to a User"""
+  success: Optional[bool] = True
+  message: Optional[
+      str] = "Successfully fetched usergroups of user"
+  data: Optional[List[UserGroupsOfUser]]
+
+  class Config():
+    orm_mode = True
+    schema_extra = {
+        "example": {
+            "success": True,
+            "message": "Successfully fetched user groups of the user",
+            "data": GET_USERGROUPS_OF_USER
         }
     }

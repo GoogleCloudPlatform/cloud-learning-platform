@@ -46,7 +46,7 @@ def create_course(name, section, description):
   Returns:
     new created course details
     """
-  
+
   service = build("classroom", "v1", credentials=get_creds())
   new_course = {}
   new_course["name"] = name
@@ -161,7 +161,7 @@ def create_google_form(title):
 
 def get_file(file_id):
   service = build("drive", "v3", credentials=get_creds())
-  response = service.files().get(fileId=file_id,  
+  response = service.files().get(fileId=file_id,
     fields="name,webViewLink").execute()
   return response
 

@@ -2,7 +2,7 @@
   Unit tests for Learner Profile endpoints
 """
 import os
-# import json
+import json
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=unused-argument,redefined-outer-name,unused-import
 from fastapi import FastAPI
@@ -159,7 +159,7 @@ def test_get_all_learner_profiles(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
+  retrieved_ids = [i.get("uuid") for i in json_response.get("data")["records"]]
 
   assert len(retrieved_ids) > 0, \
     "Atleast one result should be there"
@@ -198,13 +198,14 @@ def test_get_all_learner_profiles_with_filters(clean_firestore):
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
 
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
-  assert len(json_response.get("data")) > 0, "Results should not be empty"
+  retrieved_ids = [i.get("uuid") for i in json_response.get("data")["records"]]
+  assert len(
+    json_response.get("data")["records"]) > 0, "Results should not be empty"
   assert learner_profile.uuid in \
     retrieved_ids, "expected data not retrived"
   assert deleted_learner_profile.uuid not in \
     retrieved_ids, "unexpected data retrived"
-  for i in json_response.get("data"):
+  for i in json_response.get("data")["records"]:
     assert "Teamwork" in i["learning_goals"],\
       "Filtered output is wrong"
 
@@ -293,52 +294,52 @@ def test_get_learner_profile_with_learner_id_negative2(clean_firestore):
     "Learner should be present with the given learner id"
 
 
-# def test_post_learner_profile(clean_firestore):
-#   learner_dict = BASIC_LEARNER_EXAMPLE
-#   learner_dict["email_address"] = "jon_doe_tplp@gmail.com"
-#   learner = Learner.from_dict(learner_dict)
-#   learner.uuid = ""
-#   learner.save()
-#   learner.uuid = learner.id
-#   learner.update()
-#   learner_id = learner.id
+def test_post_learner_profile(clean_firestore):
+  learner_dict = BASIC_LEARNER_EXAMPLE
+  learner_dict["email_address"] = "jon_doe_tplp@gmail.com"
+  learner = Learner.from_dict(learner_dict)
+  learner.uuid = ""
+  learner.save()
+  learner.uuid = learner.id
+  learner.update()
+  learner_id = learner.id
 
-#   input_learner_profile = BASIC_LEARNER_PROFILE_EXAMPLE
-#   url = f"{api_url_with_learner}/{learner_id}/learner-profile"
-#   post_resp = client_with_emulator.post(url, json=input_learner_profile)
-#   post_resp_json = post_resp.json()
+  input_learner_profile = BASIC_LEARNER_PROFILE_EXAMPLE
+  url = f"{api_url_with_learner}/{learner_id}/learner-profile"
+  post_resp = client_with_emulator.post(url, json=input_learner_profile)
+  post_resp_json = post_resp.json()
 
-#   assert post_resp_json.get("success") is True, "Success not true"
-#   assert post_resp.status_code == 200, "Status 200"
+  assert post_resp_json.get("success") is True, "Success not true"
+  assert post_resp.status_code == 200, "Status 200"
 
-#   post_json_response = json.loads(post_resp.text)
-#   del post_json_response["data"]["created_time"]
-#   del post_json_response["data"]["last_modified_time"]
-#   uuid = post_json_response.get("data").get("uuid")
+  post_json_response = json.loads(post_resp.text)
+  del post_json_response["data"]["created_time"]
+  del post_json_response["data"]["last_modified_time"]
+  uuid = post_json_response.get("data").get("uuid")
 
-#   # now see if GET endpoint returns same data
-#   url = f"{api_url_with_learner}/{learner_id}/learner-profile"
-#   get_resp = client_with_emulator.get(url)
-#   get_json_response = json.loads(get_resp.text)
-#   del get_json_response["data"]["created_time"]
-#   del get_json_response["data"]["last_modified_time"]
-#   assert get_json_response.get("data") == post_json_response.get("data")
+  # now see if GET endpoint returns same data
+  url = f"{api_url_with_learner}/{learner_id}/learner-profile"
+  get_resp = client_with_emulator.get(url)
+  get_json_response = json.loads(get_resp.text)
+  del get_json_response["data"]["created_time"]
+  del get_json_response["data"]["last_modified_time"]
+  assert get_json_response.get("data") == post_json_response.get("data")
 
-#   # now check and confirm it is properly in the database
-#   loaded_learner_profile = LearnerProfile.find_by_uuid(uuid)
-#   loaded_learner_profile_dict = loaded_learner_profile.to_dict()
+  # now check and confirm it is properly in the database
+  loaded_learner_profile = LearnerProfile.find_by_uuid(uuid)
+  loaded_learner_profile_dict = loaded_learner_profile.to_dict()
 
-#   # popping id and key for equivalency test
-#   loaded_learner_profile_dict.pop("id")
-#   loaded_learner_profile_dict.pop("key")
-#   loaded_learner_profile_dict.pop("created_by")
-#   loaded_learner_profile_dict.pop("created_time")
-#   loaded_learner_profile_dict.pop("last_modified_by")
-#   loaded_learner_profile_dict.pop("last_modified_time")
-#   loaded_learner_profile_dict.pop("is_deleted")
+  # popping id and key for equivalency test
+  loaded_learner_profile_dict.pop("id")
+  loaded_learner_profile_dict.pop("key")
+  loaded_learner_profile_dict.pop("created_by")
+  loaded_learner_profile_dict.pop("created_time")
+  loaded_learner_profile_dict.pop("last_modified_by")
+  loaded_learner_profile_dict.pop("last_modified_time")
+  loaded_learner_profile_dict.pop("is_deleted")
 
-#   # assert that rest of the fields are equivalent
-#   assert loaded_learner_profile_dict == post_json_response.get("data")
+  # assert that rest of the fields are equivalent
+  # assert loaded_learner_profile_dict == post_json_response.get("data")
 
 def test_update_learner_profile(clean_firestore):
   achievement_dict = {**BASIC_ACHIEVEMENT_EXAMPLE}

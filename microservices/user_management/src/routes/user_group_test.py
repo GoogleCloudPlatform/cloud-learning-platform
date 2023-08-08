@@ -526,6 +526,41 @@ def test_add_user_to_user_group_negative_2(clean_firestore):
   assert updated_json_response[
            "message"] == f"UserGroup with uuid {uuid} not found"
 
+def test_add_inactive_user_to_user_group_negative_3(clean_firestore):
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type": "assessor",
+               "status": "inactive"}
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+  user_dict["user_id"] = user.id
+
+
+  group_dict = {
+    **BASIC_GROUP_MODEL_EXAMPLE, "name": "random_group",
+    "is_immutable": False,
+    "users": []
+  }
+  group = UserGroup.from_dict(group_dict)
+  group.uuid = ""
+  group.save()
+  group.uuid = group.id
+  group.update()
+  uuid = group.uuid
+  group_dict["uuid"] = group.id
+
+  req_body = {"user_ids": [user.id]}
+
+  url = f"{api_url}/{uuid}/users/add"
+  resp = client_with_emulator.post(url, json=req_body)
+  updated_json_response = resp.json()
+  print(updated_json_response,"*****************************")
+  assert resp.status_code == 422, "Status code not 200"
+  assert updated_json_response[
+  "message"] == "Only active users can be added to user group. "\
+                    "Few of the given users are inactive"
+
 
 def test_remove_user_from_user_group(clean_firestore):
   group_dict = {**BASIC_GROUP_MODEL_EXAMPLE, "users": ["test_user_id"]}
@@ -857,6 +892,16 @@ def test_get_users_to_add_to_user_group(clean_firestore):
   user.save()
   user.user_id = user.id
   user.update()
+  #create inactive user
+  user_dict_2 = {
+    **FULL_USER_MODEL_EXAMPLE,
+    "user_groups": [], "status": "inactive"
+  }
+  user_2 = User.from_dict(user_dict_2)
+  user_2.user_id = ""
+  user_2.save()
+  user_2.user_id = user_2.id
+  user_2.update()
 
   group_dict = deepcopy(BASIC_GROUP_MODEL_EXAMPLE)
   group = UserGroup.from_dict(group_dict)
@@ -872,6 +917,9 @@ def test_get_users_to_add_to_user_group(clean_firestore):
   assert resp_json["success"] is True
   assert resp_json["message"] == "Successfully fetched users " \
                                  "that can be added to user group"
+  assert len(resp_json.get("data")) == 1, "expected data not retrieved"
+  assert resp_json.get("data")[0]["user_id"
+         ] == user.id, "expected data not retrieved"
 
 
 def test_get_users_to_add_to_user_group_negative(clean_firestore):

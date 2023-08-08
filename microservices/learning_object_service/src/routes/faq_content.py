@@ -10,8 +10,8 @@ from common.utils.errors import (ResourceNotFoundException, ValidationError)
 from common.utils.http_exceptions import (BadRequest, ResourceNotFound)
 from common.utils.logging_handler import Logger
 from common.utils.gcs_adapter import is_valid_path
-from common.utils.sorting import (get_sorted_list)
-from common.utils.pagination import (get_slice)
+from common.utils.sorting_logic import get_sorted_list
+from common.utils.pagination_logic import get_slice
 from config import (CONTENT_SERVING_BUCKET, ERROR_RESPONSES, FAQ_BASE_PATH)
 
 # pylint: disable = line-too-long
@@ -26,7 +26,7 @@ router = APIRouter(tags=["FAQ Content"], responses=ERROR_RESPONSES)
         "model": NotFoundErrorResponseModel
     }})
 def get_faq_by_uuid(uuid: str):
-  """Get FAQ by UUID"""
+  """Function to find FAQ by ID"""
   try:
     faq_content = FAQContent.find_by_uuid(uuid)
     faq_content_dict = faq_content.get_fields(reformat_datetime=True)
@@ -56,7 +56,9 @@ def get_faq_by_uuid(uuid: str):
 def filter_faq(skip: int = Query(0, ge=0, le=2000),
                limit: int = Query(10, ge=1, le=100),
                curriculum_pathway_id: str = None):
-  """Get all FAQs"""
+  """Function to filter FAQs
+  Args:
+    curriculum_pathway_id(str): ID of the CurriculumPathway"""
   try:
     collection_manager = FAQContent.collection.filter("is_deleted", "==", False)
     if curriculum_pathway_id is not None:
@@ -65,13 +67,16 @@ def filter_faq(skip: int = Query(0, ge=0, le=2000),
       collection_manager = collection_manager.filter("curriculum_pathway_id", "==",
                                                       curriculum_pathway_id)
 
-    sorted_list = get_sorted_list(collection_manager, sort_order="descending")
+    sorted_list = get_sorted_list(sort_by="created_time",
+                                  sort_order="descending",
+                                  collection_manager=collection_manager)
     faq_contents = get_slice(sorted_list,skip,limit)
-
+    count = 10000
+    response = {"records": faq_contents, "total_count": count}
     return {
         "success": True,
         "message": "Successfully Fetched FAQs",
-        "data": faq_contents
+        "data": response
     }
 
   except ResourceNotFoundException as e:

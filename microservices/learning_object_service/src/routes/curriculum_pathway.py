@@ -2,7 +2,7 @@
 import traceback
 from typing import Optional, Union
 from fastapi import APIRouter, UploadFile, File, Query, Request
-from common.models import CurriculumPathway, LearnerProfile
+from common.models import CurriculumPathway, LearnerProfile, LOS_LITERALS
 from common.utils.rest_method import put_method
 from common.utils.logging_handler import Logger
 from common.utils.parent_child_nodes_handler import ParentChildNodesHandler
@@ -18,14 +18,15 @@ from schemas.curriculum_pathway_schema import (
     CurriculumPathwaySearchResponseModel,
     AllCurriculumPathwaysResponseModel, CurriculumPathwayImportJsonResponse,
     CopyCurriculumPathwayModel, CurriculumPathwayResponseModel2,
-    GetCurriculumPathwayAliasResponseModel)
+    GetLearningHierarchyNodesResponseModel)
 from schemas.upload_pathway import (PathwayImportJsonResponse)
 from schemas.error_schema import (NotFoundErrorResponseModel,
                                   PayloadTooLargeResponseModel)
 from services.json_import import json_import
 from services.bulk_import import bulk_import, delete_hierarchy_handler
-from services.helper import transform_dict, get_all_nodes_for_alias
-from config import PAYLOAD_FILE_SIZE, ERROR_RESPONSES, ALL_ALIASES, UM_BASE_URL
+from services.helper import transform_dict, get_all_nodes, prerequisite_handler
+from config import (PAYLOAD_FILE_SIZE, ERROR_RESPONSES, UM_BASE_URL,
+                    LOS_NODES, SKILL_NODES)
 
 router = APIRouter(tags=["Curriculum Pathway"])
 
@@ -172,10 +173,12 @@ def get_curriculum_pathways(
     curriculum_pathways = [
         i.get_fields(reformat_datetime=True) for i in curriculum_pathways
     ]
+    count = 10000
+    response = {"records": curriculum_pathways, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": curriculum_pathways
+        "data": response
     }
 
   except ValidationError as e:
@@ -192,19 +195,71 @@ def get_curriculum_pathways(
     raise InternalServerError(str(e)) from e
 
 
-@router.get("/curriculum-pathway/{uuid}/nodes",
-    response_model=GetCurriculumPathwayAliasResponseModel,
+@router.get("/{level}/{uuid}/nodes/{node_type}",
+    response_model=GetLearningHierarchyNodesResponseModel,
     responses={404: {
       "model": NotFoundErrorResponseModel
     }})
-def fetch_all_nodes_for_alias(uuid: str, alias: Optional[str] = "discipline"):
+def fetch_child_nodes_with_filters(uuid: str,
+                              level: str,
+                              node_type: str,
+                              alias: Optional[str] = None,
+                              type: Optional[str] = None, #pylint: disable=redefined-builtin
+                              is_autogradable: Optional[bool] = None):
   """
   This endpoint fetches all nodes belonging to the given alias eg. discipline.
 
   Parameters:
-    uuid: (str) - uuid of the program (pathway).
-    alias (optional): (str) - alias for which all the nodes are to be fetched.
-                              Defaults to "discipline".
+    level (str) - level of the node, below which all nodes of type
+    node_type will be fetched. level have the following values:
+    Literal[curriculum-pathways, learning-experiences, learning-objects,
+    learning-resources, assessments]
+
+    uuid: (str) - uuid of the node of type level
+
+    node_type(str) - All nodes of type node_type will be fetched
+    which occur below the node of type level.
+    node_type can the following values:
+    Literal[curriculum-pathways, learning-experiences, learning-objects,
+    learning-resources, assessments, competencies, skills]
+
+    alias(str) - All nodes of type node_type that are fetched can be
+    filtered on alias field, if the node has alias as field, otherwise it
+    will throw ValidationError.
+    This filter is applicable for the following node_types:
+    Literal[curriculum-pathways, learning-experiences, learning-objects,
+    learning-resources, assessments]
+
+    Here, is the list of aliases that can be used for the node_types:
+    curriculum-pathways: Literal["program", "level", "discipline", "unit"]
+    learning-experiences: Literal[learning_experience]
+    learning-objects: Literal["module"]
+    learning-resources: Literal["lesson"]
+    assessments: Literal["assessment"]
+
+
+    type(str) - All nodes of type node_type that are fetched can be filtered
+    on type field, if the node has type as field, otherwise it will throw
+    ValidationError.
+    This filter is applicable for the following node_types:
+    Literal[curriculum-pathways, learning-experiences, learning-objects,
+    learning-resources, assessments]
+
+    Here, is the list of types that can be used for the node_types:
+    curriculum-pathways: Literal["pathway"]
+    learning-experiences: Literal[learning_experience]
+    learning-objects: Literal["srl", "static_srl", "cognitive_wrapper",
+                "pretest", "learning_module", "unit_overview", "project"]
+    learning-resources: Literal["pdf", "image", "html_package", "html",
+                "video", "scorm", "docx",""]
+    assessments: Literal["practice", "project", "pretest", "srl", "static_srl",
+                "cognitive_wrapper"]
+
+
+    is_autogradable(bool) - Filter applicable on nodes of type assessments.
+    If given False or True will filter out only human-gradable or
+    autogradable assessments. If None, it will give list of all assessments.
+
   Raises:
     ResourceNotFoundException: If the program (pathway) does not exist.
     Exception 500: Internal Server Error. Raised if something went wrong
@@ -214,23 +269,51 @@ def fetch_all_nodes_for_alias(uuid: str, alias: Optional[str] = "discipline"):
   """
   try:
     response = []
-    if alias not in ALL_ALIASES:
-      raise ValidationError(
-        f"Invalid \"alias\" provided. Valid aliases are {ALL_ALIASES}")
-    nodes = get_all_nodes_for_alias(uuid, "curriculum_pathways", alias, [])
+    node_type = node_type.replace("-", "_")
+    level = level.replace("-", "_")
+    if node_type in SKILL_NODES:
+      if alias is not None or type is not None or is_autogradable is not None:
+        raise ValidationError(f"{node_type} does not have alias, type or "
+                              "is_autogradable fields as part of the Schema")
+    if node_type in LOS_NODES:
+      if alias and alias not in LOS_LITERALS[node_type]["alias"]:
+        raise ValidationError(f"{node_type} can have the following aliases: "
+                              f"""{LOS_LITERALS[node_type]["alias"]}""")
+
+      if type and type not in LOS_LITERALS[node_type]["type"]:
+        raise ValidationError(f"{node_type} can have the following types: "
+                              f"""{LOS_LITERALS[node_type]["type"]}""")
+      if is_autogradable is not None and node_type != "assessments":
+        raise ValidationError("is_autogradable field is not supported by "
+                              f"{node_type} data model")
+    nodes = get_all_nodes(uuid, level, node_type, [])
     if nodes is None:
-      raise ValidationError((f"Cannot fetch {alias} from {uuid} as it belongs "
-                            f"to {alias}. Please use different uuid or alias."))
+      raise ValidationError(("Could not find any nodes of type "
+                             f"{node_type} from {uuid}."
+                            " Please use different uuid or alias."))
     else:
+      # If block to handle filters on the fetched nodes of type node_type
+      if alias is not None:
+        nodes = [node for node in nodes if node["alias"]==alias]
+      if type is not None:
+        nodes = [node for node in nodes if node["type"]==type]
+      if is_autogradable is not None:
+        nodes = [node for node in nodes if node[
+          "is_autogradable"]==is_autogradable]
       for node in nodes:
         response.append(
           {
             "uuid": node["uuid"],
+            "collection": node_type,
             "name": node["name"],
-            "alias": node["alias"],
+            "description": node.get("description", ""),
+            "alias": node.get("alias", None),
+            "type": node.get("type", None),
+            "is_autogradable": node.get("is_autogradable", None),
           }
         )
-
+      # Remove duplicates from list of responses
+      response = [dict(t) for t in {tuple(d.items()) for d in response}]
     return {
       "success": True,
       "message": "Data fetched successfully",
@@ -457,9 +540,13 @@ def update_curriculum_pathway(
         CommonAPIHandler.update_document(CurriculumPathway,
                                          uuid,
                                          input_cp_dict)
+      prerequisite_handler(uuid)
     response = None
     if input_cp_dict.get("is_active", None) and pathway.alias == "program":
-      nodes = fetch_all_nodes_for_alias(uuid, "discipline")["data"]
+      nodes = fetch_child_nodes_with_filters(uuid=uuid,
+                                             level="curriculum_pathways",
+                                             node_type="curriculum_pathways",
+                                             alias="discipline")["data"]
       headers = {"Authorization": request.headers.get("Authorization")}
       api_url = \
     f"{UM_BASE_URL}/association-groups/active-curriculum-pathway/update-all"
@@ -624,7 +711,7 @@ def copy_curriculum_pathway(uuid: str):
         "model": PayloadTooLargeResponseModel
     }})
 async def bulk_import_pathway(req: Request, json_file: UploadFile = File(...)):
-  """Import a pathway from the JSON file"""
+  """Function to bulk import the learning hierarchy"""
   try:
     if len(await json_file.read()) > PAYLOAD_FILE_SIZE:
       raise PayloadTooLargeError(

@@ -251,6 +251,8 @@ def test_copy_lti_assignment(mock_get_lti_tool, mock_list_content_items,
   req_body = {
       **COPY_LTI_ASSIGNMENT_EXAMPLE, "lti_assignment_id":
           lti_assignment_details.id,
+      "source_context_id":
+          INSERT_LTI_ASSIGNMENT_EXAMPLE["context_id"],
       "start_date":
           str(COPY_LTI_ASSIGNMENT_EXAMPLE["start_date"]),
       "end_date":
@@ -267,7 +269,8 @@ def test_copy_lti_assignment(mock_get_lti_tool, mock_list_content_items,
   assert list_content_items[0].get("id") == json_resp.get("data").get(
       "lti_content_item_id")
 
-
+@pytest.mark.parametrize(
+    "create_lti_assignment", [INSERT_LTI_ASSIGNMENT_EXAMPLE], indirect=True)
 @mock.patch("routes.lti_assignment.create_content_item")
 @mock.patch("routes.lti_assignment.get_content_item")
 @mock.patch("routes.lti_assignment.list_content_items")
@@ -276,6 +279,7 @@ def test_copy_lti_assignment_allow_everytime(mock_get_lti_tool,
                                              mock_list_content_items,
                                              mock_get_content_item,
                                              mock_create_content_item,
+                                             clean_firestore,
                                              create_lti_assignment):
   """Test for copy lti assignment for tool with deeplink_type
   as `Allow everytime`"""
@@ -318,6 +322,8 @@ def test_copy_lti_assignment_allow_everytime(mock_get_lti_tool,
   req_body = {
       **COPY_LTI_ASSIGNMENT_EXAMPLE, "lti_assignment_id":
           lti_assignment_details.id,
+      "source_context_id":
+          INSERT_LTI_ASSIGNMENT_EXAMPLE["context_id"],
       "start_date":
           str(COPY_LTI_ASSIGNMENT_EXAMPLE["start_date"]),
       "end_date":
@@ -326,6 +332,7 @@ def test_copy_lti_assignment_allow_everytime(mock_get_lti_tool,
           str(COPY_LTI_ASSIGNMENT_EXAMPLE["due_date"])
   }
   resp = client_with_emulator.post(url, json=req_body)
+  print("resp", resp.status_code, resp.text)
   print("resp", resp.status_code, resp.text)
   assert resp.status_code == 200, "Status should be 200"
   json_resp = resp.json()

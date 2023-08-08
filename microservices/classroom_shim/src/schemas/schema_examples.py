@@ -33,6 +33,8 @@ UPDATE_LTI_ASSIGNMENT_EXAMPLE = {
 COPY_LTI_ASSIGNMENT_EXAMPLE = {
     "lti_assignment_id": "bV2EH89JdS76t7q34",
     "context_id": "n0q082N1CN8Wb34y3",
+    "source_context_id": "N4gq3n07w9vbHsAqc",
+    "course_work_id": "Bre15nb2n03Vm8PsY",
     "start_date": datetime.datetime(year=2023, month=1, day=14),
     "end_date": datetime.datetime(year=2023, month=3, day=14),
     "due_date": datetime.datetime(year=2023, month=2, day=14)

@@ -7,17 +7,17 @@ from typing_extensions import Literal
 from schemas.schema_examples import (BASIC_AGENT_SCHEMA_EXAMPLE,
                                      FULL_AGENT_SCHEMA_EXAMPLE,
                                      UPDATE_AGENT_SCHEMA_EXAMPLE)
+from common.utils.schema_validator import BaseConfigModel
 
-
-class BasicAgentModel(BaseModel):
+class BasicAgentModel(BaseConfigModel):
   """Agent Pydantic Model"""
   object_type: Literal["agent", "group"]
   name: str
-  mbox: Optional[str] = ""
-  mbox_sha1sum: Optional[str] = ""
-  open_id: Optional[str] = ""
+  mbox: Optional[str] = None
+  mbox_sha1sum: Optional[str] = None
+  open_id: Optional[str] = None
   account_homepage: str
-  account_name: Optional[str] = ""
+  account_name: Optional[str] = None
   members: Optional[list] = []
   user_id: str
 
@@ -40,7 +40,7 @@ class AgentModel(BasicAgentModel):
     extra = "forbid"
 
 
-class UpdateAgentModel(BaseModel):
+class UpdateAgentModel(BaseConfigModel):
   """Update Agent Pydantic Model"""
   object_type: Optional[Literal["agent", "group"]]
   name: Optional[str]
@@ -105,11 +105,14 @@ class UpdateAgentModelResponse(BaseModel):
         }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullAgentDataModel]]
+  total_count: int
 
 class AllAgentModelResponse(BaseModel):
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the agents"
-  data: List[FullAgentDataModel]
+  data: TotalCountResponseModel
 
   class Config():
     orm_mode = True
@@ -117,7 +120,10 @@ class AllAgentModelResponse(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully fetched the agents",
-            "data": [FULL_AGENT_SCHEMA_EXAMPLE]
+            "data": {
+                      "records":[FULL_AGENT_SCHEMA_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

@@ -61,22 +61,30 @@ class UpdateGoalModel(BaseModel):
     schema_extra = {"example": UPDATE_GOAL_EXAMPLE}
 
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullGoalDataModel]]
+  total_count: int
+
+
 class GetAllGoalsResponseModel(BaseModel):
   """
   Get All Goals Response Pydantic Model
   """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the goal"
-  data: Optional[List[FullGoalDataModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
     schema_extra = {
-      "example": {
-        "success": True,
-        "message": "Successfully fetched the goal",
-        "data": [FULL_GOAL_EXAMPLE]
-      }
+        "example": {
+            "success": True,
+            "message": "Successfully fetched the goal",
+            "data": {
+                      "records":[FULL_GOAL_EXAMPLE],
+                      "total_count": 50
+                    }
+        }
     }
 
 
@@ -187,6 +195,9 @@ class GoalImportJsonResponse(BaseModel):
       "example": {
         "success": True,
         "message": "Successfully created the goals",
-        "data": ["44qxEpc35pVMb6AkZGbi", ]
-      }
+        "data": [
+                "44qxEpc35pVMb6AkZGbi", "00MPqUhCbyPe1BcevQDr",
+                "lQRzcrRuDpJ9IoW8bCHu"
+            ]
+        }
     }

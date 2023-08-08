@@ -132,7 +132,8 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  assert context.res_data["data"][0]["user_id"] == get_cache(key="test_user_id")
+  assert context.res_data["data"]["records"][0]["user_id"] == get_cache(
+    key="test_user_id")
 
 #-------------------------------GET ALL AGENTS-----------------------------------
 # --- Positive Scenario ---
@@ -158,7 +159,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Data fetched successfully"
-  fetched_uuids = [i.get("uuid") for i in context.res_data.get("data")]
+  fetched_uuids = [i.get("uuid") for i in context.res_data.get("data")["records"]]
   assert set(context.imported_agent_ids).intersection(set(fetched_uuids)) \
     == set(context.imported_agent_ids), "all data not retrieved"
 
@@ -298,7 +299,8 @@ def step_impl_3(context):
   get_agents_url = f"{API_URL_LEARNING_RECORD_SERVICE}/agents"
   get_res = get_method(get_agents_url)
   get_res_data = get_res.json()
-  fetched_uuids = [i.get("uuid") for i in get_res_data.get("data")]
+
+  fetched_uuids = [i.get("uuid") for i in get_res_data.get("data")["records"]]
   assert set(imported_agent_ids).intersection(set(fetched_uuids)) \
     == set(imported_agent_ids), "all data not retrieved"
 

@@ -1,9 +1,15 @@
 """ Function to get all discipline list for given program
 """
+from concurrent.futures import ThreadPoolExecutor
+import math
+import traceback
 from common.models import AssociationGroup
 from common.utils.collection_references import collection_references
+from common.utils.logging_handler import Logger
+from common.utils.http_exceptions import InternalServerError
+from services.collection_handler import CollectionHandler
 
-
+# pylint: disable = invalid-name
 def get_all_discipline_for_given_program(uuid, nodes):
   """
   Args:
@@ -54,3 +60,42 @@ def get_all_assign_user_for_given_instructor_or_coach(uuid, user_type):
   users = list({learner["user"] for learner in learner_list if
                 learner.get("status", "")=="active"})
   return users
+
+def get_data_for_fetch_tree(data,sort_by="created_time",sort_order="ascending"):
+  """Get data for fetch_tree"""
+  userList = []
+  def fetch_records(records):
+    for i in records:
+      record = CollectionHandler.loads_field_data_from_collection(
+        i.get_fields(reformat_datetime=True))
+      userList.append(record)
+
+  try:
+    data = list(data)
+    data_count = 0
+    for _ in enumerate(data):
+      data_count+=1
+
+    workers = math.ceil(data_count/ 50)
+    if workers == 0:
+      workers = 1
+
+    executor = ThreadPoolExecutor(max_workers=workers)
+    for batch_index in range(workers):
+      start_index = batch_index * 50
+      end_index = (batch_index + 1) * 50
+      executor.submit(fetch_records,data[start_index: end_index])
+    executor.shutdown(wait=True)
+
+    # sort the list
+    reverse = False
+    if sort_order != "ascending":
+      reverse = True
+    userList.sort(key=lambda x: x.get(sort_by), reverse=reverse)
+
+    return userList
+
+  except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise InternalServerError(str(e)) from e

@@ -378,8 +378,8 @@ def delete_lti_assignment(lti_assignment_id: str):
         classroom_crud.delete_course_work(course_id,
                                           lti_assignment.course_work_id)
       elif course_work_type == "course_work_material":
-        classroom_crud.delete_course_work_material(course_id,
-                                          lti_assignment.course_work_id)
+        classroom_crud.delete_course_work_material(
+            course_id, lti_assignment.course_work_id)
     except Exception as e:
       Logger.error(
           f"Error deleting assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
@@ -431,6 +431,15 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     content_item_id = lti_assignment_data.get("lti_content_item_id")
     prev_context_id = lti_assignment_data.get("context_id")
 
+    source_context_id = input_data_dict.get("source_context_id")
+    if prev_context_id != source_context_id:
+      Logger.error(
+          f"LTI Assignment '{lti_assignment.id}' is tagged to context - \
+            '{prev_context_id}' but doesn't match with the given source \
+              context id - {source_context_id}")
+      raise ValidationError(
+          f"Provided LTI Assignment '{lti_assignment.id}' doesn't belong to \
+            given context: '{source_context_id}'")
     content_item_data = get_content_item(content_item_id)
 
     # create a copy of above content item
@@ -495,25 +504,50 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     # if input_data_dict.get("due_date"):
     #   lti_assignment_due_date = input_data_dict.get("due_date")
 
-    new_lti_assignment_data = {
-        "lti_assignment_title": lti_assignment_data.get("lti_assignment_title"),
-        "context_type": "section",
-        "context_id": input_data_dict.get("context_id"),
-        "prev_context_ids": prev_context_ids,
-        "lti_content_item_id": copy_content_item_data.get("id"),
-        "prev_content_item_ids": prev_content_item_ids,
-        "course_work_id": None,
-        "course_work_type": lti_assignment_data.get("course_work_type"),
-        "tool_id": lti_assignment_data.get("tool_id"),
-        "max_points": lti_assignment_data.get("max_points"),
-        "start_date": lti_assignment_start_date,
-        "end_date": lti_assignment_end_date,
-        "due_date": lti_assignment_due_date
-    }
+    # Checks if the assignment for the given coursework has already been created
+    fetch_lti_assignment = LTIAssignment.collection.filter(
+        "tool_id", "==", lti_assignment_data.get("tool_id")).filter(
+            "context_id", "==", input_data_dict.get("context_id")).filter(
+                "course_work_id", "==",
+                input_data_dict.get("course_work_id")).filter(
+                    "lti_assignment_title", "==",
+                    lti_assignment_data.get("lti_assignment_title")).get()
 
-    new_lti_assignment = LTIAssignment.from_dict(new_lti_assignment_data)
-    new_lti_assignment.save()
-    new_lti_assignment_item = new_lti_assignment.to_dict()
+    if fetch_lti_assignment:
+      new_lti_assignment_item = fetch_lti_assignment.to_dict()
+    else:
+      new_lti_assignment_data = {
+          "lti_assignment_title":
+              lti_assignment_data.get("lti_assignment_title"),
+          "context_type":
+              "section",
+          "context_id":
+              input_data_dict.get("context_id"),
+          "prev_context_ids":
+              prev_context_ids,
+          "lti_content_item_id":
+              copy_content_item_data.get("id"),
+          "prev_content_item_ids":
+              prev_content_item_ids,
+          "course_work_id":
+              input_data_dict.get("course_work_id"),
+          "course_work_type":
+              lti_assignment_data.get("course_work_type"),
+          "tool_id":
+              lti_assignment_data.get("tool_id"),
+          "max_points":
+              lti_assignment_data.get("max_points"),
+          "start_date":
+              lti_assignment_start_date,
+          "end_date":
+              lti_assignment_end_date,
+          "due_date":
+              lti_assignment_due_date
+      }
+
+      new_lti_assignment = LTIAssignment.from_dict(new_lti_assignment_data)
+      new_lti_assignment.save()
+      new_lti_assignment_item = new_lti_assignment.to_dict()
 
     return {
         "success": True,

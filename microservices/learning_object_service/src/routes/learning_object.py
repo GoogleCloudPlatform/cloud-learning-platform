@@ -164,10 +164,12 @@ def get_learning_objects(display_name: str = None,
     learning_objects = [
         i.get_fields(reformat_datetime=True) for i in learning_objects
     ]
+    count = 10000
+    response = {"records": learning_objects, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": learning_objects
+        "data": response
     }
   except ValidationError as e:
     Logger.error(e)
@@ -352,7 +354,6 @@ def update_learning_object(uuid: str,
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
-    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
