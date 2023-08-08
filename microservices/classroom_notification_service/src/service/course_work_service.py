@@ -96,14 +96,6 @@ def save_course_work_collection(course_id,course_work_id,message_id,event_type):
     course_work=get_course_work(
       course_id=course_id,course_work_id=course_work_id)
     course_work["uuid"] = str(uuid.uuid4())
-    notification_message = {
-        "type": "broadcast",
-        "classroom_id": course_id,
-        "course_work_id": course_work_id,
-        "course_work_title": course_work["title"],
-        "course_work_url": course_work["alternateLink"],
-        "message": get_message(event_type,"Assignment")
-    }
     course_work["message_id"] = message_id
     course_work["assignment"] =convert_to_json(course_work,"assignment")
     course_work["multipleChoiceQuestion"] = convert_to_json(
@@ -118,7 +110,14 @@ def save_course_work_collection(course_id,course_work_id,message_id,event_type):
     return insert_rows_to_bq(
       rows=[course_work],
       dataset=BQ_DATASET,
-      table_name=BQ_TABLE_DICT["BQ_COLL_CW_TABLE"]),notification_message
+      table_name=BQ_TABLE_DICT["BQ_COLL_CW_TABLE"]),{
+        "type": "broadcast",
+        "classroom_id": course_id,
+        "course_work_id": course_work_id,
+        "course_work_title": course_work["title"],
+        "course_work_url": course_work["alternateLink"],
+        "message": get_message(event_type, "Assignment")
+    }
   except HttpError as hte:
     Logger.info(hte)
     if hte.status_code == 404:
@@ -155,7 +154,7 @@ def save_student_submission(course_id, course_work_id,
   """
   submission = get_student_submissions(
       course_id, course_work_id, submissions_id)
-  notification_message = get_student_submission_message(submission)
+  submission_details=submission.copy()
   submission["uuid"] = str(uuid.uuid4())
   submission["message_id"]=message_id
   submission["assignmentSubmission"] = convert_to_json(
@@ -171,7 +170,9 @@ def save_student_submission(course_id, course_work_id,
   return insert_rows_to_bq(
     rows=[submission],
     dataset=BQ_DATASET,
-    table_name=BQ_TABLE_DICT["BQ_COLL_SCW_TABLE"]),notification_message
+    table_name=BQ_TABLE_DICT["BQ_COLL_SCW_TABLE"]
+    ),get_student_submission_message(
+      submission_details)
 
 def get_student_submission_message(submission):
   """get student submission message for lms notification
@@ -191,24 +192,25 @@ def get_student_submission_message(submission):
       if x["gradeHistory"]["gradeChangeType"] ==
       "ASSIGNED_GRADE_POINTS_EARNED_CHANGE"
   ]
-
-  if (datetime.datetime.strptime(
-    submission["updateTime"].split(".")[0],
-      "%Y-%m-%dT%H:%M:%S") == max(list_of_assigned_datetime)):
-    course_work = get_course_work(submission["courseId"],
-                                  submission["courseWorkId"])
-    user = get_user(submission["userId"])
-    notification_message = {
-        "type": "user",
-        "email": user["emailAddress"],
-        "name": user["name"],
-        "classroom_id": submission["courseId"],
-        "course_work_id": submission["courseWorkId"],
-        "course_work_title": course_work["title"],
-        "course_work_url": course_work["alternateLink"],
-        "assigned_grade": submission["assignedGrade"],
-        "gaia_id": submission["userId"],
-        "role": "learner",
-        "message": "Teacher graded the assignment"
-    }
+  if (submission["state"]=="RETURNED"
+      or submission["assignedGrade"] or list_of_assigned_datetime):
+    if (datetime.datetime.strptime(
+      submission["updateTime"].split(".")[0],
+        "%Y-%m-%dT%H:%M:%S") == max(list_of_assigned_datetime)):
+      course_work = get_course_work(submission["courseId"],
+                                    submission["courseWorkId"])
+      user = get_user(submission["userId"])
+      notification_message = {
+          "type": "user",
+          "email": user["emailAddress"],
+          "name": user["name"],
+          "classroom_id": submission["courseId"],
+          "course_work_id": submission["courseWorkId"],
+          "course_work_title": course_work["title"],
+          "course_work_url": course_work["alternateLink"],
+          "assigned_grade": submission["assignedGrade"],
+          "gaia_id": submission["userId"],
+          "role": "learner",
+          "message": "Teacher graded the assignment"
+      }
   return notification_message

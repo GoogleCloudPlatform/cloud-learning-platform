@@ -76,26 +76,35 @@ def save_user(user_id,course_id,message_id,event_type,collection):
   """
   user=get_user(user_id)
   notification_message=None
-  if event_type == "CREATED":
-    course=get_course_by_id(course_id)
-    notification_message = {
-        "type": "user",
-        "email": user["emailAddress"],
-        "name": user["name"],
-        "gaia_id": user_id,
-        "role": role_dict[collection.split(".")[1]],
-        "classroom_id": course_id,
-        "course_title": course["name"],
-        "classroom_url":course["alternateLink"],
-        "message": ("User is successfully enrolled in classroom "
-                    + f"{course['name']}")
-        }
   user["uuid"]=str(uuid.uuid4())
   user["message_id"]=message_id
   user["timestamp"] = datetime.datetime.utcnow()
   user["event_type"]=event_type
   user["permissions"] = convert_dict_array_to_json(user, "permissions")
-  return insert_rows_to_bq(
+  insert_rows_flag=insert_rows_to_bq(
     rows=[user],
     dataset=BQ_DATASET,
-    table_name=BQ_TABLE_DICT["BQ_COLL_USER_TABLE"]),notification_message
+    table_name=BQ_TABLE_DICT["BQ_COLL_USER_TABLE"])
+  if event_type == "CREATED":
+    course = get_course_by_id(course_id)
+    notification_message = {
+        "type":
+        "user",
+        "email":
+        user["emailAddress"],
+        "name":
+        user["name"],
+        "gaia_id":
+        user_id,
+        "role":
+        role_dict[collection.split(".")[1]],
+        "classroom_id":
+        course_id,
+        "course_title":
+        course["name"],
+        "classroom_url":
+        course["alternateLink"],
+        "message":
+        ("User is successfully enrolled in classroom " + f"{course['name']}")
+    }
+  return insert_rows_flag,notification_message
