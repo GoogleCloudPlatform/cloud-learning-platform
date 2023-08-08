@@ -19,6 +19,7 @@ from routes import activity_state, agent, activity, statement, verb
 from common.utils.http_exceptions import add_exception_handlers
 from common.utils.auth_service import validate_token
 
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,

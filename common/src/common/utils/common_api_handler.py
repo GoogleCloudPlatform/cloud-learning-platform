@@ -18,7 +18,7 @@ class CommonAPIHandler:
         for key, val in request_body[field].items():
           if val is None:
             request_body[field][key] = \
-              existing_doc_object_dict[field][key]
+              existing_doc_object_dict[field].get(key,[])
     ParentChildNodesHandler.compare_and_update_nodes_references(
         request_body, existing_doc_object_dict, collection)
     for key, value in request_body.items():

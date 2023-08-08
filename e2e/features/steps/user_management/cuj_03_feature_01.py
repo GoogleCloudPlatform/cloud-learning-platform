@@ -188,7 +188,7 @@ def step_impl_3(context):
   assert context.res_data["success"] is True
   assert context.res_data["message"] == "Data fetched successfully"
   fetched_uuids = [i.get(
-    "uuid") for i in context.res_data.get("data")]
+    "uuid") for i in context.res_data.get("data")["records"]]
   assert context.application_uuid in fetched_uuids
 
 

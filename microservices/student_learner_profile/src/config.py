@@ -16,10 +16,10 @@ os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 
-IS_DEVELOPMENT = bool(os.getenv("IS_DEVELOPMENT", "").lower() \
+IS_DEVELOPMENT = bool(os.getenv("IS_DEVELOPMENT", "").lower()
                       in ("True", "true"))
 
-PAYLOAD_FILE_SIZE = 2097152 #2MB
+PAYLOAD_FILE_SIZE = 2097152  # 2MB
 
 ERROR_RESPONSES = {
   500: {

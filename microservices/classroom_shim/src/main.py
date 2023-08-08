@@ -14,7 +14,7 @@ import config
 import uvicorn
 from fastapi import FastAPI, Depends
 from fastapi.templating import Jinja2Templates
-from routes import launch, lti_assignment, grade, context, content_selection, user_shim
+from routes import launch, lti_assignment, grade, context, content_selection, user_shim, e2e_resource_launch
 from common.utils.http_exceptions import add_exception_handlers
 from common.utils.auth_service import validate_user
 
@@ -41,6 +41,10 @@ api.include_router(grade.router, dependencies=[Depends(validate_user)])
 api.include_router(
     content_selection.router, dependencies=[Depends(validate_user)])
 api.include_router(user_shim.router, dependencies=[Depends(validate_user)])
+api.include_router(
+    e2e_resource_launch.router,
+    dependencies=[Depends(validate_user)],
+    include_in_schema=False)
 
 add_exception_handlers(app)
 add_exception_handlers(api)

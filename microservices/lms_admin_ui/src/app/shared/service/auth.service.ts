@@ -54,6 +54,7 @@ export class AuthService {
     const credential = await this.afAuth.signInWithPopup(provider);
     localStorage.setItem('user', credential.user.displayName)
     localStorage.setItem('userEmail', credential.user.email)
+    this.setUserId(credential.user.email)
     credential.user?.getIdToken().then(idToken => {
       localStorage.setItem('idToken', idToken)
       this.setUserId(credential.user.email)
@@ -72,17 +73,18 @@ export class AuthService {
     });
   }
 
-  async emaiAndPasswordSignIn(email:string,password:string) {
-    const provider = new auth.GoogleAuthProvider();
-    const credential = await this.afAuth.signInWithEmailAndPassword(email,password)
-console.log("credential",credential)
+  async emaiAndPasswordSignIn(email: string, password: string) {
+    const credential = await this.afAuth.signInWithEmailAndPassword(email, password)
+    console.log("credential", credential)
     console.log('user', credential.user.displayName)
     localStorage.setItem('user', credential.user.displayName)
+    localStorage.setItem('userEmail', credential.user.email)
+    this.setUserId(credential.user.email)
 
     credential.user?.getIdToken().then(idToken => {
       localStorage.setItem('idToken', idToken)
       // this.openFailureSnackBar('idToken :' +idToken, 'Close')
-      
+
       this.validate().subscribe((res: any) => {
         // console.log(res)
         if (res.success == true) {
@@ -99,8 +101,8 @@ console.log("credential",credential)
       })
 
     })
-    .catch(error => {
-      console.log('Something is wrong:', error.message);
+      .catch(error => {
+        console.log('Something is wrong:', error.message);
       });
   }
 

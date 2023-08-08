@@ -70,7 +70,7 @@ class GcsCrudService:
 
 
 def create_single_submitted_assessment(assign_assessor=True):
-  """Function to create a submitted assessment"""
+  """Function to create a single submitted assessment for UT"""
   # create a submitted assessment
   with open(
       "./testing/submitted_assessment.json", encoding="UTF-8") as json_file:
@@ -686,10 +686,8 @@ def test_download_all_content_for_assessment_positive(clean_firestore, mocker):
 
   zip_file_location = f"{TESTING_FOLDER_PATH}/sample_zip_download.zip"
 
-  mocker.patch("services.assessment_content_helper.download_files_for_assessment",
-      return_value=[])
-  mocker.patch("services.zip_file_processor.create_zip_file",
-      return_value=zip_file_location)
+  mocker.patch("routes.assessment_content.create_zip_for_assessment_contents",
+      return_value=(zip_file_location, "sample_zip_download.zip", []))
 
   assessment = create_single_assessment()
 

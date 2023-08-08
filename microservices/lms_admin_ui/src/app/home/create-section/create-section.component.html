@@ -52,10 +52,16 @@
 </div>
 <div mat-dialog-actions>
     <button mat-flat-button (click)="onNoClick()">Cancel</button>
-    <button mat-flat-button color="primary" (click)="createSection()" [disabled]="!addSectionForm.valid">
+    <button mat-flat-button color="primary" (click)="createSectionAlpha()" [disabled]="!addSectionForm.valid || showProgressSpinner">
+        <mat-icon *ngIf="showProgressSpinnerAlpha" style="margin-right:5px;">
+            <mat-spinner diameter="20"></mat-spinner>
+        </mat-icon>{{ (requiredDetails.mode == 'Create') ? 'Create Section (Alpha)*' : 'Save Section (Alpha)*' }}
+    </button>
+
+    <button mat-flat-button color="primary" (click)="createSection()" [disabled]="!addSectionForm.valid || showProgressSpinnerAlpha">
         <mat-icon *ngIf="showProgressSpinner" style="margin-right:5px;">
             <mat-spinner diameter="20"></mat-spinner>
-        </mat-icon>{{ (requiredDetails.mode == 'Create') ? 'Create' : 'Save' }}
+        </mat-icon>{{ (requiredDetails.mode == 'Create') ? 'Create Section' : 'Save Section' }}
     </button>
 </div>
 <!-- <button mat-button (click)="createCourseTemplate()">Create</button> -->

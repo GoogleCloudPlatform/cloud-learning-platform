@@ -120,7 +120,7 @@ def step_impl_3(context):
     )
     get_agent_res_json = get_agent_res.json()
     assert get_agent_res.status_code == 200
-    assert get_agent_res_json["data"][0]["name"] == context.request_body["first_name"] + " " + context.request_body["last_name"], "Agent name not updated"
+    assert get_agent_res_json["data"]["records"][0]["name"] == context.request_body["first_name"] + " " + context.request_body["last_name"], "Agent name not updated"
     get_learner_url = f"{SLP_API_URL}/learner/{context.user_ref_id}"
     get_learner_res = get_method(url=get_learner_url)
     get_learner_res_json = get_learner_res.json()
@@ -204,7 +204,7 @@ def step_impl_3(context):
         query_params= {"user_id":context.uuid}
     )
     assert get_agent_res.status_code == 200
-    assert len(get_agent_res.json()["data"]) == 0
+    assert len(get_agent_res.json()["data"]["records"]) == 0
 
     get_learner_url = f"{SLP_API_URL}/learner/{context.learner_id}"
     get_learner_res = get_method(url= get_learner_url)

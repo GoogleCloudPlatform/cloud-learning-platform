@@ -7,9 +7,10 @@ from copy import deepcopy
 from uuid import uuid4
 
 sys.path.append("../")
+from common.models import AssociationGroup, UserGroup, User
 from e2e.test_object_schemas import TEST_ASSOCIATION_GROUP, TEST_USER
 from e2e.test_config import API_URL_USER_MANAGEMENT
-from e2e.setup import post_method, get_method, put_method, delete_method
+from e2e.setup import create_immutable_user_groups, post_method, get_method, put_method, delete_method
 
 UM_API_URL = f"{API_URL_USER_MANAGEMENT}"
 
@@ -45,7 +46,7 @@ def step_impl_3(context):
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Successfully fetched the association group"
   assert context.res_data[
-     "data"][0]["name"] == context.name
+     "data"]["records"][0]["name"] == context.name
 
 
 # --- Negative Scenario---
@@ -74,7 +75,7 @@ def step_impl_3(context):
   assert context.res.status_code == 200
   assert context.res_data["success"] is True, "Success is not True"
   assert context.res_data["message"] == "Successfully fetched the association group"
-  assert context.res_data["data"] == []
+  assert context.res_data["data"]["records"] == []
 
 
 # --- Fetch Association Groups from User management by searching with empty search_query--
@@ -214,6 +215,13 @@ def step_impl_1(context):
 
     assert post_user_res.status_code == 200
     context.uuid = post_user_res.json()["data"]["user_id"]
+    learner_user_group_id = create_immutable_user_groups("learner")
+    user_group = UserGroup.find_by_uuid(learner_user_group_id)
+    setattr(user_group, 'users', [context.uuid])
+
+    existing_user = User.find_by_uuid(context.uuid)
+    setattr(existing_user, 'user_groups', [user_group.uuid])
+    existing_user.update()
 
     association_group_dict = deepcopy(TEST_ASSOCIATION_GROUP)
     association_group_dict["name"] = str(uuid4())

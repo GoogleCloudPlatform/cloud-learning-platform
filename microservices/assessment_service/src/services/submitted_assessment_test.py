@@ -47,8 +47,7 @@ def fixture_create_assessment():
 
 
 def create_single_user(user_id="user_id", ref="learner1"):
-  """Function to create a user"""
-  # create a user
+  """create a user"""
   with open(RELATIVE_PATH + "user.json", encoding="UTF-8") as json_file:
     user_fields = json.load(json_file)[0]
   user_fields["user_id"] = user_id
@@ -73,8 +72,7 @@ def create_single_learner():
 
 
 def create_single_assessment(create_rubric = False):
-  """Function to create an assessment"""
-  # create an assessment
+  """create an assessment"""
   if create_rubric:
     rubric = Rubric()
     rubric.uuid = ""
@@ -188,16 +186,17 @@ def test_submit_assessment(clean_firestore, mocker, input_submitted_assessment,
   submission_output = submit_assessment(input_submitted_assessment, "token")
   assert submission_output["timer_start_time"] == submission_output[
       "created_time"]
+  del submission_output["id"]
   del submission_output["timer_start_time"]
   del submission_output["created_time"]
   del submission_output["last_modified_time"]
   del submission_output["created_by"]
   del submission_output["last_modified_by"]
   del submission_output["uuid"]
-  del submission_output["archived_by"]
   del submission_output["archived_at_timestamp"]
-  del submission_output["deleted_by"]
+  del submission_output["archived_by"]
   del submission_output["deleted_at_timestamp"]
+  del submission_output["deleted_by"]
   output["assessment_id"]= assessment.uuid
   assert submission_output == output
 
@@ -247,6 +246,7 @@ def test_get_all_submission(mocker, clean_firestore):
   submitted_assessment_dict["max_attempts"] = assessment.max_attempts
   submitted_assessment_dict["instructor_id"] = ""
   submitted_assessment_dict["instructor_name"] = "Unassigned"
+  submitted_assessment_dict["assessment_name"] = assessment.display_name
   submitted_assessment_dict["attempt_no"] = 1
 
   submitted_assessment_uuid = submitted_assessment_dict["uuid"]
@@ -294,6 +294,7 @@ def test_latest_submitted_assessment(mocker, clean_firestore):
     submitted_assessment_dict["max_attempts"] = assessment.max_attempts
     submitted_assessment_dict["instructor_id"] = ""
     submitted_assessment_dict["instructor_name"] = "Unassigned"
+    submitted_assessment_dict["assessment_name"] = assessment.display_name
     submitted_assessment_dict["attempt_no"] = i
 
   learner_id = submitted_assessment_dict["learner_id"]

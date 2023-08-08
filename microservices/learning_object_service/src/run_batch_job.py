@@ -8,7 +8,7 @@ from common.models.batch_job import BatchJobModel
 from services.zip_file_processor import recreate_zip_structure_on_gcs
 
 from config import (JOB_NAMESPACE, VALIDATE_AND_UPLOAD_ZIP)
-# pylint: disable = broad-exception-raised
+# pylint: disable = broad-exception-raised, consider-using-f-string
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("container_name", "",
@@ -33,13 +33,12 @@ def main(argv):
     if JOB_NAMESPACE == "default":
       kube_delete_job(FLAGS.container_name, JOB_NAMESPACE)
   except Exception as e:
-    Logger.info(f"Job failed. Error: {str(e)}")
+    Logger.info("Job failed. Error: %s" % str(e))
     job = BatchJobModel.find_by_uuid(FLAGS.container_name)
     job.status = "failed"
     job.errors = {"error_message": str(e)}
     job.update()
-    Logger.info(f"Namespace: {JOB_NAMESPACE}")
-
+    Logger.info("Namespace: %s" % JOB_NAMESPACE)
     raise e
 
 

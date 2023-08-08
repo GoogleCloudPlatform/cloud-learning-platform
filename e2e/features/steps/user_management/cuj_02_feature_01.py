@@ -155,6 +155,31 @@ def step_impl_3(context):
     fetched_uuids = [i.get("uuid") for i in context.res_data.get("data")["records"]]
     assert context.group_uuid in fetched_uuids
 
+@behave.given("A user has access to User management and needs to sort user groups")
+def step_impl_1(context):
+    context.group_dict = {**TEST_USER_GROUP, "name": f"{uuid4()}"}
+    post_group = post_method(
+        url=f"{UM_API_URL}/user-group", request_body=context.group_dict)
+    context.post_group_data = post_group.json()
+    context.group_uuid = context.post_group_data["data"]["uuid"]
+    assert post_group.status_code == 200
+    context.url = f"{UM_API_URL}/user-groups"
+
+@behave.when("API request is sent to sort user groups")
+def step_impl_2(context):
+    query_params = {"sort_by": "name", "sort_order": "ascending"}
+    context.res = get_method(url=context.url, query_params=query_params)
+    context.res_data = context.res.json()
+
+
+@behave.then("User management will return all existing UserGroup objects by sorted order")
+def step_impl_3(context):
+    assert context.res.status_code == 200
+    assert context.res_data["success"] is True, "Success is not True"
+    assert context.res_data["message"] == "Successfully fetched user groups"
+    fetched_uuids = [i.get("uuid") for i in context.res_data.get("data")["records"]]
+    assert context.group_uuid in fetched_uuids
+
 
 # --- Negative Scenario ---
 @behave.given("A user can access User management and needs to fetch all UserGroups")

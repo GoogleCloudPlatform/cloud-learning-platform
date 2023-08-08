@@ -30,3 +30,17 @@ Feature: Adding users to the discipline association group
         Given discipline association group is already been exist
             When an API request sent to remove the user from the discipline association group with the incorrect request payload
                 Then a validations error is thrown
+
+    @filter-api
+    Scenario: remove the user of assessor type from the discipline association group with the correct request payload when multiple assessors exists
+        Given discipline association group already exists with multiple users of assessor type and discipline
+            When an API request sent to remove a single user of assessor type from the discipline association group with correct request payload
+                Then the user of assessor type will get removed from the corresponding discipline association group object
+                    And the assessor will also get replaced from the Submitted Assessments of the same discipline where it exists
+
+    @filter-api
+    Scenario: remove the user of assessor type from the discipline association group with the correct request payload when single assessor exists
+        Given discipline association group already exists with single user of assessor type and discipline
+            When an API request sent to remove the only user of assessor type from the discipline association group with correct request payload
+                Then the only user of assessor type will get removed from the corresponding discipline association group object
+                    And the assessor will also get removed from the Submitted Assessments of the same discipline where it exists

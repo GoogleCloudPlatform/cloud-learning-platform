@@ -23,26 +23,50 @@ PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
 GKE_POD_SA_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CREDENTIALS = service_account.Credentials.from_service_account_info(
   GKE_POD_SA_KEY)
+# create publisher client object using credentials
+publisher = pubsub_v1.PublisherClient(credentials=CREDENTIALS)
+# create subscriber client object using credentials
+subscriber = pubsub_v1.SubscriberClient(credentials=CREDENTIALS)
 
+def clean_pub_sub(topic_path, subscription_paths):
+  try:
+    for subscription_path in subscription_paths:
+      delete_subscription(subscription_path)
+    publisher.delete_topic(request={"topic": topic_path})
+    print(f"Deleted Pub/Sub topic: {topic_path}")
+  except Exception as e:
+    print("Error occured while deleting topic:"
+        + f" {topic_path} \nError: {str(e)}")
 
-try:
-  # create publisher client object using credentials
-  publisher = pubsub_v1.PublisherClient(credentials=CREDENTIALS)
-  # create subscriber client object using credentials
-  subscriber = pubsub_v1.SubscriberClient(credentials=CREDENTIALS)
+def delete_subscription(subscription_path):
+  try:
+    subscriber.delete_subscription(
+          request={"subscription": subscription_path})
+    print(f"Subscription deleted: {subscription_path}")
+  except Exception as e:
+    print("Error occured while deleting Subscription:" +
+          f" {subscription_path} \nError: {str(e)}")
 
-  topic_name = DATABASE_PREFIX + "classroom-notifications"
-  subscription_name = DATABASE_PREFIX + "classroom-notifications-sub"
+if __name__ == "__main__":
+  if not DATABASE_PREFIX:
+    raise Exception(
+        "DATABASE_PREFIX is not defined. Deleting Pub/Sub skipped.")
+  cls_topic_name = DATABASE_PREFIX + "classroom-notifications"
+  lms_topic_name = DATABASE_PREFIX + "lms-notifications"
+  cls_subscription_name = DATABASE_PREFIX + "classroom-notifications-sub"
+  lms_subscription_name = DATABASE_PREFIX + "lms-notifications-push-sub"
+  lms_bq_subscription_name = DATABASE_PREFIX + "lms-notifications-bq-sub"
   #generate complete topic path using topic name and project id
-  topic_path = publisher.topic_path(PUB_SUB_PROJECT_ID, topic_name)
+  cls_topic_path = publisher.topic_path(PUB_SUB_PROJECT_ID, cls_topic_name)
+  lms_topic_path = publisher.topic_path(PUB_SUB_PROJECT_ID, lms_topic_name)
 
   #generate complete subscription path using subscription name and project id
-  subscription_path = subscriber.subscription_path(PUB_SUB_PROJECT_ID,
-                                                 subscription_name)
-  with subscriber:
-    subscriber.delete_subscription(request={"subscription": subscription_path})
-  print(f"Subscription deleted: {subscription_path}")
-  publisher.delete_topic(request={"topic": topic_path})
-  print(f"Deleted Pub/Sub topic: {topic_path}")
-except Exception as e:
-  print(f"Error occured while deleting topic: {topic_path} \nError: {str(e)}")
+  cls_subscription_path = subscriber.subscription_path(
+    PUB_SUB_PROJECT_ID,cls_subscription_name)
+  lms_subscription_path = subscriber.subscription_path(
+    PUB_SUB_PROJECT_ID, lms_subscription_name)
+  lms_bq_subscription_path = subscriber.subscription_path(
+      PUB_SUB_PROJECT_ID, lms_bq_subscription_name)
+  clean_pub_sub(cls_topic_path, [cls_subscription_path])
+  clean_pub_sub(
+    lms_topic_path,[lms_subscription_path,lms_bq_subscription_path])

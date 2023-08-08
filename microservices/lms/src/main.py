@@ -25,7 +25,7 @@ from common.utils.http_exceptions import add_exception_handlers
 from fastapi import FastAPI, Request, Depends
 import config
 from routes import (section, student, course_template, cohort,
-                    classroom_courses, analytics, lms_job, lms_notification)
+                    classroom_courses, analytics, lms_job,lms_dummy, lms_notification)
 
 app = FastAPI()
 
@@ -93,6 +93,7 @@ api.include_router(lms_notification.router)
 add_exception_handlers(app)
 add_exception_handlers(api)
 app.mount("/lms/api/v1", api)
+app.include_router(lms_dummy.router)
 
 if __name__ == "__main__":
   uvicorn.run(

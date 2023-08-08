@@ -85,4 +85,4 @@ def step_impl_2(context):
 
 @behave.then("Error in creating inpsace token message will be returned")
 def step_impl_3(context):
-  assert context.get_token_res.status_code == 500
+  assert context.get_token_res.status_code == 404

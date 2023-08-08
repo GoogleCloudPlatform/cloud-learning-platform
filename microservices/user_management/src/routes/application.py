@@ -1,10 +1,13 @@
 """ application endpoints """
+import traceback
 from fastapi import APIRouter, Query
 from typing import Optional
 from common.models import Application, Module
+from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError, ConflictError
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound,Conflict)
+from services.helper import get_data_for_fetch_tree
 from services.permissions import get_permissions_based_on_application
 from services.collection_handler import CollectionHandler
 from schemas.application_schema import (
@@ -22,8 +25,8 @@ router = APIRouter(tags=["Application"], responses=ERROR_RESPONSES)
     "/applications",
     response_model=AllApplicationResponseModel,
     name="Get all applications")
-def get_all_applications(skip: int = Query(0, ge=0, le=2000),
-                         limit: int = Query(10, ge=1, le=100),
+def get_all_applications(skip:  int = Query(None,ge=0, le=2000),
+                         limit: int = Query(None,ge=1, le=100),
                          fetch_tree: Optional[bool] = False):
   """The get applications endpoint will return an array applications from
   firestore
@@ -45,22 +48,26 @@ def get_all_applications(skip: int = Query(0, ge=0, le=2000),
     applications = collection_manager.order("-created_time").offset(
         skip).fetch(limit)
     if fetch_tree:
-      applications = [
-          CollectionHandler.loads_field_data_from_collection(
-              i.get_fields(reformat_datetime=True)) for i in applications
-      ]
+      applications = get_data_for_fetch_tree(applications)
+
     else:
       applications = [
           i.get_fields(reformat_datetime=True) for i in applications
       ]
+    count = 10000
+    response = {"records": applications, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": applications
+        "data": response
     }
   except ValidationError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -101,8 +108,12 @@ def get_application(uuid: str, fetch_tree: Optional[bool] = False):
     }
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -154,10 +165,16 @@ def create_application(input_data: ApplicationModel):
     }
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
   except ConflictError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise Conflict(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -188,7 +205,7 @@ def update_application(uuid: str, input_application: UpdateApplicationModel):
         f"Application with the given name: {input_application.name} "
         "already exists")
 
-    input_application_dict = {**input_application.dict()}
+    input_application_dict = {**input_application.dict(exclude_unset=True)}
 
     if "modules" in input_application_dict and input_application.modules != []:
       for module in input_application.modules:
@@ -213,8 +230,16 @@ def update_application(uuid: str, input_application: UpdateApplicationModel):
     }
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
+  except ConflictError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise Conflict(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
 
@@ -239,7 +264,6 @@ def delete_application(uuid: str):
   """
   try:
     application = Application.find_by_uuid(uuid)
-    #TODO:update permissions of application in user_group
 
     user_groups,permissions = get_permissions_based_on_application(uuid)
     for user_group in user_groups:
@@ -258,6 +282,10 @@ def delete_application(uuid: str):
     return {"success": True, "message": "Successfully deleted the application"}
 
   except ResourceNotFoundException as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
   except Exception as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e

@@ -1,13 +1,16 @@
 """ Permission endpoints """
+from operator import itemgetter
 import traceback
 from fastapi import APIRouter, Query
 from typing import Optional
+from typing_extensions import Literal
 from iteration_utilities import unique_everseen
 from common.models import Permission, Application, Module, Action, UserGroup
 from common.utils.logging_handler import Logger
 from common.utils.errors import ResourceNotFoundException, ValidationError
 from common.utils.http_exceptions import (InternalServerError, BadRequest,
                                           ResourceNotFound)
+from common.utils.sorting_logic import sort_records
 from schemas.permission_schema import (
     AllPermissionResponseModel, GetPermissionResponseModel,
     PermissionFilerUniqueResponseModel, PermissionModel,
@@ -16,6 +19,7 @@ from schemas.permission_schema import (
 from schemas.error_schema import NotFoundErrorResponseModel
 from services.collection_handler import CollectionHandler
 from services.permissions import get_unique_records
+from services.helper import get_data_for_fetch_tree
 from config import ERROR_RESPONSES
 
 router = APIRouter(tags=["Permission"], responses=ERROR_RESPONSES)
@@ -64,29 +68,34 @@ def search_permission(search_query: str,
 
       if len(res) == fetch_length:
         break
-
+    count = 10000
+    response = {"records": res[skip:fetch_length], "total_count": count}
     return {
       "success": True,
       "message": "Successfully fetched the permissions",
-      "data": res[skip:fetch_length]
+      "data": response
     }
   except Exception as e:
     Logger.error(e)
     Logger.error(traceback.print_exc())
     raise InternalServerError(str(e)) from e
 
-
 @router.get(
     "/permissions",
     response_model=AllPermissionResponseModel,
     name="Get Permissions")
-def get_permissions(skip: int = Query(0, ge=0, le=20000),
-                      limit: int = Query(10, ge=1, le=100),
+def get_permissions(skip: int = Query(None, ge=0, le=2000),
+                      limit: int = Query(None, ge=1, le=100),
                       application_ids: Optional[str] = None,
                       module_ids: Optional[str] = None,
                       action_ids: Optional[str] = None,
                       user_groups: Optional[str] = None,
-                      fetch_tree: Optional[bool] = False):
+                      fetch_tree: Optional[bool] = False,
+                      sort_by: Optional[Literal["application", "module",
+                        "action", "user_groups","created_time"]]
+                        = "created_time",
+                      sort_order: Optional[Literal["ascending", "descending"]]
+                        = "descending"):
   """The get permissions endpoint will fetch the permissions
      matching the values in request body from firestore
 
@@ -99,6 +108,8 @@ def get_permissions(skip: int = Query(0, ge=0, le=20000),
       user_groups (str): User groups to be filtered
       fetch_tree (bool): To fetch the entire object
       instead of the UUID of the object
+      sort_by (str): sorting field name
+      sort_order (str): ascending / descending
 
   ### Raises:
       Exception: 500 Internal Server Error if something went wrong
@@ -111,7 +122,7 @@ def get_permissions(skip: int = Query(0, ge=0, le=20000),
 
     filtered_list = []
     if application_ids is not None or module_ids is not None or\
-        action_ids is not None or user_groups is not None:
+      action_ids is not None or user_groups is not None:
       input_permission_dict = {
         "application_id": application_ids,
         "module_id": module_ids,
@@ -126,6 +137,7 @@ def get_permissions(skip: int = Query(0, ge=0, le=20000),
         i.get_fields(reformat_datetime=True) for i in permissions
       ]
 
+      # filter permissions
       for idx, permission in enumerate(permissions_with_fields):
         match = True
         for key, value in input_permission_dict.items():
@@ -147,17 +159,31 @@ def get_permissions(skip: int = Query(0, ge=0, le=20000),
         fetch(limit)
 
     if fetch_tree:
-      filtered_list = [
-          CollectionHandler.loads_field_data_from_collection(
-              i.get_fields(reformat_datetime=True)) for i in filtered_list
-      ]
+      filtered_list = get_data_for_fetch_tree(filtered_list)
+      # sort permissions
+      if sort_by in ["application", "module", "action"]:
+        filtered_list = sort_records(sort_by="name",sort_order=sort_order,
+                                    records=filtered_list, key=sort_by+"_id")
+      elif sort_by == "user_groups":
+        reverse = sort_order == "descending"
+        # Sort user_groups array within each record
+        for record in filtered_list:
+          record["user_groups"] = sorted(record["user_groups"],key=itemgetter(
+                                          "name"),reverse=reverse)
+
+        # Sort user_groups array across all records
+        filtered_list = sorted(filtered_list, key=lambda x:(itemgetter("name")\
+         (x["user_groups"][0])) if x["user_groups"] else "" ,reverse=reverse)
     else:
       filtered_list = [i.get_fields(reformat_datetime=True) for i in
                         filtered_list]
+
+    count = 10000
+    response = {"records": filtered_list, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": filtered_list
+        "data": response
     }
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
@@ -349,21 +375,108 @@ def delete_permission(uuid: str):
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_permission_filters_unique():
+def get_permission_filters_unique(application: Optional[str] = None,
+                                  module: Optional[str] = None,
+                                  action: Optional[str] = None,
+                                  user_group: Optional[str] = None):
   """The get unique permission endpoint will return an array
   of unique values for applications, modules, actions and user groups from
   firestore
+
+  ### Query:
+      application: uuid of application that needs to be filtered
+      module: uuid of module that needs to be filtered
+      action: uuid of action that needs to be filtered
+      user_group: uuid of user_group that needs to be filtered
+
+  ### Raises:
+      ResourceNotFoundException: 404 If the permission does not exist
+      Exception: 500 Internal Server Error if something went wrong
+      ValidationError: If filter length is more than 30 for any query param
+
+  ### Returns:
+      Dict containing list of unique filters for applications,
+      modules, actions and user groups
   """
   try:
+    permission_collection = Permission.collection
     unique_record_keys = ["uuid","name"]
-    unique_applications = get_unique_records(Application.collection.fetch(),\
-                                             unique_record_keys)
-    unique_modules = get_unique_records(Module.collection.fetch(),\
-                                        unique_record_keys)
-    unique_actions = get_unique_records(Action.collection.fetch(),\
-                                        unique_record_keys)
-    unique_user_groups = get_unique_records(UserGroup.collection.fetch(),\
-                                            unique_record_keys)
+
+    filter_limit_30_reached = False
+
+    application_uuid_list = module_uuid_list = None
+    action_uuid_list = user_group_uuid_list = None
+    if application:
+      application_uuid_list = application.split(",")
+      if len(application_uuid_list) > 30:
+        filter_limit_30_reached = True
+      else:
+        permission_collection = permission_collection.filter(
+          "application_id", "in", application_uuid_list)
+    if module:
+      module_uuid_list = module.split(",")
+      if len(module_uuid_list) > 30:
+        filter_limit_30_reached = True
+      else:
+        permission_collection = permission_collection.filter(
+          "module_id", "in", module_uuid_list)
+    if action:
+      action_uuid_list = action.split(",")
+      if len(action_uuid_list) > 30:
+        filter_limit_30_reached = True
+      else:
+        permission_collection = permission_collection.filter(
+          "action_id", "in", action_uuid_list)
+    if user_group:
+      user_group_uuid_list = user_group.split(",")
+      if len(user_group_uuid_list) > 30:
+        filter_limit_30_reached = True
+      else:
+        permission_collection = permission_collection.filter(
+          "user_groups", "array_contains_any", user_group_uuid_list)
+
+    if filter_limit_30_reached:
+      raise ValidationError(str("Filter has a limit of 30 values"))
+
+    final_data = permission_collection.fetch()
+    application_id_list = []
+    module_id_list = []
+    action_id_list = []
+    user_group_id_list = []
+    for each in final_data:
+      application_id_list.append(each.get_fields()["application_id"])
+      module_id_list.append(each.get_fields()["module_id"])
+      action_id_list.append(each.get_fields()["action_id"])
+      user_group_id_list.extend(each.get_fields()["user_groups"])
+
+    if not application_id_list:
+      unique_applications = []
+    else:
+      unique_applications = get_unique_records(
+        Application.collection.filter(
+        "uuid", "in", application_id_list).fetch(),unique_record_keys)
+
+    if not module_id_list:
+      unique_modules = []
+    else:
+      unique_modules = get_unique_records(
+        Module.collection.filter(
+        "uuid", "in", module_id_list).fetch(),unique_record_keys)
+
+    if not action_id_list:
+      unique_actions = []
+    else:
+      unique_actions = get_unique_records(
+        Action.collection.filter(
+        "uuid", "in", action_id_list).fetch(),unique_record_keys)
+
+    if not user_group_id_list:
+      unique_user_groups = []
+    else:
+      unique_user_groups = get_unique_records(
+        UserGroup.collection.filter(
+        "uuid", "in",user_group_id_list).fetch(),unique_record_keys)
+
     return {
       "success": True,
       "message": "Successfully fetched the unique values for " + \
@@ -379,6 +492,10 @@ def get_permission_filters_unique():
     Logger.error(e)
     Logger.error(traceback.print_exc())
     raise ResourceNotFound(str(e)) from e
+  except ValidationError as e:
+    Logger.error(e)
+    Logger.error(traceback.print_exc())
+    raise BadRequest(str(e)) from e
   except Exception as e:
     Logger.error(e)
     Logger.error(traceback.print_exc())

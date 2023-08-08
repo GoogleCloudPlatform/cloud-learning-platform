@@ -7,11 +7,12 @@ from copy import deepcopy
 from uuid import uuid4
 
 sys.path.append("../")
-from common.models import AssociationGroup
-from e2e.test_object_schemas import TEST_USER, TEST_ASSOCIATION_GROUP, TEST_CURRICULUM_PATHWAY
+from common.models import AssociationGroup, UserGroup, User
+from e2e.test_object_schemas import (TEST_USER, TEST_ASSOCIATION_GROUP, TEST_CURRICULUM_PATHWAY,
+                                TEST_USER_GROUP)
 from environment import TEST_USER_MANAGEMENT_PATH
 from e2e.test_config import (API_URL_USER_MANAGEMENT as UM_API_URL, API_URL_LEARNING_OBJECT_SERVICE as LOS_API_URL)
-from e2e.setup import post_method, get_method, put_method
+from e2e.setup import create_immutable_user_groups, post_method, get_method, put_method
 
 # -----------------------------------------------------
 # Scenario 1: User wants to upload a learning content file with sync api
@@ -40,6 +41,14 @@ def step_impl_1(context):
   res_json = res.json()
   context.user_uuid = res_json["data"]["user_id"]
 
+  learner_user_group_id = create_immutable_user_groups("learner")
+  user_group = UserGroup.find_by_uuid(learner_user_group_id)
+  print(user_group)
+  setattr(user_group, 'users', [context.user_uuid])
+
+  existing_user = User.find_by_uuid(context.user_uuid)
+  setattr(existing_user, 'user_groups', [user_group.uuid])
+  existing_user.update()
   # Add Learner to Learner Association Grp
   res = post_method(
             url=f"{UM_API_URL}/association-groups/learner-association/{context.lag_uuid}/users/add",
@@ -108,6 +117,16 @@ def step_impl_1(context):
   res_json = res.json()
   context.user_uuid = res_json["data"]["user_id"]
 
+  coach_user_group_id = create_immutable_user_groups("coach")
+  user_group = UserGroup.find_by_uuid(coach_user_group_id)
+  print(user_group)
+  setattr(user_group, 'users', [context.user_uuid])
+
+  existing_user = User.find_by_uuid(context.user_uuid)
+  setattr(existing_user, 'user_groups', [user_group.uuid])
+  existing_user.update()
+
+
   # Add Coach to Learner Association Grp
   res = post_method(
             url=f"{UM_API_URL}/association-groups/learner-association/{context.lag_uuid}/coaches/add",
@@ -175,6 +194,14 @@ def step_impl_1(context):
   assert res.status_code == 200
   res_json = res.json()
   context.user_uuid = res_json["data"]["user_id"]
+  assessor_user_group_id = create_immutable_user_groups("assessor")
+  user_group = UserGroup.find_by_uuid(assessor_user_group_id)
+  print(user_group)
+  setattr(user_group, 'users', [context.user_uuid])
+
+  existing_user = User.find_by_uuid(context.user_uuid)
+  setattr(existing_user, 'user_groups', [user_group.uuid])
+  existing_user.update()
 
   # Add Assessor to Discipline Association Grp
   res = post_method(
@@ -254,6 +281,17 @@ def step_impl_1(context):
   assert res.status_code == 200
   res_json = res.json()
   context.user_uuid = res_json["data"]["user_id"]
+
+  instructor_user_group_id = create_immutable_user_groups("instructor")
+  user_group = UserGroup.find_by_uuid(instructor_user_group_id)
+  print(user_group)
+  setattr(user_group, 'users', [context.user_uuid])
+  
+
+  existing_user = User.find_by_uuid(context.user_uuid)
+  setattr(existing_user, 'user_groups', [user_group.id])
+  existing_user.update()
+
 
   # Create Program Pathway
   program_dict = {**TEST_CURRICULUM_PATHWAY}

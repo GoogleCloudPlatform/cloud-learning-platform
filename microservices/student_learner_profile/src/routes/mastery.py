@@ -9,8 +9,8 @@ from config import ERROR_RESPONSES
 ERROR_RESPONSE_DICT = deepcopy(ERROR_RESPONSES)
 del ERROR_RESPONSE_DICT[422]
 
-router = APIRouter(prefix="/mastery",
-tags=["Mastery"], responses=ERROR_RESPONSE_DICT)
+router = APIRouter(
+    prefix="/mastery", tags=["Mastery"], responses=ERROR_RESPONSE_DICT)
 
 
 @router.post("", response_model=MasteryScoresResponse)

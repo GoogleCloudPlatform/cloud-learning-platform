@@ -1,7 +1,7 @@
 """
 Service to map the learning content with the hiearchy
 """
-from services.helper import get_all_nodes_for_alias
+from services.helper import get_all_nodes
 from common.utils.content_processing import FileUtils
 
 from common.utils.collection_references import collection_references
@@ -119,7 +119,8 @@ def link_content_to_lr(le_uuid, lr_uuid, resource_path, resource_type, is_srl):
 
 
 def get_parent_node_list(node_id, collection):
-  """Get the list of parent nodes"""
+  """Function to get the parent node list of a give
+  node_id and collection"""
   parent_list = []
   node_doc = collection.find_by_uuid(node_id)
   parent_nodes = node_doc.parent_nodes
@@ -219,10 +220,10 @@ def get_all_sibling_le(le_uuid):
 
   program_uuid = get_hierarchy_root(le_uuid, "learning_experiences")
 
-  le_list = get_all_nodes_for_alias(
+  le_list = get_all_nodes(
       uuid=program_uuid,
       level="curriculum_pathways",
-      final_alias="learning_experience",
+      node_type="learning_experiences",
       nodes=sibling_le_list)
 
   return le_list
@@ -297,7 +298,7 @@ def get_all_lr_for_le(le_uuid):
 
 
 def get_file_and_folder_list(prefix, list_madcap_contents=False):
-  """Get the file and folder list for a given prefix"""
+  """Function to get list of files and folders under a given prefix"""
   if prefix is None:
     prefix = ""
   else:

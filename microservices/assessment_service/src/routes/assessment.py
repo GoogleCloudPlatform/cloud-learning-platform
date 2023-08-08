@@ -2,7 +2,7 @@
 import traceback
 import copy
 import requests
-from typing import Optional, Union
+from typing import Optional, Union, List
 from typing_extensions import Literal
 from fastapi import APIRouter, UploadFile, File, Query, Request
 from common.models import Assessment, LearningResource, LearningObject, Skill,Rubric
@@ -96,6 +96,8 @@ def get_assessments(skip: int = Query(0, ge=0, le=2000),
                     limit: int = Query(10, ge=1, le=100),
                     is_archived: Optional[bool] = False,
                     is_autogradable: Optional[bool] = False,
+                    performance_indicators: Union[List[str], None] = \
+                      Query(default=None),
                     sort_by: Optional[str] = "created_time",
                     sort_order: Optional[Literal["ascending", "descending"]] =
                     "descending",
@@ -148,11 +150,25 @@ def get_assessments(skip: int = Query(0, ge=0, le=2000),
 
     filtered_assessments = [CollectionHandler.loads_field_data_from_collection(
       i) for i in filtered_assessments]
+    final_filtered_assessments = []
     for assessment in filtered_assessments:
       modified_competencies = []
       modified_skills = []
+      performance_indicator_overlap = not bool(performance_indicators)
       if assessment.get("references", {}) and assessment.get("references", \
-                                            {}).get("competencies", []):
+                                                      {}).get("skills", []):
+        for skill in assessment["references"]["skills"]:
+          if isinstance(skill, dict):
+            modified_skill = {"uuid": skill.get("uuid"),
+                              "name": skill.get("name")}
+            modified_skills.append(modified_skill)
+          if performance_indicators and\
+            skill.get("uuid") in performance_indicators:
+            performance_indicator_overlap = True
+        assessment["references"]["skills"] = modified_skills
+      if assessment.get("references", {}) and assessment.get("references", \
+                                            {}).get("competencies", []) and \
+                                              performance_indicator_overlap:
         for competency in assessment["references"]["competencies"]:
           if isinstance(competency, dict):
             modified_competency = {
@@ -161,18 +177,12 @@ def get_assessments(skip: int = Query(0, ge=0, le=2000),
             }
             modified_competencies.append(modified_competency)
         assessment["references"]["competencies"] = modified_competencies
-      if assessment.get("references", {}) and assessment.get("references", \
-                                                      {}).get("skills", []):
-        for skill in assessment["references"]["skills"]:
-          if isinstance(skill, dict):
-            modified_skill = {"uuid": skill.get("uuid"),
-                              "name": skill.get("name")}
-            modified_skills.append(modified_skill)
-        assessment["references"]["skills"] = modified_skills
+      if performance_indicator_overlap:
+        final_filtered_assessments.append(assessment)
 
     count = 10000
     response = {
-      "records": filtered_assessments[skip:fetch_length],
+      "records": final_filtered_assessments[skip:fetch_length],
       "total_count": count
     }
     return {

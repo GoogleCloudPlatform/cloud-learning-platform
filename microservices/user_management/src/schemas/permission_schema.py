@@ -6,6 +6,7 @@ from pydantic import BaseModel, Extra
 from schemas.schema_examples import (FULL_PERMISSION_MODEL_EXAMPLE,
                                      PERMISSION_FILTER_UNIQUE_EXAMPLE,
                                      POST_PERMISSION_MODEL_EXAMPLE)
+from common.utils.schema_validator import BaseConfigModel
 
 
 class BasicPermissionModel(BaseModel):
@@ -52,7 +53,7 @@ class AllPermissionsDataModel(BaseModel):
   last_modified_time: str
 
 
-class PermissionModel(BaseModel):
+class PermissionModel(BaseConfigModel):
   """Permission Input Pydantic Model"""
   name: str
   description: str
@@ -66,7 +67,7 @@ class PermissionModel(BaseModel):
     schema_extra = {"example": POST_PERMISSION_MODEL_EXAMPLE}
 
 
-class UpdatePermissionModel(BaseModel):
+class UpdatePermissionModel(BaseConfigModel):
   """Update Permission Pydantic Request Model"""
   name: Optional[str]
   description: Optional[str]
@@ -144,12 +145,15 @@ class DeletePermission(BaseModel):
         }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[AllPermissionsDataModel]]
+  total_count: int
 
 class AllPermissionResponseModel(BaseModel):
   """Permission Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Data fetched successfully"
-  data: Optional[List[AllPermissionsDataModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -157,7 +161,10 @@ class AllPermissionResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Data fetched successfully",
-            "data": [FULL_PERMISSION_MODEL_EXAMPLE]
+            "data": {
+                      "records":[FULL_PERMISSION_MODEL_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 
