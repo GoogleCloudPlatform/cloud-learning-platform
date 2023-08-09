@@ -344,6 +344,7 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
     ConflictResponseModel: if any conflict occurs,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
+  section_id="null"
   try:
     cohort = Cohort.find_by_id(cohort_id)
     sections = Section.collection.filter("cohort", "==", cohort.key).filter(
@@ -364,6 +365,7 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
     if section is None:
       raise Conflict(
         "All sections in chorot are full or not open for enrollment")
+    section_id = section.id
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {input_data.email}")
     user_object = classroom_crud.enroll_student(
@@ -404,18 +406,27 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
 
   except InvalidTokenError as ive:
     err = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, err, "InvalidTokenError")
     Logger.error(err)
     raise InvalidToken(str(ive)) from ive
   except ResourceNotFoundException as err:
+    er = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, er, "ResourceNotFound")
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Conflict as conflict:
     Logger.error(conflict)
     err = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, err, "Conflict")
     Logger.error(err)
     raise Conflict(str(conflict)) from conflict
   except HttpError as ae:
     err = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, err, "ClassroomHttpException")
     Logger.error(err)
     if ae.resp.status == 409:
       raise ClassroomHttpException(
@@ -426,11 +437,16 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
                                    message="Can't enroll student to classroom,\
   Please check organizations policy or authentication scopes") from ae
   except ValidationError as ve:
+    err = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, err, "BadRequest")
     Logger.error(ve)
     raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, err, "InternalServerError")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
@@ -453,11 +469,13 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
     ConflictResponseModel: if any conflict occurs,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
+  cohort_id = "null"
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
     section_service.validate_section(section)
     cohort = section.cohort
+    cohort_id = cohort.id
     if cohort.enrolled_students_count >= cohort.max_students:
       raise ValidationError("Cohort Max count reached hence student cannot" +
             "be erolled in this cohort")
@@ -511,18 +529,27 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
     }
   except InvalidTokenError as ive:
     err = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, err, "InvalidTokenError")
     Logger.error(err)
     raise InvalidToken(str(ive)) from ive
   except ResourceNotFoundException as err:
+    er = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, er, "ResourceNotFound")
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Conflict as conflict:
     Logger.error(conflict)
     err = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, err, "conflict")
     Logger.error(err)
     raise Conflict(str(conflict)) from conflict
   except HttpError as ae:
     err = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, err, "ClassroomHttpException")
     Logger.error(err)
     # if ae.resp.status == 409:
     #   raise ClassroomHttpException(status_code=ae.resp.status,
@@ -532,11 +559,16 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
                                  message="Can't enroll student to classroom,\
   Please check organizations policy or authentication scopes") from ae
   except ValidationError as ve:
+    err = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, err, "BadRequest")
     Logger.error(ve)
     raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")
+    student_service.insert_failure_log(input_data.email, section_id,
+                            cohort_id, err, "InternalServerError")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 

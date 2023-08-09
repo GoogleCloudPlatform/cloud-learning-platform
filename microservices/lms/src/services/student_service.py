@@ -1,9 +1,11 @@
 """Student API services"""
 import requests
 import traceback
-from config import USER_MANAGEMENT_BASE_URL
+import datetime
+from config import USER_MANAGEMENT_BASE_URL,BQ_TABLE_DICT,BQ_DATASET
 from services.section_service import insert_section_enrollment_to_bq
 from common.utils import classroom_crud
+from common.utils.bq_helper import insert_rows_to_bq
 from common.utils.logging_handler import Logger
 from common.models import CourseEnrollmentMapping, User
 from common.utils.errors import (ResourceNotFoundException,
@@ -65,6 +67,24 @@ def check_student_can_enroll_in_cohort(email, headers, sections):
         return False
   return True
 
+
+def insert_failure_log(email:str, section_id:str, cohort_id:str,
+                       err:str, error_type:str):
+  """
+  Insert enrollment error logs to BQ
+  """
+  rows = [{
+  "email": email,
+  "error_type": error_type,
+  "traceback": err,
+  "log_time": datetime.datetime.utcnow(),
+  "section_id": section_id,
+  "cohort_id": cohort_id 
+  }]
+
+  insert_rows_to_bq(rows=rows,
+    dataset=BQ_DATASET,
+    table_name=BQ_TABLE_DICT["BQ_ENROLLMENT_FAILURE_LOGS"])
 
 
 def invite_student(section, student_email, headers):
