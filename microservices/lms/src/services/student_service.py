@@ -79,7 +79,7 @@ def insert_failure_log(email:str, section_id:str, cohort_id:str,
   "traceback": err,
   "log_time": datetime.datetime.utcnow(),
   "section_id": section_id,
-  "cohort_id": cohort_id 
+  "cohort_id": cohort_id
   }]
 
   insert_rows_to_bq(rows=rows,
