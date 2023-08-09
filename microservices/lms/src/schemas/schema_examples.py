@@ -64,7 +64,7 @@ INSERT_COHORT_EXAMPLE = {
 INPUT_REPLAY_NOTIFICATION_EXAMPLE = {
 "start_date": datetime.datetime(year=2023, month=7, day=14),
 "end_date": datetime.datetime(year=2023, month=7, day=25),
-} 
+}
 
 SECTION_EXAMPLE = {
     "id": "id",
