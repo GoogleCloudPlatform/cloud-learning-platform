@@ -36,8 +36,7 @@ from config import (SIGNURL_SA_KEY_PATH, RESOURCE_BASE_PATH,
                     ZIP_EXTRACTION_FOLDER, FAQ_BASE_PATH)
 
 # pylint: disable = line-too-long
-# pylint: disable = invalid-name
-# pylint: disable = broad-except
+# pylint: disable = broad-except,invalid-name
 router = APIRouter(tags=["Content Serving"], responses=ERROR_RESPONSES)
 
 ALLOWED_CONTENT_VERSION_STATUS = Literal["published", "unpublished", "draft"]
@@ -57,7 +56,7 @@ fileHandler = FileUtils()
     }})
 def list_all_files(prefix: Optional[str] = None,
                    list_madcap_contents: Optional[bool] = False):
-  """List all files and folders at a given prefix"""
+  """Function to list all files given a prefix"""
   try:
 
     prefix, folders_list, files_list = get_file_and_folder_list(
@@ -496,10 +495,12 @@ def list_content_versions(uuid: str,
   """
   try:
     content_versions_list = get_content_versions(uuid, status, skip, limit)
+    count = 10000
+    response = {"records": content_versions_list, "total_count": count}
     return {
         "success": True,
         "message": "Successfully fetched content version for learning resource",
-        "data": content_versions_list
+        "data": response
     }
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e
@@ -519,7 +520,12 @@ def list_content_versions(uuid: str,
 async def upload_madcap_export(le_uuid: str,
                                is_srl: bool = False,
                                content_file: UploadFile = File(...)):
-  """Upload a madcap export"""
+  """Function to upload madcap exports
+  Args:
+  le_uuid(str): ID of Learning Experience
+  is_srl(bool): Flag to determine if the LE is of type SRL
+  content_file: JSON file that needs to be uploaded
+  """
   try:
 
     # check file size
@@ -583,6 +589,8 @@ async def upload_madcap_export(le_uuid: str,
         # override only if all the file names map 1:1
         flag_2, err_msg_2 = is_missing_linked_files(
             local_dest_path, learning_experience.resource_path)
+        print("IF")
+        print(flag_2, err_msg_2)
         if flag_2 is False:
           raise ValidationError(err_msg_2)
     else:
@@ -591,9 +599,11 @@ async def upload_madcap_export(le_uuid: str,
         # override only if all the file names map 1:1
         flag_2, err_msg_2 = is_missing_linked_files(local_dest_path,
                                     learning_experience.srl_resource_path)
+        print("ELSE")
+        print(flag_2, err_msg_2)
         if flag_2 is False:
           raise ValidationError(err_msg_2)
-
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     # recreate zip structure on GCS
     upload_folder(CONTENT_SERVING_BUCKET, local_dest_path,
                   content_upload_folder)
@@ -676,7 +686,12 @@ async def link_madcap_to_lr(
     input_json: ContentLinkInputModel,
     is_srl: bool = False,
 ):
-  """Link Madcap Content to Learning Resource"""
+  """Function to link madcap exports to a Learning Resource
+  Args:
+  le_uuid(str): ID of Learning Experience
+  lr_uuid(str): ID of Learning Resource
+  input_json: JSON file that needs to be linked
+  is_srl(bool): Flag to determine if the LE is of type SRL"""
   try:
     input_dict = input_json.dict()
     resource_path = input_dict["resource_path"]

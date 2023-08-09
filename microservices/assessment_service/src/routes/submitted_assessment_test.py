@@ -48,8 +48,7 @@ def fixture_create_assessment():
 
 
 def create_single_learning_experience():
-  """Function to create a learnin experience"""
-  # create a learning experience
+  """create a learning experience"""
   with open(
       RELATIVE_PATH + "learning_experiences.json",
       encoding="UTF-8") as json_file:
@@ -76,8 +75,7 @@ def create_single_learning_object():
 
 
 def create_single_submitted_assessment(assign_assessor=True):
-  """Function to create submitted assessment"""
-  # create a submitted assessment
+  """create a submitted assessment"""
   with open(
       "./testing/submitted_assessment.json", encoding="UTF-8") as json_file:
     sa_fields = json.load(json_file)[0]
@@ -198,6 +196,7 @@ def test_get_all_submitted_assessment(mocker, clean_firestore):
     post_resp_json["data"]["assigned_to"] = user.first_name + " " + \
       user.last_name
     post_resp_json["data"]["max_attempts"] = assessment.max_attempts
+    post_resp_json["data"]["assessment_name"] = assessment.display_name
     post_resp_json["data"]["instructor_name"] = "Unassigned"
     post_resp_json["data"]["instructor_id"] = ""
     post_resp_json["data"]["assessment_name"] = None
@@ -447,6 +446,7 @@ def test_get_latest_submitted_assessment(mocker, clean_firestore):
   post_resp_json["data"]["discipline_name"] = ""
   post_resp_json["data"]["assigned_to"] = user.first_name + " " + user.last_name
   post_resp_json["data"]["max_attempts"] = assessment.max_attempts
+  post_resp_json["data"]["assessment_name"] = assessment.display_name
   post_resp_json["data"]["instructor_name"] = "Unassigned"
   post_resp_json["data"]["instructor_id"] = ""
   post_resp_json["data"]["assessment_name"] = None
@@ -817,8 +817,6 @@ def test_delete_submitted_assessment(mocker, clean_firestore,
     "Successfully deleted the submitted assessment."
 
 
-@mock.patch("common.models.learner_profile.Learner",
-            mock.MagicMock(side_effect=LearnerTest))
 def test_get_all_submitted_assessment_for_learner(mocker, clean_firestore):
 
   input_submitted_assessment = SUBMITTED_ASSESSMENT_EXAMPLE
@@ -847,13 +845,19 @@ def test_get_all_submitted_assessment_for_learner(mocker, clean_firestore):
   post_resp = client_with_emulator.post(
       post_url, json=input_submitted_assessment)
   post_resp_json = post_resp.json()
-  post_resp_json["instructor_id"] = "user_id"
+  post_resp_json["data"]["instructor_id"] = ""
+  post_resp_json["data"]["learner_name"] = \
+      learner.first_name + " " + learner.last_name
+  post_resp_json["data"]["unit_name"] = ""
+  post_resp_json["data"]["discipline_name"] = ""
+  post_resp_json["data"]["assigned_to"] = None
+  post_resp_json["data"]["max_attempts"] = assessment.max_attempts
+  post_resp_json["data"]["assessment_name"] = assessment.display_name
+  post_resp_json["data"]["instructor_name"] = "Unassigned"
   assert post_resp_json.get("success") is True, "Success not true"
   assert post_resp.status_code == 200, "Status 200"
 
-
-
-  get_url = f"{api_url}/learner/{learner_id}/submitted-assessments/"
+  get_url = f"{api_url}/learner/{learner_id}/submitted-assessments"
 
   # get the submitted assessment
   query_params = {"skip": 0, "limit": 1}

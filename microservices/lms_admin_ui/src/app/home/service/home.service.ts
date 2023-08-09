@@ -41,6 +41,9 @@ export class HomeService {
   createSection(data: any) {
     return this.http.post(`${environment.apiurl}sections`, data)
   }
+  createSectionAlpha(data: any) {
+    return this.http.post(`${environment.apiurl}sections/alpha/v1`, data)
+  }
   editSection(data: any) {
     return this.http.patch(`${environment.apiurl}sections`, data)
   }

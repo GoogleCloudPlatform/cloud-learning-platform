@@ -146,52 +146,73 @@ def create_lti_assignment(input_lti_assignment: InputLTIAssignmentModel):
     lti_assignment = LTIAssignment.from_dict(lti_assignment_dict)
     lti_assignment.save()
     lti_assignment_id = lti_assignment.id
+    course_work_type = lti_assignment_dict.get("course_work_type")
 
-    coursework = {
-        "title": lti_assignment.lti_assignment_title,
-        "materials": [{
-            "link": {
-                "url":
-                    f"{API_DOMAIN}/classroom-shim/api/v1/launch?lti_assignment_id={lti_assignment_id}"
-            }
-        },],
-        "workType": "ASSIGNMENT",
-        "state": "PUBLISHED",
-    }
-
-    lti_assignment_due_date = lti_assignment_dict.get("due_date")
-    if lti_assignment_due_date:
-      curr_utc_timestamp = datetime.datetime.utcnow()
-      lti_assignment_datetime = datetime.datetime.fromtimestamp(
-          lti_assignment_due_date.timestamp())
-
-      if lti_assignment_datetime < curr_utc_timestamp:
-        raise ValidationError(
-            f"Given due date - {lti_assignment_due_date} is in the past")
-
-      coursework["dueDate"] = {
-          "year": lti_assignment.due_date.year,
-          "month": lti_assignment.due_date.month,
-          "day": lti_assignment.due_date.day
-      }
-      coursework["dueTime"] = {
-          "hours": lti_assignment.due_date.hour,
-          "minutes": lti_assignment.due_date.minute
+    if course_work_type == "course_work":
+      coursework = {
+          "title": lti_assignment.lti_assignment_title,
+          "materials": [{
+              "link": {
+                  "url":
+                      f"{API_DOMAIN}/classroom-shim/api/v1/launch?lti_assignment_id={lti_assignment_id}"
+              }
+          },],
+          "workType": "ASSIGNMENT",
+          "state": "PUBLISHED"
       }
 
-    lti_assignment_max_points = lti_assignment_dict.get("max_points")
-    if lti_assignment_max_points:
-      if lti_assignment_max_points <= 0:
-        raise ValidationError(
-            f"Given max points - {lti_assignment_due_date} should be greater than zero"
-        )
-      coursework["maxPoints"] = lti_assignment_dict.get("max_points")
+      lti_assignment_due_date = lti_assignment_dict.get("due_date")
+      if lti_assignment_due_date:
+        curr_utc_timestamp = datetime.datetime.utcnow()
+        lti_assignment_datetime = datetime.datetime.fromtimestamp(
+            lti_assignment_due_date.timestamp())
+
+        if lti_assignment_datetime < curr_utc_timestamp:
+          raise ValidationError(
+              f"Given due date - {lti_assignment_due_date} is in the past")
+
+        coursework["dueDate"] = {
+            "year": lti_assignment.due_date.year,
+            "month": lti_assignment.due_date.month,
+            "day": lti_assignment.due_date.day
+        }
+        coursework["dueTime"] = {
+            "hours": lti_assignment.due_date.hour,
+            "minutes": lti_assignment.due_date.minute
+        }
+
+      lti_assignment_max_points = lti_assignment_dict.get("max_points")
+      if lti_assignment_max_points:
+        if lti_assignment_max_points <= 0:
+          raise ValidationError(
+              f"Given max points - {lti_assignment_due_date} should be greater than zero"
+          )
+        coursework["maxPoints"] = lti_assignment_dict.get("max_points")
+
+    elif course_work_type == "course_work_material":
+      coursework_material = {
+          "title": lti_assignment.lti_assignment_title,
+          "materials": [{
+              "link": {
+                  "url":
+                      f"{API_DOMAIN}/classroom-shim/api/v1/launch?lti_assignment_id={lti_assignment_id}"
+              }
+          },],
+          "state": "PUBLISHED"
+      }
+    else:
+      raise ValidationError(
+          f"Provided course work type - '{course_work_type}' is not valid")
 
     context_resp = get_context_details(lti_assignment.context_id)
     course_id = context_resp["data"]["classroom_id"]
 
     try:
-      classroom_resp = classroom_crud.create_coursework(course_id, coursework)
+      if course_work_type == "course_work":
+        classroom_resp = classroom_crud.create_coursework(course_id, coursework)
+      elif course_work_type == "course_work_material":
+        classroom_resp = classroom_crud.create_coursework_material(
+            course_id, coursework_material)
     except Exception as e:
       LTIAssignment.delete_by_id(lti_assignment_id)
       Logger.error(
@@ -253,35 +274,49 @@ def update_lti_assignment(
     coursework_body = {}
     update_mask_list = []
 
-    if update_lti_assignment_dict.get("lti_assignment_title"):
-      update_mask_list.append("title")
-      coursework_body["title"] = update_lti_assignment_dict[
-          "lti_assignment_title"]
+    course_work_type = lti_assignment_details.course_work_type
 
-    if update_lti_assignment_dict.get("max_points"):
-      update_mask_list.append("maxPoints")
-      coursework_body["maxPoints"] = update_lti_assignment_dict["max_points"]
+    if course_work_type == "course_work":
+      if update_lti_assignment_dict.get("lti_assignment_title"):
+        update_mask_list.append("title")
+        coursework_body["title"] = update_lti_assignment_dict[
+            "lti_assignment_title"]
 
-    if update_lti_assignment_dict.get("due_date"):
-      update_mask_list.append("dueDate")
-      update_mask_list.append("dueTime")
-      coursework_body["dueDate"] = {
-          "year": update_lti_assignment_dict["due_date"].year,
-          "month": update_lti_assignment_dict["due_date"].month,
-          "day": update_lti_assignment_dict["due_date"].day
-      }
-      coursework_body["dueTime"] = {
-          "hours": update_lti_assignment_dict["due_date"].hour,
-          "minutes": update_lti_assignment_dict["due_date"].minute
-      }
+      if update_lti_assignment_dict.get("max_points"):
+        update_mask_list.append("maxPoints")
+        coursework_body["maxPoints"] = update_lti_assignment_dict["max_points"]
+
+      if update_lti_assignment_dict.get("due_date"):
+        update_mask_list.append("dueDate")
+        update_mask_list.append("dueTime")
+        coursework_body["dueDate"] = {
+            "year": update_lti_assignment_dict["due_date"].year,
+            "month": update_lti_assignment_dict["due_date"].month,
+            "day": update_lti_assignment_dict["due_date"].day
+        }
+        coursework_body["dueTime"] = {
+            "hours": update_lti_assignment_dict["due_date"].hour,
+            "minutes": update_lti_assignment_dict["due_date"].minute
+        }
+
+    elif course_work_type == "course_work_material":
+      if update_lti_assignment_dict.get("lti_assignment_title"):
+        update_mask_list.append("title")
+        coursework_body["title"] = update_lti_assignment_dict[
+            "lti_assignment_title"]
 
     update_mask = ",".join(update_mask_list)
 
     if update_mask:
       try:
-        classroom_crud.update_course_work(course_id,
-                                          lti_assignment_details.course_work_id,
-                                          update_mask, coursework_body)
+        if course_work_type == "course_work":
+          classroom_crud.update_course_work(
+              course_id, lti_assignment_details.course_work_id, update_mask,
+              coursework_body)
+        elif course_work_type == "course_work_material":
+          classroom_crud.update_course_work_material(
+              course_id, lti_assignment_details.course_work_id, update_mask,
+              coursework_body)
       except Exception as e:
         Logger.error(
             f"Update coursework failed for assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
@@ -336,10 +371,15 @@ def delete_lti_assignment(lti_assignment_id: str):
     lti_assignment = LTIAssignment.find_by_id(lti_assignment_id)
     context_resp = get_context_details(lti_assignment.context_id)
     course_id = context_resp["data"]["classroom_id"]
+    course_work_type = lti_assignment.course_work_type
 
     try:
-      classroom_crud.delete_course_work(course_id,
-                                        lti_assignment.course_work_id)
+      if course_work_type == "course_work":
+        classroom_crud.delete_course_work(course_id,
+                                          lti_assignment.course_work_id)
+      elif course_work_type == "course_work_material":
+        classroom_crud.delete_course_work_material(
+            course_id, lti_assignment.course_work_id)
     except Exception as e:
       Logger.error(
           f"Error deleting assignment with id - {lti_assignment_id} due to error from classroom API with error - {e}"
@@ -391,6 +431,15 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     content_item_id = lti_assignment_data.get("lti_content_item_id")
     prev_context_id = lti_assignment_data.get("context_id")
 
+    source_context_id = input_data_dict.get("source_context_id")
+    if prev_context_id != source_context_id:
+      Logger.error(
+          f"LTI Assignment '{lti_assignment.id}' is tagged to context - \
+            '{prev_context_id}' but doesn't match with the given source \
+              context id - {source_context_id}")
+      raise ValidationError(
+          f"Provided LTI Assignment '{lti_assignment.id}' doesn't belong to \
+            given context: '{source_context_id}'")
     content_item_data = get_content_item(content_item_id)
 
     # create a copy of above content item
@@ -455,24 +504,50 @@ def copy_lti_assignment(input_copy_lti_assignment: InputCopyLTIAssignmentModel):
     # if input_data_dict.get("due_date"):
     #   lti_assignment_due_date = input_data_dict.get("due_date")
 
-    new_lti_assignment_data = {
-        "lti_assignment_title": lti_assignment_data.get("lti_assignment_title"),
-        "context_type": "section",
-        "context_id": input_data_dict.get("context_id"),
-        "prev_context_ids": prev_context_ids,
-        "lti_content_item_id": copy_content_item_data.get("id"),
-        "prev_content_item_ids": prev_content_item_ids,
-        "course_work_id": None,
-        "tool_id": lti_assignment_data.get("tool_id"),
-        "max_points": lti_assignment_data.get("max_points"),
-        "start_date": lti_assignment_start_date,
-        "end_date": lti_assignment_end_date,
-        "due_date": lti_assignment_due_date
-    }
+    # Checks if the assignment for the given coursework has already been created
+    fetch_lti_assignment = LTIAssignment.collection.filter(
+        "tool_id", "==", lti_assignment_data.get("tool_id")).filter(
+            "context_id", "==", input_data_dict.get("context_id")).filter(
+                "course_work_id", "==",
+                input_data_dict.get("course_work_id")).filter(
+                    "lti_assignment_title", "==",
+                    lti_assignment_data.get("lti_assignment_title")).get()
 
-    new_lti_assignment = LTIAssignment.from_dict(new_lti_assignment_data)
-    new_lti_assignment.save()
-    new_lti_assignment_item = new_lti_assignment.to_dict()
+    if fetch_lti_assignment:
+      new_lti_assignment_item = fetch_lti_assignment.to_dict()
+    else:
+      new_lti_assignment_data = {
+          "lti_assignment_title":
+              lti_assignment_data.get("lti_assignment_title"),
+          "context_type":
+              "section",
+          "context_id":
+              input_data_dict.get("context_id"),
+          "prev_context_ids":
+              prev_context_ids,
+          "lti_content_item_id":
+              copy_content_item_data.get("id"),
+          "prev_content_item_ids":
+              prev_content_item_ids,
+          "course_work_id":
+              input_data_dict.get("course_work_id"),
+          "course_work_type":
+              lti_assignment_data.get("course_work_type"),
+          "tool_id":
+              lti_assignment_data.get("tool_id"),
+          "max_points":
+              lti_assignment_data.get("max_points"),
+          "start_date":
+              lti_assignment_start_date,
+          "end_date":
+              lti_assignment_end_date,
+          "due_date":
+              lti_assignment_due_date
+      }
+
+      new_lti_assignment = LTIAssignment.from_dict(new_lti_assignment_data)
+      new_lti_assignment.save()
+      new_lti_assignment_item = new_lti_assignment.to_dict()
 
     return {
         "success": True,

@@ -21,7 +21,7 @@ import json
 from google.cloud import pubsub_v1
 from common.utils.logging_handler import Logger
 from config import PUB_SUB_PROJECT_ID, DATABASE_PREFIX
-from service import roster_service,course_work_service
+from service import roster_service,course_work_service,pub_sub_publish_message
 from helper.bq_check import check_bq_tables
 
 # disabling for linting to pass
@@ -39,12 +39,16 @@ def callback(message: pubsub_v1.subscriber.message.Message) -> None:
     data["publish_time"] = message.publish_time
     result_flag=False
     if data["collection"].split(".")[1] == "courseWork":
-      result_flag=course_work_service.save_course_work(data)
+      result_flag,notification_message=course_work_service.save_course_work(
+        data)
     else:
-      result_flag=roster_service.save_roster(data)
+      result_flag,notification_message=roster_service.save_roster(data)
 
     if result_flag:
-      message.ack()
+      if pub_sub_publish_message.send_message(notification_message):
+        message.ack()
+      else:
+        message.nack()
     else:
       message.nack()
   except KeyError as ke:

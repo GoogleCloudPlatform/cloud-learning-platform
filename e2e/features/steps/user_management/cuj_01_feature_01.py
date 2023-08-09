@@ -44,11 +44,6 @@ def step_impl_4(context):
     get_learner_url = f'''{SLP_API_URL}/learner/{context.post_user_res_dict["user_type_ref"]}'''
     get_learner_res = get_method(url = get_learner_url)
 
-    print("\n\n**************************")
-    print(context.post_user_res_dict["user_type_ref"])
-    print(get_learner_res.status_code)
-    print(get_learner_res.json())
-
     assert get_learner_res.status_code == 200
 
     get_learner_profile_url = f'''{SLP_API_URL}/learner/{context.post_user_res_dict["user_type_ref"]}/learner-profile'''
@@ -62,7 +57,7 @@ def step_impl_4(context):
         query_params= {"user_id":context.post_user_res_dict["user_id"]}
     )
     assert get_agent_res.status_code == 200
-    assert get_agent_res.json()["data"][0]["user_id"] == context.post_user_res_dict["user_id"]
+    assert get_agent_res.json()["data"]["records"][0]["user_id"] == context.post_user_res_dict["user_id"]
 
 
 '''
@@ -104,7 +99,6 @@ def step_impl_2(context):
     with open(json_file_path, encoding="UTF-8") as users_json_file:
         post_res = post_method(context.url, files={"json_file": users_json_file})
 
-        print(post_res.status_code)
         print(post_res.json())
 
         assert post_res.status_code == 200
@@ -141,7 +135,7 @@ def step_impl_4(context):
             query_params= {"user_id":context.imported_user_ids[i]}
         )
         assert get_agent_res.status_code == 200
-        assert get_agent_res.json()["data"][0]["user_id"] == context.imported_user_ids[i]
+        assert get_agent_res.json()["data"]["records"][0]["user_id"] == context.imported_user_ids[i]
 
 
 @behave.Given("A User has access to the application and will submit form "
@@ -342,7 +336,7 @@ def step_impl_4(context):
 		query_params= {"user_id":context.post_user_res_dict["user_id"]}
 	)
 	assert get_agent_res.status_code == 200
-	assert get_agent_res.json()["data"][0]["user_id"] == context.post_user_res_dict["user_id"]
+	assert get_agent_res.json()["data"]["records"][0]["user_id"] == context.post_user_res_dict["user_id"]
 	
 	staff_uuid = context.post_user_res_dict["user_type_ref"]
 	get_staff_url = f"{UM_API_URL}/staff/{staff_uuid}"

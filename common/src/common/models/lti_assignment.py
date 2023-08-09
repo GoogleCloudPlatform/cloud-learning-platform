@@ -27,6 +27,15 @@ def check_context_type(field_val):
           ",".join("'" + i + "'" for i in context_types))
 
 
+def check_course_work_type(field_val):
+  """validator method for context type field"""
+  coursework_types = ["course_work", "course_work_material"]
+  if field_val.lower() in coursework_types:
+    return True
+  return (False, "Context Type must be one of " +
+          ",".join("'" + i + "'" for i in coursework_types))
+
+
 class LTIAssignment(BaseModel):
   """LTI Assignment Data Model"""
   id = IDField()
@@ -39,6 +48,8 @@ class LTIAssignment(BaseModel):
   prev_content_item_ids = ListField(default=[])
   tool_id = TextField()
   course_work_id = TextField()
+  course_work_type = TextField(
+      required=True, default="course_work", validator=check_course_work_type)
   max_points = NumberField()
   start_date = DateTime()
   end_date = DateTime()

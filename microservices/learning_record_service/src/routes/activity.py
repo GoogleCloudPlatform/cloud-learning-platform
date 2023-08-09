@@ -47,13 +47,15 @@ def get_activities(skip: int = Query(0, ge=0, le=2000),
   try:
     collection_manager = Activity.collection
 
-    acivities = collection_manager.order("-created_time").offset(skip).fetch(
+    activities = collection_manager.order("-created_time").offset(skip).fetch(
         limit)
-    acivities = [i.get_fields(reformat_datetime=True) for i in acivities]
+    activities = [i.get_fields(reformat_datetime=True) for i in activities]
+    count = 10000
+    response = {"records": activities, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": acivities
+        "data": response
     }
   except ValidationError as e:
     raise BadRequest(str(e)) from e
@@ -129,9 +131,9 @@ def create_activity(input_actvity: BasicActivityModel):
           "data": activity_fields
       }
     else:
-      activity_name = input_activity_dict["name"]
       raise ConflictError(
-        f"Activity with the given name {activity_name} already exists")
+    f"Activity with the given name {input_activity_dict['name']} already exists"
+    )
 
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e

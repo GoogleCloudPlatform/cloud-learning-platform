@@ -12,11 +12,13 @@ from fastapi.testclient import TestClient
 from uuid import uuid4
 from routes.learner_association_group import router
 from testing.test_config import API_URL
-from schemas.schema_examples import (
-    BASIC_ASSOCIATION_GROUP_EXAMPLE, BASIC_USER_MODEL_EXAMPLE,
-    ADD_INSTRUCTOR_LEARNER_ASSOCIATION_GROUP_EXAMPLE, BASIC_GROUP_MODEL_EXAMPLE,
-    BASIC_CURRICULUM_PATHWAY_EXAMPLE,
-    REMOVE_INSTRUCTOR_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+from schemas.schema_examples import (BASIC_ASSOCIATION_GROUP_EXAMPLE,
+                        BASIC_USER_MODEL_EXAMPLE,
+                        ADD_INSTRUCTOR_LEARNER_ASSOCIATION_GROUP_EXAMPLE,
+                        BASIC_GROUP_MODEL_EXAMPLE,
+                        BASIC_CURRICULUM_PATHWAY_EXAMPLE,
+                        FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE,
+                        REMOVE_INSTRUCTOR_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
 
 from common.models import AssociationGroup, User, UserGroup, CurriculumPathway
 from common.testing.firestore_emulator import (firestore_emulator,
@@ -131,6 +133,564 @@ def test_get_all_association_groups_negative(clean_firestore):
   json_response = resp.json()
   assert resp.status_code == 422, "Status should be 422"
   assert json_response["message"] == "Validation Failed"
+
+
+def test_get_all_learner_ids_of_association_group(clean_firestore):
+  # create learner
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+
+  user_obj = {
+    "user": user.user_id,
+    "status": "active"
+  }
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+  association_group_dict["users"].append(user_obj)
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": False}
+  url = f"{api_url}/{association_group.uuid}/learners"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get("user") == user.user_id
+  assert json_response["data"]["records"][0].get("status") == "active"
+
+
+def test_get_all_learners_of_association_group(clean_firestore):
+  # create learner
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+
+  user_obj = {
+    "user": user.user_id,
+    "status": "active"
+  }
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+  association_group_dict["users"].append(user_obj)
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": True}
+  url = f"{api_url}/{association_group.uuid}/learners"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+  print(json_response)
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get(
+      "user").get("user_id") == user.user_id
+  assert json_response["data"]["records"][0].get("status") == "active"
+
+def test_get_all_learners_of_association_group_with_status_param(
+    clean_firestore):
+  # create learner
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+
+  user_obj = {
+    "user": user.user_id,
+    "status": "inactive"
+  }
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+  association_group_dict["users"].append(user_obj)
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": True, "status": "inactive"}
+  url = f"{api_url}/{association_group.uuid}/learners"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+  print(json_response)
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get(
+      "user").get("user_id") == user.user_id
+  assert json_response["data"]["records"][0].get("status") == "inactive"
+
+def test_sort_all_learners_of_association_group(clean_firestore):
+  # create learner
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+
+  user_obj = {
+    "user": user.user_id,
+    "status": "active"
+  }
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+  association_group_dict["users"].append(user_obj)
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": True,
+            "sort_by": "email", "sort_order": "ascending"}
+  url = f"{api_url}/{association_group.uuid}/learners"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get(
+      "user").get("user_id") == user.user_id
+  assert json_response["data"]["records"][0].get("status") == "active"
+
+
+def test_get_all_learners_of_association_group_negative(clean_firestore):
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": True}
+  url = f"{api_url}/random_uuid/learners"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 404, "Status 404"
+  assert json_response["message"] == \
+          "AssociationGroup with uuid random_uuid not found"
+  assert json_response["success"] is False
+  assert json_response["data"] is None
+
+
+def test_get_all_coach_ids_of_association_group(clean_firestore):
+  # create coach
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user_dict["user_type"] = "coach"
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+
+  user_obj = {
+    "coach": user.user_id,
+    "status": "active"
+  }
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+  association_group_dict["associations"]["coaches"].append(user_obj)
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": False}
+  url = f"{api_url}/{association_group.uuid}/coaches"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get("coach") == user.user_id
+  assert json_response["data"]["records"][0].get("status") == "active"
+
+def test_get_all_coach_ids_of_association_group_with_status_param(
+    clean_firestore):
+  # create coach
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user_dict["user_type"] = "coach"
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+
+  user_obj = {
+    "coach": user.user_id,
+    "status": "inactive"
+  }
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+  association_group_dict["associations"]["coaches"].append(user_obj)
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": False,"status": "inactive"}
+  url = f"{api_url}/{association_group.uuid}/coaches"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get("coach") == user.user_id
+  assert json_response["data"]["records"][0].get("status") == "inactive"
+
+def test_sort_all_coach_of_association_group(clean_firestore):
+  # create coach
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user_dict["user_type"] = "coach"
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+
+  user_obj = {
+    "coach": user.user_id,
+    "status": "active"
+  }
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+  association_group_dict["associations"]["coaches"].append(user_obj)
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": True,
+            "sort_by": "last_name", "sort_oder": "descending"}
+  url = f"{api_url}/{association_group.uuid}/coaches"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get("coach")["user_id"] == \
+         user.user_id
+  assert json_response["data"]["records"][0].get("status") == "active"
+
+
+
+def test_get_all_coaches_of_association_group(clean_firestore):
+  # create coach
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user_dict["user_type"] = "coach"
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+
+  user_obj = {
+    "coach": user.user_id,
+    "status": "active"
+  }
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+  association_group_dict["associations"]["coaches"].append(user_obj)
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": True}
+  url = f"{api_url}/{association_group.uuid}/coaches"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get(
+      "coach").get("user_id") == user.user_id
+  assert json_response["data"]["records"][0].get("status") == "active"
+
+
+def test_get_all_coaches_of_association_group_negative(clean_firestore):
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": True}
+  url = f"{api_url}/random_uuid/coaches"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 404, "Status 404"
+  assert json_response["message"] == \
+          "AssociationGroup with uuid random_uuid not found"
+  assert json_response["success"] is False
+  assert json_response["data"] is None
+
+
+def test_get_all_instructor_ids_of_association_group(clean_firestore):
+  # create coach
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user_dict["user_type"] = "instructor"
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+
+  user_obj = {
+    "instructor": user.user_id,
+    "curriculum_pathway_id": "curr_path_id",
+    "status": "active"
+  }
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+  association_group_dict["associations"]["instructors"].append(user_obj)
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": False}
+  url = f"{api_url}/{association_group.uuid}/instructors"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get("instructor") == user.user_id
+  assert json_response["data"]["records"][0].get(
+      "curriculum_pathway_id") == "curr_path_id"
+  assert json_response["data"]["records"][0].get("status") == "active"
+
+
+def test_sort_all_instructor_of_association_group(clean_firestore):
+  user_dict_1 = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user_1 = User.from_dict(user_dict_1)
+  user_1.user_id = ""
+  user_1.save()
+  user_1.user_id = user_1.id
+  user_1.update()
+  user_dict_1["user_id"] = user_1.id
+
+  user_dict_2 = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user_2 = User.from_dict(user_dict_2)
+  user_2.user_id = ""
+  user_2.save()
+  user_2.user_id = user_2.id
+  user_2.update()
+  user_dict_2["user_id"] = user_2.id
+
+  # Create curriculum pathway
+  curriculum_pathway_id = create_curriculum_pathway(
+    payload=BASIC_CURRICULUM_PATHWAY_EXAMPLE).uuid
+
+  # Create Discipline Association Group
+  discipline_group_dict = {
+    **BASIC_ASSOCIATION_GROUP_EXAMPLE, "association_type": "discipline"
+  }
+  discipline_group = AssociationGroup.from_dict(discipline_group_dict)
+  discipline_group.uuid = ""
+  discipline_group.save()
+  discipline_group.uuid = discipline_group.id
+  discipline_group.update()
+
+  discipline_group.users = [{"user": user_2.user_id, "status": "active"}]
+  discipline_group.associations = {
+    "curriculum_pathways": [{
+      "curriculum_pathway_id": curriculum_pathway_id, "status": "active"
+    }]
+  }
+  discipline_group.update()
+
+  # Create Learner Association Group
+  association_group_dict = {
+    **BASIC_ASSOCIATION_GROUP_EXAMPLE, "association_type": "learner"
+  }
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+  association_group_uuid = association_group.id
+
+  association_group.users = [{
+    "user": user_1.user_id, "status": "active"
+  }]
+  association_group.associations = {"instructors": [
+    {
+      "instructor": user_2.user_id,
+      "curriculum_pathway_id": curriculum_pathway_id,
+      "status": "inactive"
+    }]
+  }
+  association_group.update()
+
+  url = f"{api_url}/{association_group_uuid}/user-association/status"
+  request_body = {
+    "instructor": {"instructor_id": user_2.user_id,
+                   "curriculum_pathway_id": curriculum_pathway_id,
+                   "status": "active"}
+  }
+
+  client_with_emulator.put(url, json=request_body)
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": True,
+            "sort_by": "first_name", "sort_order": "ascending"}
+  url = f"{api_url}/{association_group.uuid}/instructors"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get("instructor")["user_id"] == \
+         user_2.user_id
+  assert json_response["data"]["records"][0].get(
+      "curriculum_pathway_id").get("uuid") == curriculum_pathway_id
+  assert json_response["data"]["records"][0].get("status") == "active"
+
+
+def test_get_all_instructors_of_association_group(clean_firestore):
+  # create coach
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user_dict["user_type"] = "instructor"
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+
+  # create curriculum pathway
+  pathway = create_curriculum_pathway(BASIC_CURRICULUM_PATHWAY_EXAMPLE)
+
+  user_obj = {
+    "instructor": user.user_id,
+    "curriculum_pathway_id": pathway.uuid,
+    "status": "active"
+  }
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+  association_group_dict["associations"]["instructors"].append(user_obj)
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": True}
+  url = f"{api_url}/{association_group.uuid}/instructors"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get("instructor").get(
+                              "user_id") == user.user_id
+  assert json_response["data"]["records"][0].get("curriculum_pathway_id").get(
+                              "uuid") == pathway.uuid
+  assert json_response["data"]["records"][0].get("status") == "active"
+
+def test_get_all_instructors_of_association_group_with_status_param(
+    clean_firestore):
+  # create coach
+  user_dict = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
+  user_dict["user_type"] = "instructor"
+  user = User.from_dict(user_dict)
+  user.user_id = ""
+  user.save()
+  user.user_id = user.id
+  user.update()
+
+  # create curriculum pathway
+  pathway = create_curriculum_pathway(BASIC_CURRICULUM_PATHWAY_EXAMPLE)
+
+  user_obj = {
+    "instructor": user.user_id,
+    "curriculum_pathway_id": pathway.uuid,
+    "status": "inactive"
+  }
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+  association_group_dict["associations"]["instructors"].append(user_obj)
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": True, "status": "inactive"}
+  url = f"{api_url}/{association_group.uuid}/instructors"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 200, "Status 200"
+  assert json_response["data"]["records"][0].get("instructor").get(
+                              "user_id") == user.user_id
+  assert json_response["data"]["records"][0].get("curriculum_pathway_id").get(
+                              "uuid") == pathway.uuid
+  assert json_response["data"]["records"][0].get("status") == "inactive"
+
+
+def test_get_all_instructors_of_association_group_negative(clean_firestore):
+  association_group_dict = deepcopy(FULL_LEARNER_ASSOCIATION_GROUP_EXAMPLE)
+  association_group_dict["association_type"] = "learner"
+
+  # create association group
+  association_group = AssociationGroup.from_dict(association_group_dict)
+  association_group.uuid = ""
+  association_group.save()
+  association_group.uuid = association_group.id
+  association_group.update()
+
+  params = {"skip": 0, "limit": 100, "fetch_tree": True}
+  url = f"{api_url}/random_uuid/instructors"
+  resp = client_with_emulator.get(url, params=params)
+  json_response = resp.json()
+
+  assert resp.status_code == 404, "Status 404"
+  assert json_response["message"] == \
+          "AssociationGroup with uuid random_uuid not found"
+  assert json_response["success"] is False
+  assert json_response["data"] is None
 
 
 def test_post_association_group(clean_firestore):
@@ -649,33 +1209,41 @@ def test_update_association_status_negative_3(clean_firestore):
   assert update_response["message"] == error_message
 
 
-def create_user_and_group(user_group_name, user_type):
+def create_user_and_group(user_group_name, user_type1, user_type2 ):
   """Function to check POST route"""
-  user_dict = User.from_dict({
-      **BASIC_USER_MODEL_EXAMPLE, "user_type": user_type
+  user_dict1 = User.from_dict({
+      **BASIC_USER_MODEL_EXAMPLE, "user_type": user_type1
   })
-  user_dict.user_id = ""
-  user_dict.save()
-  user_dict.user_id = user_dict.id
-  user_dict.update()
-  user_id1 = user_dict.user_id
+  user_dict1.user_id = ""
+  user_dict1.save()
+  user_dict1.user_id = user_dict1.id
+  user_dict1.update()
+  user_id1 = user_dict1.user_id
 
-  user_dict = User.from_dict({
-      **BASIC_USER_MODEL_EXAMPLE, "user_type": user_type
+  user_dict2 = User.from_dict({
+      **BASIC_USER_MODEL_EXAMPLE, "user_type": user_type2
   })
-  user_dict.user_id = ""
-  user_dict.save()
-  user_dict.user_id = user_dict.id
-  user_dict.update()
-  user_id2 = user_dict.user_id
+  user_dict2.user_id = ""
+  user_dict2.save()
+  user_dict2.user_id = user_dict2.id
+  user_dict2.update()
+  user_id2 = user_dict2.user_id
 
-  group_example = {"name": user_group_name, "users": [user_id1, user_id2]}
+  group_example = {**BASIC_GROUP_MODEL_EXAMPLE,
+                  "name": user_group_name, "users": [user_id1, user_id2]}
 
   group_dict = UserGroup.from_dict(group_example)
   group_dict.uuid = ""
   group_dict.save()
-  group_dict.user_id = group_dict.id
+  group_dict.uuid = group_dict.id
   group_dict.update()
+
+
+  user_dict1.user_groups = [group_dict.uuid]
+  user_dict1.update()
+
+  user_dict2.user_groups = [group_dict.uuid]
+  user_dict2.update()
 
   return [user_id1, user_id2]
 
@@ -690,7 +1258,7 @@ def test_add_user_to_learner_association_group(clean_firestore):
   assert post_resp_json.get("success") is True, "Success not true"
   assert post_resp.status_code == 200, "Status 200"
 
-  add_users = create_user_and_group("learner group", "learner")
+  add_users = create_user_and_group("learner", "learner", "learner")
   add_users = {"users": add_users, "status": "active"}
   url = api_url + f"/{uuid}/users/add"
   post_resp = client_with_emulator.post(url, json=add_users)
@@ -711,7 +1279,7 @@ def test_remove_user_from_learner_association_group(clean_firestore):
   assert post_resp.status_code == 200, "Status 200"
 
   # Add users to the association group
-  add_users = create_user_and_group("learner group", "learner")
+  add_users = create_user_and_group("learner", "learner", "learner")
   add_users = {"users": add_users, "status": "active"}
   url = api_url + f"/{uuid}/users/add"
   post_resp = client_with_emulator.post(url, json=add_users)
@@ -743,7 +1311,7 @@ def test_add_coach_to_learner_association_group(clean_firestore):
   assert post_resp.status_code == 200, "Status 200"
 
   # Add coach to the association group
-  add_coaches = create_user_and_group("coach group", "coach")
+  add_coaches = create_user_and_group("coach", "coach", "coach")
   add_coaches = {"coaches": [add_coaches[0]], "status": "active"}
   url = api_url + f"/{uuid}/coaches/add"
   post_resp = client_with_emulator.post(url, json=add_coaches)
@@ -766,7 +1334,7 @@ def test_add_two_coach_to_learner_association_group(clean_firestore):
   assert post_resp.status_code == 200, "Status 200"
 
   # Add coach to the association group
-  add_coaches = create_user_and_group("coach group", "faculty")
+  add_coaches = create_user_and_group("coach", "coach", "coach")
   add_coaches = {"coaches": add_coaches, "status": "active"}
   url = api_url + f"/{uuid}/coaches/add"
   post_resp = client_with_emulator.post(url, json=add_coaches)
@@ -788,7 +1356,7 @@ def test_remove_coach_from_learner_association_group(clean_firestore):
   assert post_resp.status_code == 200, "Status 200"
 
   # Add coach to the association group
-  add_coaches = create_user_and_group("coach group", "coach")
+  add_coaches = create_user_and_group("coach", "coach", "coach")
   add_coaches = {"coaches": [add_coaches[0]], "status": "active"}
   url = api_url + f"/{uuid}/coaches/add"
   post_resp = client_with_emulator.post(url, json=add_coaches)
@@ -867,6 +1435,18 @@ def create_user_record(payload: dict) -> any:
   user_dict.user_id = ""
   user_dict.save()
   user_dict.user_id = user_dict.id
+  user_dict.update()
+
+  group_example = {**BASIC_GROUP_MODEL_EXAMPLE,
+                  "name": payload["user_type"], "users": [user_dict.id]}
+
+  group_dict = UserGroup.from_dict(group_example)
+  group_dict.uuid = ""
+  group_dict.save()
+  group_dict.uuid = group_dict.id
+  group_dict.update()
+
+  user_dict.user_groups = [group_dict.uuid]
   user_dict.update()
 
   return user_dict
@@ -1544,7 +2124,7 @@ def test_remove_instructor_negative_7(mocker, clean_firestore):
       return_value=[curriculum_pathway_id])
 
   # Create User as type faculty
-  user = {**BASIC_USER_MODEL_EXAMPLE, "user_type": "faculty"}
+  user = {**BASIC_USER_MODEL_EXAMPLE, "user_type": "instructor"}
   instructor_id = create_user_record(payload=user).user_id
   instructor_2 = create_user_record(payload=user).user_id
 
@@ -1634,22 +2214,7 @@ def test_remove_instructor_negative_8(mocker, clean_firestore):
   assert res.json().get("success") is False
 
 def test_get_all_the_learner_for_instructor(clean_firestore):
-  user_dict_1 = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
-  user_1 = User.from_dict(user_dict_1)
-  user_1.user_id = ""
-  user_1.save()
-  user_1.user_id = user_1.id
-  user_1.update()
-  user_dict_1["user_id"] = user_1.id
-
-  user_dict_2 = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": "",
-                 "user_type": "instructor"}
-  user_2 = User.from_dict(user_dict_2)
-  user_2.user_id = ""
-  user_2.save()
-  user_2.user_id = user_2.id
-  user_2.update()
-  user_dict_2["user_id"] = user_2.id
+  users = create_user_and_group("instructor", "instructor", "learner")
 
   association_group_dict = {
       **BASIC_ASSOCIATION_GROUP_EXAMPLE, "association_type": "learner"
@@ -1658,42 +2223,29 @@ def test_get_all_the_learner_for_instructor(clean_firestore):
   association_group.uuid = ""
   association_group.save()
   association_group.uuid = association_group.id
-  association_group.users = [{"user": user_1.user_id, "status": "active"}]
+  association_group.users = [{"user": users[1], "status": "active"}]
   association_group.associations = {
       "instructors": [{
-          "instructor": user_2.user_id,
+          "instructor": users[0],
           "curriculum_pathway_id": "",
           "status": "active"
       }]
   }
   association_group.update()
 
-  url = f"{api_url}/instructor/{user_2.user_id}/learners"
+  url = f"{api_url}/instructor/{users[0]}/learners"
   res = client_with_emulator.get(url=url)
   res_data = res.json()
   assert res.status_code == 200
   assert res_data["success"] is True
   assert res_data["message"] == "Successfully fetched the learners "\
         "for the given instructor"
-  assert user_1.user_id in res_data["data"]
+  assert users[1] in res_data["data"]
 
 def test_get_all_the_learner_for_coach(clean_firestore):
-  user_dict_1 = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}
-  user_1 = User.from_dict(user_dict_1)
-  user_1.user_id = ""
-  user_1.save()
-  user_1.user_id = user_1.id
-  user_1.update()
-  user_dict_1["user_id"] = user_1.id
+  users = create_user_and_group("coach", "coach", "learner")
 
-  user_dict_2 = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": "",
-                 "user_type": "coach"}
-  user_2 = User.from_dict(user_dict_2)
-  user_2.user_id = ""
-  user_2.save()
-  user_2.user_id = user_2.id
-  user_2.update()
-  user_dict_2["user_id"] = user_2.id
+
 
   association_group_dict = {
       **BASIC_ASSOCIATION_GROUP_EXAMPLE, "association_type": "learner"
@@ -1702,23 +2254,23 @@ def test_get_all_the_learner_for_coach(clean_firestore):
   association_group.uuid = ""
   association_group.save()
   association_group.uuid = association_group.id
-  association_group.users = [{"user": user_1.user_id, "status": "active"}]
+  association_group.users = [{"user": users[1], "status": "active"}]
   association_group.associations = {
       "coaches": [{
-          "coach": user_2.user_id,
+          "coach": users[0],
           "status": "active"
       }]
   }
   association_group.update()
 
-  url = f"{api_url}/coach/{user_2.user_id}/learners"
+  url = f"{api_url}/coach/{users[0]}/learners"
   res = client_with_emulator.get(url=url)
   res_data = res.json()
   assert res.status_code == 200
   assert res_data["success"] is True
   assert res_data["message"] == "Successfully fetched the learners "\
         "for the given coach"
-  assert user_1.user_id in res_data["data"]
+  assert users[1] in res_data["data"]
 
 def test_get_all_the_learner_for_coach_and_instructor_negative(clean_firestore):
   user_dict_1 = {**BASIC_USER_MODEL_EXAMPLE, "user_type_ref": ""}

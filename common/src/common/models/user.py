@@ -182,7 +182,7 @@ class UserGroup(BaseModel):
   """UserGroup Class"""
   uuid = TextField(required=True)
   name = TextField(required=True)
-  description = TextField()
+  description = TextField(required=True)
   alias = TextField(default="security groups")
   users = ListField(default=[])
   roles = ListField(default=[])
@@ -223,7 +223,7 @@ class Permission(BaseModel):
   """Permission Class"""
   uuid = TextField(required=True)
   name = TextField(required=True)
-  description = TextField()
+  description = TextField(required=True)
   application_id = TextField(required=True)
   module_id = TextField(required=True)
   action_id = TextField(required=True)
@@ -262,7 +262,7 @@ class Application(BaseModel):
   """Application Class"""
   uuid = TextField(required=True)
   name = TextField(required=True)
-  description = TextField()
+  description = TextField(required=True)
   modules = ListField(default=[])
 
   class Meta:
@@ -307,7 +307,7 @@ class Action(BaseModel):
   """Action Class"""
   uuid = TextField(required=True)
   name = TextField(required=True)
-  description = TextField()
+  description = TextField(required=True)
   action_type = TextField(validator=check_action_type)
 
   class Meta:
@@ -342,7 +342,7 @@ class Module(BaseModel):
   """Module Class"""
   uuid = TextField(required=True)
   name = TextField(required=True)
-  description = TextField()
+  description = TextField(required=True)
   actions = ListField(default=[])
 
   class Meta:
@@ -423,7 +423,7 @@ class AssociationGroup(BaseModel):
   uuid = TextField(required=True)
   name = TextField(required=True, validator=validate_name)
   association_type = TextField(required=True, validator=check_association_type)
-  description = TextField()
+  description = TextField(required=True)
   users = ListField(default=[])
   associations = MapField(default={})
   is_immutable = BooleanField(default=False)

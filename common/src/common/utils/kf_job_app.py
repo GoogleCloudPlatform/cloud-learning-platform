@@ -1,3 +1,17 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Utiliy functions for kubernetes job related operations"""
 
 import os
@@ -12,6 +26,7 @@ from pytz import timezone
 from requests import JSONDecodeError
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
+from common.utils.errors import BatchJobError
 from common.models.batch_job import BatchJobModel
 from common.utils.config import (DEFAULT_JOB_LIMITS,
   DEFAULT_JOB_REQUESTS)
@@ -24,14 +39,14 @@ from common.utils.config import (JOB_TYPES_WITH_PREDETERMINED_TITLES,
 #pylint: disable=consider-using-f-string
 #pylint: disable=logging-format-interpolation
 #pylint: disable=broad-exception-raised
-#pylint: disable=invalid-name
 # Set logging
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-# Setup K8 configs
-config.load_incluster_config()
-configuration = client.Configuration()
-api_instance = client.BatchV1Api(client.ApiClient(configuration))
+# Setup K8 configs (if running in a pod)
+if os.getenv("KUBERNETES_SERVICE_HOST"):
+  config.load_incluster_config()
+  api_instance = client.BatchV1Api()
+
 
 def kube_delete_empty_pods(namespace="default"):
   """
@@ -197,7 +212,7 @@ def kube_create_job_object(name,
       containers=[container],
       restart_policy="Never",
       service_account_name="ksa")
-  # And finaly we can create our V1JobSpec!
+  # And finally we can create our V1JobSpec!
   body.spec = client.V1JobSpec(
       backoff_limit=0,
       template=template.template)
@@ -222,122 +237,142 @@ def get_cloud_link(microservice_name):
   """Creates a query which can be used to directly view the logs of
   the required microservice"""
   # Fetching the required ENV variables to create the log query
-  GCP_PROJECT = os.getenv("GCP_PROJECT")
-  SKAFFOLD_NAMESPACE = os.getenv("SKAFFOLD_NAMESPACE")
-  GKE_CLUSTER = os.getenv("GKE_CLUSTER")
-  GCP_ZONE = os.getenv("GCP_ZONE")
+  gcp_project = os.getenv("GCP_PROJECT")
+  skaffold_namespace = os.getenv("SKAFFOLD_NAMESPACE")
+  gke_cluster = os.getenv("GKE_CLUSTER")
+  gcp_zone = os.getenv("GCP_ZONE")
   url = GCLOUD_LOG_URL
   # Fetching the current time in GMT
   tz = timezone("GMT")
-  INIT_TIMESTAMP = datetime.now(tz)
-  FINAL_TIMESTAMP = (INIT_TIMESTAMP + \
+  init_timestamp = datetime.now(tz)
+  final_timestamp = (init_timestamp + \
     timedelta(hours=-1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-  INIT_TIMESTAMP = INIT_TIMESTAMP.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+  init_timestamp = init_timestamp.strftime("%Y-%m-%dT%H:%M:%S.000Z")
   # Replacing the values to get the correct URL
-  url = url.replace("{GCP_PROJECT}", GCP_PROJECT)
-  url = url.replace("{SKAFFOLD_NAMESPACE}", SKAFFOLD_NAMESPACE)
-  url = url.replace("{GKE_CLUSTER}", GKE_CLUSTER)
-  url = url.replace("{GCP_ZONE}", GCP_ZONE)
-  url = url.replace("{INIT_TIMESTAMP}", INIT_TIMESTAMP)
-  url = url.replace("{FINAL_TIMESTAMP}", FINAL_TIMESTAMP)
+  url = url.replace("{GCP_PROJECT}", gcp_project)
+  url = url.replace("{SKAFFOLD_NAMESPACE}", skaffold_namespace)
+  url = url.replace("{GKE_CLUSTER}", gke_cluster)
+  url = url.replace("{GCP_ZONE}", gcp_zone)
+  url = url.replace("{INIT_TIMESTAMP}", init_timestamp)
+  url = url.replace("{FINAL_TIMESTAMP}", final_timestamp)
   url = url.replace("{MICROSERVICE}", microservice_name)
 
   return url
 
-def kube_create_job(job_specs ,namespace="default", env_vars={}):
-  """check for pending/active duplicate job"""
-  job_logs = {}
-  logging.info("Type of request body")
-  logging.info(job_specs["input_data"])
-  logging.info(type(job_specs["input_data"]))
-  duplicate_job = find_duplicate_jobs(job_specs["type"],
-                                      job_specs["input_data"])
-  if duplicate_job:
-    return duplicate_job
-
-  # Create the job definition
-  logging.info("Batch Job Creation Started")
-  container_image = job_specs["container_image"]
-  limits = job_specs.get("limits", DEFAULT_JOB_LIMITS)
-  requests = job_specs.get("requests", DEFAULT_JOB_REQUESTS)
-  name = str(uuid.uuid4())  #job name
-
-  # creating a job entry in firestore
-  job_model = BatchJobModel()
-  job_model.id_ = name
-  job_model.type = job_specs["type"]
-  job_model.status = "pending"
-  job_model.uuid = name
-  job_model.save()
-  logging.info("Batch Job {}: Started with job type " \
-      "{}".format(job_model.name,job_model.type))
-  logging.info("Batch Job {}: Updated Batch Job Status " \
-      "to pending in firestore".format(job_model.name))
-  if job_specs["type"] in JOB_TYPES_WITH_PREDETERMINED_TITLES:
-    job_model.input_data = job_specs[
-      "input_data"]  # data required for running job
-    if isinstance(job_specs["input_data"], str):
-      try:
-        job_specs["input_data"] = json.loads(job_specs["input_data"])
-      except JSONDecodeError as e:
-        logging.info("Unable to convert job_specs['input_data'] to dict,\
-          \nError: {}".format(e))
-    if isinstance(job_specs["input_data"], dict) and \
-      "title" in job_specs["input_data"].keys():
-      job_model.name = job_specs["input_data"]["title"]
-    else:
-      job_model.name = name
-  else:
-    created_time = job_model.created_time
-    job_name_suffix = str(created_time.year)+"-"+\
-      str(created_time.month)+"-"+str(
-      created_time.day)+"-"+str(created_time.hour)+"-"+\
-      str(created_time.minute)+"-"+str(created_time.second)
-    input_data = json.loads(job_specs["input_data"])
-    input_data["title"] = input_data["title"] + "-" +\
-      job_name_suffix
-    job_specs["input_data"] = json.dumps(input_data)
-    job_model.name = input_data["title"]
-    job_model.input_data = job_specs[
-        "input_data"]  # data required for running job
-
-  if job_specs["type"] == "assessment-items":
-    job_logs = {job_specs["type"]: get_cloud_link(job_specs["type"]),
-                input_data["activity"]: get_cloud_link(
-                  input_data["activity"].replace("_", "-"))}
-
-  elif job_specs["type"] in ["course-ingestion",
-                             "course-ingestion_topic-tree",
-                             "course-ingestion_learning-units"]:
-    job_logs = {job_specs["type"]: get_cloud_link("course-ingestion")}
-  elif job_specs["type"] in ["deep-knowledge-tracing"]:
-    job_logs = {job_specs["type"]: get_cloud_link("deep-knowledge-tracing")}
-  else:
-    job_logs = {}
-
-  job_model.job_logs = job_logs
-
-  job_model.update()
-
-  body = kube_create_job_object(
-    name=name,
-    container_image=container_image,
-    namespace=namespace,
-    env_vars=env_vars,
-    limits=limits,
-    requests=requests)
+def kube_create_job(job_specs, namespace="default", env_vars={}):
+  """ Create a kube job based on the job spec """
+  logging.info("kube_create_job: {}".format(job_specs))
+  logging.info("kube_create_job: namespace {} env {}".format(
+      namespace, env_vars))
   try:
-    api_instance.create_namespaced_job(namespace, body, pretty=True)
-    logging.info("Batch Job {}: Created".format(job_model.uuid))
-    return {"job_name": job_model.uuid, "doc_id": job_model.id_,
-    "status": "active", "job logs": job_logs}
-  except ApiException as e:
-    logging.error("Batch Job {}: Failed".format(job_model.uuid))
+    # check for pending/active duplicate job
+    job_logs = {}
+    logging.info("Type of request body")
+    logging.info(job_specs["input_data"])
+    logging.info(type(job_specs["input_data"]))
+    duplicate_job = find_duplicate_jobs(job_specs["type"],
+                                        job_specs["input_data"])
+    if duplicate_job:
+      return duplicate_job
+
+    # Create the job definition
+    logging.info("Batch Job Creation Started")
+    container_image = job_specs["container_image"]
+    limits = job_specs.get("limits", DEFAULT_JOB_LIMITS)
+    requests = job_specs.get("requests", DEFAULT_JOB_REQUESTS)
+    name = str(uuid.uuid4())  #job name
+
+    # creating a job entry in firestore
+    job_model = BatchJobModel()
+    job_model.id = name
+    job_model.type = job_specs["type"]
+    job_model.status = "pending"
+    job_model.uuid = name
+    job_model.save()
+    logging.info("Batch Job {}: Started with job type " \
+        "{}".format(job_model.name,job_model.type))
+    logging.info("Batch Job {}: Updated Batch Job Status " \
+        "to pending in firestore".format(job_model.name))
+
+    if job_specs["type"] in JOB_TYPES_WITH_PREDETERMINED_TITLES:
+      job_model.input_data = job_specs[
+        "input_data"]  # data required for running job
+      if isinstance(job_specs["input_data"], str):
+        try:
+          job_specs["input_data"] = json.loads(job_specs["input_data"])
+        except JSONDecodeError as e:
+          logging.info("Unable to convert job_specs['input_data'] to dict,\
+            \nError: {}".format(e))
+      if isinstance(job_specs["input_data"], dict) and \
+        "title" in job_specs["input_data"].keys():
+        job_model.name = job_specs["input_data"]["title"]
+      else:
+        job_model.name = name
+    else:
+      created_time = job_model.created_time
+      job_name_suffix = str(created_time.year)+"-"+\
+        str(created_time.month)+"-"+str(
+        created_time.day)+"-"+str(created_time.hour)+"-"+\
+        str(created_time.minute)+"-"+str(created_time.second)
+      input_data = json.loads(job_specs["input_data"])
+      input_data["title"] = input_data["title"] + "-" +\
+        job_name_suffix
+      job_specs["input_data"] = json.dumps(input_data)
+      job_model.name = input_data["title"]
+      job_model.input_data = job_specs[
+          "input_data"]  # data required for running job
+
+    if job_specs["type"] == "assessment-items":
+      job_logs = {job_specs["type"]: get_cloud_link(job_specs["type"]),
+                  input_data["activity"]: get_cloud_link(
+                    input_data["activity"].replace("_", "-"))}
+
+    elif job_specs["type"] in ["course-ingestion",
+                               "course-ingestion_topic-tree",
+                               "course-ingestion_learning-units"]:
+      job_logs = {job_specs["type"]: get_cloud_link("course-ingestion")}
+    elif job_specs["type"] in ["deep-knowledge-tracing"]:
+      job_logs = {job_specs["type"]: get_cloud_link("deep-knowledge-tracing")}
+    else:
+      job_logs = {}
+
+    job_model.job_logs = job_logs
+
+    job_model.save(merge=True)
+
+    logging.info("Batch Job {}:  " \
+        "model updated in firestore".format(job_model.name))
+
+    logging.info("Batch Job {}:  " \
+        "creating kube job object".format(job_model.name))
+    body = kube_create_job_object(
+      name=name,
+      container_image=container_image,
+      namespace=namespace,
+      env_vars=env_vars,
+      limits=limits,
+      requests=requests)
+
+    logging.info("Batch Job {}:  " \
+        "kube job body created".format(job_model.name))
+
+    # call kube batch API to create job
+    job = api_instance.create_namespaced_job(namespace, body, pretty=True)
+    logging.info("Batch Job {} id {}: Created".format(job, job_model.uuid))
+
+    response = {
+      "job_name": job_model.uuid,
+      "doc_id": job_model.id,
+      "status": "active",
+      "job logs": job_logs
+    }
+    return response
+
+  except Exception as e:
+    logging.error("Batch Job {}: Failed".format(job_specs))
     logging.error(traceback.print_exc())
     BatchJobModel.delete_by_id(job_model.id)
-    raise Exception(
-        "Exception when calling BatchV1Api->create_namespaced_job: %s\n" % e) \
-            from e
+    raise BatchJobError(str(e)) from e
 
 
 def kube_get_namespaced_deployment_image_path(deployment_name,container_name,
@@ -363,6 +398,7 @@ def kube_get_namespaced_deployment_image_path(deployment_name,container_name,
   except ApiException as e:
     logging.info("---ERROR---")
     logging.info(e)
+    raise BatchJobError(str(e)) from e
   return image_path
 
 

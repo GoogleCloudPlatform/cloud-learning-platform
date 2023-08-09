@@ -119,7 +119,7 @@ def test_get_all_goals(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status should be 200"
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
+  retrieved_ids = [i.get("uuid") for i in json_response.get("data")["records"]]
   assert goal.uuid in retrieved_ids, "expected data not retrived"
   assert deleted_goal.uuid not in retrieved_ids, "unexpected data retrived"
   assert archived_goal.uuid not in retrieved_ids, "is_archived not working"
@@ -150,11 +150,12 @@ def test_get_all_goals_with_filter(clean_firestore):
   json_response = resp.json()
   assert resp.status_code == 200, "Status should be 200"
 
-  assert len(json_response.get("data")) > 0, "Results should not be empty"
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
+  assert len(
+    json_response.get("data")["records"]) > 0, "Results should not be empty"
+  retrieved_ids = [i.get("uuid") for i in json_response.get("data")["records"]]
   assert goal.uuid in retrieved_ids, "expected data not retrived"
   assert deleted_goal.uuid not in retrieved_ids, "unexpected data retrived"
-  for i in json_response.get("data"):
+  for i in json_response.get("data")["records"]:
     assert i["type"] == goal_type, "Filtered output is wrong"
 
 
@@ -192,8 +193,8 @@ def test_post_goal(clean_firestore):
   loaded_goal_dict.pop("last_modified_time")
   loaded_goal_dict.pop("is_deleted")
 
-#   # assert that rest of the fields are equivalent
-#   assert loaded_goal_dict == post_json_response.get("data")
+  # # assert that rest of the fields are equivalent
+  # assert loaded_goal_dict == post_json_response.get("data")
 
 
 def test_update_goal(clean_firestore):

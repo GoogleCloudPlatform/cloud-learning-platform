@@ -7,34 +7,36 @@ from fireo.fields import (TextField, BooleanField, MapField, ListField,
 from common.models import NodeItem, BaseModel
 from common.utils.errors import ResourceNotFoundException
 
+
 def validate_name(name):
   """Validator method to validate name"""
   if regex.fullmatch(r"[\D\p{L}\p{N}\s]+$", name):
     return True
   else:
-    return (False, "Invalid name format")
+    return False, "Invalid name format"
+
 
 def check_gender(field_val):
   """validator method for gender field"""
   if field_val.lower() in ["male", "female", "notselected"]:
     return True
-  return (False, "Gender must be one of 'Male','Female','NotSelected'")
+  return False, "Gender must be one of 'Male','Female','NotSelected'"
 
 
 def check_email_address(field_val):
   """validator method for email_address field"""
   if "@" in field_val and len(field_val) >= 7:
     return True
-  return (False, "Invalid Email Address")
+  return False, "Invalid Email Address"
 
 
 def check_backup_email_address(field_val):
   """validator method for email_address field"""
   if (len(field_val) == 0) or ((re.match(
-      r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", field_val) and
-                                len(field_val) >= 7)):
+    r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", field_val)
+                                and len(field_val) >= 7)):
     return True
-  return (False, "Invalid Email Address")
+  return False, "Invalid Email Address"
 
 
 def check_email_address_type(field_val):
@@ -46,7 +48,7 @@ def check_email_address_type(field_val):
 
 
 def check_do_not_publish_indicator(field_val):
-  """validator method for do not publish field"""
+  """validator method for does not publish field"""
   if field_val.lower() in ["yes", "no", "unknown"]:
     return True
   return (False,
@@ -56,27 +58,27 @@ def check_do_not_publish_indicator(field_val):
 class Learner(NodeItem):
   """Data model class for Learner"""
   uuid = TextField(required=True)
-  #name
+  # name
   first_name = TextField(required=True, max_length=60, validator=validate_name)
   middle_name = TextField(max_length=60)
   last_name = TextField(required=True, max_length=60, validator=validate_name)
   suffix = TextField(max_length=10)
   prefix = TextField(max_length=30)
 
-  #preferred_name
+  # preferred_name
   preferred_name = TextField()
   preferred_first_name = TextField()
   preferred_middle_name = TextField()
   preferred_last_name = TextField()
   preferred_name_type = TextField()
   preferred_pronoun = TextField()
-  #identification
+  # identification
   student_identifier = TextField(max_length=40)
   student_identification_system = TextField(max_length=15)
   personal_information_verification = TextField()
   personal_information_type = TextField()
 
-  #address
+  # address
   address_type = TextField(max_length=30)
   street_number_and_name = TextField(max_length=100)
   apartment_room_or_suite_number = TextField(max_length=100)
@@ -89,21 +91,22 @@ class Learner(NodeItem):
   longitude = TextField(max_length=20)
   country_ansi_code = NumberField(int_only=True, range=(10000, 99999))
   address_do_not_publish_indicator = TextField(
-      validator=check_do_not_publish_indicator)
+    validator=check_do_not_publish_indicator)
 
-  #telephone
+  # telephone
   phone_number = MapField()
 
-  #email
+  # email
   email_address_type = TextField(validator=check_email_address_type)
   email_address = TextField(required=True, max_length=128,
-      validator=check_email_address, to_lowercase=True)
+                            validator=check_email_address, to_lowercase=True)
   email_do_not_publish_indicator = TextField(
-      validator=check_do_not_publish_indicator)
+    validator=check_do_not_publish_indicator)
   backup_email_address = TextField(max_length=128,
-      validator=check_backup_email_address, to_lowercase=True)
+                                   validator=check_backup_email_address,
+                                   to_lowercase=True)
 
-  #demographics
+  # demographics
   birth_date = TextField()
   gender = TextField(validator=check_gender)
   country_of_birth_code = TextField()
@@ -156,7 +159,7 @@ class Learner(NodeItem):
       "is_deleted", "==", False).fetch()
 
   @classmethod
-  def delete_by_uuid(cls, uuid, delete_children = True):
+  def delete_by_uuid(cls, uuid, delete_children=True):
     learner = cls.collection.filter(
       "uuid", "==", uuid).filter("is_deleted", "==", False).get()
     if learner is not None:
@@ -179,12 +182,12 @@ class Learner(NodeItem):
         LearnerProfile.archive_by_learner_id(learner.uuid, archive)
     else:
       raise ResourceNotFoundException(
-          f"Learner Profile with uuid {uuid} not found")
+        f"Learner Profile with uuid {uuid} not found")
 
 
 class LearnerProfile(NodeItem):
   """Data model class for Learner Profile"""
-  # schema for object
+  # schema for an object
   uuid = TextField(required=True)
   learner_id = TextField(required=True)
   learning_goals = ListField()
@@ -219,7 +222,7 @@ class LearnerProfile(NodeItem):
       "uuid", "==", uuid).filter("is_deleted", "==", is_deleted).get()
     if learner_profile is None:
       raise ResourceNotFoundException(
-          f"Learner profile with uuid {uuid} not found")
+        f"Learner profile with uuid {uuid} not found")
     return learner_profile
 
   @classmethod
@@ -231,35 +234,36 @@ class LearnerProfile(NodeItem):
         LearnerProfile: Learner Profile Object
     """
     Learner.find_by_uuid(learner_id)
-    learner_profile = LearnerProfile.collection.filter("learner_id", "==",\
-       learner_id).filter("is_deleted", "==", False).get()
+    learner_profile = LearnerProfile.collection.filter("learner_id", "==",
+                                                       learner_id).filter(
+      "is_deleted", "==", False).get()
     if learner_profile is None:
       raise ResourceNotFoundException(
-          f"LearnerProfile with learner id {learner_id} not found")
+        f"LearnerProfile with learner id {learner_id} not found")
     return learner_profile
 
   @classmethod
   def create_object(cls, input_learner_profile_dict):
-    """Function to create learner object"""
+    """Function to create a learner object"""
     new_learner_profile = cls()
     learner = Learner.collection.filter(
-        "uuid", "==", input_learner_profile_dict["learner_id"]).get()
+      "uuid", "==", input_learner_profile_dict["learner_id"]).get()
 
     # Raises an error for not creating a learner profile if a
     # learner is not found for the given id
     if learner is None:
       raise ResourceNotFoundException(
-          f"Cannot create learner profile as learner with uuid "
-          f"'{input_learner_profile_dict['learner_id']}' not found"
+        f"Cannot create learner profile as learner with uuid "
+        f"'{input_learner_profile_dict['learner_id']}' not found"
       )
     existing_learner_profile = cls.collection.filter(
-        "learner_id", "==", input_learner_profile_dict["learner_id"]).get()
+      "learner_id", "==", input_learner_profile_dict["learner_id"]).get()
 
-    # If Learning profile already exists for the learner then
+    # If Learning profile already exists for the learner, then
     # the existing learner profile is returned
     if existing_learner_profile is None:
       new_learner_profile = new_learner_profile.from_dict(
-          input_learner_profile_dict)
+        input_learner_profile_dict)
       new_learner_profile.uuid = ""
 
       new_learner_profile.save()
@@ -281,8 +285,8 @@ class LearnerProfile(NodeItem):
   def archive_by_learner_id(cls, learner_id, archive=True):
     learner_profiles = LearnerProfile.collection.filter("learner_id", "==",
                                                         learner_id).filter(
-                                                            "is_deleted", "==",
-                                                            False).fetch()
+      "is_deleted", "==",
+      False).fetch()
     for learner_profile in learner_profiles:
       learner_profile.is_archived = archive
       learner_profile.update()
@@ -290,7 +294,7 @@ class LearnerProfile(NodeItem):
 
 class Achievement(NodeItem):
   """Data model class for Achievement"""
-  # schema for object
+  # schema for an object
   uuid = TextField(required=True)
   name = TextField(required=True)
   type = TextField(required=True)
@@ -344,7 +348,7 @@ class Achievement(NodeItem):
 
   @classmethod
   def create_object(cls, input_achievement_dict):
-    """Function to create new achievement object"""
+    """Function to create a new achievement object"""
     new_achievement = cls()
     new_achievement = new_achievement.from_dict(input_achievement_dict)
     new_achievement.uuid = ""
@@ -367,8 +371,8 @@ class Achievement(NodeItem):
   def archive_by_learner_id(cls, learner_id, archive=True):
     achievements = Achievement.collection.filter("learner_id", "==",
                                                  learner_id).filter(
-                                                     "is_deleted", "==",
-                                                     False).fetch()
+      "is_deleted", "==",
+      False).fetch()
     for achievement in achievements:
       achievement.is_archived = archive
       achievement.update()
@@ -376,7 +380,7 @@ class Achievement(NodeItem):
 
 class Goal(NodeItem):
   """Data model class for Goal"""
-  # schema for object
+  # schema for an object
   uuid = TextField(required=True)
   name = TextField(required=True)
   description = TextField()
@@ -393,7 +397,7 @@ class Goal(NodeItem):
     ignore_none_field = False
 
   @classmethod
-  def find_by_uuid(cls, uuid, is_deleted = False):
+  def find_by_uuid(cls, uuid, is_deleted=False):
     goal = Goal.collection.filter(
       "uuid", "==", uuid).filter("is_deleted", "==", is_deleted).get()
     if goal is None:

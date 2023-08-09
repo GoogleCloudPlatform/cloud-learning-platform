@@ -30,3 +30,40 @@ Feature: A user with appropriate permissions wants to get user account informati
         Given A user has access to User management and needs to fetch users
             When API request is sent to fetch users along with a filter
                 Then User management will successfully return users for the given filter
+
+    @filter-api
+    Scenario: Fetch users from User management based on given sort order by email
+        Given A user has access to User management and needs to fetch users on a specific sort order by email
+            When API request is sent to fetch users along with a sort order by email
+                Then User management will successfully return users for the given sort order by email
+
+    @filter-api
+    Scenario: Fetch users from User management based on given sort order by firstname
+        Given A user has access to User management and needs to fetch users on a specific firstname sort order
+            When API request is sent to fetch users along with a sort order by firstname
+                Then User management will successfully return users for the given sort order by firstname
+
+    @filter-api
+    Scenario: Fetch users from User management based on given sort order by lastname
+        Given A user has access to User management and needs to fetch users on a specific lastname sort order
+            When API request is sent to fetch users along with a sort order by lastname
+                Then User management will successfully return users for the given sort order by lastname
+
+    @filter-api
+    Scenario: Fetch users from User management based on given sort order by email in ascending
+        Given A user has access to User management and needs to fetch users on a specific sort order by email in ascending
+            When API request is sent to fetch users along with a sort order by email in ascending
+                Then User management will successfully return users for the given sort order by email in ascending
+
+    @filter-api
+    Scenario: Fetch users from User management based on given sort order by firstname in ascending
+        Given A user has access to User management and needs to fetch users on a specific firstname sort order in ascending
+            When API request is sent to fetch users along with a sort order by firstname in ascending
+                Then User management will successfully return users for the given sort order by firstname in ascending
+
+    @filter-api
+    Scenario: Fetch users from User management based on given sort order by lastname in ascending
+        Given A user has access to User management and needs to fetch users on a specific lastname sort order in ascending
+            When API request is sent to fetch users along with a sort order by lastname in ascending
+                Then User management will successfully return users for the given sort order by lastname in ascending
+        

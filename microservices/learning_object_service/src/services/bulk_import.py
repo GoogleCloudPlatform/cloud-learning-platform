@@ -11,11 +11,13 @@ from common.utils.parent_child_nodes_handler import ParentChildNodesHandler
 from config import ASSESSMENT_SERVICE_BASE_URL
 from pydantic.error_wrappers import ValidationError as PydanticValidationError
 from schemas.upload_pathway import UploadPathwayModel
+#pylint: disable=unnecessary-list-index-lookup,global-variable-not-assigned
 
-# pylint: disable = global-variable-not-assigned
 # creating global variable of SRL to insert its again directly
 SRL_COLLECTIONS = {}
+PARENT_SKILLS = []
 header = None
+
 
 def get_all_nodes_for_project(uuid: str, level: str, nodes: list):
   """
@@ -41,7 +43,8 @@ def get_all_nodes_for_project(uuid: str, level: str, nodes: list):
 
 
 def module_assessment_prerequisite_handler(uuid):
-  """Module assessment prerequisite handler"""
+  """Function to handle assessment prerequisites when ingesting
+  the learning hierarchy"""
   learning_object_project = get_all_nodes_for_project(uuid,
                                                       "curriculum_pathways", [])
   for learning_object in learning_object_project:
@@ -55,23 +58,11 @@ def module_assessment_prerequisite_handler(uuid):
         assessment.update()
 
 
-def skill_update_handler(content, new_content_obj):
-  skills = new_content_obj.find_by_name(content["name"])
-  skills = [skill.get_fields(reformat_datetime=True) for skill in skills]
-  if len(skills) > 0:
-    for i, skill in enumerate(skills):
-      if skill["name"] == content["name"] and \
-        skill["description"] == content["description"]:
-        new_content_uuid, new_content_field = skills[i]["uuid"], skills[i]
-        return new_content_uuid, new_content_field
-  return None, None
-
-
 def add_data_to_db_handler(content, new_content_obj, collection_name):
-  """Add data to the database handler"""
+  """Function to add data to the Firestore DB"""
   if collection_name == "assessments":
     global header
-    url = ASSESSMENT_SERVICE_BASE_URL+"/assessment"
+    url = ASSESSMENT_SERVICE_BASE_URL + "/assessment"
     # pylint: disable = missing-timeout, broad-exception-raised
     assessment = requests.post(url=url, json=content, headers=header)
     if assessment.status_code != 200:
@@ -117,43 +108,34 @@ def add_data_to_db(content, new_content_obj, collection_name):
   new_content_field: `dict`
     JSON object contain the ingested data
   """
-  new_content_field = None
-  new_content_uuid = None
+  if collection_name == "learning_objects":
+    # converting dictionary into the class object
+    new_content_srl_object = new_content_obj.from_dict(content)
+    # if object_type == "srl" then we need to update
+    # the prerequisites and parent_nodes
+    # new srl object will only be create only once
+    global SRL_COLLECTIONS
 
-  if collection_name in ["skills", "competencies"]:
-    new_content_uuid, new_content_field = skill_update_handler(
-        content, new_content_obj)
+    if new_content_srl_object.type == "srl":
+      if SRL_COLLECTIONS.get(content["name"]):
+        trigger_srl = new_content_obj.find_by_uuid(
+            SRL_COLLECTIONS.get(content["name"]))
+        trigger_srl.parent_nodes["learning_experiences"].extend(
+            new_content_srl_object.parent_nodes["learning_experiences"])
+        trigger_srl.prerequisites["learning_objects"].extend(
+            new_content_srl_object.prerequisites["learning_objects"])
+        trigger_srl.update()
+        new_content_uuid = trigger_srl.uuid
+        new_content_field = trigger_srl.get_fields(reformat_datetime=True)
+        return new_content_uuid, new_content_field
+      else:
+        new_content_uuid, new_content_field = add_data_to_db_handler(
+            content, new_content_obj, collection_name)
+        SRL_COLLECTIONS[content["name"]] = new_content_uuid
+        return new_content_uuid, new_content_field
 
-  if not new_content_uuid and not new_content_field:
-
-    if collection_name == "learning_objects":
-      # converting dictionary into the class object
-      new_content_srl_object = new_content_obj.from_dict(content)
-      # if object_type == "srl" then we need to update
-      # the prerequisites and parent_nodes
-      # new srl object will only be create only once
-      global SRL_COLLECTIONS
-
-      if new_content_srl_object.type == "srl":
-        if SRL_COLLECTIONS.get(content["name"]):
-          trigger_srl = new_content_obj.find_by_uuid(
-              SRL_COLLECTIONS.get(content["name"]))
-          trigger_srl.parent_nodes["learning_experiences"].extend(
-              new_content_srl_object.parent_nodes["learning_experiences"])
-          trigger_srl.prerequisites["learning_objects"].extend(
-              new_content_srl_object.prerequisites["learning_objects"])
-          trigger_srl.update()
-          new_content_uuid = trigger_srl.uuid
-          new_content_field = trigger_srl.get_fields(reformat_datetime=True)
-          return new_content_uuid, new_content_field
-        else:
-          new_content_uuid, new_content_field = add_data_to_db_handler(
-              content, new_content_obj, collection_name)
-          SRL_COLLECTIONS[content["name"]] = new_content_uuid
-          return new_content_uuid, new_content_field
-
-    new_content_uuid, new_content_field = add_data_to_db_handler(
-        content, new_content_obj, collection_name)
+  new_content_uuid, new_content_field = add_data_to_db_handler(
+      content, new_content_obj, collection_name)
   return new_content_uuid, new_content_field
 
 
@@ -185,12 +167,10 @@ def update_reference(node, obj):
   """
   child_uuid, content_field = add_data_to_db(node, collection_references[obj],
                                              obj)
-  # Updating the parent-child relationship
   ParentChildNodesHandler.update_child_references(
       content_field, collection_references[obj], operation="add")
   ParentChildNodesHandler.update_parent_references(
       content_field, collection_references[obj], operation="add")
-  # Returning the uuid of the recently added node
   return child_uuid
 
 
@@ -301,55 +281,55 @@ def support_upload_handler(key, contents, uuid):
     UUID of the parent_nodes which was ingested in the firestore
   ### Return:
   None: we are terminating the recursion using the for-loop
+
+  LOGIC:
+
+  let content = {
+        "learning_experience": [
+            {"order":1},
+            {"order":3}
+            ],
+        "assessments" : [
+          {"order":2},
+          {"order":3}
+        ]
+      }
+
+      According to the problem we need to
+      maintain the prerequisites such that order 2
+      the object will contain the UUID of order 1 in their
+      prerequisites["learning_experience"] field and soon...
+
+      we have created one function
+      def ordered_content(content)-> LIST
+      which will return the list in the below format
+
+      ordered_list = [
+        {"learning_experience":{"order":1}},
+        {"assessments":{"order":2}},
+        {"learning_experience":{"order":1}},
+        {"assessments":{"order":3}}
+      ]
+
+      Let UUID of the order:1 object is UUID1
+      then insert this in the object of order:2
+
+      we need to find the exact key inside the
+      prerequisites where we need to add this UUID1
+
+      key = list(ordered_list[count -1].keys())[0]]
+
+      After getting the key insert it into the
+
+      Object["prerequisites"] = UUID1
+
+      And rest of the logic is simple recursion to
+      do the same above process again and again
+      util we reach at the end of the
+      hierarchy
   """
   for content in contents:
-
     if len(content.keys()) > 1:
-
-      # let content = {
-      #   "learning_experience": [
-      #       {"order":1},
-      #       {"order":3}
-      #       ],
-      #   "assessments" : [
-      #     {"order":2},
-      #     {"order":3}
-      #   ]
-      # }
-
-      # According to the problem we need to
-      # maintain the prerequisites such that order 2
-      # the object will contain the UUID of order 1 in their
-      # prerequisites["learning_experience"] field and soon...
-
-      # we have created one function
-      # def ordered_content(content)-> LIST
-      # which will return the list in the below format
-
-      # ordered_list = [
-      #   {"learning_experience":{"order":1}},
-      #   {"assessments":{"order":2}},
-      #   {"learning_experience":{"order":1}},
-      #   {"assessments":{"order":3}}
-      # ]
-
-      # Let UUID of the order:1 object is UUID1
-      # then insert this in the object of order:2
-
-      # we need to find the exact key inside the
-      # prerequisites where we need to add this UUID1
-
-      # key = list(ordered_list[count -1].keys())[0]]
-
-      # After getting the key insert it into the
-
-      # Object["prerequisites"] = UUID1
-
-      # And rest of the logic is simple recursion to
-      # do the same above process again and again
-      # util we reach at the end of the
-      # hierarchy
-
       previous_order_id = {}
       ordered_list = ordered_content(content)
       count = 0
@@ -378,6 +358,25 @@ def support_upload_handler(key, contents, uuid):
           handler(parent_node, previous_order_id, obj)
 
 
+def skill_competency_update_handler(content, new_content_obj):
+  """Function to handle skill competency ingestion"""
+  content_object = new_content_obj.find_by_name(content["name"])
+  content_object = [
+      obj.get_fields(reformat_datetime=True) for obj in content_object
+  ]
+  if len(content_object) > 0:
+    for i, skill in enumerate(content_object):
+      if skill["name"] == content["name"] and \
+        skill["description"] == content["description"]:
+        return new_content_obj.find_by_uuid(content_object[i]["uuid"])
+  new_content_obj = new_content_obj.from_dict(content)
+  new_content_obj.uuid = ""
+  new_content_obj.save()
+  new_content_obj.uuid = new_content_obj.id
+  new_content_obj.update()
+  return new_content_obj
+
+
 def upload_reference_handler(contents):
   """
   Add the reference key data recursively into the database
@@ -390,16 +389,72 @@ def upload_reference_handler(contents):
   None: we are terminating the recursion using the for-loop
   """
   references = contents.get("references", None)
+  global PARENT_SKILLS
   if references is not None:
-    for key, values in references.items():
-      id_list = []
-      for value in values:
-        deepcopy = create_deep_copy_handler(value)
-        node_update_handler(value)
-        uuid, _ = add_data_to_db(value, collection_references[key], key)
-        support_upload_handler(key, deepcopy, uuid)
-        id_list.append(uuid)
-      references[key] = id_list
+    if len(references.keys()) > 1:
+      competencies = references.get("competencies", [])
+      competencies_id = []
+      for competency in competencies:
+        competency_object = skill_competency_update_handler(
+            competency, collection_references["competencies"])
+        competencies_id.append(competency_object.uuid)
+        for skills in PARENT_SKILLS:
+          if isinstance(
+              competency_object.child_nodes.get("skills", None), list):
+            competency_object.child_nodes["skills"].append(skills.uuid)
+            competency_object.child_nodes["skills"] = list(
+                set(competency_object.child_nodes["skills"]))
+          else:
+            competency_object.child_nodes["skills"] = [skills.uuid]
+          if isinstance(skills.parent_nodes.get("competencies", None), list):
+            skills.parent_nodes["competencies"].append(competency_object.uuid)
+            skills.parent_nodes["competencies"] = list(
+                set(skills.parent_nodes["competencies"]))
+          else:
+            skills.parent_nodes["competencies"] = [competency_object.uuid]
+          competency_object.update()
+          skills.update()
+
+      references["competencies"] = competencies_id
+      references["skills"] = [skill_id.uuid for skill_id in PARENT_SKILLS]
+      PARENT_SKILLS = []
+    else:
+      skills = references.get("skills", [])
+      parent_skill_object_id = []
+      for skill in skills:
+        child_skills = skill.get("child_nodes", None)
+        skill["child_nodes"] = {}
+        parent_skill_object = skill_competency_update_handler(
+            skill, collection_references["skills"])
+        parent_skill_object_id.append(parent_skill_object.uuid)
+        PARENT_SKILLS.append(parent_skill_object)
+        if child_skills:
+          child_skill_ids = []
+          for child_skill in child_skills.get("skills", []):
+            child_skill_object = skill_competency_update_handler(
+                child_skill, collection_references["skills"])
+            if isinstance(child_skill_object.parent_nodes.get("skills"), list):
+              child_skill_object.parent_nodes["skills"].append(
+                  parent_skill_object.uuid)
+              child_skill_object.parent_nodes["skills"] = list(
+                  set(child_skill_object.parent_nodes["skills"]))
+            else:
+              child_skill_object.parent_nodes["skills"] = [
+                  parent_skill_object.uuid
+              ]
+            child_skill_object.update()
+            child_skill_ids.append(child_skill_object.uuid)
+          if isinstance(parent_skill_object.child_nodes.get("skills"), list):
+            parent_skill_object.child_nodes["skills"].extend(child_skill_ids)
+            parent_skill_object.child_nodes["skills"] = list(
+                set(parent_skill_object.child_nodes["skills"]))
+          else:
+            parent_skill_object.child_nodes["skills"] = list(
+                set(child_skill_ids))
+
+          child_skill_object.update()
+          parent_skill_object.update()
+      references["skills"] = parent_skill_object_id
 
 
 def upload_achievements_handler(contents):
@@ -452,8 +507,8 @@ def upload_handler(key, content, uuid):
 
 
 def find_redundent_id(content):
-  """Find the redundent ID"""
-
+  """Function to remove redundant ids during learning hierarchy
+  ingestion"""
   result = {"learning_resources": [], "assessments": []}
   input_dict = {"learning_resources": [], "assessments": []}
 
@@ -478,7 +533,8 @@ def find_redundent_id(content):
 
 
 def srl_redundency_cleaner():
-  """SRL Redundency Cleaner"""
+  """Function to resolve redundant dependencies that gets created during
+  learning hierarchy ingestion"""
   learning_objects = collection_references["learning_objects"].find_by_type(
       "srl")
   for learning_object in learning_objects:
@@ -518,16 +574,13 @@ def bulk_import(headers, json_file):
     else:
       contents = json.load(json_file.file)
       if isinstance(contents, dict):
-        for _, content in contents.items():
-          UploadPathwayModel(**content)
-
+        UploadPathwayModel(**contents)
         data = []
-
-        for key, content in contents.items():
-          global header
-          header = headers
-          data.append(upload_handler(key=key, content=content, uuid=""))
-
+        global header
+        header = headers
+        data.append(
+            upload_handler(
+                key="curriculum_pathways", content=contents, uuid=""))
         # to remove the redundent data from the object
         srl_redundency_cleaner()
         module_assessment_prerequisite_handler(data[0])

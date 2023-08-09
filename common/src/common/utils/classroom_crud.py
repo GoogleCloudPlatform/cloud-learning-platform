@@ -10,11 +10,11 @@ from common.utils.errors import InvalidTokenError, UserManagementServiceError, \
   ResourceNotFoundException,ValidationError
 from common.utils.http_exceptions import InternalServerError
 from common.utils.logging_handler import Logger
+from common.utils.secrets import get_secret
 from common.models import Section
-
-
-from common.config import CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL, PUB_SUB_PROJECT_ID, DATABASE_PREFIX
-# pylint: disable=line-too-long
+from common.config import (CLASSROOM_ADMIN_EMAIL, USER_MANAGEMENT_BASE_URL,
+                           PUB_SUB_PROJECT_ID, DATABASE_PREFIX)
+# pylint: disable=line-too-long, redefined-outer-name, broad-exception-caught
 
 SUCCESS_RESPONSE = {"status": "Success"}
 FAILED_RESPONSE = {"status": "Failed"}
@@ -22,6 +22,26 @@ FEED_TYPE_DICT = {
     "COURSE_WORK_CHANGES": "courseWorkChangesInfo",
     "COURSE_ROSTER_CHANGES": "courseRosterChangesInfo"
 }
+
+try:
+  COPY_COURSE_API_KEY = get_secret("copy-course-api-key")
+except Exception as e:
+  COPY_COURSE_API_KEY = ""
+  Logger.info(f"Failed to fetch copy course api key secret with error - {e}")
+
+try:
+  COPY_COURSE_API_LABEL = get_secret("copy-course-api-label")
+except Exception as e:
+  COPY_COURSE_API_LABEL = ""
+  Logger.info(f"Failed to fetch copy course api label secret with error - {e}")
+
+try:
+  COPY_COURSE_API_VERSION = get_secret("copy-course-api-version")
+except Exception as e:
+  COPY_COURSE_API_VERSION = ""
+  Logger.info(f"Failed to fetch copy course api version secret with error - {e}")
+
+DISCOVERY_SERVICE_URL = f"https://classroom.googleapis.com/$discovery/rest?labels={COPY_COURSE_API_LABEL}&key={COPY_COURSE_API_KEY}"
 
 SCOPES = [
     "https://www.googleapis.com/auth/classroom.courses",
@@ -97,14 +117,14 @@ def get_course_by_id(course_id):
 
 
 def drive_copy(file_id, target_folder_id, name):
-  """copy the file in the target_folder 
-  Args: 
+  """copy the file in the target_folder
+  Args:
   file_id : (str) google drive file _id
   target_folder_id:(str) folder_id of destination folder
   name:(str) file name of the copied file
   Returns:
     new created file details dictionary with name,mimeType,WebViewLink
-    id of file 
+    id of file
   """
 
   copied_file = {"name": name, "parents": [target_folder_id]}
@@ -116,13 +136,13 @@ def drive_copy(file_id, target_folder_id, name):
 
 
 def copy_material(drive_file_dict, target_folder_id):
-  """copy the file in the target_folder 
-  Args: 
+  """copy the file in the target_folder
+  Args:
   drive_file_dict : (str) drive file details dictionary given by get
-      coursework API 
-  target_folder_id:(str) folder_id of destination folder 
+      coursework API
+  target_folder_id:(str) folder_id of destination folder
   Returns:
-    new created drive_file_dict with new copied file id in target folder 
+    new created drive_file_dict with new copied file id in target folder
   """
   file_id = drive_file_dict["driveFile"]["driveFile"]["id"]
   if "title" not in drive_file_dict["driveFile"]["driveFile"].keys():
@@ -243,7 +263,7 @@ def create_topics(course_id, topics):
   return topic_id_map
 
 
-def get_coursework_list(course_id):
+def get_coursework_list(course_id,coursework_state="PUBLISHED"):
   """Get  list of coursework from classroom
 
   Args: course_id
@@ -252,11 +272,16 @@ def get_coursework_list(course_id):
   """
 
   service = build("classroom", "v1", credentials=get_credentials())
+  page_token = None
+  coursework_list=[]
   try:
-    coursework_list = service.courses().courseWork().list(
-        courseId=course_id).execute()
-    if coursework_list:
-      coursework_list = coursework_list["courseWork"]
+    while True:
+      response = service.courses().courseWork().list(
+          courseId=course_id,pageToken=page_token,courseWorkStates=coursework_state).execute()
+      coursework_list.extend(response.get("courseWork", []))
+      page_token = response.get("nextPageToken", None)
+      if not page_token:
+        break
     return coursework_list
   except HttpError as error:
     logger.error(error)
@@ -311,21 +336,26 @@ def patch_student_submission(course_id, coursework_id, student_submission_id,
   return patch_result
 
 
-def get_coursework_material_list(course_id):
+def get_coursework_material_list(course_id,coursework_material_state="PUBLISHED"):
   """Get  list of coursework from classroom
 
   Args: course_id
   Returns:
     returns list of coursework of given course in classroom
   """
-
   service = build("classroom", "v1", credentials=get_credentials())
+  page_token = None
+  coursework_material_list=[]
   try:
-    coursework_list = service.courses().courseWorkMaterials().list(
-        courseId=course_id).execute()
-    if coursework_list:
-      coursework_list = coursework_list["courseWorkMaterial"]
-    return coursework_list
+    while True:
+      response = service.courses().courseWorkMaterials().list(
+       courseId=course_id,pageToken=page_token,
+       courseWorkMaterialStates=coursework_material_state).execute()
+      coursework_material_list.extend(response.get("courseWorkMaterial", []))
+      page_token = response.get("nextPageToken", None)
+      if not page_token:
+        break
+    return coursework_material_list
   except HttpError as error:
     logger.error(error)
     return None
@@ -348,7 +378,60 @@ def create_coursework(course_id, coursework):
   return data
 
 
-def create_coursework_material(course_id, coursework_material_list):
+def patch_coursework_alpha(course_id, coursework_id, update_mask, updated_data):
+  """Update a coursework in a classroom course
+
+  Args:
+    course_id: ID of the classroom course
+    coursework_id: ID of the coursework in the classroom
+    update_mask: update mask contains the fields to be updated
+    updated_data: Data that needs to be updated in the coursework
+  Returns:
+    returns success
+  """
+  service = build(
+      "classroom",
+      "v1",
+      credentials=get_credentials(),
+      static_discovery=False,
+      discoveryServiceUrl=DISCOVERY_SERVICE_URL)
+  data = service.courses().courseWork().patch(
+      courseId=course_id,
+      id=coursework_id,
+      updateMask=update_mask,
+      previewVersion=COPY_COURSE_API_VERSION,
+      body=updated_data).execute()
+  return data
+
+
+def patch_coursework_material_alpha(course_id, coursework_material_id,
+                                    update_mask, updated_data):
+  """Update a coursework in a classroom course
+
+  Args:
+    course_id: ID of the classroom course
+    coursework_material_id: ID of the coursework material in the classroom
+    update_mask: update mask contains the fields to be updated
+    updated_data: Data that needs to be updated in the coursework material
+  Returns:
+    returns success
+  """
+  service = build(
+      "classroom",
+      "v1",
+      credentials=get_credentials(),
+      static_discovery=False,
+      discoveryServiceUrl=DISCOVERY_SERVICE_URL)
+  data = service.courses().courseWorkMaterials().patch(
+      courseId=course_id,
+      id=coursework_material_id,
+      updateMask=update_mask,
+      previewVersion=COPY_COURSE_API_VERSION,
+      body=updated_data).execute()
+  return data
+
+
+def create_coursework_material(course_id, coursework_material):
   """create coursework in a classroom course
 
   Args:
@@ -359,11 +442,11 @@ def create_coursework_material(course_id, coursework_material_list):
   """
   Logger.info("In Create coursework Material")
   service = build("classroom", "v1", credentials=get_credentials())
-  for coursework_item in coursework_material_list:
-    _ = service.courses().courseWorkMaterials().create(
-        courseId=course_id, body=coursework_item).execute()
+
+  data = service.courses().courseWorkMaterials().create(courseId=course_id,
+                                               body=coursework_material).execute()
   Logger.info("Create coursework Material worked")
-  return "success"
+  return data
 
 
 def delete_course_by_id(course_id):
@@ -809,9 +892,10 @@ def get_course_work(course_id, course_work_id):
     dict: _description_
   """
   service = service = build("classroom", "v1", credentials=get_credentials())
-  return service.courses().courseWork().get(courseId=course_id,
-                                            id=course_work_id).execute()
 
+  response =  service.courses().courseWork().get(courseId=course_id,
+                                            id=course_work_id).execute()
+  return response
 
 def delete_course_work(course_id, course_work_id):
   """delete course work by course id and course work id
@@ -826,6 +910,21 @@ def delete_course_work(course_id, course_work_id):
                                                id=course_work_id).execute()
   Logger.info(
       f"Deleted course work - {course_work_id} in course - {course_id}")
+  return data
+
+def delete_course_work_material(course_id, course_work_material_id):
+  """delete course work by course id and course work id
+  Args:
+    course_id (str): Id of the course
+    course_work_material_id (str): Id of the course work material to be deleted
+  Returns:
+    dict: empty dict if success
+  """
+  service = service = build("classroom", "v1", credentials=get_credentials())
+  data = service.courses().courseWorkMaterials().delete(courseId=course_id,
+                                               id=course_work_material_id).execute()
+  Logger.info(
+      f"Deleted course work  material- {course_work_material_id} in course - {course_id}")
   return data
 
 
@@ -847,6 +946,27 @@ def update_course_work(course_id, course_work_id, update_mask, updated_body):
       updateMask=update_mask).execute()
   Logger.info(
       f"Updated course work - {course_work_id} in course - {course_id}")
+  return data
+
+
+def update_course_work_material(course_id, course_work_material_id, update_mask,
+                                updated_body):
+  """update course work material by course id and course work id
+  Args:
+    course_id (str): Id of the course
+    course_work_material_id (str): Id of the course work to be deleted
+    update_mask (str): Fields(Concat multiple fields if any) to be updated in the coursework
+    updated_body(dict): Updated field object data
+  Returns:
+    dict: empty dict if success
+  """
+  service = service = build("classroom", "v1", credentials=get_credentials())
+  data = service.courses().courseWorkMaterials().patch(
+      courseId=course_id,
+      id=course_work_material_id,
+      body=updated_body,
+      updateMask=update_mask).execute()
+  Logger.info(f"Updated course work material - {course_work_material_id} in course - {course_id}")
   return data
 
 
@@ -914,3 +1034,28 @@ def list_coursework_submissions(course_id, coursework_id):
     if not page_token:
       break
   return submissions
+
+def copy_classroom_course(source_classroom_id, name):
+  """Copy classroom course from given classroom id
+  Args:
+      source_classroom_id: Unique ID of the source classroom
+      name: Title of the copied classroom
+  Returns:
+      dict: Output response of the classroom course
+  """
+  alpha_service = build(
+      "classroom",
+      "v1",
+      credentials=get_credentials(),
+      static_discovery=False,
+      discoveryServiceUrl=DISCOVERY_SERVICE_URL)
+
+  input_data = {
+      "sourceCourseId": source_classroom_id,
+      "title": name,
+      "previewVersion": COPY_COURSE_API_VERSION
+  }
+
+  data = alpha_service.courses().duplicateCourseAlpha(body=input_data).execute()
+
+  return data

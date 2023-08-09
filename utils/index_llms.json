@@ -1,0 +1,46 @@
+[
+    {
+        "collection_group": "user_chats",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "deleted_at_timestamp",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "user_id",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            },
+            {
+                "field_path": "__name__",
+                "order": "DESCENDING"
+            }
+        ]
+    },
+    {
+        "collection_group": "user_queries",
+        "query_scope": "COLLECTION",
+        "fields": [
+            {
+                "field_path": "deleted_at_timestamp",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "user_id",
+                "order": "ASCENDING"
+            },
+            {
+                "field_path": "created_time",
+                "order": "DESCENDING"
+            },
+            {
+                "field_path": "__name__",
+                "order": "DESCENDING"
+            }
+        ]
+    }    
+]

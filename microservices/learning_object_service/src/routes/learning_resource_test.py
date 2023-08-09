@@ -412,7 +412,8 @@ def test_get_learning_resources(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  saved_names = [i.get("name") for i in json_response.get("data")]
+  saved_names = [i.get("name") for i in json_response.get(
+    "data")["records"]]
   assert learning_resource_dict["name"] in saved_names, "all data not retrieved"
 
 
@@ -434,8 +435,8 @@ def test_get_learning_resources_with_filters(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  assert len(json_response.get("data")) != 0
-  for lr_data in json_response.get("data"):
+  assert len(json_response.get("data")["records"]) != 0
+  for lr_data in json_response.get("data")["records"]:
     assert lr_data.get("type") == params["type"], "filter not working properly"
     assert lr_data.get("course_category")[0] == params["course_category"],\
       "filter not working properly"
@@ -446,8 +447,10 @@ def test_get_learning_resources_with_filters(clean_firestore):
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
   assert len(json_response.get("data")) != 0
-  saved_types = [i.get("type") for i in json_response.get("data")]
-  saved_versions = [i.get("version") for i in json_response.get("data")]
+  saved_types = [i.get("type") for i in json_response.get(
+    "data")["records"]]
+  saved_versions = [i.get("version") for i in json_response.get(
+    "data")["records"]]
   assert len(list(set(saved_types))) == 1, "Unnecessary type retrieved"
   assert list(set(saved_types))[0] == params["type"], "Wrong type retrieved"
   assert len(list(set(saved_versions))) == 1, "Unnecessary versions retrieved"
@@ -462,9 +465,10 @@ def test_get_learning_resources_with_filters(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  assert len(json_response.get("data")) != 0
+  assert len(json_response.get("data")["records"]) != 0
   saved_archived_flags = [
-      i.get("is_archived") for i in json_response.get("data")
+      i.get("is_archived") for i in json_response.get(
+    "data")["records"]
   ]
   assert list(
       set(saved_archived_flags))[0] == params["fetch_archive"],\
@@ -479,8 +483,8 @@ def test_get_learning_resources_with_filters(clean_firestore):
   resp = client_with_emulator.get(url, params=params)
   json_response = resp.json()
   assert resp.status_code == 200, "Status 200"
-  assert len(json_response.get("data")) != 0
-  saved_name = [i.get("name") for i in json_response.get("data")]
+  assert len(json_response.get("data")["records"]) != 0
+  saved_name = [i.get("name") for i in json_response.get("data")["records"]]
   assert len(list(set(saved_name))) == 1, "Unnecessary name retrieved"
   assert list(set(saved_name))[0] == params["name"], "Wrong name retrieved"
 

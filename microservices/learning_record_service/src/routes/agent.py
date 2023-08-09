@@ -83,14 +83,18 @@ def get_agents(user_id: str = None,
         "is_deleted", "==", False).order("-created_time")
       agents = collection_manager.offset(skip).fetch(limit)
     agents = [i.get_fields(reformat_datetime=True) for i in agents if i.name]
+    count = 10000
+    response = {"records": agents, "total_count": count}
     return {
         "success": True,
         "message": "Data fetched successfully",
-        "data": agents
+        "data": response
     }
   except ValidationError as e:
+    Logger.error(str(e))
     raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(str(e))
     raise InternalServerError(str(e)) from e
 
 
@@ -175,9 +179,8 @@ def create_agent(input_agent: AgentModel):
         raise ResourceNotFoundException(
             f"User with user_id {input_agent_dict['user_id']} not found")
     else:
-      agent_user_id = input_agent_dict["user_id"]
-      raise ConflictError(
-        f"Agent with the given user_id {agent_user_id} already exists")
+      raise ConflictError("Agent with the given user_id "\
+                          f"{input_agent_dict['user_id']} already exists")
 
   except ResourceNotFoundException as e:
     raise ResourceNotFound(str(e)) from e

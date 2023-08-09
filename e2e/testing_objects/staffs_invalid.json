@@ -3,10 +3,10 @@
     "first_name": "Ron",
     "last_name": "Turner",
     "preferred_name": "r staff",
-    "bio": "",
+    "bio": "test bio",
     "pronoun": "he/him/his",
     "phone_number": "0000000001",
-    "shared_inboxes": "",
+    "shared_inboxes": "test@example.com",
     "office_hours": []
   }
 ]

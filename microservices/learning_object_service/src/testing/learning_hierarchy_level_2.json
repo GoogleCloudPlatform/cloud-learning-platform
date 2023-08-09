@@ -1,0 +1,2131 @@
+{
+  "name": "Level 2",
+  "display_name": "Level 2",
+  "description": "",
+  "order": 2,
+  "alias": "level",
+  "achievements": [
+    {
+      "type": "level",
+      "name": "Level 2",
+      "description": "Level 2",
+      "metadata": {
+        "design_config": {
+          "shape": "",
+          "theme": "",
+          "illustration": ""
+        }
+      }
+    }
+  ],
+  "child_nodes": {
+    "curriculum_pathways": [
+      {
+        "name": "Math",
+        "display_name": "Math",
+        "description": "Solving Problems with Math",
+        "order": 1,
+        "alias": "discipline",
+        "achievements": [
+          {
+            "type": "course equate",
+            "name": "",
+            "description": "Solving Problems with Math",
+            "metadata": {
+              "design_config": {
+                "shape": "",
+                "theme": "",
+                "illustration": ""
+              }
+            }
+          }
+        ],
+        "child_nodes": {
+          "curriculum_pathways": [
+            {
+              "name": "MAT13486",
+              "display_name": "MAT13486",
+              "description": "Unit 1:MAT13486",
+              "alias": "unit",
+              "order": 1,
+              "metadata": {
+                "design_config": {
+                  "illustration": "L1_U2",
+                  "theme": "red-primary-light"
+                }
+              },
+              "achievements": [
+                {
+                  "type": "competency",
+                  "name": "Analyze Quantitative Elements",
+                  "description": "Analyze Quantitative Elements",
+                  "metadata": {
+                    "design_config": {
+                      "shape": "circle",
+                      "theme": "",
+                      "illustration": "L1_A2"
+                    }
+                  }
+                }
+              ],
+              "child_nodes": {
+                "learning_experiences": [
+                  {
+                    "description": "",
+                    "display_name": "Analyze Quantitative Elements",
+                    "name": "Analyze Quantitative Elements",
+                    "order": 1,
+                    "alias": "learning_experience",
+                    "metadata": {
+                      "design_config": {
+                        "illustration": "L1_U2",
+                        "theme": "red-primary-light"
+                      }
+                    },
+                    "child_nodes": {
+                      "learning_objects": [
+                        {
+                          "description": "pre-test module",
+                          "display_name": "LUMAT126.U1 Pre-test",
+                          "name": "LUMAT126.U1 Pre-test",
+                          "order": 1,
+                          "type": "pretest",
+                          "alias": "module",
+                          "references": {
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U01.M01",
+                                "description": "Qualitative vs. Quantitative Elements",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U01.M02",
+                                "description": "Frequency Distributions",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U01.M03",
+                                "description": "Graphical Representations of Data",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S4",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U01.M04",
+                                "description": "Summarizing Data",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U01.M05",
+                                "description": "Measures of Dispersion",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "assessments": [
+                              {
+                                "name": "Pre-test Assessment",
+                                "display_name": "Pre-test Assessment",
+                                "type": "pretest",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "order": 1,
+                                "alias": "assessment",
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Unit Overview",
+                          "display_name": "Unit Overview",
+                          "description": "Module 1",
+                          "order": 2,
+                          "type": "unit_overview",
+                          "alias": "module",
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Unit Overview",
+                                "display_name": "Unit Overview",
+                                "type": "html",
+                                "alias": "lesson",
+                                "order": 1
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "description": "Stepping Stones",
+                          "display_name": "Stepping Stones",
+                          "name": "Stepping Stones",
+                          "type": "srl",
+                          "order": 3,
+                          "alias": "module",
+                          "is_hidden": true,
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Goal attainment strategy",
+                                "display_name": "Goal attainment strategy",
+                                "type": "html",
+                                "alias": "lesson",
+                                "order": 1
+                              },
+                              {
+                                "name": "Record your time on task",
+                                "display_name": "Record your time on task",
+                                "type": "html",
+                                "alias": "lesson",
+                                "order": 2
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "type": "srl",
+                                "name": "Submit your time on task worksheet",
+                                "alias": "assessment",
+                                "order": 3,
+                                "is_autogradable": false
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Qualitative vs Quantitative Elements",
+                          "display_name": "Qualitative vs Quantitative Elements",
+                          "description": "Module 2",
+                          "order": 4,
+                          "alias": "module",
+                          "references": {
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U01.M01",
+                                "description": "Qualitative vs. Quantitative Elements",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Module Overview",
+                                "display_name": "Module Overview",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "Lesson 1: What is a quantitative element?",
+                                "display_name": "Lesson 1: What is a quantitative element?",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "Lesson 2: Types of quantitative measurements",
+                                "display_name": "Lesson 2: Types of quantitative measurements",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 3
+                              },
+                              {
+                                "name": "Module wrap-up",
+                                "display_name": "Module wrap-up",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "type": "html",
+                                "order": 5
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Multiple Choice Quiz - Knowledge Check",
+                                "display_name": "Multiple Choice Quiz - Knowledge Check",
+                                "type": "practice",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "order": 4,
+                                "alias": "assessment",
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Frequency Distributions",
+                          "display_name": "Frequency Distributions",
+                          "description": "Module 3",
+                          "order": 5,
+                          "alias": "module",
+                          "references": {
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U01.M02",
+                                "description": "Frequency Distributions",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Module Overview",
+                                "display_name": "Module Overview",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "Lesson 1: Frequency tables",
+                                "display_name": "Lesson 1: Frequency tables",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "Lesson 2: Percentages and percentiles",
+                                "display_name": "Lesson 2: Percentages and percentiles",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 3
+                              },
+                              {
+                                "name": "Module wrap-up",
+                                "display_name": "Module wrap-up",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "type": "html",
+                                "order": 5
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Multiple Choice Quiz - Knowledge Check",
+                                "display_name": "Multiple Choice Quiz - Knowledge Check",
+                                "type": "practice",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "order": 4,
+                                "alias": "assessment",
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Support to reach your goals",
+                          "display_name": "Support to reach your goals",
+                          "description": "Support to reach your goals",
+                          "order": 6,
+                          "alias": "module",
+                          "type": "srl",
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "How to maintain a support network",
+                                "display_name": "How to maintain a support network",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "Monitoring goal progress",
+                                "display_name": "Monitoring goal progress",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Submit your goal monitoring sheet",
+                                "display_name": "Submit your goal monitoring sheet",
+                                "type": "srl",
+                                "order": 3,
+                                "alias": "assessment",
+                                "is_autogradable": false
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Graphical Representations of Data",
+                          "display_name": "Graphical Representations of Data",
+                          "description": "Module 4",
+                          "order": 7,
+                          "alias": "module",
+                          "references": {
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U01.M03",
+                                "description": "Graphical Representations of Data",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S4",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Module Overview",
+                                "display_name": "Module Overview",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "Lesson 1: Basic data representations",
+                                "display_name": "Lesson 1: Basic data representations",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "Lesson 2: Misrepresentation of data using graphs",
+                                "display_name": "Lesson 2: Misrepresentation of data using graphs",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 3
+                              },
+                              {
+                                "name": "Module wrap-up",
+                                "display_name": "Module wrap-up",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "type": "html",
+                                "order": 5
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Multiple Choice Quiz - Knowledge Check",
+                                "display_name": "Multiple Choice Quiz - Knowledge Check",
+                                "type": "practice",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "order": 4,
+                                "alias": "assessment",
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Summarizing Data",
+                          "display_name": "Summarizing Data",
+                          "description": "Module 5",
+                          "order": 8,
+                          "alias": "module",
+                          "references": {
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U01.M04",
+                                "description": "Summarizing Data",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Module Overview",
+                                "display_name": "Module Overview",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "Lesson 1: Mean, median and mode",
+                                "display_name": "Lesson 1: Mean, median and mode",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "Lesson 2: Knowing which measure to use",
+                                "display_name": "Lesson 2: Knowing which measure to use",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 3
+                              },
+                              {
+                                "name": "Module wrap-up",
+                                "display_name": "Module wrap-up",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "type": "html",
+                                "order": 5
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Multiple Choice Quiz - Knowledge Check",
+                                "display_name": "Multiple Choice Quiz - Knowledge Check",
+                                "type": "practice",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "order": 4,
+                                "alias": "assessment",
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Measures of Dispersion",
+                          "display_name": "Measures of Dispersion",
+                          "description": "Module 6",
+                          "order": 9,
+                          "alias": "module",
+                          "references": {
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U01.M05",
+                                "description": "Measures of Dispersion",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Module Overview",
+                                "display_name": "Module Overview",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "Bias and Assumptions",
+                                "display_name": "Bias and Assumptions",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "Identifying Bias",
+                                "display_name": "Identifying Bias",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "Confirming Bias",
+                                "display_name": "Confirming Bias",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "Bias in Writing",
+                                "display_name": "Bias in Writing",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "Module wrap-up",
+                                "display_name": "Module wrap-up",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "type": "html",
+                                "order": 4
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Multiple Choice Quiz - Knowledge Check",
+                                "display_name": "Multiple Choice Quiz - Knowledge Check",
+                                "type": "practice",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "order": 3,
+                                "alias": "assessment",
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "description": "Maintaining the Right Mindset",
+                          "display_name": "Maintaining the Right Mindset",
+                          "name": "Maintaining the Right Mindset",
+                          "type": "srl",
+                          "order": 10,
+                          "alias": "module",
+                          "is_hidden": true,
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "type": "html",
+                                "alias": "lesson",
+                                "order": 1
+                              },
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "type": "html",
+                                "alias": "lesson",
+                                "order": 2
+                              },
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "type": "html",
+                                "alias": "lesson",
+                                "order": 3
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "description": "Navigating Feedback",
+                          "display_name": "Navigating Feedback",
+                          "name": "Navigating Feedback",
+                          "type": "srl",
+                          "order": 11,
+                          "alias": "module",
+                          "is_hidden": true,
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "type": "html",
+                                "alias": "lesson",
+                                "order": 1
+                              },
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "type": "html",
+                                "alias": "lesson",
+                                "order": 2
+                              },
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "type": "html",
+                                "alias": "lesson",
+                                "order": 3
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "description": "Reflect on Learning",
+                          "display_name": "Reflect on Learning",
+                          "name": "Reflect on Learning",
+                          "type": "cognitive_wrapper",
+                          "alias": "module",
+                          "order": 12,
+                          "is_optional": true,
+                          "is_hidden": true,
+                          "child_nodes": {
+                            "assessments": [
+                              {
+                                "name": "Cognitive wrapper assessment",
+                                "display_name": "Cognitive wrapper assessment",
+                                "type": "cognitive_wrapper",
+                                "order": 1,
+                                "is_autogradable": false,
+                                "alias": "assessment"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "LUMAT126.U01 Exam",
+                          "display_name": "LUMAT126.U01 Exam",
+                          "description": "Module 7",
+                          "order": 13,
+                          "alias": "module",
+                          "type": "project",
+                          "references": {
+                            "competencies": [
+                              {
+                                "name": "MAT-13486",
+                                "description": ""
+                              }
+                            ],
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U01.M01",
+                                "description": "Qualitative vs. Quantitative Elements",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U01.M02",
+                                "description": "Frequency Distributions",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U01.M03",
+                                "description": "Graphical Representations of Data",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S4",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U01.M04",
+                                "description": "Summarizing Data",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U01.M05",
+                                "description": "Measures of Dispersion",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Project Instructions",
+                                "display_name": "Project Instructions",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "Unit Wrap-up",
+                                "display_name": "Unit Wrap-up",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 3
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Project Submission",
+                                "display_name": "Project Submission",
+                                "type": "project",
+                                "max_attempts": 3,
+                                "order": 2,
+                                "alias": "assessment",
+                                "is_autogradable": false,
+                                "pass_threshold": 0.7
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "name": "MAT13487",
+              "display_name": "MAT13487",
+              "description": "Unit 2:MAT13487",
+              "alias": "unit",
+              "order": 1,
+              "metadata": {
+                "design_config": {
+                  "illustration": "L1_U2",
+                  "theme": "red-primary-light"
+                }
+              },
+              "achievements": [
+                {
+                  "type": "competency",
+                  "name": "Apply Math and Quantitative Reasoning",
+                  "description": "Apply Math and Quantitative Reasoning",
+                  "metadata": {
+                    "design_config": {
+                      "shape": "circle",
+                      "theme": "",
+                      "illustration": "L1_A2"
+                    }
+                  }
+                }
+              ],
+              "child_nodes": {
+                "learning_experiences": [
+                  {
+                    "description": "",
+                    "display_name": "Apply Math and Quantitative Reasoning",
+                    "name": "Apply Math and Quantitative Reasoning",
+                    "order": 1,
+                    "alias": "learning_experience",
+                    "metadata": {
+                      "design_config": {
+                        "illustration": "L1_U2",
+                        "theme": "red-primary-light"
+                      }
+                    },
+                    "child_nodes": {
+                      "learning_objects": [
+                        {
+                          "description": "pre-test module",
+                          "display_name": "LUMAT126.U2 Pre-test",
+                          "name": "LUMAT126.U2 Pre-test",
+                          "order": 1,
+                          "type": "pretest",
+                          "alias": "module",
+                          "references": {
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U02.M06",
+                                "description": "Randomness and Probability",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U02.M07",
+                                "description": "Sampling and Bias",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U02.M08",
+                                "description": "Correlation and Causation",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "assessments": [
+                              {
+                                "name": "Pre-test Assessment",
+                                "display_name": "Pre-test Assessment",
+                                "type": "pretest",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "order": 1,
+                                "alias": "assessment",
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Unit Overview",
+                          "display_name": "Unit Overview",
+                          "description": "Module 1",
+                          "order": 2,
+                          "type": "unit_overview",
+                          "alias": "module",
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Unit Overview",
+                                "display_name": "Unit Overview",
+                                "type": "html",
+                                "alias": "lesson",
+                                "order": 1
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "description": "Planning your week",
+                          "display_name": "Planning your week",
+                          "name": "Planning your week",
+                          "type": "srl",
+                          "order": 3,
+                          "alias": "module",
+                          "is_hidden": true,
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Plan your study weeks",
+                                "display_name": "Plan your study weeks",
+                                "type": "html",
+                                "alias": "lesson",
+                                "order": 1
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "type": "srl",
+                                "name": "Submit your plan your study weeks worksheet",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "alias": "assessment",
+                                "order": 2,
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Randomness and Probability",
+                          "display_name": "Randomness and Probability",
+                          "description": "Module 2",
+                          "order": 4,
+                          "alias": "module",
+                          "references": {
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U02.M06",
+                                "description": "Randomness and Probability",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Module Overview",
+                                "display_name": "Module Overview",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "Lesson 1: Randomness",
+                                "display_name": "Lesson 1: Randomness",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "Lesson 2: Basics of probability",
+                                "display_name": "Lesson 2: Basics of probability",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 3
+                              },
+                              {
+                                "name": "Module wrap-up",
+                                "display_name": "Module wrap-up",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "type": "html",
+                                "order": 5
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Multiple Choice Quiz - Knowledge Check",
+                                "display_name": "Multiple Choice Quiz - Knowledge Check",
+                                "type": "practice",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "order": 4,
+                                "alias": "assessment",
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Notetaking Strategies",
+                          "display_name": "Notetaking Strategies",
+                          "description": "Notetaking Strategies",
+                          "order": 5,
+                          "alias": "module",
+                          "type": "srl",
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Notetaking Strategies",
+                                "display_name": "Notetaking Strategies",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Sampling and Bias",
+                          "display_name": "Sampling and Bias",
+                          "description": "Module 3",
+                          "order": 6,
+                          "alias": "module",
+                          "references": {
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U02.M07",
+                                "description": "Sampling and Bias",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Module Overview",
+                                "display_name": "Module Overview",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "Lesson 1: Frequency tables",
+                                "display_name": "Lesson 1: Frequency tables",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "Lesson 2: Percentages and percentiles",
+                                "display_name": "Lesson 2: Percentages and percentiles",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 3
+                              },
+                              {
+                                "name": "Module wrap-up",
+                                "display_name": "Module wrap-up",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "type": "html",
+                                "order": 5
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Multiple Choice Quiz - Knowledge Check",
+                                "display_name": "Multiple Choice Quiz - Knowledge Check",
+                                "type": "practice",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "order": 4,
+                                "alias": "assessment",
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Maintaing your motivation",
+                          "display_name": "Maintaing your motivation",
+                          "description": "Maintaing your motivation",
+                          "order": 7,
+                          "alias": "module",
+                          "type": "srl",
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Motivational strategies",
+                                "display_name": "Motivational strategies",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Submit your goal monitoring sheet",
+                                "display_name": "Submit your goal monitoring sheet",
+                                "type": "srl",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "order": 2,
+                                "alias": "assessment",
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Correlation and Causation",
+                          "display_name": "Correlation and Causation",
+                          "description": "Module 4",
+                          "order": 8,
+                          "alias": "module",
+                          "references": {
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U02.M08",
+                                "description": "Correlation and Causation",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Module Overview",
+                                "display_name": "Module Overview",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "Lesson 1: Basic data representations",
+                                "display_name": "Lesson 1: Basic data representations",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "Lesson 2: Misrepresentation of data using graphs",
+                                "display_name": "Lesson 2: Misrepresentation of data using graphs",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 3
+                              },
+                              {
+                                "name": "Module wrap-up",
+                                "display_name": "Module wrap-up",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "type": "html",
+                                "order": 4
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Multiple Choice Quiz - Knowledge Check",
+                                "display_name": "Multiple Choice Quiz - Knowledge Check",
+                                "type": "practice",
+                                "assessment_reference": {
+                                  "activity_template_id": ""
+                                },
+                                "order": 3,
+                                "alias": "assessment",
+                                "is_autogradable": true
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "description": "Mindset Check-in",
+                          "display_name": "Mindset Check-in",
+                          "name": "Mindset Check-in",
+                          "type": "srl",
+                          "alias": "module",
+                          "order": 9,
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "How has your mindset changed?",
+                                "display_name": "How has your mindset changed?",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Submit your changed mindset worksheet",
+                                "display_name": "Submit your changed mindset worksheet",
+                                "type": "srl",
+                                "order": 2,
+                                "alias": "assessment",
+                                "is_autogradable": false
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "description": "Navigating Feedback",
+                          "display_name": "Navigating Feedback",
+                          "name": "Navigating Feedback",
+                          "type": "srl",
+                          "alias": "module",
+                          "order": 10,
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 2
+                              },
+                              {
+                                "name": "",
+                                "display_name": "",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 3
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "description": "Reflect on Learning",
+                          "display_name": "Reflect on Learning",
+                          "name": "Reflect on Learning",
+                          "type": "cognitive_wrapper",
+                          "alias": "module",
+                          "order": 11,
+                          "is_optional": true,
+                          "is_hidden": true,
+                          "child_nodes": {
+                            "assessments": [
+                              {
+                                "name": "Cognitive wrapper assessment",
+                                "display_name": "Cognitive wrapper assessment",
+                                "type": "cognitive_wrapper",
+                                "order": 1,
+                                "is_autogradable": false,
+                                "alias": "assessment"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "LUMAT126.U02 Exam",
+                          "display_name": "LUMAT126.U02 Exam",
+                          "description": "Module 7",
+                          "order": 12,
+                          "alias": "module",
+                          "type": "project",
+                          "references": {
+                            "competencies": [
+                              {
+                                "name": "MAT-13487",
+                                "description": ""
+                              }
+                            ],
+                            "skills": [
+                              {
+                                "name": "LUMAT126.U02.M06",
+                                "description": "Randomness and Probability",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U02.M07",
+                                "description": "Sampling and Bias",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13487_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "name": "LUMAT126.U02.M08",
+                                "description": "Correlation and Causation",
+                                "child_nodes": {
+                                  "skills": [
+                                    {
+                                      "name": "MAT-13486_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S3",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-13486_S4",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S1",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S2",
+                                      "description": ""
+                                    },
+                                    {
+                                      "name": "MAT-23488_S3",
+                                      "description": ""
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "child_nodes": {
+                            "learning_resources": [
+                              {
+                                "name": "Project Instructions",
+                                "display_name": "Project Instructions",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 1
+                              },
+                              {
+                                "name": "Unit Wrap-up",
+                                "display_name": "Unit Wrap-up",
+                                "type": "html",
+                                "alias": "lesson",
+                                "duration": 15,
+                                "order": 3
+                              }
+                            ],
+                            "assessments": [
+                              {
+                                "name": "Project Submission",
+                                "display_name": "Project Submission",
+                                "type": "project",
+                                "max_attempts": 3,
+                                "order": 2,
+                                "alias": "assessment",
+                                "is_autogradable": false,
+                                "pass_threshold": 0.7
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

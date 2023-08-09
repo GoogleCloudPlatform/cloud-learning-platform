@@ -107,13 +107,18 @@ class FullAchievementDataModel(BasicAchievementModel):
   last_modified_time: str
 
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullAchievementDataModel]]
+  total_count: int
+
+
 class AllAchievementsResponseModel(BaseModel):
   """
   All Achievements Response Pydantic Model
   """
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the achievements"
-  data: Optional[List[FullAchievementDataModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -121,7 +126,10 @@ class AllAchievementsResponseModel(BaseModel):
       "example": {
         "success": True,
         "message": "Successfully fetched the achievements",
-        "data": [FULL_ACHIEVEMENT_EXAMPLE]
+        "data": {
+                  "records":[FULL_ACHIEVEMENT_EXAMPLE],
+                  "total_count": 50
+                }
       }
     }
 

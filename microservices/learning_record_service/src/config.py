@@ -71,3 +71,10 @@ RESUMED_RULE_VERBS = ["resumed"]
 
 VALID_VERBS = STARTED_RULE_VERBS + COMPLETED_RULE_VERBS\
    + RESUMED_RULE_VERBS
+
+SERVICES = {
+    "student-learner-profile": {
+        "host": "student-learner-profile",
+        "port": 80
+    }
+}

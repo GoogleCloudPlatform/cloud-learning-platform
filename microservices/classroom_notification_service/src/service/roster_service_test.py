@@ -26,10 +26,10 @@ def test_save_roster():
           "userId": "12345678900",
           "courseId": "550005555"
       }}
-  with mock.patch("service.roster_service.save_user",return_value=True):
+  with mock.patch("service.roster_service.save_user",return_value=(True,None)):
     with mock.patch("service.roster_service.insert_rows_to_bq",
                     return_value=True):
-      result=save_roster(data)
+      result,_ =save_roster(data)
   assert result is True
 
 def test_save_roster_negative():
@@ -42,14 +42,15 @@ def test_save_roster_negative():
           "userId": "12345678900",
           "courseId": "550005555"
       }}
-  with mock.patch("service.roster_service.save_user", return_value=False):
+  with mock.patch("service.roster_service.save_user",
+                  return_value=(False,None)):
     with mock.patch("service.roster_service.insert_rows_to_bq",
                     return_value=True):
-      result_1 = save_roster(data)
-  with mock.patch("service.roster_service.save_user", return_value=True):
+      result_1,_ = save_roster(data)
+  with mock.patch("service.roster_service.save_user", return_value=(True,None)):
     with mock.patch("service.roster_service.insert_rows_to_bq",
                     return_value=False):
-      result_2 = save_roster(data)
+      result_2,_ = save_roster(data)
 
   assert result_1 is False
   assert result_2 is False

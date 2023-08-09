@@ -101,11 +101,15 @@ class DeleteApplicationResponseModel(BaseModel):
     }
 
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullApplicationDataModel]]
+  total_count: int
+
 class AllApplicationResponseModel(BaseModel):
   """Module Response Pydantic Model"""
   success: Optional[bool] = True
   message: Optional[str] = "Data fetched successfully"
-  data: Optional[List[FullApplicationDataModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -113,12 +117,15 @@ class AllApplicationResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Data fetched successfully",
-            "data": [FULL_APPLICATION_MODEL_EXAMPLE]
+            "data": {
+                      "records":[FULL_APPLICATION_MODEL_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 
 
-class UpdateApplicationModel(BaseModel):
+class UpdateApplicationModel(BaseConfigModel):
   """Update Module Pydantic Request Model"""
   name: Optional[StrictStr]
   description: Optional[StrictStr]

@@ -6,7 +6,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, constr
 from schemas.schema_examples import BASIC_FAQ_CONTENT_EXAMPLE, FULL_FAQ_CONTENT_EXAMPLE
 
-# pylint: disable = invalid-name
+#pylint: disable=invalid-name
 ALLOWED_FAQ_TYPES = Literal["faq_item", "faq_group"]
 
 
@@ -53,11 +53,15 @@ class GetFAQResponseModel(BaseModel):
     }
 
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullFAQModel]]
+  total_count: int
+
 class SearchFAQResponseModel(BaseModel):
   """Search FAQ Response Pydantic Model"""
   success: bool
   message: str
-  data: List[FullFAQModel]
+  data: TotalCountResponseModel
 
   class Config():
     orm_mode = True
@@ -65,7 +69,10 @@ class SearchFAQResponseModel(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully fetched FAQs",
-            "data": [FULL_FAQ_CONTENT_EXAMPLE]
+            "data": {
+                      "records":[FULL_FAQ_CONTENT_EXAMPLE],
+                      "total_count": 50
+                    }
         }
     }
 

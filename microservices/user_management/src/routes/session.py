@@ -1,9 +1,10 @@
 """ Session endpoints """
 from typing import Optional
 from fastapi import APIRouter, Query
+from common.utils.logging_handler import Logger
 from common.models import User, Session
-from common.utils.errors import ResourceNotFoundException
-from common.utils.http_exceptions import (InternalServerError, ResourceNotFound)
+from common.utils.errors import ResourceNotFoundException, ValidationError
+from common.utils.http_exceptions import (BadRequest, InternalServerError, ResourceNotFound)
 from schemas.session_schema import (GetSessionResponseModel, PostSessionModel,
                                     UpdateSessionModel,
                                     PostSessionResponseModel,
@@ -26,8 +27,13 @@ router = APIRouter(
     })
 
 
-@router.get("/session", response_model=GetAllSessionResponseModel)
-def get_sessions(user_id: str,
+@router.get(
+    "/session",
+    response_model=GetAllSessionResponseModel,
+    responses={404: {
+        "model": NotFoundErrorResponseModel
+    }})
+def get_sessions(user_id: str = Query(None, min_length=1),
                  node_id: Optional[str] = None,
                  parent_session_id: Optional[str] = None,
                  skip: int = Query(0, ge=0, le=2000),
@@ -45,6 +51,9 @@ def get_sessions(user_id: str,
       GetAllSessionResponseModel: Latest session for given criteria
   """
   try:
+    if not user_id:
+      raise ValidationError("user_id should be provided in query param")
+    _ = User.find_by_uuid(user_id)
     sessions = Session.collection.filter("user_id", "==", user_id)
     if node_id is not None:
       sessions = sessions.filter("session_data.node_id", "==", node_id)
@@ -53,12 +62,21 @@ def get_sessions(user_id: str,
     all_sessions = sessions.order("-last_modified_time").offset(
         skip).fetch(limit)
     all_sessions = [i.get_fields(reformat_datetime=True) for i in all_sessions]
+    count = 10000
+    response = {"records": all_sessions, "total_count": count}
     return {
         "success": True,
         "message": "Successfully fetched the sessions",
-        "data": all_sessions
+        "data": response
     }
+  except ResourceNotFoundException as e:
+    Logger.error(e)
+    raise ResourceNotFound(str(e)) from e
+  except ValidationError as e:
+    Logger.error(e)
+    raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(e)
     raise InternalServerError(str(e)) from e
 
 
@@ -68,7 +86,7 @@ def get_sessions(user_id: str,
     responses={404: {
         "model": NotFoundErrorResponseModel
     }})
-def get_latest_session(user_id: str,
+def get_latest_session(user_id: str = Query(None, min_length=1),
                        node_id: Optional[str] = None,
                        parent_session_id: Optional[str] = None):
   """Get latest session based on user_id, node_id and/or session_id
@@ -82,6 +100,9 @@ def get_latest_session(user_id: str,
       GetSessionResponseModel: Latest session for given criteria
   """
   try:
+    if not user_id:
+      raise ValidationError("user_id should be provided in query param")
+    _ = User.find_by_uuid(user_id)
     sessions = Session.collection.filter("user_id", "==", user_id)
     if node_id is not None:
       sessions = sessions.filter("session_data.node_id", "==", node_id)
@@ -96,8 +117,13 @@ def get_latest_session(user_id: str,
         "data": latest_session.get_fields(reformat_datetime=True)
     }
   except ResourceNotFoundException as e:
+    Logger.error(str(e))
     raise ResourceNotFound(str(e)) from e
+  except ValidationError as e:
+    Logger.error(e)
+    raise BadRequest(str(e)) from e
   except Exception as e:
+    Logger.error(str(e))
     raise InternalServerError(str(e)) from e
 
 

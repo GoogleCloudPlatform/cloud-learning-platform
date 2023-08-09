@@ -158,10 +158,14 @@ class ContentVersionModel(BaseModel):
       kwargs["status"] = "draft"
     super().__init__(**kwargs)
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[ContentVersionModel]]
+  total_count: int
+
 class GetContentVersionsResponse(BaseModel):
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched all content versions"
-  data: Optional[List[ContentVersionModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -169,12 +173,17 @@ class GetContentVersionsResponse(BaseModel):
         "example": {
             "success": True,
             "message": "Successfully fetched all content versions",
-            "data": [{
-                "resource_path": "/some/resource/path",
-                "type":"pdf",
-                "content_version_uuid": "efb382hf32b8nlweife",
-                "last_published_on": "2022-03-03 09:22:49.843674+00:00",
-                "status": "draft"
-            }]
+            "data": {
+                      "records":[
+                    [{
+                      "resource_path": "/some/resource/path",
+                      "type":"pdf",
+                      "content_version_uuid": "efb382hf32b8nlweife",
+                      "last_published_on": "2022-03-03 09:22:49.843674+00:00",
+                      "status": "draft"
+                    }]
+                      ],
+                      "total_count": 50
+                    }
         }
     }

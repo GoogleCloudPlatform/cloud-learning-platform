@@ -1,3 +1,4 @@
+import json
 import os
 import behave
 import requests
@@ -23,16 +24,24 @@ def step_impl_01(context):
     "Pipline got messages related to roster changes"
 )
 def step_impl_02(context):
-  qurey_result=run_query(f"select * from {PROJECT_ID}.{BQ_DATASET}.userCollectionView where emailAddress=\"{context.user_id}\"")
+  qurey_result = run_query(
+      f"select * from {PROJECT_ID}.{BQ_DATASET}.userCollectionView where emailAddress=\"{context.user_id}\""
+  )
+  noti_query_result = run_query(
+      f"select * from `{PROJECT_ID}.{BQ_DATASET}.lms-notifications` where JSON_VALUE(data.email)=\"{context.user_id}\""
+  )
   context.users=[dict(row) for row in qurey_result]
+  context.notification=[dict(row) for row in noti_query_result]
 
 
 @behave.then(
-    "Pipline get user related details from classroom and store user details and Pub/Sub message in bigquery"
+    "Pipline get user related details from classroom and store user details and Push filter message to lms notifications"
 )
 def step_impl_03(context):
   user=context.users[0]
+  message_data = json.loads(context.notification[0]["data"])
   assert user["id"]==context.analytics_data["student_data"]["gaia_id"]
+  assert message_data["email"] == context.user_id
 
 # -------------------------------Course Work Changes-------------------------------------
 
@@ -41,6 +50,7 @@ def step_impl_03(context):
 )
 def step_impl_04(context):
   context.course_work_id=context.analytics_data['course_work']['id']
+  context.user_id = context.analytics_data['student_data']['email']
 
 
 @behave.when(
@@ -52,13 +62,13 @@ def step_impl_05(context):
 
 
 @behave.then(
-    "Pipline get course work details from classroom and store course work details and Pub/Sub message in bigquery"
+    "Pipline get course work details from classroom and store course work details and Push filter message to lms notifications"
 )
 def step_impl_06(context):
   course_work=context.course_work[0]
   assert course_work["courseId"]==context.analytics_data["course_work"]["courseId"]
   assert course_work["title"]==context.analytics_data["course_work"]["title"]
-  
+
   # -------------------------------Submitted Course Work Changes-------------------------------------
 
 @behave.given(
@@ -66,20 +76,27 @@ def step_impl_06(context):
 )
 def step_impl_07(context):
   context.submission_id=context.analytics_data['submission']['id']
+  context.user_id = context.analytics_data['student_data']['email']
 
 
 @behave.when(
-    "Pipline got messages related to create Submitted Course work"
+    "Pipline got messages related to Submitted Course work"
 )
 def step_impl_08(context):
   qurey_result=run_query(f"select * from {PROJECT_ID}.{BQ_DATASET}.submittedCourseWorkCollectionView where submission_id=\"{context.submission_id}\"")
+  noti_query_result = run_query(
+      f"select * from `{PROJECT_ID}.{BQ_DATASET}.lms-notifications` where JSON_VALUE(data.email)=\"{context.user_id}\" and JSON_VALUE(data.message)=\"Teacher graded the assignment\""
+  )
   context.submission=[dict(row) for row in qurey_result][0]
+  context.notification=[dict(row) for row in noti_query_result]
 
 
 @behave.then(
-    "Pipline get submitted course work details from classroom and store Submitted Course Work details and Pub/Sub message in bigquery"
+    "Pipline get submitted course work details from classroom and store Submitted Course Work details and Push filter message to lms notifications"
 )
 def step_impl_09(context):
+  message_data = json.loads(context.notification[0]["data"])
   assert context.submission["submission_course_id"]==context.analytics_data["course_details"]["id"]
   assert context.submission["submission_course_work_id"]==context.analytics_data["course_work"]["id"]
   assert context.submission["submission_user_id"]==context.analytics_data["student_data"]["gaia_id"]
+  assert message_data["email"]==context.user_id

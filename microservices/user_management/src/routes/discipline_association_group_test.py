@@ -7,14 +7,19 @@ from copy import deepcopy
 # pylint: disable=unused-argument,redefined-outer-name,unused-import,invalid-name
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from routes.discipline_association_group import router
+from unittest import mock
+with mock.patch(
+    "google.cloud.logging.Client",
+    side_effect=mock.MagicMock()) as mok:
+  from routes.discipline_association_group import router
 from testing.test_config import API_URL
 from schemas.schema_examples import (BASIC_ASSOCIATION_GROUP_EXAMPLE,
                                       BASIC_USER_MODEL_EXAMPLE,
                                       TEST_CURRICULUM_PATHWAY,
                                       FULL_DISCIPLINE_ASSOCIATION_GROUP_EXAMPLE,
                                       FULL_USER_MODEL_EXAMPLE,
-                                      BASIC_CURRICULUM_PATHWAY_EXAMPLE)
+                                      BASIC_CURRICULUM_PATHWAY_EXAMPLE,
+                                      POST_USERGROUP_MODEL_EXAMPLE)
 from common.models import AssociationGroup, UserGroup, User, CurriculumPathway
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
@@ -86,7 +91,8 @@ def test_get_all_association_groups(clean_firestore):
   resp = client_with_emulator.get(url, params=params_1)
   json_response = resp.json()
   assert resp.status_code == 200, "Status should be 200"
-  retrieved_ids = [i.get("uuid") for i in json_response.get("data")]
+  retrieved_ids = [
+    i.get("uuid") for i in json_response.get("data")["records"]]
   assert association_group.uuid in retrieved_ids, "expected data not retrieved"
 
 def test_get_all_association_groups_negative(clean_firestore):
@@ -401,7 +407,10 @@ def test_add_discipline_to_discipline_association_group(clean_firestore):
   assert resp.status_code == 422, f"Status Code = {resp.status_code}"
 
 
-def test_remove_discipline_from_discipline_association_group(clean_firestore):
+def test_remove_discipline_from_discipline_association_group(clean_firestore,
+                                                              mocker):
+  # pylint: disable=line-too-long
+  mocker.patch("routes.discipline_association_group.update_assessor_of_submitted_assessments_of_a_discipline")
 
   # assertion to successfully remove a discipline
   association_group_dict = {**BASIC_ASSOCIATION_GROUP_EXAMPLE}
@@ -455,32 +464,40 @@ def test_remove_discipline_from_discipline_association_group(clean_firestore):
   assert resp.status_code == 422, f"Status Code = {resp.status_code}"
 
 def create_user_and_group(user_group_name, user_type):
-  """Test function to check post route"""
-  user_dict = User.from_dict({
+  """Create a user and a user group"""
+  user_dict1 = User.from_dict({
       **BASIC_USER_MODEL_EXAMPLE, "user_type": user_type
   })
-  user_dict.user_id = ""
-  user_dict.save()
-  user_dict.user_id = user_dict.id
-  user_dict.update()
-  user_id1 = user_dict.user_id
+  user_dict1.user_id = ""
+  user_dict1.save()
+  user_dict1.user_id = user_dict1.id
+  user_dict1.update()
+  user_id1 = user_dict1.user_id
 
-  user_dict = User.from_dict({
+  user_dict2 = User.from_dict({
       **BASIC_USER_MODEL_EXAMPLE, "user_type": user_type
   })
-  user_dict.user_id = ""
-  user_dict.save()
-  user_dict.user_id = user_dict.id
-  user_dict.update()
-  user_id2 = user_dict.user_id
+  user_dict2.user_id = ""
+  user_dict2.save()
+  user_dict2.user_id = user_dict2.id
+  user_dict2.update()
+  user_id2 = user_dict2.user_id
 
-  GROUP_EXAMPLE = {"name": user_group_name, "users": [user_id1, user_id2]}
+  GROUP_EXAMPLE = {**POST_USERGROUP_MODEL_EXAMPLE,
+    "name": user_group_name, "users": [user_id1, user_id2]}
 
   group_dict = UserGroup.from_dict({**GROUP_EXAMPLE})
   group_dict.uuid = ""
   group_dict.save()
-  group_dict.user_id = group_dict.id
+  group_dict.uuid = group_dict.id
   group_dict.update()
+
+  #add user group to users
+  user_dict1.user_groups = [group_dict.uuid]
+  user_dict1.update()
+
+  user_dict2.user_groups = [group_dict.uuid]
+  user_dict2.update()
 
   return [user_id1, user_id2]
 
@@ -495,11 +512,12 @@ def test_add_user_to_discipline_association_group(clean_firestore):
   assert post_resp_json.get("success") is True, "Success not true"
   assert post_resp.status_code == 200, "Status 200"
 
-  add_users = create_user_and_group("instructor group", "instructor")
+  add_users = create_user_and_group("instructor", "instructor")
   add_users = {"users": add_users, "status": "active"}
   url = api_url + f"/{uuid}/users/add"
   post_resp = client_with_emulator.post(url, json=add_users)
   post_resp_json = post_resp.json()
+
   assert post_resp_json.get("success") is True, "Success not true"
   assert post_resp.status_code == 200, "Status 200"
   assert len(post_resp_json.get("data").get("users")) == 2
@@ -516,7 +534,7 @@ def test_remove_user_from_discipline_association_group(clean_firestore):
   assert post_resp.status_code == 200, "Status 200"
 
   # Add users to the association group
-  add_users = create_user_and_group("instructor group", "instructor")
+  add_users = create_user_and_group("instructor", "instructor")
   add_users = {"users": add_users, "status": "active"}
   url = api_url + f"/{uuid}/users/add"
   post_resp = client_with_emulator.post(url, json=add_users)
@@ -725,7 +743,7 @@ def test_add_user_to_discipline_association_group_negative(clean_firestore):
   assert post_resp_json.get("success") is True, "Success not true"
   assert post_resp.status_code == 200, "Status 200"
 
-  add_users = create_user_and_group("instructor group", "instructor")
+  add_users = create_user_and_group("instructor", "instructor")
   add_users = {"users": add_users, "status": "active"}
   url = api_url + f"/{uuid}/users/add"
   post_resp = client_with_emulator.post(url, json=add_users)

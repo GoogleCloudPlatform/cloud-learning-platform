@@ -25,6 +25,11 @@ Feature: CRUD for managing UserGroup in user management
             When API request is sent to fetch all UserGroups
                 Then User management will return all existing UserGroup objects successfully
 
+    Scenario:  sort UserGroup records from User management
+        Given A user has access to User management and needs to sort user groups
+            When API request is sent to sort user groups
+                Then User management will return all existing UserGroup objects by sorted order
+
     Scenario: Unable to retrieve all UserGroups from User management when incorrect params given
         Given A user can access User management and needs to fetch all UserGroups
             When API request is sent to fetch all UserGroups with incorrect request payload
@@ -73,7 +78,6 @@ Feature: CRUD for managing UserGroup in user management
             When API request is sent to search UserGroup by providing invalid name
                 Then An empty list would be returned for the search
 
-    @filter-api
     Scenario: Retrieve Users that can be added to UserGroup
         Given A user has access to User management and needs to retrieve users that can be added to a UserGroup
             When API request is sent to fetch users by providing valid UserGroup uuid

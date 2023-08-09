@@ -99,7 +99,7 @@ def add_user_to_db(headers, user_input_dict):
         user_dict.update()
   # create agent for the user
   agent_dict = {
-      "account_homepage": "",
+      "account_homepage": "homepage",
       "object_type": "agent",
       "name": user_input_dict.get("first_name") + " " +
               user_input_dict.get("last_name"),

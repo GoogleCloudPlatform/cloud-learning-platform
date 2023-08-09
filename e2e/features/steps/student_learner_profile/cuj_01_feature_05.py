@@ -2,7 +2,7 @@
 For the given learner get the curriculum pathway
 """
 
-from e2e.setup import post_method, get_method, delete_method, put_method
+from e2e.setup import post_method, get_method, delete_method, put_method, create_immutable_user_groups
 from copy import copy, deepcopy
 from e2e.test_config import DEL_KEYS, API_URL_LEARNER_PROFILE_SERVICE, API_URL_LEARNING_OBJECT_SERVICE, API_URL_USER_MANAGEMENT as UM_API_URL
 from e2e.test_object_schemas import (TEST_USER, TEST_CURRICULUM_PATHWAY,
@@ -33,11 +33,6 @@ def step_1_1(context):
   assert context.res_data["success"] is True
   context.curriculum_pathway_id = context.res_data["data"]["uuid"]
 
-  context.res = put_method(
-      url=f"{API_URL_LEARNING_OBJECT_SERVICE}/curriculum-pathway/{context.curriculum_pathway_id}",
-      request_body = {"is_active": True}
-  )
-  assert context.res.status_code == 200
 
   # create an learner association group and add learner to it
   association_group_dict = deepcopy(TEST_ASSOCIATION_GROUP)
@@ -61,6 +56,11 @@ def step_1_1(context):
   context.user_id = context.post_user_res.json()["data"]["user_id"]
   context.learner_id = context.post_user_res.json()["data"]["user_type_ref"]
 
+  user_group_id = create_immutable_user_groups("learner")
+  user_group_url = f"{UM_API_URL}/user-group/{user_group_id}/users/add"
+  context.add_user_to_user_group = post_method(
+      url=user_group_url, request_body={"user_ids":[context.user_id]})
+  assert context.add_user_to_user_group.status_code == 200
   # add learner to the learner association group
   add_users = {"users": [context.user_id], "status": "active"}
   context.url = f"{UM_API_URL}/association-groups/learner-association/{context.learner_association_uuid}/users/add"
@@ -221,6 +221,12 @@ def step_1_1(context):
   assert context.post_user_res.status_code == 200
   context.user_id = context.post_user_res.json()["data"]["user_id"]
   context.learner_id = context.post_user_res.json()["data"]["user_type_ref"]
+
+  user_group_id = create_immutable_user_groups("learner")
+  user_group_url = f"{UM_API_URL}/user-group/{user_group_id}/users/add"
+  context.add_user_to_user_group = post_method(
+      url=user_group_url, request_body={"user_ids":[context.user_id]})
+  assert context.add_user_to_user_group.status_code == 200
 
   # add learner to the learner association group
   add_users = {"users": [context.user_id], "status": "active"}

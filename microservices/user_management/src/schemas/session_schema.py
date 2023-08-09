@@ -7,11 +7,12 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Extra
 from schemas.schema_examples import (POST_SESSION_EXAMPLE, FULL_SESSION_EXAMPLE,
                                      UPDATE_SESSION_EXAMPLE)
+from common.utils.schema_validator import BaseConfigModel
 
 NODES = Literal["assessments", "learning_resources"]
 
 
-class BasicSessionModel(BaseModel):
+class BasicSessionModel(BaseConfigModel):
   """Session Skeleton Pydantic Model"""
   user_id: str
   parent_session_id: Optional[str] = None
@@ -35,7 +36,7 @@ class PostSessionModel(BasicSessionModel):
     schema_extra = {"example": POST_SESSION_EXAMPLE}
 
 
-class UpdateSessionModel(BaseModel):
+class UpdateSessionModel(BaseConfigModel):
   """Update Session Pydantic Model"""
   session_data: Optional[dict] = {}
   is_expired: Optional[bool]
@@ -61,11 +62,14 @@ class GetSessionResponseModel(BaseModel):
       }
     }
 
+class TotalCountResponseModel(BaseModel):
+  records: Optional[List[FullSessionDataModel]]
+  total_count: int
 
 class GetAllSessionResponseModel(BaseModel):
   success: Optional[bool] = True
   message: Optional[str] = "Successfully fetched the session"
-  data: Optional[List[FullSessionDataModel]]
+  data: Optional[TotalCountResponseModel]
 
   class Config():
     orm_mode = True
@@ -73,7 +77,10 @@ class GetAllSessionResponseModel(BaseModel):
       "example": {
         "success": True,
         "message": "Successfully fetched the session",
-        "data": [FULL_SESSION_EXAMPLE]
+        "data": {
+                  "records":[FULL_SESSION_EXAMPLE],
+                  "total_count": 50
+                }
       }
     }
 
