@@ -344,7 +344,7 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
     ConflictResponseModel: if any conflict occurs,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
-  section_id="null"
+  section_id=None
   try:
     cohort = Cohort.find_by_id(cohort_id)
     sections = Section.collection.filter("cohort", "==", cohort.key).filter(
@@ -469,7 +469,7 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
     ConflictResponseModel: if any conflict occurs,
     InternalServerErrorResponseModel: if the add student raises an exception
   """
-  cohort_id = "null"
+  cohort_id = None
   try:
     section = Section.find_by_id(section_id)
     headers = {"Authorization": request.headers.get("Authorization")}
