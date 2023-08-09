@@ -175,7 +175,7 @@ class InputCopyLTIAssignmentModel(BaseModel):
   lti_assignment_id: str
   context_id: str
   source_context_id: str
-  coursework_id: Optional[str]
+  course_work_id: Optional[str]
   start_date: Optional[datetime.datetime]
   end_date: Optional[datetime.datetime]
   due_date: Optional[datetime.datetime]

@@ -4,8 +4,7 @@
 
 ### Access
 - Access to the following Github repos:
-    - [GPS-Solutions/cloud-learning-platform](https://github.com/GPS-Solutions/cloud-learning-platform)
-- Read-only access to `aitutor-dev` buckets (for ML model export and Firestore import)
+    - [GoogleCloudPlatform/cloud-learning-platform](https://github.com/GoogleCloudPlatform/cloud-learning-platform)
 - A new project for installation with Project Owner (`roles/owner`)
 - A domain or sub_domain that you control and can create DNS records for (not needed for CEs)
 
@@ -14,9 +13,6 @@ You'll need the following quotas in your preferred zone
 - 48 vCPU
 - 4 x T4 GPUs
 
-### Version
-Confirm with the Learning Platform team which release version of each repo to use.
-
 ### Tools
 Install the following tools:
 - [gcloud](https://cloud.google.com/sdk/docs/install)
@@ -24,7 +20,7 @@ Install the following tools:
 
 ## 2. Project Bootstrap
 
-You will use a provided Terraform module to perform the following:
+Please make sure that you have the project `Owner` role to be able to update the organizational policies for CLP deployment. You will use a provided Terraform module to perform the following:
 - Bootstrap a project in your organization
 - Create a Terraform service account and Terraform state bucket in the project for further Terraform scripts
 
@@ -40,7 +36,7 @@ export BILLING_ACCOUNT="$(gcloud beta billing projects describe ${PROJECT_ID} | 
 
 export CLP_VERSION=<clp_tag>
 export DEMO_VERSION=<v2.0.0-beta12.7-demo>
-git clone https://github.com/GPS-Solutions/cloud-learning-platform.git
+git clone https://github.com/GoogleCloudPlatform/cloud-learning-platform.git
 cd cloud-learning-platform
 git checkout $CLP_VERSION
 cd terraform/stages/project_bootstrap/
@@ -86,7 +82,7 @@ terraform apply
 
 Ensure that a bucket with the same name as the project has been created:
 ```commandline
-gsutil ls -p $PROJECT_ID
+gsutil ls -p "${PROJECT_ID}"
 ```
 
 There should also be a jump host VM in the project:
@@ -140,7 +136,7 @@ git config --global user.name "Your Name"
 git config --global credential.https://github.com.username "username"
 
 git config --global credential.helper store
-git clone https://github.com/GPS-Solutions/cloud-learning-platform.git
+git clone https://github.com/GoogleCloudPlatform/cloud-learning-platform.git
 ```
 
 ### Set Project ID and other variables
@@ -230,8 +226,8 @@ Deploy the needed indexes to firestore. Make sure the database import is complet
 ```bash
 cd cloud-learning-platform
 export PWD=$(pwd)
-export GCP_PROJECT=$PROJECT_ID
-echo "Your current GCP Project ID is: "$GCP_PROJECT
+export GCP_PROJECT=${PROJECT_ID}
+echo "Your current GCP Project ID is: "${GCP_PROJECT}
 
 cd utils
 PYTHONPATH=../common/src python firestore_indexing.py
@@ -246,7 +242,7 @@ First connect to your GKE cluster that you've already provisioned. You can find 
 <img src="docs/static/images/gke_credentials.png" width=70%>
 
 ```bash
-gcloud container clusters get-credentials $GCP_PROJECT-$REGION --region $REGION --project $GCP_PROJECT
+gcloud container clusters get-credentials ${GCP_PROJECT}-${REGION} --region ${REGION} --project ${GCP_PROJECT}
 ```
 
 [kubectx and kubens](https://github.com/ahmetb/kubectx) are handy tools to easily switch between Kubernetes clusters and namespaces.
@@ -256,9 +252,9 @@ Return to the repo root. Make sure you have the version you desire checked out.
 cd $PWD
 echo "Your current GCP Project ID is: "$(git branch --show-current)
 
-export GCP_PROJECT=$PROJECT_ID
-export PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
-echo "Your current GCP Project ID is: "$PROJECT_ID
+export GCP_PROJECT=${PROJECT_ID}
+export PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format="value(projectNumber)")
+echo "Your current GCP Project ID is: "${PROJECT_ID}
 
 export BACKEND_API=https://$PROJECT_ID-api.cloudpssolutions.com
 # GIT_RELEASE=$(git describe --tags --abbrev=0 --exact-match)
@@ -268,14 +264,14 @@ GIT_SHA=$(git rev-parse HEAD)
 Run the following to get Firebase API key (Web API key):
 ```bash
 KEY_NAME=$(gcloud alpha services api-keys list --filter="displayName='Browser key (auto created by Firebase)'" --format="value(name)")
-export FIREBASE_API_KEY=$(gcloud alpha services api-keys get-key-string $KEY_NAME --format="value(keyString)")
+export FIREBASE_API_KEY=$(gcloud alpha services api-keys get-key-string ${KEY_NAME} --format="value(keyString)")
 ```
 
 Set environment variables:
 ```bash
 export IS_DEVELOPMENT=false
 export IS_CLOUD_LOGGING_ENABLED=true
-export RELEASE_VERSION=$CLP_VERSION
+export RELEASE_VERSION=${CLP_VERSION}
 export SKAFFOLD_BUILD_CONCURRENCY=0
 ```
 
@@ -285,9 +281,9 @@ Deploy each set of services, one set at a time. This can take several tries due 
 
 You can watch the logs of your builds in [Cloud Build](https://console.cloud.google.com/cloud-build/builds) as well as streaming to your command line.
 ```bash
-echo $GCP_PROJECT $PROJECT_ID $GIT_SHA $CLP_VERSiON
+echo ${GCP_PROJECT} ${PROJECT_ID} ${GIT_SHA} ${CLP_VERSiON}
 # Deploy backend microservices
-skaffold run -p custom --default-repo=gcr.io/$PROJECT_ID -l commit=$GIT_SHA -m v3_backends --tag $CLP_VERSION
+skaffold run -p custom --default-repo=gcr.io/${PROJECT_ID} -l commit=${GIT_SHA} -m v3_backends --tag ${CLP_VERSION}
 ```
 
 Eventually you should see that all the containers are built and `skaffold` is starting to deploy resources.
