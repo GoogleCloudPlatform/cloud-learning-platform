@@ -1,4 +1,5 @@
 """ Section endpoints """
+import sys
 import traceback
 import datetime
 from common.models import Cohort, CourseTemplate, Section, LmsJob, CourseEnrollmentMapping
@@ -934,8 +935,7 @@ def post_null_value(section_id: str,
 
   Args:
       section_id (str): _description_
-      request (Request): _description_
-      teacher_details (EnrollTeacherSection): _description_
+      coursework_id (str): _description_
 
   Raises:
       Conflict: _description_
@@ -949,18 +949,16 @@ def post_null_value(section_id: str,
   """
   try:
     section = Section.find_by_id(section_id)
-    results=CourseEnrollmentMapping.\
-    fetch_all_by_section(section.key,"learner")
-    data = [
-        course_enrollment_user_model(i) for i in results
-    ]
-    classroom_submissions = classroom_crud.list_coursework_submissions(section_id,coursework_id)
-    for student in data:
-      submission_obj = next((x for x in classroom_submissions if x.userId == student.gaia_id), None)
-      classroom_crud.post_grade_of_the_user(section_id,coursework_id,submission_obj.id,0,0)
+    classroom_submissions = classroom_crud.list_coursework_submissions\
+      (section.classroom_id,coursework_id)
+    for student in classroom_submissions:
+      if student.get('assignedGrade') is None:
+        classroom_crud.post_grade_of_the_user\
+          (section_id,coursework_id,student['id'],0,0)
 
     return {
-        "message": f"Successfully provided null grades for section id : {section_id}"
+        "message": f"Successfully provided null grades for section id : \
+          {section_id}, coursework id: {coursework_id}"
     }
 
   except ResourceNotFoundException as err:
