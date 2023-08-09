@@ -18,7 +18,7 @@ from assessment_service import cuj_01_feature_01, cuj_01_feature_02, \
   cuj_04_feature_05, cuj_04_feature_06, cuj_05_feature_01
 from classroom_notification_service import pipe_line_test
 from lms import cuj01_classroom_courses,cuj02_course_template,\
-cuj04_section,cuj05_01_student,cuj05_02_student,cuj06_analytics
+cuj04_section,cuj05_01_student,cuj05_02_student,cuj06_analytics, cuj07_lms_notification
 # from test_environment import test_environment
 from authentication_service import cuj_01_feature_02, cuj_02_feature_01
 from student_learner_profile import cuj_01_feature_01, cuj_01_feature_02, \
