@@ -1,5 +1,4 @@
 """ Section endpoints """
-import sys
 import traceback
 import datetime
 from common.models import Cohort, CourseTemplate, Section, LmsJob, CourseEnrollmentMapping
@@ -1027,9 +1026,9 @@ def post_null_value(section_id: str,
     classroom_submissions = classroom_crud.list_coursework_submissions\
       (section.classroom_id,coursework_id)
     for student in classroom_submissions:
-      if student.get('assignedGrade') is None:
+      if student.get("assignedGrade") is None:
         classroom_crud.post_grade_of_the_user\
-          (section_id,coursework_id,student['id'],0,0)
+          (section_id,coursework_id,student["id"],0,0)
 
     return {
         "message": f"Successfully provided null grades for section id : \
@@ -1051,4 +1050,4 @@ def post_null_value(section_id: str,
   except Exception as e:
     Logger.error(e)
     raise InternalServerError(str(e)) from e
-  
+    
