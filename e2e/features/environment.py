@@ -68,8 +68,6 @@ TEST_GOAL_PATH = os.path.join(TESTING_OBJECTS_PATH, "goals.json")
 
 TEST_CSV_SKILLS_PATH = os.path.join(TESTING_OBJECTS_PATH, "generic_skill.csv")
 TEST_INVALID_CSV_SKILLS_PATH = os.path.join(TESTING_OBJECTS_PATH, "invalid_generic_skill.csv")
-# TEST_CSV_COMPETENCIES_PATH = os.path.join(TESTING_OBJECTS_PATH, "generic_competency.csv")
-# TEST_INVALID_CSV_COMPETENCIES_PATH = os.path.join(TESTING_OBJECTS_PATH, "invalid_generic_competency.csv")
 TEST_CSV_CATEGORIES_PATH = os.path.join(TESTING_OBJECTS_PATH, "generic_category.csv")
 TEST_INVALID_CSV_CATEGORIES_PATH = os.path.join(TESTING_OBJECTS_PATH, "invalid_generic_category.csv")
 TEST_CSV_SUBDOMAINS_PATH = os.path.join(TESTING_OBJECTS_PATH, "generic_sub_domain.csv")

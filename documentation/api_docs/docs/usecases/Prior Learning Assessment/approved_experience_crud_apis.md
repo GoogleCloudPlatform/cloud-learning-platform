@@ -18,7 +18,7 @@ The request body for the API is as follows:
 {
   "title": "Machine Learning",
   "description": "Machine learning (ML) is a field devoted to understanding and building methods that let machines learn.",
-  "organization": "XYZ Innovations",
+  "organization": "Dummy Org",
   "type": "Certificate",
   "student_type": "Graduate",
   "class_level": "Lower level",
@@ -38,7 +38,7 @@ If the response is successful then a new Approved Experience with the request bo
     "success": true,
     "message": "Successfully created the approved experience",
     "data": {
-        "organization": "XYZ Innovations",
+        "organization": "Dummy Org",
         "title": "Machine Learning",
         "description": "Machine learning (ML) is a field devoted to understanding and building methods that let machines learn.",
         "type": "Certificate",
