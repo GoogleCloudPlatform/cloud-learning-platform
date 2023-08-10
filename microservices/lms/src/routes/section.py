@@ -25,7 +25,8 @@ from schemas.section import (
     ImportGradeResponseModel,
     EnrollTeacherSection,DeleteTeacherFromSectionResponseModel,
     UpdateEnrollmentStatusSectionModel,
-    DeleteFailedSectionSectionModel,UpdateInviteResponseModel)
+    DeleteFailedSectionSectionModel,UpdateInviteResponseModel,
+    NullGradesResponseModel)
 from schemas.update_section import UpdateSection
 from services.section_service import (copy_course_background_task,
                                 copy_course_background_task_alpha,
@@ -1000,3 +1001,53 @@ f"Cannot update invitation status for{user_ref.email}\
     Logger.error(err)
     raise InternalServerError(str(e)) from e
 
+@router.post("/{section_id}/post_null_value/{coursework_id}",
+             response_model=NullGradesResponseModel)
+def post_null_value(section_id: str,
+                    coursework_id:str):
+  """_summary_
+
+  Args:
+      section_id (str): _description_
+      coursework_id (str): _description_
+
+  Raises:
+      Conflict: _description_
+      ResourceNotFound: _description_
+      Conflict: _description_
+      ClassroomHttpException: _description_
+      InternalServerError: _description_
+
+  Returns:
+      _type_: _description_
+  """
+  try:
+    section = Section.find_by_id(section_id)
+    classroom_submissions = classroom_crud.list_coursework_submissions\
+      (section.classroom_id,coursework_id)
+    for student in classroom_submissions:
+      if student.get("assignedGrade") is None:
+        classroom_crud.post_grade_of_the_user\
+          (section_id,coursework_id,student["id"],0,0)
+
+    return {
+        "message": f"Successfully provided null grades for section id : \
+          {section_id}, coursework id: {coursework_id}"
+    }
+
+  except ResourceNotFoundException as err:
+    Logger.error(err)
+    raise ResourceNotFound(str(err)) from err
+  except Conflict as conflict:
+    Logger.error(conflict)
+    err = traceback.format_exc().replace("\n", " ")
+    Logger.error(err)
+    raise Conflict(str(conflict)) from conflict
+  except HttpError as ae:
+    Logger.error(ae)
+    raise ClassroomHttpException(status_code=ae.resp.status,
+                                 message=str(ae)) from ae
+  except Exception as e:
+    Logger.error(e)
+    raise InternalServerError(str(e)) from e
+    
