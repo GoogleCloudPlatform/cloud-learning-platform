@@ -66,9 +66,9 @@ jobs:
           E2E_FACULTY_PASSWORD:core-learning-services-dev/org-test-user-1-password
 
     - name: Install & run e2e tests
-        uses: cypress-io/github-action@v5
-        with:
-          start: npx cypress run
-          working-directory: experimental/e2e-frontend
-          browser: chrome
-          record: false
+      uses: cypress-io/github-action@v5
+      with:
+        start: npx cypress run
+        working-directory: experimental/e2e-frontend
+        browser: chrome
+        record: false
