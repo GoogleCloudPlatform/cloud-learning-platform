@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS submittedCourseWorkCollection (
+CREATE TABLE IF NOT EXISTS submittedCourseWorkCollections (
         uuid STRING NOT NULL OPTIONS(description = "unique id"),
         courseId STRING NOT NULL OPTIONS(description = "course id"),
         courseWorkId STRING NOT NULL OPTIONS(description = "course work id"),
