@@ -29,7 +29,7 @@ BQ_TABLE_DICT = {
     "BQ_LOG_RS_TABLE": "rosterLogs",
     "BQ_COLL_USER_TABLE": "userCollection",
     "BQ_COLL_CW_TABLE": "courseWorkCollection",
-    "BQ_COLL_SCW_TABLE": "submittedCourseWorkCollection"
+    "BQ_COLL_SCW_TABLE": "submittedCourseWorkCollections"
 }
 
 CLASSROOM_ADMIN_EMAIL = os.getenv("CLASSROOM_ADMIN_EMAIL")

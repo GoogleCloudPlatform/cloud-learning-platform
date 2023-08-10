@@ -38,7 +38,7 @@ FROM `lms_analytics.userCollection`
         `timestamp` as submission_timestamp,
         message_id as submission_message_id FROM(
 SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY timestamp DESC) AS row_num
-FROM `lms_analytics.submittedCourseWorkCollection`
+FROM `lms_analytics.submittedCourseWorkCollections`
 ) b
     WHERE
       b.row_num = 1

@@ -113,13 +113,12 @@ def invite_student(section, student_email, headers):
         "status": "active",
         "is_registered": True,
         "failed_login_attempts_count": 0,
-        "access_api_docs": False,
-        "gaia_id": "",
-        "photo_url": ""
+        "access_api_docs": False
     }
     create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
                                          json=body,
                                          headers=headers)
+    Logger.info(create_user_response.json())
     if create_user_response.status_code != 200:
       raise UserManagementServiceError(
           f"Create User API Error {create_user_response.status_code}")

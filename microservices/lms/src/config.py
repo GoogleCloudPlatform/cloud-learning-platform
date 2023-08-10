@@ -37,7 +37,8 @@ BQ_TABLE_DICT = {
     "BQ_ENROLLMENT_RECORD" : "sectionEnrollmentRecord",
     "EXISTS_IN_CLASSROOM_NOT_IN_DB_VIEW":"roastersExitsInClassroomNotInDB",
     "EXISTS_IN_DB_NOT_IN_CLASSROOM_VIEW":"roastersExitsInDBNotInClassroom",
-    "BQ_ENROLLMENT_FAILURE_LOGS":"enrollmentFailureLogs"
+    "BQ_ENROLLMENT_FAILURE_LOGS":"enrollmentFailureLogs",
+    "BQ_NOTIFICATION_TABLE":"lms-notifications"
 }
 
 ENABLE_UVICORN_LOGS = bool(
