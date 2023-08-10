@@ -963,7 +963,7 @@ f"Cannot update invitation status for{user_ref.email}\
   {course_record.section.id} because does not have first name or last\
       name set in google profile")
             continue
-          if user_ref.gaia_id == "":
+          if not user_ref.gaia_id:
             user_ref.first_name = user_profile["name"]["givenName"]
             user_ref.last_name = user_profile["name"]["familyName"]
             user_ref.gaia_id = user_profile["id"]
