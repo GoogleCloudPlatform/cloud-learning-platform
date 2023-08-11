@@ -11,11 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Config module to setup common environment
 """
-
 
 import os
 
@@ -26,19 +24,13 @@ PROJECT_ID = os.environ.get("PROJECT_ID") or \
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
 PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
   PROJECT_ID
-
 API_BASE_URL = os.getenv("API_BASE_URL")
-CLOUD_LOGGING_ENABLED=bool(
-  os.getenv("CLOUD_LOGGING_ENABLED","true").lower() in ("true",))
+CLOUD_LOGGING_ENABLED = bool(
+    os.getenv("CLOUD_LOGGING_ENABLED", "true").lower() in ("true",))
 
-BQ_REGION= os.getenv("BQ_REGION", "US")
+BQ_REGION = os.getenv("BQ_REGION", "US")
 
-SERVICES = {
-  "user-management": {
-    "host": "user-management",
-    "port": 80
-  }
-}
+SERVICES = {"user-management": {"host": "user-management", "port": 80}}
 
 USER_MANAGEMENT_BASE_URL = f"http://{SERVICES['user-management']['host']}:" \
                   f"{SERVICES['user-management']['port']}" \
@@ -49,3 +41,5 @@ CONTAINER_NAME = os.getenv("CONTAINER_NAME")
 DEPLOYMENT_NAME = os.getenv("DEPLOYMENT_NAME")
 API_BASE_URL = os.getenv("API_BASE_URL")
 SERVICE_NAME = os.getenv("SERVICE_NAME")
+
+REDIS_HOST = os.environ.get("REDIS_HOST", "redis-master")
