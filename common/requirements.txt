@@ -1,7 +1,7 @@
 fastapi==0.85.1
 fireo==1.6.2
 google-cloud-core==2.3.2 
-google-api-python-client==2.91.0
+google-api-python-client==2.96.0
 google-auth==2.21.0
 google-cloud-logging==3.5.0
 google-cloud-secret-manager==2.16.1
