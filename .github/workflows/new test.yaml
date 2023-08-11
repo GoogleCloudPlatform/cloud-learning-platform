@@ -24,9 +24,9 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'microservices/lti'
-      - 'microservices/classroom_shim'
+    # paths:
+    #   - 'microservices/lti'
+    #   - 'microservices/classroom_shim'
 
 jobs:
   e2e-ui-test-lms-admin-ui:
