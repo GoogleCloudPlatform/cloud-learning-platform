@@ -1155,9 +1155,7 @@ def add_teacher(headers, section, teacher_email):
         "status": "active",
         "is_registered": True,
         "failed_login_attempts_count": 0,
-        "access_api_docs": False,
-        "gaia_id": "",
-        "photo_url": ""
+        "access_api_docs": False
     }
     status = "invited"
     invitation_id = invitation_object["id"]
