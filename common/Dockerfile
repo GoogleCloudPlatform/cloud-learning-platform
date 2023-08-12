@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# changed from slim for FireO
 FROM python:3.9.14-slim
 
 WORKDIR /opt
 
-
-# needed for backports-datetime-fromisoformat in fireo
-RUN apt-get update
-RUN apt-get -y install gcc
+RUN apt-get update && apt-get -y upgrade && \
+    apt-get -y install gcc vim && \
+    apt-get autoremove -yqq --purge && apt-get clean
 
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    rm -Rf /root/.cache/pip
 
 COPY src/ .
