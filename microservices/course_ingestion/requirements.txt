@@ -1,4 +1,4 @@
-tornado==6.3.2
+tornado==6.3.3
 jsonschema==2.6.0
 firebase-admin==4.5.2
 Scrapy==2.8.0
