@@ -27,12 +27,9 @@ Please make sure that you have the project `Owner` role to be able to update the
 From your workstation:
 ```bash
 export PROJECT_ID=<your-project-id>
-export DOMAIN_NAME=<your-org-domain>
 export REGION=<your-region>
 export ZONE=<your-zone>
 export PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format="value(projectNumber)")
-export BILLING_ACCOUNT="$(gcloud beta billing projects describe ${PROJECT_ID} | grep billingAccountName \
-    | tr / ' ' | cut -f3 -d' ')"
 
 export CLP_VERSION=<clp_tag>
 export DEMO_VERSION=<v2.0.0-beta12.7-demo>
@@ -66,12 +63,9 @@ Run the following to set Terraform variables:
 ```bash
 # Pass variables to terraform using environment prefix TF_VAR_
 export TF_VAR_project_id=${PROJECT_ID}
-export TF_VAR_billing_account=${BILLING_ACCOUNT}
 export TF_VAR_region=${REGION}
 export TF_VAR_zone=${ZONE}
 export TF_VAR_bucket_region_or_multiregion="US"
-export TF_VAR_org_domain_name=${DOMAIN_NAME}
-export TF_VAR_add_project_owner=true
 ```
 
 Now that you're logged in, initialize and run a `terraform apply` command to see the expected changes. Inspect the changes before typing `yes` when prompted.
