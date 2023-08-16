@@ -149,7 +149,8 @@ def test_enroll_student_negative(client_with_emulator):
   }
   with mock.patch("routes.section.classroom_crud.enroll_student"):
     with mock.patch("routes.section.Logger"):
-      resp = client_with_emulator.post(url, json=input_data)
+      with mock.patch("routes.student.student_service.insert_failure_log"):
+        resp = client_with_emulator.post(url, json=input_data)
 
   assert resp.status_code == 404, "Status 404"
   assert resp.json()["success"] is False, "Check success"
@@ -194,7 +195,8 @@ def test_enroll_student_already_present(client_with_emulator, create_fake_data):
       "services.student_service.check_student_can_enroll_in_cohort",
     return_value =False):
       with mock.patch("routes.student.Logger"):
-        resp = client_with_emulator.post(url, json=input_data)
+        with mock.patch("routes.student.student_service.insert_failure_log"):
+          resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 409, "Status 409"
   assert resp.json()["success"] is False
 
@@ -212,7 +214,8 @@ def test_enroll_student_already_present_section\
   "routes.student.student_service.check_student_can_enroll_in_cohort",
     return_value =False):
       with mock.patch("routes.student.Logger"):
-        resp = client_with_emulator.post(url, json=input_data)
+        with mock.patch("routes.student.student_service.insert_failure_log"):
+          resp = client_with_emulator.post(url, json=input_data)
   assert resp.status_code == 409, "Status 409"
   assert resp.json()["success"] is False
 
@@ -266,7 +269,8 @@ def test_enroll_student_section_closed_enrollment(
       with mock.patch(
     "routes.student.student_service.check_student_can_enroll_in_cohort",
         return_value =True):
-        resp = client_with_emulator.post(url, json=input_data)
+        with mock.patch("routes.student.student_service.insert_failure_log"):
+          resp = client_with_emulator.post(url, json=input_data)
   print(resp.json())
   assert resp.status_code == 422, "Status 422"
 
@@ -292,7 +296,8 @@ def test_enroll_student_section_failed_section(
       with mock.patch(
     "routes.student.student_service.check_student_can_enroll_in_cohort",
         return_value =True):
-        resp = client_with_emulator.post(url, json=input_data)
+        with mock.patch("routes.student.student_service.insert_failure_log"):
+          resp = client_with_emulator.post(url, json=input_data)
   print(resp.json())
   assert resp.status_code == 422, "Status 422"
 
@@ -319,7 +324,8 @@ def test_enroll_student_section_enrollment_count(
       with mock.patch(
   "routes.student.student_service.check_student_can_enroll_in_cohort",
         return_value =True):
-        resp = client_with_emulator.post(url, json=input_data)
+        with mock.patch("routes.student.student_service.insert_failure_log"):
+          resp = client_with_emulator.post(url, json=input_data)
   print(resp.json())
   assert resp.status_code == 422, "Status 422"
 
@@ -332,7 +338,8 @@ def test_enroll_student_section_negative(client_with_emulator):
   }
   with mock.patch("routes.section.classroom_crud.enroll_student"):
     with mock.patch("routes.section.Logger"):
-      resp = client_with_emulator.post(url, json=input_data)
+      with mock.patch("routes.student.student_service.insert_failure_log"):
+        resp = client_with_emulator.post(url, json=input_data)
 
   assert resp.status_code == 404, "Status 404"
   assert resp.json()["success"] is False, "Check success"

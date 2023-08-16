@@ -1,9 +1,11 @@
 """Student API services"""
 import requests
 import traceback
-from config import USER_MANAGEMENT_BASE_URL
+import datetime
+from config import USER_MANAGEMENT_BASE_URL,BQ_TABLE_DICT,BQ_DATASET
 from services.section_service import insert_section_enrollment_to_bq
 from common.utils import classroom_crud
+from common.utils.bq_helper import insert_rows_to_bq
 from common.utils.logging_handler import Logger
 from common.models import CourseEnrollmentMapping, User
 from common.utils.errors import (ResourceNotFoundException,
@@ -66,6 +68,24 @@ def check_student_can_enroll_in_cohort(email, headers, sections):
   return True
 
 
+def insert_failure_log(email:str, section_id:str, cohort_id:str,
+                       err:str, error_type:str):
+  """
+  Insert enrollment error logs to BQ
+  """
+  rows = [{
+  "email": email,
+  "error_type": error_type,
+  "traceback": err,
+  "log_time": datetime.datetime.utcnow(),
+  "section_id": section_id,
+  "cohort_id": cohort_id
+  }]
+
+  insert_rows_to_bq(rows=rows,
+    dataset=BQ_DATASET,
+    table_name=BQ_TABLE_DICT["BQ_ENROLLMENT_FAILURE_LOGS"])
+
 
 def invite_student(section, student_email, headers):
   """
@@ -93,13 +113,12 @@ def invite_student(section, student_email, headers):
         "status": "active",
         "is_registered": True,
         "failed_login_attempts_count": 0,
-        "access_api_docs": False,
-        "gaia_id": "",
-        "photo_url": ""
+        "access_api_docs": False
     }
     create_user_response = requests.post(f"{USER_MANAGEMENT_BASE_URL}/user",
                                          json=body,
                                          headers=headers)
+    Logger.info(create_user_response.json())
     if create_user_response.status_code != 200:
       raise UserManagementServiceError(
           f"Create User API Error {create_user_response.status_code}")

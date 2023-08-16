@@ -5,13 +5,6 @@ sidebar_position: 2
 
 # Filter Submitted Assessments for an assessor
 
-
-
-<!-- :::note
-
-**`APP_URL`** used in the below URLs is **<https://snhu-glidepath-dev-api.cloudpssolutions.com>**
-
-::: -->
 To fetch a list of child nodes with filters from a given node_id and node_type in the learning hierarchy, the following
 endpoint will be used:
 **`<APP_URL>/learning-object-service/api/v1/{level}/{node_id}/nodes/{node_type}`**

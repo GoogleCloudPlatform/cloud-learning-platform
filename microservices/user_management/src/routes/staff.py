@@ -14,6 +14,7 @@ from common.utils.http_exceptions import (Conflict, InternalServerError,
                                           BadRequest, ResourceNotFound,
                                           PayloadTooLarge)
 from common.utils.inspace import update_inspace_user_helper
+from common.utils.config import EXTERNAL_USER_PROPERTY_PREFIX
 from schemas.staff_schema import (StaffSearchResponseModel,
                                   AllStaffResponseModel,
                                   GetStaffResponseModel,
@@ -211,8 +212,11 @@ def update_staff_api(uuid: str, input_staff: UpdateStaffModel):
       update_payload = {}
 
       user_fields = User.find_by_user_type_ref(uuid)
-      update_payload["userProperties"] = {"SNHU_CALENDLY_URL"
-                                          : input_staff_dict["calendly_url"]}
+      update_payload["userProperties"] = {
+          f"{EXTERNAL_USER_PROPERTY_PREFIX}CALENDLY_URL": input_staff_dict[
+              "calendly_url"
+          ]
+      }
 
       is_update_successful = update_inspace_user_helper(user_fields,
                                                             update_payload)

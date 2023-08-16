@@ -22,16 +22,6 @@ spec:
             configMapKeyRef:
               name: env-vars
               key: DATABASE_PREFIX
-        - name: ONET_USERNAME
-          valueFrom:
-            configMapKeyRef:
-              name: env-vars
-              key: ONET_USERNAME
-        - name: ONET_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              name: env-vars
-              key: ONET_PASSWORD
         - name: USE_LEARNOSITY_SECRET
           valueFrom:
             configMapKeyRef:
