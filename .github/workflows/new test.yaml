@@ -66,3 +66,7 @@ jobs:
         working-directory: experimental/e2e-frontend
         browser: chrome
         record: false
+        env: 
+          E2E_TEST_CREDS: ${{ secrets.E2E_TEST_CREDS }}
+          E2E_FACULTY_EMAIL: ${{ secrets.E2E_FACULTY_EMAIL }}
+          E2E_FACULTY_PASSWORD: ${{ secrets.E2E_FACULTY_PASSWORD }}

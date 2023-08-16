@@ -1,11 +1,12 @@
 describe("Test Honorlock Deeplinking", () => {
-  const EMAIL = "e2e_7112f773_1a53_email@gmail.com";
-  const PASSWORD = "!45RK&2L!m9%Ef";
+  const e2eUserCreds = Cypress.env("E2E_TEST_CREDS");
+  const EMAIL = e2eUserCreds.email;
+  cy.log("e2eUserCreds", e2eUserCreds);
+  const PASSWORD = e2eUserCreds.password;
   it("should visit the login page with username password", () => {
     const domain =
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e";
     cy.visit(domain);
-    window.localStorage.setItem("userId", "hVo8p8wupciYtjfWK8GP");
     cy.url().should(
       "eq",
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e"
@@ -61,7 +62,10 @@ describe("Test Honorlock Deeplinking", () => {
     // Assert that the API call was made and wait for the response
     cy.wait("@apiRequest").then((interception) => {
       const response = interception.response;
-      cy.writeFile("cypress/fixtures/HONORLOCK_LTI_ASSIGNMENT_ID.txt", response.body.data.id);
+      cy.writeFile(
+        "cypress/fixtures/HONORLOCK_LTI_ASSIGNMENT_ID.txt",
+        response.body.data.id
+      );
       cy.log("response.body.id", response.body.data.id);
       expect(response.statusCode).to.equal(200);
     });

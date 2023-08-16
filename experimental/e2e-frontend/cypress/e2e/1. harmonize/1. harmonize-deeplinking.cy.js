@@ -1,7 +1,9 @@
 import "cypress-iframe";
 describe("Test Harmonize Deeplinking", () => {
-  const EMAIL = "e2e_7112f773_1a53_email@gmail.com";
-  const PASSWORD = "!45RK&2L!m9%Ef";
+  const e2eUserCreds = Cypress.env("E2E_TEST_CREDS");
+  const EMAIL = e2eUserCreds.email;
+  cy.log("e2eUserCreds", e2eUserCreds);
+  const PASSWORD = e2eUserCreds.password;
   const getIframeDocument = () => {
     console.log(cy.get("#ltiIframe"));
     return cy.get("#ltiIframe").its("0.contentDocument").should("exist");
@@ -19,7 +21,6 @@ describe("Test Harmonize Deeplinking", () => {
     const domain =
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e";
     cy.visit(domain);
-    window.localStorage.setItem("userId", "hVo8p8wupciYtjfWK8GP");
     cy.url().should(
       "eq",
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e"
@@ -84,7 +85,10 @@ describe("Test Harmonize Deeplinking", () => {
     cy.get('button[type="submit"]').contains("Save").click();
     cy.wait("@apiRequest").then((interception) => {
       const response = interception.response;
-      cy.writeFile("cypress/fixtures/HARMONIZE_LTI_ASSIGNMENT_ID.txt", response.body.data.id);
+      cy.writeFile(
+        "cypress/fixtures/HARMONIZE_LTI_ASSIGNMENT_ID.txt",
+        response.body.data.id
+      );
       cy.log("response.body.id", response.body.data.id);
       expect(response.statusCode).to.equal(200);
     });
