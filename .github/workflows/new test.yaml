@@ -67,6 +67,5 @@ jobs:
         browser: chrome
         record: false
         env: |
-          E2E_TEST_CREDS: ${{ toJson(steps.secrets.outputs.E2E_TEST_CREDS) }}
-          E2E_FACULTY_EMAIL: ${{ toJson(steps.secrets.outputs.E2E_FACULTY_EMAIL) }}
-          E2E_FACULTY_PASSWORD: ${{ toJson(steps.secrets.outputs.E2E_FACULTY_PASSWORD) }}
+          E2E_FACULTY_EMAIL: ${{ steps.secrets.outputs.E2E_FACULTY_EMAIL }}
+          E2E_FACULTY_PASSWORD: ${{ steps.secrets.outputs.E2E_FACULTY_PASSWORD }}
