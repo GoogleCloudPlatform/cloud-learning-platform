@@ -98,6 +98,7 @@ def save_course_work_collection(course_id, course_work_id, message_id,
   Returns:
     _type_: _description_
   """
+  notification_message = None
   try:
     course_work = get_course_work(course_id=course_id,
                                   course_work_id=course_work_id)
@@ -114,36 +115,37 @@ def save_course_work_collection(course_id, course_work_id, message_id,
         course_work, "materials")
     course_work["event_type"] = event_type
     course_work["timestamp"] = datetime.datetime.utcnow()
-    return insert_rows_to_bq(rows=[course_work],
-                             dataset=BQ_DATASET,
-                             table_name=BQ_TABLE_DICT["BQ_COLL_CW_TABLE"]), {
-                                 "type": "broadcast",
-                                 "classroom_id": course_id,
-                                 "course_work_id": course_work_id,
-                                 "course_work_title": course_work["title"],
-                                 "course_work_url":
-                                 course_work["alternateLink"],
-                                 "message":
-                                 get_message(event_type, "Assignment")
-                             }
+    if course_work["state"] == "PUBLISHED":
+      notification_message = {
+          "type": "broadcast",
+          "classroom_id": course_id,
+          "course_work_id": course_work_id,
+          "course_work_title": course_work["title"],
+          "course_work_url": course_work["alternateLink"],
+          "message": get_message(event_type, "Assignment")
+      }
+    return insert_rows_to_bq(
+        rows=[course_work],
+        dataset=BQ_DATASET,
+        table_name=BQ_TABLE_DICT["BQ_COLL_CW_TABLE"]), notification_message
   except HttpError as hte:
     Logger.info(hte)
     if hte.status_code == 404:
       course_work_material = get_course_work_material(course_id,
                                                       course_work_id)
       if course_work_material:
-        notification_message = {
-            "type": "broadcast",
-            "classroom_id": course_id,
-            "course_work_id": course_work_id,
-            "course_work_title": course_work_material["title"],
-            "course_work_url": course_work_material["alternateLink"],
-            "message": get_message(event_type, "Material")
-        }
+        if course_work_material["state"] == "PUBLISHED":
+          notification_message = {
+              "type": "broadcast",
+              "classroom_id": course_id,
+              "course_work_id": course_work_id,
+              "course_work_title": course_work_material["title"],
+              "course_work_url": course_work_material["alternateLink"],
+              "message": get_message(event_type, "Material")
+          }
 
         return True, notification_message
-    else:
-      raise HttpError(hte.resp, hte.content, hte.uri) from hte
+    raise HttpError(hte.resp, hte.content, hte.uri) from hte
 
 
 def save_student_submission(course_id, course_work_id, submissions_id,
@@ -191,9 +193,10 @@ def get_student_submission_message(submission):
   Returns:
     dict|None: lms notification message
   """
-  notification_message = None
   if "assignedGrade" not in submission.keys():
     return None
+  notification_message = None
+
   list_of_assigned_datetime = [
       datetime.datetime.strptime(
         x["gradeHistory"]["gradeTimestamp"].split(".")[0],
@@ -204,7 +207,7 @@ def get_student_submission_message(submission):
   ]
   if list_of_assigned_datetime:
     if (datetime.datetime.strptime(
-      submission["updateTime"].split(".")[0],
+        submission["updateTime"].split(".")[0],
         "%Y-%m-%dT%H:%M:%S") == max(list_of_assigned_datetime)):
       course_work = get_course_work(submission["courseId"],
                                     submission["courseWorkId"])
