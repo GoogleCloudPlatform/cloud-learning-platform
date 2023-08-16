@@ -79,6 +79,6 @@ jobs:
           browser: chrome
           record: false
           env: |
-            E2E_TEST_CREDS:"${{toJson(steps.convert_json_to_string_e2e_test_creds.outputs.E2E_TEST_CREDS)}}"
-            E2E_FACULTY_EMAIL:"${{toJson(steps.convert_json_to_string_e2e_faculty_email.outputs.E2E_TEST_CREDS)}}"
-            E2E_FACULTY_PASSWORD:"${{toJson(steps.convert_json_to_string_e2e_faculty_password.outputs.E2E_TEST_CREDS)}}"
+            E2E_TEST_CREDS:${{toJson(steps.convert_json_to_string_e2e_test_creds.outputs.E2E_TEST_CREDS)}}
+            E2E_FACULTY_EMAIL:${{toJson(steps.convert_json_to_string_e2e_faculty_email.outputs.E2E_FACULTY_EMAIL)}}
+            E2E_FACULTY_PASSWORD:${{toJson(steps.convert_json_to_string_e2e_faculty_password.outputs.E2E_FACULTY_PASSWORD)}}
