@@ -67,4 +67,4 @@ jobs:
         browser: chrome
         record: false
         env: |
-          E2E_TEST_CREDS: ${{ toJson(steps.secrets.outputs.E2E_TEST_CREDS) }}
+          E2E_TEST_CREDS:"${{toJson(steps.secrets.outputs.E2E_TEST_CREDS)}}""
