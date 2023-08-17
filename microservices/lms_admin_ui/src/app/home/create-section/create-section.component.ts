@@ -29,7 +29,6 @@ export class CreateSectionComponent implements OnInit {
     private _snackBar: MatSnackBar, private _HomeService: HomeService) { }
 
   ngOnInit(): void {
-    console.log('required det', this.requiredDetails)
     if (this.requiredDetails.mode == 'Create') {
       this.addSectionForm = this.fb.group({
         section_name: this.fb.control('', [Validators.required]),
@@ -63,7 +62,6 @@ export class CreateSectionComponent implements OnInit {
 
   //   // Add our fruit
   //   if (value) {
-  //     console.log(value)
   //     this.teachingStaff.push(value);
   //   }
 
@@ -104,7 +102,6 @@ export class CreateSectionComponent implements OnInit {
     
 
     if (this.requiredDetails.mode == 'Edit') {
-      console.log('sec obj', sectionObj)
       // this.requiredDetails.extra_data.instructional_desiner ? tempTeacherList.push(this.requiredDetails.extra_data.instructional_desiner) : tempTeacherList.push(this.requiredDetails.init_data.instructional_desiner)
       sectionObj['section_name'] = this.addSectionForm.value.section_name.trim()
       sectionObj['max_students'] = this.addSectionForm.value.max_students
@@ -151,7 +148,6 @@ export class CreateSectionComponent implements OnInit {
         this.showProgressSpinner = false
         
       })
-      console.log('final obj', sectionObj)
     }
   }
 
@@ -165,7 +161,6 @@ export class CreateSectionComponent implements OnInit {
     
 
     if (this.requiredDetails.mode == 'Edit') {
-      console.log('sec obj', sectionObj)
       // this.requiredDetails.extra_data.instructional_desiner ? tempTeacherList.push(this.requiredDetails.extra_data.instructional_desiner) : tempTeacherList.push(this.requiredDetails.init_data.instructional_desiner)
       sectionObj['section_name'] = this.addSectionForm.value.section_name.trim()
       sectionObj['max_students'] = this.addSectionForm.value.max_students
@@ -212,7 +207,6 @@ export class CreateSectionComponent implements OnInit {
         this.showProgressSpinnerAlpha = false
         
       })
-      console.log('final obj', sectionObj)
     }
   }
 

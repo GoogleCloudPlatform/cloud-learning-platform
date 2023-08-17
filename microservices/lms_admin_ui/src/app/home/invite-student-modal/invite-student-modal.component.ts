@@ -16,7 +16,6 @@ export class InviteStudentModalComponent implements OnInit {
   constructor(public dialog: MatDialog, public dialogRef: MatDialogRef<InviteStudentModalComponent>, private fb: UntypedFormBuilder,
     private _snackBar: MatSnackBar, private _HomeService: HomeService, @Inject(MAT_DIALOG_DATA) public InviteStudentModalData: any) { }
   ngOnInit(): void {
-    console.log("data ", this.InviteStudentModalData)
     if (this.InviteStudentModalData.mode == 'Cohort') {
       this.inviteStudentForm = this.fb.group({
         cohortName: this.fb.control({ value: this.InviteStudentModalData.init_data.name, disabled: true }, [Validators.required]),
@@ -33,7 +32,6 @@ export class InviteStudentModalComponent implements OnInit {
   }
 
   inviteStudent(): void {
-    console.log(this.inviteStudentForm.value.studentEmail)
     if (this.InviteStudentModalData.mode == 'Cohort') {
       this.showProgressSpinner = true
       this._HomeService.inviteInCohort(this.InviteStudentModalData.init_data.id, this.inviteStudentForm.value.studentEmail).subscribe((res: any) => {
@@ -54,7 +52,6 @@ export class InviteStudentModalComponent implements OnInit {
       })
     }
     else {
-      console.log(this.InviteStudentModalData)
       this.showProgressSpinner = true
       this._HomeService.inviteInSection(this.InviteStudentModalData.init_data.section_id, this.inviteStudentForm.value.studentEmail).subscribe((res: any) => {
         if (res.success == true) {

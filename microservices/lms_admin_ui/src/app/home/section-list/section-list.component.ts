@@ -27,6 +27,5 @@ export class SectionListComponent implements OnInit {
 return 'section-'+status+'-chip'
   }
   onChipClick(){
-    console.log('chip click')
   }
 }

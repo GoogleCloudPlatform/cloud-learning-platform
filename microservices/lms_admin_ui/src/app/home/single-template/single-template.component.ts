@@ -72,7 +72,6 @@ this.instructionalDesignerList=res.data
       (res: any) => {
         this.loadCard = true
         this.courseTemplateDetails = res
-        console.log('course template', this.courseTemplateDetails)
       }
     )
   }
@@ -82,7 +81,6 @@ this.instructionalDesignerList=res.data
       (res: any) => {
         this.loadTable = true
         this.ltiAssignments = res.data
-        console.log('this.ltiAssignments', this.ltiAssignments)
       }
     )
   }
@@ -103,7 +101,6 @@ this.instructionalDesignerList=res.data
     });
     
     dialogRef.afterClosed().subscribe(result => {
-      console.log("result", result)
       if (result?.data == "success") {
         this.fetchLtiAssignments(courseTemplateId)
       }
@@ -126,7 +123,6 @@ this.instructionalDesignerList=res.data
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log("result", result)
       if (result?.data == "success") {
         this.fetchLtiAssignments(courseTemplateId)
       }
@@ -144,13 +140,10 @@ this.instructionalDesignerList=res.data
       if (result.data == "success") {
         this.fetchLtiAssignments(courseTemplateId)
       }
-      console.log("result", result)
     });
-    console.log(id)
   }
 
   openViewAssignmentsDialog(id, data): void {
-    console.log("id", id)
     let ltiModalData = {}
     ltiModalData['mode'] = 'View'
     ltiModalData['init_data'] = ''
@@ -164,12 +157,10 @@ this.instructionalDesignerList=res.data
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log("result", result)
     });
   }
 
   openAddOrEditIdTemplate(){
-    console.log(this.courseTemplateDetails)
     let idData: LooseObject = {}
     idData['course_template_name'] = this.courseTemplateDetails.name
     idData['course_template_id'] = this.courseTemplateDetails.id

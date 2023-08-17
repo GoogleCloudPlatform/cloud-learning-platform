@@ -22,7 +22,6 @@ export class CourseTemplateComponent implements OnInit {
   }
   selectedCourseTemplate: any
   ngOnInit(): void {
-    console.log('list', this.courseTemplateList)
 this.callToGetId()
   }
 
@@ -74,7 +73,6 @@ this.callToGetId()
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log(result)
       if (result.data == 'success') {
       }
     });
@@ -112,7 +110,6 @@ this.callToGetId()
     //   return res.data[0]['email']
     // })
     this.apiCall = this.apiCall+1
-    console.log(course_template_id, this.apiCall)
     return course_template_id
   }
 
