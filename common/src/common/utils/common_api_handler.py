@@ -51,7 +51,7 @@ class CommonAPIHandler:
               existing_doc_object_dict[field][key]
     # Creating a versioned doc
     versioned_doc = collection()
-    versioned_doc = versioned_doc.from_dict(existing_doc_object_dict)
+    versioned_doc = versioned_doc.from_dict(request_body)
 
     # Code to find the correct version number
     collection_manager = collection.collection
@@ -68,6 +68,7 @@ class CommonAPIHandler:
     for key, value in request_body.items():
       if value is not None:
         setattr(versioned_doc, key, value)
+    versioned_doc.uuid = ""
     versioned_doc.save()
     versioned_doc.uuid = versioned_doc.id
     versioned_doc.update()

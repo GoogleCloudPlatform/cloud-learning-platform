@@ -49,7 +49,6 @@ export class HomeComponent implements OnInit {
   }
   handleCohortPageEvent(e: PageEvent) {
     this.pageEvent = e;
-    console.log(this.pageEvent)
 
     if (this.pageEvent.pageSize != this.cohortPageSize) {
       this.cohortSkip = 0
@@ -69,14 +68,12 @@ export class HomeComponent implements OnInit {
 
       }
     }
-    console.log("skip ", this.cohortSkip, 'limit ', this.cohortLimit)
     this.getCohortList()
   }
 
 
   handleCourseTemplatePageEvent(e: PageEvent) {
     this.pageEvent = e;
-    console.log(this.pageEvent)
 
     if (this.pageEvent.pageSize != this.courseTemplatePageSize) {
       this.courseTemplateSkip = 0
@@ -100,14 +97,12 @@ export class HomeComponent implements OnInit {
 
       }
     }
-    console.log("skip ", this.courseTemplateSkip, 'limit ', this.courseTemplateLimit)
     this.getCourseTemplateList()
   }
 
 
   handleSectionPageEvent(e: PageEvent) {
     this.pageEvent = e;
-    console.log(this.pageEvent)
 
     if (this.pageEvent.pageSize != this.sectionPageSize) {
       this.sectionSkip = 0
@@ -126,7 +121,6 @@ export class HomeComponent implements OnInit {
 
       }
     }
-    console.log("skip ", this.sectionSkip, 'limit ', this.sectionLimit)
     this.getAllSectionsList()
   }
 
@@ -204,7 +198,6 @@ for (let x of res.course_template_list){
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log(result)
       if (result.data == 'success') {
         this.getCourseTemplateList()
       }
@@ -237,7 +230,6 @@ export class CourseTemplateDetailsDialog {
     public dialogRef: MatDialogRef<CourseTemplateDetailsDialog>,
     @Inject(MAT_DIALOG_DATA) public CourseTemplateDetailsDialogData: any
   ) {
-    console.log('dialog data',CourseTemplateDetailsDialogData)
    }
 
   close(): void {

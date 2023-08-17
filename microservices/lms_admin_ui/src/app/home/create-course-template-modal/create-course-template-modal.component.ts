@@ -19,7 +19,6 @@ export class CreateCourseTemplateModalComponent implements OnInit {
     private _snackBar: MatSnackBar, private _HomeService: HomeService, @Inject(MAT_DIALOG_DATA) public courseTemplateModalData: any) { }
 
   ngOnInit(): void {
-    console.log("data ", this.courseTemplateModalData)
     if (this.courseTemplateModalData.mode == 'Create') {
       this.courseTemplateForm = this.fb.group({
         name: this.fb.control({ value: this.courseTemplateModalData.init_data.name, disabled: false }, [Validators.required]),

@@ -32,7 +32,6 @@ export class CreateAssignmentComponent {
     private fb: FormBuilder, private homeService: HomeService, private ltiService: LtiService, private authService: AuthService) { }
 
   ngOnInit() {
-    console.log('dialog data', this.dialogData)
     this.ltiService.getToolsList().subscribe((res: any) => {
       this.toolsList = res.data
       if (this.dialogData.mode == "Create") {
@@ -127,7 +126,6 @@ export class CreateAssignmentComponent {
     if (this.dialogData.mode == "Create") {
       this.homeService.postLtiAssignments({ ...data, context_type: context_type, context_id: this.dialogData.extra_data.contextId }).subscribe((response: any) => {
         if (response.success == true) {
-          console.log("response", response)
           this.dialogRef.close({ data: 'success' })
         }
         else {
@@ -136,9 +134,7 @@ export class CreateAssignmentComponent {
         this.showProgressSpinner = false
       })
     } else {
-      console.log("this.dialogData.extra_data", this.dialogData.extra_data)
       this.homeService.updateLtiAssignments(this.dialogData.extra_data.assignment.id, data).subscribe((response: any) => {
-        console.log("response", response)
         if (response.success == true) {
           this.dialogRef.close({ data: 'success' })
         }
@@ -207,7 +203,6 @@ export class CreateAssignmentComponent {
         if (result.data) {
           this.ltiAssignmentForm.get("lti_content_item_id").setValue(result.data.response[0].content_item_id)
         }
-        console.log("result", result)
       });
     }
     else {
