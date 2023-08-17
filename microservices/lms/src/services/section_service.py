@@ -1288,11 +1288,11 @@ def copy_lti_shim_assignment(link, lti_assignment_details, logs):
   return final_resp
 
 def post_null_value_background_task(section_details,coursework_id_details,lms_job_id):
+  """Post null grade for a courseworkid
+  """
+  lms_job = LmsJob.find_by_id(lms_job_id)
+  logs = lms_job.logs
   try:
-    lms_job = LmsJob.find_by_id(lms_job_id)
-    logs = lms_job.logs
-    lms_job.section_id = section_details.id
-    lms_job.classroom_id = section_details.classroom_id
     lms_job.start_time = datetime.datetime.utcnow()
     lms_job.status = "running"
     lms_job.update()
@@ -1300,7 +1300,7 @@ def post_null_value_background_task(section_details,coursework_id_details,lms_jo
         (section_details.classroom_id,coursework_id_details)
     for student in classroom_submissions:
       if student.get("assignedGrade") is None:
-          classroom_crud.post_grade_of_the_user\
+        classroom_crud.post_grade_of_the_user\
           (section_details.id,coursework_id_details,student["id"],0,0)
     lms_job.end_time = datetime.datetime.utcnow()
     lms_job.status = "success"

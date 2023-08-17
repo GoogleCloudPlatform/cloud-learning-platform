@@ -1032,7 +1032,9 @@ def post_null_value(section_id: str,
         "logs": {
             "info": [],
             "errors": []
-        }
+        },
+        "section_id" : section_id,
+        "classroom_id" : section.classroom_id
     }
 
     lms_job = LmsJob.from_dict(lms_job_input)
@@ -1052,7 +1054,8 @@ def post_null_value(section_id: str,
 
     return {
         "success": True,
-        "message": "Null grade will be given to ungraded students for the coursework, " +
+        "message": "Null grade will be given to ungraded students for\
+            the coursework, " +
                     f"use this job id - '{lms_job.id}' for more info",
         "data": None
     }
