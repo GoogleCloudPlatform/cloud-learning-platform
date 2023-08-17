@@ -61,17 +61,11 @@ jobs:
 
       - name: Convert JSON to String E2E_TEST_CREDS
         id: convert_json_to_string_e2e_test_creds
-        run: |
-          echo ${{ toJson(steps.secrets.outputs.E2E_TEST_CREDS) }} | sed 's/ //g'
-          echo '${{ toJson(steps.secrets.outputs.E2E_TEST_CREDS) }}' | jq -c -r .
-          echo "::set-output name=E2E_TEST_CREDS::$(echo '${{ toJson(steps.secrets.outputs.E2E_TEST_CREDS) }}' | jq -c -r .)"
+        run: echo "::set-output name=E2E_TEST_CREDS::$(echo '${{ toJson(steps.secrets.outputs.E2E_TEST_CREDS) }}' | jq -c -r .)"
 
       - name: Convert JSON to String E2E_FACULTY_EMAIL
         id: convert_json_to_string_e2e_faculty_email
-        run: |
-          echo ${{ toJson(steps.secrets.outputs.E2E_FACULTY_EMAIL) }} | sed 's/ //g'
-          echo '${{ toJson(steps.secrets.outputs.E2E_FACULTY_EMAIL) }}' | jq -c -r .
-          echo "::set-output name=E2E_FACULTY_EMAIL::$(echo '${{ toJson(steps.secrets.outputs.E2E_FACULTY_EMAIL) }}' | jq -c -r .)"
+        run: echo "::set-output name=E2E_FACULTY_EMAIL::$(echo '${{ toJson(steps.secrets.outputs.E2E_FACULTY_EMAIL) }}' | jq -c -r .)"
 
       - name: Convert JSON to String E2E_FACULTY_PASSWORD
         id: convert_json_to_string_e2e_faculty_password
@@ -85,6 +79,5 @@ jobs:
           browser: chrome
           record: false
           env: |
-            E2E_TEST_CREDS:${{steps.convert_json_to_string_e2e_test_creds.outputs.E2E_TEST_CREDS}}
             E2E_FACULTY_EMAIL:${{steps.convert_json_to_string_e2e_faculty_email.outputs.E2E_FACULTY_EMAIL}}
             E2E_FACULTY_PASSWORD:${{steps.convert_json_to_string_e2e_faculty_password.outputs.E2E_FACULTY_PASSWORD}}
