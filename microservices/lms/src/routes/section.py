@@ -1,5 +1,4 @@
 """ Section endpoints """
-import sys
 import traceback
 import datetime
 from common.models import Cohort, CourseTemplate, Section, LmsJob, CourseEnrollmentMapping
@@ -1026,11 +1025,10 @@ def post_null_value(section_id: str,
   """
   try:
     section = Section.find_by_id(section_id)
-    sys.stdout.flush()
     lms_job_input = {
         "job_type": "post null grade",
         "status": "ready",
-        "input_data": {'section_id':section_id,'coursework_id':coursework_id},
+        "input_data": {"section_id":section_id,"coursework_id":coursework_id},
         "logs": {
             "info": [],
             "errors": []
@@ -1044,8 +1042,7 @@ def post_null_value(section_id: str,
         post_null_value_background_task,
         section_details=section,
         coursework_id_details=coursework_id,
-        lms_job_id=lms_job.id,
-        message="Create section background task completed")
+        lms_job_id=lms_job.id)
     info_msg = f"Background Task called for the section id {section_id}\
                  with section name {section.name}"
     Logger.info(info_msg)
@@ -1059,13 +1056,14 @@ def post_null_value(section_id: str,
                     f"use this job id - '{lms_job.id}' for more info",
         "data": None
     }
-  
+
   except ResourceNotFoundException as err:
     Logger.error(err)
     raise ResourceNotFound(str(err)) from err
   except Conflict as conflict:
     Logger.error(conflict)
-    err = traceback.format_exc().replace("\n", " ")
+    err = traceback.format_exc().replace\
+      ("\n", " ")
     Logger.error(err)
     raise Conflict(str(conflict)) from conflict
   except HttpError as ae:

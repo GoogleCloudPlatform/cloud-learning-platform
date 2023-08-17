@@ -1,5 +1,4 @@
 """Section API services"""
-import sys
 import traceback
 import datetime
 import time
@@ -1288,7 +1287,7 @@ def copy_lti_shim_assignment(link, lti_assignment_details, logs):
   final_resp["logs"] = logs
   return final_resp
 
-def post_null_value_background_task(section_details,coursework_id_details,lms_job_id,message=""):
+def post_null_value_background_task(section_details,coursework_id_details,lms_job_id):
   try:
     lms_job = LmsJob.find_by_id(lms_job_id)
     logs = lms_job.logs
@@ -1300,9 +1299,9 @@ def post_null_value_background_task(section_details,coursework_id_details,lms_jo
     classroom_submissions = classroom_crud.list_coursework_submissions\
         (section_details.classroom_id,coursework_id_details)
     for student in classroom_submissions:
-          if student.get("assignedGrade") is None:
-            classroom_crud.post_grade_of_the_user\
-              (section_details.id,coursework_id_details,student["id"],0,0)
+      if student.get("assignedGrade") is None:
+          classroom_crud.post_grade_of_the_user\
+          (section_details.id,coursework_id_details,student["id"],0,0)
     lms_job.end_time = datetime.datetime.utcnow()
     lms_job.status = "success"
     lms_job.update()
@@ -1311,7 +1310,6 @@ def post_null_value_background_task(section_details,coursework_id_details,lms_jo
     Logger.error(f"Post null grade failed due to error - {str(e)}")
     error = traceback.format_exc().replace("\n", " ")
     Logger.error(f"Traceback - {error}")
-
     logs["errors"].append(f"Post null grade failed due to error - {str(e)}")
     lms_job.end_time = datetime.datetime.utcnow()
     lms_job.logs = logs
