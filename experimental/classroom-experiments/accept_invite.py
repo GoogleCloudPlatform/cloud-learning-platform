@@ -6,25 +6,10 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-# SCOPES = [
-#     'https://www.googleapis.com/auth/classroom.rosters',
-#     "https://www.googleapis.com/auth/userinfo.email",
-#     "https://www.googleapis.com/auth/userinfo.profile",
-#     # 'https://www.googleapis.com/auth/classroom.courses',
-# ]
-
-SCOPES =[
-"https://www.googleapis.com/auth/classroom.rosters", 
-"https://www.googleapis.com/auth/userinfo.email",
-"https://www.googleapis.com/auth/userinfo.profile",
-"openid",
-"https://www.googleapis.com/auth/classroom.coursework.me",
-"https://www.googleapis.com/auth/classroom.courses",
-"https://www.googleapis.com/auth/classroom.coursework.students",
-"https://www.googleapis.com/auth/classroom.courseworkmaterials",
-"https://www.googleapis.com/auth/classroom.topics"
+SCOPES = [
+    'https://www.googleapis.com/auth/classroom.rosters',
+    # 'https://www.googleapis.com/auth/classroom.courses'
 ]
-os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 
 def list_courses(creds):
@@ -64,18 +49,16 @@ def get_creds():
     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
 
   # If there are no (valid) credentials available, let the user log in.
-  # if not creds or not creds.valid:
-  #   if creds and creds.expired and creds.refresh_token:
-  #     creds.refresh(Request())
-  #   else:
-  flow = InstalledAppFlow.from_client_secrets_file('credentials.json',
-                                                    SCOPES)
-  creds = flow.run_local_server(port=3008)
-  # Save the credentials for the next run
-  print("Creds Generated success")
-  print(creds.to_json())
-  with open('token.json', 'w') as token:
-    token.write(creds.to_json())
+  if not creds or not creds.valid:
+    if creds and creds.expired and creds.refresh_token:
+      creds.refresh(Request())
+    else:
+      flow = InstalledAppFlow.from_client_secrets_file('credentials.json',
+                                                       SCOPES)
+      creds = flow.run_local_server(port=3008)
+    # Save the credentials for the next run
+    with open('token.json', 'w') as token:
+      token.write(creds.to_json())
 
   return creds
 
@@ -102,8 +85,7 @@ def add_student(creds):
 def main():
   creds = get_creds()
   # accept_invite(creds)
-  # add_student(creds)
-  print(creds.to_json())
+  add_student(creds)
 
 
 if __name__ == "__main__":
