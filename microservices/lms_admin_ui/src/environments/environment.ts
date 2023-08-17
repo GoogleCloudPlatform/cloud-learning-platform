@@ -9,11 +9,11 @@ export const environment = {
   classroomShimUrl: 'http://localhost:4200/classroom-shim/api/v1/',
   auth_apiUrl: 'http://localhost:4200/authentication/api/v1/',
   firebase: {
-    apiKey: "AIzaSyC7ZF4D98P6woFEYCeIpdFSY4S73btYA7Y",
-    authDomain: "core-learning-services-dev.firebaseapp.com",
-    projectId: "core-learning-services-dev",
-    storageBucket: "core-learning-services-dev.appspot.com",
-    appId: "1:142865211726:web:4a5a50aa0173200602be1f",
+    apiKey: "*********",
+    authDomain: "***********",
+    projectId: "***************",
+    storageBucket: "******************",
+    appId: "*********************",
   }
 };
 

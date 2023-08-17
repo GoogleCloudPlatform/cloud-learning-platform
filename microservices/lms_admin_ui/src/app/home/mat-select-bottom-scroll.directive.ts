@@ -32,7 +32,6 @@ export class MatSelectScrollBottomDirective implements OnDestroy {
         takeUntil(this.unsubscribeAll)
       )
       .subscribe((event: any) => {
-        // console.log(event, event.target.scrollTop, event.target.scrollHeight);
         if (
           event.target.scrollTop >=
           event.target.scrollHeight -

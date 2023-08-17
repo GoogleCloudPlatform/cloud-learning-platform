@@ -33,7 +33,6 @@ export class AuthService {
         if (user) {
           localStorage.setItem('userEmail', user.email)
           user.getIdToken().then(idToken => {
-            console.log('id token', idToken)
             localStorage.setItem('idToken', idToken)
             if (idToken) {
               this.router.navigate(['/home'])
@@ -75,8 +74,6 @@ export class AuthService {
 
   async emaiAndPasswordSignIn(email: string, password: string) {
     const credential = await this.afAuth.signInWithEmailAndPassword(email, password)
-    console.log("credential", credential)
-    console.log('user', credential.user.displayName)
     localStorage.setItem('user', credential.user.displayName)
     localStorage.setItem('userEmail', credential.user.email)
     this.setUserId(credential.user.email)
@@ -86,7 +83,6 @@ export class AuthService {
       // this.openFailureSnackBar('idToken :' +idToken, 'Close')
 
       this.validate().subscribe((res: any) => {
-        // console.log(res)
         if (res.success == true) {
           if (idToken) {
             this.router.navigate(['/home'])
@@ -102,7 +98,6 @@ export class AuthService {
 
     })
       .catch(error => {
-        console.log('Something is wrong:', error.message);
       });
   }
 

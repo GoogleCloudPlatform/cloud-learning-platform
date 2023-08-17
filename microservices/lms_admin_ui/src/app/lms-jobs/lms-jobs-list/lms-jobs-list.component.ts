@@ -52,7 +52,6 @@ export class LmsJobsListComponent {
         this.jobLimit = this.paginator.pageSize
       }
     }
-    console.log("skip ", this.jobSkip, 'limit ', this.jobLimit)
     this.fetchJobs()
   }
 
@@ -66,7 +65,6 @@ export class LmsJobsListComponent {
         this.lmsJobsData = response.data
       }
       else {
-        console.log("response", response?.message)
       }
     })
   }
@@ -85,7 +83,6 @@ export class LmsJobsListComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log("result", result)
     });
   }
 
@@ -103,7 +100,6 @@ export class LmsJobsListComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log("result", result)
     });
   }
 

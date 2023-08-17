@@ -34,7 +34,6 @@ export class ToolsListComponent {
         this.isLoadingData = false
       }, 100);
       this.ltiToolsData = response.data
-      console.log(this.ltiToolsData)
     })
   }
 
@@ -55,12 +54,10 @@ export class ToolsListComponent {
       if (result.data == "success") {
         this.fetchLtiTools()
       }
-      console.log("result", result)
     });
   }
 
   openUpdateToolDialog(id, data): void {
-    console.log("id", id)
     let ltiModalData: LooseObject = {}
     ltiModalData['mode'] = 'Update'
     ltiModalData['init_data'] = ''
@@ -77,12 +74,10 @@ export class ToolsListComponent {
       if (result.data == "success") {
         this.fetchLtiTools()
       }
-      console.log("result", result)
     });
   }
 
   openViewToolDialog(id, data): void {
-    console.log("id", id)
     let ltiModalData: LooseObject = {}
     ltiModalData['mode'] = 'View'
     ltiModalData['init_data'] = ''
@@ -96,7 +91,6 @@ export class ToolsListComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log("result", result)
     });
   }
 
@@ -110,9 +104,7 @@ export class ToolsListComponent {
       if (result.data == "success") {
         this.fetchLtiTools()
       }
-      console.log("result", result)
     });
-    console.log(id)
   }
 }
 
