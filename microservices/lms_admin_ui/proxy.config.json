@@ -24,30 +24,3 @@
         "changeOrigin": true
     }
 }
-
-// {
-//     "/lms/api/v1/*": {
-//         "target": "https://core-learning-services-dev.cloudpssolutions.com",
-//         "secure": false,
-//         "logLevel": "debug",
-//         "changeOrigin": true
-//     },
-//     "/lti/api/v1/*": {
-//         "target": "https://core-learning-services-dev.cloudpssolutions.com",
-//         "secure": false,
-//         "logLevel": "debug",
-//         "changeOrigin": true
-//     },
-//     "/classroom-shim/api/v1/*": {
-//         "target": "https://core-learning-services-dev.cloudpssolutions.com",
-//         "secure": false,
-//         "logLevel": "debug",
-//         "changeOrigin": true
-//     },
-//     "/authentication/api/v1/*": {
-//         "target": "https://core-learning-services-dev.cloudpssolutions.com",
-//         "secure": false,
-//         "logLevel": "debug",
-//         "changeOrigin": true
-//     }
-// }

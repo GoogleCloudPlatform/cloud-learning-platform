@@ -22,7 +22,6 @@ export class ErrorInterceptor implements HttpInterceptor {
       let errorMsg = '';
       let errorObj = {}
       if (error.error instanceof ErrorEvent) {
-        console.log('This is client side error');
         errorMsg = `Error: ${error.error.message}`;
       } else {
         if (error.status == 401) {

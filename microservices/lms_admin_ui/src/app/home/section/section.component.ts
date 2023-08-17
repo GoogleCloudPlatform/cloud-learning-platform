@@ -89,7 +89,6 @@ export class SectionComponent implements OnInit,OnDestroy {
 
   ngOnInit(): void {
     let id
-    console.log(this.router.url)
     id = this.router.url.split('/')[2]
     this.getCohortDetails(id)
   }
@@ -99,7 +98,6 @@ export class SectionComponent implements OnInit,OnDestroy {
     this.loadSection = true
     this._HomeService.getCohort(id).subscribe((res: any) => {
       this.cohortDetails = res
-      console.log('cohort details', this.cohortDetails)
       this.getCourseTemplateDetails(res.course_template.split('/')[1])
       this.getInstructionalDesignerDetails(res.course_template.split('/')[1])
     })
@@ -108,7 +106,6 @@ export class SectionComponent implements OnInit,OnDestroy {
     this._HomeService.getCourseTemplate(id).subscribe((res: any) => {
       this.courseTemplateDetails = res
       this.loadCard = false
-      console.log('course template', this.courseTemplateDetails)
       this.getSectionList(this.cohortDetails.id)
     })
   }
@@ -147,9 +144,7 @@ this.instructionalDesignerList=res.data
       this.sectionDetails = res.data
       if (this.sectionDetails.length > 0) {
         if (location.pathname.split('/' )[3]) {
-          console.log('if router url split',this.router.url.split('/'))
           this.selectedSection = this.sectionDetails.find(o => o.id == location.pathname.split('/')[3])
-          console.log('selected sec', this.selectedSection )
         }
         else {
           this.selectedSection = this.sectionDetails[0]
@@ -157,7 +152,6 @@ this.instructionalDesignerList=res.data
         this.createTableData()
       }
       this.loadSection = false
-      // console.log('section', this.sectionDetails)
     })
   }
   
@@ -174,11 +168,8 @@ this.instructionalDesignerList=res.data
   
   getLtiAssignmentsDetails(){
     this.ltiAssignmentTableLoader=true
-    console.log("URL for lti ",this._HomeService.getLtiAssignments)
     this._HomeService.getLtiAssignments(this.selectedSection.id).subscribe((res:any)=>{
-      console.log("Resi;t ->",res.data)
       this.ltiAssignmentsTableData = res.data
-      console.log("ltiAssignmentData ->",this.ltiAssignmentsTableData)
       this.ltiAssignmentTableLoader=false
     },
     (err:any)=>{
@@ -193,7 +184,6 @@ transformCourseworkTableData(data:any){
     x['status'] = 'import'
     this.courseworkTable.push(x)
   }
-  console.log('coursework',this.courseworkTable)
 }
 
   openClassroom() {
@@ -208,7 +198,6 @@ transformCourseworkTableData(data:any){
     this.getStudentListSub=this._HomeService.getStudentsInSection(this.selectedSection.id).subscribe((res: any) => {
       this.studentTableData = []
       this.studentTableData = res.data
-      console.log('student data', this.studentTableData)
       this.studentTableLoader = false
     },
     (err:any)=>{
@@ -233,7 +222,6 @@ transformCourseworkTableData(data:any){
       this.teacherTableData.push(staffObj)
     }
 
-      console.log('teacher data', this.teacherTableData)
       this.teacherTableLoader = false
     },
     (err:any)=>{
@@ -243,7 +231,6 @@ transformCourseworkTableData(data:any){
   }
 
   updateUrl(url: string) {
-    console.log('path',location.pathname)
     let pathArr = location.pathname.split('/')
     if(pathArr.length == 4){
       pathArr[3] = url
@@ -251,12 +238,10 @@ transformCourseworkTableData(data:any){
     else{
       pathArr.push(url)
     }
-    console.log(pathArr.toString().replace(/,/g,'/'))
     this._location.go(pathArr.toString().replace(/,/g,'/'))
   }
 
   createTableData() {
-    console.log('selected sec', this.selectedSection)
     if(this.importGradesSub){
       this.importGradesSub.unsubscribe();
     }
@@ -381,7 +366,6 @@ transformCourseworkTableData(data:any){
   }
 
   openInviteStudentDialog(){
-    console.log('selected sec',this.selectedSection)
     let tempObj: LooseObject = {}
     tempObj['cohort_name'] = this.cohortDetails.name
     tempObj['section'] = this.selectedSection.section
@@ -419,7 +403,6 @@ transformCourseworkTableData(data:any){
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log("result", result)
       if (result?.data == "success") {
         this.getLtiAssignmentsDetails()
       }
@@ -436,13 +419,10 @@ transformCourseworkTableData(data:any){
       if (result.data == "success") {
         this.getLtiAssignmentsDetails()
       }
-      console.log("result", result)
     });
-    console.log(id)
   }
 
   openViewLtiAssignmentDialog(id, data): void {
-    console.log("id", id)
     let ltiModalData = {}
     ltiModalData['mode'] = 'View'
     ltiModalData['init_data'] = ''
@@ -456,7 +436,6 @@ transformCourseworkTableData(data:any){
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log("result", result)
     });
   }
 
@@ -476,7 +455,6 @@ transformCourseworkTableData(data:any){
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log("result", result)
       if (result?.data == "success") {
         this.getLtiAssignmentsDetails()
       }
@@ -506,7 +484,6 @@ transformCourseworkTableData(data:any){
     }
   }
   callGradeImport(rowNumber:any,courseworkId:string){
-    console.log("row num", rowNumber)
     this.disableCourseworkAction=true
     this.courseworkTable[rowNumber]['status'] = 'loading'
     this.importGradesSub = this._HomeService.gradeImport(this.selectedSection.id,courseworkId).subscribe((res:any)=>{
@@ -539,7 +516,6 @@ transformCourseworkTableData(data:any){
     let sectionTemp:LooseObject={}
     sectionTemp['name'] = this.selectedSection.section
     sectionTemp['id'] = this.selectedSection.id
-    console.log('data sent',sectionTemp)
     const dialogRef = this.dialog.open(addTeacherDialog, {
       width: '500px',
       data: sectionTemp
@@ -610,7 +586,6 @@ export class addTeacherDialog {
   }
 
   addTeacher(){
-    console.log(this.addTeacherForm.value)
     this.showProgressSpinner=true
 this.homeService.addTeacher(this.addTeacherDialogData.id,this.addTeacherForm.value).subscribe((res:any)=>{
 this.showProgressSpinner=false

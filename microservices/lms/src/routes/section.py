@@ -30,6 +30,7 @@ from schemas.section import (
 from schemas.update_section import UpdateSection
 from services.section_service import (copy_course_background_task,
                                 copy_course_background_task_alpha,
+                                post_null_value_background_task,
 update_grades,add_teacher, insert_section_enrollment_to_bq)
 from utils.helper import (convert_section_to_section_model,
                           convert_assignment_to_assignment_model, FEED_TYPES,
@@ -1004,7 +1005,8 @@ f"Cannot update invitation status for{user_ref.email}\
 @router.post("/{section_id}/post_null_value/{coursework_id}",
              response_model=NullGradesResponseModel)
 def post_null_value(section_id: str,
-                    coursework_id:str):
+                    coursework_id:str,
+                    background_tasks: BackgroundTasks):
   """_summary_
 
   Args:
@@ -1023,16 +1025,39 @@ def post_null_value(section_id: str,
   """
   try:
     section = Section.find_by_id(section_id)
-    classroom_submissions = classroom_crud.list_coursework_submissions\
-      (section.classroom_id,coursework_id)
-    for student in classroom_submissions:
-      if student.get("assignedGrade") is None:
-        classroom_crud.post_grade_of_the_user\
-          (section_id,coursework_id,student["id"],0,0)
+    lms_job_input = {
+        "job_type": "post null grade",
+        "status": "ready",
+        "input_data": {"section_id":section_id,"coursework_id":coursework_id},
+        "logs": {
+            "info": [],
+            "errors": []
+        },
+        "section_id" : section_id,
+        "classroom_id" : section.classroom_id
+    }
+
+    lms_job = LmsJob.from_dict(lms_job_input)
+    lms_job.save()
+
+    background_tasks.add_task(
+        post_null_value_background_task,
+        section_details=section,
+        coursework_id_details=coursework_id,
+        lms_job_id=lms_job.id)
+    info_msg = f"Background Task called for the section id {section_id}\
+                 with section name {section.name}"
+    Logger.info(info_msg)
+
+    lms_job.logs["info"].append(info_msg)
+    lms_job.update()
 
     return {
-        "message": f"Successfully provided null grades for section id : \
-          {section_id}, coursework id: {coursework_id}"
+        "success": True,
+        "message": "Null grade will be given to ungraded students for\
+            the coursework, " +
+                    f"use this job id - '{lms_job.id}' for more info",
+        "data": None
     }
 
   except ResourceNotFoundException as err:
@@ -1040,7 +1065,8 @@ def post_null_value(section_id: str,
     raise ResourceNotFound(str(err)) from err
   except Conflict as conflict:
     Logger.error(conflict)
-    err = traceback.format_exc().replace("\n", " ")
+    err = traceback.format_exc().replace\
+      ("\n", " ")
     Logger.error(err)
     raise Conflict(str(conflict)) from conflict
   except HttpError as ae:

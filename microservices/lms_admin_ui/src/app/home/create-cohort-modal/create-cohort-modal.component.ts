@@ -20,10 +20,8 @@ export class CreateCohortModalComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<CreateCohortModalComponent>, @Inject(MAT_DIALOG_DATA) public cohortModalData: any, private fb: UntypedFormBuilder,
     private _snackBar: MatSnackBar, private _HomeService: HomeService) { }
   ngOnInit(): void {
-    console.log("data ", this.cohortModalData)
     if (this.cohortModalData.mode == 'Create') {
       this.getCourseTemplateList()
-      console.log('data', this.cohortModalData)
       this.createCohortForm = this.fb.group({
         name: this.fb.control('', [Validators.required]),
         description: this.fb.control('', [Validators.required]),
@@ -36,7 +34,6 @@ export class CreateCohortModalComponent implements OnInit {
       });
     }
     else {
-      console.log('edit data', this.cohortModalData, this.cohortModalData.init_data.name)
       this.createCohortForm = this.fb.group({
         name: this.fb.control({ value: this.cohortModalData.init_data.name, disabled: false }, [Validators.required]),
         description: this.fb.control({ value: this.cohortModalData.init_data.description, disabled: false }, [Validators.required]),
@@ -69,7 +66,6 @@ export class CreateCohortModalComponent implements OnInit {
       if (res.success == true){
         if(res.course_template_list.length){
           this.courseTemplateList = this.courseTemplateList.concat(res.course_template_list)
-          console.log(this.courseTemplateList.length)
         }else{
           this.noMoreBatch = true
         }
