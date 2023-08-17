@@ -51,25 +51,18 @@
 #         run: |
 #           gcloud components install gke-gcloud-auth-plugin
 
-#       - id: "secrets"
-#         uses: "google-github-actions/get-secretmanager-secrets@v1"
+#       - name: Set up Python
+#         uses: actions/setup-python@v2
 #         with:
-#           secrets: |-
-#             E2E_TEST_CREDS:core-learning-services-dev/e2e_test_email_password
-#             E2E_FACULTY_EMAIL:core-learning-services-dev/org-test-user-1-username
-#             E2E_FACULTY_PASSWORD:core-learning-services-dev/org-test-user-1-password
+#           python-version: 3.x
 
-#       - name: Convert JSON to String E2E_TEST_CREDS
-#         id: convert_json_to_string_e2e_test_creds
-#         run: echo "::set-output name=E2E_TEST_CREDS::$(echo '${{ toJson(steps.secrets.outputs.E2E_TEST_CREDS) }}' | jq -c -r .)"
-
-#       - name: Convert JSON to String E2E_FACULTY_EMAIL
-#         id: convert_json_to_string_e2e_faculty_email
-#         run: echo "::set-output name=E2E_FACULTY_EMAIL::$(echo '${{ toJson(steps.secrets.outputs.E2E_FACULTY_EMAIL) }}' | jq -c -r .)"
-
-#       - name: Convert JSON to String E2E_FACULTY_PASSWORD
-#         id: convert_json_to_string_e2e_faculty_password
-#         run: echo "::set-output name=E2E_FACULTY_PASSWORD::$(echo '${{ toJson(steps.secrets.outputs.E2E_FACULTY_PASSWORD) }}' | jq -c -r .)"
+#       - name: Generate env variables
+#         id: generate-env
+#         run: |
+#           cd experimental/e2e-frontend
+#           python generate_env_vars.py >> $GITHUB_ENV
+#         env:
+#           GITHUB_ENV: $GITHUB_ENV
 
 #       - name: Install & run e2e tests
 #         uses: cypress-io/github-action@v5
