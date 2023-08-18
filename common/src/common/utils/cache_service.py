@@ -2,9 +2,14 @@
 import datetime
 import json
 import redis
-from common.config import REDIS_HOST
+from common.config import MEMORYSTORE_ENABLED
+from common.utils.secrets import get_secret
 
-r = redis.Redis(host=REDIS_HOST, port=6379, db=0)
+if MEMORYSTORE_ENABLED == "true":
+  redis_host = get_secret("redis-host")
+  r = redis.Redis(host=redis_host, port=6379, db=0)
+else:
+  r = redis.Redis(host="redis-master", port=6379, db=0)
 
 
 def json_serial(obj):

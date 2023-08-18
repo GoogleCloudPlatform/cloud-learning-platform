@@ -42,4 +42,4 @@ DEPLOYMENT_NAME = os.getenv("DEPLOYMENT_NAME")
 API_BASE_URL = os.getenv("API_BASE_URL")
 SERVICE_NAME = os.getenv("SERVICE_NAME")
 
-REDIS_HOST = os.environ.get("REDIS_HOST", "redis-master")
+MEMORYSTORE_ENABLED = os.environ.get("MEMORYSTORE_ENABLED", "false")

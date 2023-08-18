@@ -14,6 +14,8 @@
 
 FROM python:3.9.14-slim
 
+ARG MEMORYSTORE_ENABLED
+
 WORKDIR /opt
 
 RUN apt-get update && apt-get -y upgrade && \
