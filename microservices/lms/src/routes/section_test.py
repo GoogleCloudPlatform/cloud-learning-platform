@@ -182,6 +182,52 @@ def test_create_section(client_with_emulator, create_fake_data):
                                     url, json=section_details)
   assert resp.status_code == 202
 
+def test_create_section_alpha(client_with_emulator, create_fake_data):
+  url = BASE_URL + "/sections/alpha/v1"
+  section_details = {
+      "name": "section_20",
+      "description": "This is description",
+      "course_template": create_fake_data["course_template"],
+      "cohort": create_fake_data["cohort"],
+      "max_students":50
+  }
+  with mock.patch("routes.section.classroom_crud.get_course_by_id"):
+    resp = client_with_emulator.post(
+      url, json=section_details)
+  assert resp.status_code == 202
+
+def test_create_section_alpha_course_not_found(client_with_emulator,
+                                        create_fake_data):
+  url = BASE_URL + "/sections/alpha/v1"
+  section_details = {
+      "name": "section_20",
+      "description": "This is description",
+      "course_template": create_fake_data["course_template"],
+      "cohort": create_fake_data["cohort"],
+      "max_students":50
+  }
+
+  with mock.patch("routes.section.classroom_crud.get_course_by_id",
+                  return_value=None):
+    resp = client_with_emulator.post(
+      url, json=section_details)
+  assert resp.status_code == 404
+
+def test_create_section_alpha_template_not_found(client_with_emulator,
+                                        create_fake_data):
+  section_details = {
+      "name": "section_20",
+      "description": "This is description",
+      "course_template": "fake_123",
+      "cohort": create_fake_data["cohort"],
+      "max_students":50
+  }
+  url = BASE_URL + "/sections/alpha/v1"
+  with mock.patch("routes.section.classroom_crud.get_course_by_id",
+                ):
+    resp = client_with_emulator.post(
+      url, json=section_details)
+  assert resp.status_code == 404
 
 def test_create_section_course_template_not_found(client_with_emulator,
                                                   create_fake_data):
