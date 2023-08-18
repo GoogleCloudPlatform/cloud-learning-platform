@@ -75,7 +75,6 @@ env:
   E2E_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr' || 'e2e_pr' }}${{  github.event.pull_request.number }}_
   E2E_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-' }}${{  github.event.pull_request.number }}
   CONTENT_SERVING_BUCKET: core-learning-services-dev-content-serving-bucket
-  MEMORYSTORE_ENABLED: false
 # cookiecutter:raw 
 jobs:
   admin-teacher:
@@ -181,7 +180,7 @@ jobs:
         skaffold run \
         --profile dev \
         --namespace $NAMESPACE \
-        --module backends,redis \
+        --module backends \
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }}
 

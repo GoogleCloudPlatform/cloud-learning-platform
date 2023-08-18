@@ -60,8 +60,6 @@ profiles:
         cacheFrom:
           - gcr.io/core-learning-services-dev/common
           - gcr.io/core-learning-services-dev/common:latest
-        buildArgs:
-          MEMORYSTORE_ENABLED: "{{.MEMORYSTORE_ENABLED}}"
       sync:
         infer:
           - '**/*.py'

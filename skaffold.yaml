@@ -122,16 +122,3 @@ requires:
 
 build:
   googleCloudBuild: {}
-
----
-# Master Skaffold for Redis
-apiVersion: skaffold/v2beta12
-kind: Config
-metadata:
-  name: redis-helm
-requires:
-- path: ./microservices/redis
-  configs: [redis]
-
-build:
-  googleCloudBuild: {}

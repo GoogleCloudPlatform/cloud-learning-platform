@@ -52,11 +52,8 @@ spec:
           value: authentication
         - name: COLLECTION
           value: users
-        - name: MEMORYSTORE_ENABLED
-          valueFrom:
-            configMapKeyRef:
-              name: env-vars
-              key: MEMORYSTORE_ENABLED
+        - name: REDIS_HOST
+          value: redis-master
         - name: FIREBASE_API_KEY # value to be added/removed later
           valueFrom:
             configMapKeyRef:
