@@ -36,12 +36,11 @@ def get_data():
   e2e_test_credentials = get_e2e_test_user()
   e2e_faculty_email = faculty_credentials.get("email")
   e2e_faculty_password = faculty_credentials.get("password")
+  return f"""
+      export E2E_TEST_CREDS={json.dumps(e2e_test_credentials)}
+      export E2E_FACULTY_EMAIL={e2e_faculty_email}
+      export E2E_FACULTY_PASSWORD={e2e_faculty_password}
+  """
 
-  return {
-      "E2E_TEST_CREDS": e2e_test_credentials,
-      "E2E_FACULTY_EMAIL": e2e_faculty_email,
-      "E2E_FACULTY_PASSWORD": e2e_faculty_password,
-  }
 
-
-print(json.dumps(get_data()))
+print(get_data())

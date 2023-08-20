@@ -1,5 +1,5 @@
 describe("Test Honorlock Deeplinking", () => {
-  const e2eUserCreds = Cypress.env("E2E_TEST_CREDS");
+  const e2eUserCreds = JSON.parse(Cypress.env("E2E_TEST_CREDS"));
   const EMAIL = e2eUserCreds.email;
   cy.log("e2eUserCreds", e2eUserCreds);
   const PASSWORD = e2eUserCreds.password;
