@@ -1,4 +1,5 @@
 """ Helper Functions"""
+import json
 import os
 from google.cloud import secretmanager
 
@@ -11,7 +12,7 @@ def get_e2e_test_user():
   user_email_password_secret_name = f"projects/{PROJECT_ID}/secrets/{user_email_password_secret_id}/versions/latest"
   user_email_password_response = client.access_secret_version(
       request={"name": user_email_password_secret_name})
-  return user_email_password_response.payload.data.decode("UTF-8")
+  return json.loads(user_email_password_response.payload.data.decode("UTF-8"))
 
 
 def get_org_test_user():
