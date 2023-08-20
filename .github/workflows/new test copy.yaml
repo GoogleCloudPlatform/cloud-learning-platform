@@ -70,7 +70,7 @@ jobs:
         run: |
           cd experimental/e2e-frontend
           python -m pip install --upgrade pip
-          python -m pip install -r e2e/requirements.txt
+          python -m pip install -r requirements.txt
           python generate_env_vars.py >> $GITHUB_ENV
         env:
           GITHUB_ENV: $GITHUB_ENV
