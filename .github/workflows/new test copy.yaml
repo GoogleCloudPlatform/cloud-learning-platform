@@ -73,10 +73,10 @@ jobs:
           python -m pip install -r requirements.txt
           python generate_env_vars.py >> generate_env_vars.sh
           source generate_env_vars.sh
-          echo "E2E_TEST_EMAIL=$E2E_TEST_EMAIL" >> "$GITHUB_ENV"
-          echo "E2E_TEST_PASSWORD=$E2E_TEST_PASSWORD" >> "$GITHUB_ENV"
-          echo "E2E_FACULTY_EMAIL=$E2E_FACULTY_EMAIL" >> "$GITHUB_ENV"
-          echo "E2E_FACULTY_PASSWORD=$E2E_FACULTY_PASSWORD" >> "$GITHUB_ENV"
+          echo "E2E_TEST_EMAIL=$E2E_TEST_EMAIL" >> $GITHUB_ENV
+          echo "E2E_TEST_PASSWORD=$E2E_TEST_PASSWORD" >> $GITHUB_ENV
+          echo "E2E_FACULTY_EMAIL=$E2E_FACULTY_EMAIL" >> $GITHUB_ENV
+          echo "E2E_FACULTY_PASSWORD=$E2E_FACULTY_PASSWORD" >> $GITHUB_ENV
           echo "E2E_TEST_EMAIL=$E2E_TEST_EMAIL"
           echo "E2E_TEST_PASSWORD=$E2E_TEST_PASSWORD"
           echo "E2E_FACULTY_EMAIL=$E2E_FACULTY_EMAIL"
