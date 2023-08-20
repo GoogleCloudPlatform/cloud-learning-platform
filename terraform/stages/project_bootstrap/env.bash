@@ -18,27 +18,19 @@
 
 # TODO: Set Project ID and other variables
 export PROJECT_ID=<your-project-id>
-export DOMAIN_NAME=<your-org-domain>
 export REGION=<your-region>
 export ZONE=<your-zone>
 export PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format="value(projectNumber)")
-export BILLING_ACCOUNT="$(gcloud beta billing projects describe ${PROJECT_ID} | grep billingAccountName \
-    | tr / ' ' | cut -f3 -d' ')"
 
 echo
 echo "PROJECT_ID      = ${PROJECT_ID}"
 echo "PROJECT_NUMBER  = ${PROJECT_NUMBER}"
-echo "BILLING_ACCOUNT = ${BILLING_ACCOUNT}"
 echo "REGION          = ${REGION}"
 echo "ZONE            = ${ZONE}"
-echo "DOMAIN_NAME     = ${DOMAIN_NAME}"
 echo
 
 # Pass variables to terraform using environment prefix TF_VAR_
 export TF_VAR_project_id=${PROJECT_ID}
-export TF_VAR_billing_account=${BILLING_ACCOUNT}
 export TF_VAR_region=${REGION}
 export TF_VAR_zone=${ZONE}
 export TF_VAR_bucket_region_or_multiregion="US"
-export TF_VAR_org_domain_name=${DOMAIN_NAME}
-export TF_VAR_add_project_owner=true

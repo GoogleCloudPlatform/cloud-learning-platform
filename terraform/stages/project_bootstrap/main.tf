@@ -51,21 +51,8 @@ locals {
   ]
 }
 
-data "google_organization" "org" {
-  domain = var.org_domain_name
-}
-
-resource "google_project" "create_new_project" {
-  count           = var.create_new_project ? 1 : 0
-  name            = var.project_id
-  project_id      = var.project_id
-  org_id          = data.google_organization.org.org_id
-  billing_account = var.billing_account
-}
-
 # basic APIs needed to get project up and running
 resource "google_project_service" "project-apis" {
-  depends_on                 = [google_project.create_new_project]
   for_each                   = toset(local.services)
   project                    = var.project_id
   service                    = each.value
@@ -73,7 +60,6 @@ resource "google_project_service" "project-apis" {
 }
 
 resource "google_project_organization_policy" "enable_service_account_keys" {
-  depends_on = [google_project.create_new_project]
   for_each   = toset(local.org_policies_disabled)
   constraint = each.value
   project    = var.project_id
@@ -85,7 +71,6 @@ resource "google_project_organization_policy" "enable_service_account_keys" {
 
 # need external IPs for serving
 resource "google_project_organization_policy" "enable_external_ip" {
-  depends_on = [google_project.create_new_project]
   constraint = "compute.vmExternalIpAccess"
   project    = var.project_id
 
@@ -98,7 +83,6 @@ resource "google_project_organization_policy" "enable_external_ip" {
 
 # Add google.com accounts
 resource "google_project_organization_policy" "allow_member_domains" {
-  depends_on = [google_project.create_new_project]
   constraint = "iam.allowedPolicyMemberDomains"
   project    = var.project_id
 

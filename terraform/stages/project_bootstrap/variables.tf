@@ -13,16 +13,6 @@ variable "zone" {
   description = "GCP Zone"
 }
 
-variable "billing_account" {
-  type        = string
-  description = "The billing account ID of your org"
-}
-
-variable "org_domain_name" {
-  type        = string
-  description = "The domain name provided in your org. For argolis use: YOUR_LDAP.altostrat.com"
-}
-
 variable "bucket_region_or_multiregion" {
   type        = string
   description = "GCP Region or Multiregion"
@@ -34,14 +24,8 @@ variable "bucket_region_or_multiregion" {
 
 variable "add_project_owner" {
   type        = bool
-  default     = false
+  default     = true
   description = "Whether or not to add the Terraform CICD account as project Owner"
-}
-
-variable "create_new_project" {
-  type        = bool
-  default     = false
-  description = "Whether or not to create a new project"
 }
 
 # custom vpc network variables
