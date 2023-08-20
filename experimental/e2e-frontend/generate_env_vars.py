@@ -39,10 +39,10 @@ def get_data():
   e2e_faculty_email = faculty_credentials.get("email")
   e2e_faculty_password = faculty_credentials.get("password")
   return f"""
-      export E2E_TEST_EMAIL={e2e_test_email}
-      export E2E_TEST_PASSWORD={e2e_test_password}
-      export E2E_FACULTY_EMAIL={e2e_faculty_email}
-      export E2E_FACULTY_PASSWORD={e2e_faculty_password}
+      export E2E_TEST_EMAIL='{e2e_test_email}'
+      export E2E_TEST_PASSWORD='{e2e_test_password}'
+      export E2E_FACULTY_EMAIL='{e2e_faculty_email}'
+      export E2E_FACULTY_PASSWORD='{e2e_faculty_password}'
   """
 
 
