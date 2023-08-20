@@ -1,9 +1,7 @@
 import "cypress-iframe";
 describe("Test Harmonize Deeplinking", () => {
-  const e2eUserCreds = JSON.parse(Cypress.env("E2E_TEST_CREDS"));
-  const EMAIL = e2eUserCreds.email;
-  cy.log("e2eUserCreds", e2eUserCreds);
-  const PASSWORD = e2eUserCreds.password;
+  const EMAIL = Cypress.env("E2E_TEST_EMAIL");
+  const PASSWORD = Cypress.env("E2E_TEST_PASSWORD");
   const getIframeDocument = () => {
     console.log(cy.get("#ltiIframe"));
     return cy.get("#ltiIframe").its("0.contentDocument").should("exist");

@@ -1,5 +1,4 @@
 """ Helper Functions"""
-import json
 import os
 from google.cloud import secretmanager
 
@@ -32,12 +31,15 @@ def get_org_test_user():
 
 
 def get_data():
-  faculty_credentials = get_org_test_user()
   e2e_test_credentials = get_e2e_test_user()
+  e2e_test_email = e2e_test_credentials.get("email")
+  e2e_test_password = e2e_test_credentials.get("password")
+  faculty_credentials = get_org_test_user()
   e2e_faculty_email = faculty_credentials.get("email")
   e2e_faculty_password = faculty_credentials.get("password")
   return f"""
-      export E2E_TEST_CREDS={json.dumps(e2e_test_credentials)}
+      export E2E_TEST_EMAIL={e2e_test_email}
+      export E2E_TEST_PASSWORD={e2e_test_password}
       export E2E_FACULTY_EMAIL={e2e_faculty_email}
       export E2E_FACULTY_PASSWORD={e2e_faculty_password}
   """

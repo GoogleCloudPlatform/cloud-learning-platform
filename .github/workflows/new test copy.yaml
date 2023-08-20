@@ -71,11 +71,19 @@ jobs:
           cd experimental/e2e-frontend
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
+          echo "Requirements installed"
           python generate_env_vars.py >> generate_env_vars.sh
+          echo "Variables generated"
           source generate_env_vars.sh
-          echo "E2E_TEST_CREDS=$E2E_TEST_CREDS" >> "$GITHUB_OUTPUT"
+          echo "Variables exported"
+          echo "E2E_TEST_EMAIL=$E2E_TEST_EMAIL" >> "$GITHUB_OUTPUT"
+          echo "E2E_TEST_PASSWORD=$E2E_TEST_PASSWORD" >> "$GITHUB_OUTPUT"
           echo "E2E_FACULTY_EMAIL=$E2E_FACULTY_EMAIL" >> "$GITHUB_OUTPUT"
           echo "E2E_FACULTY_PASSWORD=$E2E_FACULTY_PASSWORD" >> "$GITHUB_OUTPUT"
+          echo "E2E_TEST_EMAIL=$E2E_TEST_EMAIL"
+          echo "E2E_TEST_PASSWORD=$E2E_TEST_PASSWORD"
+          echo "E2E_FACULTY_EMAIL=$E2E_FACULTY_EMAIL"
+          echo "E2E_FACULTY_PASSWORD=$E2E_FACULTY_PASSWORD"
 
       - name: Install & run e2e tests
         uses: cypress-io/github-action@v5
@@ -85,6 +93,7 @@ jobs:
           browser: chrome
           record: false
           env: |
-            E2E_TEST_CREDS:$E2E_TEST_CREDS
+            E2E_TEST_EMAIL:$E2E_TEST_EMAIL
+            E2E_TEST_PASSWORD:$E2E_TEST_PASSWORD
             E2E_FACULTY_EMAIL:$E2E_FACULTY_EMAIL
             E2E_FACULTY_PASSWORD:$E2E_FACULTY_PASSWORD
