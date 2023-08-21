@@ -54,6 +54,11 @@ spec:
           value: users
         - name: REDIS_HOST
           value: redis-master
+        - name: MEMORYSTORE_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: MEMORYSTORE_ENABLED
         - name: FIREBASE_API_KEY # value to be added/removed later
           valueFrom:
             configMapKeyRef:
