@@ -1,8 +1,6 @@
 import "cypress-iframe";
 
 describe("Test ALEKS Deeplinking", () => {
-  const EMAIL = Cypress.env("E2E_TEST_EMAIL");
-  const PASSWORD = Cypress.env("E2E_TEST_PASSWORD");
   const getIframeDocument = () => {
     console.log(cy.get("#ltiIframe"));
     return cy.get("#ltiIframe").its("0.contentDocument").should("exist");
@@ -17,6 +15,8 @@ describe("Test ALEKS Deeplinking", () => {
   };
 
   it("should visit the login page with username password", () => {
+    const EMAIL = Cypress.env("E2E_TEST_EMAIL");
+    const PASSWORD = Cypress.env("E2E_TEST_PASSWORD");
     const domain =
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e";
     cy.visit(domain);
@@ -35,6 +35,7 @@ describe("Test ALEKS Deeplinking", () => {
       "contain",
       "https://core-learning-services-dev.cloudpssolutions.com"
     );
+    cy.log("User logged in");
 
     cy.intercept(
       "GET",

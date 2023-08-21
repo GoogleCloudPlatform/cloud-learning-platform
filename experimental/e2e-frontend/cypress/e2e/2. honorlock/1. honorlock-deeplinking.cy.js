@@ -1,7 +1,7 @@
 describe("Test Honorlock Deeplinking", () => {
-  const EMAIL = Cypress.env("E2E_TEST_EMAIL");
-  const PASSWORD = Cypress.env("E2E_TEST_PASSWORD");
   it("should visit the login page with username password", () => {
+    const EMAIL = Cypress.env("E2E_TEST_EMAIL");
+    const PASSWORD = Cypress.env("E2E_TEST_PASSWORD");
     const domain =
       "https://core-learning-services-dev.cloudpssolutions.com/login/e2e";
     cy.visit(domain);
@@ -20,6 +20,7 @@ describe("Test Honorlock Deeplinking", () => {
       "contain",
       "https://core-learning-services-dev.cloudpssolutions.com"
     );
+    cy.log("User logged in");
 
     cy.intercept(
       "GET",
