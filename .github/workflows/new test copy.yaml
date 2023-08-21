@@ -89,7 +89,7 @@ jobs:
       - name: Install & run e2e tests
         uses: cypress-io/github-action@v5
         with:
-          start: npx cypress run --env 
+          start: npx cypress run
           working-directory: experimental/e2e-frontend
           browser: chrome
           record: false
