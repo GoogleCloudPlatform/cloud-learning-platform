@@ -93,8 +93,8 @@ jobs:
           working-directory: experimental/e2e-frontend
           browser: chrome
           record: false
-          env: 
-            E2E_TEST_EMAIL: ${{ env.E2E_TEST_EMAIL }}
-            E2E_TEST_PASSWORD: ${{ env.E2E_TEST_PASSWORD }}
-            E2E_FACULTY_EMAIL: ${{ env.E2E_FACULTY_EMAIL }}
-            E2E_FACULTY_PASSWORD: ${{ env.E2E_FACULTY_PASSWORD }}
+          env: |
+            E2E_TEST_EMAIL=${{ env.E2E_TEST_EMAIL }}
+            E2E_TEST_PASSWORD=${{ env.E2E_TEST_PASSWORD }}
+            E2E_FACULTY_EMAIL=${{ env.E2E_FACULTY_EMAIL }}
+            E2E_FACULTY_PASSWORD=${{ env.E2E_FACULTY_PASSWORD }}
