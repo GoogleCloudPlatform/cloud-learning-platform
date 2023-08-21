@@ -17,28 +17,25 @@ course_template_id = None
 
 @pytest.fixture(scope="module", autouse=True)
 def create_course_template(get_token):
-  "create a course template for reference"
+  """create a course template for reference"""
   url = f"{API_URL}/course_templates"
-  resp = requests.post(url=url,
-                       json=COURSE_TEMPLATE_INPUT_DATA,
-                       headers=get_token)
+  resp = requests.post(headers=get_token, url=url,
+                       json=COURSE_TEMPLATE_INPUT_DATA)
   global course_template_id
   course_template_id = resp.json()["course_template"]["id"]
 
-
 @pytest.fixture
 def setup_cohort():
-  """Fixture to create temprory data"""
+  """Fixture to create temporary data"""
   cohort = Cohort.from_dict(TEST_COHORT)
   course_template = CourseTemplate.find_by_id(course_template_id)
   cohort.course_template = course_template
   cohort.save()
   return cohort
 
-
 @pytest.fixture()
 def create_section(setup_cohort):
-  """Fixture to create temprory data"""
+  """Fixture to create temporary data"""
   test_section = TEST_SECTION2
   course_template = CourseTemplate.find_by_id(course_template_id)
   test_section["cohort"] = setup_cohort
@@ -47,11 +44,10 @@ def create_section(setup_cohort):
   section.save()
   return section
 
-
 def test_create_cohort(get_token):
   """
   CUJ01 create a Cohort by providing a valid json object
-  as a input using that json object creating a Cohort Model object using Third party tool.
+  as an input using that json object creating a Cohort Model object using Third party tool.
   And also finding Course template object.
   Which is required for saving Cohort object in database.
   """
@@ -63,14 +59,13 @@ def test_create_cohort(get_token):
   assert resp.status_code == 200, "Status 200"
   assert resp_json["success"] is True, "Check success"
   assert resp_json["cohort"]["start_date"].split(
-      "+")[0] == COHORT_INPUT_DATA["start_date"], "Check start_date of chort"
+      "+")[0] == COHORT_INPUT_DATA["start_date"], "Check start_date of cohort"
   assert resp_json["cohort"]["id"] not in ["", None], "Cohort Firebase check"
-
 
 def test_create_cohort_negative_course_template(get_token):
   """ 
   CUJ02 create a Cohort by providing a valid json object but invalid course_template id
-  as a input and calling create Cohort API.
+  as an input and calling create Cohort API.
   Which will return Resource not found exception.
   """
   url = f"{API_URL}/cohorts"
@@ -80,11 +75,10 @@ def test_create_cohort_negative_course_template(get_token):
   assert resp.status_code == 404, "Status 404"
   assert resp_json["success"] is False, "Check success"
 
-
 def test_create_cohort_validation(get_token):
   """
-  CUJ03 create a cohort by providing a invalid json object
-  as a input using that json object used in calling create cohort API.
+  CUJ03 create a cohort by providing an invalid json object
+  as an input using that json object used in calling create cohort API.
   Which will return a validation error response.
   """
   url = f"{API_URL}/cohorts"
@@ -96,7 +90,6 @@ def test_create_cohort_validation(get_token):
                        headers=get_token)
   assert resp.status_code == 422, "Status 422"
   assert resp.json()["success"] is False
-
 
 def test_get_cohort(setup_cohort, get_token):
   """
@@ -125,10 +118,9 @@ def test_get_cohort(setup_cohort, get_token):
   assert resp.status_code == 200, "Status 200"
   assert response_cohort == data, "Data doesn't Match"
 
-
 def test_get_cohort_negative(get_token):
   """ 
-  CUJ05 get a Cohort by providing a invalid id
+  CUJ05 get a Cohort by providing an invalid id
   as a path variable and calling get cohort api.
   Which will return a not found error response.
   """
@@ -138,8 +130,7 @@ def test_get_cohort_negative(get_token):
   assert resp.status_code == 404, "Status 404"
   assert resp_json["success"] is False, "Data doesn't Match"
 
-
-def test_update_chort(setup_cohort, get_token):
+def test_update_cohort(setup_cohort, get_token):
   """ 
   CUJ06 update a cohort by providing a valid id
   as a path variable and calling Update cohort api.
@@ -154,8 +145,7 @@ def test_update_chort(setup_cohort, get_token):
   assert resp_json["success"] is True, "Check success"
   assert resp_cohort["max_students"] == 2000, "Check Updated Data"
 
-
-def test_update_chort_nonexits_course(setup_cohort, get_token):
+def test_update_cohort_nonexists_course(setup_cohort, get_token):
   """ 
   CUJ07 update a cohort by providing a valid as a path variable id 
   and invalid course template id as json object and calling Update cohort api.
@@ -169,10 +159,9 @@ def test_update_chort_nonexits_course(setup_cohort, get_token):
   assert resp.status_code == 404, "Status 200"
   assert resp_json["success"] is False, "Check success"
 
-
 def test_update_cohort_negative(get_token):
   """ 
-  CUJ09 update a cohort by providing a invalid id
+  CUJ09 update a cohort by providing an invalid id
   as a path variable and calling update cohort api.
   Which will return a not found error response.
   """
@@ -182,8 +171,7 @@ def test_update_cohort_negative(get_token):
   assert resp.status_code == 404, "Status 404"
   assert resp_json["success"] is False, "Data doesn't Match"
 
-
-def test_delete_chort(setup_cohort, get_token):
+def test_delete_cohort(setup_cohort, get_token):
   """ 
   CUJ09 delete a cohort by providing a valid id
   as a path variable and calling delete cohort api.
@@ -196,10 +184,9 @@ def test_delete_chort(setup_cohort, get_token):
   assert resp.status_code == 200, "Status 200"
   assert resp_json["success"] is True, "Check success"
 
-
 def test_delete_cohort_negative(get_token):
   """ 
-  CUJ010 delete a cohort by providing a invalid id
+  CUJ010 delete a cohort by providing an invalid id
   as a path variable and calling delete cohort api.
   Which will return a not found error response.
   """
@@ -208,7 +195,6 @@ def test_delete_cohort_negative(get_token):
   resp_json = resp.json()
   assert resp.status_code == 404, "Status 404"
   assert resp_json["success"] is False, "Data doesn't Match"
-
 
 def test_get_list_cohort(get_token):
   """ 
@@ -221,24 +207,21 @@ def test_get_list_cohort(get_token):
   assert resp.status_code == 200, "Status 200"
   assert resp_json["success"] is True, "Check success"
 
-
 def test_get_list_sections_by_cohort(get_token, create_section):
   """
-  Get a sections list for a perticular cohort by giving cohort_id as query paramter 
+  Get a sections list for a particular cohort by giving cohort_id as query parameter
   """
   url = f"{API_URL}/cohorts/{create_section.cohort.id}/sections?skip=0&limit=10"
-  print("URLLL----",url)
+  print("URL----",url)
   resp = requests.get(url=url, headers=get_token)
   resp_json = resp.json()
-  print("This is resp json for list sections of cohort",resp_json)
+  print("Response json for list sections of cohort",resp_json)
   assert resp.status_code == 200, "Status 200"
-
 
 def test_get_list_sections_by_nonexists_cohort(get_token):
   """
-  Get a sections list for a perticular cohort by giving cohort_id as query paramter 
+  Get a sections list for a particular cohort by giving cohort_id as query parameter
   """
   url = f"{API_URL}/cohorts/fake-id/sections"
   resp = requests.get(url=url, headers=get_token)
-  resp_json = resp.json()
   assert resp.status_code == 404, "Status 404"

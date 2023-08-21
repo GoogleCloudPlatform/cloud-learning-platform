@@ -157,9 +157,6 @@ def get_student_in_section(section_id: str, user: str, request: Request):
     if result is None:
       raise ResourceNotFoundException(
           f"Student not found in this section {section_id}")
-    # users = classroom_crud.\
-    #   if_user_exists_in_section\
-    #     (section_id=section_id,user_id=user_id,headers=headers)
     return {
         "message": f"Successfully get student details by {user}",
         "data": course_enrollment_user_model(result)
@@ -352,10 +349,10 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
     if cohort.enrolled_students_count >= cohort.max_students:
-      raise Conflict("Cohort Max count reached hence student cannot" +
+      raise ValidationError("Cohort Max count reached hence student cannot" +
                      " be erolled in this cohort")
     if len(sections) == 0:
-      raise ResourceNotFoundException("Given CohortId\
+      raise ValidationError("Given CohortId\
          does not have any sections")
     if not student_service.check_student_can_enroll_in_cohort(
         email=input_data.email, headers=headers, sections=sections):
@@ -363,7 +360,7 @@ def enroll_student_cohort(cohort_id: str, input_data: AddStudentModel,
                       enrolled for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
     if section is None:
-      raise Conflict(
+      raise ValidationError(
         "All sections in chorot are full or not open for enrollment")
     section_id = section.id
     Logger.info(f"Section with minimum student is {section.id},\
@@ -543,7 +540,7 @@ def enroll_student_section(section_id: str, input_data: AddStudentModel,
     Logger.error(conflict)
     err = traceback.format_exc().replace("\n", " ")
     student_service.insert_failure_log(input_data.email, section_id,
-                            cohort_id, err, "conflict")
+                            cohort_id, err, "Conflict")
     Logger.error(err)
     raise Conflict(str(conflict)) from conflict
   except HttpError as ae:
@@ -597,7 +594,7 @@ def invite_student(section_id: str, student_email: str, request: Request):
     section_service.validate_section(section)
     cohort = section.cohort
     if cohort.enrolled_students_count >= cohort.max_students:
-      raise Conflict("Cohort Max count reached hence student cannot" +
+      raise ValidationError("Cohort Max count reached hence student cannot" +
                      " be erolled in this cohort")
     if section.enrolled_students_count >= section.max_students:
       raise ValidationError("Section Max count reached hence student cannot" +
@@ -666,7 +663,7 @@ def invite_student_cohort(cohort_id: str, student_email: str,
     sections = list(sections)
     headers = {"Authorization": request.headers.get("Authorization")}
     if cohort.enrolled_students_count >= cohort.max_students:
-      raise Conflict("Cohort Max count reached hence student " +
+      raise ValidationError("Cohort Max count reached hence student " +
                      "cannot be erolled in this cohort")
     if len(sections) == 0:
       raise ResourceNotFoundException("Given CohortId\
@@ -677,7 +674,7 @@ def invite_student_cohort(cohort_id: str, student_email: str,
                       registered for cohort {cohort_id}")
     section = student_service.get_section_with_minimum_student(sections)
     if section is None:
-      raise Conflict(
+      raise ValidationError(
       "All sections in chorot are full or not open for enrollment")
     Logger.info(f"Section with minimum student is {section.id},\
                 enroll student intiated for {student_email}")
@@ -704,6 +701,9 @@ def invite_student_cohort(cohort_id: str, student_email: str,
   except HttpError as ae:
     raise ClassroomHttpException(status_code=ae.resp.status,
                                  message=str(ae)) from ae
+  except ValidationError as ve:
+    Logger.error(ve)
+    raise BadRequest(str(ve)) from ve
   except Exception as e:
     Logger.error(e)
     err = traceback.format_exc().replace("\n", " ")

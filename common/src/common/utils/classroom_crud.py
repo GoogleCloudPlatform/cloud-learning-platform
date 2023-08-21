@@ -652,13 +652,13 @@ def enroll_student(headers, access_token, course_id, student_email,
         "gaia_id": gaia_id,
         "photo_url": profile["photos"][0]["url"]
     }
-  except Exception as e:
+  except KeyError as ke:
     err= traceback.format_exc().replace("\n", " ")
-    Logger.error(e)
+    Logger.error(ke)
     Logger.error(err)
     raise ValidationError(
-  "Please set first name and last name in your google profile or check access token is valid"
-  ) from e
+  "Please set first name and last name in your google profile"
+  ) from ke
   create_student_in_course(access_token, student_email, course_id, course_code)
   # Check if searched user is [] ,i.e student is enrolling for first time
   # then call create user user-management API and return user data else
