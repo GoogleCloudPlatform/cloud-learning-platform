@@ -77,8 +77,9 @@ export class AuthService {
     localStorage.setItem('user', credential.user.displayName)
     localStorage.setItem('userEmail', credential.user.email)
     this.setUserId(credential.user.email)
-
+    
     credential.user?.getIdToken().then(idToken => {
+      this.setUserId(credential.user.email)
       localStorage.setItem('idToken', idToken)
       // this.openFailureSnackBar('idToken :' +idToken, 'Close')
 
