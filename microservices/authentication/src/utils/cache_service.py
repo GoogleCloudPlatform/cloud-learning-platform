@@ -5,7 +5,7 @@ import redis
 from common.utils.secrets import get_secret
 
 redis_host = get_secret("redis-host")
-r = redis.Redis(host=redis_host, port=6378, db=0, ssl=True)
+r = redis.Redis(host=redis_host, port=6379, db=0)
 
 
 def json_serial(obj):
