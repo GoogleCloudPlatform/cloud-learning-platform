@@ -21,9 +21,9 @@ on:
     secrets:
       DEPLOYMENT_DEV_SA_KEY:
         required: true
-  pull_request:
-    branches:
-      - main
+  # pull_request:
+  #   branches:
+  #     - main
     # paths:
     #   - 'microservices/lti'
     #   - 'microservices/classroom_shim'
@@ -34,7 +34,7 @@ env:
   GKE_ZONE: us-central1
 
 jobs:
-  e2e-ui-test-lms-admin-ui:
+  lti-cypress-e2e-tests:
     runs-on: ubuntu-latest
     # if: ${{contains(github.event.pull_request.labels.*.name, 'LTI') }}
 
