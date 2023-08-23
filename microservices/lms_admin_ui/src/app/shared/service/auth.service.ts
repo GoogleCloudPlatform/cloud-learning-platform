@@ -76,12 +76,10 @@ export class AuthService {
     const credential = await this.afAuth.signInWithEmailAndPassword(email, password)
     localStorage.setItem('user', credential.user.displayName)
     localStorage.setItem('userEmail', credential.user.email)
-    this.setUserId(credential.user.email)
 
     credential.user?.getIdToken().then(idToken => {
+      setTimeout(() => { this.setUserId(credential.user.email) }, 10)
       localStorage.setItem('idToken', idToken)
-      // this.openFailureSnackBar('idToken :' +idToken, 'Close')
-
       this.validate().subscribe((res: any) => {
         if (res.success == true) {
           if (idToken) {
@@ -90,15 +88,12 @@ export class AuthService {
         }
         else {
           this.openFailureSnackBar(res.message, 'Close')
-          // this.openFailureSnackBar(environment.auth_apiUrl,'Close')
         }
       }, (error: any) => {
         this.openFailureSnackBar("504 error", 'Close')
       })
 
     })
-      .catch(error => {
-      });
   }
 
   private updateUserData(user: any) {
@@ -139,7 +134,7 @@ export class AuthService {
       // Logged in
       if (user) {
         localStorage.setItem('userEmail', user.email)
-        this.setUserId(user.email)
+        setTimeout(() => { this.setUserId(user.email) }, 10)
         return true
       } else {
         // Logged out
