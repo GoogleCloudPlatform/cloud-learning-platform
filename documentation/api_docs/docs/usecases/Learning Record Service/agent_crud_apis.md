@@ -63,7 +63,8 @@ When we need to fetch all the Agents available then we would make a **GET** requ
 {
   "success": true,
   "message": "Data fetched successfully",
-  "data": [
+  "data": {
+    "records": [
     {
       "object_type": "agent",
       "name": "Test Agent",
@@ -78,7 +79,9 @@ When we need to fetch all the Agents available then we would make a **GET** requ
       "created_time": "2022-09-01 07:13:34.801165+00:00",
       "last_modified_time": "2022-09-01 07:13:35.001616+00:00"
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 

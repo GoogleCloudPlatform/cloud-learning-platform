@@ -558,7 +558,8 @@ Hitting this EndPoint fetches the list of submitted assessment responses which m
 {
     "success": true,
     "message": "Successfully fetched the submitted assessments.",
-    "data": [{
+    "data": {
+        "records": [{
         "assessment_id": "uuid of assessment for which the submitted assessment is created",
         "learner_id": "uuid of learner submitting the assessment",
         "assessor_id": "uuid of assessor who will assess the submitted assessment",
@@ -718,7 +719,9 @@ Hitting this EndPoint fetches the list of submitted assessment responses which m
         "created_by": "",
         "last_modified_by": ""
     }
-    ]
+    ],
+        "total_count": 10000
+    }
 }
 ```
 
@@ -729,38 +732,5 @@ If no submitted assessment match the given filter or search parameters then the 
   "success": true,
   "message": "Successfully fetched the submitted assessments.",
   "data": []
-}
-```
-
-### Replace assessor of submitted assessments of a discipline:
-
-When we need to replace the assessor of all evaluation pending submitted assessemnets of a discipline then we would make a **PUT** request to the API endpoint - **`<APP_URL>/discipline/{discipline_id}/submitted-assessments/update-assessor`** where **`discipline_id`** is the unique ID of the curriculum pathway of alias discipline.
-The request body would be as follows:
-
-```json
-{
-  "assessor_id": "user_id of the assessor which is to be replaced"
-}
-```
-
-After replacing the assessor with another assessor then the response would be as follows:
-
-```json
-{
-    "success": true,
-    "message": "Successfully replaced assessor {assessor_id} for submitted assessments of discipline with uuid {discipline_id}"
-}
-```
-
-### Remove assessor of submitted assessments of a discipline:
-
-When we need to remove the assessor of all evaluation pending submitted assessemnets of a discipline then we would make a **PUT** request to the API endpoint - **`<APP_URL>/discipline/{discipline_id}/submitted-assessments/update-assessor`** where **`discipline_id`** is the unique ID of the curriculum pathway of alias discipline.
-
-After removing the assessor of submitted assessmets then the response would be as follows:
-
-```json
-{
-    "success": true,
-    "message": "Successfully unassigned assessor for all evaluation pending submitted assessments of discipline with uuid {discipline_id}"
 }
 ```

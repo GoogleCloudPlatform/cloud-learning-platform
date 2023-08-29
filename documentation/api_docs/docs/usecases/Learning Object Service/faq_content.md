@@ -82,7 +82,8 @@ The response will look like:
     {
         "success": true,
         "message": "Successfully Fetched FAQs",
-        "data": [{
+        "data": {
+            "records": [{
             "resource_path": "some/entry/point",
             "name": "Sample FAQ",
             "curriculum_pathway_id": "Sample_pathway_id",
@@ -90,7 +91,9 @@ The response will look like:
             "is_archived": false,
             "created_time": "2022-03-03 09:22:49.843674+00:00",
             "last_modified_time": "2022-03-03 09:22:49.843674+00:00"
-        }]
+        }],
+            "total_count": 10000
+        }
     }
 
 ```

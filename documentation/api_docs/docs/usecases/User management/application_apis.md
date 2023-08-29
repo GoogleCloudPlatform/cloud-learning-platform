@@ -50,7 +50,8 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Data fetched successfully",
-  "data": [
+  "data": {
+    "records": [
     {
       "uuid": "124hsgxR77QKS8uS7Zgm",
       "name": "content management",
@@ -59,7 +60,9 @@ Then the response would be as follows:
         "44qxEpc35pVMb6AkZGbi"
       ]
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 
