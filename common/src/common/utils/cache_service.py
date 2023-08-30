@@ -12,7 +12,7 @@ if MEMORYSTORE_ENABLED == "true":
   redis_host = get_secret("redis-host")
   Logger.info("redis_host")
   Logger.info(redis_host)
-  r = redis.Redis(host=redis_host, port=6379, db=0, ssl=True)
+  r = redis.Redis(host=redis_host, port=6379, db=0)
 else:
   r = redis.Redis(host="redis-master", port=6379, db=0)
 

@@ -5,6 +5,7 @@ from fastapi import Depends
 from fastapi.security import HTTPBearer
 from common.utils.errors import InvalidTokenError
 from common.utils.http_exceptions import Unauthenticated, InternalServerError
+from common.utils.config import SERVICES
 
 auth_scheme = HTTPBearer(auto_error=False)
 
@@ -107,13 +108,14 @@ def user_verification(token: str) -> json:
   :param token:
   :return: json
   """
-  api_endpoint = "http://authentication/authentication/api/v1/validate"
+  api_endpoint = "http://{}:{}/authentication/api/v1/validate".format(
+      SERVICES["authentication"]["host"], SERVICES["authentication"]["port"])
   response = requests.get(
       url=api_endpoint,
       headers={
           "Content-Type": "application/json",
           "Authorization": token
       },
-      timeout=60)
+  )
 
   return response
