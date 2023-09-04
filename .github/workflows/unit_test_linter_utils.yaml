@@ -43,7 +43,7 @@ jobs:
           utils,
         ]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install gcloud
       uses: google-github-actions/setup-gcloud@v0
@@ -91,7 +91,7 @@ jobs:
           utils,
         ]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
