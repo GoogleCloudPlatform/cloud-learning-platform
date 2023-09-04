@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 'Set up Gcloud auth'
         id: 'gcloud_auth'
@@ -128,7 +128,7 @@ jobs:
     needs: [deploy_backends]
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 'Set up Gcloud auth'
         id: 'gcloud_auth'
