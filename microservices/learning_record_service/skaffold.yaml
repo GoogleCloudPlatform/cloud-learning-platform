@@ -1,4 +1,4 @@
-apiVersion: skaffold/v2beta12
+apiVersion: skaffold/v4beta1
 kind: Config
 metadata:
   name: learning-record-service
@@ -31,7 +31,7 @@ portForward:
   resourceName: learning-record-service
   port: 80
   localPort: 8888
-deploy:
+manifests:
   kustomize:
     paths:
     - ./kustomize/minikube
@@ -47,15 +47,21 @@ profiles:
       requires:
         - image: common
           alias: BASE_IMG
-  deploy:
+  manifests:
     kustomize:
       paths:
       - ./kustomize/custom
-- name: prod_non_cloudbuild
   deploy:
+    kubectl: {}
+
+- name: prod_non_cloudbuild
+  manifests:
     kustomize:
       paths:
       - ./kustomize/prod
+  deploy:
+    kubectl: {}
+
 - name: dev
   activation:
   - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
@@ -74,10 +80,13 @@ profiles:
         infer:
           - '**/*.py'
           - '**/*.json'
-  deploy:
+  manifests:
     kustomize:
       paths:
       - ./kustomize/dev
+  deploy:
+    kubectl: {}
+
 - name: prod
   build:
     googleCloudBuild: {}
@@ -90,7 +99,9 @@ profiles:
       requires:
         - image: common
           alias: BASE_IMG
-  deploy:
+  manifests:
     kustomize:
       paths:
       - ./kustomize/prod
+  deploy:
+    kubectl: {}
