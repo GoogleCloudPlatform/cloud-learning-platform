@@ -1011,7 +1011,7 @@ def update_coursework_material(materials,
   }
 
 
-def update_grades(material, section, coursework_id, lms_job_id):
+def update_grades(material, section, coursework_id, lms_job_id, classroom_course):
   """Takes the forms all responses ,section, and coursework_id and
   updates the grades of student who have responsed to form and
   submitted the coursework
@@ -1033,8 +1033,12 @@ def update_grades(material, section, coursework_id, lms_job_id):
     lms_job.update()
 
     #Get url mapping of google forms view links and edit ids
-    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_folder(
+      classroom_course["teacherFolder"]["id"]
+    )
+    
     form_details = url_mapping[material["form"]["formUrl"]]
+    Logger.info(f"Form Details found----{form_details}")
 
     form_id = form_details["file_id"]
     # Get all responses for the form if no responses of

@@ -720,6 +720,7 @@ def import_grade(section_id: str, coursework_id: str,
   try:
     section = Section.find_by_id(section_id)
     result = classroom_crud.get_course_work(section.classroom_id, coursework_id)
+    classroom = classroom_crud.get_course_by_id(section.classroom_id)
 
     lms_job_input = {
         "job_type": "grade_import",
@@ -746,7 +747,7 @@ def import_grade(section_id: str, coursework_id: str,
         if "form" in material.keys():
           is_google_form_present = True
           background_tasks.add_task(update_grades, material, section,
-                                    coursework_id, lms_job.id)
+                                    coursework_id, lms_job.id,classroom)
 
       if is_google_form_present:
         return {
