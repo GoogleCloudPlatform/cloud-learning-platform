@@ -110,7 +110,7 @@ def get_course_by_id(course_id):
     return course
 
   except HttpError as error:
-    Logger.ogger.error(error)
+    Logger.error(error)
     return None
 
 
@@ -166,7 +166,7 @@ def update_course(course_id, section_name, description, course_name=None):
   """
 
   service = build("classroom", "v1", credentials=get_credentials())
-  
+
   course = service.courses().get(id=course_id).execute()
   if course_name is not None:
     course["name"] = course_name
