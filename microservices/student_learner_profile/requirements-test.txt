@@ -8,3 +8,4 @@ google-cloud-core==1.7.3
 google-cloud-logging==3.1.2
 backports.unittest-mock==1.5
 regex==2022.10.31
+anyio==3.7.1
