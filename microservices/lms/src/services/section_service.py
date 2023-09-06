@@ -1038,8 +1038,6 @@ def update_grades(material, section, coursework_id, lms_job_id, classroom_course
     )
     
     form_details = url_mapping[material["form"]["formUrl"]]
-    Logger.info(f"Form Details found----{form_details}")
-
     form_id = form_details["file_id"]
     # Get all responses for the form if no responses of
     # the form then return
