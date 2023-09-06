@@ -110,7 +110,7 @@ def get_course_by_id(course_id):
     return course
 
   except HttpError as error:
-    logger.error(error)
+    Logger.ogger.error(error)
     return None
 
 
@@ -166,19 +166,17 @@ def update_course(course_id, section_name, description, course_name=None):
   """
 
   service = build("classroom", "v1", credentials=get_credentials())
-  try:
-    course = service.courses().get(id=course_id).execute()
-    if course_name is not None:
-      course["name"] = course_name
-    course["section"] = section_name
-    course["description"] = description
-    course = service.courses().update(id=course_id, body=course).execute()
-    course_name = course.get("name")
-    course_id = course.get("id")
-    return course
-  except HttpError as error:
-    logger.error(error)
-    raise HttpError from error
+  
+  course = service.courses().get(id=course_id).execute()
+  if course_name is not None:
+    course["name"] = course_name
+  course["section"] = section_name
+  course["description"] = description
+  course = service.courses().update(id=course_id, body=course).execute()
+  course_name = course.get("name")
+  course_id = course.get("id")
+  return course
+
 
 
 def update_course_state(course_id, course_state):
@@ -234,7 +232,7 @@ def get_topics(course_id):
       topics = response["topic"]
       return topics
   except HttpError as error:
-    logger.error(error)
+    Logger.error(error)
     return None
 
 
@@ -282,7 +280,7 @@ def get_coursework_list(course_id,coursework_state="PUBLISHED"):
         break
     return coursework_list
   except HttpError as error:
-    logger.error(error)
+    Logger.error(error)
     return None
 
 
@@ -355,7 +353,7 @@ def get_coursework_material_list(course_id,coursework_material_state="PUBLISHED"
         break
     return coursework_material_list
   except HttpError as error:
-    logger.error(error)
+    Logger.error(error)
     return None
 
 
@@ -671,43 +669,6 @@ def enroll_student(headers, access_token, course_id, student_email,
     return response.json()["data"]
   else:
     return searched_student[0]
-
-def list_folders_children(folder_id,search_query=""):
-  """
-  List the files or childrens of given folder_id 
-  filters according to search query if given else gets all the 
-  childrens of folder
-  """
-  service = build("drive", "v2", credentials=get_credentials())
-  page_token = None
-  while True:
-    param = {}
-    if page_token:
-      param["pageToken"] = page_token
-    children = service.children().list(
-          folderId=folder_id,q=search_query, **param).execute()
-    page_token = children.get("nextPageToken")
-    if not page_token:
-      break
-  return children.get("items", [])
-
-def get_edit_url_and_view_url_mapping_of_folder(folder_id):
-  """  Query google drive api and get all the forms a user owns
-      return a dictionary of view link as keys and edit link as values
-  """
-  forms = list_folders_children(folder_id,
-            "mimeType=\"application/vnd.google-apps.form\"")
-  view_link_and_edit_link_matching = {}
-  count =0
-  for form in forms:
-    count = count+1
-    result = get_view_link_from_id(form.get("id"))
-    # Call get file api to get
-    file = get_file(form.get("id"))
-    view_link_and_edit_link_matching[result["responderUri"]] = \
-    {"webViewLink":file.get("webViewLink"),"file_id":form.get("id")}
-  Logger.info(f"Number of google forms  scanned are {count}")
-  return view_link_and_edit_link_matching
 
 def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns

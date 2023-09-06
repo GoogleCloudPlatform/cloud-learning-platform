@@ -817,7 +817,8 @@ def check_copy_course_alpha(original_courseworks,
                                 {error}")
 
 
-    logs["info"].append(f"Error flag in check copy course function {error_flag}")
+    logs["info"].append(
+      f"Error flag to check copied items in copy course is {error_flag}")
     lms_job.logs=logs
     lms_job.update()
     return error_flag
