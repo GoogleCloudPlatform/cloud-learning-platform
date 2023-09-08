@@ -1,7 +1,6 @@
 """ Helper functions for classroom crud API """
 import requests
 import traceback
-from asyncio.log import logger
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -108,11 +107,10 @@ def get_course_by_id(course_id):
   try:
     service = build("classroom", "v1", credentials=get_credentials())
     course = service.courses().get(id=course_id).execute()
-
     return course
 
   except HttpError as error:
-    logger.error(error)
+    Logger.error(error)
     return None
 
 
@@ -168,19 +166,17 @@ def update_course(course_id, section_name, description, course_name=None):
   """
 
   service = build("classroom", "v1", credentials=get_credentials())
-  try:
-    course = service.courses().get(id=course_id).execute()
-    if course_name is not None:
-      course["name"] = course_name
-    course["section"] = section_name
-    course["description"] = description
-    course = service.courses().update(id=course_id, body=course).execute()
-    course_name = course.get("name")
-    course_id = course.get("id")
-    return course
-  except HttpError as error:
-    logger.error(error)
-    raise HttpError from error
+
+  course = service.courses().get(id=course_id).execute()
+  if course_name is not None:
+    course["name"] = course_name
+  course["section"] = section_name
+  course["description"] = description
+  course = service.courses().update(id=course_id, body=course).execute()
+  course_name = course.get("name")
+  course_id = course.get("id")
+  return course
+
 
 
 def update_course_state(course_id, course_state):
@@ -236,7 +232,7 @@ def get_topics(course_id):
       topics = response["topic"]
       return topics
   except HttpError as error:
-    logger.error(error)
+    Logger.error(error)
     return None
 
 
@@ -284,7 +280,7 @@ def get_coursework_list(course_id,coursework_state="PUBLISHED"):
         break
     return coursework_list
   except HttpError as error:
-    logger.error(error)
+    Logger.error(error)
     return None
 
 
@@ -357,7 +353,7 @@ def get_coursework_material_list(course_id,coursework_material_state="PUBLISHED"
         break
     return coursework_material_list
   except HttpError as error:
-    logger.error(error)
+    Logger.error(error)
     return None
 
 
@@ -673,7 +669,6 @@ def enroll_student(headers, access_token, course_id, student_email,
     return response.json()["data"]
   else:
     return searched_student[0]
-
 
 def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns
