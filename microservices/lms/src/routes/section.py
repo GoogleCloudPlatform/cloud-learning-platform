@@ -109,7 +109,7 @@ def create_section(sections_details: SectionDetails,
         course_template_details=course_template_details,
         sections_details=sections_details,
         cohort_details=cohort_details,
-        lms_job_id=lms_job.id,
+        lms_job_id=lms_job.id,current_course=current_course,
         message="Create section background task completed")
     info_msg = f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\

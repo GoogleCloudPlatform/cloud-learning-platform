@@ -693,7 +693,8 @@ def list_folders_children(folder_id,search_query=""):
   return children.get("items", [])
 
 def get_edit_url_and_view_url_mapping_of_folder(folder_id):
-  """  Query google drive api and get all the forms a user owns
+  """  Query google drive api and get all the forms a inside the given 
+      google drive folder 
       return a dictionary of view link as keys and edit link as values
   """
   forms = list_folders_children(folder_id,
