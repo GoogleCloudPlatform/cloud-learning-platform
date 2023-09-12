@@ -54,7 +54,7 @@ pushd /usr/bin
 sudo ln -s python3 python
 popd
 python -m pip install --upgrade pip
-python -m pip install google-cloud-firestore google-cloud-bigquery firestore-admin
+python -m pip install google-cloud-firestore google-cloud-bigquery firebase-admin
 touch completed
 cd
 
