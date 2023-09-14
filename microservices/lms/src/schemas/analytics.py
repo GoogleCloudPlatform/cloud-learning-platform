@@ -4,6 +4,7 @@ Pydantic Model for copy course API's
 import datetime
 import json
 from pydantic import BaseModel, validator
+from common.utils.logging_handler import Logger
 from typing import  Optional
 from schemas.schema_examples import (
   ANALYTICS_USER_EXAMPLE,ANALYTICS_COURSE_EXAMPLE,ANALYTICS_COURSE_WORK_EXAMPLE
@@ -136,6 +137,10 @@ class AnalyticsCourseWork(BaseModel):
       return datetime.time().fromisoformat(v)
     if isinstance(v,datetime.time):
       return v
+    if v.get("minutes") is None:
+      v["minutes"] = 0
+    if v.get("hours") is None:
+      v["hours"] = 0
     return datetime.time(
         hour=v["hours"],
         minute=v["minutes"])
