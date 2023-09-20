@@ -670,6 +670,44 @@ def enroll_student(headers, access_token, course_id, student_email,
   else:
     return searched_student[0]
 
+def list_folders_children(folder_id,search_query=""):
+  """
+  List the files or childrens of given folder_id 
+  filters according to search query if given else gets all the 
+  childrens of folder
+  """
+  service = build("drive", "v2", credentials=get_credentials())
+  page_token = None
+  while True:
+    param = {}
+    if page_token:
+      param["pageToken"] = page_token
+    children = service.children().list(
+          folderId=folder_id,q=search_query, **param).execute()
+    page_token = children.get("nextPageToken")
+    if not page_token:
+      break
+  return children.get("items", [])
+
+def get_edit_url_and_view_url_mapping_of_folder(folder_id):
+  """  Query google drive api and get all the forms a inside the given 
+      google drive folder 
+      return a dictionary of view link as keys and edit link as values
+  """
+  forms = list_folders_children(folder_id,
+            "mimeType=\"application/vnd.google-apps.form\"")
+  view_link_and_edit_link_matching = {}
+  count =0
+  for form in forms:
+    count = count+1
+    result = get_view_link_from_id(form.get("id"))
+    # Call get file api to get
+    file = get_file(form.get("id"))
+    view_link_and_edit_link_matching[result["responderUri"]] = \
+    {"webViewLink":file.get("webViewLink"),"file_id":form.get("id")}
+  Logger.info(f"Number of google forms  scanned are {count}")
+  return view_link_and_edit_link_matching
+
 def get_edit_url_and_view_url_mapping_of_form():
   """  Query google drive api and get all the forms a user owns
       return a dictionary of view link as keys and edit link as values

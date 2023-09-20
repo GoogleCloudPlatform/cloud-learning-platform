@@ -130,12 +130,19 @@ class AnalyticsCourseWork(BaseModel):
   @validator("course_work_due_time",pre=True)
   @classmethod
   def dict_to_datetime_time(cls,v):
+    """
+    Coursework datetime format
+    """
     if not v:
       return None
     if isinstance(v,str):
       return datetime.time().fromisoformat(v)
     if isinstance(v,datetime.time):
       return v
+    if v.get("minutes") is None:
+      v["minutes"] = 0
+    if v.get("hours") is None:
+      v["hours"] = 0
     return datetime.time(
         hour=v["hours"],
         minute=v["minutes"])

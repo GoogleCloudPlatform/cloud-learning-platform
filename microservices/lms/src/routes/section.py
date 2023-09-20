@@ -109,7 +109,7 @@ def create_section(sections_details: SectionDetails,
         course_template_details=course_template_details,
         sections_details=sections_details,
         cohort_details=cohort_details,
-        lms_job_id=lms_job.id,
+        lms_job_id=lms_job.id,current_course=current_course,
         message="Create section background task completed")
     info_msg = f"Background Task called for the cohort id {cohort_details.id}\
                 course template {course_template_details.id} with\
@@ -725,6 +725,7 @@ def import_grade(section_id: str, coursework_id: str,
   try:
     section = Section.find_by_id(section_id)
     result = classroom_crud.get_course_work(section.classroom_id, coursework_id)
+    classroom = classroom_crud.get_course_by_id(section.classroom_id)
 
     lms_job_input = {
         "job_type": "grade_import",
@@ -751,7 +752,7 @@ def import_grade(section_id: str, coursework_id: str,
         if "form" in material.keys():
           is_google_form_present = True
           background_tasks.add_task(update_grades, material, section,
-                                    coursework_id, lms_job.id)
+                                    coursework_id, lms_job.id,classroom)
 
       if is_google_form_present:
         return {
