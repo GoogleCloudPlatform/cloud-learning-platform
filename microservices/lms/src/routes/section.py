@@ -557,8 +557,13 @@ def update_section(sections_details: UpdateSection):
     raise ResourceNotFound(str(err)) from err
   except HttpError as hte:
     Logger.error(hte)
+    if hte.status_code == 404:
+      message = f"Course with\
+      Course_id {sections_details.course_id} is not found in classroom"
+    else:
+      message=str(hte.reason.message)
     raise ClassroomHttpException(status_code=hte.resp.status,
-                                 message=str(hte)) from hte
+                                 message=message) from hte
   except Exception as e:
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(e)

@@ -24,6 +24,8 @@ Please make sure that you have the project `Owner` role to be able to update the
 - Bootstrap a project in your organization
 - Create a Terraform service account and Terraform state bucket in the project for further Terraform scripts
 
+For "CLP version", use the branch or tag of the CLP version you are deploying.  If you aren't sure, use "main".
+
 From your workstation:
 ```bash
 export PROJECT_ID=<your-project-id>
@@ -32,7 +34,6 @@ export ZONE=<your-zone>
 export PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format="value(projectNumber)")
 
 export CLP_VERSION=<clp_tag>
-export DEMO_VERSION=<v2.0.0-beta12.7-demo>
 git clone https://github.com/GoogleCloudPlatform/cloud-learning-platform.git
 cd cloud-learning-platform
 git checkout $CLP_VERSION
@@ -99,7 +100,7 @@ gsutil cp ../project_bootstrap/terraform.tfstate gs://"${PROJECT_ID}"-tfstate/en
 
 ### Enable deletion protection for the jump host
 ```bash
-gcloud compute instances update jump-host --deletion-protection --project="${PROJECT_ID}"
+gcloud compute instances update jump-host --deletion-protection --project="${PROJECT_ID}" " --zone=${ZONE}
 ```
 
 ### SCP startup script to jump host
@@ -134,12 +135,15 @@ git clone https://github.com/GoogleCloudPlatform/cloud-learning-platform.git
 ```
 
 ### Set Project ID and other variables
+For "CLP version", use the branch or tag of the CLP version you are deploying.  If you aren't sure, use "main".
+
 ```bash
 export PROJECT_ID=<your-project-id>
 export LDAP=<your-ldap>
 export GITHUB_ID=<your-github-id>
 export REGION=<your-region>
 export ZONE=<your-zone>
+export CLP_VERSION=<clp-version>
 ```
 
 ### Authenticate to Google Cloud
@@ -170,7 +174,7 @@ export TF_VAR_github_owner=${GITHUB_ID}
 export TF_VAR_api_domain="${PROJECT_ID}-api"
 export TF_VAR_web_app_domain="${PROJECT_ID}"
 export TF_VAR_ckt_app_domain="${PROJECT_ID}-ckt"
-export TF_VAR_github_ref="refs/tags/${DEMO_VERSION}"
+export TF_VAR_github_ref="refs/tags/${CLP_VERSION}"
 ```
 
 ### Set up the frontend app domains and whitelisted users
