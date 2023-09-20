@@ -1022,6 +1022,10 @@ def update_coursework_material(materials,
     if "form" in material.keys():
       if "title" not in material["form"].keys():
         raise ResourceNotFound("Form to be copied is deleted")
+      check_form = url_mapping.get(material["form"]["formUrl"])
+      if not check_form:
+        raise ResourceNotFound("Google form attachment not found.\
+        Please verify if form is present classroom template drive folder")
       result1 = classroom_crud.drive_copy(
           url_mapping[material["form"]["formUrl"]]["file_id"], target_folder_id,
           material["form"]["title"])
@@ -1064,8 +1068,13 @@ def update_grades(material, section, coursework_id, lms_job_id, classroom_course
     url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_folder(
       classroom_course["teacherFolder"]["id"]
     )
-    
-    form_details = url_mapping[material["form"]["formUrl"]]
+    form_details = url_mapping.get(material["form"]["formUrl"])
+    if not form_details:
+      raise ResourceNotFound(
+      "Google form attached to coursework is not present\
+      in drive folder.Please verify if google form\
+      attached to coursework is present in classroom\
+      drive folder of this section.")
     form_id = form_details["file_id"]
     # Get all responses for the form if no responses of
     # the form then return

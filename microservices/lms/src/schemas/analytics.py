@@ -136,6 +136,10 @@ class AnalyticsCourseWork(BaseModel):
       return datetime.time().fromisoformat(v)
     if isinstance(v,datetime.time):
       return v
+    if v.get("minutes") is None:
+      v["minutes"] = 0
+    if v.get("hours") is None:
+      v["hours"] = 0
     return datetime.time(
         hour=v["hours"],
         minute=v["minutes"])
