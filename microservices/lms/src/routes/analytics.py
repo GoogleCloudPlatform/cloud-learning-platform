@@ -78,3 +78,4 @@ def get_student_analytics(student_id: str,request: Request):
     err = traceback.format_exc().replace("\n", " ")
     Logger.error(err)
     raise InternalServerError(str(e)) from e
+
