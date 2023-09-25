@@ -2,7 +2,7 @@ PyJWT==2.7.0
 absl-py==1.3.0
 fastapi==0.85.1
 fireo==1.6.2
-gcsfs==2023.6.0
+gcsfs==2023.9.2
 google-api-python-client==2.91.0
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==1.0.0
