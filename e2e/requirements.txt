@@ -1,6 +1,6 @@
 firebase_admin==6.0.1
 fireo==1.6.2
-google-cloud-logging==3.5.0
+google-cloud-logging==3.7.0
 google-cloud-secret-manager==2.16.1
 mock==5.1.0
 pylint==2.17.2
