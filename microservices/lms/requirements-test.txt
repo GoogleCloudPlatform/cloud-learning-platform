@@ -1,7 +1,9 @@
 backports-unittest-mock==1.5
 httpx==0.23.1
+anyio==3.7.1
 mock==4.0.3
 pylint==2.15.10
 pytest==7.2.0
 pytest-cov==4.0.0
 pytest-custom_exit_code==0.3.0
+anyio==3.7.1

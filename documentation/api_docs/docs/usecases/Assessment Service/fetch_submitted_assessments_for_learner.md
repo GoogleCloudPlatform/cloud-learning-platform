@@ -17,7 +17,8 @@ Hitting this EndPoint fetches the list of submitted assessment responses for a g
 {
     "success": true,
     "message": "Successfully fetched the submitted assessments.",
-    "data": [{
+    "data": {
+    "records": [{
         "assessment_id": "uuid of assessment for which the submitted assessment is created",
         "learner_id": "uuid of learner submitting the assessment",
         "assessor_id": "uuid of assessor who will assess the submitted assessment",
@@ -177,7 +178,9 @@ Hitting this EndPoint fetches the list of submitted assessment responses for a g
         "created_by": "",
         "last_modified_by": ""
     }
-    ]
+    ],
+    "total_count": 10000
+    }
 }
 ```
 
@@ -308,7 +311,8 @@ Hitting this EndPoint fetches the list of all responses of submitted assessment 
 {
     "success": true,
     "message": "Successfully fetched the submitted assessments.",
-    "data": [{
+    "data": {
+        "records": [{
         "assessment_id": "uuid of assessment for which the submitted assessment is created",
         "learner_id": "uuid of learner submitting the assessment",
         "assessor_id": "uuid of assessor who will assess the submitted assessment",
@@ -383,7 +387,9 @@ Hitting this EndPoint fetches the list of all responses of submitted assessment 
         "last_modified_time": "2023-01-02 13:11:50.531421+00:00",
         "created_by": "",
         "last_modified_by": ""
-    }]
+    }],
+        "total_count": 10000
+    }
 }
 ```
 If the learner is not present for a given learner_id - **`asd98798as7dhjgkjsdfh`** then the response would be as follows:

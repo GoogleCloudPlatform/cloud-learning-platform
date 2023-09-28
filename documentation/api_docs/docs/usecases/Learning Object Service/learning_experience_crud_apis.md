@@ -119,7 +119,8 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Data fetched successfully",
-  "data": [
+  "data": {
+    "records": [
     {
       "name": "Kubernetes",
       "display_name": "Kubernetes",
@@ -165,7 +166,9 @@ Then the response would be as follows:
       "created_time": "2022-11-15 12:13:01.174422+00:00",
       "last_modified_time": "2022-11-15 12:13:01.548783+00:00"
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 

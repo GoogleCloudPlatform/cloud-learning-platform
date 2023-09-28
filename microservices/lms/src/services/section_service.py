@@ -23,7 +23,7 @@ from googleapiclient.errors import HttpError
 def copy_course_background_task(course_template_details,
                                 sections_details,
                                 cohort_details,
-                                lms_job_id,
+                                lms_job_id,current_course,
                                 message=""):
   """Create section  Background Task to copy course and updated database
   for newly created section
@@ -114,7 +114,8 @@ def copy_course_background_task(course_template_details,
     # google form which returns
     # a dictionary of view_links as keys and edit
     #  links/  and file_id as values for all drive files
-    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_folder(
+      current_course["teacherFolder"]["id"])
 
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework_list(
@@ -429,10 +430,6 @@ def copy_course_background_task_alpha(
     lms_job.start_time = datetime.datetime.utcnow()
     lms_job.status = "running"
     lms_job.update()
-
-    copied_course = classroom_crud.update_course(classroom_id,
-                        sections_details.name,
-                        sections_details.description)
     # Create section with the required fields
     section = Section()
     section.name = course_template_details.name
@@ -453,15 +450,44 @@ def copy_course_background_task_alpha(
     lms_job.logs = logs
     lms_job.update()
     course_template_id = course_template_details.id
-    # Call check_copy_course function to verify all courseworks and coursework material is copied
+    # Call check_copy_course function to verify all courseworks and coursework\
+    #  material is copied
     error_flag = check_copy_course_alpha(original_courseworks,
                                     original_coursework_materials,
                                     copied_course,lms_job_id, section_id,
                                     course_template_id)
+    # Calling classroom Update course API to update section name and
+    # description
+    try:
+      copied_course = classroom_crud.update_course(classroom_id,
+                        sections_details.name,
+                        sections_details.description)
+    except Exception as error:
+      error = traceback.format_exc().replace("\n", " ")
+      Logger.error(error)
+      error_flag = True
+      lms_job = LmsJob.find_by_id(lms_job_id)
+      logs= lms_job.logs
+      logs["errors"].append("Classroom course update failed")
+      logs["errors"].append(error)
+      lms_job.logs = logs
+      lms_job.update()
 
-    classroom_crud.enable_notifications(copied_course["id"], "COURSE_WORK_CHANGES")
-    classroom_crud.enable_notifications(copied_course["id"],
-                                        "COURSE_ROSTER_CHANGES")
+    # Calling Classroom registrations API to send classroom event noifications
+    try:
+      classroom_crud.enable_notifications(copied_course["id"], "COURSE_WORK_CHANGES")
+      classroom_crud.enable_notifications(copied_course["id"],
+                                          "COURSE_ROSTER_CHANGES")
+    except Exception as error:
+      error = traceback.format_exc().replace("\n", " ")
+      Logger.error(error)
+      error_flag = True
+      lms_job = LmsJob.find_by_id(lms_job_id)
+      logs= lms_job.logs
+      logs["errors"].append("Enable notification for classroom failed")
+      logs["errors"].append(error)
+      lms_job.logs = logs
+      lms_job.update()
     # add instructional designer
     list_course_template_enrollment_mapping = CourseTemplateEnrollmentMapping\
       .fetch_all_by_course_template(course_template_details.key)
@@ -791,7 +817,9 @@ def check_copy_course_alpha(original_courseworks,
             f"Coursework Material state update failed for {coursework_material_title}\
                                 {error}")
 
-    logs["info"].append(f"Error flag in check copy course function {error_flag}")
+
+    logs["info"].append(
+    f"Error flag to check copied items in copy course alpha is {error_flag}")
     lms_job.logs=logs
     lms_job.update()
     return error_flag
@@ -994,6 +1022,10 @@ def update_coursework_material(materials,
     if "form" in material.keys():
       if "title" not in material["form"].keys():
         raise ResourceNotFound("Form to be copied is deleted")
+      check_form = url_mapping.get(material["form"]["formUrl"])
+      if not check_form:
+        raise ResourceNotFound("Google form attachment not found.\
+        Please verify if form is present classroom template drive folder")
       result1 = classroom_crud.drive_copy(
           url_mapping[material["form"]["formUrl"]]["file_id"], target_folder_id,
           material["form"]["title"])
@@ -1011,7 +1043,7 @@ def update_coursework_material(materials,
   }
 
 
-def update_grades(material, section, coursework_id, lms_job_id):
+def update_grades(material, section, coursework_id, lms_job_id, classroom_course):
   """Takes the forms all responses ,section, and coursework_id and
   updates the grades of student who have responsed to form and
   submitted the coursework
@@ -1033,9 +1065,16 @@ def update_grades(material, section, coursework_id, lms_job_id):
     lms_job.update()
 
     #Get url mapping of google forms view links and edit ids
-    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_form()
-    form_details = url_mapping[material["form"]["formUrl"]]
-
+    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_folder(
+      classroom_course["teacherFolder"]["id"]
+    )
+    form_details = url_mapping.get(material["form"]["formUrl"])
+    if not form_details:
+      raise ResourceNotFound(
+      "Google form attached to coursework is not present\
+      in drive folder.Please verify if google form\
+      attached to coursework is present in classroom\
+      drive folder of this section.")
     form_id = form_details["file_id"]
     # Get all responses for the form if no responses of
     # the form then return

@@ -46,14 +46,17 @@ Then the response would be as follows:
 {
   "success": true,
   "message": "Data fetched successfully",
-  "data": [
+  "data": {
+    "records": [
     {
       "uuid": "124hsgxR77QKS8uS7Zgm",
       "name": "edit",
       "description": "edit includes view and create permissions",
       "action_type": "other"
     }
-  ]
+  ],
+    "total_count": 10000
+  }
 }
 ```
 

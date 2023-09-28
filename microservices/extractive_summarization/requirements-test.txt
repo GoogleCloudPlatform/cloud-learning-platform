@@ -12,3 +12,4 @@ neuralcoref==4.0
 google-cloud-logging
 protobuf==3.19.5
 redis==4.5.4
+anyio==3.7.1

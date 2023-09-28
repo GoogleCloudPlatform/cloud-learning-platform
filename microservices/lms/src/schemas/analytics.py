@@ -131,6 +131,9 @@ class AnalyticsCourseWork(BaseModel):
   @validator("course_work_due_time",pre=True)
   @classmethod
   def dict_to_datetime_time(cls,v):
+    """
+    Coursework datetime format
+    """
     if not v:
       return None
     if isinstance(v,str):

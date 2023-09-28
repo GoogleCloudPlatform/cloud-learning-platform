@@ -190,4 +190,4 @@ def test_update_section_course_not_found_in_classroom(get_token):
       "max_students":25
   }
   resp = requests.patch(url=url, json=data, headers=get_token)
-  assert resp.status_code == 500
+  assert resp.status_code == 404

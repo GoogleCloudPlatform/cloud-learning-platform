@@ -167,7 +167,7 @@ If signed URLs generation failed for all the files, then the API will respond wi
 ```json
     {
         "success": False,
-        "message": "Some error occured while generating signed urls",
+        "message": "Some error occurred while generating signed urls",
         "data": [
             {
                 "file_path": <location_of_attached_file>,

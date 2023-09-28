@@ -358,4 +358,33 @@ The response would be as follows:
 }
 ```
 
+### Get User Groups of user
+
+To get all the Usergroups to which the user is added, we would make a **GET** request to the API endpoint - **`<APP_URL>/user-management/api/v1/user/{user_id}/user-groups`**  with **`immutable`** as optional param  and **`user_id`** is the unique ID of the user. 
+To get only immutable user groups of a user, then the **`immutable`** should be sent as **`True`**
+To get only mutable user groups of a user, then the **`immutable`** should be sent as **`False`**
+To get all the usergroups to which user is added then the **`immutable`** param is not required or can be sent as **`None`**
+
+The response would be as follows:
+
+```json
+{
+  "success": true,
+  "message": "Successfully fetched user groups the user",
+  "data": [
+    {
+        "name": "learner",
+        "uuid": "44qxEpc35pVMb6AkZGbi",
+        "description": "group of learners"
+    },
+    {
+        "name": "assessor",
+        "uuid": "1qchPPgeBXs2ZvK7QIjy",
+        "description": "group of assessors"
+    }
+  ]
+    
+}
+```
+
 

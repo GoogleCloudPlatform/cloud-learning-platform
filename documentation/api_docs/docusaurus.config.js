@@ -27,7 +27,7 @@ for (let service of clpServices) {
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Cloud Learning Platform',
-  tagline: 'v3',
+  tagline: 'CLP',
   url: appUrl,
   baseUrl: '/docs/',
   onBrokenLinks: 'throw',
