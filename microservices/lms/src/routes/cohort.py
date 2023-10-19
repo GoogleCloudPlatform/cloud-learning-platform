@@ -475,7 +475,8 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
               course_work_obj["id"])):
             category_id=course_work_obj["gradeCategory"]["id"]
 
-            category_weight=course_work_obj["gradeCategory"].get("weight",0)/10000
+            category_weight=course_work_obj["gradeCategory"].get(
+              "weight",0)/10000
             total_max_points = 0
             total_assigned_points = 0
             coursework_count=0
