@@ -458,6 +458,11 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
         submitted_course_work = classroom_crud.get_submitted_course_work_list(
         section.key.split("/")[1], user_id,headers)
         overall_grade = 0
+        if submitted_course_work == {}:
+          data={"section_id":section.id,
+          "overall_grade":overall_grade,
+              "category_grade":[]}
+          return {"data" : [data]}
         category_grade=[]
         for course_work_obj in course_work_list:
           # check if gradeCategory exists in the coursework object
@@ -469,7 +474,8 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
               item["courseWorkId"] == \
               course_work_obj["id"])):
             category_id=course_work_obj["gradeCategory"]["id"]
-            category_weight=course_work_obj["gradeCategory"]["weight"]/10000
+
+            category_weight=course_work_obj["gradeCategory"].get("weight",0)/10000
             total_max_points = 0
             total_assigned_points = 0
             coursework_count=0
