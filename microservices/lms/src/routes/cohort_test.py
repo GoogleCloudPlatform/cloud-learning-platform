@@ -274,7 +274,8 @@ def test_list_section_cohort_not_found(client_with_emulator):
 
   assert resp.status_code == 404
 
-def test_get_overall_percentage(client_with_emulator,create_fake_data):
+def test_get_overall_percentage_student_not_present_cohort(
+    client_with_emulator,create_fake_data):
   url = BASE_URL+\
   f"/cohorts/{create_fake_data['cohort']}/get_overall_grade/test@gmail.com"
   course_work_data = [{
@@ -311,5 +312,5 @@ def test_get_overall_percentage(client_with_emulator,create_fake_data):
         ("routes.cohort.classroom_crud.get_submitted_course_work_list",\
                       return_value=submitted_course_work_data):
         resp = client_with_emulator.get(url)
-  assert resp.status_code == 200
+  assert resp.status_code == 404
 
