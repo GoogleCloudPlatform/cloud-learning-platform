@@ -452,6 +452,7 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
     for section in result:
       record = CourseEnrollmentMapping.\
           find_active_enrolled_student_record(section.key,user_id)
+
       if record is not None:
         course_work_list = classroom_crud.get_coursework_list(
           section.classroom_id)
@@ -521,6 +522,9 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
           "overall_grade":round(overall_grade*100,2),\
               "category_grade":category_grade}
         overall_grade_response.append(data)
+    if record is None:
+      raise ResourceNotFoundException(
+      f"{user} not found for cohort {cohort_id}")
     return {"data":overall_grade_response}
 
   except ResourceNotFoundException as err:
