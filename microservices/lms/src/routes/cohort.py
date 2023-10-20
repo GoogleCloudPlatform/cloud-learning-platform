@@ -489,7 +489,7 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
                             "category_percent":0}
             for i in course_work_list:
 
-              if ("gradeCategory" in i and
+              if ("gradeCategory" in i and "maxPoints" in i and
               i["gradeCategory"]["id"] == category_id and \
               "assignedGrade" in \
               next(item for item in submitted_course_work if \
