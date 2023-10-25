@@ -242,13 +242,11 @@ def bq_query_results_to_dict_list(result):
 def check_coursework_grade_catergory(coursework,
                                   submitted_course_works):
   """This function check if a coursework has gradeCategory,
-  maxPoints assigned to it .maxpoint key is present in coursework 
+  maxPoints assigned to it .maxpoint key is present in coursework
   only if the maxPoints of coursework are greater than 0"""
   if ("gradeCategory" in coursework and "maxPoints" in coursework):
     for submitted_coursework in submitted_course_works:
       if submitted_coursework["courseWorkId"] == coursework["id"]:
         if "assignedGrade" in submitted_coursework:
           return True
-  return False      
-
-  
+  return False

@@ -24,7 +24,7 @@ from config import BQ_TABLE_DICT,BQ_DATASET
 from utils.helper import (convert_cohort_to_cohort_model,
                           convert_section_to_section_model,
                           check_coursework_grade_catergory)
-from utils.user_helper import get_user_id 
+from utils.user_helper import get_user_id
 
 
 router = APIRouter(prefix="/cohorts",
@@ -458,7 +458,7 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
         Logger.info(
         f"Student {user} present in section {record.section.id}")
         break
-    if record is not None:      
+    if record is not None:
       course_work_list = classroom_crud.get_coursework_list(
         record.section.classroom_id)
       # submitted_course_work = classroom_crud.get_submitted_course_work_list(
@@ -535,7 +535,8 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
       overall_grade_response.append(data)
       return {"data":overall_grade_response}
     else:
-      raise ResourceNotFoundException(f"Student {user} not found in cohort {cohort_id}")
+      raise ResourceNotFoundException(
+        f"Student {user} not found in cohort {cohort_id}")
 
   except ResourceNotFoundException as err:
     Logger.error(err)
