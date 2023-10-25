@@ -22,7 +22,8 @@ from schemas.section import SectionListResponseModel
 from schemas.student import (GetProgressPercentageCohortResponseModel,GetOverallPercentage)
 from config import BQ_TABLE_DICT,BQ_DATASET
 from utils.helper import (convert_cohort_to_cohort_model,
-                          convert_section_to_section_model)
+                          convert_section_to_section_model,
+                          check_coursework_grade_catergory)
 from utils.user_helper import get_user_id
 
 
@@ -449,83 +450,93 @@ def get_overall_percentage(cohort_id: str, user: str, request: Request):
     user_id = get_user_id(user=user.strip(), headers=headers)
     cohort = Cohort.find_by_id(cohort_id)
     result = Section.fetch_all_by_cohort(cohort_key=cohort.key)
+    record = None
     for section in result:
       record = CourseEnrollmentMapping.\
           find_active_enrolled_student_record(section.key,user_id)
+      if record:
+        Logger.info(
+        f"Student {user} present in section {record.section.id}")
+        break
+    if record is not None:
+      course_work_list = classroom_crud.get_coursework_list(
+        record.section.classroom_id)
+      # submitted_course_work = classroom_crud.get_submitted_course_work_list(
+      # section.key.split("/")[1], user_id,headers)
+      submitted_course_work = classroom_crud.get_submitted_course_work_list(
+      record.section.id, user_id,headers)
+      overall_grade = 0
+      if submitted_course_work == {}:
+        data={"section_id":record.section.id,
+        "overall_grade":overall_grade,
+            "category_grade":[]}
+        return {"data" : [data]}
+      category_grade=[]
+      for course_work_obj in course_work_list:
+        # check if gradeCategory exists in the coursework object
+        # check if assigned grade exists for the coursework in submitted \
+        # coursework
+        # if ("gradeCategory" in course_work_obj and
+        #     "maxPoints" in course_work_obj and\
+        #     "assignedGrade" in \
+        #     next(item for item in submitted_course_work if \
+        #     item["courseWorkId"] == \
+        #     course_work_obj["id"])):
+        if check_coursework_grade_catergory(course_work_obj,
+                                      submitted_course_work):
+          category_id=course_work_obj["gradeCategory"]["id"]
 
-      if record is not None:
-        course_work_list = classroom_crud.get_coursework_list(
-          section.classroom_id)
-        submitted_course_work = classroom_crud.get_submitted_course_work_list(
-        section.key.split("/")[1], user_id,headers)
-        overall_grade = 0
-        if submitted_course_work == {}:
-          data={"section_id":section.id,
-          "overall_grade":overall_grade,
-              "category_grade":[]}
-          return {"data" : [data]}
-        category_grade=[]
-        for course_work_obj in course_work_list:
-          # check if gradeCategory exists in the coursework object
-          # check if assigned grade exists for the coursework in submitted \
-          # coursework
-          if ("gradeCategory" in course_work_obj and
-              "maxPoints" in course_work_obj and\
-              "assignedGrade" in \
-              next(item for item in submitted_course_work if \
-              item["courseWorkId"] == \
-              course_work_obj["id"])):
-            category_id=course_work_obj["gradeCategory"]["id"]
-
-            category_weight=course_work_obj["gradeCategory"].get(
-              "weight",0)/10000
-            total_max_points = 0
-            total_assigned_points = 0
-            coursework_count=0
-            category_data={"category_name":\
-                            course_work_obj["gradeCategory"]["name"],\
-                            "category_id":\
-                            course_work_obj["gradeCategory"]["id"],\
-                            "category_weight":category_weight,
-                            "category_percent":0}
-            for i in course_work_list:
-
-              if ("gradeCategory" in i and "maxPoints" in i and
-              i["gradeCategory"]["id"] == category_id and \
-              "assignedGrade" in \
-              next(item for item in submitted_course_work if \
-              item["courseWorkId"] == \
-              i["id"])):
-                total_max_points = total_max_points+i["maxPoints"]
-                total_assigned_points = total_assigned_points+\
-                next(item for item in submitted_course_work if \
-                    item["courseWorkId"] == i["id"])["assignedGrade"]
-                coursework_count = coursework_count+1
-            category_data["category_percent"] = \
-            round((total_assigned_points/total_max_points)*100,2)
-            if not any(d["category_id"] == category_id for \
-            d in category_grade):
-              category_grade.append(category_data)
-            # calculate coursework weight with respect to the category weight
-            assignment_weight = \
-            (course_work_obj["maxPoints"]/total_max_points)*\
-            (category_weight/100)
-            assigned_grade_by_max_points = \
+          category_weight=course_work_obj["gradeCategory"].get(
+            "weight",0)/10000
+          total_max_points = 0
+          total_assigned_points = 0
+          coursework_count=0
+          category_data={"category_name":\
+                          course_work_obj["gradeCategory"]["name"],\
+                          "category_id":\
+                          course_work_obj["gradeCategory"]["id"],\
+                          "category_weight":category_weight,
+                          "category_percent":0}
+          for i in course_work_list:
+            if ("gradeCategory" in i and "maxPoints" in i and
+            i["gradeCategory"]["id"] == category_id and \
+            "assignedGrade" in \
             next(item for item in submitted_course_work if \
             item["courseWorkId"] == \
-            course_work_obj["id"])["assignedGrade"]/\
-            course_work_obj["maxPoints"]
-            # calculate coursework's contribution towards overall grade
-            assignment_grade=assigned_grade_by_max_points*assignment_weight
-            overall_grade = overall_grade+assignment_grade
-        data={"section_id":section.key.split("/")[1],\
-          "overall_grade":round(overall_grade*100,2),\
-              "category_grade":category_grade}
-        overall_grade_response.append(data)
-    if record is None:
+            i["id"])):
+              total_max_points = total_max_points+i["maxPoints"]
+              total_assigned_points = total_assigned_points+\
+              next(item for item in submitted_course_work if \
+                  item["courseWorkId"] == i["id"])["assignedGrade"]
+              coursework_count = coursework_count+1
+          category_data["category_percent"] = \
+          round((total_assigned_points/total_max_points)*100,2)
+          if not any(d["category_id"] == category_id for \
+          d in category_grade):
+            category_grade.append(category_data)
+          # calculate coursework weight with respect to the category weight
+          assignment_weight = \
+          (course_work_obj["maxPoints"]/total_max_points)*\
+          (category_weight/100)
+          assigned_grade_by_max_points = \
+          next(item for item in submitted_course_work if \
+          item["courseWorkId"] == \
+          course_work_obj["id"])["assignedGrade"]/\
+          course_work_obj["maxPoints"]
+          # calculate coursework's contribution towards overall grade
+          assignment_grade=assigned_grade_by_max_points*assignment_weight
+          overall_grade = overall_grade+assignment_grade
+      # data={"section_id":section.key.split("/")[1],\
+      #   "overall_grade":round(overall_grade*100,2),\
+      #       "category_grade":category_grade}
+      data={"section_id":record.section.id,\
+        "overall_grade":round(overall_grade*100,2),\
+            "category_grade":category_grade}
+      overall_grade_response.append(data)
+      return {"data":overall_grade_response}
+    else:
       raise ResourceNotFoundException(
-      f"{user} not found for cohort {cohort_id}")
-    return {"data":overall_grade_response}
+        f"Student {user} not found in cohort {cohort_id}")
 
   except ResourceNotFoundException as err:
     Logger.error(err)
