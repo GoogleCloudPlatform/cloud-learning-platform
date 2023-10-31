@@ -2,5 +2,5 @@ pyyaml==6.0
 fireo==1.6.2
 firebase_admin==4.5.2
 google-cloud-bigquery==3.10.0
-pypdf==3.9.1
+pypdf==3.17.0
 requests==2.31.0
