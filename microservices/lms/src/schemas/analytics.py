@@ -4,7 +4,6 @@ Pydantic Model for copy course API's
 import datetime
 import json
 from pydantic import BaseModel, validator
-from common.utils.logging_handler import Logger
 from typing import  Optional
 from schemas.schema_examples import (
   ANALYTICS_USER_EXAMPLE,ANALYTICS_COURSE_EXAMPLE,ANALYTICS_COURSE_WORK_EXAMPLE
