@@ -2,14 +2,25 @@
 import datetime
 import json
 import redis
+from common.config import MEMORYSTORE_ENABLED
+from common.utils.secrets import get_secret
 
-r = redis.Redis(host="redis-master", port=6379, db=0)
+if MEMORYSTORE_ENABLED == "true":
+  host = get_secret("memorystore-master-host")
+  host = host.split(":")
+  host_ip = host[0]
+  host_port = host[1]
+  r = redis.Redis(host=host_ip, port=host_port, db=0)
+else:
+  r = redis.Redis(host="redis-master", port=6379, db=0)
+
 
 def json_serial(obj):
   """JSON serializer for objects not serializable by default json code"""
-  if isinstance(obj, (datetime.datetime, datetime.date,datetime.time)):
+  if isinstance(obj, (datetime.datetime, datetime.date, datetime.time)):
     return obj.isoformat()
-  raise TypeError (f"Type {type(obj)} not serializable")
+  raise TypeError(f"Type {type(obj)} not serializable")
+
 
 def set_key(key, value, expiry_time=3600):
   """
@@ -21,7 +32,7 @@ def set_key(key, value, expiry_time=3600):
         Returns:
             True or False
     """
-  value = json.dumps(value,default=json_serial)
+  value = json.dumps(value, default=json_serial)
   return r.set(key, value, ex=expiry_time)
 
 

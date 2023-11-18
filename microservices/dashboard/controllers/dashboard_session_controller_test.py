@@ -47,7 +47,6 @@ class MockSessionDoc:
   def to_dict(self):
     return dict(self.data)
 
-
 def test_get_default_session_obj():
   session_obj = get_default_session_obj()
   assert session_obj is not None

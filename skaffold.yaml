@@ -24,9 +24,6 @@ requires:
 - path: ./common_ml
   configs: [common-ml]
 
-- path: ./microservices/redis
-  configs: [redis]
-
 - path: ./microservices/authentication
   configs: [authentication]
 
@@ -122,6 +119,19 @@ metadata:
 requires:
 - path: ./documentation/api_docs
   configs: [api-docs]
+
+build:
+  googleCloudBuild: {}
+
+---
+# Master Skaffold for Redis
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: local-redis
+requires:
+- path: ./microservices/redis
+  configs: [redis]
 
 build:
   googleCloudBuild: {}

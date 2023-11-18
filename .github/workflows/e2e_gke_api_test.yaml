@@ -66,6 +66,7 @@ env:
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
+  MEMORYSTORE_ENABLED: true
   CLOUD_LOGGING_ENABLED: False
   API_DOMAIN: ${{ secrets.API_DOMAIN }}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
@@ -180,7 +181,7 @@ jobs:
         skaffold run \
         --profile dev \
         --namespace $NAMESPACE \
-        --module backends \
+        --module backends,local-redis \
         -l commit=$GITHUB_SHA \
         --tag PR${{ github.event.pull_request.number }}
 

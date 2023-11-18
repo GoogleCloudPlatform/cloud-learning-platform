@@ -9,6 +9,7 @@ from common.utils.config import SERVICES
 
 auth_scheme = HTTPBearer(auto_error=False)
 
+
 # pylint: disable = consider-using-f-string
 def validate_token(token: auth_scheme = Depends()):
   """_summary_
@@ -34,9 +35,9 @@ def validate_token(token: auth_scheme = Depends()):
           url=api_endpoint,
           headers={
               "Content-Type":
-              "application/json",
+                  "application/json",
               "Authorization":
-              f"{token_dict['scheme']} {token_dict['credentials']}"
+                  f"{token_dict['scheme']} {token_dict['credentials']}"
           },
           timeout=60)
       data = res.json()
@@ -77,9 +78,9 @@ def validate_user_type_and_token(accepted_user_types: list,
           url=api_endpoint,
           headers={
               "Content-Type":
-              "application/json",
+                  "application/json",
               "Authorization":
-              f"{token_dict['scheme']} {token_dict['credentials']}"
+                  f"{token_dict['scheme']} {token_dict['credentials']}"
           },
           timeout=60)
       data = res.json()
@@ -108,13 +109,13 @@ def user_verification(token: str) -> json:
   :return: json
   """
   api_endpoint = "http://{}:{}/authentication/api/v1/validate".format(
-    SERVICES["authentication"]["host"], SERVICES["authentication"]["port"])
+      SERVICES["authentication"]["host"], SERVICES["authentication"]["port"])
   response = requests.get(
-    url=api_endpoint,
-    headers={
-      "Content-Type": "application/json",
-      "Authorization": token
-    },
+      url=api_endpoint,
+      headers={
+          "Content-Type": "application/json",
+          "Authorization": token
+      },
   )
 
   return response
