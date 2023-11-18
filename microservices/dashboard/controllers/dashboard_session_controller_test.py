@@ -47,9 +47,6 @@ class MockSessionDoc:
   def to_dict(self):
     return dict(self.data)
 
-@mock.patch("controllers.dashboard_session_controller.set_key")
-@mock.patch("controllers.dashboard_session_controller.get_key")
-@mock.patch("controllers.dashboard_session_controller.delete_key")
 def test_get_default_session_obj():
   session_obj = get_default_session_obj()
   assert session_obj is not None
@@ -61,9 +58,6 @@ def test_get_default_session_obj():
 
 @mock.patch("controllers.dashboard_session_controller.insert_document")
 @mock.patch("controllers.dashboard_session_controller.get_default_session_obj")
-@mock.patch("controllers.dashboard_session_controller.set_key")
-@mock.patch("controllers.dashboard_session_controller.get_key")
-@mock.patch("controllers.dashboard_session_controller.delete_key")
 def test_manage_session_creation(mock_session_obj, mock_insert_document):
   # arrange
   default_obj = {
@@ -91,11 +85,8 @@ def test_manage_session_creation(mock_session_obj, mock_insert_document):
 @mock.patch("controllers.dashboard_session_controller.update_document")
 @mock.patch("controllers.dashboard_session_controller.get_document_by_id")
 @mock.patch("controllers.dashboard_session_controller.delete_key")
-@mock.patch("controllers.dashboard_session_controller.set_key")
-@mock.patch("controllers.dashboard_session_controller.get_key")
 @mock.patch(
   "controllers.dashboard_session_controller.is_archived_the_session_notes")
-@mock.patch("controllers.dashboard_session_controller.delete_key")
 def test_manage_session_update(mock_update_document, mock_get_document_by_id,
                                mock_delete_key,
                                mock_is_archived_the_session_notes):
