@@ -33,7 +33,6 @@ def set_key(key, value, expiry_time=3600):
         Returns:
             True or False
     """
-  
   value = json.dumps(value, default=json_serial)
   Logger.info(f"Set Key FUnction {MEMORYSTORE_ENABLED} {host}")
   return r.set(key, value, ex=expiry_time)
@@ -48,7 +47,6 @@ def get_key(key):
         Returns:
             value: String or Dict or Number or None
     """
-  
   value = r.get(key)
   return_value = json.loads(value) if value is not None else None
   Logger.info(f"Get Key FUnction {MEMORYSTORE_ENABLED} {host}")
