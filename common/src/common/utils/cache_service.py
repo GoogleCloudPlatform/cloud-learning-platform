@@ -4,6 +4,7 @@ import json
 import redis
 from common.config import MEMORYSTORE_ENABLED
 from common.utils.secrets import get_secret
+from common.utils.logging_handler import Logger
 
 if MEMORYSTORE_ENABLED == "true":
   host = get_secret("memorystore-master-host")
@@ -33,6 +34,7 @@ def set_key(key, value, expiry_time=3600):
             True or False
     """
   value = json.dumps(value, default=json_serial)
+  Logger.info(f"Set Key FUnction {MEMORYSTORE_ENABLED} {host}")
   return r.set(key, value, ex=expiry_time)
 
 
@@ -47,6 +49,7 @@ def get_key(key):
     """
   value = r.get(key)
   return_value = json.loads(value) if value is not None else None
+  Logger.info(f"Get Key FUnction {MEMORYSTORE_ENABLED} {host}")
   return return_value
 
 
