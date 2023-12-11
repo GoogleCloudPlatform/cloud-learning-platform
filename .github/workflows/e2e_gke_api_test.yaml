@@ -306,7 +306,7 @@ jobs:
         gcloud components install gke-gcloud-auth-plugin
 
     - id: 'secrets'
-      uses: 'google-github-actions/get-secretmanager-secrets@v1'
+      uses: 'google-github-actions/get-secretmanager-secrets@v2'
       with:
         secrets: |-
           TOKEN:core-learning-services-dev/e2e_test_email_password
