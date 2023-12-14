@@ -1078,10 +1078,11 @@ def update_grades(material, section, coursework_id, lms_job_id, classroom_course
     # form_id = form_details["file_id"]
     # Get all responses for the form if no responses of
     # the form then return
-    form_url = material['form']['formUrl']
+    form_url = material["form"]["formUrl']
     form_l = form_url.split("/")
     form_id = form_l[-2]
-    Logger.info(f"Form is Id is {form_id}")
+    Logger.info(form_url)
+    Logger.info(f"Form  Id is {form_id}")
     all_responses_of_form = classroom_crud.\
     retrieve_all_form_responses(form_id)
 
