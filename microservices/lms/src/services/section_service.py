@@ -1065,19 +1065,23 @@ def update_grades(material, section, coursework_id, lms_job_id, classroom_course
     lms_job.update()
 
     #Get url mapping of google forms view links and edit ids
-    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_folder(
-      classroom_course["teacherFolder"]["id"]
-    )
-    form_details = url_mapping.get(material["form"]["formUrl"])
-    if not form_details:
-      raise ResourceNotFound(
-      "Google form attached to coursework is not present\
-      in drive folder.Please verify if google form\
-      attached to coursework is present in classroom\
-      drive folder of this section.")
-    form_id = form_details["file_id"]
+    # url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_folder(
+      # classroom_course["teacherFolder"]["id"]
+    # )
+    # form_details = url_mapping.get(material["form"]["formUrl"])
+    # if not form_details:
+    #   raise ResourceNotFound(
+    #   "Google form attached to coursework is not present\
+    #   in drive folder.Please verify if google form\
+    #   attached to coursework is present in classroom\
+    #   drive folder of this section.")
+    # form_id = form_details["file_id"]
     # Get all responses for the form if no responses of
     # the form then return
+    form_url = material['form']['formUrl']
+    form_l = form_url.split("/")
+    form_id = form_l[-2]
+    Logger.info(f"Form is Id is {form_id}")
     all_responses_of_form = classroom_crud.\
     retrieve_all_form_responses(form_id)
 
