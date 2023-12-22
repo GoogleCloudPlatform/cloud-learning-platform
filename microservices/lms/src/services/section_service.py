@@ -188,7 +188,6 @@ def copy_course_background_task(course_template_details,
         if "materials" in coursework.keys():
           coursework_update_output = update_coursework_material(
               materials=coursework["materials"],
-              url_mapping=url_mapping,
               target_folder_id=target_folder_id,
               error_flag=error_flag,
               lti_assignment_details=lti_assignment_details,
@@ -273,7 +272,6 @@ def copy_course_background_task(course_template_details,
 
           coursework_material_update_output = update_coursework_material(
               materials=coursework_material["materials"],
-              url_mapping=url_mapping,
               target_folder_id=target_folder_id,
               error_flag=error_flag,
               lti_assignment_details=lti_assignment_details,
@@ -916,7 +914,6 @@ def sort_titles(courseworks):
   return titles
 
 def update_coursework_material(materials,
-                               url_mapping,
                                target_folder_id,
                                error_flag,
                                lti_assignment_details=None,
