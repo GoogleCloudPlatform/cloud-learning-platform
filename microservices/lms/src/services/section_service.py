@@ -1053,7 +1053,7 @@ def update_grades(material, section, coursework_id, lms_job_id, classroom_course
   """
   lms_job = LmsJob.find_by_id(lms_job_id)
   logs = lms_job.logs
-
+  Logger.info(classroom_course)
   try:
     student_grades = {}
     count = 0
