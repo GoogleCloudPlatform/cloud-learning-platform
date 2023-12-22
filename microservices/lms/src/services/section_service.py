@@ -42,6 +42,7 @@ def copy_course_background_task(course_template_details,
   """
   lms_job = LmsJob.find_by_id(lms_job_id)
   logs = lms_job.logs
+  Logger.info(current_course)
   try:
     # Create a new course
     info_msg = f"Background Task started for the cohort id {cohort_details.id}\
@@ -114,8 +115,8 @@ def copy_course_background_task(course_template_details,
     # google form which returns
     # a dictionary of view_links as keys and edit
     #  links/  and file_id as values for all drive files
-    url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_folder(
-      current_course["teacherFolder"]["id"])
+    # url_mapping = classroom_crud.get_edit_url_and_view_url_mapping_of_folder(
+    #   current_course["teacherFolder"]["id"])
 
     # Get coursework of current course and create a new course
     coursework_list = classroom_crud.get_coursework_list(
