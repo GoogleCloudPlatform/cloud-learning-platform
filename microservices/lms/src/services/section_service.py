@@ -603,7 +603,7 @@ def check_copy_course_alpha(original_courseworks,
     while count<max_count :
       Logger.info(f"Iteration  count {count} to verify copy_course process")
       logs["info"].append(f"Iteration  count {count} to verify copy_course process")
-      time.sleep(120)
+      time.sleep(240)
       count+=1
       error_flag = False
       copied_courseworks = classroom_crud.get_coursework_list(
@@ -861,6 +861,7 @@ def verifiy_attachment(title ,original_coursework_dict,
     copied_youtube_video= set()
     copied_link= set()
     copied_form=set()
+    # if "materials" in copied_coursework_dict[title]:
     for attachment in copied_coursework_dict[title]["materials"]:
       if "driveFile" in attachment.keys():
         copied_drive_files.add(attachment["driveFile"]["driveFile"]["title"])
@@ -1022,12 +1023,16 @@ def update_coursework_material(materials,
     if "form" in material.keys():
       if "title" not in material["form"].keys():
         raise ResourceNotFound("Form to be copied is deleted")
-      check_form = url_mapping.get(material["form"]["formUrl"])
-      if not check_form:
-        raise ResourceNotFound("Google form attachment not found.\
-        Please verify if form is present classroom template drive folder")
+      # check_form = url_mapping.get(material["form"]["formUrl"])
+      # if not check_form:
+      #   raise ResourceNotFound("Google form attachment not found.\
+      #   Please verify if form is present classroom template drive folder")
+      form_url = material["form"]["formUrl"]
+      form_l = form_url.split("/")
+      form_id = form_l[-2]
+      Logger.info(f"This is form ID {form_id}")
       result1 = classroom_crud.drive_copy(
-          url_mapping[material["form"]["formUrl"]]["file_id"], target_folder_id,
+          form_id, target_folder_id,
           material["form"]["title"])
       material["link"] = {
           "title": material["form"]["title"],
