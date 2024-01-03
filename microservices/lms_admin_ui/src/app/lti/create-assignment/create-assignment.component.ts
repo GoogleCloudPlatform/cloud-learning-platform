@@ -47,7 +47,7 @@ export class CreateAssignmentComponent {
         });
       } else {
         this.ltiAssignmentForm = this.fb.group({
-          "tool_id": [{value:this.dialogData.extra_data.assignment.tool_id, disabled: true} , Validators.required],
+          "tool_id": [{ value: this.dialogData.extra_data.assignment.tool_id, disabled: true }, Validators.required],
           "lti_assignment_title": [this.dialogData.extra_data.assignment.lti_assignment_title, Validators.required],
           "course_work_type": [this.dialogData.extra_data.assignment.course_work_type, Validators.required],
           "lti_content_item_id": [this.dialogData.extra_data.assignment.lti_content_item_id],
@@ -101,6 +101,9 @@ export class CreateAssignmentComponent {
           } else {
             this.isDisplayButtonEnabled = true
           }
+        } else if (tool.deeplink_type == "Only content item required everytime") {
+          this.displayButton = "createContentItem"
+          this.isDisplayButtonEnabled = true
         } else {
           this.displayButton = "selectContentItem"
           this.isDisplayButtonEnabled = true
