@@ -28,7 +28,7 @@ on:
 
 env:
   PROJECT_ID: gcp-classroom-dev
-  SKAFFOLD_DEFAULT_REPO: gcr.io/core-learning-services-dev
+  SKAFFOLD_DEFAULT_REPO: gcr.io/gcp-classroom-dev
   NAMESPACE: default
   GKE_CLUSTER: gcp-classroom-dev-us-central1
   GKE_REGION: us-central1
