@@ -28,8 +28,8 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: core-learning-services-dev
-  CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
+  PROJECT_ID: gcp-classroom-dev
+  CLASSROOM_ADMIN_EMAIL: ${{ secrets.ASU_CLASSROOM_DEV_API_DOMAIN }}
 
 # cookiecutter:raw 
 jobs:

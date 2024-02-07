@@ -38,8 +38,8 @@ jobs:
       USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: True
     secrets:
       GH_PAT: ${{ secrets.GH_PAT }}
-      GKE_POD_SA_KEY: ${{ secrets.GKE_CLASSROOM_POD_SA_KEY}}
-      FIREBASE_API_KEY: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_API_KEY }}
-      FIREBASE_APP_ID: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_APP_ID }}
-      API_DOMAIN: ${{ secrets.ASU_CLASSROOM_DEV_API_DOMAIN }}
-      DEPLOYMENT_DEV_SA_KEY: ${{ secrets.CLP_DEV_SA_KE }}
+      GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
+      FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+      FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+      API_DOMAIN: ${{ secrets.API_DOMAIN }}
+      DEPLOYMENT_DEV_SA_KEY: ${{ secrets.DEPLOYMENT_DEV_SA_KEY }}
