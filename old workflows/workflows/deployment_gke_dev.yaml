@@ -1,0 +1,191 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: GKE - Deploy microservices to dev
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'microservices/**'
+      - 'common/**'
+      - 'e2e/**'
+      - 'utils/**'
+      - '.github/workflows/deployment_gke_dev.yaml'
+      - 'skaffold.yaml'
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: core-learning-services-dev
+  SKAFFOLD_DEFAULT_REPO: gcr.io/core-learning-services-dev
+  NAMESPACE: default
+  GKE_CLUSTER: core-learning-services-dev-us-central1
+  GKE_REGION: us-central1
+  KUSTOMIZE_VERSION: 4.1.3
+  SKAFFOLD_VERSION: 1.39.2
+  SKAFFOLD_CACHE_GCS: gs://core-learning-services-dev.appspot.com/skaffold/cache
+  # CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
+  CLASSROOM_ADMIN_EMAIL : lms_admin_teacher@dhodun.altostrat.com
+  GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
+  FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+  USE_GKE_GCLOUD_AUTH_PLUGIN: True
+  API_DOMAIN: ${{ secrets.API_DOMAIN }}
+  LTI_ISSUER_DOMAIN: https://core-learning-services-dev.cloudpssolutions.com
+  LTI_PLATFORM_UNIQUE_ID: e0fc690f-7fb9-4fb2-a5a6-68466f0181a4
+  LTI_PLATFORM_NAME: CLP LTI Service
+  FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+  FIREBASE_AUTH_DOMAIN: core-learning-services-dev.firebaseapp.com
+  FIREBASE_STORAGE_BUCKET: core-learning-services-dev.appspot.com
+  WHITELIST_DOMAINS: google.com
+  # For Scalability in Dev env using Prod config
+  BQ_DATASET: lms_analytics
+  BQ_REGION: US
+  EXTERNAL_USER_PROPERTY_PREFIX: SNHU_
+  SKAFFOLD_BUILD_CONCURRENCY: 0
+  MEMORYSTORE_ENABLED: true
+  
+# cookiecutter:raw 
+jobs:
+  deploy_backends:
+    name: Deploy microservices to GKE cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: 'Set up Gcloud auth'
+        id: 'gcloud_auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.DEPLOYMENT_DEV_SA_KEY }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - name: Install GKE Auth Plugin
+        run: |
+         gcloud components install gke-gcloud-auth-plugin
+
+      - name: Connect to cluster
+        run: |
+          gcloud container clusters get-credentials "$GKE_CLUSTER" --region $GKE_REGION --project $PROJECT_ID
+
+      - name: Set up Service Account
+        run: |
+          bash setup/setup_ksa.sh
+
+      - name: Install Kustomize
+        run: |
+          wget -O kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v$KUSTOMIZE_VERSION/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
+          sudo tar -xvf kustomize.tar.gz -C /usr/local/bin/
+
+      - name: Install Skaffold release binary
+        run: |
+          curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v$SKAFFOLD_VERSION/skaffold-linux-amd64
+          sudo install skaffold /usr/local/bin/skaffold
+
+      - name: Set default repo for Skaffold
+        run: |
+          skaffold config set default-repo "$SKAFFOLD_DEFAULT_REPO"
+
+      - name: Download Skaffold cache if exists
+        run: |
+          gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
+
+      - name: Add BQ Tables
+        run: |
+          cd utils/
+          python -m pip install -r requirements.txt
+          BQ_DATASET=lms_analytics python bq_setup.py
+          BQ_DATASET=lrs python bq_setup.py
+
+      - name: Build and deploy to cluster
+        run: |
+          skaffold run \
+          --profile custom \
+          --namespace $NAMESPACE \
+          --module backends \
+          -l commit=$GITHUB_SHA \
+          --tag latest
+
+      - name: Upload Skaffold cache
+        if: always()
+        run: |
+          gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
+
+  deploy_documentation:
+    name: Deploy documentation
+    runs-on: ubuntu-latest
+    needs: [deploy_backends]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: 'Set up Gcloud auth'
+        id: 'gcloud_auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.DEPLOYMENT_DEV_SA_KEY }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - name: Install GKE Auth Plugin
+        run: |
+         gcloud components install gke-gcloud-auth-plugin
+
+      - name: Connect to cluster
+        run: |
+          gcloud container clusters get-credentials "$GKE_CLUSTER" --region $GKE_REGION --project $PROJECT_ID
+
+      - name: Set up Service Account
+        run: |
+          bash setup/setup_ksa.sh
+
+      - name: Install Kustomize
+        run: |
+          wget -O kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v$KUSTOMIZE_VERSION/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
+          sudo tar -xvf kustomize.tar.gz -C /usr/local/bin/
+
+      - name: Install Skaffold release binary
+        run: |
+          curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v$SKAFFOLD_VERSION/skaffold-linux-amd64
+          sudo install skaffold /usr/local/bin/skaffold
+
+      - name: Set default repo for Skaffold
+        run: |
+          skaffold config set default-repo "$SKAFFOLD_DEFAULT_REPO"
+
+      - name: Download Skaffold cache if exists
+        run: |
+          gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Build and deploy documentation to cluster
+        run: |
+          skaffold run -m api_docs \
+          --profile custom \
+          --namespace $NAMESPACE \
+          -l commit=$GITHUB_SHA \
+          --tag latest
+
+      - name: Upload Skaffold cache
+        if: always()
+        run: |
+          gsutil cp ~/.skaffold/cache "${SKAFFOLD_CACHE_GCS}/api_docs/cache"
+
+# cookiecutter:endraw 
