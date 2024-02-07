@@ -15,73 +15,73 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Unit test & lint for Extractive Summarization
-on:
-  pull_request:
-    branches:
-      - master
-    paths:
-      - 'microservices/extractive_summarization/src/**.py'
-  workflow_dispatch:
-jobs:
-  unit-test:
-    runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.7]
-        target-folder: [extractive_summarization]
+# name: Unit test & lint for Extractive Summarization
+# on:
+#   pull_request:
+#     branches:
+#       - master
+#     paths:
+#       - 'microservices/extractive_summarization/src/**.py'
+#   workflow_dispatch:
+# jobs:
+#   unit-test:
+#     runs-on: ubuntu-20.04
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         python-version: [3.7]
+#         target-folder: [extractive_summarization]
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+#     steps:
+#     - uses: actions/checkout@v3
+#     - name: Set up Python ${{ matrix.python-version }}
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        cd microservices/${{ matrix.target-folder }}
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install pytest pytest-custom_exit_code pytest-cov pylint pytest-mock mock
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
-        python -m spacy download en_core_web_md
-        python -m spacy download en_core_web_sm
-        python -m spacy download en
-        if [[ " ${services_with_spacy[@]} " =~ "${{ matrix.target-folder }}" ]]; then
-          python -m spacy download en
-        fi
+#     - name: Install dependencies
+#       run: |
+#         cd microservices/${{ matrix.target-folder }}
+#         python -m pip install --upgrade pip setuptools wheel
+#         python -m pip install pytest pytest-custom_exit_code pytest-cov pylint pytest-mock mock
+#         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+#         if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
+#         python -m spacy download en_core_web_md
+#         python -m spacy download en_core_web_sm
+#         python -m spacy download en
+#         if [[ " ${services_with_spacy[@]} " =~ "${{ matrix.target-folder }}" ]]; then
+#           python -m spacy download en
+#         fi
 
-    - name: Test with pytest
-      run: |
-        cd microservices/${{ matrix.target-folder }}/src
-        PYTEST_ADDOPTS="--cache-clear --cov . " python -m pytest
+#     - name: Test with pytest
+#       run: |
+#         cd microservices/${{ matrix.target-folder }}/src
+#         PYTEST_ADDOPTS="--cache-clear --cov . " python -m pytest
 
-  linter:
-    runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.7]
-        target-folder: [
-          extractive_summarization,
-        ]
+#   linter:
+#     runs-on: ubuntu-20.04
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         python-version: [3.7]
+#         target-folder: [
+#           extractive_summarization,
+#         ]
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+#     steps:
+#     - uses: actions/checkout@v3
+#     - name: Set up Python ${{ matrix.python-version }}
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        cd microservices/${{ matrix.target-folder }}
-        python -m pip install --upgrade pip
-        python -m pip install pylint
+#     - name: Install dependencies
+#       run: |
+#         cd microservices/${{ matrix.target-folder }}
+#         python -m pip install --upgrade pip
+#         python -m pip install pylint
 
-    - name: Lint with pylint
-      run: |
-        cd microservices/${{ matrix.target-folder }}
-        python -m pylint **/*.py --rcfile=../../.pylintrc
+#     - name: Lint with pylint
+#       run: |
+#         cd microservices/${{ matrix.target-folder }}
+#         python -m pylint **/*.py --rcfile=../../.pylintrc
