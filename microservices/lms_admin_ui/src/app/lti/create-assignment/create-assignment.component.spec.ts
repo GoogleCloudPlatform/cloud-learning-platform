@@ -48,10 +48,10 @@ describe('CreateAssignmentComponent', () => {
             "id": "xwsBdJzPESMQWiQw7Plh",
             "client_id": "db5e915d-87a3-49d8-9b3f-ad95c1934705",
             "deployment_id": "d143100f-e817-4e55-b1a4-63fe9016cb3e",
-            "issuer": "https://core-learning-services-dev.cloudpssolutions.com",
-            "platform_auth_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/authorize",
-            "platform_token_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/token",
-            "platform_keyset_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/jwks",
+            "issuer": "https://gcp-classroom-dev.cloudpssolutions.com",
+            "platform_auth_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/authorize",
+            "platform_token_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/token",
+            "platform_keyset_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/jwks",
             "created_time": "2023-06-07 13:28:45.285146+00:00",
             "last_modified_time": "2023-06-07 13:56:47.149432+00:00"
         },
@@ -75,10 +75,10 @@ describe('CreateAssignmentComponent', () => {
             "id": "Owxks4ehpcd9CydOwtb8",
             "client_id": "88651ff1-f0c0-4870-b8c8-828f5fbb0e2c",
             "deployment_id": "4f551486-9af0-4471-a125-e45db8b68514",
-            "issuer": "https://core-learning-services-dev.cloudpssolutions.com",
-            "platform_auth_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/authorize",
-            "platform_token_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/token",
-            "platform_keyset_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/jwks",
+            "issuer": "https://gcp-classroom-dev.cloudpssolutions.com",
+            "platform_auth_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/authorize",
+            "platform_token_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/token",
+            "platform_keyset_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/jwks",
             "created_time": "2023-04-06 16:46:44.783228+00:00",
             "last_modified_time": "2023-04-06 16:46:44.783228+00:00"
         },
@@ -102,10 +102,10 @@ describe('CreateAssignmentComponent', () => {
             "id": "dDbYYg9LuYUmLFLyc72l",
             "client_id": "f3077a63-5111-4542-b481-25909fc88720",
             "deployment_id": "0ec2040a-a43a-442c-b186-6080f4844a7a",
-            "issuer": "https://core-learning-services-dev.cloudpssolutions.com",
-            "platform_auth_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/authorize",
-            "platform_token_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/token",
-            "platform_keyset_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/jwks",
+            "issuer": "https://gcp-classroom-dev.cloudpssolutions.com",
+            "platform_auth_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/authorize",
+            "platform_token_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/token",
+            "platform_keyset_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/jwks",
             "created_time": "2023-02-03 06:08:00.435049+00:00",
             "last_modified_time": "2023-03-01 17:35:55.212836+00:00"
         },
@@ -130,10 +130,10 @@ describe('CreateAssignmentComponent', () => {
             "id": "d3JBEKfmFAg1G8rP94f0",
             "client_id": "d64fb8f1-69ae-41e5-be8e-71b599cc7e20",
             "deployment_id": "90fb5e21-b795-43af-8074-bf7f485708d8",
-            "issuer": "https://core-learning-services-dev.cloudpssolutions.com",
-            "platform_auth_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/authorize",
-            "platform_token_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/token",
-            "platform_keyset_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/jwks",
+            "issuer": "https://gcp-classroom-dev.cloudpssolutions.com",
+            "platform_auth_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/authorize",
+            "platform_token_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/token",
+            "platform_keyset_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/jwks",
             "created_time": "2023-01-13 01:25:03.864665+00:00",
             "last_modified_time": "2023-02-06 08:36:55.456025+00:00"
         },
@@ -157,10 +157,10 @@ describe('CreateAssignmentComponent', () => {
             "id": "Jz9WXCWu0pod5lDaa2q4",
             "client_id": "16cc5a75-8566-467f-a038-ffcb537f7054",
             "deployment_id": "5adf8a11-8693-4eef-b422-85009a918271",
-            "issuer": "https://core-learning-services-dev.cloudpssolutions.com",
-            "platform_auth_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/authorize",
-            "platform_token_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/token",
-            "platform_keyset_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/jwks",
+            "issuer": "https://gcp-classroom-dev.cloudpssolutions.com",
+            "platform_auth_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/authorize",
+            "platform_token_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/token",
+            "platform_keyset_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/jwks",
             "created_time": "2023-01-09 18:37:55.444490+00:00",
             "last_modified_time": "2023-06-07 13:56:53.311841+00:00"
         },
@@ -184,10 +184,10 @@ describe('CreateAssignmentComponent', () => {
             "id": "46G7Lol0eHx1th4WJEVE",
             "client_id": "75932254-b45d-4004-9d00-6b30aeddd251",
             "deployment_id": "23232fd9-03aa-4a7e-a485-05ef0a99f6c3",
-            "issuer": "https://core-learning-services-dev.cloudpssolutions.com",
-            "platform_auth_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/authorize",
-            "platform_token_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/token",
-            "platform_keyset_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/jwks",
+            "issuer": "https://gcp-classroom-dev.cloudpssolutions.com",
+            "platform_auth_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/authorize",
+            "platform_token_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/token",
+            "platform_keyset_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/jwks",
             "created_time": "2023-01-05 17:44:27.780816+00:00",
             "last_modified_time": "2023-02-06 08:36:50.422329+00:00"
         }
@@ -257,7 +257,7 @@ describe('CreateAssignmentComponent', () => {
     const select_content_button = select_content_buttonElement.nativeElement as HTMLButtonElement
     // identify and click on select tool dropdown
     const tool_Element = fixture.debugElement.query(By.css(`mat-select[formControlName='tool_id']`));
-    tool_Element.nativeElement.click() 
+    tool_Element.nativeElement.click()
     fixture.detectChanges()
     // identify "Harmonize Google Dev" option and click
     const tool_OptionElements = fixture.debugElement.queryAll(By.directive(MatOption));
@@ -272,7 +272,7 @@ describe('CreateAssignmentComponent', () => {
     spyOn(ltiService, 'getContentItems').and.returnValue(of(mockContentItemServiceResponse))
     matOption.select()
     fixture.detectChanges()
-    expect(ltiService.getContentItems).toHaveBeenCalled() 
+    expect(ltiService.getContentItems).toHaveBeenCalled()
     expect(select_content_button.disabled).toBeFalsy()       // check button Select Content that it is enabled
     spyOn(component, 'openContentSelector')
     select_content_button.click()     // click on select button should call openContentSelector method
@@ -288,7 +288,7 @@ describe('CreateAssignmentComponent', () => {
     expect(select_content_button.disabled).toBeTruthy()
     // identify and click on select tool dropdown
     const tool_Element = fixture.debugElement.query(By.css(`mat-select[formControlName='tool_id']`));
-    tool_Element.nativeElement.click() 
+    tool_Element.nativeElement.click()
     fixture.detectChanges()
     // identify "Harmonize Google Dev" option and click
     const tool_OptionElements = fixture.debugElement.queryAll(By.directive(MatOption));
@@ -303,7 +303,7 @@ describe('CreateAssignmentComponent', () => {
     spyOn(ltiService, 'getContentItems').and.returnValue(of(mockContentItemServiceResponse))
     matOption.select()
     fixture.detectChanges()
-    expect(ltiService.getContentItems).toHaveBeenCalled() 
+    expect(ltiService.getContentItems).toHaveBeenCalled()
     const create_content_item_buttonElements = fixture.debugElement.queryAll(By.css('button'))
     const create_content_item_buttonElement = create_content_item_buttonElements.find((button) => button.nativeElement.textContent.trim() === "Create Content Item");
     const create_content_item_button = create_content_item_buttonElement.nativeElement as HTMLButtonElement
@@ -342,7 +342,7 @@ describe('CreateAssignmentComponent', () => {
     const select_content_button = select_content_buttonElement.nativeElement as HTMLButtonElement
     // identify and click on select tool dropdown
     const tool_Element = fixture.debugElement.query(By.css(`mat-select[formControlName='tool_id']`));
-    tool_Element.nativeElement.click() 
+    tool_Element.nativeElement.click()
     fixture.detectChanges()
     // identify "Harmonize Google Dev" option and click
     const tool_OptionElements = fixture.debugElement.queryAll(By.directive(MatOption));
@@ -357,7 +357,7 @@ describe('CreateAssignmentComponent', () => {
     spyOn(ltiService, 'getContentItems').and.returnValue(of(mockContentItemServiceResponse))
     matOption.select()
     fixture.detectChanges()
-    expect(ltiService.getContentItems).toHaveBeenCalled() 
+    expect(ltiService.getContentItems).toHaveBeenCalled()
     expect(select_content_button.disabled).toBeFalsy()       // check button Select Content that it is enabled
     spyOn(component, 'openContentSelector')
     select_content_button.click()     // click on select button should call openContentSelector method
@@ -377,7 +377,7 @@ describe('CreateAssignmentComponent', () => {
   it('should fill LTI form, submit and observe response of postLtiAssignments', ()=>{
     // Set tool_id
     const tool_Element = fixture.debugElement.query(By.css(`mat-select[formControlName='tool_id']`));
-    tool_Element.nativeElement.click() 
+    tool_Element.nativeElement.click()
     fixture.detectChanges()
     const tool_ElementSelect = tool_Element.componentInstance as MatSelect
     tool_ElementSelect.value = "Harmonize Google Dev";
@@ -390,7 +390,7 @@ describe('CreateAssignmentComponent', () => {
     fixture.detectChanges();
     //Set course_work_type
     const course_work_type_Element = fixture.debugElement.query(By.css(`mat-select[formControlName='course_work_type']`));
-    course_work_type_Element.nativeElement.click() 
+    course_work_type_Element.nativeElement.click()
     fixture.detectChanges()
     const course_work_type_ElementSelect = course_work_type_Element.componentInstance as MatSelect
     course_work_type_ElementSelect.value = "Coursework";
@@ -445,7 +445,7 @@ describe('CreateAssignmentComponent', () => {
       "end_date": "2023-06-17T00:00:00+00:00",
       "due_date": "2023-06-24T00:00:00+00:00"
     }
-    component.dialogData.extra_data.assignment = mockData 
+    component.dialogData.extra_data.assignment = mockData
     component.dialogData.mode = 'Update'
     component.ngOnInit()
     fixture.detectChanges()

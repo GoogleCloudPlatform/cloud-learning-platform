@@ -101,7 +101,7 @@ if __name__ == "__main__":
                         "topic": cls_topic_path,
                         "ack_deadline_seconds": 600
                     }])
-  # webhook_url = ("https://core-learning-services-dev.cloudpssolutions.com"
+  # webhook_url = ("https://gcp-classroom-dev.cloudpssolutions.com"
   #                 + "/lms/api/test/webhook")
   # oidc_token = pubsub_v1.types.PushConfig.OidcToken(
   #     service_account_email=

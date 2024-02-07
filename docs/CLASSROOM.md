@@ -158,7 +158,7 @@ Body :
 {
 "first_name": "Backend",
 "last_name": "Bot",
-"email": "bot@core-learning-services-dev.cloudpssolutions.com",
+"email": "bot@gcp-classroom-dev.cloudpssolutions.com",
 "user_type": "other"
 }
 ```

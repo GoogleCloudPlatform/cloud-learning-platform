@@ -11,7 +11,7 @@ from schemas.error_schema import (UnauthorizedResponseModel,
 PORT = os.environ["PORT"] if os.environ.get("PORT") is not None else 80
 GCP_PROJECT = os.environ.get("PROJECT_ID", "")
 os.environ["GOOGLE_CLOUD_PROJECT"] = GCP_PROJECT
-GCP_BUCKET = os.environ.get("PROJECT_ID", "core-learning-services-dev")
+GCP_BUCKET = os.environ.get("PROJECT_ID", "gcp-classroom-dev")
 
 SCOPES = [
   "https://www.googleapis.com/auth/cloud-platform",

@@ -58,17 +58,17 @@ profiles:
       - ./kustomize/custom
 - name: dev
   activation:
-  - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
+  - kubeContext: gke_gcp-classroom-dev_us-central1_gcp-classroom-dev-us-central1
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: gcr.io/core-learning-services-dev/authentication
+    - image: gcr.io/gcp-classroom-dev/authentication
       docker:
         cacheFrom:
-          - gcr.io/core-learning-services-dev/authentication
-          - gcr.io/core-learning-services-dev/authentication:latest
+          - gcr.io/gcp-classroom-dev/authentication
+          - gcr.io/gcp-classroom-dev/authentication:latest
       requires:
-        - image: gcr.io/core-learning-services-dev/common
+        - image: gcr.io/gcp-classroom-dev/common
           alias: BASE_IMG
       sync:
         infer:

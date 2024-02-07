@@ -22,7 +22,7 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: core-learning-services-dev
+  PROJECT_ID: gcp-classroom-dev
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
 
 jobs:

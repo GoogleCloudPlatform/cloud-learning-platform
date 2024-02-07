@@ -45,7 +45,7 @@ jobs:
     - name: Install gcloud
       uses: google-github-actions/setup-gcloud@v0
       with:
-        project_id: core-learning-services-dev
+        project_id: gcp-classroom-dev
         service_account_key: ${{ secrets.DEPLOYMENT_SA_KEY }}
         export_default_credentials: true
     

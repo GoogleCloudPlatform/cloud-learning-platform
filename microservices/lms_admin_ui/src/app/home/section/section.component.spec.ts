@@ -178,7 +178,7 @@ describe('SectionComponent', () => {
     const managementTitleElement  = fixture.debugElement.query(By.css('.section-management span'))
     expect(managementTitleElement.nativeElement.textContent).toBe(component.selectedSection.section+ ' management')
   })
-  
+
   it('should call getSectionStudents and update studentTableData', ()=>{
     const mockSectionStudents = {
       "success": true,
@@ -253,7 +253,7 @@ describe('SectionComponent', () => {
     expect(JSON.stringify(component.teacherTableData)).toEqual(JSON.stringify(mockTeacherTableData))
     expect(component.teacherTableLoader).toBeFalsy()
 
-    
+
   })
 
   it('should call getCourseworkDetails and update courseworkTable', ()=>{
@@ -270,9 +270,9 @@ describe('SectionComponent', () => {
               "materials": [
                   {
                       "link": {
-                          "url": "https://core-learning-services-dev.cloudpssolutions.com/classroom-shim/api/v1/launch?lti_assignment_id=NluSaWeHbd87r5SjFg",
+                          "url": "https://gcp-classroom-dev.cloudpssolutions.com/classroom-shim/api/v1/launch?lti_assignment_id=NluSaWeHbd87r5SjFg",
                           "title": "new assignment",
-                          "thumbnailUrl": "https://classroom.google.com/webthumbnail?url=https://core-learning-services-dev.cloudpssolutions.com/classroom-shim/api/v1/launch?lti_assignment_id%3DNWluSaWHbdH7r5SjFg"
+                          "thumbnailUrl": "https://classroom.google.com/webthumbnail?url=https://gcp-classroom-dev.cloudpssolutions.com/classroom-shim/api/v1/launch?lti_assignment_id%3DNWluSaWHbdH7r5SjFg"
                       }
                   }
               ]
@@ -430,5 +430,5 @@ describe('SectionComponent', () => {
     fixture.detectChanges()
     expect(homeService.deleteLtiAssignments).toHaveBeenCalled()
   })
-  
+
 });

@@ -23,5 +23,5 @@ spec:
       serviceAccountName: ksa
       containers:
       - name: lms
-        image: gcr.io/core-learning-services-dev/lms
+        image: gcr.io/gcp-classroom-dev/lms
         imagePullPolicy: Always

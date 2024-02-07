@@ -55,13 +55,13 @@ on:
         default: false
 
 env:
-  PROJECT_ID: core-learning-services-dev
-  SKAFFOLD_DEFAULT_REPO: gcr.io/core-learning-services-dev
-  GKE_CLUSTER: core-learning-services-dev-us-central1
+  PROJECT_ID: gcp-classroom-dev
+  SKAFFOLD_DEFAULT_REPO: gcr.io/gcp-classroom-dev
+  GKE_CLUSTER: gcp-classroom-dev-us-central1
   GKE_ZONE: us-central1
   KUSTOMIZE_VERSION: 4.1.3
   SKAFFOLD_VERSION: 1.39.2
-  SKAFFOLD_CACHE_GCS: gs://core-learning-services-dev.appspot.com/skaffold/cache
+  SKAFFOLD_CACHE_GCS: gs://gcp-classroom-dev.appspot.com/skaffold/cache
   WORKSPACE_ADMIN_EMAIL: lms_service@dhodun.altostrat.com
   GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
@@ -75,7 +75,7 @@ env:
   USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT }}
   E2E_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr' || 'e2e_pr' }}${{  github.event.pull_request.number }}_
   E2E_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-' }}${{  github.event.pull_request.number }}
-  CONTENT_SERVING_BUCKET: core-learning-services-dev-content-serving-bucket
+  CONTENT_SERVING_BUCKET: gcp-classroom-dev-content-serving-bucket
 # cookiecutter:raw 
 jobs:
   admin-teacher:
@@ -310,7 +310,7 @@ jobs:
       uses: 'google-github-actions/get-secretmanager-secrets@v1'
       with:
         secrets: |-
-          TOKEN:core-learning-services-dev/e2e_test_email_password
+          TOKEN:gcp-classroom-dev/e2e_test_email_password
 
     - name: Connect to cluster
       run: |

@@ -28,7 +28,7 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: core-learning-services-dev
+  PROJECT_ID: gcp-classroom-dev
 
 # cookiecutter:raw
 jobs:

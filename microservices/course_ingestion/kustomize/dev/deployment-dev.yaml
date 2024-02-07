@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: course-ingestion
-        image: gcr.io/core-learning-services-dev/course-ingestion
+        image: gcr.io/gcp-classroom-dev/course-ingestion
         imagePullPolicy: Always
         resources:
           requests:

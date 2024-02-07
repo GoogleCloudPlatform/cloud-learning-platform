@@ -24,7 +24,7 @@ spec:
         spec:
           containers:
           - name: update-invitations-cronjob
-            image: gcr.io/core-learning-services-dev/update-invitations-cronjob
+            image: gcr.io/gcp-classroom-dev/update-invitations-cronjob
             envFrom:
             - configMapRef:
                 name: env-vars

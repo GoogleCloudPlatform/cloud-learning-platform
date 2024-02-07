@@ -23,7 +23,7 @@ spec:
       serviceAccountName: ksa
       containers:
       - name: authentication
-        image: gcr.io/core-learning-services-dev/authentication
+        image: gcr.io/gcp-classroom-dev/authentication
         imagePullPolicy: Always
         resources:
           requests:

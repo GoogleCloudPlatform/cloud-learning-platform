@@ -41,10 +41,10 @@ describe('ToolFormComponent', () => {
     // "id": "xwsBdJzPESMQWiQw7Plh",
     // "client_id": "db5e95d-87a3-49d8-9b3f-ad95c194705",
     // "deployment_id": "d14300f-e817-4e55-b1a4-63fe906cb3e",
-    // "issuer": "https://core-learning-services-dev.cloudpssolutions.com",
-    // "platform_auth_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/authorize",
-    // "platform_token_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/token",
-    // "platform_keyset_url": "https://core-learning-services-dev.cloudpssolutions.com/lti/api/v1/jwks",
+    // "issuer": "https://gcp-classroom-dev.cloudpssolutions.com",
+    // "platform_auth_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/authorize",
+    // "platform_token_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/token",
+    // "platform_keyset_url": "https://gcp-classroom-dev.cloudpssolutions.com/lti/api/v1/jwks",
     // "created_time": "2023-06-07 13:28:45.285146+00:00",
     // "last_modified_time": "2023-06-07 13:56:47.149432+00:00"
   }
@@ -106,7 +106,7 @@ describe('ToolFormComponent', () => {
     tool_login_urlInput.value =  mockData.tool_login_url;
     tool_login_urlInput.dispatchEvent(new Event('input'));
     fixture.detectChanges();
-    
+
     // By default 'JWK URL' option selected for public_key_type
     const public_key_typeElement = fixture.debugElement.query(By.css(`mat-select[formControlName='public_key_type']`));
     const public_key_typeInput = public_key_typeElement.componentInstance as MatSelect;
@@ -141,7 +141,7 @@ describe('ToolFormComponent', () => {
     deeplink_typeInput.writeValue(deeplink_typeInput.value);
     fixture.detectChanges();
 
-    //Insert in redirect_uris textarea 
+    //Insert in redirect_uris textarea
     const redirect_urisElement = fixture.debugElement.query(By.css(`textarea[formControlName='redirect_uris']`));
     const redirect_urisInput = redirect_urisElement.nativeElement as HTMLTextAreaElement;
     let redirectUris:any = mockData.redirect_uris;
@@ -152,7 +152,7 @@ describe('ToolFormComponent', () => {
     redirect_urisInput.dispatchEvent(new Event('input'));
     fixture.detectChanges();
 
-    //Insert in redirect_uris textarea 
+    //Insert in redirect_uris textarea
     const custom_paramsElement = fixture.debugElement.query(By.css(`textarea[formControlName='custom_params']`));
     const custom_paramsInput = custom_paramsElement.nativeElement as HTMLTextAreaElement;
     custom_paramsInput.value =  mockData.custom_params;
@@ -175,7 +175,7 @@ describe('ToolFormComponent', () => {
     fixture.detectChanges();
     expect(enable_nrpsComponent.checked).toBeTrue()
 
-    //debug validate_title_for_grade_sync and verify it's value is false 
+    //debug validate_title_for_grade_sync and verify it's value is false
     const validate_title_for_grade_syncElement = fixture.debugElement.query(By.css('mat-checkbox[formControlName="validate_title_for_grade_sync"]'));
     const validate_title_for_grade_syncComponent = validate_title_for_grade_syncElement.componentInstance as MatCheckbox;
     expect(validate_title_for_grade_syncComponent.checked).toBeFalse()
@@ -247,10 +247,10 @@ describe('ToolFormComponent', () => {
   it('should toggle tool_public_key/tool_keyset_url formcontrol on public_key_type change',()=>{
     // for public_key_type "JKW URL" formControl tool_keyset_url should be available
     const tool_keyset_url = fixture.debugElement.query(By.css(`input[formControlName='tool_keyset_url']`));
-    expect(tool_keyset_url).toBeTruthy() 
+    expect(tool_keyset_url).toBeTruthy()
     // identify and click on public_key_type select dropdown
     const publiKeyType_Element = fixture.debugElement.query(By.css(`mat-select[formControlName='public_key_type']`));
-    publiKeyType_Element.nativeElement.click() 
+    publiKeyType_Element.nativeElement.click()
     fixture.detectChanges()
     // identify "Public Key" option and click
     const publiKeyType_OptionElement = fixture.debugElement.query(By.css('mat-option[value="Public Key"]'))
@@ -259,6 +259,6 @@ describe('ToolFormComponent', () => {
     fixture.detectChanges()
     // for public_key_type "Public Key" formControl tool_public_key should be available
     const tool_public_key = fixture.debugElement.query(By.css(`textarea[formControlName='tool_public_key']`));
-    expect(tool_public_key).toBeTruthy() 
+    expect(tool_public_key).toBeTruthy()
   })
 });

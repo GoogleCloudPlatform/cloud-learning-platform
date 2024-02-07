@@ -24,7 +24,7 @@ spec:
         spec:
           containers:
           - name: classroom-notifications-cronjob
-            image: gcr.io/core-learning-services-dev/classroom-notifications-cronjob
+            image: gcr.io/gcp-classroom-dev/classroom-notifications-cronjob
             envFrom:
             - configMapRef:
                 name: env-vars

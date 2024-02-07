@@ -8,7 +8,7 @@ spec:
       serviceAccountName: ksa
       containers:
       - name: dashboard
-        image: gcr.io/core-learning-services-dev/dashboard
+        image: gcr.io/gcp-classroom-dev/dashboard
         imagePullPolicy: Always
         resources:
           requests:

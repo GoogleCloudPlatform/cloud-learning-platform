@@ -91,11 +91,11 @@ profiles:
           PROJECT_ID: "{{.PROJECT_ID}}"
 - name: dev
   activation:
-  - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
+  - kubeContext: gke_gcp-classroom-dev_us-central1_gcp-classroom-dev-us-central1
   build:
     googleCloudBuild: {}
     artifacts:
-    - image: gcr.io/core-learning-services-dev/lms-admin-ui
+    - image: gcr.io/gcp-classroom-dev/lms-admin-ui
       sync:
         infer:
           - '**/*.js'
@@ -103,8 +103,8 @@ profiles:
           - '**/*.css'
       docker:
         cacheFrom:
-          - gcr.io/core-learning-services-dev/lms-admin-ui
-          - gcr.io/core-learning-services-dev/lms-admin-ui:latest
+          - gcr.io/gcp-classroom-dev/lms-admin-ui
+          - gcr.io/gcp-classroom-dev/lms-admin-ui:latest
         buildArgs:
           API_DOMAIN: "{{.API_DOMAIN}}"
           FIREBASE_API_KEY: "{{.FIREBASE_API_KEY}}"

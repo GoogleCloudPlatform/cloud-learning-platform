@@ -23,8 +23,8 @@ The successful response will be as follows:
   "success": true,
   "message": "Successfully uploaded the transcripts",
   "data": [
-    "gs://core-learning-services-dev/pla/user-transcripts/test_3.pdf",
-    "gs://core-learning-services-dev/pla/user-transcripts/test_2.pdf"
+    "gs://gcp-classroom-dev/pla/user-transcripts/test_3.pdf",
+    "gs://gcp-classroom-dev/pla/user-transcripts/test_2.pdf"
   ]
 }
 ```
@@ -68,7 +68,7 @@ The request body will be as follows:
   "doc_class": "transcripts",
   "context": "generic",
   "gcs_urls": [
-    "gs://core-learning-services-dev/pla/user-transcripts/Transcript_Example.pdf"
+    "gs://gcp-classroom-dev/pla/user-transcripts/Transcript_Example.pdf"
   ]
 }
 ```

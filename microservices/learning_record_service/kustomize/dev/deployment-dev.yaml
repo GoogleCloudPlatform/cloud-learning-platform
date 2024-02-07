@@ -9,7 +9,7 @@ spec:
       serviceAccountName: ksa
       containers:
       - name: learning-record-service
-        image: gcr.io/core-learning-services-dev/learning-record-service
+        image: gcr.io/gcp-classroom-dev/learning-record-service
         imagePullPolicy: Always
         env:
         - name: PROJECT_ID

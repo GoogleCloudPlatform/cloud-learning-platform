@@ -23,5 +23,5 @@ spec:
       serviceAccountName: ksa
       containers:
       - name: jobs-service
-        image: gcr.io/core-learning-services-dev/jobs-service
+        image: gcr.io/gcp-classroom-dev/jobs-service
         imagePullPolicy: Always

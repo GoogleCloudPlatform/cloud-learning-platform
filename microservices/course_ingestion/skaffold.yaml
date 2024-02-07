@@ -52,18 +52,18 @@ profiles:
     statusCheckDeadlineSeconds: 1200
 - name: dev
   activation:
-  - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
+  - kubeContext: gke_gcp-classroom-dev_us-central1_gcp-classroom-dev-us-central1
   build:
     googleCloudBuild:
       machineType: N1_HIGHCPU_8
       timeout: '3000s'
     artifacts:
-    - image: gcr.io/core-learning-services-dev/course-ingestion
+    - image: gcr.io/gcp-classroom-dev/course-ingestion
       docker:
           cacheFrom:
-            - gcr.io/core-learning-services-dev/course-ingestion:latest
+            - gcr.io/gcp-classroom-dev/course-ingestion:latest
       requires:
-        - image: gcr.io/core-learning-services-dev/common
+        - image: gcr.io/gcp-classroom-dev/common
           alias: BASE_IMG
       sync:
         infer:
@@ -82,14 +82,14 @@ profiles:
       machineType: N1_HIGHCPU_8
       timeout: '3000s'
     artifacts:
-    - image: gcr.io/core-learning-services-dev/course-ingestion
+    - image: gcr.io/gcp-classroom-dev/course-ingestion
       docker:
           cacheFrom:
             - course-ingestion
             - course-ingestion:latest
-            - gcr.io/core-learning-services-dev/course-ingestion:latest
+            - gcr.io/gcp-classroom-dev/course-ingestion:latest
       requires:
-        - image: gcr.io/core-learning-services-dev/common
+        - image: gcr.io/gcp-classroom-dev/common
           alias: BASE_IMG
       sync:
         infer:

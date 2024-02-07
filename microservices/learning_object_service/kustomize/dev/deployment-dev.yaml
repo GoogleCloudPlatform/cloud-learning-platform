@@ -23,7 +23,7 @@ spec:
       serviceAccountName: ksa
       containers:
       - name: learning-object-service
-        image: gcr.io/core-learning-services-dev/learning-object-service
+        image: gcr.io/gcp-classroom-dev/learning-object-service
         imagePullPolicy: Always
         resources:
           requests:

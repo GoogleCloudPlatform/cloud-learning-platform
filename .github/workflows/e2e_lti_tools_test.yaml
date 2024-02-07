@@ -29,8 +29,8 @@ on:
     #   - 'microservices/classroom_shim'
 
 env:
-  PROJECT_ID: core-learning-services-dev
-  GKE_CLUSTER: core-learning-services-dev-us-central1
+  PROJECT_ID: gcp-classroom-dev
+  GKE_CLUSTER: gcp-classroom-dev-us-central1
   GKE_ZONE: us-central1
 
 jobs:
