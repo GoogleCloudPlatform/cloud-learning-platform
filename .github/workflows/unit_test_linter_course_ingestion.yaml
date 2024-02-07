@@ -46,7 +46,7 @@ jobs:
       uses: google-github-actions/setup-gcloud@v0
       with:
         project_id: gcp-classroom-dev
-        service_account_key: ${{ secrets.CLP_DEV_SA_KE }}
+        service_account_key: ${{ secrets.CLP_DEV_SA_KEY }}
         export_default_credentials: true
     
     - name: Install Firebase CLI
