@@ -34,26 +34,12 @@ env:
   GKE_REGION: us-central1
   KUSTOMIZE_VERSION: 4.1.3
   SKAFFOLD_VERSION: 1.39.2
-<<<<<<< HEAD
-  SKAFFOLD_CACHE_GCS: gs://gcp-classroom-dev.appspot.com/skaffold/cache
-=======
   SKAFFOLD_CACHE_GCS: gs://gcp-classroom-dev/skaffold/cache
->>>>>>> origin/asu-classroom-env
   # CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
   CLASSROOM_ADMIN_EMAIL : lms_admin_teacher@gostudyhall.com
   GKE_POD_SA_KEY: ${{ secrets.GKE_CLASSROOM_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_API_KEY }}
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
-<<<<<<< HEAD
-  API_DOMAIN: ${{ secrets.API_DOMAIN }}
-  LTI_ISSUER_DOMAIN: https://gcp-classroom-dev.cloudpssolutions.com
-  LTI_PLATFORM_UNIQUE_ID: e0fc690f-7fb9-4fb2-a5a6-68466f0181a4
-  LTI_PLATFORM_NAME: CLP LTI Service
-  FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
-  FIREBASE_AUTH_DOMAIN: gcp-classroom-dev.firebaseapp.com
-  FIREBASE_STORAGE_BUCKET: gcp-classroom-dev.appspot.com
-  WHITELIST_DOMAINS: google.com
-=======
   API_DOMAIN: ${{ secrets.ASU_CLASSROOM_DEV_API_DOMAIN }}
   LTI_ISSUER_DOMAIN: https://core-learning-services-dev.cloudpssolutions.com
   LTI_PLATFORM_UNIQUE_ID: e0fc690f-7fb9-4fb2-a5a6-68466f0181a4
@@ -62,7 +48,6 @@ env:
   FIREBASE_AUTH_DOMAIN: gcp-classroom-dev.firebaseapp.com
   FIREBASE_STORAGE_BUCKET: gcp-classroom-dev.appspot.com
   WHITELIST_DOMAINS: gostudyhall.com
->>>>>>> origin/asu-classroom-env
   # For Scalability in Dev env using Prod config
   BQ_DATASET: lms_analytics
   BQ_REGION: US

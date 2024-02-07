@@ -42,21 +42,12 @@
 #       with:
 #         node-version: ${{ matrix.node-version }}
     
-<<<<<<< HEAD
-    - name: Install gcloud
-      uses: google-github-actions/setup-gcloud@v0
-      with:
-        project_id: gcp-classroom-dev
-        service_account_key: ${{ secrets.DEPLOYMENT_SA_KEY }}
-        export_default_credentials: true
-=======
 #     - name: Install gcloud
 #       uses: google-github-actions/setup-gcloud@v0
 #       with:
 #         project_id: gcp-classroom-dev
 #         service_account_key: ${{ secrets.CLP_DEV_SA_KEY }}
 #         export_default_credentials: true
->>>>>>> origin/asu-classroom-env
     
 #     - name: Install Firebase CLI
 #       run: |

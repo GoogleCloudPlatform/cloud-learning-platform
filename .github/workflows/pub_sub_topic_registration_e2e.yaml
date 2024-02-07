@@ -21,15 +21,9 @@
 #     - cron: "0 0 * * *"
 #   workflow_dispatch:
 
-<<<<<<< HEAD
-env:
-  PROJECT_ID: gcp-classroom-dev
-  GKE_POD_SA_KEY: ${{ secrets.GKE_POD_SA_KEY }}
-=======
 # env:
 #   PROJECT_ID: gcp-classroom-dev
 #   GKE_POD_SA_KEY: ${{ secrets.GKE_CLASSROOM_POD_SA_KEY }}
->>>>>>> origin/asu-classroom-env
 
 # jobs:
 #   register_classroom:

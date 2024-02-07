@@ -28,17 +28,10 @@
 #     #   - 'microservices/lti'
 #     #   - 'microservices/classroom_shim'
 
-<<<<<<< HEAD
-env:
-  PROJECT_ID: gcp-classroom-dev
-  GKE_CLUSTER: gcp-classroom-dev-us-central1
-  GKE_ZONE: us-central1
-=======
 # env:
 #   PROJECT_ID: gcp-classroom-dev
 #   GKE_CLUSTER: gcp-classroom-dev-us-central1
 #   GKE_ZONE: us-central1
->>>>>>> origin/asu-classroom-env
 
 # jobs:
 #   lti-cypress-e2e-tests:

@@ -27,15 +27,9 @@
 #       - '.pylintrc'
 #   workflow_dispatch:
 
-<<<<<<< HEAD
-env:
-  PROJECT_ID: gcp-classroom-dev
-  CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
-=======
 # env:
 #   PROJECT_ID: gcp-classroom-dev
 #   CLASSROOM_ADMIN_EMAIL: ${{ secrets.ASU_CLASSROOM_Dev_CLASSROOM_ADMIN_EMAIL }}
->>>>>>> origin/asu-classroom-env
 
 # # cookiecutter:raw 
 # jobs:

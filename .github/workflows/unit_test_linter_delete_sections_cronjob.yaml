@@ -27,13 +27,8 @@
 #       - '.pylintrc'
 #   workflow_dispatch:
 
-<<<<<<< HEAD
-env:
-  PROJECT_ID: gcp-classroom-dev
-=======
 # env:
 #   PROJECT_ID: gcp-classroom-dev
->>>>>>> origin/asu-classroom-env
 
 # # cookiecutter:raw 
 # jobs:
