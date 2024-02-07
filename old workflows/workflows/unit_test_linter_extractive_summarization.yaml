@@ -15,50 +15,25 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Unit test & lint for utils service
+name: Unit test & lint for Extractive Summarization
 on:
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - master
     paths:
-      - 'microservices/**'
-      - 'common/**'
-      - '.github/workflows/unit_test_linter_utils_service.yaml'
-      - '.pylintrc'
+      - 'microservices/extractive_summarization/src/**.py'
   workflow_dispatch:
-
-env:
-  PROJECT_ID: gcp-classroom-dev
-
-# cookiecutter:raw
 jobs:
   unit-test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9]
-        target-folder: [
-          microservices/utils,
-        ]
+        python-version: [3.7]
+        target-folder: [extractive_summarization]
+
     steps:
     - uses: actions/checkout@v3
-
-    - name: Install gcloud
-      uses: google-github-actions/setup-gcloud@v0
-      with:
-        project_id: ${{env.PROJECT_ID}}
-        service_account_key: ${{ secrets.FIREBASE_EMULATOR_SA_KEY }}
-        export_default_credentials: true
-
-    - name: Install Firebase CLI
-      run: |
-        curl -sL https://firebase.tools | bash
-
-    - name: Download Firestore emulator
-      run: |
-        firebase setup:emulators:firestore
-
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -66,29 +41,33 @@ jobs:
 
     - name: Install dependencies
       run: |
-        BASE_DIR=$(pwd)
-        cd ${{ matrix.target-folder }}
-        python -m pip install --upgrade pip
+        cd microservices/${{ matrix.target-folder }}
+        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install pytest pytest-custom_exit_code pytest-cov pylint pytest-mock mock
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
-        if [ -f $BASE_DIR/common/requirements.txt ]; then pip install -r $BASE_DIR/common/requirements.txt; fi
+        python -m spacy download en_core_web_md
+        python -m spacy download en_core_web_sm
+        python -m spacy download en
+        if [[ " ${services_with_spacy[@]} " =~ "${{ matrix.target-folder }}" ]]; then
+          python -m spacy download en
+        fi
 
-    - name: Run pytest with coverage
+    - name: Test with pytest
       run: |
-        BASE_DIR=$(pwd)
-        cd ${{ matrix.target-folder }}/src
-        PYTEST_ADDOPTS="--cache-clear --cov . " PYTHONPATH=$BASE_DIR/common/src python -m pytest
+        cd microservices/${{ matrix.target-folder }}/src
+        PYTEST_ADDOPTS="--cache-clear --cov . " python -m pytest
 
   linter:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9]
+        python-version: [3.7]
         target-folder: [
-          microservices/utils,
+          extractive_summarization,
         ]
+
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -98,14 +77,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd ${{ matrix.target-folder }}
+        cd microservices/${{ matrix.target-folder }}
         python -m pip install --upgrade pip
-        if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
+        python -m pip install pylint
 
     - name: Lint with pylint
       run: |
-        BASE_DIR=$(pwd)
-        cd ${{ matrix.target-folder }}/src
-        python -m pylint $(git ls-files '*.py') --rcfile=$BASE_DIR/.pylintrc
-
-# cookiecutter:endraw
+        cd microservices/${{ matrix.target-folder }}
+        python -m pylint **/*.py --rcfile=../../.pylintrc
