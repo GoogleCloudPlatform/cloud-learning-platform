@@ -15,72 +15,72 @@
 # # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-# name: Cypress Runner for LTI
-# on:
-#   workflow_call:
-#     secrets:
-#       DEPLOYMENT_DEV_SA_KEY:
-#         required: true
-#   # pull_request:
-#   #   branches:
-#   #     - main
-#     # paths:
-#     #   - 'microservices/lti'
-#     #   - 'microservices/classroom_shim'
+name: Cypress Runner for LTI
+on:
+  workflow_call:
+    secrets:
+      DEPLOYMENT_DEV_SA_KEY:
+        required: true
+  # pull_request:
+  #   branches:
+  #     - main
+    # paths:
+    #   - 'microservices/lti'
+    #   - 'microservices/classroom_shim'
 
-# env:
-#   PROJECT_ID: gcp-classroom-dev
-#   GKE_CLUSTER: gcp-classroom-dev-us-central1
-#   GKE_ZONE: us-central1
+env:
+  PROJECT_ID: gcp-classroom-dev
+  GKE_CLUSTER: gcp-classroom-dev-us-central1
+  GKE_ZONE: us-central1
 
-# jobs:
-#   lti-cypress-e2e-tests:
-#     runs-on: ubuntu-latest
-#     # if: ${{contains(github.event.pull_request.labels.*.name, 'LTI') }}
+jobs:
+  lti-cypress-e2e-tests:
+    runs-on: ubuntu-latest
+    # if: ${{contains(github.event.pull_request.labels.*.name, 'LTI') }}
 
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-#       - name: "Set up Gcloud auth"
-#         id: "gcloud_auth"
-#         uses: "google-github-actions/auth@v1"
-#         with:
-#           credentials_json: "${{ secrets.CLP_DEV_SA_KEY }}"
+      - name: "Set up Gcloud auth"
+        id: "gcloud_auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.CLP_DEV_SA_KEY }}"
 
-#       - name: "Set up Cloud SDK"
-#         uses: "google-github-actions/setup-gcloud@v1"
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v1"
 
-#       - name: Install GKE Auth Plugin
-#         run: |
-#           gcloud components install gke-gcloud-auth-plugin
+      - name: Install GKE Auth Plugin
+        run: |
+          gcloud components install gke-gcloud-auth-plugin
 
-#       - name: Connect to cluster
-#         run: |
-#           gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+      - name: Connect to cluster
+        run: |
+          gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
-#       - name: Set up Python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: 3.x
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
 
-#       - name: Generate env variables
-#         id: generate-env
-#         run: |
-#           cd experimental/e2e-frontend
-#           python -m pip install --upgrade pip
-#           python -m pip install -r requirements.txt
-#           python generate_env_vars.py >> generate_env_vars.sh
-#           source generate_env_vars.sh
-#           echo "CYPRESS_E2E_TEST_EMAIL=$E2E_TEST_EMAIL" >> $GITHUB_ENV
-#           echo "CYPRESS_E2E_TEST_PASSWORD=$E2E_TEST_PASSWORD" >> $GITHUB_ENV
-#           echo "CYPRESS_E2E_FACULTY_EMAIL=$E2E_FACULTY_EMAIL" >> $GITHUB_ENV
-#           echo "CYPRESS_E2E_FACULTY_PASSWORD=$E2E_FACULTY_PASSWORD" >> $GITHUB_ENV
+      - name: Generate env variables
+        id: generate-env
+        run: |
+          cd experimental/e2e-frontend
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python generate_env_vars.py >> generate_env_vars.sh
+          source generate_env_vars.sh
+          echo "CYPRESS_E2E_TEST_EMAIL=$E2E_TEST_EMAIL" >> $GITHUB_ENV
+          echo "CYPRESS_E2E_TEST_PASSWORD=$E2E_TEST_PASSWORD" >> $GITHUB_ENV
+          echo "CYPRESS_E2E_FACULTY_EMAIL=$E2E_FACULTY_EMAIL" >> $GITHUB_ENV
+          echo "CYPRESS_E2E_FACULTY_PASSWORD=$E2E_FACULTY_PASSWORD" >> $GITHUB_ENV
 
-#       - name: Install & run e2e tests
-#         uses: cypress-io/github-action@v6
-#         with:
-#           start: npx cypress run
-#           working-directory: experimental/e2e-frontend
-#           browser: chrome
-#           record: false
+      - name: Install & run e2e tests
+        uses: cypress-io/github-action@v6
+        with:
+          start: npx cypress run
+          working-directory: experimental/e2e-frontend
+          browser: chrome
+          record: false
