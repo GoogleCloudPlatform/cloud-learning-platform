@@ -74,8 +74,8 @@ env:
   SKAFFOLD_BUILD_CONCURRENCY: 0
   USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT }}
   E2E_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr' || 'e2e_pr' }}${{  github.event.pull_request.number }}_
-  E2E_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-' }}${{  github.event.pull_request.number }}
-  CONTENT_SERVING_BUCKET: core-learning-services-dev-content-serving-bucket
+  E2C_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-' }}${{  github.event.pull_request.number }}
+  CONTENT_SERVING_BUCKET: gcp-classroom-dev-content-serving-bucket
 # cookiecutter:raw 
 jobs:
   admin-teacher:
@@ -144,7 +144,7 @@ jobs:
 
     - name: Set up Kubernetes namespace and Service Account
       run: |
-        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        NAMESPACE=$E2C_NAMESPACE_PREFIX
         kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
         NAMESPACE=${NAMESPACE} bash setup/setup_ksa.sh
 
@@ -171,12 +171,12 @@ jobs:
 
     - name: Local setup
       run: |
-        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        NAMESPACE=$E2C_NAMESPACE_PREFIX
         SKAFFOLD_NAMESPACE=${NAMESPACE} REGION=us-central1 bash setup/setup_local.sh
 
     - name: Build and deploy to cluster
       run: |
-        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        NAMESPACE=$E2C_NAMESPACE_PREFIX
         export DATABASE_PREFIX=$E2E_PREFIX
         skaffold run \
         --profile dev \
@@ -232,7 +232,7 @@ jobs:
 
     - name: Set up port forwarding
       run: |
-        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        NAMESPACE=$E2C_NAMESPACE_PREFIX
         python e2e/utils/port_forward.py --namespace $NAMESPACE
 
     - name: Setup redis
@@ -318,7 +318,7 @@ jobs:
 
     - name: Set up port forwarding
       run: |
-        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        NAMESPACE=$E2C_NAMESPACE_PREFIX
         python -m pip install -r e2e/requirements.txt
         python e2e/utils/port_forward.py --namespace $NAMESPACE
 
