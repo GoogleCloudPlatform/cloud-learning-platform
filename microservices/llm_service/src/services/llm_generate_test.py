@@ -90,9 +90,9 @@ async def test_llm_generate_google(clean_firestore):
   assert response == FAKE_GENERATE_RESPONSE
 
 @pytest.mark.asyncio
-async def test_llm_chat_google(clean_firestore, test_chat):
+def test_llm_chat_google(clean_firestore, test_chat):
   with mock.patch("vertexai.preview.language_models.ChatSession.send_message",
                   return_value = FAKE_GOOGLE_RESPONSE):
-    response = await llm_chat(FAKE_PROMPT, VERTEX_LLM_TYPE_BISON_CHAT)
+    response =  llm_chat(FAKE_PROMPT, VERTEX_LLM_TYPE_BISON_CHAT)
 
   assert response == FAKE_GENERATE_RESPONSE
