@@ -14,33 +14,33 @@
 
 # # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-# name: Unit test for lms_admin_ui
-# on:
-#   pull_request:
-#     branches:
-#       - main
-#     paths:
-#       - 'microservices/lms_admin_ui/**'
-#   workflow_dispatch:
-# jobs:
-#   unit-test:
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         node-version: [16.x]
-#     steps:
-#     - uses: actions/checkout@v3
-#     - name: Use Node.js ${{ matrix.node-version }}
-#       uses: actions/setup-node@v3
-#       with:
-#         node-version: ${{ matrix.node-version }}  
+name: Unit test for lms_admin_ui
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'microservices/lms_admin_ui/**'
+  workflow_dispatch:
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}  
     
-#     - name: Install dependencies
-#       run: |
-#           cd ./microservices/lms_admin_ui
-#           npm install --save-exact
+    - name: Install dependencies
+      run: |
+          cd ./microservices/lms_admin_ui
+          npm install --save-exact
 
-#     - name: Run unit tests
-#       run: |
-#           cd ./microservices/lms_admin_ui
-#           npm run test:prod
+    - name: Run unit tests
+      run: |
+          cd ./microservices/lms_admin_ui
+          npm run test:prod
