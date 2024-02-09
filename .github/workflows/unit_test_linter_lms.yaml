@@ -29,7 +29,7 @@ on:
 
 env:
   PROJECT_ID: gcp-classroom-dev
-  CLASSROOM_ADMIN_EMAIL: ${{ secrets.ASU_CLASSROOM_Dev_CLASSROOM_ADMIN_EMAIL }}
+  CLASSROOM_ADMIN_EMAIL: ${{ secrets.ASU_CLASSROOM_DEV_CLASSROOM_ADMIN_EMAIL }}
 
 # cookiecutter:raw 
 jobs:
