@@ -50,7 +50,7 @@ jobs:
       id: 'gcloud_auth'
       uses: 'google-github-actions/auth@v1'
       with:
-        credentials_json: '${{ secrets.FIREBASE_EMULATOR_CLASSROOM__SA_KEY }}'
+        credentials_json: '${{ secrets.FIREBASE_EMULATOR_CLASSROOM_SA_KEY }}'
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
 
