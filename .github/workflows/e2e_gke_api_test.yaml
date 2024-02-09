@@ -144,7 +144,7 @@ jobs:
 
     - name: Set up Kubernetes namespace and Service Account
       run: |
-        NAMESPACE=$E2C_NAMESPACE_PREFIX
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
         kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
         NAMESPACE=${NAMESPACE} bash setup/setup_ksa.sh
 
@@ -171,12 +171,12 @@ jobs:
 
     - name: Local setup
       run: |
-        NAMESPACE=$E2C_NAMESPACE_PREFIX
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
         SKAFFOLD_NAMESPACE=${NAMESPACE} REGION=us-central1 bash setup/setup_local.sh
 
     - name: Build and deploy to cluster
       run: |
-        NAMESPACE=$E2C_NAMESPACE_PREFIX
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
         export DATABASE_PREFIX=$E2E_PREFIX
         skaffold run \
         --profile dev \
@@ -318,7 +318,7 @@ jobs:
 
     - name: Set up port forwarding
       run: |
-        NAMESPACE=$E2C_NAMESPACE_PREFIX
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
         python -m pip install -r e2e/requirements.txt
         python e2e/utils/port_forward.py --namespace $NAMESPACE
 
