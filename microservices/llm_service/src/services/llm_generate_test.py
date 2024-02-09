@@ -75,7 +75,7 @@ async def test_llm_generate(clean_firestore):
 @pytest.mark.asyncio
 async def test_llm_chat(clean_firestore, test_chat):
   with mock.patch("langchain.chat_models.ChatOpenAI.agenerate",
-                  return_value = FAKE_CHAT_RESULT):
+                  return_value = FAKE_CHAT_RESULT,new=mock.AsyncMock()):
     response = await llm_chat(FAKE_PROMPT, OPENAI_LLM_TYPE_GPT3_5)
 
   assert response == FAKE_GENERATE_RESPONSE
