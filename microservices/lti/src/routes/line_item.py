@@ -601,6 +601,9 @@ def create_score_for_line_item(context_id: str,
       if input_grade_dict.get(
           "draft_grade") is not None or input_grade_dict.get(
               "assigned_grade") is not None:
+        Logger.info(
+            f"Processing grade passback for context/{context_id}/line_items/{line_item_id} with api request payload --- {str(input_score)} ---"
+        )
         gpb_resp = grade_pass_back(input_grade_dict, user_id, line_item_id)
         if gpb_resp:
           result = Result.collection.filter(
