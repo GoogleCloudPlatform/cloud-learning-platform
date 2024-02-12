@@ -97,8 +97,19 @@ def update_classroom_grade(input_grade: PostGradeModel):
 
       if submissions:
         submission_id = submissions[0].get("id")
-        post_grade_of_the_user(lti_assignment.context_id, course_work_id,
-                               submission_id, assigned_grade, draft_grade)
+        output = post_grade_of_the_user(lti_assignment.context_id,
+                                        course_work_id, submission_id,
+                                        assigned_grade, draft_grade)
+
+        if output:
+          Logger.info(
+              f"Grade passback completed for user with id {user_id} and lti assignment - {lti_assignment.id} with payload --- {str(output)} --- and api request payload --- {str(input_grade)} ---"
+          )
+        else:
+          Logger.info(
+              f"No output for grade passback for user with id {user_id} and lti assignment - {lti_assignment.id} with api request payload --- {str(input_grade)} ---"
+          )
+
       else:
         Logger.error(
             f"Submission not found for the user with id - {user_id}, section id - {lti_assignment.context_id} and course work id - {course_work_id}"
