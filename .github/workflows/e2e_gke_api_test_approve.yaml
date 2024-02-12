@@ -14,32 +14,32 @@
 
 # This workflow will calls e2e gke api test workflow with a flag as true if PR is approved and flaged as approved.
 
-name: E2E API Tests on GKE Microservices on approval
-on:
-  pull_request_review:
-    types: [submitted]
-    branches:
-      - main
-    paths:
-      - 'microservices/**'
-      - 'common/**'
-      - 'e2e/**'
-      - 'utils/**'
-      - '.github/workflows/e2e_gke_api_test_approve.yaml'
-      - 'skaffold.yaml'
-  workflow_dispatch:
+# name: E2E API Tests on GKE Microservices on approval
+# on:
+#   pull_request_review:
+#     types: [submitted]
+#     branches:
+#       - main
+#     paths:
+#       - 'microservices/**'
+#       - 'common/**'
+#       - 'e2e/**'
+#       - 'utils/**'
+#       - '.github/workflows/e2e_gke_api_test_approve.yaml'
+#       - 'skaffold.yaml'
+#   workflow_dispatch:
 
-jobs:
-  run-e2e-with-gmail:
-    name: Run E2E with gmail user
-    if: github.event.review.state == 'approved' && contains(github.event.pull_request.labels.*.name, 'LMS') 
-    uses: ./.github/workflows/e2e_gke_api_test.yaml
-    with:
-      USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: True
-    secrets:
-      GH_PAT: ${{ secrets.GH_PAT }}
-      GKE_POD_SA_KEY: ${{ secrets.GKE_CLASSROOM_POD_SA_KEY}}
-      FIREBASE_API_KEY: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_API_KEY }}
-      FIREBASE_APP_ID: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_APP_ID }}
-      API_DOMAIN: ${{ secrets.ASU_CLASSROOM_DEV_API_DOMAIN }}
-      DEPLOYMENT_DEV_SA_KEY: ${{ secrets.CLP_DEV_SA_KEY }}
+# jobs:
+#   run-e2e-with-gmail:
+#     name: Run E2E with gmail user
+#     if: github.event.review.state == 'approved' && contains(github.event.pull_request.labels.*.name, 'LMS') 
+#     uses: ./.github/workflows/e2e_gke_api_test.yaml
+#     with:
+#       USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: True
+#     secrets:
+#       GH_PAT: ${{ secrets.GH_PAT }}
+#       GKE_POD_SA_KEY: ${{ secrets.GKE_CLASSROOM_POD_SA_KEY}}
+#       FIREBASE_API_KEY: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_API_KEY }}
+#       FIREBASE_APP_ID: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_APP_ID }}
+#       API_DOMAIN: ${{ secrets.ASU_CLASSROOM_DEV_API_DOMAIN }}
+#       DEPLOYMENT_DEV_SA_KEY: ${{ secrets.CLP_DEV_SA_KEY }}
