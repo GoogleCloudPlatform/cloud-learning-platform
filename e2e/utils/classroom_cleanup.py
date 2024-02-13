@@ -29,7 +29,7 @@ import traceback
 PROJECT_ID = os.getenv("PROJECT_ID")
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", None)
 CLASSROOM_ADMIN_EMAIL=os.environ.get("CLASSROOM_ADMIN_EMAIL")
-GKE_POD_SA_KEY=json.loads(os.environ.get("GKE_POD_SA_KEY"))
+GKE_POD_SA_KEY=json.loads(os.environ.get("GKE_CLASSROOM_POD_SA_KEY"))
 SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly",
     "https://www.googleapis.com/auth/drive",
