@@ -88,12 +88,12 @@ requires:
   configs: [jobs-service]
 
 - path: ./microservices/item_response_theory
-  configs: [item_response_theory]
+  configs: [item-response-theory]
 
-- path: ./microservices/deep-knowledge-tracing
+- path: ./microservices/deep_knowledge_tracing
   configs: [deep-knowledge-tracing]
 
-- path: ./microservices/extractive-summarization
+- path: ./microservices/extractive_summarization
   configs: [extractive-summarization]
 
 
