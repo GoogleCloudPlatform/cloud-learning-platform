@@ -94,7 +94,7 @@ def update_classroom_grade(input_grade: PostGradeModel):
           user_id=user_id,
           headers=headers,
           course_work_id=course_work_id)
-
+      Logger.info(f"Submissions Value in grade passback --- {str(submissions)} ---  for user with id {user_id} and lti assignment - {lti_assignment.id} sectionId {lti_assignment.context_id}")
       if submissions:
         submission_id = submissions[0].get("id")
         output = post_grade_of_the_user(lti_assignment.context_id,
