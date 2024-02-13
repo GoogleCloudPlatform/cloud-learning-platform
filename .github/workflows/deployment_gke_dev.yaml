@@ -33,7 +33,7 @@ env:
   GKE_CLUSTER: gcp-classroom-dev-us-central1
   GKE_REGION: us-central1
   KUSTOMIZE_VERSION: 4.1.3
-  SKAFFOLD_VERSION: 1.39.2
+  SKAFFOLD_VERSION: 2.10.0
   SKAFFOLD_CACHE_GCS: gs://gcp-classroom-dev/skaffold/cache
   # CLASSROOM_ADMIN_EMAIL: ${{ secrets.CLASSROOM_ADMIN_EMAIL }}
   CLASSROOM_ADMIN_EMAIL : lms_admin_teacher@gostudyhall.com
