@@ -29,7 +29,7 @@ PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
   PROJECT_ID
 # generate credentials using SA json keys
 GKE_POD_SA_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
-"iam.serviceAccounts.actAs"
+# "iam.serviceAccounts.actAs"
 CREDENTIALS = service_account.Credentials.from_service_account_info(
     GKE_POD_SA_KEY)
 
