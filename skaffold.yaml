@@ -18,32 +18,32 @@ kind: Config
 metadata:
   name: backends
 requires:
-- path: ./common
-  configs: [common]
+# - path: ./common
+#   configs: [common]
 
-- path: ./common_ml
-  configs: [common-ml]
+# - path: ./common_ml
+#   configs: [common-ml]
 
-- path: ./microservices/authentication
-  configs: [authentication]
+# - path: ./microservices/authentication
+#   configs: [authentication]
 
-- path: ./microservices/lms
-  configs: [lms]
+# - path: ./microservices/lms
+#   configs: [lms]
 
-- path: ./microservices/lms_admin_ui
-  configs: [lms-admin-ui]
+# - path: ./microservices/lms_admin_ui
+#   configs: [lms-admin-ui]
 
-- path: ./microservices/lti
-  configs: [lti]
+# - path: ./microservices/lti
+#   configs: [lti]
 
-- path: ./microservices/llm_service
-  configs: [llm-service]
+# - path: ./microservices/llm_service
+#   configs: [llm-service]
 
 - path: ./microservices/classroom_notification_service
   configs: [classroom-notification-service]
 
-- path: ./microservices/classroom_shim
-  configs: [classroom-shim]
+# - path: ./microservices/classroom_shim
+#   configs: [classroom-shim]
 
 - path: ./microservices/classroom_notifications_cronjob
   configs: [classroom-notifications-cronjob]
