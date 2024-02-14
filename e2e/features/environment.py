@@ -44,7 +44,7 @@ USER_EMAIL_PASSWORD_DICT = get_user_email_and_password_for_e2e()
 
 EMAILS = get_required_emails_from_secret_manager()
 TEACHER_EMAIL = EMAILS["teacher"]
-CLASSROOM_KEY = json.loads(os.environ.get("GKE_CLASSROOM_POD_SA_KEY"))
+CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=missing-timeout,broad-exception-raised,broad-exception-caught,unused-argument
