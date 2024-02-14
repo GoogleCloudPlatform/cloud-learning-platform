@@ -22,6 +22,8 @@ def create_course_template(get_token):
   resp = requests.post(headers=get_token, url=url,
                        json=COURSE_TEMPLATE_INPUT_DATA)
   global course_template_id
+  print("=============================")
+  print(f"COHORT RESPONSE {resp.json()}")
   course_template_id = resp.json()["course_template"]["id"]
 
 @pytest.fixture
