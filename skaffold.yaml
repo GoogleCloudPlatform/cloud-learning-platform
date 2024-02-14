@@ -81,11 +81,11 @@ requires:
 - path: ./microservices/credential_pathway_service
   configs: [credential-pathway-service]
 
-- path: ./microservices/prior_learning_assessment
-  configs: [prior-learning-assessment]
+# - path: ./microservices/prior_learning_assessment
+#   configs: [prior-learning-assessment]
 
-- path: ./microservices/jobs_service
-  configs: [jobs-service]
+# - path: ./microservices/jobs_service
+#   configs: [jobs-service]
 
 # - path: ./microservices/item_response_theory
 #   configs: [item-response-theory]
