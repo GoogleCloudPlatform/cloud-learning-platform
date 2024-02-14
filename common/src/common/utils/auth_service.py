@@ -82,7 +82,7 @@ def validate_user_type_and_token(accepted_user_types: list,
               "Authorization":
                   f"{token_dict['scheme']} {token_dict['credentials']}"
           },
-          timeout=60)
+          timeout=300)
       data = res.json()
       if res.status_code == 200 and data["success"] is True and data["data"][
           "user_type"] in accepted_user_types:

@@ -266,10 +266,10 @@ jobs:
         cd e2e/utils
         PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python database_setup.py
 
-    # - name: Run pytest
-    #   run: |
+    - name: Run pytest
+      run: |
 
-    #     PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m pytest e2e/gke_api_tests/
+        PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m pytest e2e/gke_api_tests/
 
     - name: Run behave
       run: |
