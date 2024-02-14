@@ -7,7 +7,7 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 
-CLASSROOM_KEY = json.loads(os.environ.get("GKE_CLASSROOM_POD_SA_KEY"))
+CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
 WORKSPACE_ADMIN_EMAIL = os.environ.get("WORKSPACE_ADMIN_EMAIL")
 USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT = bool(
