@@ -19,6 +19,7 @@ course_template_id = None
 def create_course_template(get_token):
   """create a course template for reference"""
   url = f"{API_URL}/course_templates"
+  print(f"COHORT RESPONSE URL {url}")
   resp = requests.post(headers=get_token, url=url,
                        json=COURSE_TEMPLATE_INPUT_DATA)
   global course_template_id

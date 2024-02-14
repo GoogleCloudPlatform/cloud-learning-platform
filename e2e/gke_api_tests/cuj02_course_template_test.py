@@ -49,9 +49,12 @@ def test_create_course_template_validation(get_token):
   Which will return a validation error response.
   """
   url = f"{API_URL}/course_templates"
+  print(f"======================================")
+  print(f"course template URL {url}")
   resp = requests.post(url=url,
                        json={"name": "e2e_test_cases"},
                        headers=get_token)
+  print(f"course template response {resp.json()}")
   assert resp.status_code == 422, "Status 422"
   assert resp.json()["success"] is False
 
