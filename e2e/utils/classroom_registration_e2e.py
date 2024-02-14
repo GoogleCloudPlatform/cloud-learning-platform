@@ -15,7 +15,7 @@ SCOPES = [
 ]
 
 PROJECT_ID = os.getenv("PROJECT_ID", "")
-CLASSROOM_KEY = json.loads(os.environ.get("GKE_CLASSROOM_POD_SA_KEY"))
+CLASSROOM_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
 
 def get_email(index):
   client = secretmanager.SecretManagerServiceClient()

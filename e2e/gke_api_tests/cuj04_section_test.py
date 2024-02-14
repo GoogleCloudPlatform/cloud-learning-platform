@@ -28,7 +28,7 @@ def create_course(name, description, section, owner_id):
       "https://www.googleapis.com/auth/classroom.courses",
       "https://www.googleapis.com/auth/classroom.courses.readonly"
   ]
-  classroom_key = json.loads(os.environ.get("GKE_CLASSROOM_POD_SA_KEY"))
+  classroom_key = json.loads(os.environ.get("GKE_POD_SA_KEY"))
   classroom_admin_email = os.environ.get("CLASSROOM_ADMIN_EMAIL")
   a_creds = service_account.Credentials.from_service_account_info(
       classroom_key, scopes=scopes)

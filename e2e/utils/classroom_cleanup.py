@@ -32,8 +32,7 @@ CLASSROOM_ADMIN_EMAIL=os.environ.get("CLASSROOM_ADMIN_EMAIL")
 GKE_POD_SA_KEY=json.loads(os.environ.get("GKE_POD_SA_KEY"))
 SCOPES = ["https://www.googleapis.com/auth/classroom.courses",
     "https://www.googleapis.com/auth/classroom.courses.readonly",
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/drive.file"]
+    "https://www.googleapis.com/auth/drive"]
 a_creds = service_account.Credentials.from_service_account_info(GKE_POD_SA_KEY,scopes=SCOPES)
 creds = a_creds.with_subject(CLASSROOM_ADMIN_EMAIL)
 
