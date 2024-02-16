@@ -1,8 +1,9 @@
 """Line item  Endpoints"""
 import traceback
+import requests
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
-from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN
+from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN, auth_client
 from common.models import LineItem, Result, Score, Tool, LTIContentItem
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  InvalidTokenError)
@@ -21,7 +22,7 @@ from services.line_item_service import (create_new_line_item,
 from services.grade_service import grade_pass_back
 from typing import List, Optional
 from services.validate_service import validate_access, get_tool_info_using_token
-# pylint: disable=unused-argument, use-maxsplit-arg, line-too-long
+# pylint: disable=unused-argument, use-maxsplit-arg, line-too-long, broad-exception-raised
 
 auth_scheme = HTTPBearer(auto_error=False)
 
@@ -578,41 +579,53 @@ def create_score_for_line_item(context_id: str,
 
     # Passing grades back to the LMS using shim service API
     if line_item.resourceLinkId:
-      lti_content_item = LTIContentItem.find_by_id(line_item.resourceLinkId)
-      tool = Tool.find_by_id(lti_content_item.tool_id)
 
-      input_grade_dict = {
-          "user_id": user_id,
-          "comment": input_result_dict["comment"],
-          "lti_content_item_id": line_item.resourceLinkId,
-          "maximum_grade": input_result_dict["resultMaximum"],
-          "assigned_grade": None,
-          "draft_grade": None,
-          "validate_title": tool.validate_title_for_grade_sync,
-          "line_item_title": line_item.label
-      }
+      # check if user is present in the context
+      section_user_mapping_status_url = f"http://classroom-shim/classroom-shim/api/v1/context/{context_id}/user/{user_id}"
+      check_section_user_mapping_req = requests.get(
+          url=section_user_mapping_status_url,
+          headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
+          timeout=60)
 
-      if input_score_dict["gradingProgress"] in ["Pending", "PendingManual"]:
-        input_grade_dict["draft_grade"] = input_result_dict["resultScore"]
+      if check_section_user_mapping_req.status_code == 200:
+        lti_content_item = LTIContentItem.find_by_id(line_item.resourceLinkId)
+        tool = Tool.find_by_id(lti_content_item.tool_id)
 
-      if input_score_dict["gradingProgress"] == "FullyGraded":
-        input_grade_dict["assigned_grade"] = input_result_dict["resultScore"]
+        input_grade_dict = {
+            "user_id": user_id,
+            "comment": input_result_dict["comment"],
+            "lti_content_item_id": line_item.resourceLinkId,
+            "maximum_grade": input_result_dict["resultMaximum"],
+            "assigned_grade": None,
+            "draft_grade": None,
+            "validate_title": tool.validate_title_for_grade_sync,
+            "line_item_title": line_item.label
+        }
 
-      if input_grade_dict.get(
-          "draft_grade") is not None or input_grade_dict.get(
-              "assigned_grade") is not None:
-        Logger.info(
-            f"Processing grade passback for context/{context_id}/line_items/{line_item_id} with api request payload --- {str(input_score)} ---"
-        )
-        gpb_resp = grade_pass_back(input_grade_dict, user_id, line_item_id)
-        if gpb_resp:
-          result = Result.collection.filter(
-              "scoreOf", "==",
-              line_item_id).filter("userId", "==",
-                                   input_score_dict["userId"]).get()
-          result.isGradeSyncCompleted = True
-          result.update()
+        if input_score_dict["gradingProgress"] in ["Pending", "PendingManual"]:
+          input_grade_dict["draft_grade"] = input_result_dict["resultScore"]
 
+        if input_score_dict["gradingProgress"] == "FullyGraded":
+          input_grade_dict["assigned_grade"] = input_result_dict["resultScore"]
+
+        if input_grade_dict.get(
+            "draft_grade") is not None or input_grade_dict.get(
+                "assigned_grade") is not None:
+          Logger.info(
+              f"Processing grade passback for context/{context_id}/line_items/{line_item_id} with api request payload --- {str(input_score)} ---"
+          )
+          gpb_resp = grade_pass_back(input_grade_dict, user_id, line_item_id)
+          if gpb_resp:
+            result = Result.collection.filter(
+                "scoreOf", "==",
+                line_item_id).filter("userId", "==",
+                                     input_score_dict["userId"]).get()
+            result.isGradeSyncCompleted = True
+            result.update()
+      else:
+        error_message = f"Failed to passback grade. User with id {user_id} not found in context {context_id}. API request payload --- {str(input_score)} ---"
+        Logger.error(error_message)
+        raise Exception(error_message)
     else:
       Logger.error(
           f"Content item id not found for given line item {line_item_id} to trigger grade passback"

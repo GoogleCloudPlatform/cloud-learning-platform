@@ -27,6 +27,23 @@ def get_user_details(user_email):
         "Request Denied with code 1002, Please contact administrator")
 
 
+def get_user_details_with_id(user_id):
+  """Get the details of the user"""
+  get_user_data_url = f"{USER_MANAGEMENT_BASE_URL}/user/{user_id}"
+  user_data_res = get_method(url=get_user_data_url, use_bot_account=True)
+
+  if user_data_res.status_code == 200:
+    return user_data_res.json()
+  if user_data_res.status_code == 404:
+    return None
+  else:
+    Logger.error(f"Error 1014 response: Internal error from User management \
+                 search user API, Status code: {user_data_res.status_code} \
+                Response: {user_data_res.text}")
+    raise Exception(
+        "Request Denied with code 1014, Please contact administrator")
+
+
 def get_student_details(context_id, user_email):
   """Get the details of the student for a given context"""
   get_student_details_url = f"{LMS_BASE_URL}/sections/{context_id}/students/{user_email}"
