@@ -41,7 +41,7 @@ env:
   FIREBASE_API_KEY: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_API_KEY }}
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
   API_DOMAIN: clp-sandbox.gostudyhall.com
-  LTI_ISSUER_DOMAIN: https://clp-dev.gostudyhall.com/
+  LTI_ISSUER_DOMAIN: https://clp-sandbox.gostudyhall.com/
   LTI_PLATFORM_UNIQUE_ID: e0fc690f-7fb9-4fb2-a5a6-68466f0181a4
   LTI_PLATFORM_NAME: CLP LTI Service
   FIREBASE_APP_ID: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_APP_ID}}
