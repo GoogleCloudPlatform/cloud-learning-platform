@@ -119,10 +119,10 @@ jobs:
           --tag latest \
           --cache-artifacts=false
 
-      - name: Upload Skaffold cache
-        if: always()
-        run: |
-          gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
+      # - name: Upload Skaffold cache
+      #   if: always()
+      #   run: |
+      #     gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
 
 #   deploy_documentation:
 #     name: Deploy documentation
