@@ -1,3 +1,4 @@
+@assessment
 Feature: CRUD for managing SubmittedAssessment model in Assessment services
 
     Scenario: Create a Submitted Assessment for existing learner and assessment with correct request payload

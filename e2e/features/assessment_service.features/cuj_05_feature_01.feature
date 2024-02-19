@@ -1,3 +1,4 @@
+@assessment
 Feature: Creation and authoring of Human Graded Assessments
 
   Scenario: Creating a Human Graded Assessment with the correct request payload

@@ -1,3 +1,4 @@
+@assessment
 Feature: Learner can download a zip containing all files linked to an assessment
 
     Scenario: Learner wants to download a zip containing all files linked to an assessment

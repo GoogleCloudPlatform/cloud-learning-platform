@@ -1,3 +1,4 @@
+@assessment
 Feature: Upload File for Assessment Submission
 
     Scenario: Learner wants to upload a single file for assessment submission
