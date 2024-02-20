@@ -25,7 +25,9 @@ export class ContentSelectorComponent {
       // Get the sent data
       const data = e.data;
       const decoded = JSON.parse(data);
-      this.dialogRef.close({ data: decoded });
+      if (decoded.response && decoded.response[0]?.content_item_id) {
+        this.dialogRef.close({ data: decoded });
+      }
     });
   }
   getToolUrl() {
