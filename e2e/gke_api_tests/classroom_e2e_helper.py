@@ -58,7 +58,7 @@ def create_course(name, section, description):
 
 def enroll_teacher_in_classroom(classroom_id,teacher_email):
   """enroll teacher in classroom"""
-  service = build("classroom", "v1", credentials=get_creds())
+  service = build("classroom", "v1", credentials=get_creds(True))
   body = {"userId": teacher_email}
   teacher = service.courses().teachers().create(
     courseId=classroom_id,
