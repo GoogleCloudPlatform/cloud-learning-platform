@@ -46,7 +46,7 @@ def create_course(name, section, description):
     new created course details
     """
 
-  service = build("classroom", "v1", credentials=get_creds())
+  service = build("classroom", "v1", credentials=get_creds(True))
   new_course = {}
   new_course["name"] = name
   new_course["section"] = section
