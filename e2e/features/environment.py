@@ -300,16 +300,14 @@ def import_google_form_grade(context):
   "Fixture for import grade"
   section = use_fixture(create_section, context)
   links=[
-    "https://docs.google.com/forms/d/1oZrH6Wc1TSMSQDwO17Y_TCf38Xdpw55PYRRVMMS0fBM/edit",
-    "https://docs.google.com/forms/d/12J-XG9pSRyo7y8TKHuCKqh6U8Gp6F4dpLE-GQdLJN_I/edit",
-    "https://docs.google.com/forms/d/1dL0CK_6Dzx1oQHNMVF8_1DVJh40pElSo55S9qZTq50o/edit",
-    "https://docs.google.com/forms/d/1N_9iAiy2IOnYi8tZKnO4JSMQcTvwlRyL_tyjp8o-QRI/edit",
-    "https://docs.google.com/forms/d/1xW5E74d6u2Ayi4pN4z3jYYl3tg7c5BhlDdnrBCttz5M/edit",
-    "https://docs.google.com/forms/d/18IeP3nJ4GttXzvyHb2jIj9XmUungbkuaI29tTCaIxhA/edit",
-    "https://docs.google.com/forms/d/1UPgmkuwpu2UG-k7h8xFVASV_bESG7xAYRhsoYgzEJAg/edit",
-    "https://docs.google.com/forms/d/1uVdWHmCyyJeJVK1WlaD_xw9-Ti6mn2Dy5DBrDR8uu0U/edit",
-    "https://docs.google.com/forms/d/1Tjb-25B_j0XdMQWZpon7n2vTnqvU0w1tN6La3ARp3pM/edit",
-    "https://docs.google.com/forms/d/1kBIG62F0N85C_viwhbnHNr2LlFbuoer7bMWOE43Yuxw/edit"
+    "https://docs.google.com/forms/d/1WR7xMbPKvM-a0hxRXOllrP_hU7hUU80BoGY4lBxBnc0/edit",
+    "https://docs.google.com/forms/d/1ntA0LrjipDiSMMlmYTx09Pe5FtXmA2HduDCLLOa9nJk/edit",
+    "https://docs.google.com/forms/d/1k1Rd4zata3lUT1VyyW4UFNYzcU2NEnNv1AOnQLpWdtU/edit",
+    "https://docs.google.com/forms/d/1OqQj8bP22AH99ILpEVgawBJ7-vnBW6sik1wtlztgQoo/edit",
+    "https://docs.google.com/forms/d/1jqFZJ8ukhye3M589a2G5LgJSXCBWtjUVGlAx1Tsmbj4/edit",
+    "https://docs.google.com/forms/d/1b_mBisHX0QWQYNeVFdMid1XCAQgkr1ngqr97yEiQcgE/edit",
+    "https://docs.google.com/forms/d/1fTa2yZt4yGYy-P-AMBe5tG7q1LPpPDPmMGaZFetI9yA/edit",
+    "https://docs.google.com/forms/d/1LZ-eLyyMaImXebZaYanSikIcfj59dqrOQ9PVlf2EAbs/edit"
   ]
   coursework_body = {
       "title":
