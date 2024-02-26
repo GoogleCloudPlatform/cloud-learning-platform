@@ -105,6 +105,7 @@ def invite_user(course_id, email, role):
   return invitation
 
 def create_course_work(classroom_id,body):
+  print(f"Create Coursework body ---------> {body}")
   service = build("classroom", "v1", credentials=get_creds(True))
   return service.courses().courseWork().create(courseId=classroom_id,
                                                  body=body).execute()
