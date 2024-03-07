@@ -125,7 +125,6 @@ export class CreateAssignmentComponent {
   onSubmit(ltiAssignmentForm) {
     this.showProgressSpinner = true
     const data = ltiAssignmentForm.value
-    console.log("submitted data", data)
     let context_type = this.dialogData.page
     if (this.dialogData.mode == "Create") {
       this.homeService.postLtiAssignments({ ...data, context_type: context_type, context_id: this.dialogData.extra_data.contextId }).subscribe((response: any) => {
@@ -144,7 +143,6 @@ export class CreateAssignmentComponent {
         end_date: this.toIsoString(data.end_date),
         due_date: this.toIsoString(data.due_date)
       }
-      console.log("finalData", finalData)
       this.homeService.updateLtiAssignments(this.dialogData.extra_data.assignment.id, finalData).subscribe((response: any) => {
         if (response.success == true) {
           this.dialogRef.close({ data: 'success' })
