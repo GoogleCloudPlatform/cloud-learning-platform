@@ -64,6 +64,7 @@ export class SectionComponent implements OnInit,OnDestroy {
   studentTableData: student[] = []
   courseworkTable: coursework[] = []
   ltiAssignmentsTableData: ltiAssignment[] = []
+  ltiAssignmentsDataSource = new MatTableDataSource(this.ltiAssignmentsTableData);
 
   instructionalDesignerList:string[]=[]
   // dataSource = new MatTableDataSource(this.tableData);
@@ -169,7 +170,7 @@ this.instructionalDesignerList=res.data
   getLtiAssignmentsDetails(){
     this.ltiAssignmentTableLoader=true
     this._HomeService.getLtiAssignments(this.selectedSection.id).subscribe((res:any)=>{
-      this.ltiAssignmentsTableData = res.data
+      this.ltiAssignmentsDataSource.data = res.data
       this.ltiAssignmentTableLoader=false
     },
     (err:any)=>{
@@ -388,6 +389,7 @@ transformCourseworkTableData(data:any){
   }
 
   openUpdateLtiAssignmentDialog(id, data) {
+    console.log("data", JSON.parse(JSON.stringify(data)))
     let sectionId = this.selectedSection.id
     let ltiModalData = {}
     ltiModalData['mode'] = 'Update'

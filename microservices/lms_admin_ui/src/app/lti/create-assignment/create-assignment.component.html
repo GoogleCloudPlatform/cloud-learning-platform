@@ -57,34 +57,40 @@
             </div>
 
             <div>
+                {{ltiAssignmentForm.get("start_date").value}}
                 <mat-form-field appearance="fill" style="width: 100%">
                     <mat-label>Start Date</mat-label>
                     <input matInput [ngxMatDatetimePicker]="start_date" placeholder="Choose a date"
                         formControlName="start_date">
                     <mat-datepicker-toggle matSuffix [for]="$any(start_date)"></mat-datepicker-toggle>
                     <ngx-mat-datetime-picker #start_date [enableMeridian]="false" [showSeconds]="true"
+                        [defaultTime]="[getCurrentHour(),getCurrentMinute(),59]"
                         color="primary"></ngx-mat-datetime-picker>
                 </mat-form-field>
             </div>
 
             <div>
+                {{ltiAssignmentForm.get("end_date").value}}
                 <mat-form-field appearance="fill" style="width: 100%">
                     <mat-label>End Date</mat-label>
                     <input matInput [ngxMatDatetimePicker]="end_date" placeholder="Choose a date"
                         formControlName="end_date">
                     <mat-datepicker-toggle matSuffix [for]="$any(end_date)"></mat-datepicker-toggle>
                     <ngx-mat-datetime-picker #end_date [enableMeridian]="false" [showSeconds]="true"
+                        [defaultTime]="[getCurrentHour(),getCurrentMinute(),59]"
                         color="primary"></ngx-mat-datetime-picker>
                 </mat-form-field>
             </div>
 
             <div>
+                {{ltiAssignmentForm.get("due_date").value}}
                 <mat-form-field appearance="fill" style="width: 100%">
                     <mat-label>Due Date</mat-label>
                     <input matInput [ngxMatDatetimePicker]="due_date" placeholder="Choose a date"
                         formControlName="due_date">
                     <mat-datepicker-toggle matSuffix [for]="$any(due_date)"></mat-datepicker-toggle>
                     <ngx-mat-datetime-picker #due_date [enableMeridian]="false" [showSeconds]="true"
+                        [defaultTime]="[getCurrentHour(),getCurrentMinute(),59]"
                         color="primary"></ngx-mat-datetime-picker>
                 </mat-form-field>
             </div>

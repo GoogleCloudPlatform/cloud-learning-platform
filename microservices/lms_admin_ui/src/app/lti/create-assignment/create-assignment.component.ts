@@ -125,6 +125,7 @@ export class CreateAssignmentComponent {
   onSubmit(ltiAssignmentForm) {
     this.showProgressSpinner = true
     const data = ltiAssignmentForm.value
+    console.log("submitted data", data)
     let context_type = this.dialogData.page
     if (this.dialogData.mode == "Create") {
       this.homeService.postLtiAssignments({ ...data, context_type: context_type, context_id: this.dialogData.extra_data.contextId }).subscribe((response: any) => {
@@ -137,7 +138,14 @@ export class CreateAssignmentComponent {
         this.showProgressSpinner = false
       })
     } else {
-      this.homeService.updateLtiAssignments(this.dialogData.extra_data.assignment.id, data).subscribe((response: any) => {
+      let finalData = {
+        ...data,
+        start_date: this.toIsoString(data.start_date),
+        end_date: this.toIsoString(data.end_date),
+        due_date: this.toIsoString(data.due_date)
+      }
+      console.log("finalData", finalData)
+      this.homeService.updateLtiAssignments(this.dialogData.extra_data.assignment.id, finalData).subscribe((response: any) => {
         if (response.success == true) {
           this.dialogRef.close({ data: 'success' })
         }
@@ -242,4 +250,18 @@ export class CreateAssignmentComponent {
     this.dialogRef.close({ data: 'closed' });
   }
 
+
+  getCurrentHour() {
+    return new Date().getHours()
+  }
+
+  getCurrentMinute() {
+    return new Date().getMinutes()
+  }
+
+  toIsoString(dateString) {
+    let dateObject = new Date(dateString);
+    let iso8601String = dateObject.toISOString();
+    return iso8601String
+  }
 }
