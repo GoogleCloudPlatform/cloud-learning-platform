@@ -40,8 +40,8 @@ env:
   GKE_POD_SA_KEY: ${{ secrets.GKE_CLASSROOM_POD_SA_KEY }}
   FIREBASE_API_KEY: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_API_KEY }}
   USE_GKE_GCLOUD_AUTH_PLUGIN: True
-  API_DOMAIN: ${{ secrets.ASU_CLASSROOM_DEV_API_DOMAIN }}
-  LTI_ISSUER_DOMAIN: https://clp-sandbox.gostudyhall.com/
+  API_DOMAIN: clp-sandbox.gostudyhall.com
+  LTI_ISSUER_DOMAIN: https://clp-sandbox.gostudyhall.com
   LTI_PLATFORM_UNIQUE_ID: e0fc690f-7fb9-4fb2-a5a6-68466f0181a4
   LTI_PLATFORM_NAME: CLP LTI Service
   FIREBASE_APP_ID: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_APP_ID}}
@@ -98,9 +98,9 @@ jobs:
         run: |
           skaffold config set default-repo "$SKAFFOLD_DEFAULT_REPO"
 
-      - name: Download Skaffold cache if exists
-        run: |
-          gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
+      # - name: Download Skaffold cache if exists
+      #   run: |
+      #     gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
 
       - name: Add BQ Tables
         run: |
@@ -116,12 +116,13 @@ jobs:
           --namespace $NAMESPACE \
           --module backends \
           -l commit=$GITHUB_SHA \
-          --tag latest
+          --tag latest \
+          --cache-artifacts=false
 
-      - name: Upload Skaffold cache
-        if: always()
-        run: |
-          gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
+      # - name: Upload Skaffold cache
+      #   if: always()
+      #   run: |
+      #     gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
 
 #   deploy_documentation:
 #     name: Deploy documentation

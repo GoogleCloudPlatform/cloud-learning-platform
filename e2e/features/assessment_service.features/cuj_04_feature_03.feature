@@ -1,3 +1,4 @@
+@assessment
 Feature: Generate Signed URL for Assessment Content
 
     Scenario: LXE wants to generate signed URL for assessment contents

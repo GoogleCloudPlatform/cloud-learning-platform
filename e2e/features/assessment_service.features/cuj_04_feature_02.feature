@@ -1,3 +1,4 @@
+@assessment
 Feature: Upload File for Assessment Authoring
 
     Scenario: LXE wants to upload a single file for assessment authoring
