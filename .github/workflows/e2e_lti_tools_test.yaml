@@ -29,7 +29,7 @@ on:
     #   - 'microservices/classroom_shim'
 
 env:
-  PROJECT_ID: gcp-classroom-dev
+  #PROJECT_ID: gcp-classroom-dev
   GKE_CLUSTER: gcp-classroom-dev-us-central1
   GKE_ZONE: us-central1
 
