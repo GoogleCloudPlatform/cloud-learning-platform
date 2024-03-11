@@ -98,9 +98,9 @@ jobs:
         run: |
           skaffold config set default-repo "$SKAFFOLD_DEFAULT_REPO"
 
-      # - name: Download Skaffold cache if exists
-      #   run: |
-      #     gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
+      - name: Download Skaffold cache if exists
+        run: |
+          gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
 
       - name: Add BQ Tables
         run: |
@@ -119,10 +119,10 @@ jobs:
           --tag latest \
           --cache-artifacts=false
 
-      # - name: Upload Skaffold cache
-      #   if: always()
-      #   run: |
-      #     gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
+      - name: Upload Skaffold cache
+        if: always()
+        run: |
+          gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
 
 #   deploy_documentation:
 #     name: Deploy documentation
