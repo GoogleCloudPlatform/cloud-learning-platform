@@ -137,7 +137,13 @@ export class CreateAssignmentComponent {
         this.showProgressSpinner = false
       })
     } else {
-      this.homeService.updateLtiAssignments(this.dialogData.extra_data.assignment.id, data).subscribe((response: any) => {
+      let finalData = {
+        ...data,
+        start_date: this.toIsoString(data.start_date),
+        end_date: this.toIsoString(data.end_date),
+        due_date: this.toIsoString(data.due_date)
+      }
+      this.homeService.updateLtiAssignments(this.dialogData.extra_data.assignment.id, finalData).subscribe((response: any) => {
         if (response.success == true) {
           this.dialogRef.close({ data: 'success' })
         }
@@ -242,4 +248,18 @@ export class CreateAssignmentComponent {
     this.dialogRef.close({ data: 'closed' });
   }
 
+
+  getCurrentHour() {
+    return new Date().getHours()
+  }
+
+  getCurrentMinute() {
+    return new Date().getMinutes()
+  }
+
+  toIsoString(dateString) {
+    let dateObject = new Date(dateString);
+    let iso8601String = dateObject.toISOString();
+    return iso8601String
+  }
 }
