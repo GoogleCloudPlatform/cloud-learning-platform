@@ -23,5 +23,5 @@ spec:
       serviceAccountName: ksa
       containers:
       - name: classroom-shim
-        image: gcr.io/core-learning-services-dev/classroom-shim
+        image: gcr.io/gcp-classroom-dev/classroom-shim
         imagePullPolicy: Always

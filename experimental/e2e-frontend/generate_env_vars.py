@@ -3,7 +3,7 @@ import json
 import os
 from google.cloud import secretmanager
 
-PROJECT_ID = os.getenv("PROJECT_ID", "core-learning-services-dev")
+PROJECT_ID = os.getenv("PROJECT_ID", "gcp-classroom-dev")
 
 
 def get_e2e_test_user():

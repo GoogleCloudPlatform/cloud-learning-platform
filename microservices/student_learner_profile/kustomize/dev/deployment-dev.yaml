@@ -9,7 +9,7 @@ spec:
       serviceAccountName: ksa
       containers:
       - name: student-learner-profile
-        image: gcr.io/core-learning-services-dev/student-learner-profile
+        image: gcr.io/gcp-classroom-dev/student-learner-profile
         imagePullPolicy: Always
         env:
         - name: PROJECT_ID

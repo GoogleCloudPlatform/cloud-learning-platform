@@ -8,7 +8,7 @@ import sys
 from google.cloud import firestore_admin_v1
 
 DATABASE_PREFIX = os.getenv("DATABASE_PREFIX", "")
-PROJECT_ID = os.getenv("PROJECT_ID", "core-learning-services-dev")
+PROJECT_ID = os.getenv("PROJECT_ID", "gcp-classroom-dev")
 
 client = firestore_admin_v1.FirestoreAdminClient()
 # pylint: disable=broad-exception-caught

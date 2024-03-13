@@ -8,7 +8,7 @@ spec:
       serviceAccountName: ksa
       containers:
       - name: utils
-        image: gcr.io/core-learning-services-dev/utils
+        image: gcr.io/gcp-classroom-dev/utils
         imagePullPolicy: Always
         resources:
             requests:
@@ -19,7 +19,7 @@ spec:
               cpu: "200m"
         env:
           - name: GCP_LEARNING_RESOURCE_BUCKET
-            value: core-learning-services-dev
+            value: gcp-classroom-dev
           - name: PROJECT_ID
             valueFrom:
               configMapKeyRef:

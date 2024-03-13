@@ -9,7 +9,7 @@ spec:
       serviceAccountName: ksa
       containers:
       - name: prior-learning-assessment
-        image: gcr.io/core-learning-services-dev/prior-learning-assessment
+        image: gcr.io/gcp-classroom-dev/prior-learning-assessment
         imagePullPolicy: Always
         env:
         - name: PROJECT_ID

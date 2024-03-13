@@ -1,3 +1,4 @@
+@assessment
 Feature: Get files uploaded to temp folder on GCS
 
     Scenario: User wants to fetch the files present in the Assessment Author's temp folder on GCS

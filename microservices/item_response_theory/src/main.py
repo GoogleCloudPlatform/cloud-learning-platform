@@ -13,7 +13,7 @@ import sys
 sys.path.append("../../../common/src")
 import os
 # os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
-os.environ["GOOGLE_CLOUD_PROJECT"] = "core-learning-services-dev"
+os.environ["GOOGLE_CLOUD_PROJECT"] = "gcp-classroom-dev"
 """
 
 app = FastAPI()

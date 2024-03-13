@@ -63,7 +63,7 @@ def registration_func(creds):
       },
       "cloudPubsubTopic": {
           "topicName":
-          "projects/core-learning-services-dev/topics/classroom-messeges"
+          "projects/gcp-classroom-dev/topics/classroom-messeges"
       }
   }
   service.registrations().create(body=body).execute()
@@ -79,7 +79,7 @@ def registration_func(creds):
       },
       "cloudPubsubTopic": {
           "topicName":
-          "projects/core-learning-services-dev/topics/classroom-messeges"
+          "projects/gcp-classroom-dev/topics/classroom-messeges"
       }
   }
   service.registrations().create(body=body).execute()

@@ -23,5 +23,5 @@ spec:
       serviceAccountName: ksa
       containers:
       - name: classroom-notification-service
-        image: gcr.io/core-learning-services-dev/classroom-notification-service
+        image: gcr.io/gcp-classroom-dev/classroom-notification-service
         imagePullPolicy: Always

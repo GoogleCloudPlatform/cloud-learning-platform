@@ -1,3 +1,4 @@
+@assessment
 Feature: Filter and Search on SubmittedAssessment in Assessment services
 
     Scenario: Fetch list of all SubmittedAssessments submitted by a learner

@@ -337,7 +337,7 @@ After cloning the repo, please set up for local development.
 
 * Export GCP project id and the namespace based on your Github handle (i.e. user ID)
   ```
-  export PROJECT_ID=core-learning-services-dev
+  export PROJECT_ID=gcp-classroom-dev
   export REGION=us-central1
   export SKAFFOLD_NAMESPACE=<Replace with your Github user ID>
   ```
@@ -367,7 +367,7 @@ skaffold dev
 > **IMPORTANT**: Please change gcloud project and kubectl context before running skaffold.
 
 ```
-export PROJECT_ID=core-learning-services-dev
+export PROJECT_ID=gcp-classroom-dev
 
 # Switch to a specific project.
 gcloud config set project $PROJECT_ID

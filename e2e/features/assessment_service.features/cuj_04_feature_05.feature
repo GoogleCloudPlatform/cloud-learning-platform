@@ -1,3 +1,4 @@
+@assessment
 Feature: Delete uploaded files during assessment authoring and submission
 
     Scenario: User wants to delete uploaded file during assessment authoring

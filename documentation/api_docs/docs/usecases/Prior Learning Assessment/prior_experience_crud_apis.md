@@ -352,7 +352,7 @@ Then the response would be as follows:
             "Mathematics"
         ],
         "documents": [
-            "gs://core-learning-services-dev/pla/user-transcripts/test.pdf"
+            "gs://gcp-classroom-dev/pla/user-transcripts/test.pdf"
         ],
         "cpl": 6,
         "is_flagged": false,
@@ -412,7 +412,7 @@ After the validation of Prior Experience for given uuid, Prior Experience for th
             "Mathematics"
         ],
         "documents": [
-            "gs://core-learning-services-dev/pla/user-transcripts/test.pdf"
+            "gs://gcp-classroom-dev/pla/user-transcripts/test.pdf"
         ],
         "cpl": 6,
         "is_flagged": false,

@@ -1,3 +1,4 @@
+@assessment
 Feature: CRUD for managing Assessment model in Assessment services
 
     Scenario: Create an Assessment with correct request payload

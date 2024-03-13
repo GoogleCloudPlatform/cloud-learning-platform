@@ -18,11 +18,11 @@ describe("Test ALEKS Deeplinking", () => {
     const EMAIL = Cypress.env("E2E_TEST_EMAIL");
     const PASSWORD = Cypress.env("E2E_TEST_PASSWORD");
     const domain =
-      "https://core-learning-services-dev.cloudpssolutions.com/login/e2e";
+      "https://gcp-classroom-dev.cloudpssolutions.com/login/e2e";
     cy.visit(domain);
     cy.url().should(
       "eq",
-      "https://core-learning-services-dev.cloudpssolutions.com/login/e2e"
+      "https://gcp-classroom-dev.cloudpssolutions.com/login/e2e"
     );
 
     // sign in with a account
@@ -33,13 +33,13 @@ describe("Test ALEKS Deeplinking", () => {
     // check if domain is right
     cy.url().should(
       "contain",
-      "https://core-learning-services-dev.cloudpssolutions.com"
+      "https://gcp-classroom-dev.cloudpssolutions.com"
     );
     cy.log("User logged in");
 
     cy.intercept(
       "GET",
-      "https://core-learning-services-dev.cloudpssolutions.com/lms/api/v1/sections?skip=0&limit=10"
+      "https://gcp-classroom-dev.cloudpssolutions.com/lms/api/v1/sections?skip=0&limit=10"
     ).as("getAllSections");
 
     // go to section
@@ -74,7 +74,7 @@ describe("Test ALEKS Deeplinking", () => {
 
     cy.intercept(
       "POST",
-      "https://core-learning-services-dev.cloudpssolutions.com/classroom-shim/api/v1/lti-assignment"
+      "https://gcp-classroom-dev.cloudpssolutions.com/classroom-shim/api/v1/lti-assignment"
     ).as("apiRequest");
 
     cy.get('button[type="submit"]').contains("Save").click();

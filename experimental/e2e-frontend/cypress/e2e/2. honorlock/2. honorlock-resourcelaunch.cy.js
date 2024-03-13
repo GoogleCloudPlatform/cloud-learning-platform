@@ -5,7 +5,7 @@ describe("Test Honorlock Resource Launch", () => {
     let facultyPassword = "gudvuk-sEnjo0-vosduv";
     cy.request(
       "POST",
-      "https://core-learning-services-dev.cloudpssolutions.com/authentication/api/v1/sign-in/credentials",
+      "https://gcp-classroom-dev.cloudpssolutions.com/authentication/api/v1/sign-in/credentials",
       {
         email: facultyEmail,
         password: facultyPassword,
@@ -16,7 +16,7 @@ describe("Test Honorlock Resource Launch", () => {
         (assignmenuId) => {
           cy.visit({
             method: "GET",
-            url: `https://core-learning-services-dev.cloudpssolutions.com/classroom-shim/api/v1/e2e-resource-launch?lti_assignment_id=${assignmenuId}`,
+            url: `https://gcp-classroom-dev.cloudpssolutions.com/classroom-shim/api/v1/e2e-resource-launch?lti_assignment_id=${assignmenuId}`,
             headers: {
               Authorization: `Bearer ${idToken}`,
             },

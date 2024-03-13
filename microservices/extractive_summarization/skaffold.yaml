@@ -40,16 +40,16 @@ profiles:
     statusCheckDeadlineSeconds: 1200
 - name: dev
   activation:
-  - kubeContext: gke_core-learning-services-dev_us-central1_core-learning-services-dev-us-central1
+  - kubeContext: gke_gcp-classroom-dev_us-central1_gcp-classroom-dev-us-central1
   build:
     googleCloudBuild:
       machineType: N1_HIGHCPU_8
       timeout: '900s'
     artifacts:
-    - image: gcr.io/core-learning-services-dev/extractive-summarization
+    - image: gcr.io/gcp-classroom-dev/extractive-summarization
       docker:
         cacheFrom:
-          - gcr.io/core-learning-services-dev/extractive-summarization:latest
+          - gcr.io/gcp-classroom-dev/extractive-summarization:latest
       sync:
         infer:
           - '**/*.py'
@@ -66,12 +66,12 @@ profiles:
       machineType: N1_HIGHCPU_8
       timeout: '900s'
     artifacts:
-    - image: gcr.io/core-learning-services-dev/extractive-summarization
+    - image: gcr.io/gcp-classroom-dev/extractive-summarization
       docker:
         cacheFrom:
           - extractive-summarization
           - extractive-summarization:latest
-          - gcr.io/core-learning-services-dev/extractive-summarization:latest
+          - gcr.io/gcp-classroom-dev/extractive-summarization:latest
       sync:
         infer:
           - '**/*.py'

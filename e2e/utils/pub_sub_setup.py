@@ -29,7 +29,7 @@ PUB_SUB_PROJECT_ID=os.getenv("PUB_SUB_PROJECT_ID") or \
   PROJECT_ID
 # generate credentials using SA json keys
 GKE_POD_SA_KEY = json.loads(os.environ.get("GKE_POD_SA_KEY"))
-"iam.serviceAccounts.actAs"
+# "iam.serviceAccounts.actAs"
 CREDENTIALS = service_account.Credentials.from_service_account_info(
     GKE_POD_SA_KEY)
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
                         "topic": cls_topic_path,
                         "ack_deadline_seconds": 600
                     }])
-  # webhook_url = ("https://core-learning-services-dev.cloudpssolutions.com"
+  # webhook_url = ("https://gcp-classroom-dev.cloudpssolutions.com"
   #                 + "/lms/api/test/webhook")
   # oidc_token = pubsub_v1.types.PushConfig.OidcToken(
   #     service_account_email=

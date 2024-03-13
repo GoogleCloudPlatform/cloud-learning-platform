@@ -7,8 +7,8 @@ Sample objects for the schema
 BASIC_VALIDATE_TOKEN_RESPONSE_EXAMPLE = {
     "name": "Test User",
     "picture": "https://lh3.googleusercontent.com/photo.jpg",
-    "iss": "https://securetoken.google.com/core-learning-services-dev",
-    "aud": "core-learning-services-dev",
+    "iss": "https://securetoken.google.com/gcp-classroom-dev",
+    "aud": "gcp-classroom-dev",
     "auth_time": 1663140772,
     "user_id": "Yfgfst2hgynghjfgh",
     "sub": "Yfgfst2hgynghjfgh",

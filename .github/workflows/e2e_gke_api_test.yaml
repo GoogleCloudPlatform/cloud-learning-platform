@@ -15,463 +15,463 @@
 # # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-# name: E2E API Tests on GKE Microservices
-# on:
-#   workflow_call:
-#     inputs:
-#       USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT:
-#         required: false
-#         type: boolean
-#         default: false
-#     secrets:
-#       GKE_POD_SA_KEY:
-#         required: true
-#       FIREBASE_API_KEY:
-#         required: true
-#       API_DOMAIN:
-#         required: true
-#       FIREBASE_APP_ID:
-#         required: true
-#       DEPLOYMENT_DEV_SA_KEY:
-#         required: true
-#       GH_PAT:
-#         required: true
-#   pull_request:
-#     branches:
-#       - main
-#     paths:
-#       - 'microservices/**'
-#       - 'common/**'
-#       - 'e2e/**'
-#       - 'utils/**'
-#       - '.github/workflows/e2e_gke_api_test.yaml'
-#       - 'skaffold.yaml'
-#   workflow_dispatch:
-#     inputs:
-#       USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT:
-#         description: "set flag to use gmail account"
-#         required: false
-#         type: boolean
-#         default: false
+name: E2E API Tests on GKE Microservices
+on:
+  workflow_call:
+    inputs:
+      USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      GKE_POD_SA_KEY:
+        required: true
+      FIREBASE_API_KEY:
+        required: true
+      API_DOMAIN:
+        required: true
+      FIREBASE_APP_ID:
+        required: true
+      DEPLOYMENT_DEV_SA_KEY:
+        required: true
+      GH_PAT:
+        required: true
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'microservices/**'
+      - 'common/**'
+      - 'e2e/**'
+      - 'utils/**'
+      - '.github/workflows/e2e_gke_api_test.yaml'
+      - 'skaffold.yaml'
+  workflow_dispatch:
+    inputs:
+      USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT:
+        description: "set flag to use gmail account"
+        required: false
+        type: boolean
+        default: false
 
-# env:
-#   PROJECT_ID: gcp-classroom-dev
-#   SKAFFOLD_DEFAULT_REPO: gcr.io/gcp-classroom-dev
-#   GKE_CLUSTER: gcp-classroom-dev-us-central1
-#   GKE_ZONE: us-central1
-#   KUSTOMIZE_VERSION: 4.1.3
-#   SKAFFOLD_VERSION: 1.39.2
-#   SKAFFOLD_CACHE_GCS: gs://gcp-classroom-dev/skaffold/cache
-#   WORKSPACE_ADMIN_EMAIL: admin-programmatic-user@gostudyhall.com
-#   GKE_POD_SA_KEY: ${{ secrets.GKE_CLASSROOM_POD_SA_KEY }}
-#   FIREBASE_API_KEY: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_API_KEY }}
-#   USE_GKE_GCLOUD_AUTH_PLUGIN: True
-#   MEMORYSTORE_ENABLED: true
-#   CLOUD_LOGGING_ENABLED: False
-#   API_DOMAIN: ${{ secrets.ASU_CLASSROOM_DEV_API_DOMAIN }}
-#   FIREBASE_APP_ID: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_APP_ID }}
-#   EXTERNAL_USER_PROPERTY_PREFIX: SNHU_
-#   SKAFFOLD_BUILD_CONCURRENCY: 0
-#   USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT }}
-#   E2E_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr' || 'e2e_pr' }}${{  github.event.pull_request.number }}_
-#   E2E_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-' }}${{  github.event.pull_request.number }}
-#   CONTENT_SERVING_BUCKET: core-learning-services-dev-content-serving-bucket
-# # cookiecutter:raw 
-# jobs:
-#   admin-teacher:
-#     name: Set admin-teacher account as env
-#     runs-on: ubuntu-latest
-#     outputs:
-#       CLASSROOM_ADMIN_EMAIL: ${{steps.account-setup.outputs.account}}
-#     steps:
-#     - name: 'Set up Gcloud auth'
-#       id: 'gcloud_auth'
-#       uses: 'google-github-actions/auth@v1'
-#       with:
-#         credentials_json: '${{ secrets.CLP_DEV_SA_KEY }}'
-#     - name: 'Set up Cloud SDK'
-#       uses: 'google-github-actions/setup-gcloud@v1'
-#     - name: export admin-teacher account in github env
-#       id: account-setup
-#       run: |
-#         secret_id=e2e-admin-teacher-$(shuf -n1 -i 1-4)-username
-#         account=$(gcloud secrets versions access latest --secret="$secret_id")
-#         echo "account=$account" >> "$GITHUB_OUTPUT"
+env:
+  PROJECT_ID: gcp-classroom-dev
+  SKAFFOLD_DEFAULT_REPO: gcr.io/gcp-classroom-dev
+  GKE_CLUSTER: gcp-classroom-dev-us-central1
+  GKE_ZONE: us-central1
+  KUSTOMIZE_VERSION: 4.1.3
+  SKAFFOLD_VERSION: 1.39.2
+  SKAFFOLD_CACHE_GCS: gs://gcp-classroom-dev/skaffold/cache
+  WORKSPACE_ADMIN_EMAIL: admin-programmatic-user@gostudyhall.com
+  GKE_POD_SA_KEY: ${{ secrets.GKE_CLASSROOM_POD_SA_KEY }}
+  FIREBASE_API_KEY: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_API_KEY }}
+  USE_GKE_GCLOUD_AUTH_PLUGIN: True
+  MEMORYSTORE_ENABLED: true
+  CLOUD_LOGGING_ENABLED: False
+  API_DOMAIN: ${{ secrets.ASU_CLASSROOM_DEV_API_DOMAIN }}
+  FIREBASE_APP_ID: ${{ secrets.ASU_CLASSROOM_DEV_FIREBASE_APP_ID }}
+  EXTERNAL_USER_PROPERTY_PREFIX: SNHU_
+  SKAFFOLD_BUILD_CONCURRENCY: 0
+  USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT }}
+  E2E_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e_approval_pr' || 'e2e_pr' }}${{  github.event.pull_request.number }}_
+  E2E_NAMESPACE_PREFIX: ${{ inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true && 'e2e-pr-approval-' || 'e2e-pr-' }}${{  github.event.pull_request.number }}
+  CONTENT_SERVING_BUCKET: gcp-classroom-dev-content-serving-bucket
+# cookiecutter:raw 
+jobs:
+  admin-teacher:
+    name: Set admin-teacher account as env
+    runs-on: ubuntu-latest
+    outputs:
+      CLASSROOM_ADMIN_EMAIL: ${{steps.account-setup.outputs.account}}
+    steps:
+    - name: 'Set up Gcloud auth'
+      id: 'gcloud_auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.CLP_DEV_SA_KEY }}'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
+    - name: export admin-teacher account in github env
+      id: account-setup
+      run: |
+        secret_id=e2e-admin-teacher-$(shuf -n1 -i 1-4)-username
+        account=$(gcloud secrets versions access latest --secret="$secret_id")
+        echo "account=$account" >> "$GITHUB_OUTPUT"
 
-#   deploy:
-#     name: Deploy all microservices in PR namespace
-#     runs-on: ubuntu-latest
-#     needs: admin-teacher
-#     env:
-#       CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
-#     steps:
-#     - name: Check out repository
-#       uses: actions/checkout@v3
+  deploy:
+    name: Deploy all microservices in PR namespace
+    runs-on: ubuntu-latest
+    needs: admin-teacher
+    env:
+      CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
 
-#     - name: 'Set up Gcloud auth'
-#       id: 'gcloud_auth'
-#       uses: 'google-github-actions/auth@v1'
-#       with:
-#         credentials_json: '${{ secrets.CLP_DEV_SA_KEY }}'
-#     - name: 'Set up Cloud SDK'
-#       uses: 'google-github-actions/setup-gcloud@v1'
+    - name: 'Set up Gcloud auth'
+      id: 'gcloud_auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.CLP_DEV_SA_KEY }}'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
     
-#     - name: Install GKE Auth Plugin
-#       run: | 
-#         gcloud components install gke-gcloud-auth-plugin
+    - name: Install GKE Auth Plugin
+      run: | 
+        gcloud components install gke-gcloud-auth-plugin
       
-#     - name: Connect to cluster
-#       run: |
-#         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+    - name: Connect to cluster
+      run: |
+        gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
-#     - name: Install Kustomize
-#       run: |
-#         wget -O kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v$KUSTOMIZE_VERSION/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
-#         sudo tar -xvf kustomize.tar.gz -C /usr/local/bin/
+    - name: Install Kustomize
+      run: |
+        wget -O kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v$KUSTOMIZE_VERSION/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
+        sudo tar -xvf kustomize.tar.gz -C /usr/local/bin/
 
-#     - name: Install Skaffold release binary
-#       run: |
-#         curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v$SKAFFOLD_VERSION/skaffold-linux-amd64
-#         sudo install skaffold /usr/local/bin/skaffold
+    - name: Install Skaffold release binary
+      run: |
+        curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v$SKAFFOLD_VERSION/skaffold-linux-amd64
+        sudo install skaffold /usr/local/bin/skaffold
 
-#     - name: Set default repo for Skaffold
-#       run: |
-#         skaffold config set default-repo "$SKAFFOLD_DEFAULT_REPO"
+    - name: Set default repo for Skaffold
+      run: |
+        skaffold config set default-repo "$SKAFFOLD_DEFAULT_REPO"
 
-#     - name: Download Skaffold cache if exists
-#       run: |
-#         gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
+    - name: Download Skaffold cache if exists
+      run: |
+        gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
 
-#     - name: Set up Kubernetes namespace and Service Account
-#       run: |
-#         NAMESPACE=$E2E_NAMESPACE_PREFIX
-#         kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
-#         NAMESPACE=${NAMESPACE} bash setup/setup_ksa.sh
+    - name: Set up Kubernetes namespace and Service Account
+      run: |
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+        NAMESPACE=${NAMESPACE} bash setup/setup_ksa.sh
 
-#     - name: Add indexing to collections in firestore
-#       run: |
-#         export DATABASE_PREFIX=$E2E_PREFIX
-#         cd utils/
-#         python -m pip install -r requirements.txt
-#         PYTHONPATH=../common/src python firestore_e2e_indexing_setup.py
+    - name: Add indexing to collections in firestore
+      run: |
+        export DATABASE_PREFIX=$E2E_PREFIX
+        cd utils/
+        python -m pip install -r requirements.txt
+        PYTHONPATH=../common/src python firestore_e2e_indexing_setup.py
 
-#     - name: Initialize Pub/Sub
-#       run: |
-#         cd e2e
-#         python -m pip install -r requirements.txt
-#         cd utils
-#         PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python pub_sub_setup.py
+    - name: Initialize Pub/Sub
+      run: |
+        cd e2e
+        python -m pip install -r requirements.txt
+        cd utils
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python pub_sub_setup.py
 
-#     - name: Initialize BQ
-#       run: |
-#         cd utils/
-#         python -m pip install -r requirements.txt
-#         BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_setup.py --create-dataset=true
-#         BQ_DATASET=lrs DATABASE_PREFIX=$E2E_PREFIX python bq_setup.py --create-dataset=true
+    - name: Initialize BQ
+      run: |
+        cd utils/
+        python -m pip install -r requirements.txt
+        BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_setup.py --create-dataset=true
+        BQ_DATASET=lrs DATABASE_PREFIX=$E2E_PREFIX python bq_setup.py --create-dataset=true
 
-#     - name: Local setup
-#       run: |
-#         NAMESPACE=$E2E_NAMESPACE_PREFIX
-#         SKAFFOLD_NAMESPACE=${NAMESPACE} REGION=us-central1 bash setup/setup_local.sh
+    - name: Local setup
+      run: |
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        SKAFFOLD_NAMESPACE=${NAMESPACE} REGION=us-central1 bash setup/setup_local.sh
 
-#     - name: Build and deploy to cluster
-#       run: |
-#         NAMESPACE=$E2E_NAMESPACE_PREFIX
-#         export DATABASE_PREFIX=$E2E_PREFIX
-#         skaffold run \
-#         --profile dev \
-#         --namespace $NAMESPACE \
-#         --module backends,local-redis \
-#         -l commit=$GITHUB_SHA \
-#         --tag PR${{ github.event.pull_request.number }}
+    - name: Build and deploy to cluster
+      run: |
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        export DATABASE_PREFIX=$E2E_PREFIX
+        skaffold run \
+        --profile dev \
+        --namespace $NAMESPACE \
+        --module backends,local-redis \
+        -l commit=$GITHUB_SHA \
+        --tag PR${{ github.event.pull_request.number }}
 
-#     - name: Upload Skaffold cache
-#       if: always()
-#       run: |
-#         gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
+    - name: Upload Skaffold cache
+      if: always()
+      run: |
+        gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
 
-#   e2e-api-test:
-#     runs-on: ubuntu-latest
-#     needs: [deploy,admin-teacher]
-#     env:
-#       CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         python-version: [3.9]
+  e2e-api-test:
+    runs-on: ubuntu-latest
+    needs: [deploy,admin-teacher]
+    env:
+      CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9]
 
-#     steps:
-#     - uses: actions/checkout@v3
+    steps:
+    - uses: actions/checkout@v3
 
-#     - name: 'Set up Gcloud auth'
-#       id: 'gcloud_auth'
-#       uses: 'google-github-actions/auth@v1'
-#       with:
-#         credentials_json: '${{ secrets.CLP_DEV_SA_KEY }}'
-#     - name: 'Set up Cloud SDK'
-#       uses: 'google-github-actions/setup-gcloud@v1'
+    - name: 'Set up Gcloud auth'
+      id: 'gcloud_auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.CLP_DEV_SA_KEY }}'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
 
-#     - name: Install GKE Auth Plugin
-#       run: |
-#         gcloud components install gke-gcloud-auth-plugin
+    - name: Install GKE Auth Plugin
+      run: |
+        gcloud components install gke-gcloud-auth-plugin
 
-#     - name: Set up Python ${{ matrix.python-version }}
-#       uses: actions/setup-python@v4
-#       with:
-#         python-version: ${{ matrix.python-version }}
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
 
-#     - name: Install dependencies
-#       run: |
-#         python -m pip install --upgrade pip
-#         python -m pip install pytest pytest-custom_exit_code pytest-cov pylint pytest-mock mock
-#         python -m pip install -r e2e/requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pytest pytest-custom_exit_code pytest-cov pylint pytest-mock mock
+        python -m pip install -r e2e/requirements.txt
 
-#     - name: Connect to cluster
-#       run: |
-#         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+    - name: Connect to cluster
+      run: |
+        gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
-#     - name: Set up port forwarding
-#       run: |
-#         NAMESPACE=$E2E_NAMESPACE_PREFIX
-#         python e2e/utils/port_forward.py --namespace $NAMESPACE
+    - name: Set up port forwarding
+      run: |
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        python e2e/utils/port_forward.py --namespace $NAMESPACE
 
-#     - name: Setup redis
-#       uses: supercharge/redis-github-action@1.6.0
-#       with:
-#         redis-version: 6
+    - name: Setup redis
+      uses: supercharge/redis-github-action@1.6.0
+      with:
+        redis-version: 6
 
-#     - name: Install redis cli
-#       run: sudo apt-get install -y redis-tools
+    - name: Install redis cli
+      run: sudo apt-get install -y redis-tools
 
-#     - name: Verify that redis is up
-#       run: redis-cli ping
+    - name: Verify that redis is up
+      run: redis-cli ping
 
-#     - name: Cleaning up database
-#       run: |
-#         cd e2e/utils
-#         PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python database_cleanup.py
+    - name: Cleaning up database
+      run: |
+        cd e2e/utils
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python database_cleanup.py
 
-#     - name: Cleaning up classroom
-#       run: |
+    - name: Cleaning up classroom
+      run: |
 
-#         cd e2e/utils
-#         PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python classroom_cleanup.py
+        cd e2e/utils
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python classroom_cleanup.py
 
-#     - name: Wait for 5s for database cleaning up
-#       run: sleep 10s
-#       shell: bash
+    - name: Wait for 5s for database cleaning up
+      run: sleep 10s
+      shell: bash
 
-#     - name: Initialize database
-#       run: |
-#         cd e2e/utils
-#         PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python database_setup.py
+    - name: Initialize database
+      run: |
+        cd e2e/utils
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python database_setup.py
 
-#     - name: Run pytest
-#       run: |
+    - name: Run pytest
+      run: |
 
-#         PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m pytest e2e/gke_api_tests/
+        PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m pytest e2e/gke_api_tests/
 
-#     - name: Run behave
-#       run: |
-#         PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m behave e2e/features/ --tags=~@test --tags=~@auth-api --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode --tags=~@inspace --tags=~@not-implemented
+    - name: Run behave
+      run: |
+        PYTHONPATH=common/src DATABASE_PREFIX=$E2E_PREFIX python -m behave e2e/features/ --tags=~@test --tags=~@auth-api --tags=~@filter-api --tags=~@single-sign-on-auth-flow --tags=~@matching-engine --tags=~@publish-draft-mode --tags=~@inspace --tags=~@not-implemented --tags=~@assessment --tags=~@content-serving-api
 
-#   e2e-ui-test-lms-admin-ui:
-#     runs-on: ubuntu-latest
-#     needs: deploy
-#     if: ${{contains(github.event.pull_request.labels.*.name, 'LMS_ADMIN_UI') || inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true}}
-#     env:
-#       HEADLESS: enables
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         node-version: [16.x]
+  e2e-ui-test-lms-admin-ui:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: ${{contains(github.event.pull_request.labels.*.name, 'LMS_ADMIN_UI') || inputs.USE_GMAIL_ACCOUNT_STUDENT_ENROLLMENT == true}}
+    env:
+      HEADLESS: enables
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [16.x]
 
-#     steps:
-#     - uses: actions/checkout@v3
-#     - name: Use Node.js ${{ matrix.node-version }}
-#       uses: actions/setup-node@v3
-#       with:
-#         node-version: ${{ matrix.node-version }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
 
-#     - name: 'Set up Gcloud auth'
-#       id: 'gcloud_auth'
-#       uses: 'google-github-actions/auth@v1'
-#       with:
-#         credentials_json: '${{ secrets.CLP_DEV_SA_KE }}'
+    - name: 'Set up Gcloud auth'
+      id: 'gcloud_auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.CLP_DEV_SA_KE }}'
 
-#     - name: 'Set up Cloud SDK'
-#       uses: 'google-github-actions/setup-gcloud@v1'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
 
-#     - name: Install GKE Auth Plugin
-#       run: |
-#         gcloud components install gke-gcloud-auth-plugin
+    - name: Install GKE Auth Plugin
+      run: |
+        gcloud components install gke-gcloud-auth-plugin
 
-#     - id: 'secrets'
-#       uses: 'google-github-actions/get-secretmanager-secrets@v1'
-#       with:
-#         secrets: |-
-#           TOKEN:core-learning-services-dev/e2e_test_email_password
+    - id: 'secrets'
+      uses: 'google-github-actions/get-secretmanager-secrets@v1'
+      with:
+        secrets: |-
+          TOKEN:gcp-classroom-dev/e2e_test_email_password
 
-#     - name: Connect to cluster
-#       run: |
-#         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+    - name: Connect to cluster
+      run: |
+        gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
-#     - name: Set up port forwarding
-#       run: |
-#         NAMESPACE=$E2E_NAMESPACE_PREFIX
-#         python -m pip install -r e2e/requirements.txt
-#         python e2e/utils/port_forward.py --namespace $NAMESPACE
+    - name: Set up port forwarding
+      run: |
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        python -m pip install -r e2e/requirements.txt
+        python e2e/utils/port_forward.py --namespace $NAMESPACE
 
-#     - name: Install wait-for-it
-#       run: sudo apt install -y wait-for-it
+    - name: Install wait-for-it
+      run: sudo apt install -y wait-for-it
 
-#     - name: Install dependencies
-#       run: |
-#           cd ./microservices/lms_admin_ui
-#           npm install --save-exact
+    - name: Install dependencies
+      run: |
+          cd ./microservices/lms_admin_ui
+          npm install --save-exact
 
-#     - name: Run frontend server on localhost
-#       run: |
-#           cd ./microservices/lms_admin_ui
-#           npm start & wait-for-it -h localhost -p 4200 -t 0 -- echo "Frontend Dev Server up"
+    - name: Run frontend server on localhost
+      run: |
+          cd ./microservices/lms_admin_ui
+          npm start & wait-for-it -h localhost -p 4200 -t 0 -- echo "Frontend Dev Server up"
 
-#     - name: Waiting 30 sec
-#       run: |
-#           sleep 30s
+    - name: Waiting 30 sec
+      run: |
+          sleep 30s
 
-#     - name: Create new user for e2e
-#       env:
-#         ACCOUNT : '${{ steps.secrets.outputs.TOKEN }}'
-#       run: |
-#           echo $ACCOUNT
-#           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-#           export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
-#           python -m pip install -r common/requirements.txt
-#           cd utils/
-#           python -m pip install -r requirements.txt
-#           PYTHONPATH=../common/src python create_e2e_user.py
+    - name: Create new user for e2e
+      env:
+        ACCOUNT : '${{ steps.secrets.outputs.TOKEN }}'
+      run: |
+          echo $ACCOUNT
+          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          export DATABASE_PREFIX=e2e_pr${PR_NUMBER}_
+          python -m pip install -r common/requirements.txt
+          cd utils/
+          python -m pip install -r requirements.txt
+          PYTHONPATH=../common/src python create_e2e_user.py
 
-#     - name: Run E2E UI Tests
-#       env:
-#         ACCOUNT : '${{ steps.secrets.outputs.TOKEN }}'
-#       run: |
-#           echo $ACCOUNT
-#           cd ./microservices/lms_admin_ui
-#           npm run e2e-ui
+    - name: Run E2E UI Tests
+      env:
+        ACCOUNT : '${{ steps.secrets.outputs.TOKEN }}'
+      run: |
+          echo $ACCOUNT
+          cd ./microservices/lms_admin_ui
+          npm run e2e-ui
 
-#   dataset-cleanup:
-#     runs-on: ubuntu-latest
-#     needs: [e2e-api-test,admin-teacher]
-#     if: always()
-#     env:
-#       CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         python-version: [3.9]
+  dataset-cleanup:
+    runs-on: ubuntu-latest
+    needs: [e2e-api-test,admin-teacher]
+    if: always()
+    env:
+      CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9]
 
-#     steps:
-#     - uses: actions/checkout@v3
+    steps:
+    - uses: actions/checkout@v3
 
-#     - name: 'Set up Gcloud auth'
-#       id: 'gcloud_auth'
-#       uses: 'google-github-actions/auth@v1'
-#       with:
-#         credentials_json: '${{ secrets.CLP_DEV_SA_KEY }}'
-#     - name: 'Set up Cloud SDK'
-#       uses: 'google-github-actions/setup-gcloud@v1'
+    - name: 'Set up Gcloud auth'
+      id: 'gcloud_auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.CLP_DEV_SA_KEY }}'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
 
-#     - name: Install GKE Auth Plugin
-#       run: |
-#         gcloud components install gke-gcloud-auth-plugin
+    - name: Install GKE Auth Plugin
+      run: |
+        gcloud components install gke-gcloud-auth-plugin
 
-#     - name: Set up Python ${{ matrix.python-version }}
-#       uses: actions/setup-python@v4
-#       with:
-#         python-version: ${{ matrix.python-version }}
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
 
-#     - name: Install dependencies
-#       run: |
-#         python -m pip install --upgrade pip
-#         python -m pip install pytest pytest-custom_exit_code pytest-cov pylint pytest-mock mock
-#         python -m pip install -r e2e/requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pytest pytest-custom_exit_code pytest-cov pylint pytest-mock mock
+        python -m pip install -r e2e/requirements.txt
 
-#     - name: Removing firestore indexes
-#       run: |
-#         export DATABASE_PREFIX=$E2E_PREFIX
-#         cd utils/
-#         python -m pip install -r requirements.txt
-#         PYTHONPATH=../common/src python firestore_indexing_cleanup.py
+    - name: Removing firestore indexes
+      run: |
+        export DATABASE_PREFIX=$E2E_PREFIX
+        cd utils/
+        python -m pip install -r requirements.txt
+        PYTHONPATH=../common/src python firestore_indexing_cleanup.py
 
-#     - name: Cleaning up database
-#       run: |
-#         cd e2e/utils
-#         PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python database_cleanup.py
+    - name: Cleaning up database
+      run: |
+        cd e2e/utils
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python database_cleanup.py
 
-#     - name: Cleaning up classroom
-#       run: |
-#         cd e2e/utils
-#         PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python classroom_cleanup.py
+    - name: Cleaning up classroom
+      run: |
+        cd e2e/utils
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python classroom_cleanup.py
 
-#   deployment-cleanup:
-#     name: Clean up deployment in PR namespace
-#     needs: [e2e-api-test,admin-teacher]
-#     if: always()
-#     env:
-#       CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Check out repository
-#       uses: actions/checkout@v3
+  deployment-cleanup:
+    name: Clean up deployment in PR namespace
+    needs: [e2e-api-test,admin-teacher]
+    if: always()
+    env:
+      CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
 
-#     - name: 'Set up Gcloud auth'
-#       id: 'gcloud_auth'
-#       uses: 'google-github-actions/auth@v1'
-#       with:
-#         credentials_json: '${{ secrets.CLP_DEV_SA_KEY }}'
-#     - name: 'Set up Cloud SDK'
-#       uses: 'google-github-actions/setup-gcloud@v1'
+    - name: 'Set up Gcloud auth'
+      id: 'gcloud_auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.CLP_DEV_SA_KEY }}'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
     
-#     - name: Install GKE Auth Plugin
-#       run: | 
-#         gcloud components install gke-gcloud-auth-plugin
+    - name: Install GKE Auth Plugin
+      run: | 
+        gcloud components install gke-gcloud-auth-plugin
 
-#     - name: Connect to cluster
-#       run: |
-#         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+    - name: Connect to cluster
+      run: |
+        gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
-#     - name: Install Kustomize
-#       run: |
-#         wget -O kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v4.0.4/kustomize_v4.0.4_linux_amd64.tar.gz
-#         sudo tar -xvf kustomize.tar.gz -C /usr/local/bin/
+    - name: Install Kustomize
+      run: |
+        wget -O kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v4.0.4/kustomize_v4.0.4_linux_amd64.tar.gz
+        sudo tar -xvf kustomize.tar.gz -C /usr/local/bin/
 
-#     - name: Install Skaffold release binary
-#       run: |
-#         curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v$SKAFFOLD_VERSION/skaffold-linux-amd64
-#         sudo install skaffold /usr/local/bin/skaffold
+    - name: Install Skaffold release binary
+      run: |
+        curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v$SKAFFOLD_VERSION/skaffold-linux-amd64
+        sudo install skaffold /usr/local/bin/skaffold
 
-#     - name: Set default repo for Skaffold
-#       run: |
-#         skaffold config set default-repo "$SKAFFOLD_DEFAULT_REPO"
+    - name: Set default repo for Skaffold
+      run: |
+        skaffold config set default-repo "$SKAFFOLD_DEFAULT_REPO"
 
-#     - name: Delete all deployments and namespace
-#       run: |
-#         NAMESPACE=$E2E_NAMESPACE_PREFIX
-#         skaffold delete --namespace $NAMESPACE
-#         kubectl delete namespace $NAMESPACE
+    - name: Delete all deployments and namespace
+      run: |
+        NAMESPACE=$E2E_NAMESPACE_PREFIX
+        skaffold delete --namespace $NAMESPACE
+        kubectl delete namespace $NAMESPACE
 
-#     - name: Cleaning up Pub/Sub
-#       run: |
-#         cd e2e
-#         python -m pip install -r requirements.txt
-#         cd utils
-#         PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python pub_sub_cleanup.py  
+    - name: Cleaning up Pub/Sub
+      run: |
+        cd e2e
+        python -m pip install -r requirements.txt
+        cd utils
+        PYTHONPATH=../common/src DATABASE_PREFIX=$E2E_PREFIX python pub_sub_cleanup.py  
 
-#     - name: Cleaning up BQ
-#       run: |
-#         cd utils/
-#         python -m pip install -r requirements.txt
-#         BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_cleanup.py
-#         BQ_DATASET=lrs DATABASE_PREFIX=$E2E_PREFIX python bq_cleanup.py
+    - name: Cleaning up BQ
+      run: |
+        cd utils/
+        python -m pip install -r requirements.txt
+        BQ_DATASET=lms_analytics DATABASE_PREFIX=$E2E_PREFIX python bq_cleanup.py
+        BQ_DATASET=lrs DATABASE_PREFIX=$E2E_PREFIX python bq_cleanup.py
 
-# # cookiecutter:endraw 
+# cookiecutter:endraw 

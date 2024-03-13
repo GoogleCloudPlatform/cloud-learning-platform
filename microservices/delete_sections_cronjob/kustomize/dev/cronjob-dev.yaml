@@ -23,7 +23,7 @@ spec:
         spec:
           containers:
           - name: delete-sections-cronjob
-            image: gcr.io/core-learning-services-dev/delete-sections-cronjob
+            image: gcr.io/gcp-classroom-dev/delete-sections-cronjob
             envFrom:
             - configMapRef:
                 name: env-vars

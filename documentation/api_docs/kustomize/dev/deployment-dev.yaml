@@ -7,14 +7,14 @@ spec:
     spec:
       containers:
       - name: api-docs
-        image: gcr.io/core-learning-services-dev/api-docs
+        image: gcr.io/gcp-classroom-dev/api-docs
         imagePullPolicy: Always
         env:
         # Define the environment variable
         - name: SERVER_DESCRIPTION
           value: Development Server
         - name: SERVER
-          value: https://core-learning-services-dev.cloudpssolutions.com
+          value: https://gcp-classroom-dev.cloudpssolutions.com
         - name: PROJECT_ID
           valueFrom:
             configMapKeyRef:

@@ -1,3 +1,4 @@
+@assessment
 Feature: Establishing a relationship between the Assessment and Learning Experience
 
     Scenario: LXE wants to associate the Assessment with the Learning Experience

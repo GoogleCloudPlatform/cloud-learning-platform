@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
       - name: credential-pathway-service
-        image: gcr.io/core-learning-services-dev/credential-pathway-service
+        image: gcr.io/gcp-classroom-dev/credential-pathway-service
         imagePullPolicy: Always
         env:
         - name: PROJECT_ID

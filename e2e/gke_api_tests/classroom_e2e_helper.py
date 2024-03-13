@@ -58,6 +58,7 @@ def create_course(name, section, description):
 
 def enroll_teacher_in_classroom(classroom_id,teacher_email):
   """enroll teacher in classroom"""
+  print(f"ENROLL TEACHER EMAIL--------> {teacher_email}")
   service = build("classroom", "v1", credentials=get_creds())
   body = {"userId": teacher_email}
   teacher = service.courses().teachers().create(
@@ -104,6 +105,7 @@ def invite_user(course_id, email, role):
   return invitation
 
 def create_course_work(classroom_id,body):
+  print(f"Create Coursework body ---------> {body}")
   service = build("classroom", "v1", credentials=get_creds(True))
   return service.courses().courseWork().create(courseId=classroom_id,
                                                  body=body).execute()
