@@ -14,7 +14,8 @@ import config
 import uvicorn
 from fastapi import FastAPI, Depends
 from fastapi.templating import Jinja2Templates
-from routes import launch, lti_assignment, grade, context, content_selection, user_shim, e2e_resource_launch
+from routes import (launch, lti_assignment, grade, context, content_selection,
+                    user_shim, e2e_resource_launch, grade_exception)
 from common.utils.http_exceptions import add_exception_handlers
 from common.utils.auth_service import validate_user
 
@@ -35,6 +36,7 @@ def health_check():
 api = FastAPI(title="Classroom Shim Service APIs", version="latest")
 
 api.include_router(launch.router)
+api.include_router(grade_exception.router)
 api.include_router(lti_assignment.router, dependencies=[Depends(validate_user)])
 api.include_router(context.router, dependencies=[Depends(validate_user)])
 api.include_router(grade.router, dependencies=[Depends(validate_user)])
