@@ -63,7 +63,7 @@
                         formControlName="start_date">
                     <mat-datepicker-toggle matSuffix [for]="$any(start_date)"></mat-datepicker-toggle>
                     <ngx-mat-datetime-picker #start_date [enableMeridian]="false" [showSeconds]="true"
-                        [defaultTime]="[getCurrentHour(),getCurrentMinute(),59]"
+                        [defaultTime]="[getCurrentHour(),getCurrentMinute(),00]"
                         color="primary"></ngx-mat-datetime-picker>
                 </mat-form-field>
             </div>
@@ -75,7 +75,7 @@
                         formControlName="end_date">
                     <mat-datepicker-toggle matSuffix [for]="$any(end_date)"></mat-datepicker-toggle>
                     <ngx-mat-datetime-picker #end_date [enableMeridian]="false" [showSeconds]="true"
-                        [defaultTime]="[getCurrentHour(),getCurrentMinute(),59]"
+                        [defaultTime]="[23,59,59]"
                         color="primary"></ngx-mat-datetime-picker>
                 </mat-form-field>
             </div>
@@ -87,7 +87,7 @@
                         formControlName="due_date">
                     <mat-datepicker-toggle matSuffix [for]="$any(due_date)"></mat-datepicker-toggle>
                     <ngx-mat-datetime-picker #due_date [enableMeridian]="false" [showSeconds]="true"
-                        [defaultTime]="[getCurrentHour(),getCurrentMinute(),59]"
+                        [defaultTime]="[23,59,59]"
                         color="primary"></ngx-mat-datetime-picker>
                 </mat-form-field>
             </div>
