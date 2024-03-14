@@ -4,7 +4,8 @@ import requests
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 from config import ERROR_RESPONSES, LTI_ISSUER_DOMAIN, auth_client
-from common.models import LineItem, Result, Score, Tool, LTIContentItem
+from common.models import (LineItem, Result, Score, Tool, LTIContentItem,
+                           UserGradeException)
 from common.utils.errors import (ResourceNotFoundException, ValidationError,
                                  InvalidTokenError)
 from common.utils.logging_handler import Logger
@@ -587,10 +588,18 @@ def create_score_for_line_item(context_id: str,
           headers={"Authorization": f"Bearer {auth_client.get_id_token()}"},
           timeout=60)
 
-      if check_section_user_mapping_req.status_code == 200:
-        lti_content_item = LTIContentItem.find_by_id(line_item.resourceLinkId)
-        tool = Tool.find_by_id(lti_content_item.tool_id)
+      lti_content_item = LTIContentItem.find_by_id(line_item.resourceLinkId)
+      tool = Tool.find_by_id(lti_content_item.tool_id)
 
+      user_exception = UserGradeException.find_by_user_and_tool_id(
+          user_id=user_id, tool_id=lti_content_item.tool_id)
+
+      if user_exception and user_exception.allow_exception is True:
+        error_message = f"Skipped grade passback due to manual exception for user with id {user_id} and context {context_id}. API request payload --- {str(input_score)} ---"
+        Logger.error(error_message)
+        return {"success": True, "message": "Grade passback skipped"}
+
+      if check_section_user_mapping_req.status_code == 200:
         input_grade_dict = {
             "user_id": user_id,
             "comment": input_result_dict["comment"],
