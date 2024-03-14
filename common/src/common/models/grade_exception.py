@@ -19,9 +19,6 @@ class UserGradeException(BaseModel):
   @classmethod
   def find_by_user_and_tool_id(cls, user_id, tool_id):
     user = cls.collection.filter("user_id", "==", user_id).filter("tool_id", "==", tool_id).get()
-    if user is None:
-      raise ResourceNotFoundException(
-          f"{cls.__name__} with user_id {user_id} & tool_id {tool_id} not found")
     return user
 
   @classmethod
