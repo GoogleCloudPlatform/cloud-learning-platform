@@ -124,7 +124,7 @@ def create_record(input_dict: GradeExceptionInputModel):
         raise Exception(f"User with email {email_id} not found")
       new_user = UserGradeException()
       new_user = new_user.from_dict(input_dict)
-      new_user.user_id = user_details.get("user_id")
+      new_user.user_id = user_details.user_id
       new_user.save()
       user_fields = new_user.get_fields(reformat_datetime=True)
       user_fields["id"] = new_user.id
