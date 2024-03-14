@@ -12,7 +12,6 @@ class GradeExceptionInputModel(BaseModel):
       BaseModel (_type_): _description_
   """
   email_id: str
-  user_id: str
   tool_id: str
   allow_exception: Optional[bool] = True
 
@@ -21,8 +20,7 @@ class GradeExceptionInputModel(BaseModel):
     orm_mode = True
     schema_extra = {
         "example": {
-            "email_id": "Kv57BaY2uqE23N",
-            "user_id": "N49q6vGt29oBvn8gt",
+            "email_id": "test@gmail.com",
             "tool_id": "Z3bV9qJ7p41uCX",
             "allow_exception": True
         }
