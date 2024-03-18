@@ -2,10 +2,11 @@
 from fireo.fields import TextField, BooleanField, IDField
 from common.utils.errors import ResourceNotFoundException
 from common.models import BaseModel
+# pylint: disable=line-too-long
 
 
 class UserGradeException(BaseModel):
-  """LTI Tool Data Model"""
+  """LTI User Grade Exception Data Model"""
   id = IDField()
   email_id = TextField(required=True)
   user_id = TextField(required=True)
@@ -18,13 +19,18 @@ class UserGradeException(BaseModel):
 
   @classmethod
   def find_by_user_and_tool_id(cls, user_id, tool_id):
-    user = cls.collection.filter("user_id", "==", user_id).filter("tool_id", "==", tool_id).get()
+    user = cls.collection.filter("user_id", "==",
+                                 user_id).filter("tool_id", "==",
+                                                 tool_id).get()
     return user
 
   @classmethod
   def find_by_email_and_tool_id(cls, email_id, tool_id):
-    email = cls.collection.filter("email_id", "==", email_id).filter("tool_id", "==", tool_id).get()
+    email = cls.collection.filter("email_id", "==",
+                                  email_id).filter("tool_id", "==",
+                                                   tool_id).get()
     if email is None:
       raise ResourceNotFoundException(
-          f"{cls.__name__} with email_id {email_id} & tool_id {tool_id} not found")
+          f"{cls.__name__} with email_id {email_id} & tool_id {tool_id} not found"
+      )
     return email

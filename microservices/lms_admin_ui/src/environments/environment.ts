@@ -4,18 +4,18 @@
 
 export const environment = {
   production: false,
-  apiurl: "https://clp-sandbox.gostudyhall.com/lms/api/v1/",
-  ltiUrl: "https://clp-sandbox.gostudyhall.com/lti/api/v1/",
-  classroomShimUrl: "https://clp-sandbox.gostudyhall.com/classroom-shim/api/v1/",
-  auth_apiUrl: "https://clp-sandbox.gostudyhall.com/authentication/api/v1/",
+  apiurl: 'http://localhost:4200/lms/api/v1/',
+  ltiUrl: 'http://localhost:4200/lti/api/v1/',
+  classroomShimUrl: 'http://localhost:4200/classroom-shim/api/v1/',
+  auth_apiUrl: 'http://localhost:4200/authentication/api/v1/',
   firebase: {
-      apiKey: "AIzaSyAbrin_xZLhKzRt9hvNVIw8c92LGStKLao",
-      authDomain: "gcp-classroom-dev.firebaseapp.com",
-      projectId: "gcp-classroom-dev",
-      storageBucket: "gcp-classroom-dev.appspot.com",
-      appId: "1:636807882786:web:0f8979da60a1b806a4c27b"
+    apiKey: "*********",
+    authDomain: "***********",
+    projectId: "***************",
+    storageBucket: "******************",
+    appId: "*********************",
   }
-}
+};
 
 /*
  * For easier debugging in development mode, you can import the following file

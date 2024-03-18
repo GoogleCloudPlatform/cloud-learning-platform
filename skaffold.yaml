@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Master Skaffoldx
+# Master Skaffold
 apiVersion: skaffold/v2beta12
 kind: Config
 metadata:
@@ -21,12 +21,117 @@ requires:
 - path: ./common
   configs: [common]
 
+- path: ./common_ml
+  configs: [common-ml]
+
+- path: ./microservices/authentication
+  configs: [authentication]
+
+- path: ./microservices/lms
+  configs: [lms]
+
+- path: ./microservices/lms_admin_ui
+  configs: [lms-admin-ui]
+
 - path: ./microservices/lti
   configs: [lti]
+
+- path: ./microservices/llm_service
+  configs: [llm-service]
+
+- path: ./microservices/classroom_notification_service
+  configs: [classroom-notification-service]
 
 - path: ./microservices/classroom_shim
   configs: [classroom-shim]
 
+- path: ./microservices/classroom_notifications_cronjob
+  configs: [classroom-notifications-cronjob]
+
+- path: ./microservices/classroom_code_update_cronjob
+  configs: [classroom-code-update-cronjob]
+
+- path: ./microservices/update_invitations_cronjob
+  configs: [update-invitations-cronjob]
+
+- path: ./microservices/student_learner_profile
+  configs: [student-learner-profile]
+
+- path: ./microservices/user_management
+  configs: [user-management]
+
+- path: ./microservices/learning_record_service
+  configs: [learning-record-service]
+
+- path: ./microservices/learning_object_service
+  configs: [learning-object-service]
+
+- path: ./microservices/dashboard
+  configs: [dashboard]
+
+- path: ./microservices/assessment_service
+  configs: [assessment-service]
+
+- path: ./microservices/delete_sections_cronjob
+  configs: [delete-sections-cronjob]
+
+- path: ./microservices/utils
+  configs: [utils]
+
+- path: ./microservices/credential_pathway_service
+  configs: [credential-pathway-service]
+
+- path: ./microservices/prior_learning_assessment
+  configs: [prior-learning-assessment]
+
+- path: ./microservices/jobs_service
+  configs: [jobs-service]
+
+build:
+  googleCloudBuild: {}
+---
+# Master Skaffold for AI services
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: ai_backends
+requires:
+- path: ./microservices/item_response_theory
+  configs: [item-response-theory]
+
+- path: ./microservices/deep_knowledge_tracing
+  configs: [deep-knowledge-tracing]
+
+- path: ./microservices/extractive_summarization
+  configs: [extractive-summarization]
+
+- path: ./microservices/course_ingestion
+  configs: [course-ingestion]
+
+build:
+  googleCloudBuild: {}
+---
+# Master Skaffold for API Docs
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: api_docs
+requires:
+- path: ./documentation/api_docs
+  configs: [api-docs]
+
+build:
+  googleCloudBuild: {}
+
+---
+# Master Skaffold for Redis
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: local-redis
+requires:
+- path: ./microservices/redis
+  configs: [redis]
 
 build:
   googleCloudBuild: {}

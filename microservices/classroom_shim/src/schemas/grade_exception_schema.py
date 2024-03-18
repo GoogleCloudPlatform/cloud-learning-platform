@@ -6,11 +6,7 @@ from pydantic import BaseModel
 
 
 class GradeExceptionInputModel(BaseModel):
-  """Pydantic Model
-
-  Args:
-      BaseModel (_type_): _description_
-  """
+  """Pydantic Model"""
   email_id: str
   tool_id: str
   allow_exception: Optional[bool] = True

@@ -36,7 +36,6 @@ def health_check():
 api = FastAPI(title="Classroom Shim Service APIs", version="latest")
 
 api.include_router(launch.router)
-api.include_router(grade_exception.router)
 api.include_router(lti_assignment.router, dependencies=[Depends(validate_user)])
 api.include_router(context.router, dependencies=[Depends(validate_user)])
 api.include_router(grade.router, dependencies=[Depends(validate_user)])
@@ -47,6 +46,7 @@ api.include_router(
     e2e_resource_launch.router,
     dependencies=[Depends(validate_user)],
     include_in_schema=False)
+api.include_router(grade_exception.router, dependencies=[Depends(validate_user)])
 
 add_exception_handlers(app)
 add_exception_handlers(api)
