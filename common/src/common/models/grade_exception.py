@@ -31,6 +31,6 @@ class UserGradeException(BaseModel):
                                                    tool_id).get()
     if email is None:
       raise ResourceNotFoundException(
-          f"{cls.__name__} with email_id {email_id} & tool_id {tool_id} not found"
+          f"{cls.__name__} with email {email_id} & tool_id {tool_id} not found"
       )
     return email

@@ -46,7 +46,8 @@ api.include_router(
     e2e_resource_launch.router,
     dependencies=[Depends(validate_user)],
     include_in_schema=False)
-api.include_router(grade_exception.router, dependencies=[Depends(validate_user)])
+api.include_router(
+    grade_exception.router, dependencies=[Depends(validate_user)])
 
 add_exception_handlers(app)
 add_exception_handlers(api)
