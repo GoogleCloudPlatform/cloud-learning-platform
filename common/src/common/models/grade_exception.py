@@ -1,4 +1,7 @@
-"""Temporary collection for storing list of users for whom grade passback needs to be skipped"""
+"""
+  Temporary collection for storing list of users for
+  whom grade passback needs to be skipped
+"""
 from fireo.fields import TextField, BooleanField, IDField
 from common.utils.errors import ResourceNotFoundException
 from common.models import BaseModel
@@ -31,6 +34,5 @@ class UserGradeException(BaseModel):
                                                    tool_id).get()
     if email is None:
       raise ResourceNotFoundException(
-          f"{cls.__name__} with email {email_id} & tool_id {tool_id} not found"
-      )
+          f"{cls.__name__} with email {email_id} & tool_id {tool_id} not found")
     return email
