@@ -44,3 +44,4 @@ from .faq import *
 from .staff import *
 from .lms_job import *
 from .prior_learning_assessment import *
+from .grade_exception import *
