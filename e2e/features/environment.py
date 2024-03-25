@@ -49,7 +49,7 @@ CLASSROOM_ADMIN_EMAIL = os.environ.get("CLASSROOM_ADMIN_EMAIL")
 # disabling pylint rules that conflict with pytest fixtures
 # pylint: disable=missing-timeout,broad-exception-raised,broad-exception-caught,unused-argument
 
-TEST_E2E_SKILLS_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_wgu_skills.csv")
+TEST_E2E_SKILLS_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_osn_skills.csv")
 TEST_DOMAINS_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_domains.csv")
 TEST_SUBDOMAINS_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_subdomains.csv")
 TEST_CATEGORIES_PATH = os.path.join(TESTING_OBJECTS_PATH, "test_e2e_categories.csv")

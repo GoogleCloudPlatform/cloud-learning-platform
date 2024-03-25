@@ -24,20 +24,25 @@ from vertexai.preview.language_models import TextGenerationResponse
 from common.testing.firestore_emulator import (firestore_emulator,
                                                clean_firestore)
 from common.models import User, UserChat
-from services.langchain_service_test import (FAKE_GENERATE_RESULT,
-                                             FAKE_CHAT_RESULT,
-                                             FAKE_GENERATE_RESPONSE)
 from schemas.schema_examples import (CHAT_EXAMPLE, USER_EXAMPLE)
-from services.llm_generate import llm_generate, llm_chat
+from testing.test_config import (FAKE_GENERATE_RESPONSE,
+                                 FAKE_GENERATE_RESULT,
+                                 FAKE_CHAT_RESULT,
+                                 FAKE_CHAT_RESPONSE)
+
+with mock.patch("langchain.llms.Cohere.agenerate",
+                return_value = FAKE_GENERATE_RESULT):
+  with mock.patch("langchain.chat_models.ChatOpenAI.agenerate",
+                  return_value = FAKE_CHAT_RESPONSE):
+    from services.langchain_service import langchain_llm_generate
+    from services.llm_generate import llm_generate, llm_chat
 
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "fake-project"
 os.environ["OPENAI_API_KEY"] = "fake-key"
 os.environ["COHERE_API_KEY"] = "fake-key"
 
-with mock.patch(
-    "google.cloud.secretmanager.SecretManagerServiceClient",
-    side_effect=mock.MagicMock()) as mok:
+with mock.patch("google.cloud.secretmanager.SecretManagerServiceClient"):
   with mock.patch("langchain.chat_models.ChatOpenAI"):
     with mock.patch("langchain.llms.Cohere"):
       from config import (COHERE_LLM_TYPE,
@@ -66,18 +71,14 @@ def test_chat(clean_firestore):
 @pytest.mark.asyncio
 @pytest.mark.skip(reason="Skipping this test case as it's failing")
 async def test_llm_generate(clean_firestore):
-  with mock.patch("langchain.llms.Cohere.agenerate",
-                  return_value = FAKE_GENERATE_RESULT):
-    response = await llm_generate(FAKE_PROMPT, COHERE_LLM_TYPE)
+  response = await llm_generate(FAKE_PROMPT, COHERE_LLM_TYPE)
 
   assert response == FAKE_GENERATE_RESPONSE
 
 @pytest.mark.asyncio
 @pytest.mark.skip(reason="Skipping this test case as it's failing")
 async def test_llm_chat(clean_firestore, test_chat):
-  with mock.patch("langchain.chat_models.ChatOpenAI.agenerate",
-                  return_value = FAKE_CHAT_RESULT):
-    response = await llm_chat(FAKE_PROMPT, OPENAI_LLM_TYPE_GPT3_5)
+  response = await llm_chat(FAKE_PROMPT, OPENAI_LLM_TYPE_GPT3_5)
 
   assert response == FAKE_GENERATE_RESPONSE
 

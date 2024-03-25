@@ -1,0 +1,104 @@
+[
+  {
+    "name": "Regression Analysis",
+    "description": "Perform regression analysis to address an authentic problem",
+    "keywords": ["tbn"],
+    "level": "2",
+    "subject_code": "MAT",
+    "course_code": "MAT-240",
+    "course_title": "Applied Statistics",
+    "category": "UG.BUS.CORE",
+    "alignments": {
+      "standard_alignment": {},
+      "credential_alignment": {},
+      "skill_alignment": {
+        "aligned": "Cyber Security"
+      },
+      "organizational_alignment": {},
+      "competency_alignment": {},
+      "o_net_alignment": {}
+    },
+    "occupations": {
+      "occupations_major_group": ["15-1212.00"],
+      "occupations_minor_group": [],
+      "broad_occupation": [],
+      "detailed_occupation": []
+    },
+    "parent_nodes": {
+      "categories": [],
+      "sub_domains": []
+    },
+    "child_nodes": {"skills": []},
+    "reference_id": "ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b",
+    "source_uri": "https://credentialengineregistry.org/resources/ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b",
+    "source_name": "Credentialengine"
+  },
+  {
+    "name": "Regression Analysis",
+    "description": "Perform regression analysis to address an authentic problem",
+    "keywords": ["tbn"],
+    "level": "2",
+    "subject_code": "MAT",
+    "course_code": "MAT-240",
+    "course_title": "Applied Statistics",
+    "category": "UG.BUS.CORE",
+    "alignments": {
+      "standard_alignment": {},
+      "credential_alignment": {},
+      "skill_alignment": {
+        "aligned": "Cyber Security"
+      },
+      "organizational_alignment": {},
+      "competency_alignment": {},
+      "o_net_alignment": {}
+    },
+    "occupations": {
+      "occupations_major_group": ["15-1212.00"],
+      "occupations_minor_group": [],
+      "broad_occupation": [],
+      "detailed_occupation": []
+    },
+    "parent_nodes": {
+      "categories": [],
+      "sub_domains": []
+    },
+    "child_nodes": {"skills": []},
+    "reference_id": "ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b",
+    "source_uri": "https://credentialengineregistry.org/resources/ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b",
+    "source_name": "Credentialengine"
+  },
+  {
+    "name": "Regression Analysis",
+    "description": "Perform regression analysis to address an authentic problem",
+    "keywords": ["tbn"],
+    "level": "2",
+    "subject_code": "MAT",
+    "course_code": "MAT-240",
+    "course_title": "Applied Statistics",
+    "category": "UG.BUS.CORE",
+    "alignments": {
+      "standard_alignment": {},
+      "credential_alignment": {},
+      "skill_alignment": {
+        "aligned": "Cyber Security"
+      },
+      "organizational_alignment": {},
+      "competency_alignment": {},
+      "o_net_alignment": {}
+    },
+    "occupations": {
+      "occupations_major_group": ["15-1212.00"],
+      "occupations_minor_group": [],
+      "broad_occupation": [],
+      "detailed_occupation": []
+    },
+    "parent_nodes": {
+      "categories": [],
+      "sub_domains": []
+    },
+    "child_nodes": {"skills": []},
+    "reference_id": "ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b",
+    "source_uri": "https://credentialengineregistry.org/resources/ce-e88e730a-b365-4cdf-b67c-e2e7ad58c13b",
+    "source_name": "Credentialengine"
+  }
+]

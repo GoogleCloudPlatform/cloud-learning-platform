@@ -116,6 +116,7 @@ def user_verification(token: str) -> json:
           "Content-Type": "application/json",
           "Authorization": token
       },
+      timeout=10
   )
 
   return response

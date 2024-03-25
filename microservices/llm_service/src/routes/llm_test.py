@@ -32,10 +32,9 @@ from common.utils.auth_service import validate_token
 from common.testing.firestore_emulator import firestore_emulator, clean_firestore
 
 with mock.patch(
-    "google.cloud.secretmanager.SecretManagerServiceClient",
-    side_effect=mock.MagicMock()) as mok:
-  with mock.patch("langchain.chat_models.ChatOpenAI"):
-    with mock.patch("langchain.llms.Cohere"):
+    "google.cloud.secretmanager.SecretManagerServiceClient"):
+  with mock.patch("langchain.chat_models.ChatOpenAI", new=mock.AsyncMock):
+    with mock.patch("langchain.llms.Cohere", new=mock.AsyncMock):
       from config import LLM_TYPES
 
 # assigning url
@@ -49,8 +48,7 @@ os.environ["OPENAI_API_KEY"] = "fake-key"
 os.environ["COHERE_API_KEY"] = "fake-key"
 
 with mock.patch(
-    "google.cloud.secretmanager.SecretManagerServiceClient",
-    side_effect=mock.MagicMock()) as mok:
+    "google.cloud.secretmanager.SecretManagerServiceClient"):
   from routes.llm import router
 
 app = FastAPI()

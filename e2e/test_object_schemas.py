@@ -352,7 +352,7 @@ SKILL_OBJ_TEMPLATE = {
     },
     "reference_id": "12345",
     "source_uri": "https://emsi/resources/12345",
-    "source_name": "e2e_wgu"
+    "source_name": "e2e_osn"
 }
 
 TEST_CONCEPT = {

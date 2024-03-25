@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skill-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: skill-service
+  template:
+    metadata:
+      labels:
+        app: skill-service
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: skill-service
+        image: skill-service
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "4000m"
+            memory: "15000Mi"
+          limits:
+            memory: "16000Mi"
+            cpu: "5000m"
+        env:
+        # Define the environment variable
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: API_BASE_URL
+          # Required format: api/version
+          value: api/v1
+        - name: CONTAINER_NAME
+          value: skill-service
+        - name: DEPLOYMENT_NAME
+          value: skill-service
+        - name: SERVICE_NAME
+          value: skill-service
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT 
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60

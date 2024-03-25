@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matching-engine
+spec:
+  template:
+    spec:
+      containers:
+      - name: matching-engine
+        image: matching-engine
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "500Mi"
+        env:
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: NETWORK_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: NETWORK_NAME
+        - name: NETWORK_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: NETWORK_TYPE
+        - name: REGION
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: REGION
+        - name: PROJECT_NUMBER
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_NUMBER
+        - name: HOST_PROJECT_NUMBER
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: HOST_PROJECT_NUMBER

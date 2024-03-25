@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matching-engine
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: matching-engine
+        image: gcr.io/aitutor-dev/matching-engine
+        imagePullPolicy: Always
+        env:
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX
+        - name: NETWORK_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: NETWORK_NAME
+        - name: NETWORK_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: NETWORK_TYPE
+        - name: REGION
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: REGION
+        - name: PROJECT_NUMBER
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: PROJECT_NUMBER
+        - name: HOST_PROJECT_NUMBER
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: HOST_PROJECT_NUMBER

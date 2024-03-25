@@ -8,7 +8,7 @@ Skill service maintains all Skills and their hierarchy/relationship trees. It pr
 
 Additionally, Skill Service:
 - Automatically maps Skills to Knowledge
-- Evaluates Skill alignment: given two Skills, score their similarity and enumerate differences in Role profile (which Roles from ERPS are associated with the Skill) and knowledge coverage.
+- Evaluates Skill alignment: given two Skills, score their similarity and enumerate differences in EmploymentRole profile (which Roles from ERPS are associated with the Skill) and knowledge coverage.
 - Provides API to retrieve, search and update Skills.
 
 ## Features

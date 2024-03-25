@@ -102,7 +102,7 @@ Specifies the criteria for mastering a Competency
 
 Three types:
 
-- Workforce - Career/Job/Role
+- Workforce - Career/Job/EmploymentRole
 
 - Credential - Degree/Certificate/Badges
 

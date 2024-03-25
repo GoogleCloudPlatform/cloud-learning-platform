@@ -40,3 +40,31 @@ class LearningPathway(NodeItem):
       raise ResourceNotFoundException(
           f"Learning Pathway with uuid {uuid} not found")
     return learning_pathways
+
+
+class Program(NodeItem):
+  """Program Class"""
+  # schema for object
+  uuid = TextField(required=True)
+  name = TextField(required=True)
+
+  class Meta:
+    collection_name = BaseModel.DATABASE_PREFIX + "programs"
+    ignore_none_field = False
+
+  @classmethod
+  def find_by_uuid(cls, uuid):
+    program = Program.collection.filter("uuid", "==", uuid).get()
+    if program is None:
+      raise ResourceNotFoundException(f"Program with uuid {uuid} not found")
+    return program
+
+  @classmethod
+  def find_by_name(cls, name):
+    """Find the program item using name
+    Args:
+        name (string): node item name
+    Returns:
+        Program: Program Object
+    """
+    return Program.collection.filter("name", "==", name).fetch()

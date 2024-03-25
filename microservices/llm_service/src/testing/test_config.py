@@ -15,7 +15,20 @@
 """ Config used for testing in unit tests """
 # pylint: disable=line-too-long
 import os
+from langchain.schema import (Generation, ChatGeneration, LLMResult)
+from langchain.schema.messages import AIMessage
 
 API_URL = "http://localhost/llm-service/api/v1"
 
 TESTING_FOLDER_PATH = os.path.join(os.getcwd(), "testing")
+
+FAKE_GENERATE_RESPONSE = "test generation"
+
+FAKE_LANGCHAIN_GENERATION = Generation(text=FAKE_GENERATE_RESPONSE)
+
+FAKE_CHAT_RESPONSE = ChatGeneration(message=AIMessage(
+                                    content=FAKE_GENERATE_RESPONSE))
+
+FAKE_GENERATE_RESULT = LLMResult(generations=[[FAKE_LANGCHAIN_GENERATION]])
+
+FAKE_CHAT_RESULT = LLMResult(generations=[[FAKE_CHAT_RESPONSE]])

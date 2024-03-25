@@ -63,7 +63,7 @@ def get_default_service_account_email():
   metadata_url = "http://metadata.google.internal/computeMetadata/v1/"
   metadata_headers = {"Metadata-Flavor": "Google"}
   url = f"{metadata_url}instance/service-accounts"
-  r = requests.get(url, headers=metadata_headers)
+  r = requests.get(url, headers=metadata_headers, timeout=10)
   service_account_email = r.text.split("/")[1].strip()
   return service_account_email
 

@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matching-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matching-engine
+  template:
+    metadata:
+      labels:
+        app: matching-engine
+    spec:
+      serviceAccountName: ksa
+      containers:
+      - name: matching-engine
+        image: matching-engine
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "500Mi"
+          limits:
+            memory: "700Mi"
+            cpu: "400m"
+        env:
+        # Define the environment variable
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: API_BASE_URL
+          # Required format: api/version
+          value: api/v1
+        - name: SERVICE_NAME
+          value: matching-engine
+        - name: IS_DEVELOPMENT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: IS_DEVELOPMENT 
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /ping
+            port: 80
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 60

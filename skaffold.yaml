@@ -87,6 +87,12 @@ requires:
 - path: ./microservices/jobs_service
   configs: [jobs-service]
 
+#- path: ./microservices/skill_service
+#  configs: [skill-service]
+#
+#- path: ./microservices/matching_engine
+#  configs: [matching-engine]
+
 build:
   googleCloudBuild: {}
 ---

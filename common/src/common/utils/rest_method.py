@@ -32,7 +32,8 @@ def post_method(url: str,
       data=data,
       files=files,
       headers={"Authorization": token},
-  )
+      timeout=10
+      )
 
 
 def get_method(url: str, query_params=None, token=None) -> dict:
@@ -52,7 +53,9 @@ def get_method(url: str, query_params=None, token=None) -> dict:
       url=f"{url}",
       params=query_params,
       headers={"Authorization": token},
-      allow_redirects=False)
+      allow_redirects=False,
+      timeout=10
+      )
 
 
 def put_method(url: str,
@@ -76,7 +79,9 @@ def put_method(url: str,
       url=f"{url}",
       json=request_body,
       params=query_params,
-      headers={"Authorization": token})
+      headers={"Authorization": token},
+      timeout=10
+      )
 
 
 def delete_method(url: str, query_params=None, token=None) -> dict:
@@ -93,4 +98,6 @@ def delete_method(url: str, query_params=None, token=None) -> dict:
     """
 
   return requests.delete(
-      url=f"{url}", params=query_params, headers={"Authorization": token})
+      url=f"{url}", params=query_params, headers={"Authorization": token},
+      timeout=10
+      )

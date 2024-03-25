@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skill-service
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: skill-service
+        image: gcr.io/aitutor-dev/skill-service
+        imagePullPolicy: Always
+        env:
+        - name: GCP_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_PROJECT
+        - name: GCP_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: GCP_BUCKET
+        - name: CLIENT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: CLIENT_ID
+        - name: CLIENT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: CLIENT_SECRET
+        - name: DATABASE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: DATABASE_PREFIX
+        - name: MATCHING_ENGINE_BUCKET_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: MATCHING_ENGINE_BUCKET_NAME
+        - name: EMBEDDING_ENDPOINT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: env-vars
+              key: EMBEDDING_ENDPOINT_ID

@@ -34,7 +34,7 @@ JOB_TYPE_COURSE_INGESTION = "course-ingestion"
 JOB_TYPE_SKILL_ALIGNMENT = "skill_alignment"
 JOB_TYPE_EMSI_INGESTION = "emsi_ingestion"
 JOB_TYPE_CSV_SKILL_INGESTION = "csv_ingestion"
-JOB_TYPE_WGU_SKILL_INGESTION = "wgu_ingestion"
+JOB_TYPE_OSN_SKILL_INGESTION = "osn_ingestion"
 JOB_TYPE_CSV_INGESTION = "generic_csv_ingestion"
 JOB_TYPE_CREDENTIAL_ENGINE_INGESTION = "credential_engine_ingestion"
 JOB_TYPE_EMBEDDING_DB_UPDATE = "skill_embedding_db_update"
@@ -55,7 +55,7 @@ JOB_TYPES_WITH_PREDETERMINED_TITLES = [
     JOB_TYPE_SKILL_ALIGNMENT,
     JOB_TYPE_EMSI_INGESTION,
     JOB_TYPE_CSV_SKILL_INGESTION,
-    JOB_TYPE_WGU_SKILL_INGESTION,
+    JOB_TYPE_OSN_SKILL_INGESTION,
     JOB_TYPE_CSV_INGESTION,
     JOB_TYPE_CREDENTIAL_ENGINE_INGESTION,
     JOB_TYPE_EMBEDDING_DB_UPDATE,
@@ -81,7 +81,7 @@ class JobTypes(Enum):
   JOB_TYPE_SKILL_ALIGNMENT = "skill_alignment"
   JOB_TYPE_EMSI_INGESTION = "emsi_ingestion"
   JOB_TYPE_CSV_SKILL_INGESTION = "csv_ingestion"
-  JOB_TYPE_WGU_SKILL_INGESTION = "wgu_ingestion"
+  JOB_TYPE_OSN_SKILL_INGESTION = "osn_ingestion"
   JOB_TYPE_CSV_INGESTION = "generic_csv_ingestion"
   JOB_TYPE_CREDENTIAL_ENGINE_INGESTION = "credential_engine_ingestion"
   JOB_TYPE_EMBEDDING_DB_UPDATE = "skill_embedding_db_update"

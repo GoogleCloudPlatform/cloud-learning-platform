@@ -4,7 +4,7 @@ from google.cloud import secretmanager
 import google_crc32c
 import ttl_cache
 from config import PROJECT_ID
-
+# pylint: disable=not-callable
 
 @ttl_cache(3600)
 def get_gke_pd_sa_key_from_secret_manager():
