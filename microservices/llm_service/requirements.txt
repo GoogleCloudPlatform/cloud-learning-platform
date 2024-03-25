@@ -11,5 +11,5 @@ invoke==2.0.0
 packaging==21.3 
 shapely==1.8.5.post1
 cohere==4.1.4
-pypdf==3.12.0
+pypdf==3.17.0
 numpy==1.25.0
