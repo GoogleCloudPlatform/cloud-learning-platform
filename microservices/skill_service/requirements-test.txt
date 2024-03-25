@@ -11,5 +11,5 @@ pytest-custom_exit_code==0.3.0
 pytest-mock==3.10.0
 anyio==3.7.1
 pytest-asyncio==0.21.0
-python-multipart==0.0.5
+python-multipart==0.0.7
 faker==18.8.0
