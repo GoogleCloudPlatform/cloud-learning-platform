@@ -277,16 +277,20 @@ def update_lti_assignment(
     course_work_type = lti_assignment_details.course_work_type
 
     if course_work_type == "course_work":
-      if update_lti_assignment_dict.get("lti_assignment_title"):
+      if update_lti_assignment_dict.get(
+          "lti_assignment_title"
+      ) != lti_assignment_details.lti_assignment_title:
         update_mask_list.append("title")
         coursework_body["title"] = update_lti_assignment_dict[
             "lti_assignment_title"]
 
-      if update_lti_assignment_dict.get("max_points"):
+      if update_lti_assignment_dict.get(
+          "max_points") != lti_assignment_details.max_points:
         update_mask_list.append("maxPoints")
         coursework_body["maxPoints"] = update_lti_assignment_dict["max_points"]
 
-      if update_lti_assignment_dict.get("due_date"):
+      if update_lti_assignment_dict.get(
+          "due_date") != lti_assignment_details.due_date:
         update_mask_list.append("dueDate")
         update_mask_list.append("dueTime")
         coursework_body["dueDate"] = {
@@ -300,7 +304,8 @@ def update_lti_assignment(
         }
 
     elif course_work_type == "course_work_material":
-      if update_lti_assignment_dict.get("lti_assignment_title"):
+      if update_lti_assignment_dict.get("lti_assignment_title")!=\
+        lti_assignment_details.lti_assignment_title:
         update_mask_list.append("title")
         coursework_body["title"] = update_lti_assignment_dict[
             "lti_assignment_title"]
