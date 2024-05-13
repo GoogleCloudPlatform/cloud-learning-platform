@@ -3,7 +3,7 @@ import re
 import json
 from datetime import datetime
 from jose import jwt, jws
-from common.models import Tool, LTIContentItem, LineItem
+from common.models import Tool, LTIContentItem, LineItem, LTIAssignment
 from common.utils.logging_handler import Logger
 from services.keys_manager import get_platform_public_keyset
 from utils.request_handler import get_method
@@ -182,11 +182,24 @@ def generate_token_claims(lti_request_type, client_id, login_hint,
               f"{LTI_ISSUER_DOMAIN}/lti/api/v1/{lti_context_id}/memberships",
           "service_versions": ["2.0"]
       }
+    if not content_item_info.get("title") or content_item_info.get(
+        "title") == tool_info.get("name"):
+      assignment = LTIAssignment.collection.filter("lti_content_item_id", "==",
+                                                   lti_content_item_id).get()
+      if assignment:
+        resource_link_title = assignment.lti_assignment_title
+        resource_link_description = ""
+      else:
+        resource_link_title = content_item_info.get("title")
+        resource_link_description = content_item_info.get("text")
+    else:
+      resource_link_title = content_item_info.get("title")
+      resource_link_description = content_item_info.get("text")
 
     resource_link_claim_info = {
         "id": lti_content_item.id,
-        "title": content_item_info.get("title"),
-        "description": content_item_info.get("text")
+        "title": resource_link_title,
+        "description": resource_link_description
     }
 
     token_claims[lti_claim_field("claim",
