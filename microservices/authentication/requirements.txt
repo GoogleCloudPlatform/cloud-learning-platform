@@ -5,4 +5,4 @@ redis==4.5.4
 google-cloud-logging==3.1.2
 protobuf==3.19.5
 fireo==1.6.2
-requests==2.31.0
+requests==2.32.0
