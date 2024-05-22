@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long,unspecified-encoding,missing-module-docstring,broad-exception-raised,broad-exception-caught,redefined-outer-name,wrong-import-position
 import fireo
 
 fireo.connection(from_file="./prod_sa.json")
@@ -154,14 +155,14 @@ ASSIGNMENTS = [{
 def get_credentials():
   source_credentials = (
       service_account.Credentials.from_service_account_file(
-          './prod_sa.json', scopes=SCOPES, subject=CLASSROOM_ADMIN_EMAIL))
+          "./prod_sa.json", scopes=SCOPES, subject=CLASSROOM_ADMIN_EMAIL))
   return source_credentials
 
 
 CREDENTIALS = get_credentials()
 
 
-def write_log(log_message, log_file_name, mode='a'):
+def write_log(log_message, log_file_name, mode="a"):
   output_file_path = os.path.join(OUTPUT_DIR, log_file_name)
   with open(output_file_path, mode) as log_file:
     log_file.write("\n" + log_message)
@@ -378,7 +379,7 @@ def async_fetch_data(data_list):
 
 def csv_operations():
   # Open the CSV file
-  with open(CSV_FILE_NAME, 'r') as csv_file:
+  with open(CSV_FILE_NAME, "r") as csv_file:
     # Create a CSV reader object
     csv_reader = csv.reader(csv_file)
 
@@ -386,16 +387,15 @@ def csv_operations():
     header = next(csv_reader)
 
     # Find the indices of the desired columns
-    email_col = header.index('Primary Email')
-    possible_grade_col = header.index('Possible Score')
-    student_grade_col = header.index('Student Score')
-    state = header.index('State')
+    email_col = header.index("Primary Email")
+    possible_grade_col = header.index("Possible Score")
+    student_grade_col = header.index("Student Score")
     csv_data = []
     for row in csv_reader:
       csv_data.append({
-          'email_col': row[email_col],
-          'possible_grade_col': row[possible_grade_col],
-          'student_grade_col': row[student_grade_col]
+          "email_col": row[email_col],
+          "possible_grade_col": row[possible_grade_col],
+          "student_grade_col": row[student_grade_col]
       })
     # Convert the CSV data to a list of dictionaries
     temp_dict = {}
@@ -421,23 +421,23 @@ def csv_operations():
       if row["email_col"] not in added_emails:
         added_emails.append(row["email_col"])
         largest_score_data = {
-            'user_email': row["email_col"],
-            'max_grade_percentage': row["possible_grade_col"],
-            'final_grade_percentage': temp_dict[row["email_col"]]
+            "user_email": row["email_col"],
+            "max_grade_percentage": row["possible_grade_col"],
+            "final_grade_percentage": temp_dict[row["email_col"]]
         }
         student_data.append(largest_score_data)
 
   print(len(student_data))
 
-  output_file_path = os.path.join(OUTPUT_DIR, 'output.json')
-  with open(output_file_path, 'w') as json_file:
+  output_file_path = os.path.join(OUTPUT_DIR, "output.json")
+  with open(output_file_path, "w") as json_file:
     json.dump(student_data, json_file, indent=4)
 
 
 def add_remaining_students():
   with open("all_students_list.json") as f:
     all_students = json.load(f)
-  output_file_path = os.path.join(OUTPUT_DIR, 'output.json')
+  output_file_path = os.path.join(OUTPUT_DIR, "output.json")
 
   with open(output_file_path) as f:
     data = json.load(f)
@@ -452,12 +452,12 @@ def add_remaining_students():
 
     if not student_email_found:
       final_json.append({
-          'user_email': student_email,
-          'max_grade_percentage': ZYBOOKS_MAX_GRADE_PERCENTAGE,
-          'final_grade_percentage': "0"
+          "user_email": student_email,
+          "max_grade_percentage": ZYBOOKS_MAX_GRADE_PERCENTAGE,
+          "final_grade_percentage": "0"
       })
   print(len(final_json))
-  with open(output_file_path, 'w') as json_file:
+  with open(output_file_path, "w") as json_file:
     # Write the data to the JSON file
     json.dump(final_json, json_file, indent=4)
 
@@ -474,18 +474,18 @@ for assignment in ASSIGNMENTS:
   OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
   FINAL_JSON = []
   FAILED_SUBMISSIONS = []
-  grade_push_json_path = os.path.join(OUTPUT_DIR, 'data_for_grade_push.json')
+  grade_push_json_path = os.path.join(OUTPUT_DIR, "data_for_grade_push.json")
   print("loading csv", CSV_FILE_NAME)
   csv_operations()
 
   add_remaining_students()
 
   print("fetching data from firestore")
-  with open(os.path.join(OUTPUT_DIR, 'output.json')) as f:
+  with open(os.path.join(OUTPUT_DIR, "output.json")) as f:
     data = json.load(f)
     async_fetch_data(data)
 
-  with open(grade_push_json_path, 'w', encoding='utf-8') as f:
+  with open(grade_push_json_path, "w", encoding="utf-8") as f:
     print(f"count of grades to be pushed for {LTI_ASSIGNMENT_TITLE}",
           len(FINAL_JSON))
     json.dump(FINAL_JSON, f, ensure_ascii=False, indent=4)

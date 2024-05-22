@@ -1,7 +1,7 @@
+# pylint: disable=line-too-long,unspecified-encoding,missing-module-docstring,broad-exception-raised,broad-exception-caught,redefined-outer-name,wrong-import-position
 import fireo
 
 fireo.connection(from_file="./prod_sa.json")
-
 import os
 import csv
 import copy
@@ -293,14 +293,14 @@ ASSIGNMENTS = [{
 def get_credentials():
   source_credentials = (
       service_account.Credentials.from_service_account_file(
-          './prod_sa.json', scopes=SCOPES, subject=CLASSROOM_ADMIN_EMAIL))
+          "./prod_sa.json", scopes=SCOPES, subject=CLASSROOM_ADMIN_EMAIL))
   return source_credentials
 
 
 CREDENTIALS = get_credentials()
 
 
-def write_log(log_message, log_file_name, mode='a'):
+def write_log(log_message, log_file_name, mode="a"):
   output_file_path = os.path.join(OUTPUT_DIR, log_file_name)
   with open(output_file_path, mode) as log_file:
     log_file.write("\n" + log_message)
@@ -497,10 +497,11 @@ async def initiate_data_collection_process(data_list):
   with ThreadPoolExecutor(max_workers=200) as executor:
     loop = asyncio.get_event_loop()
     tasks = []
-    for data in data_list:
+    for grade_data in data_list:
       runner = loop.run_in_executor(
           executor, main,
-          *(data.get("user_email"), data.get("final_grade_percentage")))
+          *(grade_data.get("user_email"),
+            grade_data.get("final_grade_percentage")))
       tasks.append(runner)
 
     for response in await asyncio.gather(*tasks):  # pylint: disable=unused-variable
@@ -515,7 +516,7 @@ def async_fetch_data(data_list):
 
 def csv_operations():
   # Open the CSV file
-  with open(CSV_FILE_NAME, 'r') as csv_file:
+  with open(CSV_FILE_NAME, "r") as csv_file:
     # Create a CSV reader object
     csv_reader = csv.reader(csv_file)
 
@@ -523,19 +524,19 @@ def csv_operations():
     header = next(csv_reader)
 
     # Find the indices of the desired columns
-    email_col = header.index('Primary email')
-    grade_col = header.index('Percent grade')
+    email_col = header.index("Primary email")
+    grade_col = header.index("Percent grade")
 
     # Convert the CSV data to a list of dictionaries
     data = []
     for row in csv_reader:
       data.append({
-          'user_email': row[email_col],
-          'final_grade_percentage': row[grade_col]
+          "user_email": row[email_col],
+          "final_grade_percentage": row[grade_col]
       })
-  output_file_path = os.path.join(OUTPUT_DIR, 'output.json')
+  output_file_path = os.path.join(OUTPUT_DIR, "output.json")
   # Open a JSON file for writing
-  with open(output_file_path, 'w') as json_file:
+  with open(output_file_path, "w") as json_file:
     # Write the data to the JSON file
     json.dump(data, json_file, indent=4)
 
@@ -554,12 +555,12 @@ for assignment in ASSIGNMENTS:
   csv_operations()
 
   print("fetching data from firestore")
-  with open(os.path.join(OUTPUT_DIR, 'output.json')) as f:
+  with open(os.path.join(OUTPUT_DIR, "output.json")) as f:
     data = json.load(f)
     async_fetch_data(data)
 
-  grade_push_json_path = os.path.join(OUTPUT_DIR, 'data_for_grade_push.json')
-  with open(grade_push_json_path, 'w', encoding='utf-8') as f:
+  grade_push_json_path = os.path.join(OUTPUT_DIR, "data_for_grade_push.json")
+  with open(grade_push_json_path, "w", encoding="utf-8") as f:
     print(f"count of grades to be pushed for {LTI_ASSIGNMENT_TITLE}",
           len(FINAL_JSON))
     json.dump(FINAL_JSON, f, ensure_ascii=False, indent=4)
