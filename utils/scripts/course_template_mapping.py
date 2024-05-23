@@ -60,9 +60,10 @@ def main():
       try:
         course_template = CourseTemplate.find_by_id(doc.id)
         create_course_template_enrollment_mapping(
-          course_template_dict["instructional_designer"], course_template)
+            course_template_dict["instructional_designer"], course_template)
       except Exception as e:
         print(e)
+
 
 if __name__ == "__main__":
   main()
