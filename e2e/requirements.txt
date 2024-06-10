@@ -17,7 +17,7 @@ google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.8.0
 google-cloud-pubsub==2.17.1
 google-cloud-bigquery==3.10.0
-gcsfs==2022.11.0
+gcsfs==2024.6.0
 fastapi==0.65.2
 regex==2023.6.3
 redis==4.5.4
