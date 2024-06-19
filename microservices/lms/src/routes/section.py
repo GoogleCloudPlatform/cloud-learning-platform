@@ -137,6 +137,8 @@ def create_section(sections_details: SectionDetails,
     Logger.error(error)
     Logger.error(e)
     raise InternalServerError(str(e)) from e
+
+
 @router.post("/alpha/v1", status_code=status.HTTP_202_ACCEPTED)
 def create_section_apha(sections_details: SectionDetails,
                    background_tasks: BackgroundTasks):
