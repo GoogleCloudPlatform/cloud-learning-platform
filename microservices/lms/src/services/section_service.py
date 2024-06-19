@@ -852,7 +852,10 @@ def verifiy_attachment(title ,original_coursework_dict,
         original_youtube_video.add(attachment["youtubeVideo"]["title"])
       if "link" in attachment.keys():
         Logger.error(f"coursework{title} {attachment}")
-        original_link.add(attachment["link"]["title"])
+        if "title" in attachment["link"]:
+          original_link.add(attachment["link"]["title"])
+        else:
+          original_link.add(attachment["link"]["url"])
       if "form" in attachment.keys():
         original_form.add(attachment["form"]["title"])
 
@@ -867,7 +870,10 @@ def verifiy_attachment(title ,original_coursework_dict,
       if "youtubeVideo" in attachment.keys():
         copied_youtube_video.add(attachment["youtubeVideo"]["title"])
       if "link" in attachment.keys():
-        copied_link.add(attachment["link"]["title"])
+        if "title" in attachment["link"]:
+          copied_link.add(attachment["link"]["title"])
+        else:
+          copied_link.add(attachment["link"]["url"])
       if "form" in attachment.keys():
         copied_form.add(attachment["form"]["title"])
     missing_attachments = []
