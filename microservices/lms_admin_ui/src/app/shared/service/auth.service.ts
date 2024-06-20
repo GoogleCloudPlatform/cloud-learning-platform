@@ -32,11 +32,11 @@ export class AuthService {
         // Logged in
         if (user) {
           localStorage.setItem('userEmail', user.email)
-          user.getIdToken().then(idToken => {
+          user.getIdToken(true).then(idToken => {
             localStorage.setItem('idToken', idToken)
-            if (idToken) {
-              this.router.navigate(['/home'])
-            }
+              setTimeout(() => {
+                this.router.navigate(['/home'])
+              }, 50);
           });
           return this.afs.doc<any>(`users/${user.uid}`).valueChanges();
         } else {
@@ -54,14 +54,15 @@ export class AuthService {
     localStorage.setItem('user', credential.user.displayName)
     localStorage.setItem('userEmail', credential.user.email)
     this.setUserId(credential.user.email)
-    credential.user?.getIdToken().then(idToken => {
+    credential.user?.getIdToken(true).then(idToken => {
       localStorage.setItem('idToken', idToken)
       this.setUserId(credential.user.email)
       this.validate().subscribe((res: any) => {
         if (res.success == true) {
-          if (idToken) {
+
+          setTimeout(() => {
             this.router.navigate(['/home'])
-          }
+          }, 50);
         }
         else {
           this.openFailureSnackBar('Authentication Failed', 'Close')
@@ -82,9 +83,9 @@ export class AuthService {
       localStorage.setItem('idToken', idToken)
       this.validate().subscribe((res: any) => {
         if (res.success == true) {
-          if (idToken) {
+          setTimeout(() => {
             this.router.navigate(['/home'])
-          }
+          }, 50);
         }
         else {
           this.openFailureSnackBar(res.message, 'Close')
@@ -111,6 +112,9 @@ export class AuthService {
 
   async signOut() {
     await this.afAuth.signOut();
+    if (localStorage.getItem('idToken')) {
+      localStorage.removeItem('idToken')
+    }
     this.router.navigate(['/login']);
   }
 
