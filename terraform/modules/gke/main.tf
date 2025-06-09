@@ -273,7 +273,7 @@ spec:
         - name: cos-tools
           mountPath: /build/cos-tools
       containers:
-      - image: "gcr.io/google-containers/pause:2.0"
+      - image: "registry.k8s.io/pause:3.8"
         name: pause
 YAML
 
