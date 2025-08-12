@@ -106,7 +106,7 @@ jobs:
       CLASSROOM_ADMIN_EMAIL: ${{ needs.admin-teacher.outputs.CLASSROOM_ADMIN_EMAIL }}
     steps:
     - name: Check out repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
 
     - name: 'Set up Gcloud auth'
       id: 'gcloud_auth'
@@ -201,7 +201,7 @@ jobs:
         python-version: [3.9]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
 
     - name: 'Set up Gcloud auth'
       id: 'gcloud_auth'
@@ -287,7 +287,7 @@ jobs:
         node-version: [16.x]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
@@ -371,7 +371,7 @@ jobs:
         python-version: [3.9]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
 
     - name: 'Set up Gcloud auth'
       id: 'gcloud_auth'
@@ -422,7 +422,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
 
     - name: 'Set up Gcloud auth'
       id: 'gcloud_auth'
