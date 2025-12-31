@@ -77,7 +77,7 @@ terraform apply
 
 Ensure that a bucket with the same name as the project has been created:
 ```commandline
-gsutil ls -p "${PROJECT_ID}"
+gcloud storage ls --project="${PROJECT_ID}"
 ```
 
 There should also be a jump host VM in the project:
@@ -95,7 +95,7 @@ In this section you successfully created the following:
 
 ### Copy bootstrap terraform state to tfstate-bucket
 ```bash
-gsutil cp ../project_bootstrap/terraform.tfstate gs://"${PROJECT_ID}"-tfstate/env/bootstrap/terraform.tfstate
+gcloud storage cp ../project_bootstrap/terraform.tfstate gs://"${PROJECT_ID}"-tfstate/env/bootstrap/terraform.tfstate
 ```
 
 ### Enable deletion protection for the jump host

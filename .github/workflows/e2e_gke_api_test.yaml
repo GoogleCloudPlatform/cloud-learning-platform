@@ -140,7 +140,7 @@ jobs:
 
     - name: Download Skaffold cache if exists
       run: |
-        gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
+        gcloud storage cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
 
     - name: Set up Kubernetes namespace and Service Account
       run: |
@@ -188,7 +188,7 @@ jobs:
     - name: Upload Skaffold cache
       if: always()
       run: |
-        gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
+        gcloud storage cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
 
   e2e-api-test:
     runs-on: ubuntu-latest

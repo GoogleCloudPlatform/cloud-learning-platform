@@ -39,8 +39,8 @@ create_bucket () {
   printf "TF_BUCKET_LOCATION=${TF_BUCKET_LOCATION}\n"
 
   print_highlight "Creating terraform state bucket: ${TF_BUCKET_NAME}\n"
-  gsutil mb -l $TF_BUCKET_LOCATION gs://$TF_BUCKET_NAME
-  gsutil versioning set on gs://$TF_BUCKET_NAME
+  gcloud storage buckets create gs://$TF_BUCKET_NAME --location $TF_BUCKET_LOCATION
+  gcloud storage buckets update gs://$TF_BUCKET_NAME --versioning
   export TF_BUCKET_NAME=$TF_BUCKET_NAME
   echo
 }

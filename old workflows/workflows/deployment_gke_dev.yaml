@@ -100,7 +100,7 @@ jobs:
 
       - name: Download Skaffold cache if exists
         run: |
-          gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
+          gcloud storage cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
 
       - name: Add BQ Tables
         run: |
@@ -121,7 +121,7 @@ jobs:
       - name: Upload Skaffold cache
         if: always()
         run: |
-          gsutil cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
+          gcloud storage cp ~/.skaffold/cache $SKAFFOLD_CACHE_GCS
 
   deploy_documentation:
     name: Deploy documentation
@@ -168,7 +168,7 @@ jobs:
 
       - name: Download Skaffold cache if exists
         run: |
-          gsutil cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
+          gcloud storage cp $SKAFFOLD_CACHE_GCS ~/.skaffold/ || true
 
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -186,6 +186,6 @@ jobs:
       - name: Upload Skaffold cache
         if: always()
         run: |
-          gsutil cp ~/.skaffold/cache "${SKAFFOLD_CACHE_GCS}/api_docs/cache"
+          gcloud storage cp ~/.skaffold/cache "${SKAFFOLD_CACHE_GCS}/api_docs/cache"
 
 # cookiecutter:endraw 
