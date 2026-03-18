@@ -4,7 +4,7 @@ google-cloud-secret-manager==2.11.1
 inflect==6.0.2
 keybert==0.5.1
 kubernetes==26.1.0
-nltk==3.6.6
+nltk==3.9.3
 protobuf==3.19.5
 pyyaml==6.0
 redis==4.5.4
