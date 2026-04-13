@@ -1,5 +1,5 @@
 httpx==0.23.1
-pytest==7.2.0
+pytest==9.0.3
 pylint==2.15.10
 mock==4.0.3
 protobuf==3.19.5
