@@ -23,7 +23,7 @@ google-cloud-logging==3.1.2
 redis==4.5.4
 gcsfs==2022.5.0
 editdistance==0.6.0
-Twisted==22.10.0
+Twisted==26.4.0rc2
 pyOpenSSL==23.0.0
 keybert==0.5.1
 inflect==5.3.0
