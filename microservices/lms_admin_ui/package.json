@@ -26,7 +26,7 @@
     "@angular-material-components/datetime-picker": "^9.0.0",
     "bootstrap": "5.2.3",
     "codeceptjs": "^3.4.1",
-    "firebase": "9.15.0",
+    "firebase": "12.14.0",
     "jquery": "3.6.1",
     "ngx-skeleton-loader": "6.0.0",
     "puppeteer": "^20.5.0",
