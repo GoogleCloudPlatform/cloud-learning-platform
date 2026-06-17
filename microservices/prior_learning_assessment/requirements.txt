@@ -7,7 +7,7 @@ google-cloud-storage==2.0.0
 google-cloud-logging
 typing-extensions==4.0.1
 firebase-admin==4.5.2
-python-multipart==0.0.5
+python-multipart==0.0.31
 google-cloud-secret-manager==2.11.1
 Wand==0.6.7
 google-cloud-documentai==1.2.1
